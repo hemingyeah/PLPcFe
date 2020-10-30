@@ -1,5 +1,8 @@
 <template>
-  <div class="">
+  <div class="task-box">
+    <div class="guide-model-box" v-if="nowGuideStep < listSteps.length + 1">
+      
+    </div>
     <!-- s 列表展示 -->
     <div
       class="task-list-view common-list-container"
@@ -12,10 +15,13 @@
         <!-- 搜索 -->
         <div class="task-list-header-seach">
           <form onsubmit="return false;">
-            <div class="seach task-span1 task-flex task-ai">
-              <el-dropdown>
+            <div class="seach task-span1 task-flex task-ai guide-box">
+              <div style="position: relative;" >
+                <div class="guide-disable-cover" v-if="nowGuideStep == 4"></div>
+                <div itemid="" @mouseenter="guideDropdownMenu_enter">  
+                <el-dropdown id="v-task-step-3" >
                 <div
-                  class="task-list-customize task-font14 task-c3 task-flex task-ai task-pointer"
+                  :class="['task-list-customize', 'task-font14', 'task-c3', 'task-flex', 'task-ai', 'task-pointer', nowGuideStep == 4? 'guide-point bg-w':'']"
                 >
                   <img
                     src="../../../assets/img/customize.png"
@@ -71,7 +77,7 @@
                     </div>
                   </el-dropdown-item>
                 </el-dropdown-menu>
-              </el-dropdown>
+              </el-dropdown></div></div>
 
               <el-input
                 v-model="params.keyword"
@@ -104,13 +110,17 @@
               <base-button type="ghost" @event="resetParams" class="task-ml12">
                 重置
               </base-button>
-              <div
-                class="advanced-search-visible-btn task-ml12"
+              <div class="guide-box">
+                <div class="guide-disable-cover" v-if="nowGuideStep == 3"></div>
+                <div
+                  id="v-task-step-2"
+                  :class="['advanced-search-visible-btn', 'task-ml12', nowGuideStep == 3? 'guide-point':'']"
                 @click.self="panelSearchAdvancedToggle"
               >
                 <i class="iconfont icon-gaojisousuo task-font12 task-mr4"></i>
                 高级搜索
               </div>
+            </div>
             </div>
           </form>
         </div>
@@ -433,12 +443,16 @@
               </el-dropdown-menu>
             </el-dropdown>
             <!-- 选择列 -->
-            <div
-              class="task-ai task-flex task-font14 task-c6 task-pointer task-width103"
+           <div class="guide-box">
+              <div class="guide-disable-cover" v-if="nowGuideStep == 2"></div>
+              <div
+                :class="['task-ai', 'task-flex', 'task-font14', 'task-c6', 'task-pointer', 'task-width103', nowGuideStep==2 ? 'guide-point bg-w' :'']"
+                id="v-task-step-1"
               @click="showAdvancedSetting"
             >
               <span class="task-mr4 task-ml4">选择列</span>
               <i class="iconfont icon-triangle-down task-icon"></i>
+            </div>
             </div>
 
             <!-- start 更多操作 -->
@@ -507,8 +521,10 @@
           <span class="task-c2" @click="toggleSelection">清空</span>
         </div>
         <!-- start content 列表表格 -->
-        <div
-          class="task-list-section common-list-table-view"
+        <div class="guide-box">
+          <div class="guide-disable-cover" v-if="nowGuideStep == 1"></div>
+          <div
+            id="v-task-step-0"
           v-if="columns.length"
         >
           <el-table
@@ -521,7 +537,7 @@
             @select-all="handleSelection"
             @sort-change="sortChange"
             @header-dragend="headerDragend"
-            class="task-list-table common-list-table"
+           :class="['task-list-table', 'common-list-table', nowGuideStep == 1 ? 'guide-point' : '']"
             header-row-class-name="common-list-table-header taks-list-table-header"
             ref="multipleTable"
           >
@@ -850,6 +866,7 @@
               </template>
             </el-table-column>
           </el-table>
+          </div>
 
           <div class="table-footer comment-list-table-footer">
             <div class="comment-list-table-footer-info task-flex task-ai">
@@ -969,6 +986,67 @@
     <task-view ref="taskView" @_searchModel="_searchModel" />
 
     <div class="task-bj" v-show="showBj"></div>
+
+    <v-tour
+      v-if="showTour"
+      name="myTour"
+      :steps="listSteps"
+      :options="listOptions"
+      :callbacks="myCallbacks"
+    >
+      <template slot-scope="tour">
+        <transition name="fade">
+          <template v-for="(step, index) of tour.steps">
+            <v-step
+              v-if="tour.currentStep === index"
+              :key="index"
+              :step="step"
+              :previous-step="tour.previousStep"
+              :next-step="tour.nextStep"
+              :stop="tour.stop"
+              :is-first="tour.isFirst"
+              :is-last="tour.isLast"
+              :labels="tour.labels"
+            >
+              <template>
+                <div slot="content" class="tour-content-box">
+                  <div class="tour-left-tips">
+                    {{ `${index + 1}/${listSteps.length}` }}
+                  </div>
+                  <div class="tour-content">
+                    <div class="flex-x tour-content-head">
+                      <i @click="tour.stop" class="iconfont icon-fe-close"></i>
+                    </div>
+                    <div class="tour-content-con">
+                      {{ listSteps[index].content }}
+                    </div>
+                  </div>
+                </div>
+                <div slot="actions" class="tour-bottom">
+                  <!-- <div class="text" v-if="index > 0" @click="tour.previousStep">
+                    上一步
+                  </div> -->
+                  <div
+                    class="btns"
+                    v-if="index < listSteps.length - 1"
+                    @click="tour.nextStep"
+                  >
+                    下一步
+                  </div>
+                  <div
+                    class="btns"
+                    @click="tour.stop"
+                  >
+                    ok
+                  </div>
+                </div>
+              </template>
+            </v-step>
+          </template>
+        </transition>
+      </template>
+    </v-tour>
+    
   </div>
 </template>
 
@@ -991,4 +1069,119 @@ export default TaskList;
 </style>
 <style lang="scss" scoped>
 @import "./TaskList.scss";
+</style>
+
+<style lang="scss">
+.task-box {
+  .v-step[data-v-7c9c03f0] {
+    background: #fff !important;
+    color: #333 !important;
+    -webkit-filter: drop-shadow(0px 9px 28px 8px rgba(0, 0, 0, 0.05)) !important;
+    filter: drop-shadow(0px 9px 28px 8px rgba(0, 0, 0, 0.05)) !important;
+    padding: 0 !important;
+    min-width: 240px !important;
+    max-width: 350px !important;
+  }
+  .v-step .v-step__arrow[data-v-7c9c03f0] {
+    border-color: #fff !important;
+    border-left-color: transparent !important;
+    border-right-color: transparent !important;
+  }
+  .tour-content-box {
+    position: relative;
+    overflow: hidden;
+    padding: 0 20px;
+    border-radius: 4px;
+    .tour-left-tips {
+      width: 80px;
+      height: 32px;
+      background: $color-primary;
+      color: #fff;
+      position: absolute;
+      left: -40px;
+      top: 0px;
+      line-height: 40px;
+      font-size: 12px;
+      transform-origin: center top;
+      transform: rotateZ(-45deg);
+      text-align: center;
+    }
+    .tour-content {
+      .tour-content-head {
+        justify-content: flex-end;
+        padding-top: 16px;
+        .iconfont {
+          font-size: 10px;
+          margin-bottom: 2px;
+          color: #999;
+          cursor: pointer;
+        }
+      }
+      .tour-content-con {
+        text-align: start;
+        padding-bottom: 12px;
+      }
+    }
+  }
+
+  .tour-bottom {
+    height: 52px;
+    padding: 0 20px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    .btns {
+      width: 60px;
+      height: 28px;
+      background: $color-primary;
+      color: #fff;
+      text-align: center;
+      line-height: 28px;
+      border-radius: 4px;
+    }
+    .text {
+      color: $color-primary;
+    }
+    :nth-child(n) {
+      cursor: pointer;
+    }
+    :not(:last-child) {
+      margin-right: 12px;
+    }
+  }
+
+  /* 向上的箭头 */
+
+  .normal-arrow-top {
+    font-size: 0;
+    line-height: 0;
+    border-width: 0.5rem;
+    border-color: #fff;
+    width: 0;
+    border-top-width: 0;
+    border-style: dashed;
+    border-bottom-style: solid;
+    border-left-color: transparent;
+    border-right-color: transparent;
+    position: absolute;
+    top: -0.5rem;
+  }
+
+  .guide-model-box{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left:0 ;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 996;
+  }
+  .guide-point{
+    z-index: 997;
+    position: sticky;
+  }
+  .bg-w{
+    background: #fff;
+  }
+}
 </style>

@@ -11,6 +11,7 @@ import BatchEditingCustomerDialog from './components/BatchEditingCustomerDialog.
 import TaskTransfer from './components/TaskTransfer.vue';
 import TaskMap from './components/TaskMap.vue';
 import TaskView from './components/TaskView.vue'
+import guideCompoment from '@src/component/guide/guide';
 
 /** model */
 import TaskStateEnum from '@model/enum/TaskStateEnum.ts';
@@ -25,10 +26,20 @@ import { formatDate } from '@src/util/lang';
 import { getRootWindow } from '@src/util/dom';
 import * as FormUtil from '@src/component/form/util'
 
+/* mixin */
+import tourGuide from '@src/mixins/tourGuide'
+
 /* constants */
-import { AllotTypeConvertMap, FlagConvertMap, TaskSearchInputPlaceholderMap } from '@src/modules/task/model/TaskConvertMap.ts';
+import {
+  AllotTypeConvertMap,
+  FlagConvertMap,
+  TaskSearchInputPlaceholderMap
+} from '@src/modules/task/model/TaskConvertMap.ts';
 
 const TASK_LIST_KEY = 'task_list';
+
+// 工单引导标识
+const { TASK_GUIDE_LIST, TASK_GUIDE_SEARCH_MODEL, TASK_GUIDE_SEARCH_MODEL_SAVE, TASK_GUIDE_DROPDOWN_MENU } = require('@src/component/guide/taskV2Store');;
 // 埋点事件对象
 const TRACK_EVENT_MAP = {
   search: 'pc：工单列表-搜索事件',
@@ -58,6 +69,7 @@ const EXPORT_FILTER_FORM_TYPE = ['attachment', 'address', 'autograph'];
 export default {
   name: 'task-list',
   inject: ['initData'],
+  mixins: [tourGuide],
   data() {
     return {
       selectIds, // id
@@ -117,18 +129,26 @@ export default {
           id: '',
         },
       ],
+      taskTypes: [{
+        name: '全部',
+        id: '',
+      }, ],
       taskFields: [],
       taskReceiptFields: [],
       taskPage: new Page(),
       totalItems: 0,
       navWidth: window.innerWidth - 120,
-      taskSearchInputPlaceholderMap :TaskSearchInputPlaceholderMap,
+      taskSearchInputPlaceholderMap: TaskSearchInputPlaceholderMap,
       task_view_list: [],
       seoSetList: [],
       exportColumns: [],
       showBj: false,
       typeHeight: '',
-      stateHeight: ''
+      stateHeight: '',
+      nowGuideStep:5,
+      guideSearchModelSave: false,
+      guideDropdownMenu: false,
+      isGuide:false
     };
   },
   computed: {
@@ -228,7 +248,7 @@ export default {
           EXPORT_FILTER_FORM_TYPE.indexOf(field.formType) == -1
           && field.isSystem == 0
         )
-      // return field.isSystem == 0
+        // return field.isSystem == 0
       });
       return taskTypeFilterFields;
     },
@@ -238,13 +258,12 @@ export default {
     /* 批量编辑过滤后的字段 */
     taskFieldList() {
       let fields = this.taskFields || [];
-      let taskTypeFilterFields = fields.filter((field) =>{
+      let taskTypeFilterFields = fields.filter((field) => {
         return (
           EXPORT_FILTER_FORM_TYPE.indexOf(field.formType) == -1
           && field.isSystem == 0
         )
-      }
-      );
+      });
 
       return taskTypeFilterFields;
     },
@@ -292,15 +311,47 @@ export default {
     this.getTaskCountByState();
     this.revertStorage();
 
+    this.$nextTick(() => {
+      setTimeout(() => {
+        if (!storageGet(TASK_GUIDE_LIST)) this.$tours['myTour'].start(), this.nowGuideStep = 1, storageSet(TASK_GUIDE_LIST, '4');
+        // if (!storageGet(TASK_GUIDE_DROPDOWN_MENU)) this['guideDropdownMenu'] = true;
+      }, 1000)
+    })
+
     // 对外开放刷新方法，用于其他tab刷新本tab数据
     // window.__exports__refresh = this.searchList;
   },
   methods: {
+    guideDropdownMenu_enter(){
+      // if (storageGet(TASK_GUIDE_DROPDOWN_MENU) == '1') return this['guideDropdownMenu'] = false;
+      // storageSet(TASK_GUIDE_DROPDOWN_MENU, '1')
+    },
+    previousStep() {},
+    nextStep() {
+      this.nowGuideStep ++;
+    },
+    stopStep() {
+      this.nowGuideStep = 5;
+    },
+    guideSearchModelSave_stopStep() {
+      this['guideSearchModelSave'] = false;
+    },
+    guideSearchModelSave_finishBtnFn() {
+      this.guideSearchModelSave_stopStep();
+    },
+    guideDropdownMenu_stopStep() {
+      this['guideDropdownMenu'] = false;
+    },
+    guideDropdownMenu_finishBtnFn() {
+      this.guideDropdownMenu_stopStep();
+    },
     /**
      * 获取附件
      */
     async getCardDetailList(typeId) {
-      const res = await TaskApi.getCardDetailList({ typeId });
+      const res = await TaskApi.getCardDetailList({
+        typeId
+      });
       let list = res.map((item, index) => {
         if (item.canRead) {
           let columns, endAddress = {
@@ -328,7 +379,7 @@ export default {
             }).filter(v => {
               return v
             })[0], 0, startAddress)
-            
+
             item.fields.forEach(v => {
               if (v.fieldName !== 'remark' && v.fieldName !== 'attachment' ){
                 list.push(v)
@@ -354,7 +405,9 @@ export default {
               exportAlias: v.fieldName,
               ...v,
             };
-          }).filter(v => {return v.formType !== 'attachment'});
+          }).filter(v => {
+            return v.formType !== 'attachment'
+          });
           return {
             value: `annexChecked${index}`,
             label: `附加组件：${item.cardName}`,
@@ -369,7 +422,10 @@ export default {
      * 获取视图
      */
     async getUserViews() {
-      const { success, result } = await TaskApi.getUserViews();
+      const {
+        success,
+        result
+      } = await TaskApi.getUserViews();
       if (success) {
         this.taskView = result;
         this.otherLists(result);
@@ -439,7 +495,10 @@ export default {
      * @description 删除工单列表人员
      */
     async delTask() {
-      const { selectedIds, $platform } = this;
+      const {
+        selectedIds,
+        $platform
+      } = this;
       let params = selectedIds
         .map((item) => {
           return `taskIds=${item}`;
@@ -451,7 +510,12 @@ export default {
       }
       window.TDAPP.onEvent('pc：工单列表-删除工单');
       try {
-        const { succ, status, message, data } = await TaskApi.withPart(params);
+        const {
+          succ,
+          status,
+          message,
+          data
+        } = await TaskApi.withPart(params);
         if (succ) {
           let warningMsg = '确定要删除所选工单吗？';
           if (status) {
@@ -472,7 +536,9 @@ export default {
           let confirm = await this.$platform.confirm(warningMsg);
           if (confirm) {
             // 删除工单
-            const { success } = await TaskApi.deleteTask(selectedIds);
+            const {
+              success
+            } = await TaskApi.deleteTask(selectedIds);
             if (success) {
               $platform.alert('删除成功');
               this.getTaskCountByState(this.searchParams)
@@ -604,7 +670,10 @@ export default {
      * @description 批量编辑
      */
     Alledit() {
-      const { currentTaskType, selectedIds } = this;
+      const {
+        currentTaskType,
+        selectedIds
+      } = this;
       if (!currentTaskType.id) {
         this.$platform.alert('请选择工单类型');
         return;
@@ -620,7 +689,9 @@ export default {
      * @description 工单转派
      */
     reallotBatch() {
-      const { selectedIds } = this;
+      const {
+        selectedIds
+      } = this;
       if (!selectedIds.length) {
         this.$platform.alert('请选择要转派的工单');
         return;
@@ -685,7 +756,9 @@ export default {
      * @return {Object} 页面展示数据
      */
     searchList() {
-      const { searchParams } = this;
+      const {
+        searchParams
+      } = this;
       return TaskApi.search(searchParams)
         .then((result) => {
           let isSuccess = result?.success === true;
@@ -745,7 +818,7 @@ export default {
         .finally(() => {
           this.loading = false;
         });
-        
+
     },
     /**
      * @description 时间戳转换
@@ -788,7 +861,9 @@ export default {
      */
     buildColumns() {
       const localStorageData = this.getLocalStorageData();
-      const { paymentConfig } = this.initData;
+      const {
+        paymentConfig
+      } = this.initData;
 
       let columnStatus = [];
       if (localStorageData.columnStatus) {
@@ -892,12 +967,12 @@ export default {
           col.type = 'column';
           return col;
         });
-      
+
       this.columns = []
-      
+
       this.$nextTick(() => {
         this.$set(this, 'columns', columns.slice())
-        
+
         // 根据版本号判断是否需要支付方式
         if (!paymentConfig.version) {
           this.advanceds = this.advanceds.filter((item) => {
@@ -907,7 +982,7 @@ export default {
             return item.fieldName !== 'paymentMethod';
           });
         }
-        
+
       })
     },
     buildSortFields(originFields = [], fieldsMap = {}) {
@@ -915,11 +990,15 @@ export default {
       let unsortedFields = []
 
       originFields.forEach(originField => {
-        let { fieldName } = originField
+        let {
+          fieldName
+        } = originField
         let field = fieldsMap[fieldName]
 
         if (field) {
-          let { index } = field
+          let {
+            index
+          } = field
           fields[index] = originField
         } else {
           unsortedFields.push(originField)
@@ -981,7 +1060,9 @@ export default {
           if (bool) {
             return v.exportAlias ? v.exportAlias : v.fieldName
           }
-        }).filter(item => {return item})
+        }).filter(item => {
+          return item
+        })
       }
 
       return export_list[number].columns.map(v => {
@@ -995,17 +1076,25 @@ export default {
         if (bool) {
           return v.exportAlias ? v.exportAlias : v.fieldName
         }
-      }).filter(item => {return item})
+      }).filter(item => {
+        return item
+      })
     },
     /**
      * @description 构建导出参数
      * @return {Object} 导出参数
      */
-    buildExportParams( checkedMap, ids, exportOneRow) {
-      const { receiptChecked, systemChecked, taskChecked } = checkedMap
+    buildExportParams(checkedMap, ids, exportOneRow) {
+      const {
+        receiptChecked,
+        systemChecked,
+        taskChecked
+      } = checkedMap
       const Params = Object.assign({}, this.params);
       const rootWindow = getRootWindow(window);
-      const { loginUser } = this.initData;
+      const {
+        loginUser
+      } = this.initData;
       const all = {
         ...this.searchParams,
         taskIds: this.selectedIds,
@@ -1022,15 +1111,14 @@ export default {
         exportSearchModel: JSON.stringify({
           ...all,
           ...{
-            exportTotal: exportAll
-              ? this.taskPage.totalElements
-              : this.selectedIds.length,
+            exportTotal: exportAll ?
+              this.taskPage.totalElements : this.selectedIds.length,
           },
         }),
       };
       // 附加
       let cardFieldChecked = []
-      for(let key in checkedMap) {
+      for (let key in checkedMap) {
         if (key.indexOf('annexChecked') !== -1) {
           cardFieldChecked = [...cardFieldChecked, ...checkedMap[key]]
         }
@@ -1054,10 +1142,10 @@ export default {
         .map((item) => {
           if (item === 'spare_name') {
             item = 'spare_name,spare_serialNumber,spare_type,spare_number,spare_cost'
-          } 
+          }
           if (item === 'service_name') {
             item = 'service_name,service_type,service_number,service_cost'
-          } 
+          }
           if (item === 'balance_total') {
             item = 'balance_total,balance_discount,balance_sum'
           }
@@ -1377,7 +1465,9 @@ export default {
       const {taskFields} = this
       let linkman_list = [], address_list = [], product_list = []
       if (taskFields.length) {
-        let first = taskFields.filter(item => {return item.displayName === '客户'})[0]
+        let first = taskFields.filter(item => {
+          return item.displayName === '客户'
+        })[0]
         if (first.setting.customerOption.linkman) {
           linkman_list = [{
             id: 5460,
@@ -1507,8 +1597,7 @@ export default {
     modifyColumnStatus(event) {
       let columns = event.data || [],
         colMap = columns.reduce(
-          (acc, col) => (acc[col.field] = col) && acc,
-          {}
+          (acc, col) => (acc[col.field] = col) && acc, {}
         );
       this.columns.forEach((col) => {
         let newCol = colMap[col.field];
@@ -1544,8 +1633,13 @@ export default {
      * @param {object} clientInfo 客户详情
      */
     openClientTab(clientInfo) {
-      const { linkAuth, customerEntity } = clientInfo;
-      const { id } = customerEntity;
+      const {
+        linkAuth,
+        customerEntity
+      } = clientInfo;
+      const {
+        id
+      } = customerEntity;
       if (!linkAuth) return;
 
       let fromId = window.frameElement.getAttribute('id');
@@ -1600,6 +1694,7 @@ export default {
         fromId,
       });
     },
+
     /**
      * @description 高级搜索切换
      */
@@ -1616,6 +1711,24 @@ export default {
           let form = forms[i];
           form.setAttribute('novalidate', true);
         }
+        if (!storageGet(TASK_GUIDE_SEARCH_MODEL) || storageGet(TASK_GUIDE_SEARCH_MODEL) * 1 < 2) {
+          this.$refs.searchPanel.createGuide('v-task-step-6', {
+            content: '高级搜索的“空白”，由您来填充。通过“设置”功能，定制您专属的“常用查询条件',
+            haveStep: true,
+            nowStep: 1,
+            totalStep: 2,
+            id: 'v-task-step-6',
+            gStyle: 'left:30px',
+            onlyOne: true,
+            finishBtn: 'OK'
+          });
+          storageSet(TASK_GUIDE_SEARCH_MODEL, '2')
+        }
+
+        if (storageGet(TASK_GUIDE_SEARCH_MODEL_SAVE) == '1') this['guideSearchModelSave'] = false;
+
+
+
       });
     },
     /**
@@ -1638,7 +1751,10 @@ export default {
      * @description 还原本地存储
      */
     revertStorage() {
-      const { pageSize, column_number } = this.getLocalStorageData();
+      const {
+        pageSize,
+        column_number
+      } = this.getLocalStorageData();
       // if (pageSize) {
       //   this.params.pageSize = pageSize;
       // }
@@ -1731,18 +1847,24 @@ export default {
         // 排序条件
         let sorts = [];
         if (params.orderDetail) {
-          const { column, isSystem, sequence } = params.orderDetail;
-          sorts = [
-            {
-              property: isSystem ? column : `attribute.${column}`,
-              direction: sequence,
-            },
-          ];
+          const {
+            column,
+            isSystem,
+            sequence
+          } = params.orderDetail;
+          sorts = [{
+            property: isSystem ? column : `attribute.${column}`,
+            direction: sequence,
+          }, ];
         }
         // 城市
         let citys = {};
         if (params.productAddress) {
-          const { province, city, dist } = params.productAddress;
+          const {
+            province,
+            city,
+            dist
+          } = params.productAddress;
           citys = {
             cusProvince: province,
             cusCity: city,
@@ -1750,7 +1872,9 @@ export default {
           };
         }
         // 系统字段查询条件
-        const { systemConditions = [] } = params
+        const {
+          systemConditions = []
+        } = params
         // 自定义
         const conditions = params.conditions || [];
         // 创建时间
@@ -2070,7 +2194,7 @@ export default {
     },
     getUserIdsWithSubmit(user, params, userKey) {
       let users = params[userKey]
-      let isUserArray = Array.isArray(users) 
+      let isUserArray = Array.isArray(users)
       return (
         user 
           ? isUserArray
@@ -2100,12 +2224,14 @@ export default {
     },
     /** 导出列 */
     _exportColumns() {
-      let {taskFields, taskReceiptFields} = this
+      let {
+        taskFields,
+        taskReceiptFields
+      } = this
       // 工单信息
       let taskSelfFields = [];
       // 回执信息
-      let taskReceiptSystemFields = [
-        {
+      let taskReceiptSystemFields = [{
           id: 5460,
           isSystem: 1,
           fieldName: 'spare_name',
@@ -2141,12 +2267,16 @@ export default {
       ];
 
       // 工单信息逻辑
-      let linkman_list = '', address_list = '', product_list = ''
+      let linkman_list = '',
+        address_list = '',
+        product_list = ''
       taskSelfFields = taskFields.filter(item => {
         return item.formType !== 'attachment'
       })
       if (taskFields.length) {
-        let first = taskFields.filter(item => {return item.displayName === '客户'})[0]
+        let first = taskFields.filter(item => {
+          return item.displayName === '客户'
+        })[0]
         if (first.setting.customerOption.linkman) {
           linkman_list = [{
             id: 5460,
@@ -2210,7 +2340,7 @@ export default {
             isGuideData: false,
             guideData: false,
           }]
-        } 
+        }
         if (first.setting.customerOption.product) {
           product_list = [{
             id: 5460,
@@ -2320,10 +2450,13 @@ export default {
     /**
      * @description 已选择面板移除某一项
      */
-    selectionPanelRemoveItem({ selection, item }) {
-      selection.length < 1
-        ? this.toggleSelection()
-        : this.toggleSelection([item]);
+    selectionPanelRemoveItem({
+      selection,
+      item
+    }) {
+      selection.length < 1 ?
+        this.toggleSelection() :
+        this.toggleSelection([item]);
     },
     /**
      * @description 计算已选择
@@ -2347,7 +2480,9 @@ export default {
     showLatestUpdateRecord(row) {
       if (row.latesetUpdateRecord) return;
 
-      TaskApi.getTaskUpdateRecord({ taskId: row.id })
+      TaskApi.getTaskUpdateRecord({
+          taskId: row.id
+        })
         .then((res) => {
           if (!res || res.status) return;
 
@@ -2380,7 +2515,10 @@ export default {
       }
 
       try {
-        let { prop, order } = option;
+        let {
+          prop,
+          order
+        } = option;
 
         if (!order) {
           this.params.orderDetail = {};
@@ -2393,8 +2531,7 @@ export default {
 
         if (prop === 'createTime' || prop === 'updateTime' || isConvertedProp) {
           isSystem = 1;
-        } 
-        else {
+        } else {
           isSystem = sortedField.isSystem;
         }
 
@@ -2587,6 +2724,7 @@ export default {
     [BatchEditingCustomerDialog.name]: BatchEditingCustomerDialog,
     [TaskSearchPanel.name]: TaskSearchPanel,
     [TaskViewModel.name]: TaskViewModel,
+    [guideCompoment.name]: guideCompoment,
     TaskSelect,
   },
 };

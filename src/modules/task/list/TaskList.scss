@@ -6,14 +6,17 @@
   margin-top: 5px;
   text-align: center;
   line-height: 22px;
+
   &-overtime,
   &-approve {
     display: inline-block;
     color: #fff;
   }
+
   &-overtime {
     background-color: #F56C6C;
   }
+
   &-approve {
     background-color: #FAAE14;
   }
@@ -30,8 +33,10 @@
     border-radius: 4px;
     padding: 16px;
   }
+
   &-filter {
     padding-bottom: 10px;
+
     &-flow {
       position: relative;
       display: flex;
@@ -44,36 +49,44 @@
       line-height: 35px;
       cursor: pointer;
       border-radius: 3px;
+
       &-item,
       &-dropdown {
         height: 100%;
         transition: background-color ease 0.3s, color ease 0.3s;
+
         &:hover {
           background-color: #55b7b4;
           color: #fff;
         }
+
         &:first-child {
           border-radius: 3px 0 0 3px;
         }
       }
+
       .extion {
         &:hover {
           background-color: #ef6b6b;
           color: #fff;
         }
       }
+
       &-dropdown {
         padding: 0 8px;
         border-radius: 0 3px 3px 0;
       }
+
       &-active {
         background-color: #55b7b4;
         color: #fff !important;
       }
     }
+
     &-span1 {
       flex: 1;
     }
+
     &-other {
       position: relative;
       display: flex;
@@ -86,9 +99,11 @@
       background-color: #eee;
       font-size: 12px;
       cursor: pointer;
+
       .icon-more {
         font-size: 12px;
       }
+
       &-item {
         transition: background-color ease 0.3s, color ease 0.3s,
           border-color ease 0.3s;
@@ -97,6 +112,7 @@
         text-align: center;
         line-height: 35px;
         border-radius: 3px;
+
         &:hover {
           background-color: #55b7b4;
           color: #fff;
@@ -105,49 +121,60 @@
     }
   }
 }
+
 // E 顶部筛选
 
 // S 新建 and 删除
 .top-btn-group {
   position: relative;
 }
+
 // E 新建 and 删除
 
 // S 头部
 .select-list {
   background-color: #f0f0f0;
   border-radius: 4px;
+
   &-item {
     padding: 0 20px;
     line-height: 31px;
+
     &:first-child {
       border-radius: 4px 0 0 4px;
     }
+
     &:last-child {
       border-radius: 0 4px 4px 0;
     }
+
     cursor: pointer;
+
     &:hover {
       transition: background-color ease 0.3s, color ease 0.3s;
       color: #fff;
       background-color: #55b7b4;
     }
   }
+
   &-active {
     transition: background-color ease 0.3s, color ease 0.3s;
     color: #fff;
     background-color: #55b7b4;
   }
 }
+
 // E 头部
 //导入工单
 .import-task {
   position: relative;
   left: -15px;
   padding-left: 15px;
+
   &:hover &-item {
     display: block;
   }
+
   &-item {
     position: absolute;
     background: #fff;
@@ -157,9 +184,11 @@
     border: 1px solid #eee;
     border-radius: 4px;
     display: none;
-    > div {
+
+    >div {
       padding: 4px 15px;
       width: 120px;
+
       &:hover {
         background-color: #eef8f8;
         color: #77c5c3;
@@ -172,6 +201,7 @@
   position: relative;
   padding-left: 22px !important;
 }
+
 .superscript::before {
   content: "";
   position: absolute;
@@ -195,8 +225,10 @@
   text-align: center;
   transform: scale(0.9166666) rotateZ(-45deg);
 }
+
 .task-client {
   cursor: pointer;
+
   &:hover {
     text-decoration: underline;
   }
@@ -209,11 +241,14 @@
     border-radius: 4px;
     margin-bottom: 12px;
     border-top: none;
+
     &-seach {
       padding: 6px 0;
+
       .seach {
         justify-content: flex-end;
         padding-right: 16px;
+
         .advanced-search-visible-btn {
           width: 98px;
           height: 32px;
@@ -228,6 +263,7 @@
         }
       }
     }
+
     &-nav {
       > div {
         position: relative;
@@ -268,6 +304,7 @@
     }
   }
 }
+
 .task-list-del {
   cursor: pointer;
   width: 88px;
@@ -282,14 +319,17 @@
   padding: 0 25px;
   text-align: center;
 }
+
 .table-footer {
   margin-top: 20px;
 }
+
 .task-ic19 {
   width: 18px;
   height: 15px;
   margin-right: 3px;
 }
+
 .task-list-dropdown-item {
   width: 100px;
   white-space: nowrap;
@@ -297,17 +337,20 @@
   overflow: hidden;
   word-break: break-all;
 }
+
 .task-list-dropdown-icon {
   display: none;
 }
+
 .task-list-numbering {
   display: inline-block;
   min-width: 110px;
 }
+
 .task-buttom {
-  > button {
-  margin: 0!important;
-  margin-right: 10px!important;
+  >button {
+    margin: 0 !important;
+    margin-right: 10px !important;
   }
 }
 .task-bj{
