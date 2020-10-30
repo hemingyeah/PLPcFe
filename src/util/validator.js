@@ -125,13 +125,24 @@ function textarea(value, field = {}, origin = {}, mode, changeStatus) {
 }
 
 // 验证电话手机格式
-function phone(value, field = {}) {
-  return new Promise(resolve => {
+function phone(value, field = {},origin = {}, mode, changeStatus) {
+  let validate = new Promise(resolve => {
     if(field.isNull && !value) return resolve(null);
     if(value == null || !value.toString().length) return resolve(`请输入${field.displayName}`);
     if (![TEL_REG, PHONE_REG].some(reg => reg.test(value))) return resolve('请输入正确的电话或者手机号');
     resolve(null);
   });
+
+  // 不需要校验重复性
+  if (!isRepeat || !mode || !value) return validate;
+
+  return new Promise((resolve, reject) => {
+    validate.then((res) => {
+      res === null ? repeatRemoteValidate(mode, field, value, changeStatus, resolve) : resolve(res);
+    }).catch(err => {
+      console.error('phone validate err', err);
+    })
+  })
 }
 
 function email(value, field = {}) {
