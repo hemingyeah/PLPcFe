@@ -359,13 +359,21 @@ export default {
           continue;
         }
 
-        if (tv.formType === 'cascader' || (tv.formType === 'user' && Array.isArray(form[fn]))) {
+        if (tv.formType === 'cascader') {
           params.conditions.push({
             property: fn,
             operator: tv.operator,
             inValue: form[fn]
           });
           continue;
+        }
+        if ((tv.formType === 'user' && Array.isArray(form[fn]))) {
+          params.conditions.push({
+            property: fn,
+            operator: 'user',
+            inValue: form[fn]
+          });
+          continue;         
         }
 
         if (tv.formType === 'datetime') {
@@ -595,6 +603,16 @@ export default {
             inValue: form[fn]
           });
           continue;
+        }
+
+
+        if (tv.formType === 'user') {
+          params.conditions.push({
+            property: fn,
+            operator: 'user',
+            value: form[fn]
+          });
+          continue;         
         }
 
         if (tv.formType === 'datetime') {
