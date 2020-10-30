@@ -446,7 +446,6 @@ body {
       }
     }
   }
-
   .task-detail-btn-group {
     position: absolute;
     right: 12px;
@@ -468,6 +467,11 @@ body {
         margin-left: 13px;
       }
     }
+  }
+
+  .task-detail-btn-group-point{
+    z-index: 997;
+    background: #fff;
   }
 
   // 审批中图片

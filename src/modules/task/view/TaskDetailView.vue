@@ -200,8 +200,8 @@
 
       <!-- start 工单详情 -->
       <template slot="left">
-        <div class="task-detail-main-content-left" v-show="collapseDirection != 'left'" style="position: relative;">
-          <div class="task-detail-btn-group" :style="nowGuideStep == 4 ? 'z-index: 997;background: #fff;' : ''" id="v-task-detail-step-3">
+        <div class="task-detail-main-content-left" v-show="collapseDirection != 'left'" >
+          <div class="task-detail-btn-group" :class=" nowGuideStep == 4 ? 'task-detail-btn-group-point' : ''" id="v-task-detail-step-3">
             <div class="guide-disable-cover" v-if="nowGuideStep == 4"></div>
             <el-tooltip :popper-options="popperOptions" content="编辑工单" placement="top" v-if="allowEditTask">
               <i class="iconfont icon-bianji1" @click="goEdit"></i>
