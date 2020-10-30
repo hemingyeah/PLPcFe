@@ -360,7 +360,7 @@
               :label="column.label"
               :width="column.width">
 
-              <template slot-scope="scope" v-if="scope.row.userId == userId && (scope.row.repertoryCount - scope.row.occupyNum) > 0 ">
+              <template slot-scope="scope" v-if="scope.row.userId == userId && (scope.row.repertoryCount - scope.row.occupyNum) > 0 && isShowPartBack">
                 <el-button type="text" class="no-padding" @click="partBack(scope.row)">退回</el-button>
               </template>
             </el-table-column>
@@ -370,7 +370,7 @@
               :label="column.label"
               :width="column.width"
             >
-              <template slot-scope="scope" >{{repertoryCount(scope.row.repertoryCount, scope.row.applyBacking)}} </template>
+              <template slot-scope="scope" >{{Number(repertoryCount(scope.row.repertoryCount, scope.row.applyBacking))}} </template>
             </el-table-column>
 
             <!-- 不可用数量 -->
@@ -455,13 +455,47 @@
         <template v-else-if="listType == 'useRecord'">
           <template v-for="column in showColumns">
             <el-table-column
+              v-if="column.field === 'taskNo'"
+              :key="column.field"
+              :label="column.label"
+              :width="column.width"
+              :min-width="column.minWidth"
+              show-overflow-tooltip
+            >
+              <template slot-scope="scope">
+                <a
+                  class="no-padding el-button no-padding el-button--text"
+                  style="color: #55B7B4;text-decoration: none;"
+                  @click.prevent="openTaskDetail2(scope.row.taskNo)">
+                  {{scope.row.taskNo}}
+                </a>
+              </template>
+            </el-table-column>
+            <el-table-column
+              v-else-if="column.field === 'customerNumber'"
+              :key="column.field"
+              :label="column.label"
+              :width="column.width"
+              :min-width="column.minWidth"
+              show-overflow-tooltip
+            >
+              <template slot-scope="scope">
+                <a
+                  class="no-padding el-button no-padding el-button--text"
+                  style="color: #55B7B4;text-decoration: none;"
+                  @click.prevent="openCustomerDetail(scope.row.customer)">
+                  {{scope.row.customerNumber}}
+                </a>
+              </template>
+            </el-table-column>
+            <el-table-column
+              v-else
               :key="column.field"
               :label="column.label"
               :width="column.width"
               :min-width="column.minWidth"
               :prop="column.field"
               show-overflow-tooltip>
-
             </el-table-column>
           </template>
         </template>
@@ -613,6 +647,8 @@ import StorageUtil from '@src/util/storageUtil';
 
 import PartBackForm from './form/PartBackForm.vue';  
 import PartReceiveRejectFom from './form/PartReceiveRejectFom.vue';
+
+import { isShowPartBack } from '@src/util/version.ts'
 
 const STORAGE_PART_COLNUM_KEY = 'repe_person_part_list_column';
 const STORAGE_STOCK_COLNUM_KEY = 'repe_person_stock_list_column';
@@ -766,6 +802,10 @@ export default {
       if(this.listType == 'part') action = '/partV2/repertory/person/exportSparepartUser';
       return action;
     },
+    /* 是否显示备件退回 */
+    isShowPartBack() {
+      return isShowPartBack()
+    }
     // filteredTeams() {
     //   if (this.personDataLevel <= 1) return [];
     //   if (this.personDataLevel === 2) {
@@ -810,6 +850,21 @@ export default {
         close: true,
         fromId
       })
+    },
+    async openTaskDetail2(taskNo){
+      const result=await this.$http.get('http://30.40.56.82:3000/mock/59/outside/pc/task/getTaskIdByNo');
+      console.log(result);
+    },
+    openCustomerDetail(customerId){
+      let fromId = window.frameElement.getAttribute('id');
+
+      this.$platform.openTab({
+        id: `customer_view_${customerId}`,
+        title: '客户详情',
+        close: true,
+        url: `/customer/view/${customerId}?noHistory=1`,
+        fromId
+      });
     },
 
     //

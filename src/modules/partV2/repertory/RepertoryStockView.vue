@@ -120,8 +120,8 @@
       <div class="action-button-group">
         <base-button v-if="allowInout" type="primary" @event="outstockBatch();trackEventHandler('outStock')" native-type="submit">出库</base-button>
         <base-button v-if="allowInout" type="primary" @event="instockBatch($event);trackEventHandler('inStock')" native-type="submit">入库</base-button>
-        <base-button v-if="allowInout" type="primary" @event="transferBatch($event);trackEventHandler('transfer')" native-type="submit">调拨</base-button>
-        <base-button v-if="allowInout && isPersonalRepertory !== false" type="primary" @event="partSparesBatchDialog($event);trackEventHandler('spare')" native-type="submit">分配</base-button>
+        <base-button v-if="allowInout && isShowPartTransfer" type="primary" @event="transferBatch($event);trackEventHandler('transfer')" native-type="submit">调拨</base-button>
+        <base-button v-if="allowInout && isPersonalRepertory !== false && isShowMoreSperaParts" type="primary" @event="partSparesBatchDialog($event);trackEventHandler('spare')" native-type="submit">分配</base-button>
         <base-button v-if="allowInout" type="primary" @event="openDialogForSetSafetyStock(selected);trackEventHandler('setSafeStock')" native-type="submit">设置安全库存</base-button>
 
         <el-dropdown :hide-on-click="false" trigger="click" :show-timeout="150">
@@ -230,9 +230,9 @@
             <template v-else-if="column.field == 'operate'" slot-scope="scope">
               <el-button type="text" class="no-padding" size="medium" @click="outstock(scope.row);tableTrackEventHandler('outStock')" v-if="isEnableSparePart(scope.row) && allowInout && allowInOutStore(scope.row)">出库</el-button>
               <el-button type="text" class="no-padding" size="medium" @click="instock(scope.row);tableTrackEventHandler('inStock')" v-if="isEnableSparePart(scope.row) && allowInout && allowInOutStore(scope.row)">入库</el-button>
-              <el-button type="text" class="no-padding" size="medium" @click="allocation(scope.row);tableTrackEventHandler('allocation')" v-if="isEnableSparePart(scope.row) && allowInout && allowInOutStore(scope.row)">调拨</el-button>
-              <el-button type="text" class="no-padding" size="medium" @click="partSparesDialog(scope.row);tableTrackEventHandler('spare')" v-if="isEnableSparePart(scope.row) && allowInout && allowInOutStore(scope.row) && isPersonalRepertory !== false">分配</el-button>
-              <el-button type="text" class="no-padding" size="medium" @click="apply(scope.row);tableTrackEventHandler('apply')" v-if="isEnableSparePart(scope.row) && allowApply">申领</el-button>
+              <el-button type="text" class="no-padding" size="medium" @click="allocation(scope.row);tableTrackEventHandler('allocation')" v-if="isEnableSparePart(scope.row) && allowInout && allowInOutStore(scope.row) && isShowPartTransfer">调拨</el-button>
+              <el-button type="text" class="no-padding" size="medium" @click="partSparesDialog(scope.row);tableTrackEventHandler('spare')" v-if="isEnableSparePart(scope.row) && allowInout && allowInOutStore(scope.row) && isPersonalRepertory !== false && isShowMoreSperaParts">分配</el-button>
+              <el-button type="text" class="no-padding" size="medium" @click="apply(scope.row);tableTrackEventHandler('apply')" v-if="isEnableSparePart(scope.row) && allowApply && isShowPartApply">申领</el-button>
             </template>
             <template v-else>
               {{scope.row[column.field]}}
@@ -446,10 +446,12 @@
             <div class="page-row">
               <div class="page-row-left">图片：</div>
               <div class="page-row-right part-info-dialog-img">
-                <template v-if="partInfo.image">
-                  <!--<img class="part-image" :src="partInfo.image" @click="preview" alt="备件图片">-->
-                  <img class="part-image" :src="partInfo.image" alt="备件图片">
-
+                <template v-if="Array.isArray(partInfo.imageList) && partInfo.imageList.length > 0">
+                  <img class="part-image" v-for="(img, idx) in partInfo.imageList" :key="idx" :src="img" @click="preview($event)" alt="备件图片">
+                </template>
+                <template v-else-if="partInfo.image">
+                  <img class="part-image" :src="partInfo.image" @click="preview($event)" alt="备件图片">
+                  <!-- <img class="part-image" :src="partInfo.image" alt="备件图片"> -->
                 </template>
               </div>
             </div>
@@ -543,6 +545,9 @@ import DateUtil from '@src/util/date'
 import AuthUtil from '@src/util/auth';
 import StorageUtil from '@src/util/storageUtil';
 
+import BaseGallery from 'packages/BaseGallery/index'
+
+import { isShowPartTransfer, isShowPartApply, isShowMoreSperaParts } from '@src/util/version.ts'
 
 const STORAGE_COLNUM_KEY = 'repertory_list_column';
 const STORAGE_PAGESIZE_KEY = 'repertory_list_pagesize';
@@ -703,6 +708,17 @@ export default {
     },
     filterColumns() {
       return this.columns.filter(c => c.label);
+    },
+    // 是否显示 备件调拨
+    isShowPartTransfer() {
+      return isShowPartTransfer()
+    },
+    // 是否显示 备件申领
+    isShowPartApply() {
+      return isShowPartApply()
+    },
+    isShowMoreSperaParts() {
+      return isShowMoreSperaParts()
     }
   },
   methods: {
@@ -911,6 +927,10 @@ export default {
       if(!this.allowImportAndExport || !this.allowEdit || !this.allowInout) return;
       let instance = this.$refs.importStock;
       instance.open();
+    },
+    //备件图片预览
+    preview(event){
+      BaseGallery.preview(event.currentTarget);
     },
     isEnableSparePart(row){
       let part = row.sparepart || {};
@@ -1786,10 +1806,20 @@ export default {
     }
 
     .part-info-dialog-img {
+      display: flex;
+      flex-wrap: wrap;
       width: 100%;
       img {
         width: inherit;
+        padding: 5px;
       }
+    }
+
+    .part-image {
+      display: block;
+      max-width: 128px;
+      max-height: 128px;
+      cursor: pointer;
     }
   }
   .part-spares-batch-dialog {

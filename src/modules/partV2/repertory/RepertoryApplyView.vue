@@ -843,7 +843,7 @@
         @open='partDearOpen'
         :close-on-click-modal="false"
       >
-        <part-deal-with-form ref="partDealWithForm" :partDealKey='partDealKey' :prop-data="partDealData"></part-deal-with-form>
+        <part-deal-with-form ref="partDealWithForm" :partDealKey='partDealKey' @getTargetList='getTargetList' :targetList='targetList' :prop-data="partDealData"></part-deal-with-form>
 
         <div
           slot="footer"
@@ -1263,7 +1263,9 @@ export default {
       cancelType: 0, // 0 拒绝 1 撤销
       partDealKey:1,
       formdata:[],
-      mulHandleKey:1
+      mulHandleKey:1,
+
+      targetList:[],   // 目标仓库
     };
   },
   computed: {
@@ -1308,6 +1310,12 @@ export default {
     }
   },
   methods: {
+    // 获取目标仓库
+    getTargetList(){
+      this.$http.get('/partV2/repertory/listForTeam').then(result => {
+        this.targetList = result || [];
+      })
+    },
     // 批量办理
     mulHandle(value){
       if(value.length===0){
@@ -1425,7 +1433,9 @@ export default {
             message: res.message || '办理成功',
             type: 'success'
           });
-          this.loadData();
+          setTimeout(()=>{
+            this.loadData();
+          },1000)
         }else{
           this.$message({
             showClose: true,
@@ -2342,7 +2352,9 @@ export default {
                 message: res.message,
                 type: 'success'
               });
-              this.loadData();
+              setTimeout(()=>{
+                this.loadData();
+              },1000);
             } else {
               this.$message({
                 showClose: true,
@@ -2368,7 +2380,9 @@ export default {
             message: res.message,
             type: 'success'
           });
-          this.loadData();
+          setTimeout(()=>{
+            this.loadData();
+          },1000);
         } else {
           this.$message({
             showClose: true,
@@ -2419,7 +2433,9 @@ export default {
                   message: res_.message,
                   type: 'success'
                 });
-                this.loadData();
+                setTimeout(()=>{
+                  this.loadData();
+                },1000)
               } else {
                 this.$message({
                   showClose: true,
@@ -2905,6 +2921,7 @@ export default {
             isreject,
             approved,
             suggestion,
+            targetId:result.relations[0].targetId,
             remark: result.list.remark || '',
             staffs: result.staffs
           },

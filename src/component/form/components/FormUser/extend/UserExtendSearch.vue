@@ -9,6 +9,7 @@
     :placeholder="field.placeHolder?field.placeHolder:'请输入关键词搜索'"
     :clearable="field.noClearable?false:true"
     :loading="loading"
+    :multiple="multiple"
     :remote-method="searchUser"
   >
     <el-option
@@ -27,9 +28,13 @@ export default {
   name: "user-search",
   mixins: [FormMixin],
   props: {
+    multiple: {
+      type: Boolean,
+      default: false,
+    },
     value: {
-      type: String,
-      default: ""
+      type: String | Array,
+      default: ''
     }
   },
   data() {

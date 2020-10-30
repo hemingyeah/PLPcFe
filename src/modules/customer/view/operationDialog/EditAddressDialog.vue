@@ -13,7 +13,7 @@
 
 <script>
 export default {
-  name: "edit-address-dialog",
+  name: 'edit-address-dialog',
   props: {
     customerId: {
       type: String,
@@ -51,15 +51,15 @@ export default {
       addressField: {
         formType: 'address',
         fieldName: 'customerAddress',
-        displayName: "地址",
-        placeholder: '请输入详细地址[最多50字]',
+        displayName: '地址',
+        placeholder: '请输入详细地址[最多1000字]',
         isNull: 0,
       },
       fields: [{
         formType: 'address',
         fieldName: 'customerAddress',
-        displayName: "地址",
-        placeholder: '请输入详细地址[最多50字]',
+        displayName: '地址',
+        placeholder: '请输入详细地址[最多1000字]',
         isNull: 0,
       }]
     }
@@ -68,9 +68,6 @@ export default {
     title() {
       return this.action === 'create' ? '添加地址' : '编辑地址';
     }
-  },
-  created () {
-    console.log('defaultAddress', this.defaultAddress)
   },
   methods: {
     reset() {
@@ -99,9 +96,9 @@ export default {
 
         if(result.status != 0) {
           return this.$platform.notification({
-              title: '失败',
-              message: result.message || `${this.action === 'create' ? '新建' : '更新'}失败`,
-              type: 'error',
+            title: '失败',
+            message: result.message || `${this.action === 'create' ? '新建' : '更新'}失败`,
+            type: 'error',
           });
         }
 
@@ -115,6 +112,9 @@ export default {
         if (this.action === 'create') {
           this.$eventBus.$emit('customer_detail_view.select_tab', 'customer-address-table');
         }
+
+        // 新建、编辑工单页面新建地址
+        this.$eventBus.$emit('task_create_or_edit.update_address', { ...params, id: result.data });
 
       } catch (e) {
         console.error('edit-address-dialog catch err', e);
@@ -190,6 +190,9 @@ export default {
 
   .edit-address-form {
     padding: 15px 0 0;
+    &.form-builder {
+      width: 100%;
+    }
 
     .form-item label {
       display: none;

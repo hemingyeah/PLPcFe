@@ -18,16 +18,17 @@
               :href="menu.url ? menu.url : 'javascript:;'" 
               @click.prevent="open(menu)" 
               :class="{'': menu.active}"> 
-              <span class="frame-menu-icon"><i :class="['iconfont', menuIcon[menu.menuKey]]"></i></span>
+              <span class="frame-menu-icon"><i :class="['iconfont', menu.menuIcon]"></i></span>
               <template v-if="!collapse">
                 <span class="frame-menu-name">{{menu.name}}</span>
-                <i class="iconfont icon-nav-down" v-if="menu.children && menu.children.length > 0"></i>
+                <i class="iconfont icon-caidanjiantou-zhankai" v-if="menu.children && menu.children.length > 0"></i>
+                <i class="red-dot" id="worktime_dot" v-if="menu.menuKey==='M_SYSTEM' && worktimeNoEnter && isShowCardWorkTime"></i>
               </template>
             </a>
 
             <ul 
               :class="{'frame-subMenu': true,'frame-float-menu': collapse}"
-              v-show="!collapse && menu.menuKey == (currMenu && currMenu.menuKey)">
+              v-show="!collapse && menu == currMenu">
               <li class="frame-float-menu-title"><h3>{{menu.name}}</h3></li>
               <div class="frame-subMenu-item-wrap" :style="getMenuItemWrapStyle(menu)">
                 <template v-for="menu in menu.children">
@@ -50,6 +51,8 @@ import MenuIcon from '../model/MenuIcon';
 
 import Logo from '@src/assets/img/logo.png';
 import MiniLogo from '@src/assets/svg/logo.svg';
+import { storageGet } from '@src/util/storage';
+import { isShowCardWorkTime } from '@src/util/version.ts'
 export default {
   name: 'frame-nav',
   props: {
@@ -75,12 +78,19 @@ export default {
       menus,
       menuIcon: MenuIcon,
       currMenu: null,
-      bodyHeight: 0
+      bodyHeight: 0,
+      worktimeNoEnter:true
     };
   },
   computed: {
+    isShowCardWorkTime() {
+      return isShowCardWorkTime()
+    },
     logoImg(){
       return this.collapse ? MiniLogo : Logo;
+    },
+    isShowCardWorkTime() {
+      return isShowCardWorkTime()
     }
   },
   methods: {
@@ -89,15 +99,6 @@ export default {
       if(event.target != this.$el || event.propertyName != 'width') return;
       this.$emit('collapse-changed')
     },
-    pushMenu(menu, menus){
-      if((menu.menuKey == 'M_CALLCENTER_WORKBENCH_LIST' || menu.menuKey == 'M_CALLCENTER_STATISTICS' || menu.menuKey == 'M_CALLCENTER_STAGE')) {
-        if (this.callcenter){
-          menus.push(menu);
-        }
-      } else {
-        menus.push(menu);
-      }
-    },
     /** 将后端返回的菜单，重整为多根树形结构 */
     buildMenus(source, parent){
       let menus = [];
@@ -105,11 +106,10 @@ export default {
 
       for(let i = 0; i < source.length; i++){
         let menu = source[i]
-        // 这里判断下如果呼叫中心开启灰度控制 
         if(menu.parent == parent){
-          this.pushMenu(menu, menus);
+          menus.push(menu);
         }else{
-          this.pushMenu(menu, otherMenus);
+          otherMenus.push(menu)
         }
       }
 
@@ -128,7 +128,7 @@ export default {
     open(menu){
       // 如果有子菜单，展开子菜单
       if(menu.children && menu.children.length > 0) {
-        this.currMenu = this.currMenu == menu ? null : menu;
+        this.currMenu = this.currMenu?.menuKey == menu.menuKey ? null : menu;
         this.$emit('update:collapse', false);
         return
       }
@@ -136,20 +136,6 @@ export default {
       if(!menu.url) return;
 
       let parentMenu = null;
-
-
-      // 临时解决方案
-      if(this.callcenter) {
-        this.menus.map(menu => {
-          let children = menu.children;
-          let isHaveChildren = Array.isArray(children);
-          if(isHaveChildren) {
-            children.map(child => {
-              child.active && (child.active = false)
-            })
-          }
-        })
-      }
 
       this.originMenus.forEach(item => {
         item.active && (item.active = false)
@@ -220,33 +206,29 @@ export default {
       if (remindHeight < (minHeight / 2)) return ''; 
 
       return `max-height: ${remindHeight}px; overflow-y: auto;`;
-    }
-  },
-  mounted() {
-    this.setMenuOffsetData();
-    this.registerResizeListener();
-  },
-  watch: {
-    callcenter: {
-      immediate: true,
-      deep: true,
-      handler(newValue, oldValue) {
-        if(newValue) {
-          let originMenus = _.cloneDeep(this.source);
-          let m = this.buildMenus(originMenus, null).menus || []; 
-          this.menus = _.cloneDeep(m);          
-        }
+    },
+    init() {
+      this.setMenuOffsetData();
+      this.registerResizeListener();
+      let hasEntered = storageGet('worktime_guid');
+      if(hasEntered){
+        this.worktimeNoEnter = false;
       }
     }
   },
+  mounted() {
+    this.init()
+  }
 }
 </script>
 
 <style lang="scss">
+$frame-nav-width: 190px;
+
 .frame-nav{
   width: 50px;
   height: 100%;
-  background-color: $color-primary;
+  background-color: $color-nav-primary;
   box-shadow: 1px 0 8px rgba(0,0,0,.125);
   transition: width ease .2s;
   position: relative;
@@ -258,7 +240,7 @@ export default {
 }
 
 .frame-nav.frame-nav-expand{
-  width: 220px;
+  width: $frame-nav-width;
   overflow: hidden;
 
   .frame-menu-scroll{
@@ -268,11 +250,11 @@ export default {
   }
 
   .frame-menu{
-    width: 220px;
+    width: $frame-nav-width;
   }
 
   .frame-menu-item{
-    width: 220px;
+    width: $frame-nav-width;
     overflow: hidden;
   }
 
@@ -283,15 +265,8 @@ export default {
       padding: 13px 15px 13px 46px;
     }
 
-    &.frame-subMenu-active:before{
-      content: "";
-      position: absolute;
-      left: 25px;
-      top: 20px;
-      width: 6px;
-      height: 6px;
-      background-color: $color-primary;
-      border-radius: 50%;
+    &:hover {
+      background-color: $color-nav-hover;
     }
   }
 
@@ -336,8 +311,6 @@ export default {
   transition: background-color ease .3s;
 
   &:hover{
-    background-color: lighten($color-primary, 3%);
-
     .frame-float-menu{
       display: block !important;
     }
@@ -351,13 +324,24 @@ export default {
     color: #fff;
     font-size: 14px;
 
+    &:hover {
+      background-color: $color-nav-hover;
+    }
+
     i.iconfont{
       font-size: 16px;
     }
 
-    i.icon-nav-down{
-      margin-right: 15px;
-      font-size: 12px;
+    i.icon-caidanjiantou-zhankai {
+      margin-right: 16px;
+    }
+
+    i.red-dot{
+      margin-right: 20px;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: red;
     }
   }
 }
@@ -372,7 +356,7 @@ export default {
   background-color: #fff;
 }
 
-.frame-menu-expand .icon-nav-down{
+.frame-menu-expand .icon-caidanjiantou-zhankai {
   transform: rotateZ(180deg);
 }
 
@@ -391,7 +375,7 @@ export default {
 }
 
 .frame-subMenu{
-  background-color: #4AA09E;
+  background-color: $color-nav-secondary;
   margin: 0;
   padding: 0;
 }
@@ -407,10 +391,14 @@ export default {
   transition: background-color ease .3s,
               color ease .3s;
   
-  &:hover,
+  &:hover {
+    background-color: $color-td-hover;
+  }
+
   &.frame-subMenu-active{
-    background: mix(#fff, $color-primary, 89.88%);
-    color: $color-primary !important;
+    // background: mix(#fff, $color-primary, 89.88%);
+    background-color: $color-primary !important;
+    color: #fff !important;
   }
   
   & > a{

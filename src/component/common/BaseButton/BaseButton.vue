@@ -46,7 +46,8 @@ export default {
           'base-button-disabled': disabled && type === 'primary',
           'danger-button-disabled': disabled && type === 'danger',
           'plain-button-disabled': disabled && type === 'plain',
-        }} type={nativeType} onClick={(e) => this.$emit('event', e)}>
+          'ghost-button-disabled': disabled && type === 'ghost',
+        }} type={nativeType} disabled={this.disabled} onClick={(e) => this.$emit('event', e)}>
           {icon && <i class={'iconfont ' + icon}></i>}
           {this.$slots.default}
         </button>
@@ -159,6 +160,17 @@ export default {
       border-color: $color-primary;
     }
 
+  }
+
+  .ghost-button-disabled {
+    opacity: .5;
+
+    &:hover {
+      background: #fff;
+      border-color: #E2E2E2;
+      color: $text-color-primary;
+      cursor: not-allowed;
+    }
   }
 
   // 文字按钮

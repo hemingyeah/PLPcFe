@@ -2,17 +2,20 @@
   <el-dialog title="退回" :visible.sync="visible" width="600px">
     <el-form :model="form" :rules="rules" ref="form" 
       label-width="100px" class="common-form">
+      <el-form-item label="申请人：">
+        {{part.displayName}}
+      </el-form-item>
       <el-form-item label="备件名称：">
-        <el-input type="text" :value="part.name" readonly></el-input>
+        {{part.name}}
       </el-form-item>
       <el-form-item label="备件编号：">
-        <el-input type="text" :value="part.serialNumber" readonly></el-input>
+        {{part.serialNumber}}
       </el-form-item>
       <el-form-item label="备件类别：">
-        <el-input type="text" :value="part.type" readonly></el-input>
+        {{part.type}}
       </el-form-item>
       <el-form-item label="备件规格：">
-        <el-input type="text" :value="part.standard" readonly></el-input>
+        {{part.standard}}
       </el-form-item>
       <el-form-item label="退回仓库：" prop="repertoryId">
         <el-select v-model="form.repertoryId" class="srp-list-form-item">
@@ -20,7 +23,8 @@
         </el-select>
       </el-form-item>
       <el-form-item label="持有数量：">
-        <el-input type="text" :value="holdNum" readonly></el-input>
+        {{holdNum}}
+        <!-- <el-input type="text" :value="holdNum" readonly></el-input> -->
       </el-form-item>
       <el-form-item label="退回数量：" prop="count">
         <el-input type="number" step="any" :min="0" :max="holdNum" v-model.number="form.count"></el-input>

@@ -1,0 +1,353 @@
+.my-shop-box {
+    margin: 12px;
+    min-width: 650px;
+}
+
+.al-end {
+    align-items: flex-end;
+}
+
+.flex-x {
+    display: flex;
+}
+
+.flex-y {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.flex-1 {
+    flex: 1;
+}
+
+.flex-w {
+    flex-wrap: wrap;
+}
+
+.al-start {
+    align-items: flex-start;
+}
+
+.cur-point {
+    cursor: pointer;
+}
+
+.mar-t-12 {
+    margin-top: 12px;
+}
+
+.mar-l-6 {
+    margin-left: 6px;
+}
+
+.mar-l-9 {
+    margin-left: 9px;
+}
+
+.mar-l-10 {
+    margin-left: 10px;
+}
+
+.mar-l-12 {
+    margin-left: 12px;
+}
+
+.mar-l-14 {
+    margin-left: 14px;
+}
+
+.mar-l-16 {
+    margin-left: 16px;
+}
+
+.mar-l-32 {
+    margin-left: 32px;
+}
+
+.mar-l-19 {
+    margin-left: 19px;
+}
+
+.mar-l-44 {
+    margin-left: 44px;
+}
+
+.mar-l-57 {
+    margin-left: 57px;
+}
+
+.mar-r-4 {
+    margin-right: 4px;
+}
+
+.mar-r-6 {
+    margin-right: 6px;
+}
+
+.mar-r-9 {
+    margin-right: 9px;
+}
+
+.mar-r-10 {
+    margin-right: 10px;
+}
+
+.mar-r-12 {
+    margin-right: 12px;
+}
+
+.mar-r-14 {
+    margin-right: 14px;
+}
+
+.mar-r-15 {
+    margin-right: 15px;
+}
+
+.mar-r-16 {
+    margin-right: 16px !important;
+}
+
+.mar-r-20 {
+    margin-right: 20px;
+}
+
+.mar-r-38 {
+    margin-right: 38px;
+}
+
+.mar-r-53 {
+    margin-right: 53px;
+}
+
+.mar-r-56 {
+    margin-right: 56px;
+}
+
+.mar-r-57 {
+    margin-right: 57px;
+}
+
+.mar-r-100{
+    margin-right: 100px;
+}
+
+.mar-r-120{
+    margin-right: 120px;
+}
+
+.mar-r-128 {
+    margin-right: 128px;
+}
+
+.mar-r-140 {
+    margin-right: 140px;
+}
+
+.mar-r-190 {
+    margin-right: 190px;
+}
+
+.mar-r-210 {
+    margin-right: 210px;
+}
+
+.mar-r-245 {
+    margin-right: 245px;
+}
+
+.mar-b-5 {
+    margin-bottom: 5px;
+}
+
+.mar-b-8 {
+    margin-bottom: 8px;
+}
+
+.mar-b-12 {
+    margin-bottom: 12px;
+}
+
+.mar-b-14 {
+    margin-bottom: 14px;
+}
+
+.mar-b-15 {
+    margin-bottom: 15px;
+}
+
+.mar-b-17 {
+    margin-bottom: 17px;
+}
+
+.mar-b-18 {
+    margin-bottom: 18px;
+}
+
+.mar-b-20 {
+    margin-bottom: 20px;
+}
+
+.mar-b-28 {
+    margin-bottom: 28px;
+}
+
+.mar-b-32 {
+    margin-bottom: 32px;
+}
+
+.mar-b-35 {
+    margin-bottom: 35px;
+}
+
+.mar-t-24 {
+    margin-top: 24px;
+}
+
+.font-24 {
+    font-size: 24px;
+}
+
+.font-16 {
+    font-size: 16px;
+}
+
+.font-18 {
+    font-size: 18px;
+}
+
+.font-12 {
+    font-size: 12px;
+}
+
+.font-13 {
+    font-size: 13px;
+}
+
+.font-10 {
+    font-size: 10px;
+}
+
+.font-w-500 {
+    font-weight: 500;
+}
+
+.min-w-214 {
+    min-width: 214px;
+}
+
+.min-w-361 {
+    min-width: 361px;
+}
+
+.min-w-500 {
+    min-width: 500px;
+}
+
+.min-w-604 {
+    min-width: 604px;
+}
+
+.min-w-620 {
+    min-width: 620px;
+}
+
+.min-w-406 {
+    min-width: 406px;
+}
+
+.min-w-650 {
+    min-width: 650px;
+}
+
+.min-w-700 {
+    min-width: 700px;
+}
+
+.w-128 {
+    width: 128px;
+}
+
+.pad-b-34 {
+    padding-bottom: 34px;
+}
+
+.pad-b-20 {
+    padding-bottom: 20px;
+}
+
+.w-228 {
+    width: 228px;
+}
+
+.w-33-present {
+    width: 33.33%;
+    box-sizing: border-box;
+}
+
+.overHideCon-1 {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+    overflow: hidden;
+    white-space: normal;
+    word-wrap: break-word;
+    word-break: break-all;
+}
+
+.overHideCon-2 {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    white-space: normal;
+    word-wrap: break-word;
+    word-break: break-all;
+}
+
+.overHideCon-3 {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    overflow: hidden;
+    white-space: normal;
+    word-wrap: break-word;
+    word-break: break-all;
+}
+
+.color-ccc {
+    color: #ccc;
+}
+
+.color-666 {
+    color: #666;
+}
+
+.color-primary {
+    color: $color-primary !important;
+}
+
+
+.can-move {
+    cursor: move;
+}
+
+.el-input__suffix {
+    right: 0;
+}
+
+.el-dialog__header {
+    padding: 10px;
+    position: relative;
+}
+
+.el-dialog__footer {
+    padding: 10px;
+}
+
+.el-dialog__headerbtn {
+    top: 0;
+    bottom: 0;
+    margin: auto;
+}

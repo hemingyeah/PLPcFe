@@ -1,9 +1,10 @@
 import _ from 'lodash';
+import { FORM_FIELD_TEXT_MAX_LENGTH, FORM_FIELD_TEXTAREA_MAX_LENGTH } from '@src/model/const/Number.ts';
 
 // 单行最大长度
-export const SINGLE_LINE_MAX_LEN = 50;
+export const SINGLE_LINE_MAX_LEN = FORM_FIELD_TEXT_MAX_LENGTH;
 // 多行最大长度
-export const MULTI_LINE_MAX_LEN = 500;
+export const MULTI_LINE_MAX_LEN = FORM_FIELD_TEXTAREA_MAX_LENGTH;
 // 电话
 export const TEL_REG = /^(((0\d{2,3}-{0,1})?\d{7,8})|(\d{6}))$/;
 // 手机号
@@ -32,8 +33,10 @@ const RuleMap = {
   attachment,
   address,
   link,
-  customer,
-  extend
+  customer: select,
+  sparepart: select,
+  serviceIterm: select,
+  planTime
 };
 
 /** 单行文本验证，50字以内 */
@@ -105,6 +108,16 @@ function datetime(value, field = {}) {
     if (field.isNull === 1) return resolve(null);
     if (!value || !value.toString().length) return resolve(`请选择${field.displayName}`);
     if (!DATETIME_REG.test(value)) return resolve('请输入正确格式的日期');
+    resolve(null);
+  });
+}
+
+function planTime(value, field = {}) {
+  return new Promise(resolve => {
+    if (field.isNull === 1) return resolve(null);
+    if (!value || !value.toString().length) return resolve(`请选择${field.displayName}`);
+    let REG = field.setting.dateType == 'date' ? DATE_REG : DATETIME_REG;
+    if (!REG.test(value)) return resolve('请输入正确格式的日期');
     resolve(null);
   });
 }

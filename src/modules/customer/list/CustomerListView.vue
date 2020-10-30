@@ -48,7 +48,7 @@
             v-if="editedPermission === 3"
           >发送短信</base-button>
           <base-button type="plain" @event="openDialog('edit')" v-if="editedPermission === 3">批量编辑</base-button>
-          <base-button type="plain" @event="openDialog('remind')" v-if="editedPermission === 3">批量提醒</base-button>
+          <base-button type="plain" @event="openDialog('remind')" v-if="editedPermission === 3 && isShowCustomerRemind">批量提醒</base-button>
           <el-dropdown trigger="click" v-if="exportPermission">
             <span class="el-dropdown-link el-dropdown-btn" @click="trackEventHandler('moreAction')">
               更多操作
@@ -370,6 +370,8 @@ import SearchPanel from './operationDialog/SearchPanel.vue';
 import * as CustomerApi from '@src/api/CustomerApi';
 // import {searchLinkman} from '@src/api/EcSearchApi.js';
 import TeamMixin from '@src/mixins/teamMixin';
+import { isShowCustomerRemind } from '@src/util/version.ts'
+
 const link_reg = /((((https?|ftp?):(?:\/\/)?)(?:[-;:&=\+\$]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\?\+=&;:%!\/@.\w_]*)#?(?:[-\+=&;%!\?\/@.\w_]*))?)/g;
 
 export default {
@@ -483,6 +485,9 @@ export default {
     },
     smsRest() {
       return this.initData.smsRest || 0;
+    },
+    isShowCustomerRemind() {
+      return isShowCustomerRemind()
     }
   },
   filters: {
@@ -674,8 +679,7 @@ export default {
 
       this.loadingListData = true;
 
-      return this.$http
-        .post('/customer/list', params)
+      return CustomerApi.getCustomerList(params)
         .then(res => {
           if (!res || !res.list) {
             this.customers = [];

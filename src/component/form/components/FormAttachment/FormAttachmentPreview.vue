@@ -9,18 +9,11 @@
 </template>
 
 <script>
+import { previewProps } from '@src/component/form/components/props';
+
 export default {
   name: 'form-attachment-preview',
-  props: {
-    field: {
-      type: Object,
-      default: () => ({})
-    },
-    setting: {
-      type: Object,
-      default: () => ({})
-    }
-  }
+  props: previewProps
 }
 </script>
 
@@ -37,5 +30,9 @@ export default {
   margin: 0 0 0 8px;
   font-size: 14px;
   @include text-ellipsis(); 
+}
+
+.form-attachment-preview .btn{
+  padding: 4px 12px;
 }
 </style>

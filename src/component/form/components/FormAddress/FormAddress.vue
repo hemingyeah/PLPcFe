@@ -9,14 +9,14 @@
         type="text"
         :value="detail"
         @input="input"
-        maxlength="50"
+        :maxlength="maxlength"
         :id="`form_${field.fieldName}`"
         autocomplete="off"/>
       <el-button type="button" class="action-btn" @click="toggleModal">解析地址</el-button>
     </div>
 
     <base-modal :show.sync="visible" title="解析地址" class="form-address-modal">
-      <textarea v-model.trim="copy" placeholder="请输入或粘贴地址到文本框进行解析" maxlength="500"></textarea>
+      <textarea v-model.trim="copy" placeholder="请输入或粘贴地址到文本框进行解析" maxlength="1000"></textarea>
       <el-button type="primary" @click="analyze" :disabled="!copy.length || pending">解析</el-button>
     </base-modal>
   </div>
@@ -24,7 +24,9 @@
 
 <script>
 import FormMixin from '@src/component/form/mixin/form';
-import {parseAddress} from '@src/api/CommonApi';
+import { parseAddress } from '@src/api/CommonApi';
+import { FORM_FIELD_TEXT_MAX_LENGTH } from '@src/model/const/Number.ts';
+
 /* global AMap */
 export default {
   name: 'form-address',
@@ -59,13 +61,19 @@ export default {
     disableMap: {
       type: Boolean,
       default: false
-    }
+    },
+    // 工单客户关联字段清除位置信息时候不调用update
+    taskDisableUpdate: {
+      type: Boolean,
+      default: false
+    },
   },
   data() {
     return {
       visible: false,
       pending: false,
-      copy: ''
+      copy: '',
+      maxlength: FORM_FIELD_TEXT_MAX_LENGTH
     }
   },
   computed: {
@@ -183,7 +191,10 @@ export default {
     },
     updateValue(newValue) {
       let oldValue = null;
-      this.$emit('update', {newValue, oldValue, field: this.field});
+      // 工单客户关联字段清除位置信息时候不调用update
+      if(!this.taskDisableUpdate){
+        this.$emit('update', {newValue, oldValue, field: this.field});
+      }
       this.$emit('input', newValue);
     },
     chooseMap() {

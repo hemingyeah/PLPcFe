@@ -98,7 +98,7 @@
 import {formatDate, } from '@src/util/lang';
 import platform from '@src/platform';
 import { getPlanOfProduct } from '@src/api/ProductApi';
-import { deletePlanTask } from '@src/api/TaskApi';
+import { deletePlanTask } from '@src/api/TaskApi.ts';
 
 
 export default {

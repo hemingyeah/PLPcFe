@@ -1,10 +1,14 @@
 import { assign } from 'lodash'
+import { FORM_FIELD_TEXT_MAX_LENGTH, FORM_FIELD_TEXTAREA_MAX_LENGTH } from '@src/model/const/Number.ts';
+
 import FormField from '../FormField';
 
 export * from './validate';
 
 const DEFAULT_PLACEHOLDER = {
-  text: '最多50字',
+  text: `最多${FORM_FIELD_TEXT_MAX_LENGTH}字`,
+  description: `最多${FORM_FIELD_TEXTAREA_MAX_LENGTH}字`,
+  textarea: `最多${FORM_FIELD_TEXTAREA_MAX_LENGTH}字`,
   number: '请输入数字',
   customerAddress: '请填写详细地址',
   relationCustomer: '由客户信息查询',
@@ -14,6 +18,8 @@ const DEFAULT_PLACEHOLDER = {
   datetime: '日期 + 时间',
   select: '请选择',
   location: '请输入',
+  phone: '请输入电话号码',
+  code: '请通过移动端扫码或手动输入'
 }
 
 /** 
@@ -90,12 +96,14 @@ export function genPlaceholder(field, defaultText = ''){
     text += (isSelect(field) || isMultiSelect(field)) ? '[必选] ' : '[必填] '
   }
 
-  if(field.placeholder) return text + field.placeholder;
+  let placeholder = field.placeholder || field.placeHolder;
+  if(placeholder) return text + placeholder;
 
   let key = field.formType;
   if(isDate(field)) key = 'date';
   if(isDatetime(field)) key = 'datetime';
   if(isSelect(field) || isMultiSelect(field) || field.formType == 'cascader') key = 'select';  
+
   return text + (DEFAULT_PLACEHOLDER[key] || '');
 }
 /**
@@ -118,10 +126,10 @@ export function initialize(fields = [], origin = {}, callback){
     if(field.formType == 'customer' || field.formType == 'eventNo' || field.formType == 'taskNo') return;
     // 如果已经存在值 则无需初始化
     if(result[fieldName]) return;
-
+    
     // 屏蔽工单上单选里不存在默认值
     if(isSelect(field) && dataSource.indexOf(defaultValue) < 0) defaultValue = '';
-
+    
     // 优先级、服务类型、服务内容在空值时选中第一个
     if(field.formType == 'level' || field.formType == 'serviceContent' || field.formType == 'serviceType') {
       if(defaultValue == '') defaultValue = dataSource[0];
@@ -131,29 +139,28 @@ export function initialize(fields = [], origin = {}, callback){
     if (field.formType === 'link') {
       defaultValue = {}
     }
-
+    
     // 多选和附件的默认值初始化为空数组
-    if(isMultiSelect(field) || field.formType == 'attachment'){
+    if(isMultiSelect(field) || field.formType == 'attachment' || field.formType == 'taskAttachment' || field.formType == 'receiptAttachment'){
       defaultValue = [];
     }
-
+    
     // 多级选择，需要拆解默认值
     if(formType == 'cascader'){
       let cascaderDefaultValue = [];
       if(defaultValue) cascaderDefaultValue = defaultValue.split(',')
-
+    
       defaultValue = cascaderDefaultValue;
     }
-
-    // 地址的默认值初始化为对象
-    if(field.formType == 'customerAddress' || field.formType == 'address') defaultValue = {};
-    // 人员的默认值初始化为对象
-    if(field.formType == 'user') defaultValue = {}
-
+    
+    // 地址、人员的默认值初始化为对象
+    let objValueFields = ['customerAddress', 'address', 'user']
+    if(objValueFields.indexOf(field.formType) >= 0) defaultValue = {};
+    
     // 来自表单的值，用于编辑时初始化值
     let attribute = origin.attribute || {};
     let formData = field.isSystem === 1 ? origin[fieldName] : attribute[fieldName];
-
+    
     // 多选改单选,若原来有值则保留第一个
     if(isSelect(field) && Array.isArray(formData)) {
       formData = (formData && formData.length >= 1) ? formData[0] : '';
@@ -162,7 +169,7 @@ export function initialize(fields = [], origin = {}, callback){
     if(isMultiSelect(field) && !Array.isArray(formData)) {
       formData = formData ? [formData] : [];
     }
-
+    
     result[fieldName] = formData == null ? defaultValue : formData;
   });
 

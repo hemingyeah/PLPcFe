@@ -18,12 +18,21 @@
 .form-design-tabs {
   display: flex;
   flex-flow: row nowrap;
-  border-bottom: 1px solid #ddd;
+}
+
+.form-design-withSys .form-design-tab{
+  text-align: center;
 }
 
 .form-design-tab {
   padding: 10px;
   flex: 1;
+  border-bottom: 1px solid #ddd;
+}
+
+.form-design-tab-active{
+  color: $color-primary;
+  border-bottom-color: $color-primary;
 }
 
 .form-design-tabs-content {
@@ -67,7 +76,8 @@
 .form-design-main {
   width: calc(100% - 630px);
   min-width: 500px;
-  height: 100%;
+  //height: 100%;
+  height: calc(100% - 53px);
   padding: 10px 15px;
   border-top: none;
   border-bottom: none;
@@ -125,6 +135,13 @@
   }
 }
 
+.form-design-field-empty{
+  flex: 1;
+  text-align: center;
+  color: #9a9a9a;
+  padding-top: 25px;
+}
+
 // ------------ setting ------------
 .form-setting-panel {
   height: 100%;
@@ -150,7 +167,7 @@
   }
 
   label {
-    margin: 0 5px 0 0;
+    margin: 5px 5px 0 0;
     vertical-align: middle;
     cursor: pointer;
   }
@@ -219,7 +236,7 @@
 }
 
 // ------------ design ------------
-.form-design-phone {
+.form-design-list {
   position: relative;
   box-shadow: 0 0 8px rgba(0, 0, 0, .15);
   width: 100%;
@@ -344,10 +361,11 @@
 
   label {
     line-height: 20px;
-    width: 98px;
+    width: 88px;
     flex-shrink: 0;
-    margin: 0;
+    margin: 0 10px 0 0;
     color: $text-color-regular;
+    word-break: break-all;
   }
 
   .form-view-row-content{
@@ -356,7 +374,8 @@
     overflow-x: hidden;
     color: $text-color-primary;
     word-break: break-word;
-    white-space: pre-wrap;
+    // white-space: pre-wrap;
+
 
     .iconfont {
       color: $color-primary;
@@ -416,7 +435,7 @@
 }
 
 .link-text {
-  color: $color-primary;
+  color: $color-primary !important;
   cursor: pointer;
   margin-right: 10px;
 }
@@ -424,6 +443,22 @@
 .form-view-info-content {
   background-color: #FAFAFA;
   padding: 3px 5px;
+}
+
+// 电子签名、客户签名
+.form-view-autograph-content {
+  width: 300px;
+  height: 100px;
+  border: 1px dashed #aaa;
+
+  img {
+    width: 100%;
+    height: 100%;
+
+    &[src=""], &:not([src]) {
+      opacity: 0;
+    }
+  }
 }
 
 // ------------ form-builder ------------
@@ -438,10 +473,11 @@
 }
 
 .form-design-warning{
-  padding: 10px;
   border-radius: 2px;
   background-color: #fdf6ec;
   color: #e6a23c;
+  padding: 10px;
+  margin-bottom: 5px;
 }
 
 .form-item__text{

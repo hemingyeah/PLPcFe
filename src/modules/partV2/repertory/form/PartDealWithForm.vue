@@ -4,8 +4,50 @@
     <div class="flex-x only-see-box">
       <div class="form-only-see flex-x" v-for="(item,index) in formArr" :key="index">
         <div class="form-only-see-title">{{item.lable}}</div>
-        <div v-if="item.lable!=='办理状态'" class="form-only-see-input">{{item.value}}</div>
-        <div v-else :class='"form-only-see-state form-only-see-"+item.state'>{{item.value}}</div>
+        <div v-if="item.lable==='办理状态'" :class='"form-only-see-state form-only-see-"+item.state'>{{item.value}}</div>
+        <div v-else-if="item.lable==='目标仓库'" class="form-only-see-input">
+          {{item.value}}
+          <el-popover
+            v-if="propData.data.type==='退回'"
+            width="50%"
+            trigger="click"
+            v-model="show"
+            placement="right"
+          >
+            <div>
+              <p>修改目标仓库</p>
+              <p class="popover-line"></p>
+              <div>
+                <span>目标仓库：</span>
+                <el-select
+                  filterable
+                  v-model="targetId"
+                >
+                  <el-option
+                    v-for="item in targetList"
+                    :key='item.id'
+                    :label='item.name'
+                    :value='item.id'
+                  ></el-option>
+                </el-select>
+                <p class="popover-line" style="margin-top:12px;"></p>
+                <base-button
+                  type="primary"
+                  style="float:right;"
+                  @event="show=false"
+                >确 定</base-button>
+                <base-button
+                  class="mar-r-15"
+                  type="ghost"
+                  style="float:right;"
+                  @event="show=false"
+                >取 消</base-button>
+              </div>
+            </div>
+            <i slot="reference" @click="editTargetRepertory" class="iconfont icon-bianji"></i>
+          </el-popover>
+        </div>
+        <div v-else class="form-only-see-input">{{item.value}}</div>
       </div>
     </div>
     <!-- 仅看数据展示 end -->
@@ -143,7 +185,8 @@ export default {
     },
     partDealKey:{
       type:Number
-    }
+    },
+    targetList:Array
   },
   watch:{
     partDealKey(newVal){
@@ -320,10 +363,20 @@ export default {
       tableColumn,
       tableColumnReadonly,
       inputonlyread,
-      selects
+      selects,
+      show:false,
+      targetId:''
     };
   },
   methods: {
+    // 修改目标仓库
+    editTargetRepertory(){
+      this.show=true;
+      this.targetId=this.propData.data.targetId;
+      if(this.targetList.length===0){
+        this.$emit('getTargetList');
+      }
+    },
     // 跳转到出入库记录
     toWareRecord(data){
       this.$platform.openTab({
@@ -357,20 +410,24 @@ export default {
           item.handleNum=(item.variation-item.solvedVariation).toFixed(decimals);
         });
       }else{
-        if((this.propData.data.type==='调拨' || this.propData.data.type==='分配') && this.propData.data.state==='suspending'){
-          this.propData.arr.forEach(item=>{
-            item.checked=true;
-            // item.disabled=true;
-            const decimals=Math.max(this.countDecimals(item.variation),this.countDecimals(item.solvedVariation));
-            item.handleNum=(item.variation-item.solvedVariation).toFixed(decimals);
-            this.$refs.selectTable.toggleRowSelection(item,true);
-          });
-        }else{
-          this.propData.arr.forEach(item=>{
-            item.checked=false;
-            item.handleNum='';
-          });
-        }
+        // if((this.propData.data.type==='调拨' || this.propData.data.type==='分配') && this.propData.data.state==='suspending'){
+        //   this.propData.arr.forEach(item=>{
+        //     item.checked=true;
+        //     item.disabled=true;
+        //     const decimals=Math.max(this.countDecimals(item.variation),this.countDecimals(item.solvedVariation));
+        //     item.handleNum=(item.variation-item.solvedVariation).toFixed(decimals);
+        //     this.$refs.selectTable.toggleRowSelection(item,true);
+        //   });
+        // }else{
+        //   this.propData.arr.forEach(item=>{
+        //     item.checked=false;
+        //     item.handleNum='';
+        //   });
+        // }
+        this.propData.arr.forEach(item=>{
+          item.checked=false;
+          item.handleNum='';
+        });
       }
       this.selects=[...selection];
     },
@@ -526,6 +583,17 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.popover-line{
+  border-top: 1px solid $color-border-l4;
+  position: relative;
+  left: -12px;
+  width: calc(100% + 24px);
+}
+
+.icon-bianji{
+  color:$color-primary;
+  cursor: pointer;
+}
 .total{
   text-align: right;
   margin-top: 10px;

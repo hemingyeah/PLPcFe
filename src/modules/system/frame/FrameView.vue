@@ -3,10 +3,11 @@
     <div class="frame">
       <frame-nav
         :collapse.sync="collapse"
-        :source="initData.menus"
+        :source="navBarMenus"
         :callcenter="has_call_center_module"
         @open="openForNav"
         @collapse-changed="adjustOpenTab"
+        v-if="showNavBar"
       />
 
       <div class="frame-content">
@@ -20,6 +21,24 @@
               >
                 <i :class="['iconfont', collapse ? 'icon-open' : 'icon-Takeup']"></i>
               </button>
+
+              <!-- start 工单列表切换新旧版 -->
+              <template v-if="allowChangeTaskVersion">
+                <el-button
+                  @click="changeTaskVersion(false)"
+                  class="task-version-btn"
+                  type="primary"
+                  v-if="isUserTaskGray"
+                >返回旧版</el-button>
+
+                <el-button
+                  @click="changeTaskVersion(true)"
+                  class="task-version-btn task-new-version"
+                  type="primary"
+                  v-else
+                >切换新版</el-button>
+              </template>
+              <!-- end 工单列表切换新旧版 -->
             </div>
 
             <div class="frame-quick-notification" v-show="notificationShow">
@@ -104,14 +123,22 @@
                 <div class="dev-tool-menu">
                   <a href="javascript:;" @click="clearStorage">清空缓存</a>
                   <a href="javascript:;" @click="openDemo">demo</a>
-                  <a href="javascript:;" @click="goRoleTeam">团队管理</a>
+                  <!-- <a href="javascript:;" @click="goRoleTeam">团队管理</a> -->
+                  <!-- <a href="javascript:;" @click="goProductTemplate">产品模板旧版</a>
+                  <a href="javascript:;" @click="goProductOld">产品管理旧版</a>
+                  <a href="javascript:;" @click="goProductSetting">产品字段设置</a>
                   <a href="javascript:;" @click="goCustomerContact">客户联系人</a>
-                  <a href="javascript:;" @click="goDoMyself">自助门户设置</a>
+                  <a href="javascript:;" @click="goDoMyself">自助门户设置</a> -->
                   <a href="javascript:;" @click="goDepartment">组织架构管理</a>
                   <a href="javascript:;" @click="goDepartment2">组织架构管理2</a>
-                  <a href="javascript:;" @click="goCallCenterSetting">呼叫中心设置</a>
+                  <a href="javascript:;" @click="goTaskSetting">工单表单设置</a>
+                  <a href="javascript:;" @click="goTaskReceiptSetting">工单回执表单设置</a>
+                  <a href="javascript:;" @click="goCreateTask">新建工单</a>
+                  <a href="javascript:;" @click="goCreateTaskForCallcenter">新建工单呼叫中心</a>
+                  <a href="javascript:;" @click="goTaskList">工单列表</a>
+                  <!-- <a href="javascript:;" @click="goCallCenterSetting">呼叫中心设置</a>
                   <a href="javascript:;" @click="goCallCenterWorkbench">呼叫工作台</a>
-                  <a href="javascript:;" @click="goCallCenter">呼叫中心</a>
+                  <a href="javascript:;" @click="goCallCenter">呼叫中心</a> -->
                 </div>
               </el-popover>
 
@@ -303,8 +330,7 @@
           </div>
         </div>
       </div>
-
-      <version :version="releaseVersion" />
+      <version :version="releaseVersion" v-if="loadedEdition" :edition="shbEdition" />
       <sale-manager
         :service-group-url="initData.serviceGroupUrl"
         :qrcode="initData.saleManagerQRCode"
@@ -389,6 +415,12 @@ import DefaultHead from "@src/assets/img/user-avatar.png";
 import NotificationCenter from "./component/NotificationCenter.vue";
 import * as NotificationApi from "@src/api/NotificationApi";
 import * as CallCenterApi from "@src/api/CallCenterApi";
+import * as SettingApi from "@src/api/SettingApi";
+
+import { isShowDashboardScreen, isShowPlanTask, isShowLinkC, isShowMoreSperaParts } from '@src/util/version.ts'
+
+/* util */
+import _ from 'lodash';
 
 const NOTIFICATION_TIME = 1000 * 60 * 10;
 
@@ -469,6 +501,11 @@ export default {
         },
       },
       has_call_center_module: false,
+      isUserTaskGray: this.initData.isUserTaskGrayFunction, // 用户选择新旧版工单标识
+      navBarMenus: [],
+      showNavBar: false,
+      loadedEdition: false,
+      shbEdition: 1
     };
   },
   computed: {
@@ -500,7 +537,18 @@ export default {
       return this.loginUser.head || DefaultHead;
     },
     releaseVersion() {
-      return this.initData.releaseVersion || "";
+      return (this.initData.releaseVersion && this.initData.releaseVersion.toLocaleLowerCase().replace('vip', '')) || '';
+    },
+    /** 激活状态的工单列表 */
+    currentTaskListTab() {
+      let taskList = this.frameTabs.filter(tab => tab.id === 'M_TASK_ALL' && tab.show);
+      return taskList[0] || {};
+    },
+    /** 允许切换工单新旧版本 */
+    allowChangeTaskVersion() {
+      // 企业是否开启工单灰度功能
+      let isTaskGray = this.initData.isTaskGrayFunction;
+      return isTaskGray && this.currentTaskListTab.id;
     },
   },
   methods: {
@@ -553,11 +601,12 @@ export default {
         if (data.callcenter) {
           // 说明开启呼叫中心灰度
           localStorage.setItem("call_center_gray", 1);
-          this.getAccountInfo();
-        } else {
-          localStorage.setItem("call_center_module", 0);
-          localStorage.setItem("call_center_gray", 0);
+          return await this.getAccountInfo()
         }
+
+        localStorage.setItem("call_center_module", 0);
+        localStorage.setItem("call_center_gray", 0);
+        
       } catch (error) {
         console.error(error);
       }
@@ -579,6 +628,8 @@ export default {
           } else {
             alert("当前浏览器 Not support websocket");
           }
+
+          return true
         }
       } catch (error) {
         console.error(error);
@@ -606,9 +657,9 @@ export default {
     },
     openDemo() {
       this.openForFrame({
-        id: "demo",
-        url: "/payment/paymentBillOnline",
-        title: "demo",
+        id: 'demo',
+        url: '/demo',
+        title: 'demo'
       });
     },
     /** @deprecated */
@@ -761,27 +812,6 @@ export default {
       try {
         let info = await NotificationApi.newGetMessage();
         if (info.status == 0) {
-          // this.notificationInfo = info.data;
-          // this.notification.count = info.data.systemMsg + info.data.workMsg;
-          // let msgSystem = sessionStorage.getItem("shb_systemMsg");
-
-          // if (this.notification.count > 99) {
-          //   this.msgCount = "99+";
-          // } else {
-          //   this.msgCount = "";
-          // }
-          // if (
-          //   this.notificationInfo.msgSystem &&
-          //   (!msgSystem || msgSystem != this.notificationInfo.msgSystem.id)
-          // ) {
-          //   this.notification.title = info.data.msgSystem.title;
-          //   this.notificationShow = true;
-          //   this.setAnimation();
-          // } else {
-          //   this.notification.title = null;
-          //   this.notificationShow = false;
-          // }
-
           this.notificationInfo = info.data;
           this.notification.count = info.data.unReadTotalCount;
           let msgSystem = sessionStorage.getItem("shb_systemMsg");
@@ -857,11 +887,59 @@ export default {
         reload: true,
       });
     },
+    goProductSetting() {
+      platform.openTab({
+        id: "product_setting",
+        title: "产品设置",
+        url: "/setting/product/fields",
+        reload: true,
+      });
+    },
     goDoMyself() {
       platform.openTab({
         id: "do_myself",
-        title: "自助门户设置",
+        title: "消息中心",
         url: "/setting/doMyself/wxSet",
+        reload: true,
+      });
+    },
+    goTaskSetting() {
+      platform.openTab({
+        id: 'task_fields_setting',
+        title: '工单表单设置',
+        url: '/setting/task/field/task',
+        reload: true,
+      });
+    },
+    goTaskReceiptSetting() {
+      platform.openTab({
+        id: 'task_receipt_fields_setting',
+        title: '工单回执表单设置',
+        url: '/setting/task/field/taskReceipt',
+        reload: true,
+      });
+    },
+    goCreateTask() {
+      platform.openTab({
+        id: 'task_create',
+        title: '新建工单',
+        url: '/task/edit',
+        reload: true,
+      });
+    },
+    goCreateTaskForCallcenter() {
+      platform.openTab({
+        id: 'task_create',
+        title: '新建工单呼叫中心',
+        close: true,
+        url: '/task/edit4CallCenter?callRecordId=1&linkmanId=e8540bd4-e5eb-11ea-9929-00163e304a25',
+      });
+    },
+    goTaskList() {
+      platform.openTab({
+        id: 'task_list',
+        title: '工单列表',
+        url: '/task',
         reload: true,
       });
     },
@@ -886,6 +964,22 @@ export default {
         id: "M_CALLCENTER_WORKBENCH_LIST",
         title: "呼叫中心工作台",
         url: "/setting/callcenter/workbench",
+        reload: true,
+      });
+    },
+    goMyShop() {
+      platform.openTab({
+        id: "my_shop",
+        title: "门户设置",
+        url: "/linkc/setting",
+        reload: true,
+      });
+    },
+    goMyShopOrder() {
+      platform.openTab({
+        id: "my_shop_order_list",
+        title: "订单列表",
+        url: "/linkc/order/list",
         reload: true,
       });
     },
@@ -990,6 +1084,77 @@ export default {
         lockReconnect = false;
       }, 4000);
     },
+    /** 
+    * @description 切换工单新旧版本
+    */
+    changeTaskVersion: _.debounce(function (version) {
+      // 工单列表重定向
+      this.currentTaskListTab.url = `/task?newVersion=${version}`;
+      this.reloadFrameTab(this.currentTaskListTab, true);
+
+      this.isUserTaskGray = !this.isUserTaskGray;
+    }, 1000),
+    /** 
+     * 获取售后宝版本号
+    */
+    async getShbEdition() {
+      const DefaultEdition = 1
+      let shbEdition = DefaultEdition
+      
+      try {
+        const Result = await SettingApi.getSettingEdition()
+        const IsSuccess = Result.status == 0
+        const Edition = Result?.data?.edition || DefaultEdition
+        
+        shbEdition = IsSuccess ? Edition : DefaultEdition
+        
+      } catch (error) {
+        shbEdition = DefaultEdition
+        console.error('Caused: getShbEdition -> error', error)
+      }
+      
+      window.shbEdition = shbEdition
+      
+      this.loadedEdition = true
+      this.shbEdition = shbEdition
+      this.buildNavbarMenus()
+    },
+    buildNavbarMenus() {
+      let menus = this.initData?.menus || []
+      // 需要被过滤掉的菜单key对象
+      let filterMeunKeyMap = {
+        'M_DASHBOARD_SCREEN': isShowDashboardScreen(),
+        'M_TASK_PLAN': isShowPlanTask(),
+        'M_PORTAL': isShowLinkC(),
+        'M_PORTAL_SETTING': isShowLinkC(),
+        'M_PORTAL_ORDER': isShowLinkC(),
+        'M_VIP_SPAREPART_PERSON': isShowMoreSperaParts(),
+        'M_CALLCENTER_WORKBENCH_LIST': this.has_call_center_module,
+        'M_CALLCENTER_STATISTICS': this.has_call_center_module,
+        'M_CALLCENTER_STAGE': this.has_call_center_module
+      }
+      let isFilter = false
+      let filterMenuKeys = []
+      
+      for (let key in filterMeunKeyMap) {
+        let menuShow = filterMeunKeyMap[key] === true
+        
+        if (!menuShow) {
+          isFilter = true
+          filterMenuKeys.push(key)
+        }
+      }
+      
+      // 是否过滤掉不能查看的菜单
+      if (isFilter) {
+        menus = menus.filter(menu => {
+          return filterMenuKeys.indexOf(menu.menuKey) < 0
+        })
+      }
+      
+      this.navBarMenus = menus
+      this.showNavBar = true
+    }
   },
   created() {
     this.showTour = true;
@@ -1009,7 +1174,7 @@ export default {
     }, NOTIFICATION_TIME);
   },
   async mounted() {
-    this.judgeCallCenterGray();
+    await this.judgeCallCenterGray();
     let userGuide = this?.initData?.userGuide === true || false;
 
     if (userGuide) {
@@ -1018,6 +1183,7 @@ export default {
     this.checkExports();
    
     this.getTenantInform();
+    this.getShbEdition()
   },
   components: {
     [FrameNav.name]: FrameNav,

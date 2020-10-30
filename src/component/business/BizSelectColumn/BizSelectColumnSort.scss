@@ -1,0 +1,49 @@
+.nested-draggable-block {
+  background-color: #fff;
+  cursor: move;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+
+  min-height: 30px;
+  line-height: 30px;
+  padding: 0 20px;
+
+  & & {
+    padding-left: 20px;
+  }
+
+}
+
+.biz-select-column-sort-row {
+  height: 30px;
+  font-weight: 500;
+  line-height: 30px;
+}
+
+.biz-select-column-sort-row,
+.nested-draggable-name {
+  color: $text-color-primary;
+  display: flex;
+  line-height: 20px;
+
+  &-label {
+    color: $text-color-secondary;
+    font-size: font-size-small;
+    width: 60px;
+  }
+
+  &-text {
+    flex: 1;
+  }
+
+}
+
+.biz-select-column-sort {
+  .sortable-ghost {
+    background-color: #F5F7FA;
+  }
+  .flip-list-move {
+    transition: transform .5s;
+  }
+}

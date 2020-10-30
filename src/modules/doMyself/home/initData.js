@@ -5,6 +5,8 @@ let initData={
       adCity: "青岛市",
       adDist: "市北区"
     },
+    // 联客灰度控制
+    openLinkC:true,
     isPhoneUnique: true,
     loginUser: {
       displayName: "薄德忠",

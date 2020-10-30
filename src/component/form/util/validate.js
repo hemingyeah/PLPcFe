@@ -1,4 +1,5 @@
-import * as config from '../config';
+/* config */
+import * as config from '@src/component/form/config';
 import { isSelect, isMultiSelect, isInfo } from './index';
 import { isEmpty } from '@src/util/lang';
 import platform from '@src/platform'

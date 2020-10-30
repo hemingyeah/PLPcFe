@@ -1,3 +1,4 @@
+/* config */
 import * as CONFIG from './Config';
 
 export default class TableColumn{

@@ -2,10 +2,8 @@
   <div id="menu-set-box">
     <p class="set-des">
       您可以在此将自助门户功能配置到您的公众号菜单，也可以将
-      <a
-        class="color-b"
-        href="/setting/serviceStation/customerPortal#protalUrl"
-      >客户自助门户</a>内的链接嵌入到您的公众号菜单。
+      <a class="color-b" href="#" @click="fastTab">客户自助门户</a
+      >内的链接嵌入到您的公众号菜单。
       <br />在配置公众号菜单前，请先确认您的公众号已经经过认证
     </p>
     <div class="set-box">
@@ -20,21 +18,27 @@
             <img class="bottom-icon-img" src="@src/assets/img/wx/wxKey.png" />
           </div>
           <!-- move-menu-box start -->
-          <draggable class="menu-box" v-model="menu_arr" v-if="edit_type===2">
+          <draggable class="menu-box" v-model="menu_arr" v-if="edit_type === 2">
             <div
-              v-for="(item,index) in menu_arr"
+              v-for="(item, index) in menu_arr"
               :key="index"
               class="menu-item can-move"
               draggable="true"
             >
-              <i v-if="item.type==='add'" class="iconfont icon-add"></i>
-              <p class="overHideCon_1" v-else>{{item.name}}</p>
+              <i v-if="item.type === 'add'" class="iconfont icon-add"></i>
+              <p class="overHideCon_1" v-else>{{ item.name }}</p>
 
               <draggable
                 :class="[`popTopMenuBox-${index}`, 'pop-top-menu-box']"
-                :group="{name:'shared'}"
-                :disabled="(nowMoveBox>-1 && nowMoveBox!==index && item.sub_button.length>4)?true:false"
-                v-if="item.shb_type!=='add'"
+                :group="{ name: 'shared' }"
+                :disabled="
+                  nowMoveBox > -1 &&
+                  nowMoveBox !== index &&
+                  item.sub_button.length > 4
+                    ? true
+                    : false
+                "
+                v-if="item.shb_type !== 'add'"
                 v-model="item.sub_button"
                 :fallback-on-body="true"
                 swap-threshold="1"
@@ -43,43 +47,59 @@
                 @unchoose="onMenuMoveUnchoose"
               >
                 <div
-                  v-for="(items,indexs) in item.sub_button"
+                  v-for="(items, indexs) in item.sub_button"
                   :key="indexs"
                   class="menu-items can-move"
                   draggable="true"
                 >
-                  <i v-if="items.shb_type==='add'" class="iconfont icon-add"></i>
-                  <p class="overHideCon_1" v-else>{{items.name}}</p>
+                  <i
+                    v-if="items.shb_type === 'add'"
+                    class="iconfont icon-add"
+                  ></i>
+                  <p class="overHideCon_1" v-else>{{ items.name }}</p>
                 </div>
-                <div :class="['hide_virtual',item.sub_button.length<=0?'show_virtual':'']"></div>
-                <div class="arrow-css" v-if="item.sub_button.length>0"></div>
+                <div
+                  :class="[
+                    'hide_virtual',
+                    item.sub_button.length <= 0 ? 'show_virtual' : '',
+                  ]"
+                ></div>
+                <div class="arrow-css" v-if="item.sub_button.length > 0"></div>
               </draggable>
             </div>
           </draggable>
           <!-- move-menu-box end -->
           <!-- menu-box start -->
-          <div class="menu-box" v-model="menu_arr" v-if="edit_type!==2">
+          <div class="menu-box" v-if="edit_type!==2">
             <div
-              v-for="(item,index) in menu_arr"
+              v-for="(item, index) in menu_arr"
               :key="index"
               :class="main_menu_class(index)"
               @click="valid_menu_form(index)"
             >
-              <i v-if="item.shb_type==='add'" class="iconfont icon-add"></i>
-              <p class="overHideCon_1" v-else>{{item.name}}</p>
+              <i v-if="item.shb_type === 'add'" class="iconfont icon-add"></i>
+              <p class="overHideCon_1" v-else>{{ item.name }}</p>
 
               <div
                 class="pop-top-menu-box"
-                v-if="item.shb_type!=='add' && now_main_menu===index &&item.sub_button && item.sub_button.length>0"
+                v-if="
+                  item.shb_type !== 'add' &&
+                  now_main_menu === index &&
+                  item.sub_button &&
+                  item.sub_button.length > 0
+                "
               >
                 <div
-                  v-for="(items,indexs) in item.sub_button"
+                  v-for="(items, indexs) in item.sub_button"
                   :key="indexs"
                   :class="child_menu_class(index, indexs)"
-                  @click.stop="valid_menu_form(index,indexs)"
+                  @click.stop="valid_menu_form(index, indexs)"
                 >
-                  <i v-if="items.shb_type==='add'" class="iconfont icon-add"></i>
-                  <p class="overHideCon_1" v-else>{{items.name}}</p>
+                  <i
+                    v-if="items.shb_type === 'add'"
+                    class="iconfont icon-add"
+                  ></i>
+                  <p class="overHideCon_1" v-else>{{ items.name }}</p>
                 </div>
                 <div class="arrow-css"></div>
               </div>
@@ -91,9 +111,9 @@
       </div>
       <!-- box-left end -->
       <!-- box-right start -->
-      <div class="box-right" v-show="now_chooseed_menu && edit_type===1">
+      <div class="box-right" v-show="now_chooseed_menu && edit_type === 1">
         <div class="flex-x box-head">
-          <p class="flex-1 overHideCon_1">{{ruleForm.name}}</p>
+          <p class="flex-1 overHideCon_1">{{ ruleForm.name }}</p>
           <p @click="deleteMenu()">删除菜单</p>
         </div>
         <el-form
@@ -105,11 +125,24 @@
           label-position="left"
         >
           <el-form-item label="菜单名称" prop="name">
-            <el-input v-model="ruleForm.name" class="name-input" size="small" placeholder="菜单名称"></el-input>
-            <p class="tips-con" v-if="now_chooseed_menu.indexs<0">仅支持中英文和数字，字数不超过4个汉字或8个字母</p>
-            <p class="tips-con" v-else>仅支持中英文和数字，字数不超过8个汉字或16个字母</p>
+            <el-input
+              v-model="ruleForm.name"
+              class="name-input"
+              size="small"
+              placeholder="菜单名称"
+            ></el-input>
+            <p class="tips-con" v-if="now_chooseed_menu.indexs < 0">
+              仅支持中英文和数字，字数不超过4个汉字或8个字母
+            </p>
+            <p class="tips-con" v-else>
+              仅支持中英文和数字，字数不超过8个汉字或16个字母
+            </p>
           </el-form-item>
-          <el-form-item label="菜单内容" prop="menuType" v-show="!now_chooseed_menu.onlyName">
+          <el-form-item
+            label="菜单内容"
+            prop="menuType"
+            v-show="!now_chooseed_menu.onlyName"
+          >
             <el-radio-group v-model="ruleForm.menuType">
               <el-radio label="售后宝功能"></el-radio>
               <el-radio label="跳转页面"></el-radio>
@@ -120,9 +153,11 @@
             <el-radio-group
               class="change-con-radio-group"
               v-model="ruleForm.menuTypeArr"
-              v-if="ruleForm.menuType==='售后宝功能'"
+              v-if="ruleForm.menuType === '售后宝功能'"
             >
-              <p class="tips-con">选择需要为此菜单配置的售后宝功能，订阅者点击后通过登录验证将打开对应页面</p>
+              <p class="tips-con">
+                选择需要为此菜单配置的售后宝功能，订阅者点击后通过登录验证将打开对应页面
+              </p>
               <div class="flex-x change-con-radio">
                 <div>
                   <el-radio label="服务请求" value="www.baidu1.com"></el-radio>
@@ -145,9 +180,13 @@
                 </div>
               </div>
             </el-radio-group>
-            <div v-if="ruleForm.menuType==='跳转页面'">
+            <div v-if="ruleForm.menuType === '跳转页面'">
               <p class="tips-con mar-b-12">订阅者点击该菜单会跳到以下链接</p>
-              <el-form-item label="页面地址" prop="input_url" v-show="!now_chooseed_menu.onlyName">
+              <el-form-item
+                label="页面地址"
+                prop="input_url"
+                v-show="!now_chooseed_menu.onlyName"
+              >
                 <el-input
                   v-model="ruleForm.input_url"
                   class="url-input"
@@ -171,7 +210,7 @@
             </div>
 
             <el-input
-              v-if="ruleForm.menuType==='回复文本消息'"
+              v-if="ruleForm.menuType === '回复文本消息'"
               type="textarea"
               resize="none"
               maxlength="200"
@@ -186,16 +225,47 @@
     </div>
 
     <div class="bottom-btn">
-      <button class="btn btn-ghost" v-if="edit_type===1" @click="change_edit_type(2)">菜单排序</button>
+      <button
+        class="btn btn-ghost"
+        v-if="edit_type === 1"
+        @click="change_edit_type(2)"
+      >
+        菜单排序
+      </button>
 
-      <button class="btn btn-primary" v-if="edit_type===0" @click="change_edit_type(1)">编辑菜单</button>
-      <button class="btn btn-primary" v-if="edit_type===0" @click="getMenuList(false)">同步菜单</button>
       <button
         class="btn btn-primary"
-        v-if="edit_type===1||edit_type===2"
-        @click="change_edit_type(edit_type===1?0:1,edit_type===1?true:false)"
-      >{{edit_type===1?'保存并发布':'继续编辑'}}</button>
-      <button class="btn btn-ghost" v-if="edit_type===1" @click="change_edit_type(0)">取消编辑</button>
+        v-if="edit_type === 0"
+        @click="change_edit_type(1)"
+      >
+        编辑菜单
+      </button>
+      <button
+        class="btn btn-primary"
+        v-if="edit_type === 0"
+        @click="getMenuList(false)"
+      >
+        同步菜单
+      </button>
+      <button
+        class="btn btn-primary"
+        v-if="edit_type === 1 || edit_type === 2"
+        @click="
+          change_edit_type(
+            edit_type === 1 ? 0 : 1,
+            edit_type === 1 ? true : false
+          )
+        "
+      >
+        {{ edit_type === 1 ? "保存并发布" : "继续编辑" }}
+      </button>
+      <button
+        class="btn btn-ghost"
+        v-if="edit_type === 1"
+        @click="change_edit_type(0)"
+      >
+        取消编辑
+      </button>
     </div>
   </div>
 </template>
@@ -209,11 +279,11 @@ let url_obj = {
   服务进度: "https://pubapp.shb.ltd/p/102308#/event",
   服务评价: "https://pubapp.shb.ltd/p/102308#/event/evaluate",
   服务商城: "https://pubapp.shb.ltd/p/102308#/shop",
-  知识库: "https://pubapp.shb.ltd/p/102308#/wiki"
+  知识库: "https://pubapp.shb.ltd/p/102308#/wiki",
 };
 let input_obj = {
   售后宝功能: "config_url",
-  跳转网页: "input_url"
+  跳转网页: "input_url",
 };
 let menu_main_tem = {
   shb_type: "main_menu",
@@ -223,8 +293,8 @@ let menu_main_tem = {
   type: "view",
   sub_button: [
     {
-      shb_type: "add"
-    }
+      shb_type: "add",
+    },
   ],
   name: "菜单名称",
   menuType: "售后宝功能",
@@ -232,10 +302,10 @@ let menu_main_tem = {
   url: "",
   input_url: "",
   config_url: "",
-  reserve: ""
+  reserve: "",
 };
 let menu_add_tem = {
-  shb_type: "add"
+  shb_type: "add",
 };
 let menu_children_tem = {
   shb_type: "children_menu",
@@ -247,7 +317,7 @@ let menu_children_tem = {
   input_url: "",
   config_url: "",
   reserve: "",
-  sub_button: []
+  sub_button: [],
 };
 let form_tem = {
   name: "菜单名称",
@@ -255,7 +325,7 @@ let form_tem = {
   menuTypeArr: "服务请求",
   input_url: "",
   config_url: "",
-  reserve: ""
+  reserve: "",
 };
 
 let input_length = (rule, value, callback) => {
@@ -289,7 +359,7 @@ let url_check = (rule, value, callback) => {
 import draggable from "vuedraggable";
 import _ from "lodash";
 // 校验字节数
-let computedStrLen = function(str) {
+let computedStrLen = function (str) {
   let len = 0;
   for (let i = 0; i < str.length; i++) {
     let c = str.charCodeAt(i);
@@ -305,14 +375,15 @@ let computedStrLen = function(str) {
 export default {
   name: "menu-set",
   components: {
-    draggable
+    draggable,
   },
   props: {
     menuArr: {
       type: Array,
-      default: () => []
-    }
+      default: () => [],
+    },
   },
+  inject: ["initData"],
   watch: {
     ruleForm: {
       handler(newValue, oldValue) {
@@ -326,24 +397,24 @@ export default {
           ];
           this.menu_arr[now_menu.index].sub_button[now_menu.indexs] = {
             ...now_data,
-            ...newValue
+            ...newValue,
           };
         } else {
           let now_data = this.menu_arr[now_menu.index];
           this.menu_arr[now_menu.index] = {
             ...now_data,
-            ...newValue
+            ...newValue,
           };
         }
       },
       deep: true,
-      immediate: true
+      immediate: true,
     },
     edit_type: {
       handler(newValue, oldValue) {
         this.now_chooseed_menu = false;
-      }
-    }
+      },
+    },
   },
   data() {
     return {
@@ -353,47 +424,69 @@ export default {
       nowMoveBox: -1, // 当某个菜单子菜单为5个时不可拖入子菜单进入
       menu_arr: [],
       ruleForm: {},
-      now_chooseed_menu: false
+      now_chooseed_menu: false,
     };
   },
   computed: {
     rules() {
-      return this.now_chooseed_menu && this.now_chooseed_menu.indexs > -1
+      return this.now_chooseed_menu && this.now_chooseed_menu.onlyName==1?{
+            name: [
+              { required: true, message: "请输入菜单名称", trigger: "change" },
+              { validator: input_length_child, trigger: "change" },
+            ]
+          }: this.now_chooseed_menu && this.now_chooseed_menu.indexs > -1
         ? {
             name: [
               { required: true, message: "请输入菜单名称", trigger: "change" },
-              { validator: input_length_child, trigger: "change" }
+              { validator: input_length_child, trigger: "change" },
             ],
             input_url: [
               {
                 required: true,
                 message: "请输入跳转页面网址",
-                trigger: "change"
+                trigger: "change",
               },
-              { validator: url_check, trigger: "change" }
-            ]
+              { validator: url_check, trigger: "change" },
+            ],
           }
         : {
             name: [
               { required: true, message: "请输入菜单名称", trigger: "change" },
-              { validator: input_length, trigger: "change" }
+              { validator: input_length, trigger: "change" },
             ],
             input_url: [
               {
                 required: true,
                 message: "请输入跳转页面网址",
-                trigger: "change"
+                trigger: "change",
               },
-              { validator: url_check, trigger: "change" }
-            ]
+              { validator: url_check, trigger: "change" },
+            ],
           };
-    }
+    },
+    linkControl() {
+      return this.initData.openLinkC;
+    },
   },
   mounted() {
     this.menu_arr = this.menuArr;
     menu_arr_stash = this.menuArr;
   },
   methods: {
+    fastTab() {
+      let e = this.linkControl
+        ? "/linkc/setting#protalUrl"
+        : "/setting/serviceStation/customerPortal#protalUrl";
+      if (this.linkControl) {
+        this.$platform.openTab({
+          title: "门户设置",
+          close: true,
+          url: e,
+        });
+      } else {
+        window.location = e;
+      }
+    },
     main_menu_class(index) {
       if (this.now_chooseed_menu && this.now_chooseed_menu.indexs < 0)
         return `menu-item ${this.edit_type === 1 ? "can-point" : ""} ${
@@ -410,13 +503,13 @@ export default {
             this.now_chooseed_menu.indexs === indexs
             ? "menu-checked"
             : ""
-          : ""
+          : "",
       ];
     },
     pub_valid_menu() {
       return new Promise((resolve, reject) => {
         if (this.edit_type === 1 && this.now_chooseed_menu) {
-          this.$refs["ruleForm"].validate(valid => {
+          this.$refs["ruleForm"].validate((valid) => {
             if (valid) {
               resolve();
             } else {
@@ -434,7 +527,7 @@ export default {
         .then(() => {
           this.main_menu_click(index, indexs);
         })
-        .catch(err => {
+        .catch((err) => {
           console.error("valid_menu_form_error");
         });
     },
@@ -474,13 +567,13 @@ export default {
               item.hasOwnProperty("shb_type") === false ||
               (item.hasOwnProperty("shb_type") === true &&
                 item.shb_type === "system_menu")
-            )
+            ),
           };
           let now_chooseed =
             indexs > -1
               ? this.menu_arr[index].sub_button[indexs]
               : this.menu_arr[index];
-          this.ruleForm = { ...now_chooseed };
+              this.$set(this, 'ruleForm', { ...now_chooseed })
         }
       }
     },
@@ -490,7 +583,7 @@ export default {
         try {
           let arr_ = _.cloneDeep(arr);
           let add_tem = _.cloneDeep(menu_add_tem);
-          arr_.map(res => {
+          arr_.map((res) => {
             if (res.sub_button) {
               if (res.sub_button.length < 5) {
                 res.sub_button.push(add_tem);
@@ -522,7 +615,7 @@ export default {
           if (arr_[arr_.length - 1].shb_type === "add") {
             arr_.splice(arr_.length - 1, 1);
           }
-          arr_.map(res => {
+          arr_.map((res) => {
             if (
               res.sub_button &&
               res.sub_button[res.sub_button.length - 1].shb_type === "add"
@@ -558,14 +651,14 @@ export default {
           config_url: res.config_url,
           input_url: "",
           type: "view",
-          reserve: ""
+          reserve: "",
         },
         跳转页面: {
           url: res.input_url,
           config_url: "",
           input_url: res.input_url,
           type: "view",
-          reserve: ""
+          reserve: "",
         },
         回复文本消息: {
           url: "",
@@ -573,8 +666,8 @@ export default {
           input_url: "",
           reserve: res.reserve,
           value: res.reserve,
-          type: "click"
-        }
+          type: "click",
+        },
       };
       return { ...res, ...obj[res.menuType] };
     },
@@ -587,17 +680,18 @@ export default {
         this.pub_valid_menu()
           .then(() => {
             if (type === 1) {
-              this.push_add(this.menu_arr).then(res => {
+              this.push_add(this.menu_arr).then((res) => {
                 this.menu_arr = res;
               });
             } else {
-              this.slice_add(this.menu_arr).then(res => {
+              this.slice_add(this.menu_arr).then((res) => {
                 this.$emit("pageLoading", true);
-                this.setMenuList(res).then(res_ => {
+                this.setMenuList(res).then((res_) => {
                   if (res_.success) {
-                    this.menu_arr = res;
-                    menu_arr_stash = _.cloneDeep(res);
-                    this.$emit("changeMenuArr", res);
+                    let result_ = JSON.parse(res_.data.wechatMenu).menu.button
+                    this.menu_arr = result_;
+                    menu_arr_stash = _.cloneDeep(result_);
+                    this.$emit("changeMenuArr", result_);
                     this.$emit("pageLoading", false);
                   } else {
                     this.$platform.alert(res_.message);
@@ -607,16 +701,16 @@ export default {
             }
             this.edit_type = type;
           })
-          .catch(err => {
+          .catch((err) => {
             console.error("change_edit_type error", err);
           });
       } else {
         if (type === 1) {
-          this.push_add(this.menu_arr).then(res => {
+          this.push_add(this.menu_arr).then((res) => {
             this.menu_arr = res;
           });
         } else {
-          this.slice_add(this.menu_arr).then(res => {
+          this.slice_add(this.menu_arr).then((res) => {
             this.menu_arr = res;
 
             if (type === 0) this.menu_arr = _.cloneDeep(menu_arr_stash);
@@ -678,9 +772,9 @@ export default {
       // this.$emit("pageLoading", true);
       // URL 本地调试 无/api/weixin  发布需加上
       getMenuListWx({
-        type
+        type,
       })
-        .then(res => {
+        .then((res) => {
           let result = res.data.wechatMenu
             ? JSON.parse(res.data.wechatMenu).menu.button
             : [];
@@ -694,13 +788,13 @@ export default {
           }, 500);
           console.log("getSuccess", result, res);
         })
-        .catch(err => {
+        .catch((err) => {
           this.$emit("pageLoading", false);
         });
     },
     setMenuList(data) {
       return setMenuListWx({
-        wechatMenu: JSON.stringify({ menu: { button: data } })
+        wechatMenu: JSON.stringify({ menu: { button: data } }),
       });
     },
     onMenuMoveChoose(e) {
@@ -709,8 +803,8 @@ export default {
     },
     onMenuMoveUnchoose() {
       this.nowMoveBox = -1;
-    }
-  }
+    },
+  },
 };
 </script>
 <style lang="scss" scoped>

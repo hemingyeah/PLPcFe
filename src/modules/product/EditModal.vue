@@ -48,13 +48,20 @@ export default {
     window.submit = this.submit;
 
     try {
-
       // 初始化默认值
+      this.initFormData();
+      this.init = true;
+    } catch (e) {
+      console.error('CustomerEditView caught an error ', e);
+    }
+  },
+
+  methods: {
+    initFormData() {
       let form = {};
       form = util.packToForm(this.productFields, form);
 
       // 客户详情新建产品，会带的客户信息
-
       /**
          * 初始化所有字段的初始值
          * @param {*} fields 字段
@@ -63,14 +70,7 @@ export default {
          */
 
       this.form = FormUtil.initialize(this.productFields, form);
-
-      this.init = true;
-    } catch (e) {
-      console.error('CustomerEditView caught an error ', e);
-    }
-  },
-
-  methods: {
+    },
     submit(customer, callBack) {
       this.submitting = true;
 

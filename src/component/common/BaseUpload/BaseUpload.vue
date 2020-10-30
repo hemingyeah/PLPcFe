@@ -1,11 +1,11 @@
 <template>
   <div class="base-upload-container">
-    <input type="file" ref="input" @change="handleChange" :multiple="multiple">
+    <input type="file" ref="input" @change="handleChange" :multiple="multiple" :accept="accept">
 
     <div class="base-file-list base-file__preview" >
       <base-file-item v-for="file in value" :key="file.id" :file="file" @delete="deleteFile"></base-file-item>        
     </div>
-    
+
     <div class="base-upload-operation">
       <button type="button" class="btn btn-primary base-upload-btn" @click="chooseFile" :disabled="pending" :id="forId" v-if="allowUpload">
         <i class="iconfont icon-loading" v-if="pending"></i>
@@ -55,6 +55,18 @@ export default {
     placeholder: {
       type: String,
       default: ''
+    },
+    isShowOperateContent : {
+      type: Boolean,
+      default: true
+    },
+    fileType : {
+      type : String,
+      default: null
+    },
+    accept: {
+      type: String,
+      default: ""
     }
   },
   computed: {
@@ -72,7 +84,7 @@ export default {
       if(this.value.length >= Uploader.FILE_MAX_NUM) {
         return platform.alert(`上传文件数量不能超过${Uploader.FILE_MAX_NUM}个`);
       }
-        
+
       this.$refs.input.value = null;
       this.$refs.input.click();
     },
@@ -91,6 +103,22 @@ export default {
         }
 
         return platform.alert(message)
+      }
+
+      if(this.fileType) {
+        //需要做文件类型校验
+        for (let item of files) {
+          let _fileName = item.name;
+          if (!_fileName.includes(Uploader.fileTypeObj[this.fileType]["fileName"])) {
+            //没有匹配到
+            this.$platform.notification({
+              title: '文件上传失败',
+              message: Uploader.fileTypeObj[this.fileType]["errMsg"],
+              type: 'error',
+            })
+            return false;
+          }
+        }
       }
 
       if(allFilesLength > this.limit) {

@@ -1,5 +1,6 @@
 import {randomString} from '@src/util/lang';
-import Field from '@model/Field'
+import Field from '@model/Field';
+import { isSelect, isMultiSelect } from './util';
 import * as FormInfoConfig from './components/FormInfo/config';
 
 /** 补全formType 为select时的所需字段 */
@@ -10,7 +11,8 @@ function fillPropForSelect(params){
   let isMulti = false;
   let dependencies = setting.dependencies || {};
 
-  if(params.formType == 'select'){
+  if(isSelect(params) || isMultiSelect(params)){
+
     let dataSource = setting.dataSource || [];
     let initDefault = false;
 
@@ -27,7 +29,8 @@ function fillPropForSelect(params){
     })
 
     // 没有选项，添加默认项
-    if(options.length == 0) options.push({value: '选项1', isDefault: false})
+    if(options.length == 0) options.push({value: '选项1', isDefault: false});
+    
   }
 
   return {options, isMulti, dependencies};
@@ -62,6 +65,8 @@ export default class FormField{
     this.defaultValue = params.defaultValue; // 默认值
     // 是否为系统字段 0 - 非系统字段，1 - 系统字段
     this.isSystem = typeof params.isSystem == 'number' ? params.isSystem : 0;
+    // 工单专属字段： 是否在移动端显示 0 - 不显示，1 - 显示
+    this.isAppShow = typeof params.isAppShow == 'number' ? params.isAppShow : 0;
 
     // formType 为select时需要补全一下字段
     let {options, isMulti, dependencies} = fillPropForSelect(params)
@@ -78,6 +83,11 @@ export default class FormField{
   
     // 辅助字段
     this.dragging = false; // 当前字段时候正在被拖拽
+
+    if(params.relation_options) {
+      this.relation_options = params.relation_options;
+    }
+
   }
 
   /** @deprecated 兼容旧有写法*/
@@ -102,12 +112,17 @@ export default class FormField{
     option.isSearch = field.isSearch;
     option.placeHolder = field.placeHolder;
     option.isSystem = field.isSystem;
+    option.isAppShow = field.isAppShow;
+
+    if(field.relation_options) {
+      option.relation_options = field.relation_options;
+    }
 
     let setting = {};
     let defaultValue = null;
 
     // 处理下拉选项
-    if(field.formType == 'select'){
+    if(isSelect(field) || isMultiSelect(field)){
       let dataSource = [];
       let opts = field.options || [];
       for(let i = 0; i < opts.length; i++){
@@ -118,12 +133,16 @@ export default class FormField{
           defaultValue = opt.value;
         }
       }
-      setting.isMulti = field.isMulti;
+      field.formType == 'select' && (setting.isMulti = field.isMulti);
       setting.dataSource = dataSource;
     }
 
     if(field.formType === 'info') {
       option.placeHolder = option.placeHolder || FormInfoConfig.PLACE_HOLDER;
+    }
+
+    if(field.formType === 'cascader') {
+      defaultValue = field.defaultValue;
     }
     
     if (field.setting) {

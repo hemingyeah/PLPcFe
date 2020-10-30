@@ -84,6 +84,7 @@ export default {
   overflow-y: auto;
   background-color: #fff;
   box-shadow: -1px 0 8px rgba(0, 0, 0, 0.125);
+  overflow: hidden;
 }
 
 .base-panel-title {

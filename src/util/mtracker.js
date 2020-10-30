@@ -29,6 +29,8 @@ export default function(options = {}) {
     const vc = options.vc || defaultConfig.vc;
     const src = `${srcPrefix}appid=${appId}&vn=${vn}&vc=${vc}`;
 
+    
+
     script.setAttribute('src', src);
     document.querySelector('head').appendChild(script);
 }

@@ -5,8 +5,7 @@
       :value="displayName"
       :placeholder="placeholder"
       readonly 
-      @click="choose"
-    >
+      @click="choose">
     <!-- @keydown.enter.prevent="choose" -->
     <button type="button" class="btn-text form-user-clear" @click="clear" v-if="!isEmpty">
       <i class="iconfont icon-fe-close"></i>

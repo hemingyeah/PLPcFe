@@ -17,6 +17,7 @@ import { FormFieldMap, } from '@src/component/form/components';
 import * as Utils from '@src/component/form/util';
 import { editBatchProduct } from '@src/api/ProductApi';
 import FormItem from '@src/component/form/FormItem.vue';
+import * as CustomerApi from '@src/api/CustomerApi';
 // import {searchCustomer} from '@src/api/EcSearchApi.js';
 
 export default {
@@ -42,10 +43,10 @@ export default {
     fields() {
       let tv = null;
       let formTypes = ['attachment', 'separator', 'location', 'info'];
-      let fieldNames = ['updateTime', 'productTemplate', 'tags', 'remindCount', 'qrcodeId', 'linkmanName', 'phone', 'address'];
+      let fieldNames = ['createUser', 'createTime', 'updateTime', 'productTemplate', 'tags', 'remindCount', 'qrcodeId', 'linkmanName', 'phone', 'address'];
 
       let fields = (this.config.fields || [])
-        .filter(f => formTypes.indexOf(f.formType) < 0 &&  !fieldNames.some(key => key === f.fieldName))
+        .filter(f => formTypes.indexOf(f.formType) < 0 && !fieldNames.some(key => key === f.fieldName))
         .map(f => {
           tv = Object.assign({}, f);
 
@@ -240,7 +241,7 @@ export default {
         },
         searchCustomer(keyword) {
           this.inputRemoteSearch.customer.loading = true;
-          this.$http.get('/customer/getListAsyn', {keyword, pageNum: 1, })
+          CustomerApi.getCustomerListAsyn({keyword, pageNum: 1, })
             .then(res => {
               this.inputRemoteSearch.customer.options = res.list;
               this.inputRemoteSearch.customer.loading = false;

@@ -5,18 +5,11 @@
 </template>
 
 <script>
+import { previewProps } from '@src/component/form/components/props';
+
 export default {
   name: 'form-separator-preview',
-  props: {
-    field: {
-      type: Object,
-      default: () => ({})
-    },
-    setting: {
-      type: Object,
-      default: () => ({})
-    }
-  }
+  props: previewProps
 }
 </script>
 
