@@ -2026,8 +2026,9 @@ export default {
         }
         this.params.keyword = '';
         searchModel['page'] = params.page;
-        searchModel.createTimeStart = this._time(searchModel.createTimeStart);
-        searchModel.createTimeEnd = this._time(searchModel.createTimeEnd);
+
+        searchModel.createTimeStart = this._time(searchModel.createTimeStart || searchModel.timeStart);
+        searchModel.createTimeEnd = this._time(searchModel.createTimeEnd || searchModel.timeEnd);
         // 计划时间
         searchModel.planTimeStart = this._time(searchModel.planTimeStart);
         searchModel.planTimeEnd = this._time(searchModel.planTimeEnd);
