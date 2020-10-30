@@ -477,6 +477,27 @@ export default {
           continue;
         }
 
+        if (tv.fieldName === 'exceptionType') {
+          let exceptionType;
+          switch (form[fn]) {
+          case '暂停':
+            exceptionType = 1;
+            break;
+          case '超时':
+            exceptionType = 2;
+            break;
+          default:
+            exceptionType = 0;
+            break;
+          }
+          params.systemConditions.push({
+            property: 'exceptionType',
+            operator: tv.operatorValue,
+            value: exceptionType,
+          })
+          continue
+        }
+
         if (tv.fieldName == 'product') {
           params.systemConditions.push({
             property: 'productId',
