@@ -107,6 +107,7 @@ export default {
         "onceReallot",
         "oncePrinted",
         "positionException",
+        "source"
       ],
       taskTypes: [
         {
@@ -1792,6 +1793,12 @@ export default {
             oncePrinted = "";
             break;
         }
+        let source=params.source.map((item)=>{
+          if(item=='API创建'){
+            item=='开放API'
+          } 
+          return item;
+        })
         // 是否审批中
         let inApprove;
         switch (params.inApprove) {
@@ -1895,7 +1902,7 @@ export default {
           pageSize: params.pageSize,
           templateId: this.currentTaskType.id,
           state: state,
-
+          source,
           serviceTypes: params.serviceTypes,
           serviceContents: params.serviceContents,
           levels: params.levels,
