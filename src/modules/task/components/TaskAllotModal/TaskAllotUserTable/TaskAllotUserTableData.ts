@@ -1,5 +1,5 @@
 /* component */
-import TaskAllotUserTableComponent from '@src/modules/task/components/TaskAllotModal/TaskAllotUserTable/components'
+import TaskAllotUserTableComponents from '@src/modules/task/components/TaskAllotModal/TaskAllotUserTable/TaskAllotUserTableComponents'
 /* entity */
 import LoginUser from '@model/entity/LoginUser/LoginUser'
 import Tag from '@model/entity/Tag/Tag'
@@ -11,7 +11,7 @@ import { TaskAllotUserTableColumns } from '@src/modules/task/components/TaskAllo
 /* types */
 import Column from '@model/types/Column'
 
-class TaskAllotUserTableData extends TaskAllotUserTableComponent {
+class TaskAllotUserTableData extends TaskAllotUserTableComponents {
   /* 地图对象 */
   public AMap: any = null
   /* 地图弹窗对象 */

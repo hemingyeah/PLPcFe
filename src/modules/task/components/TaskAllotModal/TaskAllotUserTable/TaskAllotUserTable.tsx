@@ -59,9 +59,6 @@ export default class TaskAllotUserTable extends TaskAllotUserTableRender {
             }
           </el-table>
         </div>
-        <div class='task-allot-user-content'>
-          <div id='MapContainer'></div>
-        </div>
         <base-table-advanced-setting />
       </div>
     )

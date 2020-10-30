@@ -8,6 +8,6 @@ import { Vue } from 'vue-property-decorator'
   }
 })
 
-class TaskAllotUserTableComponent extends Vue {}
+class TaskAllotUserTableComponents extends Vue {}
 
-export default TaskAllotUserTableComponent
+export default TaskAllotUserTableComponents
