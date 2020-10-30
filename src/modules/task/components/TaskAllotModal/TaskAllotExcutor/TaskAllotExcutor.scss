@@ -1,5 +1,6 @@
-// 指派地图内容
-.task-allot-user-content {
+/* start 地图 */
+.task-allot-map {
+  display: flex;
   #MapContainer {
     height: 500px;
     width: calc(100% - 450px);
@@ -9,9 +10,13 @@
       overflow: hidden;
     }
   }
+  .user-card {
+    border-left: 1px solid $border-color-base;
+  }
 }
+/* end 地图 */
 
-// 客户地址地图
+/* start 客户地址地图 */
 .map-address-title {
   width: 60px;
   color: red;
@@ -62,3 +67,4 @@
     transform: rotate(45deg);
   }
 }
+/* end 客户地址地图 */

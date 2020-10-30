@@ -3,6 +3,8 @@ import TaskAllotUserTable from '@src/modules/task/components/TaskAllotModal/Task
 import UserCard from '@src/modules/task/components/TaskAllotModal/UserCard/UserCard.tsx'
 /* enum */
 import ComponentNameEnum from '@model/enum/ComponentNameEnum'
+/* scss */
+import '@src/modules/task/components/TaskAllotModal/TaskAllotExcutor/TaskAllotExcutor.scss'
 /* vue */
 import { Vue, Component } from 'vue-property-decorator'
 import { CreateElement } from 'vue'

@@ -39,10 +39,21 @@
   }
 }
 
+.user-card-time,
+.user-card-detail {
+  margin-top: 12px;
+  margin-right: 100px;
+}
+
 .user-card-detail {
   &-row {
+    display: flex;
+    justify-content: space-between;
+    line-height: 30px;
+    align-items: center;
     &-item {
-      
+      text-align: left;
+      width: 120px;
     }
   }
 }

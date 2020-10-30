@@ -23,10 +23,6 @@ import './TaskAllotModal.scss'
 })
 
 export default class TaskAllotModal extends TaskAllotModalRender {
-  // /* 客户id */
-  @Prop() readonly customerId: string | undefined
-  /* 用户工作状态 */
-  @Prop() readonly userStateMap: any | undefined
   
   mounted() {
     this.fetchCustomer()

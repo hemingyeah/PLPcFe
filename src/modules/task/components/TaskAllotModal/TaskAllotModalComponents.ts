@@ -1,9 +1,14 @@
 import VC from '@model/VC'
-/* props */
-import TaskAllotModalProps from '@src/modules/task/components/TaskAllotModal/TaskAllotModalProps'
 
-class TaskAllotModalComponents extends VC<TaskAllotModalProps> {
+interface Props {
+  // /* 客户id */
+  customerId: string | undefined
+  /* 用户工作状态 */
+  userStateMap: any | undefined
+}
 
+class TaskAllotModalComponents extends VC<Props> {
+  
 }
 
 export default TaskAllotModalComponents

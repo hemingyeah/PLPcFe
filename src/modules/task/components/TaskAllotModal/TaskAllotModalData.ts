@@ -1,12 +1,12 @@
-/* components */
-import TaskAllotModalComponents from '@src/modules/task/components/TaskAllotModal/TaskAllotModalComponents'
 /* entity */
 import Customer from '@model/entity/Customer'
 import LoginUser from '@model/entity/LoginUser/LoginUser'
 /* enum */
 import TaskAllotTypeEnum from '@model/enum/TaskAllotTypeEnum'
+/* props */
+import TaskAllotModalProps from '@src/modules/task/components/TaskAllotModal/TaskAllotModalProps'
 
-class TaskAllotModalData extends TaskAllotModalComponents {
+class TaskAllotModalData extends TaskAllotModalProps {
   /* 派单方式 */
   public allotType: TaskAllotTypeEnum = TaskAllotTypeEnum.Person
   /* 客户信息 */
