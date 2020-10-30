@@ -576,7 +576,8 @@
                   <span
                     class="task-state-block task-state-block-overtime task-font12"
                     v-if="
-                      new Date().getTime() >
+                      scope.row.overTime &&
+                        new Date().getTime() >
                         new Date(scope.row.overTime).getTime()
                     "
                   >
