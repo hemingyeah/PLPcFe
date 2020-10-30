@@ -1,5 +1,5 @@
 <template>
-  <base-panel :show.sync="visible" :width="panelWidth" @close="hide()" :re="true">
+  <base-panel :show="visible" :width="panelWidth" @close="hide()" :re="true">
     <h3 slot="title">
       <span>高级搜索</span>
       <el-dropdown
@@ -509,7 +509,7 @@ export default {
           params.systemConditions.push({
             property: fn,
             operator: tv.operatorValue,
-            betweenValue1: formatDate(form[fn][0], 'YYYY-MM-DD HH:mm:ss'),
+            betweenValue1: `${formatDate(form[fn][0], 'YYYY-MM-DD')} 00:00:00`,
             betweenValue2: `${formatDate(form[fn][1], 'YYYY-MM-DD')} 23:59:59`,
           })
           continue
@@ -519,7 +519,7 @@ export default {
           params.systemConditions.push({
             property: fn,
             operator: tv.operatorValue,
-            betweenValue1: formatDate(form[fn][0], 'YYYY-MM-DD HH:mm:ss'),
+            betweenValue1: `${formatDate(form[fn][0], 'YYYY-MM-DD')} 00:00:00`,
             betweenValue2: `${formatDate(form[fn][1], 'YYYY-MM-DD')} 23:59:59`
           })
           continue

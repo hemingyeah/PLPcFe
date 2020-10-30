@@ -102,14 +102,14 @@ export default {
       tableKey: (Math.random() * 1000) >> 2,
       taskStateEnum: TaskStateEnum,
       taskStatusFields: [
-        "onceOverTime",
-        "onceRefused",
-        "oncePaused",
-        "onceRollback",
-        "onceReallot",
-        "oncePrinted",
+        'onceOverTime',
+        'onceRefused',
+        'oncePaused',
+        'onceRollback',
+        'onceReallot',
+        'oncePrinted',
         // "source",
-        "positionException",
+        'positionException',
       ],
       taskTypes: [
         {
@@ -1721,6 +1721,7 @@ export default {
      */
     search(searchModel = '', bool = true, searchBool) {
       const params = this.buildSearchParams();
+      console.log('搜索条件', params)
       let resetParamBool = bool
       if (!searchBool) {
         this.loading = true;

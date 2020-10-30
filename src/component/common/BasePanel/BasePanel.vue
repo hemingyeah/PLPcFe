@@ -51,7 +51,7 @@ export default {
   props: {
     title: String,
     re: {
-      //显示方式 v-if 或者 V-show
+      // 显示方式 v-if 或者 V-show
       type: Boolean,
       default: false
     },
@@ -85,9 +85,11 @@ export default {
     }
   },
   mounted() {
+    if (this.re) return
     document.addEventListener('click', this.handleClickOutside, false);
   },
   destroyed() {
+    if (this.re) return
     document.removeEventListener('click', this.handleClickOutside);
   }
 };
