@@ -2,6 +2,10 @@ import Vue from '@src/common/entry';
 import http from '@src/util/http';
 import TaskDetailView from './TaskDetailView.vue';
 
+import VueTour from 'vue-tour';
+require('vue-tour/dist/vue-tour.css');
+Vue.use(VueTour);
+
 Vue.prototype.$http = http;
 Vue.prototype.$eventBus = new Vue();
 
