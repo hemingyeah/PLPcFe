@@ -3,6 +3,11 @@ import http from '@src/util/http';
 import TaskList from './TaskListView.vue';
 import mtracker from '@src/util/mtracker';
 
+
+import VueTour from 'vue-tour';
+require('vue-tour/dist/vue-tour.css');
+Vue.use(VueTour);
+
 Vue.prototype.$http = http;
 mtracker();
 

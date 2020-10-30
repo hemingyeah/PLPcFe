@@ -23,6 +23,17 @@
       <el-checkbox-group v-model="checkSystemList">
         <el-checkbox :label="item.displayName" v-for="(item, index) in systemList" :key="index" class="wh150"></el-checkbox>
       </el-checkbox-group>
+      <template v-if="guideSearchPupal">
+        <guide-compoment
+          :content="'①选中 ②保存，设置立刻生效'"
+          :only-one="true"
+          :have-step="false"
+          :finish-btn="'试一下'"
+          :style="'width:240px;top:250px;margin:auto;left:0;right:0;'"
+          :stop-step="guide_stopStep"
+          :finish-btn-fn="guide_finishBtnFn"
+        ></guide-compoment>
+      </template>
       <!-- 自定义字段 -->
       <el-checkbox :indeterminate="isIndeterminateCus" v-model="cusCheckAll" @change="handleCheckAllCusChange" v-if="customizeList.length"><h3 class="task-mtb13">自定义字段</h3></el-checkbox>
       <el-checkbox-group v-model="checkCustomizeList">
@@ -34,10 +45,16 @@
       <el-button type="primary" @click="onSubmit"
       >确 定</el-button
       >
+      <el-button type="primary" @click="onSubmit">确 定</el-button>
     </div>
   </base-modal>
 </template>
 <script>
+import guideCompoment from '@src/component/guide/guide';
+import { storageGet, storageSet } from '@src/util/storage';
+
+// const TASK_GUIDE_SEARCH_PUPAL = 'guide-task-tasklistsearchpupal';
+const { TASK_GUIDE_SEARCH_PUPAL } = require('@src/component/guide/taskV2Store');;
 export default {
   name: 'task-search-pupal',
   props: {
@@ -52,6 +69,9 @@ export default {
     taskInquireList: {
       type: Array, // 用于判断
     }
+  },
+  components: {
+    [guideCompoment.name]: guideCompoment,
   },
   watch: {
     taskTypeFilterFields(v) {
@@ -90,6 +110,7 @@ export default {
       checkCustomizeList: [], // 选中自定义字段
       systemList: [], // 系统字段
       customizeList: this.taskTypeFilterFields, // 自定义字段
+      guideSearchPupal: false,
     }
   },
   mounted() {
@@ -97,6 +118,16 @@ export default {
     this.loc()
   },
   methods: {
+    guide_stopStep() {
+    },
+    guide_finishBtnFn() {
+      this.guide_stopStep();
+    },
+    open() {
+      if (storageGet(TASK_GUIDE_SEARCH_PUPAL) && storageGet(TASK_GUIDE_SEARCH_PUPAL) > 0) this.guideSearchPupal = false;
+      else this.guideSearchPupal = true, storageSet(TASK_GUIDE_SEARCH_PUPAL, '1');
+      this.visible = true;
+    },
     handleCheckAllSysChange(v) {
       this.checkSystemList = v ? this.systemList.map(item => {return item.displayName}) : []
     },
@@ -127,9 +158,6 @@ export default {
       } else {
         this.isIndeterminateCus = true
       }
-    },
-    open() {
-      this.visible = true
     },
     taskSearch() {
       if (!this.seoText) {
@@ -181,28 +209,28 @@ export default {
 }
 </script>
 <style lang="scss">
-  .task-search-input {
-      .el-button {
-        background-color: #13c2c2!important;
-        color: #fff!important;
-        border-radius: 0 3px 3px 0!important;
-        border: 1px solid #13c2c2!important
-      }
+.task-search-input {
+  .el-button {
+    background-color: #13c2c2 !important;
+    color: #fff !important;
+    border-radius: 0 3px 3px 0 !important;
+    border: 1px solid #13c2c2 !important;
   }
+}
 </style>
 <style lang="scss" scoped>
-  .task-search-content {
-      padding-bottom: 100px;
-  }
-  .task-search-input {
-      width: 276px;
-  }
-  .dialog-footer {
-    display: flex;
-    justify-content: flex-end;
-  }
-  .wh150 {
-      min-width: 150px;
-      width: auto;
-  }
+.task-search-content {
+  padding-bottom: 100px;
+}
+.task-search-input {
+  width: 276px;
+}
+.dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+}
+.wh150 {
+  min-width: 150px;
+  width: auto;
+}
 </style>
