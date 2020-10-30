@@ -1795,7 +1795,7 @@ export default {
         }
         let source=params.source.map((item)=>{
           if(item=='API创建'){
-            item=='开放API'
+            item='开放API'
           } 
           return item;
         })
@@ -1903,6 +1903,7 @@ export default {
           templateId: this.currentTaskType.id,
           state: state,
           source,
+          eventNo: params.eventNo,
           serviceTypes: params.serviceTypes,
           serviceContents: params.serviceContents,
           levels: params.levels,
