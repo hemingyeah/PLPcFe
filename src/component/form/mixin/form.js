@@ -13,6 +13,12 @@ const FormMixin = {
       }
     },
   },
+  computed: {
+    disabled() {
+      let field = this.field;
+      return field.setting && field.setting.defaultValueConfig && !!field.setting.defaultValueConfig.isNotModify;
+    }
+  },
   watch: {
     field(newValue) {
       this.addFieldEvent();
