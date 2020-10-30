@@ -63,8 +63,10 @@ let repeatRemoteValidate = _.debounce(function(mode, field, value, changeStatus,
 }, 500)
 
 /** 单行文本验证，50字以内 */
-function text(value, field = {}){
-  return new Promise((resolve, reject) => {
+function text(value, field = {}, origin = {}, mode, changeStatus){
+  let { isRepeat } = field.setting || {};
+
+  let validate = new Promise((resolve, reject) => {
     // 先验证长度
     if(value != null && value.toString().length > SINGLE_LINE_MAX_LEN){
       return resolve(`长度不能超过${SINGLE_LINE_MAX_LEN}个字符`);
@@ -74,6 +76,17 @@ function text(value, field = {}){
     // 不允许为空
     if(!value || value.toString().length == 0) return resolve(`请输入${field.displayName}`);
     resolve(null);
+  })
+
+  // 不需要校验重复性
+  if (!isRepeat || !mode || !value) return validate;
+
+  return new Promise((resolve, reject) => {
+    validate.then((res) => {
+      res === null ? repeatRemoteValidate(mode, field, value, changeStatus, resolve) : resolve(res);
+    }).catch(err => {
+      console.error('text validate err', err);
+    })
   })
 }
 
@@ -87,8 +100,10 @@ function select(value, field = {}) {
 }
 
 /** 多行文本验证，500字以内 */
-function textarea(value, field = {}) {
-  return new Promise((resolve, reject) => {
+function textarea(value, field = {}, origin = {}, mode, changeStatus) {
+  let { isRepeat } = field.setting || {};
+  
+  let validate = new Promise((resolve, reject) => {
     if (value !== null && value.toString().length > MULTI_LINE_MAX_LEN) {
       return resolve(`长度不能超过${MULTI_LINE_MAX_LEN}个字符`);
     }
@@ -96,6 +111,17 @@ function textarea(value, field = {}) {
     if (value == null || value.toString().length == 0) return resolve(`请输入${field.displayName}`);
     resolve(null);
   });
+
+  // 不需要校验重复性
+  if (!isRepeat || !mode || !value) return validate;
+
+  return new Promise((resolve, reject) => {
+    validate.then((res) => {
+      res === null ? repeatRemoteValidate(mode, field, value, changeStatus, resolve) : resolve(res);
+    }).catch(err => {
+      console.error('textarea validate err', err);
+    })
+  })
 }
 
 // 验证电话手机格式

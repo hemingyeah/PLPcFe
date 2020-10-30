@@ -2,7 +2,7 @@
   <div class="form-preview-group">
     <label>
       {{field.displayName}} 
-      <span class="form-preview-notNull" v-if="field.isNull == 0">*</span>
+      <span class="form-preview-notNull" v-if="showRequired">*</span>
       <i class="iconfont icon-yidongduanxianshi" v-if="field.isAppShow === 1"></i>
     </label>
     <div class="form-preview-mock">
@@ -23,7 +23,15 @@ export default {
   computed: {
     /** 是否为扫码类型 */
     isCode(){
-      return this.field.formType == 'code';
+      return this.field.formType == 'code' || !!this.field.setting.isScanCode;
+    },
+    disabled() {
+      let field = this.field;
+      return field.setting && field.setting.defaultValueConfig && !!field.setting.defaultValueConfig.isNotModify;
+    },
+    showRequired() {
+      let field = this.field;
+      return field.isNull == 0 && !this.disabled;
     }
   }
 }

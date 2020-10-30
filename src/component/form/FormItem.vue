@@ -1,6 +1,6 @@
 <template>
   <div class="form-item" :class="{err: errMessage}">
-    <label :for="forId">{{label}} <span class="form-item-required" v-if="isRequired">*</span></label>
+    <label :for="forId">{{label}} <span class="form-item-required" v-if="showRequired">*</span></label>
     <div class="form-item-control">
       <slot></slot>
       <div class="err-msg-wrap">
@@ -55,6 +55,9 @@ export default {
       if(this.isNotNull !== undefined) return this.isNotNull;
       return this.field.isNull == 0;
     },
+    showRequired() {
+      return this.isRequired && !this.disabled;
+    },
     forId(){
       if(!this.field.fieldName) return '';
       return `form_${this.field.fieldName}`;
@@ -63,6 +66,10 @@ export default {
     needValidation(){
       let validation = this.validation;
       return (typeof validation == 'boolean' && validation) || typeof validation == 'function'
+    },
+    disabled() {
+      let field = this.field;
+      return field.setting && field.setting.defaultValueConfig && !!field.setting.defaultValueConfig.isNotModify;
     }
   },
   methods: {

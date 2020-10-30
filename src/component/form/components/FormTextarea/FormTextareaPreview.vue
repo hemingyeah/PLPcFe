@@ -2,11 +2,14 @@
   <div class="form-preview-group form-textarea-preview">
     <label>
       {{field.displayName}} 
-      <span class="form-preview-notNull" v-if="field.isNull == 0">*</span>
+      <span class="form-preview-notNull" v-if="showRequired">*</span>
       <i class="iconfont icon-yidongduanxianshi" v-if="field.isAppShow === 1"></i>
     </label>
-    <div class="form-preview-mock">
-      <p class="form-preview-control">{{field.placeHolder}}</p>
+    <div class="form-preview-mock" >
+      <p class="form-preview-control" :class="{'form-preview-withIcon': isCode}">
+        {{field.placeHolder}}
+        <i class="iconfont icon-scan" v-if="isCode"></i>
+      </p>
     </div>
   </div>
 </template>
@@ -16,7 +19,21 @@ import { previewProps } from '@src/component/form/components/props';
 
 export default {
   name: 'form-textarea-preview',
-  props: previewProps
+  props: previewProps,
+  computed: {
+    /** 是否为扫码类型 */
+    isCode(){
+      return this.field.formType == 'code' || !!this.field.setting.isScanCode;
+    },
+    disabled() {
+      let field = this.field;
+      return field.setting && field.setting.defaultValueConfig && !!field.setting.defaultValueConfig.isNotModify;
+    },
+    showRequired() {
+      let field = this.field;
+      return field.isNull == 0 && !this.disabled;
+    }
+  }
 }
 </script>
 
