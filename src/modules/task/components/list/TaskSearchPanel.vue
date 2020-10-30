@@ -359,7 +359,7 @@ export default {
           continue;
         }
 
-        if (tv.formType === 'cascader') {
+        if (tv.formType === 'cascader' || (tv.formType === 'user' && Array.isArray(form[fn]))) {
           params.conditions.push({
             property: fn,
             operator: tv.operator,
