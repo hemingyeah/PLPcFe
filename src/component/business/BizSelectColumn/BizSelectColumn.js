@@ -2,10 +2,10 @@ import './BizSelectColumn.scss'
 
 import BizSelectColumnSort from './BizSelectColumnSort'
 
-import guideCompoment from '@src/modules/task/list/components/guide';
+import guideCompoment from '@src/component/guide/guide';
 
 
-const TASK_GUIDE_SELECT_COLUMN = 'guide-task-tasklistselectcolumn';
+const { TASK_GUIDE_SELECT_COLUMN } = require('@src/component/guide/taskV2Store');
 
 import _ from 'lodash'
 import { typeOf } from '@src/util/assist';
@@ -32,7 +32,7 @@ function convertColumnWithSave(field = {}) {
 const BizSelectColumn = {
   name: 'biz-select-column',
   data() {
-    let  guideSelectColumn = !storageGet(TASK_GUIDE_SELECT_COLUMN) ? true : false;
+    let  guideSelectColumn = storageGet(TASK_GUIDE_SELECT_COLUMN) < 0 ? true : false;
     return {
       columnSortList: [],
       columnTree: {},
@@ -335,7 +335,7 @@ const BizSelectColumn = {
       this.originColumns = _.cloneDeep(columns)
       this.taskType = taskType
       this.columnTree = this.columnsDataGrouped(_.cloneDeep(columns))
-      if (storageGet(TASK_GUIDE_SELECT_COLUMN)) this['guideSelectColumn'] = false;
+      if (storageGet(TASK_GUIDE_SELECT_COLUMN) == 1) this['guideSelectColumn'] = false;
       else storageSet(TASK_GUIDE_SELECT_COLUMN, '1')
       this.show = true
     },

@@ -120,7 +120,7 @@ import TaskSearchForm from "./TaskSearchForm.vue";
 import TaskSearchPupal from "./TaskSearchPupal";
 import TaskInquire from "./TaskInquire";
 
-import guideCompoment from "@src/modules/task/list/components/guide";
+import guideCompoment from "@src/component/guide/guide";
 
 let guideCompoments = Vue.extend(guideCompoment);
 
@@ -159,7 +159,7 @@ const TaskInquireConvertFieldNamesToConditionsMap = {
   tlmName: "tlmId",
 };
 
-const TASK_GUIDE_SEARCH_MODEL = 'guide-task-tasklistsearchmodel';
+const { TASK_GUIDE_SEARCH_MODEL } = require('@src/component/guide/taskV2Store');;
 
 export default {
   name: 'task-search-panel',
@@ -799,7 +799,7 @@ export default {
     },
     previousStep(e) {
       this.createGuide("v-task-step-6", {
-        content: "测试",
+        content: "高级搜索的“空白”，由您来填充。通过“设置”功能，定制您专属的“常用查询条件”",
         haveStep: true,
         nowStep: 1,
         totalStep: 2,

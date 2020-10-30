@@ -73,12 +73,6 @@ export default {
     };
   },
   methods: {
-    // stopStep() {
-    //   this.$emit('stopStep');
-    // },
-    // finishBtnFn() {
-    //   this.$emit('finishBtnFn');
-    // },
   },
 };
 </script>

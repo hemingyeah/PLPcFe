@@ -65,10 +65,11 @@
   </base-modal>
 </template>
 <script>
-import guideCompoment from '@src/modules/task/list/components/guide';
+import guideCompoment from '@src/component/guide/guide';
 import { storageGet, storageSet } from '@src/util/storage';
 
-const TASK_GUIDE_SEARCH_PUPAL = 'guide-task-tasklistsearchpupal';
+// const TASK_GUIDE_SEARCH_PUPAL = 'guide-task-tasklistsearchpupal';
+const { TASK_GUIDE_SEARCH_PUPAL } = require('@src/component/guide/taskV2Store');;
 export default {
   name: 'task-search-pupal',
   components: {
@@ -133,7 +134,7 @@ export default {
       }
     },
     open() {
-      if (storageGet(TASK_GUIDE_SEARCH_PUPAL)) this.guideSearchPupal = false;
+      if (storageGet(TASK_GUIDE_SEARCH_PUPAL) && storageGet(TASK_GUIDE_SEARCH_PUPAL) > 0) this.guideSearchPupal = false;
       else this.guideSearchPupal = true, storageSet(TASK_GUIDE_SEARCH_PUPAL, '1');
       this.visible = true;
     },

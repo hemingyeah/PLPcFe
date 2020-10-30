@@ -9,7 +9,7 @@ import BatchEditingCustomerDialog from './components/BatchEditingCustomerDialog.
 import TaskTransfer from './components/TaskTransfer.vue';
 import TaskMap from './components/TaskMap.vue';
 import TaskView from './components/TaskView.vue'
-import guideCompoment from '@src/modules/task/list/components/guide';
+import guideCompoment from '@src/component/guide/guide';
 
 /** model */
 import TaskStateEnum from '@model/enum/TaskStateEnum.ts';
@@ -52,10 +52,7 @@ import {
 const TASK_LIST_KEY = 'task_list';
 
 // 工单引导标识
-const TASK_GUIDE_LIST = 'guide-task-tasklistview';
-const TASK_GUIDE_SEARCH_MODEL = 'guide-task-tasklistsearchmodel';
-const TASK_GUIDE_SEARCH_MODEL_SAVE = 'guide-task-tasklistsearchmodelsave';
-const TASK_GUIDE_DROPDOWN_MENU = 'guide-task-tasklistdropdownmenu'
+const { TASK_GUIDE_LIST, TASK_GUIDE_SEARCH_MODEL, TASK_GUIDE_SEARCH_MODEL_SAVE, TASK_GUIDE_DROPDOWN_MENU } = require('@src/component/guide/taskV2Store');;
 // 埋点事件对象
 const TRACK_EVENT_MAP = {
   search: 'pc：工单列表-搜索事件',
@@ -315,8 +312,8 @@ export default {
 
     this.$nextTick(() => {
       setTimeout(() => {
-        if (!storageGet(TASK_GUIDE_LIST)) this.$tours['myTour'].start(), this.nowGuideStep = 1, storageSet(TASK_GUIDE_LIST, '4');
-        // if (!storageGet(TASK_GUIDE_DROPDOWN_MENU)) this['guideDropdownMenu'] = true;
+        if (storageGet(TASK_GUIDE_LIST) < 0) this.$tours['myTour'].start(), this.nowGuideStep = 1, storageSet(TASK_GUIDE_LIST, '4');
+        // if (storageGet(TASK_GUIDE_DROPDOWN_MENU) < 0) this['guideDropdownMenu'] = true;
       }, 1000)
     })
 
@@ -451,7 +448,7 @@ export default {
       this.params.moreConditions = this.$refs.searchPanel.buildParams();
       // this.$refs.searchPanel.hide();
 
-      // if (!storageGet(TASK_GUIDE_SEARCH_MODEL_SAVE)) this['guideSearchModelSave'] = true, storageSet(TASK_GUIDE_SEARCH_MODEL_SAVE, '1');
+      // if (storageGet(TASK_GUIDE_SEARCH_MODEL_SAVE) < 0) this['guideSearchModelSave'] = true, storageSet(TASK_GUIDE_SEARCH_MODEL_SAVE, '1');
 
       this.search();
     },
@@ -1740,9 +1737,9 @@ export default {
           let form = forms[i];
           form.setAttribute('novalidate', true);
         }
-        if (!storageGet(TASK_GUIDE_SEARCH_MODEL) || storageGet(TASK_GUIDE_SEARCH_MODEL) * 1 < 2) {
+        if (storageGet(TASK_GUIDE_SEARCH_MODEL) < 0 || storageGet(TASK_GUIDE_SEARCH_MODEL) * 1 < 2) {
           this.$refs.searchPanel.createGuide('v-task-step-6', {
-            content: '测试',
+            content: '高级搜索的“空白”，由您来填充。通过“设置”功能，定制您专属的“常用查询条件',
             haveStep: true,
             nowStep: 1,
             totalStep: 2,

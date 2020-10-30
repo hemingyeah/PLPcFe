@@ -36,7 +36,7 @@ import tourGuide from '@src/mixins/tourGuide'
 const ENCRYPT_FIELD_VALUE = '***';
 
 
-const TASK_GUIDE_DETAIL = 'guide-task-taskdetailview';
+const { TASK_GUIDE_DETAIL } = require('@src/component/guide/taskV2Store');
 
 export default {
   name: 'task-detail-view',
@@ -1109,7 +1109,7 @@ export default {
 
       this.$nextTick(()=>{
         setTimeout(()=>{
-          if (!storageGet(TASK_GUIDE_DETAIL)) this.$tours['myTour'].start(), this.nowGuideStep = 1, storageSet(TASK_GUIDE_DETAIL, '4');
+          if (storageGet(TASK_GUIDE_DETAIL) < 0) this.$tours['myTour'].start(), this.nowGuideStep = 1, storageSet(TASK_GUIDE_DETAIL, '4');
         }, 1000)
         
       })
