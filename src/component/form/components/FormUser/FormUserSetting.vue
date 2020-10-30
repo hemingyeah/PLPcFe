@@ -20,7 +20,7 @@
       <h4 class="form-item-title">校验</h4>
       <div class="form-item-box">
         <!-- 必填 -->
-        <form-required-setting :field="field" @input="update"></form-required-setting>
+        <el-checkbox :value="field.isNull" @input="update($event, 'isNull')" @change="isNullUserField" :true-label="0" :false-label="1">必填</el-checkbox>
       </div>
     </div>
     <!-- end 校验 -->
@@ -30,9 +30,14 @@
       <h4 class="form-item-title">选项</h4>
       <div class="form-item-box">
         <!-- 可多选 -->
-        <el-checkbox v-model="field.setting.isMultiple" @input="update($event, 'isMultiple', true)" :true-label="1" :false-label="0">可多选</el-checkbox>
+        <div class="form-setting-item">
+          <el-checkbox v-model="field.setting.isMultiple" @input="update($event, 'isMultiple', true)" :true-label="1" :false-label="0" :disabled="!!field.id">可多选</el-checkbox>
+        </div>
+        
         <!-- 可显示离职人员 -->
-        <el-checkbox v-model="field.setting.showDeleteUser" @input="update($event, 'showDeleteUser', true)" :true-label="1" :false-label="0">可显示离职人员</el-checkbox>
+        <div class="form-setting-item">
+          <el-checkbox v-model="field.setting.showDeleteUser" @input="update($event, 'showDeleteUser', true)" :true-label="1" :false-label="0">可显示离职人员</el-checkbox>
+        </div>
       </div>
     </div>
     <!-- end 校验 -->

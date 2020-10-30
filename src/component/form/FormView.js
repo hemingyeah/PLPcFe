@@ -47,6 +47,14 @@ const FormView = {
       
       // 人员
       if (field.formType === 'user') {
+        let { isMultiple } = field.setting || {};
+
+        // 多选
+        if(isMultiple == 1) {
+          let valueArr = Array.isArray(value) ? value : [];
+          return valueArr.map(i => i.displayName || i.name).join(',');
+        }
+        
         return value && (value.displayName || value.name)
       }
       
@@ -239,7 +247,7 @@ const FormView = {
       if (formType === 'user') {
         params = {
           ...params,
-          value: value && (value.displayName || value.name)
+          value: this.formatValue(field, value)
         };
       }
       

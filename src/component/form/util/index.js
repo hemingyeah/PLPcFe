@@ -124,7 +124,7 @@ export function initialize(fields = [], origin = {}, callback){
     let dataSource = setting.dataSource || [];
     let defaultValue = field.defaultValue || '';
     let { defaultValueConfig } = setting || {};
-    let { isCurrentDate } = defaultValueConfig || {};
+    let { isCurrentDate, isCurrentUser } = defaultValueConfig || {};
     
     // 客户和编号类型不出初始化值
     if(field.formType == 'customer' || field.formType == 'eventNo' || field.formType == 'taskNo') return;
@@ -158,8 +158,23 @@ export function initialize(fields = [], origin = {}, callback){
     }
     
     // 地址、人员的默认值初始化为对象
-    let objValueFields = ['customerAddress', 'address', 'user']
+    let objValueFields = ['customerAddress', 'address']
     if(objValueFields.indexOf(field.formType) >= 0) defaultValue = {};
+
+    // 人员字段初始化
+    if(formType == 'user') {
+      let { isMultiple } = setting || {};
+
+      // 默认当前登录账户
+      if (isCurrentUser == 1) {
+        let loginUser = window.parent.loginUser;
+
+        // TODO：处理登录账户数据(登录数据和所需数据不匹配)
+        defaultValue = isMultiple == 1 ? [loginUser] : loginUser;
+      } else {
+        defaultValue = isMultiple == 1 ? [] : {};
+      }
+    }
     
     // 来自表单的值，用于编辑时初始化值
     let attribute = origin.attribute || {};
