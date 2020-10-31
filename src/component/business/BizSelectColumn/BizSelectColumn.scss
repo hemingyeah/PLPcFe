@@ -28,6 +28,9 @@
         font-weight: normal;
       }
     }
+    .out-line-dis{
+      border: 1px dashed $color-primary;
+    }
     .biz-select-column-sort {
       width: 260px;
       overflow: auto;
