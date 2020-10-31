@@ -286,7 +286,12 @@ export default {
           this.columnNum == 2 ? 'two-columns' : ''
         }`}
       >
-        {this.fields.map((f) => this.renderInput(h, f))}
+        {this.fields.map(item => {
+          if (item.formType === 'datetime') {
+            item.formType = 'date'
+          }
+          return item
+        }).map((f) => this.renderInput(h, f))}
       </div>
     );
   },
