@@ -7,7 +7,7 @@ import { getRootWindow } from '@src/util/dom';
 import TaskStateEnum from '@model/enum/TaskStateEnum.ts';
 import Filter from '@src/filter/filter.js';
 import { parse } from '@src/util/querystring';
-import { isShowReport } from '@src/util/version.ts';
+import { isShowReport } from '@src/util/version.ts'
 import {
   storageGet,
   storageSet
@@ -30,12 +30,10 @@ import TaskTimeDialog from './components/TaskTimeDialog.vue';
 
 /* enum */
 import { TaskEventNameMappingEnum } from '@model/enum/EventNameMappingEnum.ts';
-
 /* mixin */
 import tourGuide from '@src/mixins/tourGuide'
 
 const ENCRYPT_FIELD_VALUE = '***';
-
 
 const { TASK_GUIDE_DETAIL } = require('@src/component/guide/taskV2Store');
 
@@ -81,10 +79,10 @@ export default {
         boundariesElement: 'viewport',
         removeOnDestroy: true
       },
-      nowGuideStep:5,
+      nowGuideStep: 5,
       guideSearchModelSave: false,
       guideDropdownMenu: false,
-      isGuide:false,
+      isGuide: false,
     }
   },
   computed: {
@@ -631,9 +629,9 @@ export default {
     }
   },
   methods: {
-    previousStep() {},
+    previousStep() { },
     nextStep() {
-      this.nowGuideStep ++;
+      this.nowGuideStep++;
     },
     stopStep() {
       this.nowGuideStep = this.detailSteps.length + 1;
@@ -1120,12 +1118,12 @@ export default {
       }
 
       this.loading = false;
-
-      this.$nextTick(()=>{
-        setTimeout(()=>{
+      
+      this.$nextTick(() => {
+        setTimeout(() => {
           if (!storageGet(TASK_GUIDE_DETAIL)) this.$tours['myTour'].start(), this.nowGuideStep = 1, storageSet(TASK_GUIDE_DETAIL, '4');
         }, 1000)
-        
+
       })
 
     } catch (e) {
