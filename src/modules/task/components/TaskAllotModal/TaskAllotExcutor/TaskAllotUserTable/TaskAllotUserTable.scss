@@ -5,10 +5,20 @@
   .biz-team-select,
   .base-select-container,
   .el-select {
-    width: 150px;
+    width: 145px;
   }
   
   .biz-form-remote-select {
     flex: none;
+  }
+}
+
+.task-allot-user-table {
+  &-column {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100px;
   }
 }

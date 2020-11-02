@@ -7,8 +7,6 @@ interface Props {
   userStateMap: any | undefined
 }
 
-class TaskAllotModalComponents extends VC<Props> {
-  
-}
+class TaskAllotModalComponents extends VC<Props> {}
 
 export default TaskAllotModalComponents

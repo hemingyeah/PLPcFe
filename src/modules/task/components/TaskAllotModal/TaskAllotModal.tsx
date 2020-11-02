@@ -4,6 +4,7 @@ import TaskAllotExcutor from '@src/modules/task/components/TaskAllotModal/TaskAl
 import UserButton from '@src/modules/task/components/TaskAllotModal/UserButton/UserButton.tsx'
 /* enum */
 import ComponentNameEnum from '@model/enum/ComponentNameEnum'
+import TaskAllotTypeEnum from '@model/enum/TaskAllotTypeEnum'
 /* vue */
 import { CreateElement } from 'vue'
 /* vue */
@@ -40,12 +41,13 @@ export default class TaskAllotModal extends TaskAllotModalRender {
         }
       }
     }
+
     return (
       <base-modal show={this.showTaskAllotModal} {...attrs}>
         <div class='task-allot-nav'>
           <div class='task-allot-type'>
             <span class='task-allot-nav-title'>派单方式</span>
-            <task-allot-type type={this.allotType} onChange={this.handlerAllotTypeChange} />
+            <task-allot-type type={this.allotType} onChange={(value: TaskAllotTypeEnum) => this.handlerAllotTypeChange(value)} />
           </div>
           <div class='task-allot-executor'>
             <span class='task-allot-nav-title'>负责人</span>
@@ -54,7 +56,13 @@ export default class TaskAllotModal extends TaskAllotModalRender {
           {this.renderSynergy()}
         </div>
         <div class='task-allot-content'>
-          <task-allot-excutor ref="TaskAllotExcutorComponent" />
+          <keep-alive>
+            <task-allot-excutor
+              onSetExecutor={(user: any) => this.setExecutorUser(user)} 
+              onSetSynergy={(user: any) => this.setSynergyUser(user)} 
+              ref="TaskAllotExcutorComponent" 
+            />
+          </keep-alive>
         </div>
       </base-modal>
     )

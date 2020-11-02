@@ -10,6 +10,13 @@ import { Vue, Component, Prop, Emit, Watch } from 'vue-property-decorator'
 import { CreateElement } from 'vue'
 /* scss */
 import '@src/modules/task/components/TaskAllotModal/UserCard/UserCard.scss'
+/* util */
+import { dispatch } from '@src/util/emitter'
+
+enum UserCardEmitEventEnum {
+  SetExecutor = 'setExecutor',
+  SetSynergy = 'setSynergy'
+}
 
 interface TaskAllotUser extends LoginUser {
   // 未完成工单量
@@ -30,6 +37,8 @@ interface TaskAllotUser extends LoginUser {
 
 @Component({ name: 'user-card' })
 export default class UserCard extends Vue {
+  // 向外发布事件的 组件名字
+  @Prop() emitEventComponentName: string | undefined
   // 用户id
   @Prop() userId: string | undefined
   
@@ -73,15 +82,27 @@ export default class UserCard extends Vue {
   /**
    * @description 设置负责人人
   */
+  @Emit(UserCardEmitEventEnum.SetExecutor)
   private setExecutorUser() {
+    // 支持由自定义组件 发出事件
+    if (this.emitEventComponentName) {
+      dispatch.call(this, this.emitEventComponentName, UserCardEmitEventEnum.SetExecutor, this.user)
+    }
     
+    return this.user
   }
   
   /**
    * @description 设置协同人
   */
+  @Emit(UserCardEmitEventEnum.SetSynergy)
   private setSynergyUser() {
+    // 支持由自定义组件 发出事件
+    if (this.emitEventComponentName) {
+      dispatch.call(this, this.emitEventComponentName, UserCardEmitEventEnum.SetSynergy, this.user)
+    }
     
+    return this.user
   }
   
   render(h: CreateElement) {

@@ -36,7 +36,7 @@ export default class TaskAllotExcutor extends Vue {
           <div id='MapContainer'></div>
           
           <div class='task-allot-user-content'>
-            <user-card />
+            <user-card emitEventComponentName={ComponentNameEnum.TaskAllotExcutor} />
           </div>
           
         </div>

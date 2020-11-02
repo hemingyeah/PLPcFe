@@ -150,7 +150,7 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
    * @description 选择团队变化事件
   */
   public handlerTeamChange(): void {
-  
+    
   }
   
   /**
@@ -212,7 +212,7 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
    * @description 显示高级设置 选择里
   */
   public showAdvancedSetting(): void {
-    this.BaseTableAdvancedSettingComponent.open()
+    this.BaseTableAdvancedSettingComponent.open(this.columns)
   }
 }
 

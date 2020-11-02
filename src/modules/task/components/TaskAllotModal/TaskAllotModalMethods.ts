@@ -67,6 +67,20 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
   }
   
   /** 
+   * @description 设为负责人
+  */
+  setExecutorUser(user: any) {
+    // TODO: ...
+  }
+  
+  /** 
+   * @description 设为协同人
+  */
+  setSynergyUser(user: any) {
+    // TODO: ...
+  }
+  
+  /** 
    * @description 显示弹窗
   */
   public show() {

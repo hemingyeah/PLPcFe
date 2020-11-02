@@ -59,7 +59,7 @@ export default class TaskAllotUserTable extends TaskAllotUserTableRender {
             }
           </el-table>
         </div>
-        <base-table-advanced-setting />
+        <base-table-advanced-setting ref='BaseTableAdvancedSettingComponent' />
       </div>
     )
   }

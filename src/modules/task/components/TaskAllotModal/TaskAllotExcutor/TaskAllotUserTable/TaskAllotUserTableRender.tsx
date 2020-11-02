@@ -24,7 +24,7 @@ class TaskAllotUserTableRender extends TaskAllotUserTableMethods {
         placeholder='请选择工单负责人'
         remoteMethod={this.fetchTeamUsers}
         value={this.selectTeamUsers}
-        onInput={this.handlerTeamUsersChange}
+        onInput={() => this.handlerTeamUsersChange()}
         scopedSlots={scopedSlots}
       >
       </biz-form-remote-select>
@@ -43,7 +43,7 @@ class TaskAllotUserTableRender extends TaskAllotUserTableMethods {
   */
   public renderTeamSelect() {
     return (
-      <biz-team-select value={this.selectTeams} onInput={this.handlerTeamChange} multiple />
+      <biz-team-select value={this.selectTeams} onInput={() => this.handlerTeamChange()} multiple />
     )
   }
   
@@ -55,7 +55,7 @@ class TaskAllotUserTableRender extends TaskAllotUserTableMethods {
       <el-select
         value={this.selectLocation}
         placeholder="请选择距离"
-        onInput={this.handlerLocationChange}
+        onInput={(value: string) => this.handlerLocationChange(value)}
       >
         {
           this.locationOptions.map((locationOption: ElSelectOption) => {
@@ -77,7 +77,7 @@ class TaskAllotUserTableRender extends TaskAllotUserTableMethods {
         multiple
         placeholder="请选择工作状态"
         value={this.selectUserState}
-        onInput={this.handlerUserStateChange}
+        onInput={(value: string[]) => this.handlerUserStateChange(value)}
       > 
         {
           this.userStateList.map((userState: UserState) => {
@@ -98,7 +98,7 @@ class TaskAllotUserTableRender extends TaskAllotUserTableMethods {
       <el-select
         placeholder="请选择排序方式"
         value={this.selectSortord}
-        onInput={this.handlerSortordChange}
+        onInput={(value: string) => this.handlerSortordChange(value)}
       > 
         {
           this.sortordOptions.map((sortordOption: ElSelectOption) => {
@@ -116,7 +116,7 @@ class TaskAllotUserTableRender extends TaskAllotUserTableMethods {
   */
   public renderSelectColumn() {
     return (
-      <div onClick={this.showAdvancedSetting}>
+      <div class='task-allot-user-table-column' onClick={() => this.showAdvancedSetting()}>
         <span>选择列</span>
         <i class="iconfont icon-triangle-down task-icon"></i>
       </div>

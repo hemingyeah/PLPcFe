@@ -10,7 +10,9 @@ enum ComponentNameEnum {
   // 工单分配给负责人
   TaskAllotExcutor = 'task-allot-excutor',
   // 工单分配到工单池
-  TaskAllotPool = 'task-allot-pool'
+  TaskAllotPool = 'task-allot-pool',
+  // 工单指派方式
+  TaskAllotType = 'task-allot-type'
 }
 
 export default ComponentNameEnum
