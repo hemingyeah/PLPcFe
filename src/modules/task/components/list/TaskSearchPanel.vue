@@ -37,49 +37,40 @@
       <div>
         您还未设置常用字段，快去试试吧
       </div>
-
-
     </div>
     </div>
     </div>
     <!-- S 搜索条件 -->
     <el-form class="advanced-search-form" onsubmit="return false;">
-      <!-- S 搜索条件 -->
-      <el-form class="advanced-search-form" onsubmit="return false;">
-        <task-search-form
-          v-show="show"
-          class="task-search-forms"
-          :fields="fields"
-          ref="searchForm"
-          :search-params="searchParams"
-          :form-backup="formBackup"
-          :column-num="columnNum"
-        >
-        </task-search-form>
-        <div style="position: relative">
-          <div class="task-pointer task-flex task-ai">
-            <span class="task-font16 task-mr4">添加查询条件</span>
-            <span>
-              <el-tooltip content="您可以通过“添加”按钮设置更多的查询条件" placement="top">
-                <i class="iconfont icon-question task-icon"></i>
-              </el-tooltip>
-            </span>
-          </div>
-          <div id="v-task-step-7"></div>
+      <task-search-form
+        v-show="show"
+        class="task-search-forms"
+        :fields="fields"
+        ref="searchForm"
+        :search-params="searchParams"
+        :form-backup="formBackup"
+        :column-num="columnNum"
+      >
+      </task-search-form>
+      <div style="position: relative">
+        <div class="task-pointer task-flex task-ai">
+          <span class="task-font16 task-mr4">添加查询条件</span>
+          <span>
+            <el-tooltip content="您可以通过“添加”按钮设置更多的查询条件" placement="top">
+              <i class="iconfont icon-question task-icon"></i>
+            </el-tooltip>
+          </span>
         </div>
-        <!-- 设置查询条件 -->
-        <task-inquire 
-          v-if="fields.length"
-          ref="taskInquireParams" 
-          :column-num="columnNum" 
-          :inquire-form-backup="inquireFormBackup"
-          :config="[...config, ...taskTypeFilterFields]" 
-          @setting="_setting"
-        />
-        <!-- 搜索操作按钮 -->
-        <!-- <slot name="footer"></slot> -->
-      </el-form>
-      <!-- E 搜索条件 -->
+        <div id="v-task-step-7"></div>
+      </div>
+      <!-- 设置查询条件 -->
+      <task-inquire 
+        ref="taskInquireParams" 
+        :column-num="columnNum" 
+        :inquire-form-backup="inquireFormBackup"
+        :config="[...config, ...taskTypeFilterFields]" 
+        @setting="_setting"
+      />
       <!-- 搜索操作按钮 -->
       <slot name="footer"></slot>
     </el-form>

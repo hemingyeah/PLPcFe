@@ -57,7 +57,6 @@
         <task-inquire
           ref="taskInquireParams"
           type="creat"
-          :search-model-cn="searchModelCN"
           :column-num="columnNum"
           :search-model="region.searchModel"
           :config="[...config, ...taskTypeFilterFields]"

@@ -36,21 +36,24 @@
                           :key="index"
                           class="task-flex task-ai task-pointer"
                         >
+                          <span class="task-list-dropdown-item" @click="checkOther(item)">{{
+                            item.name
+                          }}</span>
                           <div class="task-list-dropdown-icon">
                             <el-tooltip content="查看筛选条件" placement="top">
-                              <i class="iconfont icon-yanjing task-font12" @click.stop="creatViewPanel(item, 'view')"></i>
+                              <i class="iconfont icon-yanjing task-font12" @click="creatViewPanel(item, 'view')"></i>
                             </el-tooltip>
                             <el-tooltip content="编辑视图" placement="top">
                               <i
                                 class="iconfont icon-bianji1 task-ml12 task-font12"
-                                @click.stop="creatViewPanel(item, 'edit')"
-                                  
+                                @click="creatViewPanel(item, 'edit')"
+                                v-if="item.authEdit"
                               ></i>
                             </el-tooltip>
                             <el-tooltip content="删除视图" placement="top">
                               <i
                                 class="iconfont icon-shanchu-copy task-ml12 task-font12"
-                                @click.stop="delView(item)"
+                                @click="delView(item)"
                                 v-if="item.authEdit"
                               ></i>{{item.authEdit}}
                             </el-tooltip>

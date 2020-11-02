@@ -13,7 +13,6 @@
         :item="item"
         :inquire-form-backup="inquireFormBackup"
         :search-model="searchModel"
-        :search-model-cn="searchModelCN"
       />
     </div>
     <div
@@ -122,10 +121,6 @@ export default {
       type: Object,
       default: () => ({}),
     },
-    searchModelCN: {
-      type: Array,
-      default: () => [],
-    },
     config: {
       type: Array,
       default: () => ({}),
@@ -157,15 +152,6 @@ export default {
       if (JSON.stringify(v) === "{}") {
         this.list = [1] 
       } 
-    },
-    searchModelCN(v) {
-      if (v.length) {
-        this.list = v.map((item, index) => {
-          return index + 1;
-        });
-      } else {
-        this.list = [1];
-      }
     },
   },
   computed: {
@@ -364,10 +350,6 @@ export default {
           type: Object,
           default: () => ({}),
         },
-        searchModelCN: {
-          type: Array,
-          default: () => [],
-        },
         fields: {
           type: Array,
           default: () => [],
@@ -440,11 +422,6 @@ export default {
             if (item.key === "customerId") {
               this.form["customer"] = item.value;
               this.customer["id"] = item.value;
-            }
-          });
-          this.searchModelCN.forEach((item) => {
-            if (item.key === "客户") {
-              this.customer["name"] = item.value;
             }
           });
         },
