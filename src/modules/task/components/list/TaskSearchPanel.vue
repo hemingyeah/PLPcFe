@@ -265,9 +265,10 @@ export default {
           }
         }
       }
+
       for(let key in this.$refs.taskInquireParams.returnData()) {
-        if (inPar.indexOf(key) !== -1 && this.$refs.taskInquireParams.returnData()[key]) {
-          if (key !== "customer" && key !== "tags" && key !== "area") {
+        if (inPar.indexOf(key) !== -1 && this.$refs.taskInquireParams.returnData()[key] && JSON.stringify(this.$refs.taskInquireParams.returnData()[key]) !== "[]") {
+          if (key !== "customer" && key !== "tags" && key !== "area" && key !== "backUp") {
             repeatBool = true
           } else {
             if (this.$refs.taskInquireParams.returnData()["area"] && this.$refs.taskInquireParams.returnData()["area"].province) {

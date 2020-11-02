@@ -811,76 +811,75 @@
                   </template>
 
                   <!-- 时间 -->
+                  <template v-else-if="!column.isSystem">
+                    {{ scope.row.attribute && scope.row.attribute[column.field] }}
+                  </template>
+
+                  <!-- 时间 -->
                   <template v-else-if="column.formType === 'datetime'">
                     <template v-if="!column.isSystem">
-                      {{ scope.row.attribute && scope.row.attribute[column.field] }}
+                      {{
+                        scope.row.attribute && scope.row.attribute[column.field]
+                      }}
                     </template>
-
-                    <!-- 时间 -->
-                    <template v-else-if="column.formType === 'datetime'">
-                      <template v-if="!column.isSystem">
-                        {{
-                          scope.row.attribute && scope.row.attribute[column.field]
-                        }}
-                      </template>
-                      <template v-else>
-                        {{ scope.row[column.field] | fmt_datetime }}
-                      </template>
-                    </template>
-
-                    <div
-                      v-else-if="column.formType === 'textarea'"
-                      v-html="buildTextarea(scope.row.attribute[column.field])"
-                      @click="openOutsideLink"
-                    ></div>
-
-                    <!-- 接单用时 -->
-                    <template v-else-if="column.field === 'acceptUsedTimeStr'">
-                      {{ scope.row.acceptUsedTime && scope.row.acceptUsedTime }}
-                    </template>
-                    <!-- 工单用时 -->
-                    <template v-else-if="column.field === 'taskUsedTimeStr'">
-                      {{ scope.row.taskUsedTime && scope.row.taskUsedTime }}
-                    </template>
-                    <!-- 工作用时 -->
-                    <template v-else-if="column.field === 'workUsedTimeStr'">
-                      {{ scope.row.workUsedTime && scope.row.workUsedTime }}
-                    </template>
-                    <!-- 响应用时 -->
-                    <template v-else-if="column.field === 'taskResponseTimeStr'">
-                      {{ scope.row.taskResponseTime && scope.row.taskResponseTime }}
-                    </template>
-                    <!-- 支付方式 -->
-                    <template
-                      v-else-if="
-                        column.field === 'paymentMethod' &&
-                          initData.paymentConfig &&
-                          initData.paymentConfig.version === 1
-                      "
-                    >
-                      {{ scope.row.attribute && scope.row.attribute.paymentMethod }}
-                    </template>
-                    <template v-else-if="!column.isSystem">
-                      <template
-                        v-if="
-                          scope.row.attribute &&
-                            Array.isArray(scope.row.attribute[column.field])
-                        "
-                      >
-                        {{ scope.row.attribute[column.field].join(",") }}
-                      </template>
-                      <template v-else>
-                        {{
-                          scope.row.attribute && scope.row.attribute[column.field]
-                        }}
-                      </template>
-                    </template>
-
                     <template v-else>
-                      {{ scope.row[column.field] }}
+                      {{ scope.row[column.field] | fmt_datetime }}
                     </template>
                   </template>
-              </template></el-table-column>
+
+                  <div
+                    v-else-if="column.formType === 'textarea'"
+                    v-html="buildTextarea(scope.row.attribute[column.field])"
+                    @click="openOutsideLink"
+                  ></div>
+
+                  <!-- 接单用时 -->
+                  <template v-else-if="column.field === 'acceptUsedTimeStr'">
+                    {{ scope.row.acceptUsedTime && scope.row.acceptUsedTime }}
+                  </template>
+                  <!-- 工单用时 -->
+                  <template v-else-if="column.field === 'taskUsedTimeStr'">
+                    {{ scope.row.taskUsedTime && scope.row.taskUsedTime }}
+                  </template>
+                  <!-- 工作用时 -->
+                  <template v-else-if="column.field === 'workUsedTimeStr'">
+                    {{ scope.row.workUsedTime && scope.row.workUsedTime }}
+                  </template>
+                  <!-- 响应用时 -->
+                  <template v-else-if="column.field === 'taskResponseTimeStr'">
+                    {{ scope.row.taskResponseTime && scope.row.taskResponseTime }}
+                  </template>
+                  <!-- 支付方式 -->
+                  <template
+                    v-else-if="
+                      column.field === 'paymentMethod' &&
+                        initData.paymentConfig &&
+                        initData.paymentConfig.version === 1
+                    "
+                  >
+                    {{ scope.row.attribute && scope.row.attribute.paymentMethod }}
+                  </template>
+                  <template v-else-if="!column.isSystem">
+                    <template
+                      v-if="
+                        scope.row.attribute &&
+                          Array.isArray(scope.row.attribute[column.field])
+                      "
+                    >
+                      {{ scope.row.attribute[column.field].join(",") }}
+                    </template>
+                    <template v-else>
+                      {{
+                        scope.row.attribute && scope.row.attribute[column.field]
+                      }}
+                    </template>
+                  </template>
+
+                  <template v-else>
+                    {{ scope.row[column.field] }}
+                  </template>
+                </template>
+              </el-table-column>
             </el-table>
           </div>
 

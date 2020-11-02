@@ -10,17 +10,8 @@
       <!-- 搜索 -->
       <div class="task-search-seo task-flex task-ai">
         <div class="task-search-input">
-          <el-input
-            placeholder="请输入字段名称"
-            v-model="seoText"
-            class="input-with-select"
-            @keyup.enter.native="taskSearch"
-          >
-            <el-button
-              slot="append"
-              icon="el-icon-search"
-              @click="taskSearch"
-            ></el-button>
+          <el-input placeholder="请输入字段名称" v-model="seoText" class="input-with-select" @keyup.enter.native="taskSearch">
+            <el-button slot="append" icon="el-icon-search" @click="taskSearch"></el-button>
           </el-input>
         </div>
         <base-button type="ghost" class="task-ml12" @event="reset">
@@ -28,14 +19,9 @@
         </base-button>
       </div>
       <!-- 系统字段 -->
-      <h3 class="task-mtb13">系统字段</h3>
+      <el-checkbox :indeterminate="isIndeterminateSys" v-model="sysCheckAll" @change="handleCheckAllSysChange"><h3 class="task-mtb13">系统字段</h3></el-checkbox>
       <el-checkbox-group v-model="checkSystemList">
-        <el-checkbox
-          :label="item.displayName"
-          v-for="(item, index) in systemList"
-          :key="index"
-          class="wh150"
-        ></el-checkbox>
+        <el-checkbox :label="item.displayName" v-for="(item, index) in systemList" :key="index" class="wh150"></el-checkbox>
       </el-checkbox-group>
       <template v-if="guideSearchPupal">
         <guide-compoment
@@ -49,15 +35,9 @@
         ></guide-compoment>
       </template>
       <!-- 自定义字段 -->
-      <h3 v-if="customizeList.length">自定义字段</h3>
+      <el-checkbox :indeterminate="isIndeterminateCus" v-model="cusCheckAll" @change="handleCheckAllCusChange" v-if="customizeList.length"><h3 class="task-mtb13">自定义字段</h3></el-checkbox>
       <el-checkbox-group v-model="checkCustomizeList">
-        <el-checkbox
-          :label="item.displayName"
-          v-for="(item, index) in customizeList"
-          :key="index"
-          class="wh150"
-          v-if="item.isSearch"
-        ></el-checkbox>
+        <el-checkbox :label="item.displayName" v-for="(item, index) in customizeList" :key="index" class="wh150" v-if="item.isSearch"></el-checkbox>
       </el-checkbox-group>
     </div>
     <div slot="footer" class="dialog-footer">
@@ -74,29 +54,27 @@ const { TASK_GUIDE_SEARCH_PUPAL } = require("@src/component/guide/taskV2Store");
 export default {
   name: "task-search-pupal",
   props: {
-    taskTypeFilterFields: {
-      // 自定义
+    taskTypeFilterFields: { // 自定义
       type: Array,
       default: () => {[]}
     },
-    config: {
-      // 系统
+    config: { // 系统
       type: Array,
       default: () => {[]},
     },
     taskInquireList: {
       type: Array, // 用于判断
-    },
+    }
   },
   components: {
     [guideCompoment.name]: guideCompoment,
   },
   watch: {
     taskTypeFilterFields(v) {
-      this.customizeList = v;
+      this.customizeList = v
     },
     config(v) {
-      this.systemList = v;
+      this.systemList = v
     },
     taskInquireList() {
       this.loc()
@@ -110,7 +88,11 @@ export default {
   },
   data() {
     return {
+      sysCheckAll:false,
+      cusCheckAll: false,
       visible: false,
+      isIndeterminateSys: false,
+      isIndeterminateCus: false,
       seoText: "",
       checkSystemList: [], // 选中系统字段
       checkCustomizeList: [], // 选中自定义字段
@@ -120,8 +102,8 @@ export default {
     }
   },
   mounted() {
-    this.systemList = this.config;
-    this.loc();
+    this.systemList = this.config
+    this.loc()
   },
   methods: {
     guide_stopStep() {
@@ -141,7 +123,7 @@ export default {
       this.checkCustomizeList = v ? this.customizeList.map(item => {return item.displayName}) : []
     },
     loc() {
-      const searchField = localStorage.getItem("task-search-field");
+      const searchField = localStorage.getItem("task-search-field")
       if (searchField) {
         this.checkSystemList = [...new Set(JSON.parse(searchField).checkSystemList)]
         this.checkCustomizeList = [...new Set(JSON.parse(searchField).checkCustomizeList)]
@@ -174,57 +156,52 @@ export default {
     },
     taskSearch() {
       if (!this.seoText) {
-        this.reset();
-        return;
+        this.reset()
+        return
       }
-      this.systemList = this.systemList.filter((item) => {
+      this.systemList = this.systemList.filter(item => {
         if (item.displayName.indexOf(this.seoText) !== -1) {
-          return item;
+          return item
         }
-      });
-      this.customizeList = this.customizeList.filter((item) => {
+      })
+      this.customizeList = this.customizeList.filter(item => {
         if (item.displayName.indexOf(this.seoText) !== -1) {
-          return item;
+          return item
         }
-      });
+      })
     },
     reset() {
-      this.systemList = this.config;
-      this.customizeList = this.taskTypeFilterFields;
-      this.seoText = "";
+      this.systemList = this.config
+      this.customizeList = this.taskTypeFilterFields
+      this.seoText = ""
     },
     onSubmit() {
-      const {
-        checkSystemList,
-        checkCustomizeList,
-        config,
-        taskTypeFilterFields,
-      } = this;
-      let sySet = new Set(checkSystemList);
-      let CuSet = new Set(checkCustomizeList);
+      const {checkSystemList, checkCustomizeList, config, taskTypeFilterFields} = this
+      let sySet = new Set(checkSystemList)
+      let CuSet = new Set(checkCustomizeList)
       let list = [];
-      [...config, ...taskTypeFilterFields].forEach((item) => {
-        [...sySet, ...CuSet].forEach((v) => {
+      [...config, ...taskTypeFilterFields].forEach(item => {
+        [...sySet, ...CuSet].forEach(v => {
           if (v === item.displayName) {
-            list.push(item);
-          }
-        });
-      });
+            list.push(item)
+          } 
+        })
+      })
       let params = {
         checkSystemList,
         checkCustomizeList,
-        list,
-      };
-      this.visible = false;
-      this.$emit("taskPupal", params);
-      if (!list.length) {
-        localStorage.removeItem("task-search-field");
-        return;
+        list
       }
-      localStorage.setItem("task-search-field", JSON.stringify(params));
-    },
-  },
-};
+      this.visible = false
+      this.$emit("taskPupal", params)
+      if (!list.length) {
+        localStorage.removeItem("task-search-field")
+        return
+      }
+      localStorage.setItem("task-search-field", JSON.stringify(params))
+    }
+  }
+}
 </script>
 <style lang="scss">
 .task-search-input {
