@@ -8,6 +8,10 @@ import TaskStateEnum from '@model/enum/TaskStateEnum.ts';
 import Filter from '@src/filter/filter.js';
 import { parse } from '@src/util/querystring';
 import { isShowReport } from '@src/util/version.ts'
+import {
+  storageGet,
+  storageSet
+} from '@src/util/storage';
 
 /* component */
 import CancelTaskDialog from './components/CancelTaskDialog.vue';
@@ -26,12 +30,17 @@ import TaskTimeDialog from './components/TaskTimeDialog.vue';
 
 /* enum */
 import { TaskEventNameMappingEnum } from '@model/enum/EventNameMappingEnum.ts';
+/* mixin */
+import tourGuide from '@src/mixins/tourGuide'
 
 const ENCRYPT_FIELD_VALUE = '***';
+
+const { TASK_GUIDE_DETAIL } = require('@src/component/guide/taskV2Store');
 
 export default {
   name: 'task-detail-view',
   inject: ['initData'],
+  mixins: [tourGuide],
   data() {
     return {
       loading: false,
@@ -69,7 +78,11 @@ export default {
       popperOptions: {
         boundariesElement: 'viewport',
         removeOnDestroy: true
-      }
+      },
+      nowGuideStep: 5,
+      guideSearchModelSave: false,
+      guideDropdownMenu: false,
+      isGuide: false,
     }
   },
   computed: {
@@ -616,6 +629,13 @@ export default {
     }
   },
   methods: {
+    previousStep() { },
+    nextStep() {
+      this.nowGuideStep++;
+    },
+    stopStep() {
+      this.nowGuideStep = this.detailSteps.length + 1;
+    },
     // 是否含有某一指定权限
     hasAuth(keys) {
       return AuthUtil.hasAuth(this.permission, keys);
@@ -1064,15 +1084,16 @@ export default {
         fieldName: 'allotUser',
         formType: 'user',
         isSystem: 1,
-      }, {
-        displayName: '创建方式',
-        fieldName: 'relevance',
-        isSystem: 1,
-      }];
+      }, 
+      // {
+      //   displayName: '创建方式',
+      //   fieldName: 'relevance',
+      //   isSystem: 1,
+      // }
+    ];
 
       this.fields.forEach(field => {
         if (field.fieldName == 'attachment') {
-          console.log(111,field);
           let { isEncryptAttachment, attachment } = this.task
           
           // 系统附件加密
@@ -1097,6 +1118,13 @@ export default {
       }
 
       this.loading = false;
+      
+      this.$nextTick(() => {
+        setTimeout(() => {
+          if (!storageGet(TASK_GUIDE_DETAIL)) this.$tours['myTour'].start(), this.nowGuideStep = 1, storageSet(TASK_GUIDE_DETAIL, '4');
+        }, 1000)
+
+      })
 
     } catch (e) {
       console.error('error ', e)

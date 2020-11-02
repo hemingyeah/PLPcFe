@@ -110,15 +110,5 @@
     "commitizen": {
       "path": "node_modules/cz-customizable"
     }
-  },
-  "husky": {
-    "hooks": {
-      "commit-msg": "commitlint --config .commitlintrc.js -E HUSKY_GIT_PARAMS"
-    }
-  },
-  "husky": {
-    "hooks": {
-      "pre-push": "npm run commit-lint"
-    }
   }
 }

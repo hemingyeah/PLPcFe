@@ -37,6 +37,17 @@
           class="wh150"
         ></el-checkbox>
       </el-checkbox-group>
+      <template v-if="guideSearchPupal">
+        <guide-compoment
+          :content="'①选中 ②保存，设置立刻生效'"
+          :only-one="true"
+          :have-step="false"
+          :finish-btn="'试一下'"
+          :style="'width:240px;top:250px;margin:auto;left:0;right:0;'"
+          :stop-step="guide_stopStep"
+          :finish-btn-fn="guide_finishBtnFn"
+        ></guide-compoment>
+      </template>
       <!-- 自定义字段 -->
       <h3 v-if="customizeList.length">自定义字段</h3>
       <el-checkbox-group v-model="checkCustomizeList">
@@ -50,25 +61,23 @@
       </el-checkbox-group>
     </div>
     <div slot="footer" class="dialog-footer">
-      <el-button
-        @click="
-          loc();
-          visible = false;
-        "
-      >取 消</el-button
-      >
+      <el-button @click="loc();visible = false">取 消</el-button>
       <el-button type="primary" @click="onSubmit">确 定</el-button>
     </div>
   </base-modal>
 </template>
 <script>
+import guideCompoment from "@src/component/guide/guide";
+import { storageGet, storageSet } from "@src/util/storage";
+
+const { TASK_GUIDE_SEARCH_PUPAL } = require("@src/component/guide/taskV2Store");
 export default {
   name: "task-search-pupal",
   props: {
     taskTypeFilterFields: {
       // 自定义
       type: Array,
-      default: () => {[]},
+      default: () => {[]}
     },
     config: {
       // 系统
@@ -79,6 +88,9 @@ export default {
       type: Array, // 用于判断
     },
   },
+  components: {
+    [guideCompoment.name]: guideCompoment,
+  },
   watch: {
     taskTypeFilterFields(v) {
       this.customizeList = v;
@@ -87,8 +99,14 @@ export default {
       this.systemList = v;
     },
     taskInquireList() {
-      this.loc();
+      this.loc()
     },
+    checkSystemList() {
+      this.checkList()
+    },
+    checkCustomizeList() {
+      this.checkList()
+    }
   },
   data() {
     return {
@@ -98,26 +116,61 @@ export default {
       checkCustomizeList: [], // 选中自定义字段
       systemList: [], // 系统字段
       customizeList: this.taskTypeFilterFields, // 自定义字段
-    };
+      guideSearchPupal: false,
+    }
   },
   mounted() {
     this.systemList = this.config;
     this.loc();
   },
   methods: {
+    guide_stopStep() {
+    },
+    guide_finishBtnFn() {
+      this.guide_stopStep();
+    },
+    open() {
+      if (storageGet(TASK_GUIDE_SEARCH_PUPAL) && storageGet(TASK_GUIDE_SEARCH_PUPAL) > 0) this.guideSearchPupal = false;
+      else this.guideSearchPupal = true, storageSet(TASK_GUIDE_SEARCH_PUPAL, "1");
+      this.visible = true;
+    },
+    handleCheckAllSysChange(v) {
+      this.checkSystemList = v ? this.systemList.map(item => {return item.displayName}) : []
+    },
+    handleCheckAllCusChange(v) {
+      this.checkCustomizeList = v ? this.customizeList.map(item => {return item.displayName}) : []
+    },
     loc() {
       const searchField = localStorage.getItem("task-search-field");
       if (searchField) {
-        this.checkSystemList = [
-          ...new Set(JSON.parse(searchField).checkSystemList),
-        ];
-        this.checkCustomizeList = [
-          ...new Set(JSON.parse(searchField).checkCustomizeList),
-        ];
+        this.checkSystemList = [...new Set(JSON.parse(searchField).checkSystemList)]
+        this.checkCustomizeList = [...new Set(JSON.parse(searchField).checkCustomizeList)]
       }
     },
-    open() {
-      this.visible = true;
+
+    checkList() {
+      if (!this.checkSystemList.length || this.systemList.length === this.checkSystemList.length) {
+        this.isIndeterminateSys = false
+      } else {
+        this.isIndeterminateSys = true
+      }
+      if (this.systemList.length === this.checkSystemList.length) {
+        this.sysCheckAll = true
+      } else {
+        this.sysCheckAll = false
+      }
+
+      if (this.customizeList.length === this.checkCustomizeList.length) {
+        this.cusCheckAll = true
+      } else {
+        this.cusCheckAll = false
+      }
+
+      if (!this.checkCustomizeList.length || this.customizeList.length === this.checkCustomizeList.length) {
+        this.isIndeterminateCus = false
+      } else {
+        this.isIndeterminateCus = true
+      }
     },
     taskSearch() {
       if (!this.seoText) {

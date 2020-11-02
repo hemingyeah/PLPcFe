@@ -1,5 +1,5 @@
 <template>
-  <div v-if="fields.length">
+  <div v-show="fields.length">
     <div v-for="(item, index) in list" :key="index">
       <batch-form
         :fields="fields"
@@ -11,6 +11,7 @@
         @del="del"
         @setting="setting"
         :item="item"
+        :inquire-form-backup="inquireFormBackup"
         :search-model="searchModel"
         :search-model-cn="searchModelCN"
       />
@@ -91,8 +92,8 @@ function setFieldOperateHandler(field = {}) {
     || formType == "textarea"
     || formType === "code"
     || formType === "description"
-    || formType === 'relationProduct'
-    || formType === 'relationCustomer'
+    || formType === "relationProduct"
+    || formType === "relationCustomer"
   ) {
     field.operatorOptions = OperatorSelectOptionsMap.text.slice();
   } else if (formType == "date" || formType == "datetime") {
@@ -113,6 +114,10 @@ function setFieldOperateHandler(field = {}) {
 export default {
   name: "task-inquire",
   props: {
+    inquireFormBackup: {
+      type:Object,
+      default: () => ({})
+    },
     searchModel: {
       type: Object,
       default: () => ({}),
@@ -147,6 +152,11 @@ export default {
   watch: {
     config() {
       this.fields;
+    },
+    inquireFormBackup(v) {
+      if (JSON.stringify(v) === "{}") {
+        this.list = [1] 
+      } 
     },
     searchModelCN(v) {
       if (v.length) {
@@ -341,17 +351,15 @@ export default {
         ...this.check_customize_list,
       ];
     },
-    initFormVal() {
-      if (!this.$refs.batchForm) return
-      this.$refs.batchForm.forEach((el) => {
-        el.buildForm();
-      });
-    },
   },
   components: {
     BatchForm: {
       name: "batch-form",
       props: {
+        inquireFormBackup: {
+          type:Object,
+          default: () => ({})
+        },
         searchModel: {
           type: Object,
           default: () => ({}),
@@ -390,19 +398,20 @@ export default {
         };
       },
       watch: {
+        inquireFormBackup(v) {
+          if (JSON.stringify(v) === "{}") {
+            this.reset();
+            this.buildForm();  
+          } 
+        },
         fields(v) {
-          if (v.length === Number(localStorage.getItem("fieldNum"))) return;
-          this.reset();
-          this.buildForm();
-        },
-        searchModelCN(v) {
-          if (JSON.stringify(this.searchModel) !== "{}") {
-            this._inPar(this.searchModel);
-          }
-        },
+          if (JSON.stringify(this.form) === "{}") {
+            this.reset();
+            this.buildForm();  
+          } 
+        }
       },
       mounted() {
-        localStorage.setItem("fieldNum", this.fields.length);
         this.reset();
         this.buildForm();
       },
@@ -449,16 +458,16 @@ export default {
         },
         reset() {
           this.form = {};
-          this.selectField(this.fields[0].fieldName);
         },
         buildForm() {
+          localStorage.setItem("fields_length", this.fields.length)
           if (Object.keys(this.form).length === this.fields.length) return;
-          // this.form = Utils.initialize(this.fields);
 
           this.fields.forEach((f) => {
             if (MultiFieldNames.indexOf(f.fieldName) > -1) {
               this.form[f.fieldName] = [];
             }
+
           });
         },
         searchCustomer(params) {

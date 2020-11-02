@@ -2214,22 +2214,19 @@ const Inquire = [
     isNull: 1,
     isSearch: 1,
     placeHolder: null,
-    setting: {
-      isMulti: false, dataSource: [
-        "全部",
-        "待指派",
-        "已指派",
-        "已接受",
-        "进行中",
-        "已完成",
-        "已拒绝",
-        "已结算",
-        "已关闭",
-        "已取消",
-        "工单池",
-        "未完成"
-      ]
-    },
+    setting: {isMulti: false, dataSource:[
+      "全部",
+      "待指派",
+      "已指派",
+      "已接受",
+      "进行中",
+      "已完成",
+      "已拒绝",
+      "已结算",
+      "已关闭",
+      "已取消",
+      "工单池"
+    ]},
     orderId: 1,
     isDelete: 0,
     guideProfessions: [],

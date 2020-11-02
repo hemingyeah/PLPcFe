@@ -285,6 +285,14 @@ export default {
         let loading = this.$loading();
         let result = await this.fetchData(urlParams.id);
         loading.close();
+        if(result.imageList && Array.isArray(result.imageList) && result.imageList.length > 0){
+          result.image = "";
+          this.attachments = result.imageList.map(url => {
+            let obj = {};
+            obj.url = url;
+            return obj;
+          });
+        }
         part = result || {};
       }
 

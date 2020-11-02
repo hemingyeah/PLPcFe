@@ -100,7 +100,6 @@ export default {
         if (MultiFieldNames.indexOf(field.fieldName) > -1) {
           tv = [];
         }
-
         form[field.fieldName] = this.formBackup[field.fieldName] || tv;
         this.$set(
           this.form,
@@ -412,7 +411,12 @@ export default {
           this.columnNum == 2 ? "two-columns" : ""
         }`}
       >
-        {this.fields.map((f) => this.renderInput(h, f))}
+        {this.fields.map(item => {
+          if (item.formType === 'datetime') {
+            item.formType = 'date'
+          }
+          return item
+        }).map((f) => this.renderInput(h, f))}
       </div>
     );
   },

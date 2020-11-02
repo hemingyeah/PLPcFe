@@ -209,7 +209,6 @@ export default {
           { lable: "目标仓库", value: this.propData.data.targetName },
           { lable: "办理状态", value: this.getStateText(this.propData.data.state),state:this.propData.data.state }
         ];
-        console.log(111,this.propData);
          this.formArr[4].value=this.propData.data.targetName;
       })
     }
