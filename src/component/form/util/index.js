@@ -166,11 +166,12 @@ export function initialize(fields = [], origin = {}, callback){
     if(formType == 'user') {
       let { isMultiple } = setting || {};
 
-      // 默认当前登录账户
-      if (isCurrentUser == 1) {
-        let loginUser = window.parent.loginUser;
+      // 当前登录账户数据
+      let { userId, displayName, staffId, head } = window.parent.loginUser || {};
 
-        // TODO：处理登录账户数据(登录数据和所需数据不匹配)
+      // 默认当前登录账户
+      if (isCurrentUser == 1 && userId) {
+        let loginUser = { userId, displayName, staffId, head };
         defaultValue = isMultiple == 1 ? [loginUser] : loginUser;
       } else {
         defaultValue = isMultiple == 1 ? [] : {};

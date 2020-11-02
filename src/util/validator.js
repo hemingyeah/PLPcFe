@@ -64,7 +64,11 @@ let repeatRemoteValidate = _.debounce(function(mode, field, value, changeStatus,
 
 /** 单行文本验证，50字以内 */
 function text(value, field = {}, origin = {}, mode, changeStatus){
-  let { isRepeat } = field.setting || {};
+  let { isRepeat, defaultValueConfig } = field.setting || {};
+
+  // 默认值是否允许修改
+  let { isNotModify } = defaultValueConfig || {};
+  let notModifyValue = isNotModify == 1 && !!field.defaultValue;
 
   let validate = new Promise((resolve, reject) => {
     // 先验证长度
@@ -79,7 +83,7 @@ function text(value, field = {}, origin = {}, mode, changeStatus){
   })
 
   // 不需要校验重复性
-  if (!isRepeat || !mode || !value) return validate;
+  if (!isRepeat || !mode || !value || notModifyValue) return validate;
 
   return new Promise((resolve, reject) => {
     validate.then((res) => {
@@ -101,7 +105,11 @@ function select(value, field = {}) {
 
 /** 多行文本验证，500字以内 */
 function textarea(value, field = {}, origin = {}, mode, changeStatus) {
-  let { isRepeat } = field.setting || {};
+  let { isRepeat, defaultValueConfig } = field.setting || {};
+
+  // 默认值是否允许修改
+  let { isNotModify } = defaultValueConfig || {};
+  let notModifyValue = isNotModify == 1 && !!field.defaultValue;
   
   let validate = new Promise((resolve, reject) => {
     if (value !== null && value.toString().length > MULTI_LINE_MAX_LEN) {
@@ -113,7 +121,7 @@ function textarea(value, field = {}, origin = {}, mode, changeStatus) {
   });
 
   // 不需要校验重复性
-  if (!isRepeat || !mode || !value) return validate;
+  if (!isRepeat || !mode || !value || notModifyValue) return validate;
 
   return new Promise((resolve, reject) => {
     validate.then((res) => {
@@ -125,7 +133,7 @@ function textarea(value, field = {}, origin = {}, mode, changeStatus) {
 }
 
 // 验证电话手机格式
-function phone(value, field = {},origin = {}, mode, changeStatus) {
+function phone(value, field = {}, origin = {}, mode, changeStatus) {
   let { isRepeat } = field.setting || {};
   let validate = new Promise(resolve => {
     if(field.isNull && !value) return resolve(null);
@@ -186,14 +194,14 @@ function planTime(value, field = {}) {
 function number(value, field = {}, origin = {}, mode, changeStatus) {
   let { decimalConfig, limitConig, defaultValueConfig, isRepeat } = field.setting || {};
 
-  let validate = new Promise(resolve => {
-    // 默认值
-    if (typeof defaultValueConfig == 'object') {
-      let { isNotModify } = defaultValueConfig;
+  // 默认值是否允许修改
+  let { isNotModify } = defaultValueConfig || {};
+  let notModifyValue = isNotModify == 1 && !!field.defaultValue;
 
-      // 不允许修改
-      if (isNotModify == 1 && !!field.defaultValue) return resolve(null);
-    }
+
+  let validate = new Promise(resolve => {
+    // 默认值且不允许修改时 不做校验
+    if (notModifyValue) return resolve(null);
 
     // 校验小数位数
     if (typeof decimalConfig == 'object') {
@@ -228,7 +236,7 @@ function number(value, field = {}, origin = {}, mode, changeStatus) {
   });
 
   // 不需要校验重复性
-  if (!isRepeat || !mode || !value) return validate;
+  if (!isRepeat || !mode || !value || notModifyValue) return validate;
 
   return new Promise((resolve, reject) => {
     validate.then((res) => {
