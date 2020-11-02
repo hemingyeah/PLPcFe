@@ -17,10 +17,10 @@ class TaskAllotModalRender extends TaskAllotModalMethods {
         <div class='task-allot-synergy-list'>
           {
             this.synergyUserList.map((synergyUser: LoginUser) => {
-              return <user-button user={synergyUser} /> 
+              return <user-button user={synergyUser} userDeleteFunc={(user: LoginUser) => this.deleteSynergyUser(user)} /> 
             })
           }
-          <user-button onClick={this.chooseSynergyUser} /> 
+          <user-button onClick={() => this.chooseSynergyUser()} /> 
         </div>
       </div>
     )

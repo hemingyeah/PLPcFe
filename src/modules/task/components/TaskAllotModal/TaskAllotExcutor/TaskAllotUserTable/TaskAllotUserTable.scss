@@ -5,20 +5,24 @@
   .biz-team-select,
   .base-select-container,
   .el-select {
-    width: 145px;
-  }
-  
-  .biz-form-remote-select {
-    flex: none;
+    flex: 1;
   }
 }
 
 .task-allot-user-table {
+  max-height: 462px;
   &-column {
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     width: 100px;
+  }
+}
+
+.task-allot-user-table-block {
+  .el-table__body-wrapper {
+    max-height: 360px;
+    overflow-y: scroll;
   }
 }

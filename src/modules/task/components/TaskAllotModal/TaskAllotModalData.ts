@@ -11,8 +11,12 @@ class TaskAllotModalData extends TaskAllotModalProps {
   public allotType: TaskAllotTypeEnum = TaskAllotTypeEnum.Person
   /* 客户信息 */
   public customer: Customer = {}
+  /* 负责人 */
+  public executorUser: LoginUser = new LoginUser()
   /* 是否是按团队派单 */
   public isAllotByTag: boolean = true
+  /* 等待状态 */
+  public pending: boolean = false
   /* 是否显示派单弹窗 */
   public showTaskAllotModal: boolean = false
   /* 协同人列表 */

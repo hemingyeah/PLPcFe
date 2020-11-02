@@ -7,15 +7,19 @@ import Tag from '@model/entity/Tag/Tag'
 import { ElSelectOption } from '@src/modules/task/components/TaskAllotModal/TaskAllotExcutor/TaskAllotUserTable/TaskAllotUserTableInterface'
 /* model */
 import Page from '@model/Page'
-import { TaskAllotUserTableColumns } from '@src/modules/task/components/TaskAllotModal/TaskAllotExcutor/TaskAllotUserTable/TaskAllotUserTableModel'
+import { TaskAllotUserTableEnterpriseEditionColumns, TaskAllotUserTableStandEditionColumns } from '@src/modules/task/components/TaskAllotModal/TaskAllotExcutor/TaskAllotUserTable/TaskAllotUserTableModel'
 /* types */
 import Column from '@model/types/Column'
+/* util */
+import { isEnterpriseEdition } from '@src/util/version'
 
 class TaskAllotUserTableData extends TaskAllotUserTableComponents {
   /* 地图对象 */
   public AMap: any = null
   /* 地图弹窗对象 */
   public AMapInfoWindow: any = null
+  /* 当前选择的负责人 */
+  public selectExecutorUser: LoginUser | null = null
   /* 当前选择的团队 */
   public selectTeams: Tag[] = []
   /* 当前选择的团队人员列表 */
@@ -47,7 +51,10 @@ class TaskAllotUserTableData extends TaskAllotUserTableComponents {
     { label: '30天内完成最多', value: '30'},
   ]
   /* 表格列 */
-  public columns: Column[] = TaskAllotUserTableColumns
+  public columns: Column[] = (
+    // 企业版 和 标准版 有所区分 (企业版支持 车程, 驾车距离)
+    isEnterpriseEdition() ? TaskAllotUserTableEnterpriseEditionColumns : TaskAllotUserTableStandEditionColumns
+  )
 }
 
 export default TaskAllotUserTableData

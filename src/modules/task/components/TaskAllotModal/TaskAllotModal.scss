@@ -3,7 +3,7 @@
   display: flex;
   
   .base-modal {
-    width: 1000px !important;
+    width: calc(100% - 100px) !important;
   }
   
   .base-modal-body {

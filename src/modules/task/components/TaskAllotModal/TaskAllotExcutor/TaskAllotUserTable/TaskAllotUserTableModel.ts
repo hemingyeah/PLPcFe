@@ -1,5 +1,5 @@
-/* 工单指派表格列 */
-export const TaskAllotUserTableColumns = [
+/* 工单指派 通用表格列 */
+const TaskAllotUserTableCommonColumns = [
   {
     "label": "设为负责人",
     "field": "excutor",
@@ -10,7 +10,7 @@ export const TaskAllotUserTableColumns = [
   },
   {
     "label": "员工",
-    "field": "user",
+    "field": "displayName",
     "show": true,
     "fixed": false,
     "minWidth": "150px",
@@ -26,7 +26,7 @@ export const TaskAllotUserTableColumns = [
   },
   {
     "label": "未完成工单",
-    "field": "unFinishedTask",
+    "field": "unfinishedTask",
     "show": true,
     "fixed": false,
     "sortable": true,
@@ -59,7 +59,23 @@ export const TaskAllotUserTableColumns = [
     "sortable": true,
     "minWidth": "150px",
     "type": "column"
-  },
+  }
+]
+
+/* 工单指派 工作状态列 */
+const TaskAllotUserTableStateColumn = {
+  "label": "工作状态",
+  "field": "userState",
+  "show": true,
+  "fixed": false,
+  "sortable": true,
+  "minWidth": "150px",
+  "type": "column"
+}
+
+/* 工单指派 企业版支持列 */
+export const TaskAllotUserTableEnterpriseEditionColumns = [
+  ...TaskAllotUserTableCommonColumns,
   {
     "label": "距客户(KM)",
     "field": "location",
@@ -78,13 +94,20 @@ export const TaskAllotUserTableColumns = [
     "minWidth": "150px",
     "type": "column"
   },
+  TaskAllotUserTableStateColumn
+]
+
+/* 工单指派 标准版 vip版 支持列 */
+export const TaskAllotUserTableStandEditionColumns = [
+  ...TaskAllotUserTableCommonColumns,
   {
-    "label": "工作状态",
-    "field": "userState",
+    "label": "距客户(KM)",
+    "field": "location",
     "show": true,
     "fixed": false,
     "sortable": true,
     "minWidth": "150px",
     "type": "column"
-  }
+  },
+  TaskAllotUserTableStateColumn
 ]

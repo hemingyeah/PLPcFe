@@ -30,9 +30,10 @@ export default class TaskAllotUserTable extends TaskAllotUserTableRender {
           {this.renderSortordSelect()}
           {this.renderSelectColumn()}
         </div>
-        <div class='task-allot-user-table'>
+        <div class='task-allot-user-table-block'>
           <el-table
             border
+            data={this.userPage.list}
             header-row-class-name="base-table-header-v3"
             row-class-name="base-table-row-v3"
             key={this.tableKey}

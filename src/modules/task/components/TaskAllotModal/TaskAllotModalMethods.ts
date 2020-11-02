@@ -4,6 +4,8 @@ import { getCustomer } from '@src/api/CustomerApi.ts'
 import TaskAllotModalComputed from '@src/modules/task/components/TaskAllotModal/TaskAllotModalComputed'
 /* enum */
 import TaskAllotTypeEnum from '@model/enum/TaskAllotTypeEnum'
+/* entity */
+import LoginUser from '@model/entity/LoginUser/LoginUser'
 /* interface */
 /* computed */
 import { DepeMultiUserResult } from '@src/modules/task/components/TaskAllotModal/TaskAllotModalInterface'
@@ -36,6 +38,18 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
       })
   }
   
+  /** 
+   * @description 删除协同人
+  */
+  public deleteSynergyUser(user: LoginUser) {
+    this.synergyUserList = (
+      this.synergyUserList
+      .filter((synergyUser: LoginUser) => {
+        return synergyUser.userId !== user.userId
+      })
+    )
+  }
+  
   /**
    * @description 获取客户信息
   */
@@ -52,7 +66,7 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
       this.customer = Object.freeze(result.data || {})
       
       // @ts-ignore
-      this.$refs.TaskAllotExcutorComponent.outsideFetchTeamUsers()
+      this.$refs.TaskAllotExcutorComponent.outsideFetchUsers()
       
     }).catch(err => {
       console.error(err)
@@ -69,15 +83,15 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
   /** 
    * @description 设为负责人
   */
-  setExecutorUser(user: any) {
-    // TODO: ...
+  setExecutorUser(user: LoginUser) {
+    this.executorUser = user
   }
   
   /** 
    * @description 设为协同人
   */
-  setSynergyUser(user: any) {
-    // TODO: ...
+  setSynergyUser(user: LoginUser) {
+    this.synergyUserList.push(user)
   }
   
   /** 

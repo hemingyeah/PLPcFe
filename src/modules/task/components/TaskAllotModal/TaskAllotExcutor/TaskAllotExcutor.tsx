@@ -18,13 +18,19 @@ import { CreateElement } from 'vue'
 })
 export default class TaskAllotExcutor extends Vue {
   
+  /* 当前选择的负责人 */
+  get selectExecutorUser() {
+    // @ts-ignore
+    return this.$refs.TaskAllotUserTableComponent?.selectExecutorUser
+  }
+  
   /**
    * @description 获取团队用户
    * -- 支持外部调用的
   */
-  public outsideFetchTeamUsers() {
+  public outsideFetchUsers() {
     // @ts-ignore
-    this.$refs.TaskAllotUserTableComponent.outsideFetchTeamUsers()
+    this.$refs.TaskAllotUserTableComponent.outsideFetchUsers()
   }
   
   render(h: CreateElement) {
@@ -36,7 +42,7 @@ export default class TaskAllotExcutor extends Vue {
           <div id='MapContainer'></div>
           
           <div class='task-allot-user-content'>
-            <user-card emitEventComponentName={ComponentNameEnum.TaskAllotExcutor} />
+            { this.selectExecutorUser && <user-card emitEventComponentName={ComponentNameEnum.TaskAllotExcutor} /> }
           </div>
           
         </div>

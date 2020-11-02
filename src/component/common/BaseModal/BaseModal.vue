@@ -240,6 +240,7 @@ export default {
 }
 
 .base-modal-body {
+  flex: 1;
   overflow: auto;
 }
 

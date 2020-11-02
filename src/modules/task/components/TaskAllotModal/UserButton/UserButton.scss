@@ -18,10 +18,35 @@
 
 .user-button {
   width: 40px;
+  position: relative;
   
-  img {
+  &-head {
     border-radius: 50%;
     height: 40px;
     width: 40px;
+  }
+  
+  &-delete {
+    cursor: pointer;
+    
+    display: none;
+    width: 12px;
+    height: 12px;
+    
+    position: absolute;
+    top: -5px;
+    right: 0;
+  }
+  
+  &-name {
+    width: 100%;
+    text-align: center;
+    @include text-ellipsis();
+  }
+  
+  &:hover {
+    .user-button-delete {
+      display: block;
+    }
   }
 }

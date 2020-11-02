@@ -5,10 +5,12 @@ import UserButton from '@src/modules/task/components/TaskAllotModal/UserButton/U
 /* enum */
 import ComponentNameEnum from '@model/enum/ComponentNameEnum'
 import TaskAllotTypeEnum from '@model/enum/TaskAllotTypeEnum'
+/* entity */
+import LoginUser from '@model/entity/LoginUser/LoginUser'
 /* vue */
 import { CreateElement } from 'vue'
 /* vue */
-import { Component, Prop } from 'vue-property-decorator'
+import { Component } from 'vue-property-decorator'
 /* render */
 import TaskAllotModalRender from '@src/modules/task/components/TaskAllotModal/TaskAllotModalRender.tsx'
 /* scss */
@@ -41,9 +43,10 @@ export default class TaskAllotModal extends TaskAllotModalRender {
         }
       }
     }
-
+    
     return (
       <base-modal show={this.showTaskAllotModal} {...attrs}>
+        
         <div class='task-allot-nav'>
           <div class='task-allot-type'>
             <span class='task-allot-nav-title'>派单方式</span>
@@ -51,19 +54,27 @@ export default class TaskAllotModal extends TaskAllotModalRender {
           </div>
           <div class='task-allot-executor'>
             <span class='task-allot-nav-title'>负责人</span>
-            <user-button />
+            <user-button user={this.executorUser} />
           </div>
           {this.renderSynergy()}
         </div>
+        
         <div class='task-allot-content'>
           <keep-alive>
+            <component is={this.allotContentComponent}></component>
             <task-allot-excutor
-              onSetExecutor={(user: any) => this.setExecutorUser(user)} 
-              onSetSynergy={(user: any) => this.setSynergyUser(user)} 
+              onSetExecutor={(user: LoginUser) => this.setExecutorUser(user)} 
+              onSetSynergy={(user: LoginUser) => this.setSynergyUser(user)} 
               ref="TaskAllotExcutorComponent" 
             />
           </keep-alive>
         </div>
+        
+        <div slot="footer" class="dialog-footer">
+            <el-button >取 消</el-button>
+            <el-button type='primary' disabled={this.pending}>确 定</el-button>
+        </div>
+        
       </base-modal>
     )
   }

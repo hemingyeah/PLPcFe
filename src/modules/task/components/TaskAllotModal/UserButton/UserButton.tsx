@@ -11,7 +11,8 @@ import '@src/modules/task/components/TaskAllotModal/UserButton/UserButton.scss'
 
 @Component({ name: 'user-button' })
 export default class UserButton extends Vue {
-
+  /* 用户删除方法 */
+  @Prop() userDeleteFunc: Function | undefined
   /* 用户信息 */
   @Prop() user: LoginUser | undefined
   
@@ -21,8 +22,11 @@ export default class UserButton extends Vue {
   @Emit('click')
   private handlerClick(): void { }
   
-  private userHead() {
+  @Emit('delete')
+  private deleteUser(): LoginUser | undefined {
+    this.userDeleteFunc && this.userDeleteFunc(this.user)
     
+    return this.user
   }
   
   render(h: CreateElement) {
@@ -37,9 +41,15 @@ export default class UserButton extends Vue {
       )
     }
     
+    let { head = '', displayName = '' } = this.user || {}
+    
     return (
       <div class='user-button'>
-        <img src={this.user?.head || this.defaultHead} />
+        <img class='user-button-head' src={head || this.defaultHead} />
+        <i class='iconfont icon-circle-delete user-button-delete' onClick={this.deleteUser}></i>
+        <el-tooltip content={displayName} placement='top'>
+          <div class='user-button-name'>{displayName}</div>
+        </el-tooltip>
       </div>
     )
   }

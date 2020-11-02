@@ -123,10 +123,10 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
   }
   
   /** 
-   * @description 获取团队用户
+   * @description 获取用户列表
    * -- 内部调用的
   */
-  public fetchTeamUsers(): Promise<any> {
+  public fetchUsers(): Promise<any> {
     let params = {
       customerId: this.customer.id || '',
       lat: String(this.customerAddress.adLatitude) || '',
@@ -146,18 +146,27 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
     )
   }
   
+  /** 
+   * @description 获取团队人员列表
+  */
+  public fetchTeamUsers(): Promise<any> {
+    return new Promise((resolve, reject) => {
+      resolve({})
+    })
+  }
+  
   /**
    * @description 选择团队变化事件
   */
   public handlerTeamChange(): void {
-    
+    this.initialize()
   }
   
   /**
    * @description 选择团队成员变化事件
   */
   public handlerTeamUsersChange(): void {
-    
+    this.initialize()
   }
   
   /**
@@ -165,6 +174,7 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
   */
   public handlerLocationChange(value: string): void {
     this.selectLocation = value
+    this.initialize()
   }
   
   /**
@@ -172,6 +182,7 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
   */
   public handlerUserStateChange(value: string[]): void {
     this.selectUserState = value
+    this.initialize()
   }
   
   /**
@@ -179,8 +190,18 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
   */
   public handlerSortordChange(value: string): void {
     this.selectSortord = value
+    this.initialize()
   }
-
+  
+  /**
+   * @description 初始化 获取用户列表并且初始化地图
+  */
+  public initialize(): void {
+    this.fetchUsers().then(() => {
+      this.mapInit()
+    })
+  }
+  
   /**
    * @description 选择排序方式事件
   */
@@ -199,13 +220,11 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
   }
   
   /** 
-   * @description 获取团队用户
+   * @description 获取用户列表
    * -- 支持外部调用的
   */
-  public outsideFetchTeamUsers(): void {
-    this.fetchTeamUsers().then(() => {
-      this.mapInit()
-    })
+  public outsideFetchUsers(): void {
+    this.initialize()
   }
   
   /** 
