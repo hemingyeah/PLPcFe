@@ -126,6 +126,7 @@ function textarea(value, field = {}, origin = {}, mode, changeStatus) {
 
 // 验证电话手机格式
 function phone(value, field = {},origin = {}, mode, changeStatus) {
+  let { isRepeat } = field.setting || {};
   let validate = new Promise(resolve => {
     if(field.isNull && !value) return resolve(null);
     if(value == null || !value.toString().length) return resolve(`请输入${field.displayName}`);
