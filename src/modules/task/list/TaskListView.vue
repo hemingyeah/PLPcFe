@@ -14,10 +14,10 @@
         <!-- 搜索 -->
         <div class="task-list-header-seach">
           <form onsubmit="return false;">
-            <div class="seach task-span1 task-flex task-ai guide-box">
+            <div class="seach task-span1 guide-box">
               <div style="position: relative;" >
                 <div class="guide-disable-cover" v-if="nowGuideStep == 4"></div>
-                <div itemid="" @mouseenter="guideDropdownMenu_enter">  
+                <div itemid="" @mouseenter="guideDropdownMenu_enter" class="task-flex task-ai task-jend">  
                   <el-dropdown id="v-task-step-3" >
                     <div
                       :class="['task-list-customize', 'task-font14', 'task-c3', 'task-flex', 'task-ai', 'task-pointer', nowGuideStep == 4? 'guide-point bg-w':'']"
@@ -44,7 +44,7 @@
                               <i
                                 class="iconfont icon-bianji1 task-ml12 task-font12"
                                 @click.stop="creatViewPanel(item, 'edit')"
-                           
+                                  
                               ></i>
                             </el-tooltip>
                             <el-tooltip content="删除视图" placement="top">
