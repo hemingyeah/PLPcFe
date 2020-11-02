@@ -411,10 +411,10 @@ export default {
           return data;
         },
         reset() {
-          this.form = {};
-          if (this.fields.length) {
-            this.selectField(this.fields[0].fieldName);
-          }
+          // this.form = {};
+          // if (this.fields.length) {
+          //   this.selectField(this.fields[0].fieldName);
+          // }
         },
         buildForm() {
           localStorage.setItem('fields_length', this.fields.length)
