@@ -27,7 +27,8 @@ export default {
     },
     disabled() {
       let field = this.field;
-      return field.setting && field.setting.defaultValueConfig && !!field.setting.defaultValueConfig.isNotModify;
+      return field.disabled ||
+        (field.setting && field.setting.defaultValueConfig && !!field.setting.defaultValueConfig.isNotModify && !!field.defaultValue);
     },
     showRequired() {
       let field = this.field;
