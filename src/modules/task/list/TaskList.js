@@ -431,13 +431,39 @@ export default {
       if (success) {
         this.taskView = result;
         this.otherLists(result);
+        const {mySearch, viewId} = this.intercept()
+
+        if (this.intercept()) {
+          this.selectId = mySearch
+          this.filterId = viewId
+        }
+
         result.forEach(item => {
           if (item.id === this.selectIds.allId) {
             this.searchParams = item.searchModel
+            if (this.intercept()) {
+              this.searchParams.state = "allocated"
+              this.searchParams.executor = this.initData.currentUserId;
+            }
           }
         })
         this.initialize();
       }
+    },
+    /**
+     * 
+     */
+    intercept() {
+      const url = document.URL
+      if (url.indexOf("viewId") !== -1) {
+        let params = {}
+        url.split("?")[1].split("&").forEach((item, index) => {
+          params[item.split("=")[0]] = item.split("=")[1]
+        })
+        return params
+      } 
+      return ""
+      
     },
     /**
      * @description 高级搜索

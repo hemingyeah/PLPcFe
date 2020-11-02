@@ -75,6 +75,7 @@
       <slot name="footer"></slot>
     </el-form>
     <!-- E 搜索条件 -->
+    <!-- E 搜索条件 -->
     <!-- 设置弹框 -->
     <task-search-pupal 
       ref="taskSearchPupal" 
@@ -491,9 +492,9 @@ export default {
 
         if (tv.fieldName == "tags") {
           let condition = {
-            property: fn,
+            property: "tagIds",
             operator: tv.operatorValue,
-            value: form[fn].map(tag => tag.id)[0]
+            value: form[fn].map(tag => {return tag.id})
           }
           params.systemConditions.push(condition);
           continue;
@@ -503,7 +504,7 @@ export default {
           let condition = {
             property: fn,
             operator: tv.operatorValue,
-            value: TaskStateEnum.getValue(form[fn])
+            value: form[fn].map(stateName => TaskStateEnum.getValue(stateName))
           }
           params.systemConditions.push(condition);
           continue;
@@ -552,20 +553,30 @@ export default {
           params.systemConditions.push({
             property: "allotType",
             operator: tv.operatorValue,
-            value: AllotTypeConvertMap[form[fn]],
+            value: form[fn].map(type => AllotTypeConvertMap[type]),
           })
           continue
         }
 
         if (tv.fieldName == "onceException") {
           params.systemConditions.push({
-            property: "flag",
+            property: "flags",
             operator: tv.operatorValue,
-            value: FlagConvertMap[form[fn]],
+            value: form[fn].map(exception => FlagConvertMap[exception] || ""),
           })
           continue
         }
 
+        if (tv.fieldName === "synergyId") {
+          let condition = {
+            property: "synergies",
+            operator: tv.operatorValue,
+            value: form[fn]
+          }
+          params.systemConditions.push(condition);
+          continue;
+        }
+        
         if (tv.formType == "date") {
           params.systemConditions.push({
             property: fn,
