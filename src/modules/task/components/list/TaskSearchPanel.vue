@@ -259,16 +259,15 @@ export default {
           if (key !== "area") {
             inPar.push(key)
           } else {
-            if (JSON.stringify(searchFormData[key]) !== "{}" && searchFormData[key].city) {
+            if (JSON.stringify(searchFormData[key]) !== "{}" && searchFormData[key].province) {
               inPar.push("area")
             }
           }
         }
       }
-
       for(let key in this.$refs.taskInquireParams.returnData()) {
-        if (inPar.indexOf(key) !== -1 && this.$refs.taskInquireParams.returnData()[key] && JSON.stringify(this.$refs.taskInquireParams.returnData()[key]) !== "[]") {
-          if (key !== "customer" && key !== "tags" && key !== "area" && key !== "backUp") {
+        if (inPar.indexOf(key) !== -1 && this.$refs.taskInquireParams.returnData()[key] && JSON.stringify(this.$refs.taskInquireParams.returnData()[key]) !== "[]" && key !== "backUp") {
+          if (key !== "customer" && key !== "tags" && key !== "area") {
             repeatBool = true
           } else {
             if (this.$refs.taskInquireParams.returnData()["area"] && this.$refs.taskInquireParams.returnData()["area"].province) {
@@ -349,8 +348,8 @@ export default {
         }
 
         if (MultiFieldNames.indexOf(fn) > -1) {
-          params[`${fn}s`] = form[fn];
-          delete params[fn];
+          params[`${fn}s`] = form[fn]
+          delete params[fn]
           continue;
         }
 
@@ -358,14 +357,14 @@ export default {
           params.tagId = form[fn].map(({ id }) => id).join("");
         }
 
-        params[fn] = form[fn];
+        params[fn] = form[fn]
       }
 
       // 自定义条件
       for (let i = 0; i < notSystemFields.length; i++) {
         tv = notSystemFields[i];
         fn = tv.fieldName;
-        !tv.operator ? (tv["operator"] = this.matchOperator(tv)) : "";
+        !tv.operator ? tv["operator"] = this.matchOperator(tv) : ""
         if (!form[fn] || (Array.isArray(form[fn]) && !form[fn].length)) {
           continue;
         }
@@ -394,7 +393,7 @@ export default {
           params.conditions.push({
             property: fn,
             operator: tv.operator,
-            inValue: form[fn],
+            inValue: form[fn]
           });
           continue;
         }
@@ -423,37 +422,8 @@ export default {
           value: form[fn],
         });
       }
-      this.buildTaskInquireParams(params);
-
-      if (params.systemConditions) {
-        params.systemConditions.forEach((item) => {
-          if (item.property === "serviceContent") {
-            params.serviceContents = [];
-          } else if (item.property === "serviceType") {
-            params.serviceTypes = [];
-          } else if (item.property === "level") {
-            params.levels = [];
-          } else if (item.property === "paymentMethod") {
-            params.paymentMethods = [];
-          } else if (item.property === "state") {
-            params.states = [];
-          } else if (item.property === "allotType") {
-            params.allotTypeStrs = [];
-          } else if (item.property === "flag") {
-            params.onceExceptions = [];
-          } else if (item.property === "allotUser") {
-            params.allotUser = [];
-          } else if (item.property === "createUser") {
-            params.createUser = [];
-          } else if (item.property === "executorUser") {
-            params.executor = [];
-          } else if (item.property === "synergies") {
-            params.synergyId = [];
-          } else if (item.property === "tags") {
-            params.tags = [];
-          }
-        });
-      }
+      this.buildTaskInquireParams(params)
+      this.clearParams(params)
       // 返回接口数据
       return {params, repeatBool};
     },
@@ -465,8 +435,8 @@ export default {
 
       const isSystemFields = taskInquireList.filter((f) => f.isSystem);
       const notSystemFields = taskInquireList.filter((f) => !f.isSystem);
-
-      params.systemConditions = [];
+      
+      params.systemConditions = []
 
       let tv = null;
       let fn = "";
@@ -474,7 +444,7 @@ export default {
       for (let i = 0; i < isSystemFields.length; i++) {
         tv = isSystemFields[i];
         fn = tv.fieldName;
-
+        
         if (!form[fn] || (Array.isArray(form[fn]) && !form[fn].length)) {
           continue;
         }
@@ -523,8 +493,8 @@ export default {
           let condition = {
             property: fn,
             operator: tv.operatorValue,
-            inValue: form[fn].map((tag) => tag.id),
-          };
+            value: form[fn].map(tag => tag.id)[0]
+          }
           params.systemConditions.push(condition);
           continue;
         }
@@ -533,10 +503,8 @@ export default {
           let condition = {
             property: fn,
             operator: tv.operatorValue,
-            inValue: form[fn].map((exception) =>
-              TaskStateEnum.getValue(exception)
-            ),
-          };
+            value: TaskStateEnum.getValue(form[fn])
+          }
           params.systemConditions.push(condition);
           continue;
         }
@@ -567,8 +535,8 @@ export default {
             property: "productId",
             operator: tv.operatorValue,
             value: form[fn],
-          });
-          continue;
+          })
+          continue
         }
 
         if (tv.fieldName === "paymentMethod") {
@@ -584,32 +552,21 @@ export default {
           params.systemConditions.push({
             property: "allotType",
             operator: tv.operatorValue,
-            inValue: form[fn].map(
-              (exception) => AllotTypeConvertMap[exception] || ""
-            ),
-          });
-          continue;
+            value: AllotTypeConvertMap[form[fn]],
+          })
+          continue
         }
 
         if (tv.fieldName == "onceException") {
           params.systemConditions.push({
             property: "flag",
             operator: tv.operatorValue,
-            inValue: form[fn].map(
-              (exception) => FlagConvertMap[exception] || ""
-            ),
-          });
-          continue;
+            value: FlagConvertMap[form[fn]],
+          })
+          continue
         }
 
-        if (
-          tv.fieldName == "level"
-          || tv.fieldName == "serviceType"
-          || tv.fieldName == "serviceContent"
-          || tv.fieldName == "paymentMethod"
-          || tv.fieldName === "createUser"
-          || tv.fieldName === "allotUser"
-        ) {
+        if (tv.formType == "date") {
           params.systemConditions.push({
             property: fn,
             operator: tv.operatorValue,
@@ -619,16 +576,7 @@ export default {
           continue
         }
 
-        if (tv.fieldName === "synergyId") {
-          params.systemConditions.push({
-            property: "synergies",
-            operator: tv.operatorValue,
-            inValue: form[fn],
-          });
-          continue;
-        }
-
-        if (tv.formType == "date") {
+        if (tv.formType === "datetime") {
           params.systemConditions.push({
             property: fn,
             operator: tv.operatorValue,
@@ -643,32 +591,17 @@ export default {
             property: TaskInquireConvertFieldNamesToConditionsMap[fn],
             operator: tv.operatorValue,
             value: form[fn],
-          });
-          continue;
+          })
+          continue
         }
 
-        let value = TaskOnceConvertMap[form[fn]] != undefined
-          ? TaskOnceConvertMap[form[fn]]
-          : form[fn];
-        value = TaskApproveConvertMap[value] != undefined
-          ? TaskApproveConvertMap[value]
-          : value;
+        let value = TaskOnceConvertMap[form[fn]] != undefined ? TaskOnceConvertMap[form[fn]] : form[fn]
+        value = TaskApproveConvertMap[value] != undefined ? TaskApproveConvertMap[value] : value
 
         params.systemConditions.push({
           property: fn,
           operator: tv.operatorValue,
-          value,
-        });
-        params.systemConditions = [
-          ...new Set(
-            params.systemConditions.map((item) => {
-              item = JSON.stringify(item);
-              return item;
-            })
-          ),
-        ].map((item) => {
-          item = JSON.parse(item);
-          return item;
+          value
         });
       }
 
@@ -720,7 +653,7 @@ export default {
           params.conditions.push({
             property: fn,
             operator: tv.operator,
-            inValue: form[fn],
+            inValue: form[fn]
           });
           continue;
         }
@@ -744,12 +677,12 @@ export default {
           });
           continue;
         }
-
-        //
+        
+        // 
         if (params.conditions && params.conditions.length) {
-          params.conditions = params.conditions.filter((item) => {
-            return fn !== item.property;
-          });
+          params.conditions = params.conditions.filter(item => {
+            return fn !== item.property
+          })
           params.conditions.push({
             property: fn,
             operator: tv.operatorValue,
@@ -762,6 +695,41 @@ export default {
             value: form[fn],
           });
         }
+      }
+
+    },
+    /**
+     * 添加查询条件存在就删除常用条件
+     */
+    clearParams (params) {
+      if (params.systemConditions) {
+        params.systemConditions.forEach((item) => {
+          if (item.property === "serviceContent") {
+            params.serviceContents = [];
+          } else if (item.property === "serviceType") {
+            params.serviceTypes = [];
+          } else if (item.property === "level") {
+            params.levels = [];
+          } else if (item.property === "paymentMethod") {
+            params.paymentMethods = [];
+          } else if (item.property === "state") {
+            params.states = [];
+          } else if (item.property === "allotType") {
+            params.allotTypeStrs = [];
+          } else if (item.property === "flag") {
+            params.onceExceptions = [];
+          } else if (item.property === "allotUser") {
+            params.allotUser = [];
+          } else if (item.property === "createUser") {
+            params.createUser = [];
+          } else if (item.property === "executorUser") {
+            params.executor = [];
+          } else if (item.property === "synergies") {
+            params.synergyId = [];
+          } else if (item.property === "tags") {
+            params.tags = [];
+          }
+        });
       }
     },
     getLocalStorageData() {

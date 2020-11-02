@@ -417,7 +417,6 @@ export default {
               inPar.push({ key, value: searchParams[key] });
             }
           }
-          console.log(inPar);
           inPar.forEach((item) => {
             if (item.key === "customerId") {
               this.form["customer"] = item.value;
