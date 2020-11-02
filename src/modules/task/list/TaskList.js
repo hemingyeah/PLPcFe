@@ -321,7 +321,7 @@ export default {
     })
 
     // 对外开放刷新方法，用于其他tab刷新本tab数据
-    // window.__exports__refresh = this.searchList;
+    window.__exports__refresh = this.searchList;
   },
   methods: {
     guideDropdownMenu_enter(){
