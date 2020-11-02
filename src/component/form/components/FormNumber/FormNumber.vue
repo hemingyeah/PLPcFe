@@ -30,17 +30,6 @@ export default {
     },
     nativeInputValue() {
       return this.value === null || this.value === undefined ? '' : String(this.value);
-    },
-    /** 
-    * @description 不允许修改
-    * 1.有默认值
-    * 2.且 设置不允许修改
-    */
-    disabled() {
-      let { defaultValueConfig } = this.field.setting || {};
-      let { isNotModify } = defaultValueConfig || {};
-
-      return typeof defaultValueConfig == 'object' && isNotModify == 1 && !!this.field.defaultValue;
     }
   },
   watch: {
@@ -107,6 +96,9 @@ export default {
   width: 100%;
   input{
     width: 100%;
+    &:disabled{
+      -webkit-text-fill-color: #b2b2b2;
+    }
   }
 }
 </style>
