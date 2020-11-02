@@ -268,6 +268,7 @@ export default {
     add() {
       this.list.push(1);
     },
+    // 删除
     del({ index, v }) {
       this.checkSystemList = [];
       this.checkCustomizeList = [];
@@ -710,7 +711,7 @@ export default {
                     </div>
                   ) : (
                     <i
-                      class="iconfont icon-yemianshanchu task-pointer task-ml15 task-icon"
+                      class="iconfont icon-shanchu1 task-pointer task-ml15 task-icon"
                       onClick={() => {
                         this.$emit("del", {
                           index: this.index,
