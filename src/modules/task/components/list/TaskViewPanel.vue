@@ -1,5 +1,5 @@
 <template>
-  <base-panel :show.sync="visible" :width="panelWidth" @close="hide()">
+  <base-panel :show.sync="visible" :width="panelWidth" @close="hide()" :re="true">
     <h3 slot="title">
       <span>{{region.viewName || '新建视图'}}</span>
       <el-dropdown
