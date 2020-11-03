@@ -13,6 +13,18 @@ const FormMixin = {
       }
     },
   },
+  computed: {
+    /** 
+    * @description 不允许修改
+    * 1.有默认值
+    * 2.且 设置不允许修改
+    */
+    disabled() {
+      let field = this.field;
+      return field.disabled ||
+        (field.setting && field.setting.defaultValueConfig && !!field.setting.defaultValueConfig.isNotModify && !!field.defaultValue);
+    }
+  },
   watch: {
     field(newValue) {
       this.addFieldEvent();

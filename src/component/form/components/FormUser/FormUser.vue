@@ -36,11 +36,25 @@ export default {
       default: false
     },
     /* 选人 配置项 */
-    max: [String, Number]
+    max: [String, Number],
+    /* 是否显示离职人员 */
+    showDeleteUser: {
+      type: Boolean,
+      default: false
+    }
   },
   computed: {
+    /** 
+    * @description 多选
+    * 1.multiple
+    * 2.或 人员字段设置可多选
+    */
+    _multiple() {
+      let { isMultiple } = this.field.setting || {};
+      return this.multiple || isMultiple == 1;
+    },
     displayName(){
-      if(!this.multiple) {
+      if(!this._multiple) {
         let user = this.value || {};
         return user.displayName || user.name;
       }
@@ -50,24 +64,34 @@ export default {
     },
     // 根据userId判断是否为空
     isEmpty(){
-      if(!this.multiple) {
+      if(!this._multiple) {
         let value = this.value || {};
         return !value.userId;
       }
 
       let value = this.value || [];
       return value.length <= 0
+    },
+    /** 
+    * @description 显示离职人员
+    * 1.通过prop showDeleteUser
+    * 2.或 人员字段设置可显示离职人员
+    */
+    seeDeleteUser() {
+      let { showDeleteUser } = this.field.setting || {};
+      return this.showDeleteUser || showDeleteUser == 1;
     }
   },
   methods: {
     choose(){
       let max = 1;
-      if(this.multiple) max = null == this.max ? -1 : parseInt(this.max)
+      if(this._multiple) max = null == this.max ? -1 : parseInt(this.max)
       
       let options = {
         title: `请选择${this.field.displayName}`,
         seeAllOrg: this.seeAllOrg,
-        selected: this.multiple ? this.value : null,
+        selected: this._multiple ? this.value : null,
+        showDeleteUser: this.seeDeleteUser,
         max
       };
       return this.$fast.contact.choose('dept', options).then(result => {
@@ -75,7 +99,7 @@ export default {
           let oldValue = null;
           let data = result.data || {};
           let users = data.users || [];
-          let newValue = this.multiple ? users : users[0];
+          let newValue = this._multiple ? users : users[0];
 
           this.$emit('update', {newValue, oldValue, field: this.field});
           this.$emit('input', newValue);
@@ -86,7 +110,7 @@ export default {
         .catch(err => console.error(err))
     },
     clear(){
-      let value = this.multiple ? [] : {};
+      let value = this._multiple ? [] : {};
       this.$emit('update', {newValue: value, field: this.field});
       this.$emit('input', value);
     }

@@ -2,13 +2,16 @@
   <div class="form-setting-group form-default-value-setting">
     <h4 class="form-item-title">
       默认值
-      <el-tooltip content="设置后在输入框中可默认显示" placement="top">
+      <el-tooltip v-show="showTip" :content="tooltipContent" placement="top">
         <i class="iconfont icon-question"></i>
       </el-tooltip>
     </h4>
     <div class="form-item-box">
-      <input :type="type" placeholder="请输入默认值" v-model="field.defaultValue" @input="update(field.defaultValue, 'defaultValue')" />
-      <el-checkbox v-model="defaultValueConfig.isNotModify" @change="update(defaultValueConfig, 'defaultValueConfig', true)" :true-label="1" :false-label="0" :disabled="modifyDefaultValueDisabled">不允许修改</el-checkbox>
+      <!-- 后备插槽(默认渲染) -->
+      <slot>
+        <input :type="type" placeholder="请输入默认值" v-model="field.defaultValue" @input="update(field.defaultValue, 'defaultValue')" />
+        <el-checkbox v-model="defaultValueConfig.isNotModify" @change="update(defaultValueConfig, 'defaultValueConfig', true)" :true-label="1" :false-label="0" :disabled="modifyDefaultValueDisabled">不允许修改</el-checkbox>
+      </slot>
     </div>
   </div>
 </template>
@@ -24,6 +27,14 @@ export default {
     type: {
       type: String,
       default: 'text'
+    },
+    showTip: {
+      type: Boolean,
+      default: true
+    },
+    tooltipContent: {
+      type: String,
+      default: '设置后在输入框中可默认显示'
     }
   },
   computed: {

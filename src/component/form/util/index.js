@@ -124,8 +124,9 @@ export function initialize(fields = [], origin = {}, callback){
     let dataSource = setting.dataSource || [];
     let defaultValue = field.defaultValue || '';
     let { defaultValueConfig } = setting || {};
-    let { isCurrentDate } = defaultValueConfig || {};
+    let { isCurrentDate, isCurrentUser } = defaultValueConfig || {};
     let dateType = setting.dateType || 'yyyy-MM-dd';
+    
     // 客户和编号类型不出初始化值
     if(field.formType == 'customer' || field.formType == 'eventNo' || field.formType == 'taskNo') return;
     // 如果已经存在值 则无需初始化
@@ -158,8 +159,24 @@ export function initialize(fields = [], origin = {}, callback){
     }
     
     // 地址、人员的默认值初始化为对象
-    let objValueFields = ['customerAddress', 'address', 'user']
+    let objValueFields = ['customerAddress', 'address']
     if(objValueFields.indexOf(field.formType) >= 0) defaultValue = {};
+
+    // 人员字段初始化
+    if(formType == 'user') {
+      let { isMultiple } = setting || {};
+
+      // 当前登录账户数据
+      let { userId, displayName, staffId, head } = window.parent.loginUser || {};
+
+      // 默认当前登录账户
+      if (isCurrentUser == 1 && userId) {
+        let loginUser = { userId, displayName, staffId, head };
+        defaultValue = isMultiple == 1 ? [loginUser] : loginUser;
+      } else {
+        defaultValue = isMultiple == 1 ? [] : {};
+      }
+    }
     
     // 来自表单的值，用于编辑时初始化值
     let attribute = origin.attribute || {};
@@ -175,7 +192,7 @@ export function initialize(fields = [], origin = {}, callback){
     }
     // 日期 若设置默认值，将系统时间设为默认值
     if( formType == 'date' && ( JSON.stringify(defaultValueConfig) !== '{}' && isCurrentDate == 1)){
-      defaultValue = fmt_data_time(new Date(),dateType);
+      defaultValue = fmt_data_time(new Date(), dateType);
     }
 
     result[fieldName] = formData == null ? defaultValue : formData;

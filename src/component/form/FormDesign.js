@@ -221,7 +221,8 @@ const FormDesign = {
       // 插入的字段
       insertedField: null,
       // 插入前的值
-      originValue: null
+      originValue: null,
+      autographMax: config.AUTOGRAPH_MAX_LENGTH_MAX
     }
   },
   computed: {
@@ -362,6 +363,12 @@ const FormDesign = {
       // 限制字段数量
       if (this.value.length >= this.max) {
         return Platform.alert(`单个表单最多支持${ this.max }个字段`)
+      }
+
+      // 限制电子签名字段数量
+      let autographFields = this.value.filter(field => field.formType == 'autograph');
+      if(autographFields.length >= this.autographMax) {
+        return Platform.alert(`电子签名自定义字段暂时不予许超过${ this.autographMax }个`);
       }
       
       let dragEvent = this.$data.$dragEvent;

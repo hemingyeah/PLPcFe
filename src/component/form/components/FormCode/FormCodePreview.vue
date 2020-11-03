@@ -2,7 +2,7 @@
   <div class="form-preview-group">
     <label>
       {{field.displayName}} 
-      <span class="form-preview-notNull" v-if="showRequired">*</span>
+      <span class="form-preview-notNull" v-if="field.isNull == 0">*</span>
       <i class="iconfont icon-yidongduanxianshi" v-if="field.isAppShow === 1"></i>
     </label>
     <div class="form-preview-mock">
@@ -18,21 +18,12 @@
 import { previewProps } from '@src/component/form/components/props';
 
 export default {
-  name: 'form-text-preview',
+  name: 'form-code-preview',
   props: previewProps,
   computed: {
     /** 是否为扫码类型 */
     isCode(){
-      return this.field.formType == 'code' || !!this.field.setting.isScanCode;
-    },
-    disabled() {
-      let field = this.field;
-      return field.disabled ||
-        (field.setting && field.setting.defaultValueConfig && !!field.setting.defaultValueConfig.isNotModify && !!field.defaultValue);
-    },
-    showRequired() {
-      let field = this.field;
-      return field.isNull == 0 && !this.disabled;
+      return this.field.formType == 'code';
     }
   }
 }

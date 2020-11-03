@@ -1,6 +1,6 @@
 <template>
   <div class="form-textarea">
-    <textarea :id="`form_${field.fieldName}`" @input="input" :value="value" rows="3" :placeholder="placeholder" :disabled="field.disabled" maxlength="2000" autocomplete="off"></textarea>
+    <textarea :id="`form_${field.fieldName}`" @input="input" :value="value" rows="3" :placeholder="placeholder" :disabled="disabled" maxlength="2000" autocomplete="off"></textarea>
     <span class="form-textarea-summary" :style="{right: `${offsetRight}px`}">{{summary}}</span>
   </div>
 </template>
@@ -38,6 +38,9 @@ export default {
   textarea{
     width: 100%;
     padding: 3px 10px 16px 10px;
+    &:disabled{
+      -webkit-text-fill-color: #b2b2b2;
+    }
   }
 }
 

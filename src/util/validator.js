@@ -63,8 +63,14 @@ let repeatRemoteValidate = _.debounce(function(mode, field, value, changeStatus,
 }, 500)
 
 /** 单行文本验证，50字以内 */
-function text(value, field = {}){
-  return new Promise((resolve, reject) => {
+function text(value, field = {}, origin = {}, mode, changeStatus){
+  let { isRepeat, defaultValueConfig } = field.setting || {};
+
+  // 默认值是否允许修改
+  let { isNotModify } = defaultValueConfig || {};
+  let notModifyValue = isNotModify == 1 && !!field.defaultValue;
+
+  let validate = new Promise((resolve, reject) => {
     // 先验证长度
     if(value != null && value.toString().length > SINGLE_LINE_MAX_LEN){
       return resolve(`长度不能超过${SINGLE_LINE_MAX_LEN}个字符`);
@@ -74,6 +80,17 @@ function text(value, field = {}){
     // 不允许为空
     if(!value || value.toString().length == 0) return resolve(`请输入${field.displayName}`);
     resolve(null);
+  })
+
+  // 不需要校验重复性
+  if (!isRepeat || !mode || !value || notModifyValue) return validate;
+
+  return new Promise((resolve, reject) => {
+    validate.then((res) => {
+      res === null ? repeatRemoteValidate(mode, field, value, changeStatus, resolve) : resolve(res);
+    }).catch(err => {
+      console.error('text validate err', err);
+    })
   })
 }
 
@@ -87,8 +104,14 @@ function select(value, field = {}) {
 }
 
 /** 多行文本验证，500字以内 */
-function textarea(value, field = {}) {
-  return new Promise((resolve, reject) => {
+function textarea(value, field = {}, origin = {}, mode, changeStatus) {
+  let { isRepeat, defaultValueConfig } = field.setting || {};
+
+  // 默认值是否允许修改
+  let { isNotModify } = defaultValueConfig || {};
+  let notModifyValue = isNotModify == 1 && !!field.defaultValue;
+  
+  let validate = new Promise((resolve, reject) => {
     if (value !== null && value.toString().length > MULTI_LINE_MAX_LEN) {
       return resolve(`长度不能超过${MULTI_LINE_MAX_LEN}个字符`);
     }
@@ -96,16 +119,39 @@ function textarea(value, field = {}) {
     if (value == null || value.toString().length == 0) return resolve(`请输入${field.displayName}`);
     resolve(null);
   });
+
+  // 不需要校验重复性
+  if (!isRepeat || !mode || !value || notModifyValue) return validate;
+
+  return new Promise((resolve, reject) => {
+    validate.then((res) => {
+      res === null ? repeatRemoteValidate(mode, field, value, changeStatus, resolve) : resolve(res);
+    }).catch(err => {
+      console.error('textarea validate err', err);
+    })
+  })
 }
 
 // 验证电话手机格式
-function phone(value, field = {}) {
-  return new Promise(resolve => {
+function phone(value, field = {}, origin = {}, mode, changeStatus) {
+  let { isRepeat } = field.setting || {};
+  let validate = new Promise(resolve => {
     if(field.isNull && !value) return resolve(null);
     if(value == null || !value.toString().length) return resolve(`请输入${field.displayName}`);
     if (![TEL_REG, PHONE_REG].some(reg => reg.test(value))) return resolve('请输入正确的电话或者手机号');
     resolve(null);
   });
+
+  // 不需要校验重复性
+  if (!isRepeat || !mode || !value) return validate;
+
+  return new Promise((resolve, reject) => {
+    validate.then((res) => {
+      res === null ? repeatRemoteValidate(mode, field, value, changeStatus, resolve) : resolve(res);
+    }).catch(err => {
+      console.error('phone validate err', err);
+    })
+  })
 }
 
 function email(value, field = {}) {
@@ -148,14 +194,14 @@ function planTime(value, field = {}) {
 function number(value, field = {}, origin = {}, mode, changeStatus) {
   let { decimalConfig, limitConig, defaultValueConfig, isRepeat } = field.setting || {};
 
-  let validate = new Promise(resolve => {
-    // 默认值
-    if (typeof defaultValueConfig == 'object') {
-      let { isNotModify } = defaultValueConfig;
+  // 默认值是否允许修改
+  let { isNotModify } = defaultValueConfig || {};
+  let notModifyValue = isNotModify == 1 && !!field.defaultValue;
 
-      // 不允许修改
-      if (isNotModify == 1 && !!field.defaultValue) return resolve(null);
-    }
+
+  let validate = new Promise(resolve => {
+    // 默认值且不允许修改时 不做校验
+    if (notModifyValue) return resolve(null);
 
     // 校验小数位数
     if (typeof decimalConfig == 'object') {
@@ -190,7 +236,7 @@ function number(value, field = {}, origin = {}, mode, changeStatus) {
   });
 
   // 不需要校验重复性
-  if (!isRepeat || !mode || !value) return validate;
+  if (!isRepeat || !mode || !value || notModifyValue) return validate;
 
   return new Promise((resolve, reject) => {
     validate.then((res) => {
