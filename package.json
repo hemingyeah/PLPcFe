@@ -12,6 +12,7 @@
     "serve": "node --max_old_space_size=8192 script/development.js",
     "build:new": "cnpm install & node script/production.js",
     "build:cloud": "node script/production.js",
+    "build:hbc": "node script/production.js --user=huangbc",
     "lint": "eslint --fix --ext .js,.vue src",
     "count": "cloc ./ --exclude-dir=node_modules,dist,package-lock.json",
     "comp": "node script/component.js",
