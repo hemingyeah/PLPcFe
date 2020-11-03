@@ -379,9 +379,11 @@ export default {
         };
       },
       watch: {
-        item() {
-          this.reset();
+        item(v) {
           this.buildForm();
+          if (!v) {
+            this.reset();
+          }
         },
         inquireFormBackup(v) {
           if (JSON.stringify(v) === '{}') {
@@ -411,7 +413,7 @@ export default {
           return data;
         },
         reset() {
-          // this.form = {};
+          this.form = {};
           // if (this.fields.length) {
           //   this.selectField(this.fields[0].fieldName);
           // }

@@ -2199,7 +2199,6 @@ const Inquire = [
     isSearch: 1,
     placeHolder: null,
     setting: {isMulti: false, dataSource:[
-      '全部',
       '待指派',
       '已指派',
       '已接受',
@@ -2401,7 +2400,6 @@ const Inquire = [
     isSearch: 1,
     placeHolder: null,
     setting: {isMulti: false, dataSource:[
-      '全部',
       '手动派单',
       '工单池派单',
       '自动派单',
@@ -2451,7 +2449,6 @@ const Inquire = [
     isSearch: 1,
     placeHolder: null,
     setting: {isMulti: false, dataSource:[
-      '全部',
       '是',
     ]},
     orderId: 1,
@@ -2473,7 +2470,6 @@ const Inquire = [
     isSearch: 1,
     placeHolder: null,
     setting: {isMulti: false, dataSource:[
-      '全部',
       '是',
       '否'
     ]},
@@ -2496,7 +2492,6 @@ const Inquire = [
     isSearch: 1,
     placeHolder: null,
     setting: {isMulti: false, dataSource:[
-      '全部',
       '审批中',
       '无审批'
     ]},
@@ -2546,7 +2541,6 @@ const Inquire = [
     isSearch: 1,
     placeHolder: null,
     setting: {isMulti: false, dataSource:[
-      '全部',
       '暂停',
       '超时'
     ]},
