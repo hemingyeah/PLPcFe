@@ -684,8 +684,9 @@ export default {
                     : "task-mt12"
                 }
               >
-                <div>
+                <div class="task-type">
                   {this.renderSelector()}
+                </div><div class="task-type">
                   {this.renderOperateSelect()}
                 </div>
                 <div
@@ -737,6 +738,12 @@ export default {
 </script>
 
 <style lang="scss">
+.task-type {
+  width: 210px !important;
+ .el-select {
+   width: 100%;
+ } 
+}
 .task-inquire,
 .task-inquire-two {
   margin-top: 12px;
@@ -744,10 +751,10 @@ export default {
     display: none !important;
   }
   .form-item {
-    width: 187px;
+    width: 210px;
   }
   .form-item-control {
-    width: 187px;
+    width: 210px;
     flex: inherit;
     .err-msg-wrap {
       min-height: 0 !important;

@@ -130,6 +130,9 @@ const MultiFieldNames = [
   "onceException",
   "paymentMethod",
   "tag",
+  "createUser",
+  "allotUser",
+  "executor",
 ];
 const TaskInquireConvertFieldNamesToConditionsMap = {
   customer: "customerId",
@@ -494,7 +497,7 @@ export default {
           let condition = {
             property: "tagIds",
             operator: tv.operatorValue,
-            value: form[fn].map(tag => {return tag.id})
+            inValue: form[fn].map(tag => {return tag.id})
           }
           params.systemConditions.push(condition);
           continue;
@@ -504,7 +507,7 @@ export default {
           let condition = {
             property: fn,
             operator: tv.operatorValue,
-            value: form[fn].map(stateName => TaskStateEnum.getValue(stateName))
+            inValue: form[fn].map(stateName => TaskStateEnum.getValue(stateName))
           }
           params.systemConditions.push(condition);
           continue;
@@ -544,7 +547,7 @@ export default {
           params.conditions.push({
             property: fn,
             operator: tv.operatorValue,
-            value: form[fn]
+            inValue: form[fn]
           });
           continue;
         }
@@ -553,7 +556,7 @@ export default {
           params.systemConditions.push({
             property: "allotType",
             operator: tv.operatorValue,
-            value: form[fn].map(type => AllotTypeConvertMap[type]),
+            inValue: form[fn].map(type => AllotTypeConvertMap[type]),
           })
           continue
         }
@@ -562,7 +565,7 @@ export default {
           params.systemConditions.push({
             property: "flags",
             operator: tv.operatorValue,
-            value: form[fn].map(exception => FlagConvertMap[exception] || ""),
+            inValue: form[fn].map(exception => FlagConvertMap[exception] || ""),
           })
           continue
         }
@@ -571,7 +574,7 @@ export default {
           let condition = {
             property: "synergies",
             operator: tv.operatorValue,
-            value: form[fn]
+            inValue: form[fn]
           }
           params.systemConditions.push(condition);
           continue;
@@ -597,6 +600,15 @@ export default {
           continue
         }
 
+        if (MultiFieldNames.indexOf(tv.formType) !== -1) {
+          params.systemConditions.push({
+            property: fn,
+            operator: tv.operatorValue,
+            inValue: form[fn]
+          });
+          continue
+        }
+        
         if (TaskInquireConvertFieldNamesToConditionsMap[fn]) {
           params.systemConditions.push({
             property: TaskInquireConvertFieldNamesToConditionsMap[fn],
@@ -605,6 +617,7 @@ export default {
           })
           continue
         }
+
 
         let value = TaskOnceConvertMap[form[fn]] != undefined ? TaskOnceConvertMap[form[fn]] : form[fn]
         value = TaskApproveConvertMap[value] != undefined ? TaskApproveConvertMap[value] : value
@@ -737,8 +750,8 @@ export default {
             params.executor = [];
           } else if (item.property === "synergies") {
             params.synergyId = [];
-          } else if (item.property === "tags") {
-            params.tags = [];
+          } else if (item.property === "tagIds") {
+            params.searchTagIds = [];
           }
         });
       }
