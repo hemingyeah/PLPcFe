@@ -744,7 +744,7 @@ export default {
       for(let key in params) {
         if(!bool_text) {
           bool = true
-          if (params['conditions'].length || params['systemConditions'].length || (params['productAddress'] && params['productAddress'].city)) {
+          if (params['conditions'].length || params['systemConditions'].length || (params['productAddress'] && params['productAddress'].province)) {
             bool = false
           }
         }
