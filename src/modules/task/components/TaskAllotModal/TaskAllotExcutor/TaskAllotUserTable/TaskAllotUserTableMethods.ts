@@ -13,6 +13,8 @@ import DefaultHead from '@src/assets/img/avatar.png'
 /* model */
 import Page from '@model/Page'
 import { getUserListByTagResult } from '@model/param/out/Task'
+/* util */
+import Log from '@src/util/log.ts'
 
 declare let AMap: any
 
@@ -23,7 +25,9 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
   */
   public buildCusomterAddressMarker(): void {
     let { validAddress } = this.customerAddress
-    if (!validAddress) return
+    if (!validAddress) {
+      return Log.warn('customerAddress.validAddress is false', this.buildCusomterAddressMarker.name)
+    }
     
     // 添加自定义点标记
     let customerAddressMarker = new AMap.Marker({
@@ -80,12 +84,15 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
    * 构建人员标记
   */
   public buildUserMarkers(): void {
-    if (this.userPage.list.length <= 0) return
-
+    if (this.userPage.list.length <= 0) {
+      return Log.warn('userPage.list is empty', this.buildUserMarkers.name)
+    }
+    
     this.userPage.list.forEach((user: LoginUser) => {
       let { longitude, latitude } = user
       // 无经纬度
       if (!longitude && !latitude) return
+
       // 用户标记
       let userMarker = new AMap.Marker({
         position: [longitude, latitude],
@@ -127,6 +134,8 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
    * -- 内部调用的
   */
   public fetchUsers(): Promise<any> {
+    Log.succ(Log.Start, this.fetchUsers.name)
+    
     let params = {
       customerId: this.customer.id || '',
       lat: String(this.customerAddress.adLatitude) || '',
@@ -134,14 +143,14 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
       tagId: this.selectTeams.map(team => team.id).join()
     }
     
-    this.userPage = new Page()
-    
     return (
       getUserListByTag(params).then((result: getUserListByTagResult) => {
         let isSuccess = result.status == 0
         if (!isSuccess) return
         
-        this.userPage.list = result.data || []
+        this.userPage.merge(result)
+        
+        Log.succ(Log.End, this.fetchUsers.name)
       })
     )
   }
@@ -159,6 +168,8 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
    * @description 选择团队变化事件
   */
   public handlerTeamChange(): void {
+    Log.succ(Log.Start, this.handlerTeamChange.name)
+    
     this.initialize()
   }
   
@@ -166,6 +177,8 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
    * @description 选择团队成员变化事件
   */
   public handlerTeamUsersChange(): void {
+    Log.succ(Log.Start, this.handlerTeamUsersChange.name)
+    
     this.initialize()
   }
   
@@ -173,6 +186,8 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
    * @description 选择距离变化事件
   */
   public handlerLocationChange(value: string): void {
+    Log.succ(Log.Start, this.handlerLocationChange.name)
+    
     this.selectLocation = value
     this.initialize()
   }
@@ -181,6 +196,8 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
    * @description 选择用户工作状态事件
   */
   public handlerUserStateChange(value: string[]): void {
+    Log.succ(Log.Start, this.handlerUserStateChange.name)
+    
     this.selectUserState = value
     this.initialize()
   }
@@ -189,6 +206,8 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
    * @description 选择排序方式事件
   */
   public handlerSortordChange(value: string): void {
+    Log.succ(Log.Start, this.handlerSortordChange.name)
+    
     this.selectSortord = value
     this.initialize()
   }
@@ -197,6 +216,10 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
    * @description 初始化 获取用户列表并且初始化地图
   */
   public initialize(): void {
+    Log.succ(Log.Start, this.initialize.name)
+    
+    this.userPage = new Page()
+
     this.fetchUsers().then(() => {
       this.mapInit()
     })
@@ -206,6 +229,8 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
    * @description 选择排序方式事件
   */
   public mapInit(): void {
+    Log.succ(Log.Start, this.mapInit.name)
+    
     this.AMap = new AMap.Map('MapContainer', {
       resizeEnable: true,
       center: this.getMapCenter(),
@@ -217,6 +242,8 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
     
     // 构建人员标记
     this.buildUserMarkers()
+    
+    Log.succ(Log.End, this.mapInit.name)
   }
   
   /** 
@@ -224,6 +251,8 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
    * -- 支持外部调用的
   */
   public outsideFetchUsers(): void {
+    Log.succ(Log.Start, this.outsideFetchUsers.name)
+    
     this.initialize()
   }
   
