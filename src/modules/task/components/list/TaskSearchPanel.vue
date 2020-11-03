@@ -424,9 +424,8 @@ export default {
         });
       }
       this.buildTaskInquireParams(params)
-      this.clearParams(params)
       // 返回接口数据
-      return {params, repeatBool};
+      return {params: this.clearParams(params), repeatBool};
     },
     buildTaskInquireParams(params) {
       const taskInquireList = this.$refs.taskInquireParams.returnInquireFields()
@@ -445,7 +444,6 @@ export default {
       for (let i = 0; i < isSystemFields.length; i++) {
         tv = isSystemFields[i];
         fn = tv.fieldName;
-        console.log(tv.formType, tv.displayName)
         
         if (!form[fn] || (Array.isArray(form[fn]) && !form[fn].length)) {
           continue;
@@ -732,13 +730,11 @@ export default {
             params.serviceTypes = [];
           } else if (item.property === "level") {
             params.levels = [];
-          } else if (item.property === "paymentMethod") {
-            params.paymentMethods = [];
           } else if (item.property === "state") {
             params.states = [];
           } else if (item.property === "allotType") {
             params.allotTypeStrs = [];
-          } else if (item.property === "flag") {
+          } else if (item.property === "flags") {
             params.onceExceptions = [];
           } else if (item.property === "allotUser") {
             params.allotUser = [];
@@ -750,9 +746,12 @@ export default {
             params.synergyId = [];
           } else if (item.property === "tagIds") {
             params.searchTagIds = [];
+          } else {
+            params[item.property] = ""
           }
         });
       }
+      return params
     },
     getLocalStorageData() {
       const dataStr = storageGet(TASK_HISTORY_KEY, "{}");

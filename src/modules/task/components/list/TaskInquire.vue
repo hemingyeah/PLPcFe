@@ -387,6 +387,11 @@ export default {
             this.buildForm();  
           } 
         },
+        item(v) {
+          if (!v) {
+            this.reset();
+          }
+        },
         fields(v) {
           if (JSON.stringify(this.form) === "{}") {
             this.reset();
