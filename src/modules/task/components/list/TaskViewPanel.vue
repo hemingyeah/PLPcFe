@@ -717,7 +717,7 @@ export default {
 <style lang="scss" scoped>
 .advanced-search-form {
   overflow: auto;
-  padding: 10px 15px 150px 15px;
+  padding: 10px 15px 300px 15px;
 
   height: calc(100%);
   justify-content: space-between;

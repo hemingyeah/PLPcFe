@@ -129,10 +129,7 @@ const MultiFieldNames = [
   "allotTypeStr",
   "onceException",
   "paymentMethod",
-  "tag",
-  "createUser",
-  "allotUser",
-  "executor",
+  "tag"
 ];
 const TaskInquireConvertFieldNamesToConditionsMap = {
   customer: "customerId",
@@ -448,6 +445,7 @@ export default {
       for (let i = 0; i < isSystemFields.length; i++) {
         tv = isSystemFields[i];
         fn = tv.fieldName;
+        console.log(tv.formType, tv.displayName)
         
         if (!form[fn] || (Array.isArray(form[fn]) && !form[fn].length)) {
           continue;
@@ -600,7 +598,7 @@ export default {
           continue
         }
 
-        if (MultiFieldNames.indexOf(tv.formType) !== -1) {
+        if (MultiFieldNames.indexOf(tv.formType) !== -1 || tv.formType === "user") {
           params.systemConditions.push({
             property: fn,
             operator: tv.operatorValue,
@@ -1031,7 +1029,7 @@ export default {
 <style lang="scss" scoped>
 .advanced-search-form {
   overflow: auto;
-  padding: 10px 15px 150px 15px;
+  padding: 10px 15px 300px 15px;
 
   height: calc(100%);
   justify-content: space-between;
