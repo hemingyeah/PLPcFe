@@ -2,8 +2,10 @@
   <div class="base-editor-container">
     <div id="toolbar"></div>
     <div id="editor" v-loading="loading" ref="editor"></div>
-
-    <input type="file" ref="input" class="input-file" @change="handleChange" accept="image/*">
+    <!-- 上传图片 -->
+    <input type="file" ref="imgInput" class="input-file" @change="handleChange($event,'image')" accept="image/*">
+    <!-- 上传视频 -->
+    <input type="file" ref="videoInput" class="input-file" @change="handleChange($event,'video')" accept="video/*">
   </div>
 </template>
 
@@ -16,7 +18,14 @@ import './style.scss';
 import 'quill/dist/quill.core.css';
 import 'quill/dist/quill.snow.css';
 
-import {toolbarOptions} from './defaultOptions';
+// 这里引入修改过的video/img标签模块并注册
+import Video from './videoOptions';
+import ImageBlot from './imgOptions';
+Quill.register(Video, true)
+Quill.register(ImageBlot, true)
+
+//toolbar
+import { toolbarOptions } from './defaultOptions';
 
 /**
  * todo
@@ -52,7 +61,7 @@ export default {
     },
     isEdit: {
       type: Boolean,
-      default: false
+      default: false 
     }
   },
   data() {
@@ -75,8 +84,12 @@ export default {
             container: _self.toolbarOptions,
             handlers: {
               image() {
-                _self.chooseFile(); // 1、选择文件；2、上传；3、appendChild
-              }
+                _self.chooseFile('image'); // 上传图片 1、选择文件；2、上传；3、appendChild
+              },
+              video() {
+                 _self.chooseFile('video'); //上传视频
+                
+              },
             }
           },
         },
@@ -95,18 +108,27 @@ export default {
 
       this.$emit('input', html)
     },
-    chooseFile(){
+    chooseFile(uploadType){
       if(this.pending) return platform.alert('请等待图片上传完成');
-      this.$refs.input.value = null;
-      this.$refs.input.click();
+   
+      if(uploadType == 'image'){
+        this.$refs.imgInput.value = null;
+        this.$refs.imgInput.click();
+      }else{
+        this.$refs.videoInput.value = null;
+        this.$refs.videoInput.click();
+      }
+     
     },
-    handleChange(event){
+    //TODO:image 上传图片 video上传视频
+    handleChange(event,uploadType){
+      let imgType = uploadType == 'image'?'图片':'视频';
       const files = event.target.files;
       if(!files || !files.length) return;
 
       const file = files[0];
       if (!file) return;
-      if (file.size > Uploader.FILE_MAX_SIZE) return platform.alert('系统暂不支持大小超过10M的图片上传')
+      if (file.size > Uploader.FILE_MAX_SIZE) return platform.alert(`系统暂不支持大小超过10M的${imgType}上传`)
 
       this.pending = true;
       this.loading = true;
@@ -115,8 +137,8 @@ export default {
           this.pending = false;
           this.loading = false;
 
-          if (res.status) return platform.alert(res.message || '图片上传失败');
-          this.insertImage(res.data);
+          if (res.status) return platform.alert(res.message || `${imgType}上传失败`);
+          this.insertImage(res.data,uploadType);
         })
         .catch(err => {
           this.pending = false;
@@ -167,16 +189,22 @@ export default {
       if (/kb/gi.test(fileSizeStr) || !size) return ossUrl;
 
       const existParams = ossUrl.indexOf('?') >= 0;
-
+       
       if (size > 3) return existParams ? `${ ossUrl }&x-oss-process=image/resize,p_50` : `${ ossUrl }?x-oss-process=image/resize,p_50`;
       if (size > 1) return existParams ? `${ ossUrl }&x-oss-process=image/resize,p_70` : `${ ossUrl }?x-oss-process=image/resize,p_70`;
       return ossUrl;
     },
-    insertImage(data) {
+    insertImage(data,uploadType) {
       let range = this.editor.getSelection();
       let index = range.index || 0;
+      let ossUrl = uploadType == 'image' ? this.genUrl(data) : data.ossUrl;
+      if(uploadType == 'image'){
+        console.log("ossUrl",ossUrl)
+        this.editor.insertEmbed(index, 'image',{ src: ossUrl ,'origin': ossUrl})
+      }else{
+        this.editor.insertEmbed(index, uploadType, ossUrl);
+      }
 
-      this.editor.insertEmbed(index, 'image', this.genUrl(data));
       this.editor.setSelection(index + 1, 0);
     },
 
