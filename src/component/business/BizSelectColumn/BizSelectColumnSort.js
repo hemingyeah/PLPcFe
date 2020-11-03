@@ -29,6 +29,7 @@ const NestedDraggable = {
   render(h) {
     return (
       <draggable 
+        animation="180"
         class="nested-draggable"
         tag="div" 
         list={ this.lists }
