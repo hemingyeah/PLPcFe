@@ -47,20 +47,6 @@
       </div>
     </div>
     <!-- end 字段权限 -->
-
-    <!-- start 其他设置 -->
-    <div class="form-setting-group form-setting-item">
-      <h4 class="form-item-title">其他设置</h4>
-      <div class="form-item-box">
-        <el-checkbox :value="field.setting.isScanCode" @input="update($event, 'isScanCode', true)" :true-label="1" :false-label="0">
-          支持扫码录入
-          <el-tooltip content="支持二维码/条形码，仅支持移动端使用" placement="top">
-            <i class="iconfont icon-question"></i>
-          </el-tooltip>
-        </el-checkbox>
-      </div>
-    </div>
-    <!-- end 其他设置 -->
   </div>
 </template>
 

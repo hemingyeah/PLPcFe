@@ -6,9 +6,8 @@
       <i class="iconfont icon-yidongduanxianshi" v-if="field.isAppShow === 1"></i>
     </label>
     <div class="form-preview-mock" >
-      <p class="form-preview-control" :class="{'form-preview-withIcon': isCode}">
+      <p class="form-preview-control">
         {{field.placeHolder}}
-        <i class="iconfont icon-scan" v-if="isCode"></i>
       </p>
     </div>
   </div>
@@ -21,10 +20,6 @@ export default {
   name: 'form-textarea-preview',
   props: previewProps,
   computed: {
-    /** 是否为扫码类型 */
-    isCode(){
-      return this.field.formType == 'code' || !!this.field.setting.isScanCode;
-    },
     disabled() {
       let field = this.field;
       return field.disabled ||

@@ -1,5 +1,5 @@
 <template>
-  <div class="form-phone">
+  <div class="form-text">
     <input
       type="text"
       :value="value"
@@ -10,7 +10,7 @@
       :maxlength="field.maxlength ? field.maxlength : maxlength"
       :id="`form_${field.fieldName}`" 
       autocomplete="off"
-      :disabled="disabled"/>
+      :disabled="field.disabled"/>
   </div>
 </template>
 
@@ -19,7 +19,7 @@ import FormMixin from '@src/component/form/mixin/form';
 import { FORM_FIELD_TEXT_MAX_LENGTH } from '@src/model/const/Number.ts';
 
 export default {
-  name: 'form-phone',
+  name: 'form-code',
   mixins: [FormMixin],
   props: {
     value: {
@@ -51,33 +51,15 @@ export default {
       this.input(event);
     }
   },
-  mounted() {
-    let defaultValueConfig = (this.field && this.field.setting && this.field.setting.defaultValueConfig) || {};
-    // 默认值为登录账号电话号码
-    if(!!defaultValueConfig.isCurrentPhone) {
-      let value = "";
-      try {
-        let loginUser = window.parent.loginUser || {};
-        value = loginUser.cellPhone || "";
-      } catch (error) {
-        value = "";
-      }
-
-      this.inputForValue(value);
-    }
-  }
 }
 </script>
 
 <style lang="scss">
-.form-phone{
+.form-text{
   width: 100%;
 
   input{
     width: 100%;
-    &:disabled{
-      -webkit-text-fill-color: #b2b2b2;
-    }
   }
 }
 </style>
