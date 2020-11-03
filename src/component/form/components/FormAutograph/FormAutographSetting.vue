@@ -2,16 +2,31 @@
 
   <!-- start autograph setting -->
   <div class="form-setting-panel">
-    <h3>{{setting.isSystem == 1 ? '系统' : '基础'}}字段 -- {{setting.name}}</h3>
-    <div class="form-setting-group" v-if="setting.isSystem == 0">
-      <input type="text" placeholder="[必填] 请输入字段标题" data-prop="displayName" :value="field.displayName" @input="updateForDom" :maxlength="nameMaxLength">
+    <!-- start 标题 -->
+    <form-title-setting
+      :field="field"
+      :setting="setting"
+      :disabled="setting.isSystem == 1"
+      @input="updateForDom"
+    ></form-title-setting>
+    <!-- end 标题 -->
+
+    <!-- start 描述信息 -->
+    <form-describe-setting
+      :field="field"
+      @input="updateForDom"
+    ></form-describe-setting>
+    <!-- end 描述信息 -->
+
+    <!-- start 校验 -->
+    <div class="form-setting-group form-setting-item">
+      <h4 class="form-item-title">校验</h4>
+      <div class="form-item-box">
+        <!-- 必填 -->
+        <form-required-setting :field="field" @input="update"></form-required-setting>
+      </div>
     </div>
-    <div class="form-setting-group">
-      <textarea rows="3" data-prop="placeHolder" :value="field.placeHolder" @input="updateForDom" :maxlength="placeholderMaxLength"></textarea>
-    </div>
-    <div class="form-setting-group">
-      <el-checkbox :value="field.isNull" @input="update($event, 'isNull')" :true-label="0" :false-label="1">必填</el-checkbox>
-    </div>
+    <!-- end 校验 -->
   </div>
   <!-- end autograph setting -->
 
@@ -33,8 +48,8 @@ export default {
 
       this.update(value, prop);
     },
-    update(value, prop) {
-      this.$emit('input', { value, prop })
+    update(value, prop, isSetting = false) {
+      this.$emit('input', {value, prop, isSetting});
     }
   }
 }
