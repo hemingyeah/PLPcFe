@@ -260,7 +260,7 @@ export default {
           })
 
           let fromId = window.frameElement.getAttribute('fromid');
-          this.$platform.refreshTab(fromId);
+          // this.$platform.refreshTab(fromId);
 
           window.location.href = `/task/view/${this.task.id}`;
         } else {
@@ -280,7 +280,7 @@ export default {
           })
 
           let fromId = window.frameElement.getAttribute('fromid');
-          this.$platform.refreshTab(fromId);
+          // this.$platform.refreshTab(fromId);
 
           window.location.href = `/task/view/${this.task.id}`;
         } else {
