@@ -1241,10 +1241,10 @@ export default {
     changeTaskType(taskType) {
       this.searchParams = {...this.searchParams_spare, ...{templateId: taskType.id}}
       this.currentTaskType = taskType;
-      // this.selectId = 'all'
+      this.selectId = 'all'
       this.params = this.initParams();
-      // this.initialize();
-      this.createPerspective({id: this.selectId}, true)
+      this.initialize();
+      // this.createPerspective({id: this.selectId}, true)
     },
     /**
      * @description 检测导出条数
