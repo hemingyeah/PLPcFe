@@ -131,10 +131,6 @@ export default {
           id: "",
         },
       ],
-      taskTypes: [{
-        name: "全部",
-        id: "",
-      }, ],
       taskFields: [],
       taskReceiptFields: [],
       taskPage: new Page(),
@@ -271,7 +267,7 @@ export default {
     },
     /* 是否是系统管理员 */
     isSystemAdmin() {
-      let roles = this.initData?.roles || []
+      let roles = this.initData?.loginUser?.roles || []
       return roles.some(role => role == "1")
     },
     /* 是否显示 批量创建/生成服务报告 */
@@ -790,7 +786,7 @@ export default {
       for(let key in params) {
         if(!bool_text) {
           bool = true
-          if (params["conditions"].length || params["systemConditions"].length || (params["productAddress"] && params["productAddress"].city)) {
+          if (params["conditions"].length || params["systemConditions"].length || (params["productAddress"] && params["productAddress"].province)) {
             bool = false
           }
         }

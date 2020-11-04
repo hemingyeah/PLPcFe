@@ -629,7 +629,7 @@ export default {
     }
   },
   methods: {
-    previousStep() { },
+    previousStep() {},
     nextStep() {
       this.nowGuideStep++;
     },

@@ -2215,7 +2215,6 @@ const Inquire = [
     isSearch: 1,
     placeHolder: null,
     setting: {isMulti: false, dataSource:[
-      "全部",
       "待指派",
       "已指派",
       "已接受",
@@ -2416,14 +2415,11 @@ const Inquire = [
     isNull: 1,
     isSearch: 1,
     placeHolder: null,
-    setting: {
-      isMulti: false, dataSource: [
-        "全部",
-        "手动派单",
-        "工单池派单",
-        "自动派单",
-      ]
-    },
+    setting: {isMulti: false, dataSource:[
+      "手动派单",
+      "工单池派单",
+      "自动派单",
+    ]},
     orderId: 1,
     isDelete: 0,
     guideProfessions: [],
@@ -2470,12 +2466,9 @@ const Inquire = [
     isNull: 1,
     isSearch: 1,
     placeHolder: null,
-    setting: {
-      isMulti: false, dataSource: [
-        "全部",
-        "是",
-      ]
-    },
+    setting: {isMulti: false, dataSource:[
+      "是",
+    ]},
     orderId: 1,
     isDelete: 0,
     guideProfessions: [],
@@ -2494,13 +2487,10 @@ const Inquire = [
     isNull: 1,
     isSearch: 1,
     placeHolder: null,
-    setting: {
-      isMulti: false, dataSource: [
-        "全部",
-        "是",
-        "否"
-      ]
-    },
+    setting: {isMulti: false, dataSource:[
+      "是",
+      "否"
+    ]},
     orderId: 1,
     isDelete: 0,
     guideProfessions: [],
@@ -2519,13 +2509,10 @@ const Inquire = [
     isNull: 1,
     isSearch: 1,
     placeHolder: null,
-    setting: {
-      isMulti: false, dataSource: [
-        "全部",
-        "审批中",
-        "无审批"
-      ]
-    },
+    setting: {isMulti: false, dataSource:[
+      "审批中",
+      "无审批"
+    ]},
     orderId: 1,
     isDelete: 0,
     guideProfessions: [],
@@ -2572,7 +2559,6 @@ const Inquire = [
     isSearch: 1,
     placeHolder: null,
     setting: {isMulti: false, dataSource:[
-      "全部",
       "暂停",
       "超时"
     ]},
