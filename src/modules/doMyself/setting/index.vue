@@ -1,5 +1,5 @@
 <template>
-  <div v-loading.fullscreen.lock="fullscreenLoading">
+  <div class="flex-1" v-loading.fullscreen.lock="fullscreenLoading">
 
     <div class="my-shop-box flex-1">
       <!-- ruler-box start-->
