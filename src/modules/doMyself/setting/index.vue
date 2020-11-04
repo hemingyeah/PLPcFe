@@ -1,394 +1,368 @@
 <template>
-  <div id="doMyself-box" v-loading.fullscreen.lock="fullscreenLoading">
-    <div class="flex-x al-start">
-      <div class="left-menu">
-        <div class="menu-title">
-          自助门户设置
-        </div>
-        <template v-for="(item, index) in menuList">
-          <nav
-            :class="`menu-list ${nowMenu == index ? 'menu-checked' : ''}`"
-            :key="index"
-            @click="changePage(index)"
-          >
-            <!-- <div class="left-border" v-if="nowMenu==index"></div> -->
-            <div class="icon-box">
-              <i
-                :class="
-                  `iconfont ${item.icon} ${
-                    nowMenu == index ? 'font-16 font-w-600' : 'font-14'
-                  }`
-                "
-              ></i>
-            </div>
-            <span>{{ item.name }}</span>
-          </nav>
-        </template>
-      </div>
+  <div class="flex-1" v-loading.fullscreen.lock="fullscreenLoading">
 
-      <div class="my-shop-box flex-1">
-        <!-- ruler-box start-->
-        <div class="box-title">规则配置</div>
-        <div class="ruler-box" v-if="setData">
-          <!-- ruler-set-list start -->
+    <div class="my-shop-box flex-1">
+      <!-- ruler-box start-->
+      <div class="box-title">规则配置</div>
+      <div class="ruler-box" v-if="setData">
+        <!-- ruler-set-list start -->
 
-          <!-- 1 -->
-          <div class="ruler-set-item flex-x">
-            <div class="flex-1">
-              <div class="ruler-set-item-title">启用客户自助门户</div>
-              <div>开启后允许外部用户通过自助门户提交服务事件</div>
-            </div>
-
-            <el-switch
-              v-model="setData.serviceStationConfig.selfHelpEnabled"
-              @change="change($event, 'selfHelpEnabled')"
-              :active-text="
-                setData.serviceStationConfig.selfHelpEnabled ? '启用' : '禁用'
-              "
-            ></el-switch>
-          </div>
-          <!-- 2 -->
-          <div class="ruler-set-item">
-            <div class="ruler-set-item-title">门户访问权限:</div>
-            <el-radio-group
-              v-model="setData.serviceStationConfig.loginValidate"
-              @change="change($event, 'loginValidate')"
-            >
-              <div class="mar-b-12">
-                <el-radio class="mar-r-16" :label="false"
-                >所有用户均可访问(短信、图片验证码或小程序授权)</el-radio
-                >
-              </div>
-              <div>
-                <el-radio :label="true">仅允许客户列表下手机号码访问</el-radio>
-              </div>
-            </el-radio-group>
-          </div>
-          <!-- 3 -->
-          <div class="ruler-set-item">
-            <div class="ruler-set-item-title">网页门户验证方式：</div>
-            <el-radio-group
-              v-model="setData.serviceStationConfig.validateBySms"
-              @change="change($event, 'validateBySms')"
-            >
-              <div class="mar-b-12">
-                <el-radio class="mar-r-16" :label="false">图形验证码</el-radio>
-              </div>
-              <div>
-                <el-radio :label="true">手机验证码(推荐)</el-radio>
-              </div>
-            </el-radio-group>
-          </div>
-          <!-- 3 -->
-
-          <div class="ruler-set-item">
-            <div class="ruler-set-item-title">允许客户查看的服务事件：</div>
-            <el-radio-group
-              v-model="setData.serviceStationConfig.showAllEvent"
-              @change="change($event, 'showAllEvent')"
-            >
-              <div class="mar-b-12">
-                <el-radio class="mar-r-16" :label="false"
-                >仅显示客户在线提交的服务事件</el-radio
-                >
-              </div>
-              <div>
-                <el-radio :label="true"
-                >显示所有与该客户相关的服务事件</el-radio
-                >
-                <el-tooltip
-                  class="item"
-                  effect="dark"
-                  content="与该客户相关的服务事件包括：客户自己在线提交的服务事件及企业内部员工在售后宝中提交的该客户的服务事件"
-                  placement="bottom"
-                >
-                  <i class="iconfont icon-info mar-l-6 color-999 cur-point"></i>
-                </el-tooltip>
-              </div>
-            </el-radio-group>
-          </div>
-
-          <div class="ruler-set-item flex-x">
-            <div class="flex-1">
-              <div class="ruler-set-item-title">
-                是否允许用户取消未完成的服务事件：
-              </div>
-              <div>开启后允许从自助门户取消尚未完成的服务事件</div>
-            </div>
-
-            <el-switch
-              v-model="setData.serviceStationConfig.eventCancel"
-              @change="change($event, 'eventCancel')"
-              :active-text="
-                setData.serviceStationConfig.eventCancel ? '启用' : '禁用'
-              "
-            ></el-switch>
-          </div>
-          <div class="">
-            <div class="ruler-set-item-title">设置服务商城显示内容：</div>
-            <div class="flex-x">
-              <el-select
-                class="w-228"
-                v-model="setData.serviceStationConfig.showAllItem"
-                @change="change($event, 'showAllItem')"
-                placeholder="仅显示选择的备件和服务项目"
-              >
-                <el-option
-                  v-for="item in options"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value"
-                ></el-option>
-              </el-select>
-              <el-button class="mar-l-9" type="primary" @click="goToShopCenter"
-              >查看商城已选项目</el-button
-              >
-            </div>
-          </div>
-
-          <!-- ruler-set-list end -->
-        </div>
-        <!-- ruler-box end -->
-
-        <!-- info-box start -->
-        <div class="info-box flex-x al-s">
-          <div class="mar-r-12 flex-1">
-            <div class="flex-x  mar-b-32">
-              门户网页地址：
-              <el-input
-                id="protalUrl"
-                class="flex-1"
-                disabled
-                placeholder="请输入内容"
-                v-model="setData.protalUrl"
-              ></el-input>
-              <el-button class="mar-l-10" type="primary" @click="copyUrl"
-              >复制</el-button
-              >
-            </div>
-            <div class="flex-x al-start">
-              <div class="flex-1 mar-r-12">
-                <i class="iconfont icon-fd-link mar-r-6 color-primary"></i>
-                <a
-                  href="javascript:;"
-                  @click="
-                    openLink(
-                      'https://register.shb.ltd/VIP/WechatAndDing.html#DingService_setting'
-                    )
-                  "
-                >绑定微信或钉钉服务窗</a
-                >
-              </div>
-              <div class="flex-y code-box" v-show="setData.protalUrl">
-                <div
-                  class="qrcode cur-point"
-                  ref="qrCodeUrl"
-                  @click="previewImg($event)"
-                ></div>
-                <div class="code-des">网页入口</div>
-              </div>
-            </div>
-          </div>
+        <!-- 1 -->
+        <div class="ruler-set-item flex-x">
           <div class="flex-1">
-            <el-button
-              v-if="!setData.weChatQRCodeUrl"
-              class="mar-b-32"
-              type="primary"
-              @click="submitWx"
-            >填写微信授权资料</el-button
-            >
-            <div class="mar-b-32 h-32 flex-x" v-if="setData.weChatQRCodeUrl">
-              您已提交了微信授权资料，如需变更请联系售后宝管理员
-            </div>
-            <div class="flex-x al-start">
-              <div class="flex-1 mar-r-12">
-                <i
-                  class="iconfont icon-fabu1 mar-r-6  color-primary cur-point"
-                ></i>
-                <a
-                  class
-                  href="javascript:;"
-                  @click="openLink('https://www.yuque.com/shb/help/XCX')"
-                >微信商户，微信支付，微信小程序申请指引</a
-                >
-              </div>
-              <div
-                class="flex-y code-box mar-l-16 i-can-scale"
-                v-show="setData.weChatQRCodeUrl"
+            <div class="ruler-set-item-title">启用客户自助门户</div>
+            <div>开启后允许外部用户通过自助门户提交服务事件</div>
+          </div>
+
+          <el-switch
+            v-model="setData.serviceStationConfig.selfHelpEnabled"
+            @change="change($event, 'selfHelpEnabled')"
+            :active-text="
+              setData.serviceStationConfig.selfHelpEnabled ? '启用' : '禁用'
+            "
+          ></el-switch>
+        </div>
+        <!-- 2 -->
+        <div class="ruler-set-item">
+          <div class="ruler-set-item-title">门户访问权限:</div>
+          <el-radio-group
+            v-model="setData.serviceStationConfig.loginValidate"
+            @change="change($event, 'loginValidate')"
+          >
+            <div class="mar-b-12">
+              <el-radio class="mar-r-16" :label="false"
+              >所有用户均可访问(短信、图片验证码或小程序授权)</el-radio
               >
-                <img
-                  class="cur-point"
-                  :src="setData.weChatQRCodeUrl"
-                  @click.stop="previewImg(setData.weChatQRCodeUrl)"
-                  alt
-                />
-                <div class="code-des">小程序入口</div>
-              </div>
+            </div>
+            <div>
+              <el-radio :label="true">仅允许客户列表下手机号码访问</el-radio>
+            </div>
+          </el-radio-group>
+        </div>
+        <!-- 3 -->
+        <div class="ruler-set-item">
+          <div class="ruler-set-item-title">网页门户验证方式：</div>
+          <el-radio-group
+            v-model="setData.serviceStationConfig.validateBySms"
+            @change="change($event, 'validateBySms')"
+          >
+            <div class="mar-b-12">
+              <el-radio class="mar-r-16" :label="false">图形验证码</el-radio>
+            </div>
+            <div>
+              <el-radio :label="true">手机验证码(推荐)</el-radio>
+            </div>
+          </el-radio-group>
+        </div>
+        <!-- 3 -->
+
+        <div class="ruler-set-item">
+          <div class="ruler-set-item-title">允许客户查看的服务事件：</div>
+          <el-radio-group
+            v-model="setData.serviceStationConfig.showAllEvent"
+            @change="change($event, 'showAllEvent')"
+          >
+            <div class="mar-b-12">
+              <el-radio class="mar-r-16" :label="false"
+              >仅显示客户在线提交的服务事件</el-radio
+              >
+            </div>
+            <div>
+              <el-radio :label="true"
+              >显示所有与该客户相关的服务事件</el-radio
+              >
+              <el-tooltip
+                class="item"
+                effect="dark"
+                content="与该客户相关的服务事件包括：客户自己在线提交的服务事件及企业内部员工在售后宝中提交的该客户的服务事件"
+                placement="bottom"
+              >
+                <i class="iconfont icon-info mar-l-6 color-999 cur-point"></i>
+              </el-tooltip>
+            </div>
+          </el-radio-group>
+        </div>
+
+        <div class="ruler-set-item flex-x">
+          <div class="flex-1">
+            <div class="ruler-set-item-title">
+              是否允许用户取消未完成的服务事件：
+            </div>
+            <div>开启后允许从自助门户取消尚未完成的服务事件</div>
+          </div>
+
+          <el-switch
+            v-model="setData.serviceStationConfig.eventCancel"
+            @change="change($event, 'eventCancel')"
+            :active-text="
+              setData.serviceStationConfig.eventCancel ? '启用' : '禁用'
+            "
+          ></el-switch>
+        </div>
+        <div class="">
+          <div class="ruler-set-item-title">设置服务商城显示内容：</div>
+          <div class="flex-x">
+            <el-select
+              class="w-228"
+              v-model="setData.serviceStationConfig.showAllItem"
+              @change="change($event, 'showAllItem')"
+              placeholder="仅显示选择的备件和服务项目"
+            >
+              <el-option
+                v-for="item in options"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              ></el-option>
+            </el-select>
+            <el-button class="mar-l-9" type="primary" @click="goToShopCenter"
+            >查看商城已选项目</el-button
+            >
+          </div>
+        </div>
+
+        <!-- ruler-set-list end -->
+      </div>
+      <!-- ruler-box end -->
+
+      <!-- info-box start -->
+      <div class="info-box flex-x al-s">
+        <div class="mar-r-12 flex-1">
+          <div class="flex-x  mar-b-32">
+            门户网页地址：
+            <el-input
+              id="protalUrl"
+              class="flex-1"
+              disabled
+              placeholder="请输入内容"
+              v-model="setData.protalUrl"
+            ></el-input>
+            <el-button class="mar-l-10" type="primary" @click="copyUrl"
+            >复制</el-button
+            >
+          </div>
+          <div class="flex-x al-start">
+            <div class="flex-1 mar-r-12">
+              <i class="iconfont icon-fd-link mar-r-6 color-primary"></i>
+              <a
+                href="javascript:;"
+                @click="
+                  openLink(
+                    'https://register.shb.ltd/VIP/WechatAndDing.html#DingService_setting'
+                  )
+                "
+              >绑定微信或钉钉服务窗</a
+              >
+            </div>
+            <div class="flex-y code-box" v-show="setData.protalUrl">
+              <div
+                class="qrcode cur-point"
+                ref="qrCodeUrl"
+                @click="previewImg($event)"
+              ></div>
+              <div class="code-des">网页入口</div>
             </div>
           </div>
         </div>
-        <!-- info-box end -->
+        <div class="flex-1">
+          <el-button
+            v-if="!setData.weChatQRCodeUrl"
+            class="mar-b-32"
+            type="primary"
+            @click="submitWx"
+          >填写微信授权资料</el-button
+          >
+          <div class="mar-b-32 h-32 flex-x" v-if="setData.weChatQRCodeUrl">
+            您已提交了微信授权资料，如需变更请联系售后宝管理员
+          </div>
+          <div class="flex-x al-start">
+            <div class="flex-1 mar-r-12">
+              <i
+                class="iconfont icon-fabu1 mar-r-6  color-primary cur-point"
+              ></i>
+              <a
+                class
+                href="javascript:;"
+                @click="openLink('https://www.yuque.com/shb/help/XCX')"
+              >微信商户，微信支付，微信小程序申请指引</a
+              >
+            </div>
+            <div
+              class="flex-y code-box mar-l-16 i-can-scale"
+              v-show="setData.weChatQRCodeUrl"
+            >
+              <img
+                class="cur-point"
+                :src="setData.weChatQRCodeUrl"
+                @click.stop="previewImg(setData.weChatQRCodeUrl)"
+                alt
+              />
+              <div class="code-des">小程序入口</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- info-box end -->
 
-        <!-- setting-box start -->
-        <div class="setting-box">
-          <div class="flex-x box-title">
-            <div class="setting-show-box-tips">资料设置</div>
-            <div class="setting-show-box-submit flex-x">
-              <el-button type="primary" @click="submitSet">发布</el-button>
-              <!-- <div class="tips">
+      <!-- setting-box start -->
+      <div class="setting-box">
+        <div class="flex-x box-title">
+          <div class="setting-show-box-tips">资料设置</div>
+          <div class="setting-show-box-submit flex-x">
+            <el-button type="primary" @click="submitSet">发布</el-button>
+            <!-- <div class="tips">
                 <i class="iconfont icon-jinggao"></i>请确定右侧信息已保存
               </div> -->
-            </div>
           </div>
-          <div class="flex-x al-s">
-            <div class="flex-x setting-show-box flex-1">
-              <div class="setting-show">
-                <div class="setting-show-data-box">
-                  <!-- <draggable class="menu-box" v-model="dataList"> 可拖动-->
-                  <div class="menu-box">
+        </div>
+        <div class="flex-x al-s">
+          <div class="flex-x setting-show-box flex-1">
+            <div class="setting-show">
+              <div class="setting-show-data-box">
+                <!-- <draggable class="menu-box" v-model="dataList"> 可拖动-->
+                <div class="menu-box">
+                  <div
+                    v-for="(item, index) in dataList"
+                    :key="index"
+                    draggable="false"
+                    @click="chooseNowSet(item)"
+                  >
                     <div
-                      v-for="(item, index) in dataList"
-                      :key="index"
-                      draggable="false"
-                      @click="chooseNowSet(item)"
+                      v-if="item.type == 'company-card'"
+                      class="head-phone-box"
                     >
-                      <div
-                        v-if="item.type == 'company-card'"
-                        class="head-phone-box"
-                      >
-                        <img :src="headPhone" class="head-phone" alt="" />
-                        <div
-                          :class="[
-                            'head-phone-con',
-                            'overHideCon-1',
-                            nowSettingDataId == item.id
-                              ? 'menu-box-item-check'
-                              : '',
-                          ]"
-                        >
-                          {{ item.data.name }}
-                        </div>
-                      </div>
+                      <img :src="headPhone" class="head-phone" alt="" />
                       <div
                         :class="[
-                          'menu-box-item',
+                          'head-phone-con',
+                          'overHideCon-1',
                           nowSettingDataId == item.id
                             ? 'menu-box-item-check'
                             : '',
                         ]"
                       >
-                        <component
-                          :is="item.type"
-                          ref="setShow"
-                          :info-data="item.data"
-                          :cmp-id="item.id"
-                          :now-setting-data-id="nowSettingDataId"
-                          :event-list="eventList"
-                          @changeThis="changeThis"
-                          @pushIcon="pushIcon"
-                        ></component>
+                        {{ item.data.name }}
                       </div>
-                      <div
-                        v-if="index == 2 || index == 3"
-                        style="height: 32px"
-                      ></div>
                     </div>
+                    <div
+                      :class="[
+                        'menu-box-item',
+                        nowSettingDataId == item.id
+                          ? 'menu-box-item-check'
+                          : '',
+                      ]"
+                    >
+                      <component
+                        :is="item.type"
+                        ref="setShow"
+                        :info-data="item.data"
+                        :cmp-id="item.id"
+                        :now-setting-data-id="nowSettingDataId"
+                        :event-list="eventList"
+                        @changeThis="changeThis"
+                        @pushIcon="pushIcon"
+                      ></component>
+                    </div>
+                    <div
+                      v-if="index == 2 || index == 3"
+                      style="height: 32px"
+                    ></div>
                   </div>
-                  <!-- </draggable> -->
                 </div>
+                <!-- </draggable> -->
               </div>
             </div>
-            <div class="setting-data">
-              <keep-alive>
-                <component
-                  v-if="nowSettingDataId > 0"
-                  :is="nowSettingData.name"
-                  ref="setData"
-                  :info-data="nowSettingData.data"
-                  :cmp-id="nowSettingData.id"
-                  :icon-set-id="nowSettingData.iconSetId"
-                  :event-list="eventList"
-                  @saveIconItem="saveIconItem"
-                  @deleteIconItem="deleteIconItem"
-                  @changeInfoData="changeInfoData"
-                ></component>
-              </keep-alive>
-            </div>
+          </div>
+          <div class="setting-data">
+            <keep-alive>
+              <component
+                v-if="nowSettingDataId > 0"
+                :is="nowSettingData.name"
+                ref="setData"
+                :info-data="nowSettingData.data"
+                :cmp-id="nowSettingData.id"
+                :icon-set-id="nowSettingData.iconSetId"
+                :event-list="eventList"
+                @saveIconItem="saveIconItem"
+                @deleteIconItem="deleteIconItem"
+                @changeInfoData="changeInfoData"
+              ></component>
+            </keep-alive>
           </div>
         </div>
-        <!-- setting-box end -->
-
-        <!-- 填写微信信息弹窗 start-->
-        <el-dialog
-          title="提交微信商户信息"
-          :visible.sync="submitDialog"
-          width="390px"
-        >
-          <div class="mar-b-18">打开微信商户平台，复制并提交微信商户信息</div>
-          <el-form
-            :model="wxRulerFormData"
-            :rules="wxRuler"
-            label-position="left"
-            ref="wxRulerForm"
-            label-width="120px"
-            class="demo-ruleForm"
-            status-icon
-          >
-            <div class="mar-b-18 font-w-600">公众号相关</div>
-            <el-form-item label="APPID" prop="publicAppId">
-              <el-input
-                v-model="wxRulerFormData.publicAppId"
-                autocomplete="off"
-                placeholder="请输入"
-              ></el-input>
-            </el-form-item>
-            <el-form-item label="APPSecret" prop="publicSecret">
-              <el-input
-                v-model="wxRulerFormData.publicSecret"
-                autocomplete="off"
-                placeholder="请输入"
-              ></el-input>
-            </el-form-item>
-            <div class="mar-b-18 font-w-600">小程序相关</div>
-            <el-form-item label="APPSecret">
-              <el-input
-                v-model="wxRulerFormData.secret"
-                autocomplete="off"
-                placeholder="请输入"
-              ></el-input>
-            </el-form-item>
-            <el-form-item label="APPID">
-              <el-input
-                v-model="wxRulerFormData.appId"
-                autocomplete="off"
-                placeholder="请输入"
-              ></el-input>
-            </el-form-item>
-            <div class="mar-b-18 font-w-600">微信商户相关</div>
-            <el-form-item label="mch_id" prop="matchId">
-              <el-input
-                v-model="wxRulerFormData.matchId"
-                autocomplete="off"
-                placeholder="请输入"
-              ></el-input>
-            </el-form-item>
-            <el-form-item label="API密钥" prop="apiSecret">
-              <el-input
-                v-model="wxRulerFormData.apiSecret"
-                autocomplete="off"
-                placeholder="请输入"
-              ></el-input>
-            </el-form-item>
-          </el-form>
-          <div slot="footer" class="dialog-footer">
-            <base-button type="ghost" @event="submitDialog = false"
-            >取消</base-button
-            >
-            <base-button type="primary" @event="submitWxData">确定</base-button>
-          </div>
-        </el-dialog>
-        <!-- 填写微信信息弹窗 end-->
       </div>
+      <!-- setting-box end -->
+
+      <!-- 填写微信信息弹窗 start-->
+      <el-dialog
+        title="提交微信商户信息"
+        :visible.sync="submitDialog"
+        width="390px"
+      >
+        <div class="mar-b-18">打开微信商户平台，复制并提交微信商户信息</div>
+        <el-form
+          :model="wxRulerFormData"
+          :rules="wxRuler"
+          label-position="left"
+          ref="wxRulerForm"
+          label-width="120px"
+          class="demo-ruleForm"
+          status-icon
+        >
+          <div class="mar-b-18 font-w-600">公众号相关</div>
+          <el-form-item label="APPID" prop="publicAppId">
+            <el-input
+              v-model="wxRulerFormData.publicAppId"
+              autocomplete="off"
+              placeholder="请输入"
+            ></el-input>
+          </el-form-item>
+          <el-form-item label="APPSecret" prop="publicSecret">
+            <el-input
+              v-model="wxRulerFormData.publicSecret"
+              autocomplete="off"
+              placeholder="请输入"
+            ></el-input>
+          </el-form-item>
+          <div class="mar-b-18 font-w-600">小程序相关</div>
+          <el-form-item label="APPSecret">
+            <el-input
+              v-model="wxRulerFormData.secret"
+              autocomplete="off"
+              placeholder="请输入"
+            ></el-input>
+          </el-form-item>
+          <el-form-item label="APPID">
+            <el-input
+              v-model="wxRulerFormData.appId"
+              autocomplete="off"
+              placeholder="请输入"
+            ></el-input>
+          </el-form-item>
+          <div class="mar-b-18 font-w-600">微信商户相关</div>
+          <el-form-item label="mch_id" prop="matchId">
+            <el-input
+              v-model="wxRulerFormData.matchId"
+              autocomplete="off"
+              placeholder="请输入"
+            ></el-input>
+          </el-form-item>
+          <el-form-item label="API密钥" prop="apiSecret">
+            <el-input
+              v-model="wxRulerFormData.apiSecret"
+              autocomplete="off"
+              placeholder="请输入"
+            ></el-input>
+          </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+          <base-button type="ghost" @event="submitDialog = false"
+          >取消</base-button
+          >
+          <base-button type="primary" @event="submitWxData">确定</base-button>
+        </div>
+      </el-dialog>
+      <!-- 填写微信信息弹窗 end-->
     </div>
   </div>
 </template>
@@ -396,7 +370,7 @@
 import draggable from 'vuedraggable'
 import _ from 'lodash'
 import QRCode from 'qrcodejs2'
-import BaseGallery from '../../../../packages/BaseGallery'
+import BaseGallery from 'packages/BaseGallery'
 
 
 import settingMixin from './settingShowCmp/index'
@@ -412,7 +386,7 @@ import {
 } from '@src/api/LinkcApi'
 
 export default {
-  name: 'my-shop',
+  name: 'do-myself-set',
   mixins: [settingMixin],
   filters: {
     usualNum(val) {
@@ -599,7 +573,7 @@ export default {
       if (index === 2) {
         window.location.href = '/setting/message/smsmessage'
       } else if (index === 0) {
-        window.location.href = '/setting/serviceStation/customerPortal'
+        window.location.href = '/setting/doMyself/doMyselfSet'
       } else if (index === 1) {
         window.location.href = '/setting/doMyself/wxSet'
       } else if (index === 3) {
@@ -851,7 +825,7 @@ export default {
 }
 </script>
 <style lang="scss">
-@import url('../assets/public.scss');
+@import url('../../linkc/assets/public.scss');
 .el-radio {
   font-weight: 400;
 }
@@ -1035,112 +1009,5 @@ export default {
   display: none;
 }
 
-//  自助门户
-.flex-1 {
-  flex: 1;
-}
-.mar-b-12 {
-  margin-bottom: 12px;
-}
-.mar-r-12 {
-  margin-right: 12px;
-}
-.font-12 {
-  font-size: 12px;
-}
-.font-14 {
-  font-size: 14px;
-}
-.font-16 {
-  font-size: 16px;
-}
-.font-w-600 {
-  font-weight: 500;
-}
-.al-c {
-  align-items: center !important;
-}
-label {
-  margin-bottom: 0;
-}
-#doMyself-box {
-  padding: 10px;
-  position: relative;
-  box-sizing: border-box;
-  min-height: 100vh;
-  max-width: 100vw;
-}
-#doMyself-components-box {
-  margin-left: 10px;
-  flex: 1;
-  min-width: 920px;
-  box-sizing: border-box;
-  min-height: 100vh;
-}
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-img {
-  width: 100%;
-  height: 100%;
-}
-.flex-x {
-  .left-menu {
-    width: 25%;
-    min-width: 200px;
-    background: #fff;
-    box-sizing: border-box;
-    border-radius: 3px;
-    overflow: hidden;
-    position: sticky;
-    position: -webkit-sticky;
-    top: 10px;
-    .menu-title {
-      font-size: 18px;
-      color: #454648;
-      padding: 10px;
-      font-weight: 600;
-    }
-    .menu-list {
-      border-left: 3px solid transparent;
-      border-top: 1px solid #f4f4f4;
-      padding: 10px 15px;
-      position: relative;
-      display: flex;
-      align-items: center;
-      cursor: pointer;
-      &:hover {
-        background: rgb(246, 246, 246);
-      }
-      span {
-        font-size: 12px;
-      }
-      .left-border {
-        height: 100%;
-        width: 3px;
-        position: absolute;
-        left: 0;
-        background: #55b7b4;
-        top: 0;
-      }
-      .icon-box {
-        width: 22px;
-        height: 22px;
-        display: flex;
-        align-items: center;
-        margin-right: 13px;
-      }
-    }
-    .menu-checked {
-      border-left: 3px solid #55b7b4;
-      &:hover {
-        background: #fff;
-      }
-      span {
-        font-size: 13px;
-        font-weight: 500;
-      }
-    }
-  }
-}
+
 </style>

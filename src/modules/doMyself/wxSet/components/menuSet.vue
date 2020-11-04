@@ -33,8 +33,8 @@
                 :group="{ name: 'shared' }"
                 :disabled="
                   nowMoveBox > -1 &&
-                  nowMoveBox !== index &&
-                  item.sub_button.length > 4
+                    nowMoveBox !== index &&
+                    item.sub_button.length > 4
                     ? true
                     : false
                 "
@@ -70,7 +70,7 @@
           </draggable>
           <!-- move-menu-box end -->
           <!-- menu-box start -->
-          <div class="menu-box" v-if="edit_type!==2">
+          <div class="menu-box" v-if="edit_type !== 2">
             <div
               v-for="(item, index) in menu_arr"
               :key="index"
@@ -84,9 +84,9 @@
                 class="pop-top-menu-box"
                 v-if="
                   item.shb_type !== 'add' &&
-                  now_main_menu === index &&
-                  item.sub_button &&
-                  item.sub_button.length > 0
+                    now_main_menu === index &&
+                    item.sub_button &&
+                    item.sub_button.length > 0
                 "
               >
                 <div
@@ -257,7 +257,7 @@
           )
         "
       >
-        {{ edit_type === 1 ? "保存并发布" : "继续编辑" }}
+        {{ edit_type === 1 ? '保存并发布' : '继续编辑' }}
       </button>
       <button
         class="btn btn-ghost"
@@ -270,110 +270,110 @@
   </div>
 </template>
 <script>
-import { getMenuListWx, setMenuListWx } from "@src/api/doMyself.js";
+import { getMenuListWx, setMenuListWx } from '@src/api/doMyself.js'
 // 缓存数据
-let menu_arr_stash = [];
+let menu_arr_stash = []
 
 let url_obj = {
-  服务请求: "https://pubapp.shb.ltd/p/102308#/chooseEvent",
-  服务进度: "https://pubapp.shb.ltd/p/102308#/event",
-  服务评价: "https://pubapp.shb.ltd/p/102308#/event/evaluate",
-  服务商城: "https://pubapp.shb.ltd/p/102308#/shop",
-  知识库: "https://pubapp.shb.ltd/p/102308#/wiki",
-};
+  服务请求: 'https://pubapp.shb.ltd/p/102308#/chooseEvent',
+  服务进度: 'https://pubapp.shb.ltd/p/102308#/event',
+  服务评价: 'https://pubapp.shb.ltd/p/102308#/event/evaluate',
+  服务商城: 'https://pubapp.shb.ltd/p/102308#/shop',
+  知识库: 'https://pubapp.shb.ltd/p/102308#/wiki',
+}
 let input_obj = {
-  售后宝功能: "config_url",
-  跳转网页: "input_url",
-};
+  售后宝功能: 'config_url',
+  跳转网页: 'input_url',
+}
 let menu_main_tem = {
-  shb_type: "main_menu",
-  url: "",
-  input_url: "",
-  config_url: "",
-  type: "view",
+  shb_type: 'main_menu',
+  url: '',
+  input_url: '',
+  config_url: '',
+  type: 'view',
   sub_button: [
     {
-      shb_type: "add",
+      shb_type: 'add',
     },
   ],
-  name: "菜单名称",
-  menuType: "售后宝功能",
-  menuTypeArr: "服务请求",
-  url: "",
-  input_url: "",
-  config_url: "",
-  reserve: "",
-};
+  name: '菜单名称',
+  menuType: '售后宝功能',
+  menuTypeArr: '服务请求',
+  url: '',
+  input_url: '',
+  config_url: '',
+  reserve: '',
+}
 let menu_add_tem = {
-  shb_type: "add",
-};
+  shb_type: 'add',
+}
 let menu_children_tem = {
-  shb_type: "children_menu",
-  type: "view",
-  name: "菜单名称",
-  menuType: "售后宝功能",
-  menuTypeArr: "服务请求",
-  url: "",
-  input_url: "",
-  config_url: "",
-  reserve: "",
+  shb_type: 'children_menu',
+  type: 'view',
+  name: '菜单名称',
+  menuType: '售后宝功能',
+  menuTypeArr: '服务请求',
+  url: '',
+  input_url: '',
+  config_url: '',
+  reserve: '',
   sub_button: [],
-};
+}
 let form_tem = {
-  name: "菜单名称",
-  menuType: "售后宝功能",
-  menuTypeArr: "服务请求",
-  input_url: "",
-  config_url: "",
-  reserve: "",
-};
+  name: '菜单名称',
+  menuType: '售后宝功能',
+  menuTypeArr: '服务请求',
+  input_url: '',
+  config_url: '',
+  reserve: '',
+}
 
 let input_length = (rule, value, callback) => {
   if (!/^[\u4e00-\u9fa5_a-zA-Z0-9]+$/.test(value)) {
-    callback(new Error("请输入正确的名称"));
+    callback(new Error('请输入正确的名称'))
   } else if (computedStrLen(value) > 8) {
-    callback(new Error("字数不超过4个汉字或8个字母"));
+    callback(new Error('字数不超过4个汉字或8个字母'))
   } else {
-    callback();
+    callback()
   }
-};
+}
 let input_length_child = (rule, value, callback) => {
   if (!/^[\u4e00-\u9fa5_a-zA-Z0-9]+$/.test(value)) {
-    callback(new Error("请输入正确的名称"));
+    callback(new Error('请输入正确的名称'))
   } else if (computedStrLen(value) > 16) {
-    callback(new Error("字数不超过8个汉字或16个字母"));
+    callback(new Error('字数不超过8个汉字或16个字母'))
   } else {
-    callback();
+    callback()
   }
-};
+}
 let url_check = (rule, value, callback) => {
   if (computedStrLen(value) > 1024) {
-    callback(new Error("地址不超过1024个字节"));
+    callback(new Error('地址不超过1024个字节'))
   } else if (/(http|https):\/\/([\w.]+\/?)\S*/.test(value)) {
-    callback();
+    callback()
   } else {
-    callback(new Error("请输入前缀是http://或https://的网址"));
+    callback(new Error('请输入前缀是http://或https://的网址'))
   }
-};
+}
 
-import draggable from "vuedraggable";
-import _ from "lodash";
+import draggable from 'vuedraggable'
+import _ from 'lodash'
 // 校验字节数
-let computedStrLen = function (str) {
-  let len = 0;
+let computedStrLen = function(str) {
+  let len = 0
   for (let i = 0; i < str.length; i++) {
-    let c = str.charCodeAt(i);
+    let c = str.charCodeAt(i)
     // 单字节加1
     if ((c >= 0x0001 && c <= 0x007e) || (0xff60 <= c && c <= 0xff9f)) {
-      len++;
+      len++
     } else {
-      len += 2;
+      len += 2
     }
   }
-  return len;
-};
+  return len
+}
 export default {
-  name: "menu-set",
+  name: 'menu-set',
   components: {
     draggable,
   },
@@ -383,28 +383,28 @@ export default {
       default: () => [],
     },
   },
-  inject: ["initData"],
+  inject: ['initData'],
   watch: {
     ruleForm: {
       handler(newValue, oldValue) {
         if (!this.now_chooseed_menu) {
-          return;
+          return
         }
-        let now_menu = this.now_chooseed_menu;
+        let now_menu = this.now_chooseed_menu
         if (now_menu.indexs > -1) {
           let now_data = this.menu_arr[now_menu.index].sub_button[
             now_menu.indexs
-          ];
+          ]
           this.menu_arr[now_menu.index].sub_button[now_menu.indexs] = {
             ...now_data,
             ...newValue,
-          };
+          }
         } else {
-          let now_data = this.menu_arr[now_menu.index];
+          let now_data = this.menu_arr[now_menu.index]
           this.menu_arr[now_menu.index] = {
             ...now_data,
             ...newValue,
-          };
+          }
         }
       },
       deep: true,
@@ -412,7 +412,7 @@ export default {
     },
     edit_type: {
       handler(newValue, oldValue) {
-        this.now_chooseed_menu = false;
+        this.now_chooseed_menu = false
       },
     },
   },
@@ -425,155 +425,154 @@ export default {
       menu_arr: [],
       ruleForm: {},
       now_chooseed_menu: false,
-    };
+    }
   },
   computed: {
     rules() {
-      return this.now_chooseed_menu && this.now_chooseed_menu.onlyName==1?{
-            name: [
-              { required: true, message: "请输入菜单名称", trigger: "change" },
-              { validator: input_length_child, trigger: "change" },
-            ]
-          }: this.now_chooseed_menu && this.now_chooseed_menu.indexs > -1
+      return this.now_chooseed_menu && this.now_chooseed_menu.onlyName == 1
         ? {
+          name: [
+            { required: true, message: '请输入菜单名称', trigger: 'change' },
+            { validator: input_length_child, trigger: 'change' },
+          ],
+        }
+        : this.now_chooseed_menu && this.now_chooseed_menu.indexs > -1
+          ? {
             name: [
-              { required: true, message: "请输入菜单名称", trigger: "change" },
-              { validator: input_length_child, trigger: "change" },
+              { required: true, message: '请输入菜单名称', trigger: 'change' },
+              { validator: input_length_child, trigger: 'change' },
             ],
             input_url: [
               {
                 required: true,
-                message: "请输入跳转页面网址",
-                trigger: "change",
+                message: '请输入跳转页面网址',
+                trigger: 'change',
               },
-              { validator: url_check, trigger: "change" },
+              { validator: url_check, trigger: 'change' },
             ],
           }
-        : {
+          : {
             name: [
-              { required: true, message: "请输入菜单名称", trigger: "change" },
-              { validator: input_length, trigger: "change" },
+              { required: true, message: '请输入菜单名称', trigger: 'change' },
+              { validator: input_length, trigger: 'change' },
             ],
             input_url: [
               {
                 required: true,
-                message: "请输入跳转页面网址",
-                trigger: "change",
+                message: '请输入跳转页面网址',
+                trigger: 'change',
               },
-              { validator: url_check, trigger: "change" },
+              { validator: url_check, trigger: 'change' },
             ],
-          };
+          }
     },
     linkControl() {
-      return this.initData.openLinkC;
+      return this.initData.openLinkC
     },
   },
   mounted() {
-    this.menu_arr = this.menuArr;
-    menu_arr_stash = this.menuArr;
+    this.menu_arr = this.menuArr
+    menu_arr_stash = this.menuArr
   },
   methods: {
     fastTab() {
-      let e = this.linkControl
-        ? "/linkc/setting#protalUrl"
-        : "/setting/serviceStation/customerPortal#protalUrl";
-      if (this.linkControl) {
-        this.$platform.openTab({
-          title: "门户设置",
-          close: true,
-          url: e,
-        });
-      } else {
-        window.location = e;
-      }
+      let e = '/setting/doMyself/doMyselfSet#protalUrl'
+      // if (this.linkControl) {
+      //   this.$platform.openTab({
+      //     title: "门户设置",
+      //     close: true,
+      //     url: e,
+      //   });
+      // } else {
+      window.location = e
+      // }
     },
     main_menu_class(index) {
       if (this.now_chooseed_menu && this.now_chooseed_menu.indexs < 0)
-        return `menu-item ${this.edit_type === 1 ? "can-point" : ""} ${
-          this.now_chooseed_menu.index === index ? "menu-checked" : ""
-        }`;
-      return `menu-item ${this.edit_type === 1 ? "can-point" : ""}`;
+        return `menu-item ${this.edit_type === 1 ? 'can-point' : ''} ${
+          this.now_chooseed_menu.index === index ? 'menu-checked' : ''
+        }`
+      return `menu-item ${this.edit_type === 1 ? 'can-point' : ''}`
     },
     child_menu_class(index, indexs) {
       return [
-        "menu-items",
-        this.edit_type === 1 ? "can-point" : "",
+        'menu-items',
+        this.edit_type === 1 ? 'can-point' : '',
         this.now_chooseed_menu
-          ? this.now_chooseed_menu.index === index &&
-            this.now_chooseed_menu.indexs === indexs
-            ? "menu-checked"
-            : ""
-          : "",
-      ];
+          ? this.now_chooseed_menu.index === index
+            && this.now_chooseed_menu.indexs === indexs
+            ? 'menu-checked'
+            : ''
+          : '',
+      ]
     },
     pub_valid_menu() {
       return new Promise((resolve, reject) => {
         if (this.edit_type === 1 && this.now_chooseed_menu) {
-          this.$refs["ruleForm"].validate((valid) => {
+          this.$refs['ruleForm'].validate((valid) => {
             if (valid) {
-              resolve();
+              resolve()
             } else {
-              console.log("error submit!!");
-              reject();
+              console.log('error submit!!')
+              reject()
             }
-          });
+          })
         } else {
-          resolve();
+          resolve()
         }
-      });
+      })
     },
     valid_menu_form(index = 0, indexs = -1) {
       this.pub_valid_menu()
         .then(() => {
-          this.main_menu_click(index, indexs);
+          this.main_menu_click(index, indexs)
         })
         .catch((err) => {
-          console.error("valid_menu_form_error");
-        });
+          console.error('valid_menu_form_error')
+        })
     },
     main_menu_click(index = 0, indexs = -1) {
-      let maxLength = 3;
-      let _arr = this.menu_arr;
-      let item = _arr[index];
-      this.now_main_menu = index;
+      let maxLength = 3
+      let _arr = this.menu_arr
+      let item = _arr[index]
+      this.now_main_menu = index
 
-      this.resetForm("ruleForm");
+      this.resetForm('ruleForm')
 
-      let main_tem = _.cloneDeep(menu_main_tem);
-      let add_tem = _.cloneDeep(menu_add_tem);
+      let main_tem = _.cloneDeep(menu_main_tem)
+      let add_tem = _.cloneDeep(menu_add_tem)
       if (indexs > -1) {
-        maxLength = 5;
-        main_tem = _.cloneDeep(menu_children_tem);
-        _arr = this.menu_arr[index].sub_button;
-        item = _arr[indexs];
+        maxLength = 5
+        main_tem = _.cloneDeep(menu_children_tem)
+        _arr = this.menu_arr[index].sub_button
+        item = _arr[indexs]
       }
       if (this.edit_type === 1) {
-        if (item.shb_type === "add") {
+        if (item.shb_type === 'add') {
           if (_arr.length < maxLength) {
-            _arr.splice(_arr.length - 1, 1, main_tem, add_tem);
+            _arr.splice(_arr.length - 1, 1, main_tem, add_tem)
           } else {
-            _arr.splice(_arr.length - 1, 1, main_tem);
+            _arr.splice(_arr.length - 1, 1, main_tem)
           }
 
-          this.main_menu_click(index, indexs > -1 ? indexs : -1);
+          this.main_menu_click(index, indexs > -1 ? indexs : -1)
         } else {
           this.now_chooseed_menu = {
             index,
             indexs,
             onlyName: !!(
-              (indexs < 0 &&
-                _arr[index].sub_button &&
-                _arr[index].sub_button.length > 1) ||
-              item.hasOwnProperty("shb_type") === false ||
-              (item.hasOwnProperty("shb_type") === true &&
-                item.shb_type === "system_menu")
+              (indexs < 0
+                && _arr[index].sub_button
+                && _arr[index].sub_button.length > 1)
+              || item.hasOwnProperty('shb_type') === false
+              || (item.hasOwnProperty('shb_type') === true
+                && item.shb_type === 'system_menu')
             ),
-          };
-          let now_chooseed =
-            indexs > -1
-              ? this.menu_arr[index].sub_button[indexs]
-              : this.menu_arr[index];
-              this.$set(this, 'ruleForm', { ...now_chooseed })
+          }
+          let now_chooseed = indexs > -1
+            ? this.menu_arr[index].sub_button[indexs]
+            : this.menu_arr[index]
+          this.$set(this, 'ruleForm', { ...now_chooseed })
         }
       }
     },
@@ -581,192 +580,192 @@ export default {
     push_add(arr = []) {
       return new Promise((resolve, reject) => {
         try {
-          let arr_ = _.cloneDeep(arr);
-          let add_tem = _.cloneDeep(menu_add_tem);
+          let arr_ = _.cloneDeep(arr)
+          let add_tem = _.cloneDeep(menu_add_tem)
           arr_.map((res) => {
             if (res.sub_button) {
               if (res.sub_button.length < 5) {
-                res.sub_button.push(add_tem);
+                res.sub_button.push(add_tem)
               }
             } else {
-              res.sub_button = [];
-              res.sub_button.push(add_tem);
+              res.sub_button = []
+              res.sub_button.push(add_tem)
             }
-            return res;
-          });
+            return res
+          })
           if (arr_.length < 3) {
-            arr_.push(add_tem);
+            arr_.push(add_tem)
           }
-          resolve(arr_);
+          resolve(arr_)
         } catch (error) {
-          reject(error);
+          reject(error)
         }
-      });
+      })
     },
     // 统一将编辑模式参数转换成微信菜单可识别的参数
     slice_add(arr = []) {
       return new Promise((resolve, reject) => {
         try {
           if (arr.length <= 0) {
-            resolve(arr);
+            resolve(arr)
           }
-          let arr_ = _.cloneDeep(arr);
+          let arr_ = _.cloneDeep(arr)
           // 剥离自定义的add类型菜单
-          if (arr_[arr_.length - 1].shb_type === "add") {
-            arr_.splice(arr_.length - 1, 1);
+          if (arr_[arr_.length - 1].shb_type === 'add') {
+            arr_.splice(arr_.length - 1, 1)
           }
           arr_.map((res) => {
             if (
-              res.sub_button &&
-              res.sub_button[res.sub_button.length - 1].shb_type === "add"
+              res.sub_button
+              && res.sub_button[res.sub_button.length - 1].shb_type === 'add'
             ) {
-              res.sub_button.splice(res.sub_button.length - 1, 1);
+              res.sub_button.splice(res.sub_button.length - 1, 1)
             }
-            return res;
-          });
+            return res
+          })
           arr_.forEach((res, index) => {
-            if (res.hasOwnProperty("shb_type") === true) {
-              arr_[index] = this.filerArrByMenuType(arr_[index]);
+            if (res.hasOwnProperty('shb_type') === true) {
+              arr_[index] = this.filerArrByMenuType(arr_[index])
             }
             if (res.sub_button && res.sub_button.length > 0) {
               res.sub_button.forEach((res_, index_) => {
-                if (res_.hasOwnProperty("shb_type") === true) {
+                if (res_.hasOwnProperty('shb_type') === true) {
                   arr_[index].sub_button[index_] = this.filerArrByMenuType(
                     arr_[index].sub_button[index_]
-                  );
+                  )
                 }
-              });
+              })
             }
-          });
-          resolve(arr_);
+          })
+          resolve(arr_)
         } catch (error) {
-          reject(error);
+          reject(error)
         }
-      });
+      })
     },
     filerArrByMenuType(res) {
       let obj = {
         售后宝功能: {
-          url: "", // 后台自己填数据
+          url: '', // 后台自己填数据
           config_url: res.config_url,
-          input_url: "",
-          type: "view",
-          reserve: "",
+          input_url: '',
+          type: 'view',
+          reserve: '',
         },
         跳转页面: {
           url: res.input_url,
-          config_url: "",
+          config_url: '',
           input_url: res.input_url,
-          type: "view",
-          reserve: "",
+          type: 'view',
+          reserve: '',
         },
         回复文本消息: {
-          url: "",
-          config_url: "",
-          input_url: "",
+          url: '',
+          config_url: '',
+          input_url: '',
           reserve: res.reserve,
           value: res.reserve,
-          type: "click",
+          type: 'click',
         },
-      };
-      return { ...res, ...obj[res.menuType] };
+      }
+      return { ...res, ...obj[res.menuType] }
     },
     change_edit_type(type, save = false) {
       if (type === this.edit_type) {
-        return;
+        return
       }
-      this.now_main_menu = 0;
+      this.now_main_menu = 0
       if (save) {
         this.pub_valid_menu()
           .then(() => {
             if (type === 1) {
               this.push_add(this.menu_arr).then((res) => {
-                this.menu_arr = res;
-              });
+                this.menu_arr = res
+              })
             } else {
               this.slice_add(this.menu_arr).then((res) => {
-                this.$emit("pageLoading", true);
+                this.$emit('pageLoading', true)
                 this.setMenuList(res).then((res_) => {
                   if (res_.success) {
                     let result_ = JSON.parse(res_.data.wechatMenu).menu.button
-                    this.menu_arr = result_;
-                    menu_arr_stash = _.cloneDeep(result_);
-                    this.$emit("changeMenuArr", result_);
-                    this.$emit("pageLoading", false);
+                    this.menu_arr = result_
+                    menu_arr_stash = _.cloneDeep(result_)
+                    this.$emit('changeMenuArr', result_)
+                    this.$emit('pageLoading', false)
                   } else {
-                    this.$platform.alert(res_.message);
+                    this.$platform.alert(res_.message)
                   }
-                });
-              });
+                })
+              })
             }
-            this.edit_type = type;
+            this.edit_type = type
           })
           .catch((err) => {
-            console.error("change_edit_type error", err);
-          });
+            console.error('change_edit_type error', err)
+          })
       } else {
         if (type === 1) {
           this.push_add(this.menu_arr).then((res) => {
-            this.menu_arr = res;
-          });
+            this.menu_arr = res
+          })
         } else {
           this.slice_add(this.menu_arr).then((res) => {
-            this.menu_arr = res;
+            this.menu_arr = res
 
-            if (type === 0) this.menu_arr = _.cloneDeep(menu_arr_stash);
-          });
+            if (type === 0) this.menu_arr = _.cloneDeep(menu_arr_stash)
+          })
         }
-        this.edit_type = type;
+        this.edit_type = type
       }
     },
     resetForm(formName) {
-      this.now_chooseed_menu = false;
-      this[formName] = _.cloneDeep(form_tem);
-      this.$refs[formName].clearValidate();
+      this.now_chooseed_menu = false
+      this[formName] = _.cloneDeep(form_tem)
+      this.$refs[formName].clearValidate()
     },
     async deleteMenu() {
-      if (!this.now_chooseed_menu) return;
-      let now_chooseed_menu = this.now_chooseed_menu;
-      let add_tem = _.cloneDeep(menu_add_tem);
+      if (!this.now_chooseed_menu) return
+      let now_chooseed_menu = this.now_chooseed_menu
+      let add_tem = _.cloneDeep(menu_add_tem)
       if (now_chooseed_menu.indexs > -1) {
         // 删除子菜单
         const alert_res = await this.$platform.confirm(
           `删除后${this.ruleForm.name}菜单下设置的内容将被删除`
-        );
-        if (!alert_res) return;
+        )
+        if (!alert_res) return
         this.menu_arr[now_chooseed_menu.index].sub_button.splice(
           now_chooseed_menu.indexs,
           1
-        );
-        let length = this.menu_arr[now_chooseed_menu.index].sub_button.length;
+        )
+        let length = this.menu_arr[now_chooseed_menu.index].sub_button.length
         if (
-          length < 5 &&
-          (this.menu_arr[now_chooseed_menu.index].sub_button[
+          length < 5
+          && (this.menu_arr[now_chooseed_menu.index].sub_button[
             length - 1
-          ].hasOwnProperty("shb_type") === false ||
-            this.menu_arr[now_chooseed_menu.index].sub_button[length - 1]
-              .shb_type !== "add")
+          ].hasOwnProperty('shb_type') === false
+            || this.menu_arr[now_chooseed_menu.index].sub_button[length - 1]
+              .shb_type !== 'add')
         ) {
-          this.menu_arr[now_chooseed_menu.index].sub_button.push(add_tem);
+          this.menu_arr[now_chooseed_menu.index].sub_button.push(add_tem)
         }
       } else {
         // 删除主菜单 需要提示风险
         const alert_res = await this.$platform.confirm(
           `删除后${this.ruleForm.name}菜单下设置的内容将被删除`
-        );
-        if (!alert_res) return;
-        this.menu_arr.splice(now_chooseed_menu.index, 1);
-        console.log(this.menu_arr);
-        let length = this.menu_arr.length;
+        )
+        if (!alert_res) return
+        this.menu_arr.splice(now_chooseed_menu.index, 1)
+        console.log(this.menu_arr)
+        let length = this.menu_arr.length
         if (
-          length < 3 &&
-          (this.menu_arr[length - 1].hasOwnProperty("shb_type") === false ||
-            this.menu_arr[length - 1].shb_type !== "add")
+          length < 3
+          && (this.menu_arr[length - 1].hasOwnProperty('shb_type') === false
+            || this.menu_arr[length - 1].shb_type !== 'add')
         ) {
-          this.menu_arr.push(add_tem);
+          this.menu_arr.push(add_tem)
         }
       }
-      this.resetForm("ruleForm");
+      this.resetForm('ruleForm')
     },
     getMenuList(type = true) {
       // this.$emit("pageLoading", true);
@@ -777,35 +776,35 @@ export default {
         .then((res) => {
           let result = res.data.wechatMenu
             ? JSON.parse(res.data.wechatMenu).menu.button
-            : [];
+            : []
           // 微信菜单数据转换成我们识别的数据
-          this.menu_arr = result;
-          menu_arr_stash = this.menu_arr;
-          this.$emit("changeMenuArr", result);
+          this.menu_arr = result
+          menu_arr_stash = this.menu_arr
+          this.$emit('changeMenuArr', result)
 
           setTimeout(() => {
-            this.$emit("pageLoading", false);
-          }, 500);
-          console.log("getSuccess", result, res);
+            this.$emit('pageLoading', false)
+          }, 500)
+          console.log('getSuccess', result, res)
         })
         .catch((err) => {
-          this.$emit("pageLoading", false);
-        });
+          this.$emit('pageLoading', false)
+        })
     },
     setMenuList(data) {
       return setMenuListWx({
         wechatMenu: JSON.stringify({ menu: { button: data } }),
-      });
+      })
     },
     onMenuMoveChoose(e) {
-      let nowIndex = e.from.classList[0].split("-")[1];
-      this.nowMoveBox = nowIndex * 1;
+      let nowIndex = e.from.classList[0].split('-')[1]
+      this.nowMoveBox = nowIndex * 1
     },
     onMenuMoveUnchoose() {
-      this.nowMoveBox = -1;
+      this.nowMoveBox = -1
     },
   },
-};
+}
 </script>
 <style lang="scss" scoped>
 .overHideCon_1 {

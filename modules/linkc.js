@@ -1,8 +1,8 @@
 module.exports = {
-  'linkc.setting': {
-    entry: './src/modules/linkc/setting/index.js',
-    template: 'src/modules/linkc/setting/index.html'
-  },
+  // 'linkc.setting': {
+  //   entry: './src/modules/linkc/setting/index.js',
+  //   template: 'src/modules/linkc/setting/index.html'
+  // },
   'linkc.goods': {
     entry: './src/modules/linkc/goods/index.js',
     template: 'src/modules/linkc/goods/index.html'
