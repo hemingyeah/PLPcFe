@@ -133,6 +133,9 @@ export default {
     padding: 0;
     color: $color-primary;
     line-height: 32px;
+    white-space:nowrap; 
+    overflow:hidden; 
+    text-overflow:ellipsis
   }
 }
 
