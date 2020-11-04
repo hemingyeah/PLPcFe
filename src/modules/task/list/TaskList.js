@@ -625,6 +625,17 @@ export default {
       this.showBj = true
     },
     /**
+     * @description 删除视图
+     */
+    async delView({ id }) {
+      const confirm = await this.$platform.confirm("确定要删除视图吗？");
+      if (confirm) {
+        TaskApi.deleteView(id).then((res) => {
+          this.getUserViews("saveView");
+        });
+      }
+    },
+    /**
      * 保存视图
      */
     saveView() {
@@ -1283,9 +1294,10 @@ export default {
     changeTaskType(taskType) {
       this.searchParams = {...this.searchParams_spare, ...{templateId: taskType.id}}
       this.currentTaskType = taskType;
-      this.selectId = "all"
+      // this.selectId = "all"
       this.params = this.initParams();
-      this.initialize();
+      this.createPerspective({id: this.selectId}, true)
+      // this.initialize();
     },
     /**
      * @description 检测导出条数
@@ -1871,7 +1883,7 @@ export default {
     /**
      * 创建视角
      */
-    createPerspective(item){
+    createPerspective(item, bool = false){
       this.loading = true;
       this.selectId = item.id;
       const {initData} = this
@@ -1897,7 +1909,7 @@ export default {
         this.searchParams.synergyId = initData.currentUserId;
         break;
       }
-      this.search(this.searchParams, false);
+      this.search(this.searchParams, bool);
     },
     /**
      * @description 搜索
@@ -2180,7 +2192,7 @@ export default {
           serviceTypes: params.serviceTypes,
           serviceContents: params.serviceContents,
           levels: params.levels,
-          searchStateList: params.states && params.states.map(stateName => TaskStateEnum.getValue(stateName)),
+          stateList: params.states && params.states.map(stateName => TaskStateEnum.getValue(stateName)),
           allotTypes: params.allotTypeStrs && params.allotTypeStrs.map(type => AllotTypeConvertMap[type]),
           flags: params.onceExceptions && params.onceExceptions.map(exception => FlagConvertMap[exception] || ""),
           createUserIds: this.getUserIdsWithSubmit(searchModel.createUser, params, "createUser"),

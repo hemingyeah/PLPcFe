@@ -74,7 +74,7 @@ const MultiFieldNames = [
   "tags",
   "synergyId",
   "createUser",
-  "executor"
+  "executor",
 ];
 
 function setFieldOperateHandler(field = {}) {
@@ -87,12 +87,12 @@ function setFieldOperateHandler(field = {}) {
   } else if (fieldName == "customer" || fieldName == "product") {
     field.operatorOptions = OperatorSelectOptionsMap.select.slice();
   } else if (
-    formType == "text"
-    || formType == "textarea"
-    || formType === "code"
-    || formType === "description"
-    || formType === "relationProduct"
-    || formType === "relationCustomer"
+    formType == "text" ||
+    formType == "textarea" ||
+    formType === "code" ||
+    formType === "description" ||
+    formType === "relationProduct" ||
+    formType === "relationCustomer"
   ) {
     field.operatorOptions = OperatorSelectOptionsMap.text.slice();
   } else if (formType == "date" || formType == "datetime") {
@@ -114,8 +114,8 @@ export default {
   name: "task-inquire",
   props: {
     inquireFormBackup: {
-      type:Object,
-      default: () => ({})
+      type: Object,
+      default: () => ({}),
     },
     searchModel: {
       type: Object,
@@ -150,8 +150,8 @@ export default {
     },
     inquireFormBackup(v) {
       if (JSON.stringify(v) === "{}") {
-        this.list = [1] 
-      } 
+        this.list = [1];
+      }
     },
   },
   computed: {
@@ -187,7 +187,7 @@ export default {
     // 高级搜索选中的值
     returnData() {
       let data = {};
-      if (!this.$refs.batchForm) return {}
+      if (!this.$refs.batchForm) return {};
       this.$refs.batchForm.forEach((item) => {
         for (let key in item.returnDatas()) {
           if (item.returnDatas()[key]) {
@@ -204,7 +204,7 @@ export default {
     returnInquireFields() {
       let inquireFields = [];
 
-      if (!this.$refs.batchForm) return []
+      if (!this.$refs.batchForm) return [];
       this.$refs.batchForm.forEach((batchFormEl) => {
         inquireFields.push(batchFormEl.selectedField);
       });
@@ -225,42 +225,42 @@ export default {
       let operator = "";
 
       switch (formType) {
-      case "date": {
-        operator = "between";
-        break;
-      }
-      case "datetime": {
-        operator = "between";
-        break;
-      }
-      case "select": {
-        if (field.setting && field.setting.isMulti) {
-          operator = "contain";
-        } else {
-          operator = "eq";
+        case "date": {
+          operator = "between";
+          break;
         }
-        break;
-      }
-      case "user": {
-        operator = "user";
-        break;
-      }
-      case "address": {
-        operator = "address";
-        break;
-      }
-      case "cascader": {
-        operator = "cascader";
-        break;
-      }
-      case "location": {
-        operator = "location";
-        break;
-      }
-      default: {
-        operator = "like";
-        break;
-      }
+        case "datetime": {
+          operator = "between";
+          break;
+        }
+        case "select": {
+          if (field.setting && field.setting.isMulti) {
+            operator = "contain";
+          } else {
+            operator = "eq";
+          }
+          break;
+        }
+        case "user": {
+          operator = "user";
+          break;
+        }
+        case "address": {
+          operator = "address";
+          break;
+        }
+        case "cascader": {
+          operator = "cascader";
+          break;
+        }
+        case "location": {
+          operator = "location";
+          break;
+        }
+        default: {
+          operator = "like";
+          break;
+        }
       }
       return operator;
     },
@@ -344,8 +344,8 @@ export default {
       name: "batch-form",
       props: {
         inquireFormBackup: {
-          type:Object,
-          default: () => ({})
+          type: Object,
+          default: () => ({}),
         },
         searchModel: {
           type: Object,
@@ -384,8 +384,8 @@ export default {
         inquireFormBackup(v) {
           if (JSON.stringify(v) === "{}") {
             this.reset();
-            this.buildForm();  
-          } 
+            this.buildForm();
+          }
         },
         item(v) {
           if (!v) {
@@ -395,9 +395,9 @@ export default {
         fields(v) {
           if (JSON.stringify(this.form) === "{}") {
             this.reset();
-            this.buildForm();  
-          } 
-        }
+            this.buildForm();
+          }
+        },
       },
       mounted() {
         this.reset();
@@ -408,17 +408,17 @@ export default {
           let inPar = []; // 初始化的参数
           for (let key in searchParams) {
             if (
-              JSON.stringify(searchParams[key]) !== "[]"
-              && searchParams[key]
-              && key !== "pageSize"
-              && key !== "page"
-              && key !== "pageNum"
-              && key !== "stateList"
-              && key !== "whoseInfo"
-              && key !== "isPermission"
-              && key !== "distance"
-              && key !== "orderDetail"
-              && key !== "sortBy"
+              JSON.stringify(searchParams[key]) !== "[]" &&
+              searchParams[key] &&
+              key !== "pageSize" &&
+              key !== "page" &&
+              key !== "pageNum" &&
+              key !== "stateList" &&
+              key !== "whoseInfo" &&
+              key !== "isPermission" &&
+              key !== "distance" &&
+              key !== "orderDetail" &&
+              key !== "sortBy"
             ) {
               inPar.push({ key, value: searchParams[key] });
             }
@@ -445,14 +445,13 @@ export default {
           // }
         },
         buildForm() {
-          localStorage.setItem("fields_length", this.fields.length)
+          localStorage.setItem("fields_length", this.fields.length);
           if (Object.keys(this.form).length === this.fields.length) return;
 
           this.fields.forEach((f) => {
             if (MultiFieldNames.indexOf(f.fieldName) > -1) {
               this.form[f.fieldName] = [];
             }
-
           });
         },
         searchCustomer(params) {
@@ -542,11 +541,6 @@ export default {
 
           return (
             <el-select
-              class={
-                this.columnNum === 2
-                  ? "task-inquire-operator-select"
-                  : "task-mt12"
-              }
               value={this.selectedField.operatorValue}
               onInput={(value) => (this.selectedField.operatorValue = value)}
             >
@@ -637,7 +631,6 @@ export default {
                 input: (event) => this.update(event, "tags"),
               },
             });
-            
           } else if (f.fieldName === "tlmName") {
             childComp = h("linkman-search", {
               props: {
@@ -692,9 +685,22 @@ export default {
                     : "task-mt12"
                 }
               >
-                <div class="task-type">
+                <div
+                  class={
+                    this.columnNum === 2
+                      ? "task-inquire-operator-select task-type"
+                      : "task-mt12 task-type"
+                  }
+                >
                   {this.renderSelector()}
-                </div><div class="task-type">
+                </div>
+                <div
+                  class={
+                    this.columnNum === 2
+                      ? "task-inquire-operator-select task-type"
+                      : "task-mt12 task-type"
+                  }
+                >
                   {this.renderOperateSelect()}
                 </div>
                 <div
@@ -748,9 +754,9 @@ export default {
 <style lang="scss">
 .task-type {
   width: 210px !important;
- .el-select {
-   width: 100%;
- } 
+  .el-select {
+    width: 100%;
+  }
 }
 .task-inquire,
 .task-inquire-two {

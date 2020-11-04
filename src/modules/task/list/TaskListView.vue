@@ -53,7 +53,7 @@
                             <el-tooltip content="删除视图" placement="top">
                               <i
                                 class="iconfont icon-shanchu-copy task-ml12 task-font12"
-                                @click="delView(item)"
+                                @click.stop="delView(item)"
                                 v-if="item.authEdit"
                               ></i>{{item.authEdit}}
                             </el-tooltip>
@@ -713,7 +713,7 @@
                         class="view-detail-btn"
                         @click.stop.prevent="
                           openUserTab(
-                            presonDisplayObj('useId', column.field, scope.row)
+                            presonDisplayObj('userId', column.field, scope.row)
                           )
                         "
                       >
