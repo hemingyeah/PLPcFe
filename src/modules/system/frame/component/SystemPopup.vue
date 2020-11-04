@@ -72,7 +72,7 @@ export default {
   position: relative;
   margin: 100px auto 20px auto;
   background-color: #fff;
-  width: 420px;
+  width: 820px;
   box-shadow: 1px 1px 8px rgba(0,0,0,0.15);
   color: #333;
 }
@@ -128,7 +128,7 @@ export default {
   border-top: 1px solid #f0f0f0;
 
   button.btn{
-    width: 100px;
+    width: 40%;
     height: 32px;
     padding: 0;
     color: $color-primary;
