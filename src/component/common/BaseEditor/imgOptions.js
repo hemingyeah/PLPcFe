@@ -14,7 +14,7 @@ export default class ImageBlot extends BlockEmbed {
   static value(node) {
       return {
           src: node.getAttribute('src'),
-          'data-origin': node.getAttribute('data-origin')
+          origin: node.getAttribute('data-origin')
       }
   }
 }

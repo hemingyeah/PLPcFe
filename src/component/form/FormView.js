@@ -25,6 +25,27 @@ const FormView = {
     }
   },
   methods: {
+    //TODO :预览图片
+    previewImage(event){
+      let element = event.target;
+      let imgSrc =  element.currentSrc;
+
+      if (!/\.(png|bmp|gif|jpg|jpeg|tiff)$/i.test(imgSrc) || !element) return
+
+      let list = event.target.closest('.ql-editor');
+      let images = Array.prototype.slice.call(list.querySelectorAll('img'));
+
+      let currIndex = 0;
+      let urls = images.map((item, index) => {
+        if(item == element) currIndex = index;
+        return item.getAttribute('src');
+      });
+      platform.imagePreview({
+        imageDom: list,
+        currIndex,
+        urls
+      });  
+    },
     toggleDisplay(id) {
       this.sectionState[id] = !this.sectionState[id];
     },
@@ -147,7 +168,9 @@ const FormView = {
       return (
         <div class="form-view-row">
           <div class="form-view-row-content form-view-info-content">
-            {value}
+            <div class="form-ql-editor ql-container">
+              <div class="ql-editor" domPropsInnerHTML={value} onClick={(e) => this.previewImage(e)}></div>
+            </div>       
           </div>
         </div>
       )

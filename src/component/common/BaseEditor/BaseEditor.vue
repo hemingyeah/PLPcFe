@@ -199,8 +199,7 @@ export default {
       let index = range.index || 0;
       let ossUrl = uploadType == 'image' ? this.genUrl(data) : data.ossUrl;
       if(uploadType == 'image'){
-        console.log("ossUrl",ossUrl)
-        this.editor.insertEmbed(index, 'image',{ src: ossUrl ,'origin': ossUrl})
+        this.editor.insertEmbed(index, 'image',{ src: ossUrl ,origin: ossUrl})
       }else{
         this.editor.insertEmbed(index, uploadType, ossUrl);
       }

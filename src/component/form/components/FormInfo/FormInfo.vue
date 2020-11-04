@@ -24,8 +24,10 @@ export default {
   methods:{
     //TODO :预览图片
     previewImage(event){
-      let element = event.currentTarget.querySelector('img');
-      if( !element) return;
+      let element = event.target;
+      let imgSrc =  element.currentSrc;
+
+      if (!/\.(png|bmp|gif|jpg|jpeg|tiff)$/i.test(imgSrc) || !element) return
 
       let list = event.target.closest('.ql-editor');
       let images = Array.prototype.slice.call(list.querySelectorAll('img'));
@@ -33,10 +35,8 @@ export default {
       let currIndex = 0;
       let urls = images.map((item, index) => {
         if(item == element) currIndex = index;
-        console.log(item.getAttribute('src'))
         return item.getAttribute('src');
       });
-
       platform.imagePreview({
         imageDom: list,
         currIndex,
