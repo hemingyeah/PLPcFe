@@ -675,7 +675,7 @@ export default {
         TaskApi.deleteTask([this.task.id]).then(res => {
           if (res.success) {
             let fromId = window.frameElement.getAttribute('fromid');
-            this.$platform.refreshTab(fromId);
+            // this.$platform.refreshTab(fromId);
 
             location.href = '/task';
           } else {
@@ -717,7 +717,7 @@ export default {
       TaskApi[API](params).then(res => {
         if (res.success) {
           let fromId = window.frameElement.getAttribute('fromid');
-          this.$platform.refreshTab(fromId);
+          // this.$platform.refreshTab(fromId);
 
           window.location.href = `/task/view/${this.task.id}`;
         } else {
@@ -784,7 +784,7 @@ export default {
       TaskApi.refuseTask(params).then(res => {
         if (res.success) {
           let fromId = window.frameElement.getAttribute('fromid');
-          this.$platform.refreshTab(fromId);
+          // this.$platform.refreshTab(fromId);
 
           location.href = '/task?viewId=12fcb144-1ea3-11e7-8d4e-00163e304a25&mySearch=execute';
         } else {
@@ -811,7 +811,7 @@ export default {
       TaskApi.startTask({ taskId: this.task.id }).then(res => {
         if (res.success) {
           let fromId = window.frameElement.getAttribute('fromid');
-          this.$platform.refreshTab(fromId);
+          // this.$platform.refreshTab(fromId);
 
           window.location.href = `/task/view/${this.task.id}`;
         } else {
@@ -1090,7 +1090,7 @@ export default {
       //   fieldName: 'relevance',
       //   isSystem: 1,
       // }
-    ];
+      ];
 
       this.fields.forEach(field => {
         if (field.fieldName == 'attachment') {

@@ -120,7 +120,7 @@ export default {
       TaskApi.cancelTask(params).then(res => {
         if (res.success) {
           let fromId = window.frameElement.getAttribute('fromid');
-          this.$platform.refreshTab(fromId);
+          // this.$platform.refreshTab(fromId);
 
           window.location.reload();
         } else {

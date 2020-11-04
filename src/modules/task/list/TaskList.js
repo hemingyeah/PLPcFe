@@ -39,7 +39,7 @@ import {
 const TASK_LIST_KEY = 'task_list';
 
 // 工单引导标识
-const { TASK_GUIDE_LIST, TASK_GUIDE_SEARCH_MODEL, TASK_GUIDE_SEARCH_MODEL_SAVE, TASK_GUIDE_DROPDOWN_MENU } = require('@src/component/guide/taskV2Store');;
+const { TASK_GUIDE_LIST, TASK_GUIDE_SEARCH_MODEL, TASK_GUIDE_SEARCH_MODEL_SAVE, TASK_GUIDE_DROPDOWN_MENU } = require('@src/component/guide/taskV2Store');
 // 埋点事件对象
 const TRACK_EVENT_MAP = {
   search: 'pc：工单列表-搜索事件',
@@ -269,7 +269,7 @@ export default {
     },
     /* 是否是系统管理员 */
     isSystemAdmin() {
-      let roles = this.initData?.roles || []
+      let roles = this.initData?.loginUser?.roles || []
       return roles.some(role => role == '1')
     },
     /* 是否显示 批量创建/生成服务报告 */
@@ -319,7 +319,7 @@ export default {
     })
 
     // 对外开放刷新方法，用于其他tab刷新本tab数据
-    // window.__exports__refresh = this.searchList;
+    window.__exports__refresh = this.searchList;
   },
   methods: {
     guideDropdownMenu_enter(){
@@ -429,13 +429,39 @@ export default {
       if (success) {
         this.taskView = result;
         this.otherLists(result);
+        const {mySearch, viewId} = this.intercept()
+
+        if (this.intercept()) {
+          this.selectId = mySearch
+          this.filterId = viewId
+        }
+
         result.forEach(item => {
           if (item.id === this.selectIds.allId) {
             this.searchParams = item.searchModel
+            if (this.intercept()) {
+              this.searchParams.state = 'allocated'
+              this.searchParams.executor = this.initData.currentUserId;
+            }
           }
         })
         this.initialize();
       }
+    },
+    /**
+     * 
+     */
+    intercept() {
+      const url = document.URL
+      if (url.indexOf('viewId') !== -1) {
+        let params = {}
+        url.split('?')[1].split('&').forEach((item, index) => {
+          params[item.split('=')[0]] = item.split('=')[1]
+        })
+        return params
+      } 
+      return ''
+      
     },
     /**
      * @description 高级搜索
@@ -718,7 +744,7 @@ export default {
       for(let key in params) {
         if(!bool_text) {
           bool = true
-          if (params['conditions'].length || params['systemConditions'].length || (params['productAddress'] && params['productAddress'].city)) {
+          if (params['conditions'].length || params['systemConditions'].length || (params['productAddress'] && params['productAddress'].province)) {
             bool = false
           }
         }
@@ -1111,8 +1137,8 @@ export default {
         exportSearchModel: JSON.stringify({
           ...all,
           ...{
-            exportTotal: exportAll ?
-              this.taskPage.totalElements : this.selectedIds.length,
+            exportTotal: exportAll
+              ? this.taskPage.totalElements : this.selectedIds.length,
           },
         }),
       };
@@ -2232,38 +2258,38 @@ export default {
       let taskSelfFields = [];
       // 回执信息
       let taskReceiptSystemFields = [{
-          id: 5460,
-          isSystem: 1,
-          fieldName: 'spare_name',
-          field: 'spare_name',
-          displayName: '备件',
-          label: '备件',
-          formType: 'text',
-          isNull: 1,
-          isSearch: 0,
-        },
-        {
-          id: 5460,
-          isSystem: 1,
-          fieldName: 'service_name',
-          field: 'service_name',
-          displayName: '服务项目',
-          label: '服务项目',
-          formType: 'text',
-          isNull: 1,
-          isSearch: 0,
-        },
-        {
-          id: 5460,
-          isSystem: 1,
-          fieldName: 'balance_total',
-          field: 'balance_total',
-          displayName: '费用信息',
-          label: '费用信息',
-          formType: 'text',
-          isNull: 1,
-          isSearch: 0,
-        },
+        id: 5460,
+        isSystem: 1,
+        fieldName: 'spare_name',
+        field: 'spare_name',
+        displayName: '备件',
+        label: '备件',
+        formType: 'text',
+        isNull: 1,
+        isSearch: 0,
+      },
+      {
+        id: 5460,
+        isSystem: 1,
+        fieldName: 'service_name',
+        field: 'service_name',
+        displayName: '服务项目',
+        label: '服务项目',
+        formType: 'text',
+        isNull: 1,
+        isSearch: 0,
+      },
+      {
+        id: 5460,
+        isSystem: 1,
+        fieldName: 'balance_total',
+        field: 'balance_total',
+        displayName: '费用信息',
+        label: '费用信息',
+        formType: 'text',
+        isNull: 1,
+        isSearch: 0,
+      },
       ];
 
       // 工单信息逻辑
@@ -2454,9 +2480,9 @@ export default {
       selection,
       item
     }) {
-      selection.length < 1 ?
-        this.toggleSelection() :
-        this.toggleSelection([item]);
+      selection.length < 1
+        ? this.toggleSelection()
+        : this.toggleSelection([item]);
     },
     /**
      * @description 计算已选择
@@ -2481,8 +2507,8 @@ export default {
       if (row.latesetUpdateRecord) return;
 
       TaskApi.getTaskUpdateRecord({
-          taskId: row.id
-        })
+        taskId: row.id
+      })
         .then((res) => {
           if (!res || res.status) return;
 

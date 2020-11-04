@@ -379,9 +379,11 @@ export default {
         };
       },
       watch: {
-        item() {
-          this.reset();
+        item(v) {
           this.buildForm();
+          if (!v) {
+            this.reset();
+          }
         },
         inquireFormBackup(v) {
           if (JSON.stringify(v) === '{}') {
@@ -412,9 +414,9 @@ export default {
         },
         reset() {
           this.form = {};
-          if (this.fields.length) {
-            this.selectField(this.fields[0].fieldName);
-          }
+          // if (this.fields.length) {
+          //   this.selectField(this.fields[0].fieldName);
+          // }
         },
         buildForm() {
           localStorage.setItem('fields_length', this.fields.length)
