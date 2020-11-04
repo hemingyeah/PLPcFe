@@ -1,7 +1,7 @@
 <template>
   <div class="form-info">
     <div class="form-item__text form-ql-editor ql-container">
-      <div class="ql-editor" v-html="field.placeHolder" @click.prevent.stop='previewImage'></div>
+      <div class="ql-editor form-editor" v-html="field.placeHolder" @click.prevent.stop='previewImage'></div>
     </div>
   </div>
 </template>

@@ -8,7 +8,7 @@
     }
     .ql-toolbar{
       background: #fafafa;
-      padding: 5px 8px;
+      padding: 5px 0px;
       border: 1px solid $border-color-base;
       border-radius: 4px 4px 0 0;
 
@@ -72,5 +72,10 @@
       color: $color-primary;
       text-decoration: underline;
     }
+  }
+}
+.form-editor{
+  .ql-video{
+    width: 60% !important;
   }
 }

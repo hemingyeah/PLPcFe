@@ -247,7 +247,7 @@ export default {
     font-size: 14px !important;
 
     .ql-editor {
-      height: 400px;
+      height: 300px;
     }
 
     .ql-editor.ql-blank::before {

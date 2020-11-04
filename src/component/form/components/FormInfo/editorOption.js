@@ -13,6 +13,5 @@ Quill.register(fontSizeStyle, true);
 export const toolbarOptions = [
   ['bold', 'italic', 'underline'],
   [{'size': sizes}],
-  [{'color': []},{'align': []}],
-  ['link', 'image','video'] 
+  [{'color': []},{'align': []},'link', 'image','video']
 ];
