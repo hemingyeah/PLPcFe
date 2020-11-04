@@ -299,6 +299,26 @@
                 <div class="text-overflow-hidden">{{scope.row[column.field]}}</div>
               </el-tooltip>
             </template>
+            <template v-else-if="column.field == 'taskNo'">
+              <a
+                v-if="scope.row.canViewTask"
+                class="no-padding el-button no-padding el-button--text"
+                style="color: #55B7B4;text-decoration: none;"
+                @click.prevent="openTaskDetail(scope.row)">
+                {{scope.row.taskNo}}
+              </a>
+              <span v-else>{{scope.row.taskNo}}</span>
+            </template>
+            <template v-else-if="column.field == 'customerNumber'">
+              <a
+                v-if="scope.row.canViewCustomer"
+                class="no-padding el-button no-padding el-button--text"
+                style="color: #55B7B4;text-decoration: none;"
+                @click.prevent="openCustomerDetail(scope.row.customer)">
+                {{scope.row.customerNumber}}
+              </a>
+              <span v-else>{{scope.row.customerNumber}}</span>
+            </template>
             <template v-else>{{scope.row[column.field]}}</template>
           </template>
         </el-table-column>
@@ -475,6 +495,29 @@ export default {
     }
   },
   methods: {
+    // 打开工单详情
+    openTaskDetail(item){
+      let fromId = window.frameElement.getAttribute('id');
+      this.$platform.openTab({
+        id: `task_view_${item.taskId}`,
+        title: `工单${item.taskNo}`,
+        close: true,
+        url: `/task/view/${item.taskId}?noHistory=1`,
+        fromId,
+      });    
+    },
+    // 打开客户详情
+    openCustomerDetail(customerId){
+      let fromId = window.frameElement.getAttribute('id');
+
+      this.$platform.openTab({
+        id: `customer_view_${customerId}`,
+        title: '客户详情',
+        close: true,
+        url: `/customer/view/${customerId}?noHistory=1`,
+        fromId
+      });
+    },
     cancelSelectPart(part) {
       if (!part || !part.id) return;
       this.selected = this.selected.filter(ms => ms.id !== part.id);

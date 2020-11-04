@@ -171,6 +171,14 @@ body {
     }
   }
 
+  // 查看全部时间点
+  .state-all-btn{
+    cursor: pointer;
+    margin-bottom: 6px;
+    color: $color-primary;
+  }
+  
+
   // 审批中
   .approving-img {
     width: 90px;
@@ -438,14 +446,13 @@ body {
       }
     }
   }
-
   .task-detail-btn-group {
     position: absolute;
     right: 12px;
     top: 8px;
 
     font-size: 0;
-    z-index: 999;
+    z-index: 995;
 
     .iconfont {
       margin-left: 16px;
@@ -460,6 +467,11 @@ body {
         margin-left: 13px;
       }
     }
+  }
+
+  .task-detail-btn-group-point{
+    z-index: 997;
+    background: #fff;
   }
 
   // 审批中图片

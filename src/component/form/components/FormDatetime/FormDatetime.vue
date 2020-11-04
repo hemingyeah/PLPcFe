@@ -6,50 +6,52 @@
       prefix-icon="iconfont icon-fd-datetime"
       value-format="yyyy-MM-dd HH:mm:ss"
       :placeholder="placeholder"
-      :value="time" @input="choose"/>
+      :value="time"
+      @input="choose"
+    />
   </div>
 </template>
 
 <script>
 import FormMixin from '@src/component/form/mixin/form';
-import { typeOf } from '@src/util/assist';
+import { isString } from '@src/util/type'
 
 export default {
-  name: 'form-datetime',
+  name: "form-datetime",
   mixins: [FormMixin],
-  props: ['value'],
+  props: ["value"],
   watch: {
-    value(v) {
-      this.time = typeOf(v) === 'string' ? v : ''
+    value(newValue) {
+      this.time = isString(newValue) ? newValue : ''
     }
   },
   data() {
     return {
-      time: ''
-    }
+      time: "",
+    };
   },
   mounted() {
-    this.time = typeOf(this.value) === 'string' ? v : ''
+    this.time = isString(this.value) ? this.value : ''
   },
   methods: {
-    choose(newValue){    
+    choose(newValue) {
       let oldValue = null;
-      this.$emit('update', {newValue, oldValue, field: this.field});
-      this.$emit('input', newValue);
-    }
-  }
-}
+      this.$emit("update", { newValue, oldValue, field: this.field });
+      this.$emit("input", newValue);
+    },
+  },
+};
 </script>
 
 <style lang="scss">
-.form-datetime{
+.form-datetime {
   width: 100%;
 
   .el-input__inner {
     cursor: pointer;
   }
 
-  .el-date-editor{
+  .el-date-editor {
     width: 100%;
   }
 }

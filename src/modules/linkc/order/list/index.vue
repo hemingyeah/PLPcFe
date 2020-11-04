@@ -40,7 +40,7 @@
               </el-option>
             </el-select>
           </div>
-          <div class="search-datecheck min-w-650 flex-x pad-b-20">
+          <div class="search-datecheck flex-x pad-b-20">
             <div class>下单时间：</div>
             <div class="search-date">
               <el-date-picker
@@ -55,7 +55,7 @@
                 value-format="yyyy-MM-dd"
               ></el-date-picker>
             </div>
-            <el-button class="mar-l-20" type="primary" @click="searchModel.pageNum=1,search()">查询</el-button>
+            <el-button class="mar-l-10" type="primary" @click="searchModel.pageNum=1,search()">搜索</el-button>
             <el-button @click="resetParams">重置</el-button>
           </div>
         </div>
@@ -219,7 +219,7 @@
                     <div class="flex-x">
                       <div
                         :class="[`status-tips-${scope.row.logisticsState}`,'status-tips-box']"
-                      >{{stateObj[scope.row.logisticsState].name}}</div>
+                      >{{scope.row.logisticsState ? stateObj[scope.row.logisticsState].name : ''}}</div>
                     </div>
                   </template>
 
@@ -330,7 +330,7 @@ import Page from "@model/Page";
 import platform from "@src/platform";
 import { formatDate } from "@src/util/lang";
 
-import { orderList, orderNum } from "@src/api/Linkc";
+import { orderList, orderNum } from "@src/api/LinkcApi";
 import componentMixin from "../component/index";
 import BaseGallery from "../../../../../packages/BaseGallery";
 
@@ -423,7 +423,7 @@ export default {
         orderDetail: {},
         moreConditions: {
           stateList: [],
-          orderTime: this.findWeekTime(),
+          orderTime: '',
         },
       },
       selectedContact: {}, // 编辑联系人弹窗参数,
@@ -516,9 +516,12 @@ export default {
       }
 
       if (Object.keys(sm.moreConditions).length > 0) {
-        if (sm.moreConditions.orderTime.length > 0) {
+        if (sm.moreConditions.orderTime && sm.moreConditions.orderTime.length > 0) {
           sm.moreConditions["startTime"] = sm.moreConditions.orderTime[0];
           sm.moreConditions["endTime"] = sm.moreConditions.orderTime[1];
+        }else{
+          sm.moreConditions["startTime"] = '';
+          sm.moreConditions["endTime"] = '';
         }
         delete sm.moreConditions.orderTime;
         params = {
@@ -549,7 +552,7 @@ export default {
           minWidth: "450px",
         },
         {
-          label: "订单号",
+          label: "订单编号",
           field: "orderNum",
           width: "220px",
           show: true,
@@ -935,7 +938,7 @@ export default {
         orderDetail: {},
         moreConditions: {
           stateList: [],
-          orderTime: this.findWeekTime(),
+          orderTime: '',
         },
       };
 

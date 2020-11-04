@@ -8,6 +8,10 @@ import TaskStateEnum from '@model/enum/TaskStateEnum.ts';
 import Filter from '@src/filter/filter.js';
 import { parse } from '@src/util/querystring';
 import { isShowReport } from '@src/util/version.ts'
+import {
+  storageGet,
+  storageSet
+} from '@src/util/storage';
 
 /* component */
 import CancelTaskDialog from './components/CancelTaskDialog.vue';
@@ -22,15 +26,21 @@ import TaskAccount from './components/TaskAccount.vue';
 import TaskFeedback from './components/TaskFeedback';
 import TaskCard from './components/TaskCard';
 import TaskView from './components/TaskView.vue';
+import TaskTimeDialog from './components/TaskTimeDialog.vue';
 
 /* enum */
 import { TaskEventNameMappingEnum } from '@model/enum/EventNameMappingEnum.ts';
+/* mixin */
+import tourGuide from '@src/mixins/tourGuide'
 
 const ENCRYPT_FIELD_VALUE = '***';
+
+const { TASK_GUIDE_DETAIL } = require('@src/component/guide/taskV2Store');
 
 export default {
   name: 'task-detail-view',
   inject: ['initData'],
+  mixins: [tourGuide],
   data() {
     return {
       loading: false,
@@ -54,6 +64,10 @@ export default {
         visible: false,
         reason: ''
       },
+      // 时间轴弹窗
+      timeDialog: {
+        visible: false
+      },
       receiptFields: [], // 自定义回执字段
       customerRelationTaskCountData: {}, // 客户关联工单数量
       hasCallCenterModule: localStorage.getItem('call_center_module') == 1,
@@ -64,7 +78,11 @@ export default {
       popperOptions: {
         boundariesElement: 'viewport',
         removeOnDestroy: true
-      }
+      },
+      nowGuideStep: 5,
+      guideSearchModelSave: false,
+      guideDropdownMenu: false,
+      isGuide: false,
     }
   },
   computed: {
@@ -611,6 +629,13 @@ export default {
     }
   },
   methods: {
+    previousStep() { },
+    nextStep() {
+      this.nowGuideStep++;
+    },
+    stopStep() {
+      this.nowGuideStep = this.detailSteps.length + 1;
+    },
     // 是否含有某一指定权限
     hasAuth(keys) {
       return AuthUtil.hasAuth(this.permission, keys);
@@ -650,7 +675,7 @@ export default {
         TaskApi.deleteTask([this.task.id]).then(res => {
           if (res.success) {
             let fromId = window.frameElement.getAttribute('fromid');
-            this.$platform.refreshTab(fromId);
+            // this.$platform.refreshTab(fromId);
 
             location.href = '/task';
           } else {
@@ -692,7 +717,7 @@ export default {
       TaskApi[API](params).then(res => {
         if (res.success) {
           let fromId = window.frameElement.getAttribute('fromid');
-          this.$platform.refreshTab(fromId);
+          // this.$platform.refreshTab(fromId);
 
           window.location.href = `/task/view/${this.task.id}`;
         } else {
@@ -759,7 +784,7 @@ export default {
       TaskApi.refuseTask(params).then(res => {
         if (res.success) {
           let fromId = window.frameElement.getAttribute('fromid');
-          this.$platform.refreshTab(fromId);
+          // this.$platform.refreshTab(fromId);
 
           location.href = '/task?viewId=12fcb144-1ea3-11e7-8d4e-00163e304a25&mySearch=execute';
         } else {
@@ -786,7 +811,7 @@ export default {
       TaskApi.startTask({ taskId: this.task.id }).then(res => {
         if (res.success) {
           let fromId = window.frameElement.getAttribute('fromid');
-          this.$platform.refreshTab(fromId);
+          // this.$platform.refreshTab(fromId);
 
           window.location.href = `/task/view/${this.task.id}`;
         } else {
@@ -860,6 +885,7 @@ export default {
     },
     // 打开弹窗
     openDialog(action) {
+      console.log(action);
       if (action === 'cancel') {
         this.$refs.cancelTaskDialog.openDialog();
       } else if (action === 'acceptFromPool' || action === 'accept' || action === 'modifyPlanTime') {
@@ -883,6 +909,8 @@ export default {
       } else if (action === 'feedback') {
         this.rightActiveTab = 'feedback-tab';
         this.$refs.taskFeedback.feedback();
+      } else if (action === 'timeAxis') {
+        this.$refs.timeAxis.openDialog();
       }
     },
     // 发起审批
@@ -1056,7 +1084,13 @@ export default {
         fieldName: 'allotUser',
         formType: 'user',
         isSystem: 1,
-      }];
+      }, 
+      // {
+      //   displayName: '创建方式',
+      //   fieldName: 'relevance',
+      //   isSystem: 1,
+      // }
+      ];
 
       this.fields.forEach(field => {
         if (field.fieldName == 'attachment') {
@@ -1084,6 +1118,13 @@ export default {
       }
 
       this.loading = false;
+      
+      this.$nextTick(() => {
+        setTimeout(() => {
+          if (!storageGet(TASK_GUIDE_DETAIL)) this.$tours['myTour'].start(), this.nowGuideStep = 1, storageSet(TASK_GUIDE_DETAIL, '4');
+        }, 1000)
+
+      })
 
     } catch (e) {
       console.error('error ', e)
@@ -1108,6 +1149,7 @@ export default {
     [TaskAccount.name]: TaskAccount,
     [TaskFeedback.name]: TaskFeedback,
     [TaskCard.name]: TaskCard,
-    [TaskView.name]: TaskView
+    [TaskView.name]: TaskView,
+    [TaskTimeDialog.name]: TaskTimeDialog
   }
 }

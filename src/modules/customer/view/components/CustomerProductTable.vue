@@ -1,5 +1,6 @@
 <template>
   <div class="customer-product-table-container">
+    <el-button style="float: right; margin-bottom: 10px" type="primary" @click="showAdvancedSetting">选择列</el-button>
     <el-table
       stripe
       :data="productList"
@@ -40,17 +41,71 @@
               </sample-tooltip>
             
           </template>
+
+          <template v-else-if="column.formType === 'select' && !column.isSystem">
+            {{scope.row.attribute[column.field] | displaySelect}}
+          </template>
+          <template v-else-if="column.field === 'updateTime'">
+            <template v-if="scope.row.latesetUpdateRecord">
+              <el-tooltip class="item" effect="dark" :content="scope.row.latesetUpdateRecord" placement="top">
+                <div @mouseover="showLatestUpdateRecord(scope.row)">
+                  {{scope.row.updateTime | formatDate}}
+                </div>
+              </el-tooltip>
+            </template>
+            <template v-else>
+              <div @mouseover="showLatestUpdateRecord(scope.row)">
+                {{scope.row.updateTime | formatDate}}
+              </div>
+            </template>
+          </template>
+          <template v-else-if="column.formType === 'address'">
+            {{formatCustomizeAddress(scope.row.attribute[column.field])}}
+          </template>
+          <template v-else-if="column.formType === 'user' && scope.row.attribute[column.field]">
+            {{scope.row.attribute[column.field].displayName || scope.row.attribute[column.field].name}}
+          </template>
+          <template v-else-if="column.formType === 'location'">
+            {{ scope.row.attribute[column.field] && scope.row.attribute[column.field].address}}
+          </template>
+          <template v-else-if="column.field === 'createUser'">
+            {{ scope.row.createUser && scope.row.createUser.displayName }}
+          </template>
+          <template v-else-if="column.field === 'createTime'">
+            {{ scope.row.createTime | formatDate }}
+          </template>
+          <div v-else-if="column.formType === 'textarea'" v-html="buildTextarea(scope.row.attribute[column.field])" @click="openOutsideLink">
+          </div>
+
+          <template v-else-if="column.fieldName == 'linkmanName'">
+            {{ scope.row.linkman.name }}
+          </template>
+          <template v-else-if="column.fieldName == 'phone'">
+            {{ scope.row.linkman.phone }}
+          </template>
+
+          
           <template v-else-if="column.field == 'address' && scope.row[column.field]">
             {{getAddress(scope.row[column.field])}}
           </template>
           <template v-else-if="column.field == 'linkman' && scope.row[column.field]">
             {{scope.row[column.field].name}}
           </template>
+          <template v-else-if="!column.isSystem && column.isSystem != null">
+            {{scope.row.attribute[column.field]}}
+          </template>
           <template v-else>
             {{scope.row[column.field]}}
           </template>
         </template>
       </el-table-column>
+      <!-- <el-table-column
+        fixed="right"
+        width="80px">
+        <template slot="header" slot-scope="scope">
+          <el-button type="primary" @click="showAdvancedSetting">选择列</el-button>
+        </template>
+      </el-table-column> -->
     </el-table>
     <div class="product-table-footer">
       <p class="total-count">共<span>{{paginationInfo.totalItems}}</span>条记录</p>
@@ -65,11 +120,15 @@
         :total="paginationInfo.totalItems">
       </el-pagination>
     </div>
+
+    <base-table-advanced-setting ref="advanced" @save="modifyColumnStatus" />
   </div>
 </template>
 
 <script>
-import {formatDate,} from '@src/util/lang';
+import {formatDate} from '@src/util/lang';
+
+const link_reg = /((((https?|ftp?):(?:\/\/)?)(?:[-;:&=\+\$]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\?\+=&;:%!\/@.\w_]*)#?(?:[-\+=&;%!\?\/@.\w_]*))?)/g
 
 export default {
   name: "customer-product-table",
@@ -77,12 +136,16 @@ export default {
     shareData: {
       type: Object,
       default: () => ({})
+    },
+    initData: {
+      type: Object,
+      default: () => ({})
     }
   },
   data() {
     return {
       productList: [],
-      columns: this.buildColumns(),
+      columns: this.fixedColumns(),
       paginationInfo: {
         pageSize: 10,
         pageNum: 1,
@@ -94,8 +157,40 @@ export default {
     customerId() {
       return this.shareData.customer ? this.shareData.customer.id : '';
     },
+    customerConfig() {
+      let initData = this.initData;
+      return {
+        fieldInfo: (initData.productFields || []).sort(
+          (a, b) => a.orderId - b.orderId
+        )
+      };
+    },
+  },
+  filters: {
+    formatTags({customer}) {
+      if (!customer) return '';
+      if (!customer.tags || !customer.tags.length) return '';
+      return customer.tags.map(t => t.tagName).join(' ')
+    },
+    formatDate(val) {
+      if (!val) return '';
+      return formatDate(val, 'YYYY-MM-DD HH:mm:ss')
+    },
+    displaySelect(value) {
+      if (!value) return null;
+      if (value && typeof value === 'string') {
+        return value;
+      }
+      if (Array.isArray(value) && value.length) {
+        return value.join('，');
+      }
+      return null;
+    },
+
   },
   mounted() {
+    this.revertStorage();
+    this.columns = this.buildTableColumn();
     this.fetchData();
   },
   methods: {
@@ -116,6 +211,12 @@ export default {
     jump(pN) {
       this.paginationInfo.pageNum = pN;
       this.fetchData();
+    },
+    revertStorage() {
+      const { pageSize, column_number } = this.getLocalStorageData();
+      if (pageSize) {
+        this.params.pageSize = pageSize;
+      }
     },
     fetchData() {
       const params = {
@@ -139,7 +240,151 @@ export default {
         })
         .catch(e => console.error('fetchData product caught e', e));
     },
-    buildColumns() {
+    showAdvancedSetting() {
+      console.log(this.columns);
+      this.$refs.advanced.open(this.columns);
+    },
+    // columns
+    modifyColumnStatus(event) {
+      let columns = event.data || [];
+      let colMap = columns.reduce(
+        (acc, col) => (acc[col.field] = col) && acc,
+        {}
+      );
+
+      this.columns.forEach(col => {
+        let newCol = colMap[col.field];
+        if (null != newCol) {
+          this.$set(col, 'show', newCol.show);
+          this.$set(col, 'width', newCol.width);
+        }
+      });
+
+      const showColumns = this.columns.map(c => ({
+        field: c.field,
+        show: c.show,
+        width: c.width
+      }));
+      this.saveDataToStorage('columnStatus', showColumns);
+    },
+    // common methods
+    getLocalStorageData() {
+      const dataStr = localStorage.getItem('customerProductListData') || '{}';
+      return JSON.parse(dataStr);
+    },
+    saveDataToStorage(key, value) {
+      const data = this.getLocalStorageData();
+      data[key] = value;
+      localStorage.setItem('customerProductListData', JSON.stringify(data));
+    },
+    showLatestUpdateRecord(row) {
+      if (row.latesetUpdateRecord) return;
+      getUpdateRecord({
+        productId: row.id
+      })
+        .then(res => {
+          if (!res || res.status) return;
+
+          this.page.list = this.page.list
+            .map(c => {
+              if (c.id === row.id) {
+                c.latesetUpdateRecord = res.data;
+              }
+              return c;
+            });
+
+          this.matchSelected();
+        })
+        .catch(e => console.error('e', e));
+    },
+    formatCustomizeAddress(ad) {
+      if (null == ad) return '';
+
+      const {province, city, dist, address} = ad;
+      return [province, city, dist, address]
+        .filter(d => !!d).join('-');
+    },
+    buildTextarea(value) {
+      return value
+        ? value.replace(link_reg, (match) => {
+          return `<a href="javascript:;" target="_blank" url="${match}">${match}</a>`
+        })
+        : '';
+    },
+    openOutsideLink(e) {
+      let url = e.target.getAttribute('url');
+      if (!url) return;
+      if (!/http/gi.test(url)) return this.$platform.alert('请确保输入的链接以http或者https开始');
+      this.$platform.openLink(url)
+    },
+    buildTableColumn() {
+      const localStorageData = this.getLocalStorageData();
+      let columnStatus = localStorageData.columnStatus || [];
+      let localColumns = columnStatus
+        .map(i => (typeof i == 'string' ? { field: i, show: true } : i))
+        .reduce((acc, col) => (acc[col.field] = col) && acc, {});
+
+      let baseColumns = this.fixedColumns();
+      // todo： 后端需要提供“客户产品”的动态列
+      let dynamicColumns = this.customerConfig.fieldInfo
+        .filter(
+          f =>
+            !f.isSystem
+            && f.formType !== 'attachment'
+            && f.formType !== 'separator'
+            && f.formType !== 'info'
+        )
+        .map(field => {
+          let sortable = false;
+          let minWidth = null;
+
+          if (['date', 'datetime', 'number'].indexOf(field.formType) >= 0) {
+            sortable = 'custom';
+            minWidth = 100;
+          }
+
+          if (field.displayName.length > 4) {
+            minWidth = field.displayName.length * 20;
+          }
+
+          if (sortable && field.displayName.length >= 4) {
+            minWidth = 125;
+          }
+
+          if (field.formType === 'datetime') {
+            minWidth = 150;
+          }
+
+          return {
+            label: field.displayName,
+            field: field.fieldName,
+            formType: field.formType,
+            minWidth: typeof minWidth == 'number' ? minWidth : `${minWidth}px`,
+            sortable,
+            isSystem: field.isSystem
+          };
+        });
+
+      let columns = [...baseColumns, ...dynamicColumns].map(col => {
+        let show = col.show === true;
+        let width = col.width;
+        let localField = localColumns[col.field];
+
+        if (null != localField) {
+          width = typeof localField.width == 'number' ? `${localField.width}px` : '';
+          show = localField.show !== false;
+        }
+
+        col.show = show;
+        col.width = width;
+        col.type = 'column';
+
+        return col;
+      });
+
+      return columns;
+    },
+    fixedColumns() {
       return [{
         label: '名称',
         field: 'name',
@@ -165,7 +410,7 @@ export default {
         field: 'createTime',
         show: true,
         width: '150px'
-      }]
+      }];
     }
   },
 }

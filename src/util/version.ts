@@ -97,7 +97,7 @@ export function isShowPartBack(): boolean {
  * 3. 企业版 原生支持
 */
 export function isShowCustomerRemind(): boolean {
-  return commonJudgeShow()
+  return true
 }
 
 /** 

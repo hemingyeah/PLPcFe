@@ -6,26 +6,37 @@
       <!-- ruler-set-list start -->
       <div class="flex-x ruler-set-list">
         <!-- 1 -->
+        <div class="ruler-set-item mar-r-100">
+          <div class="ruler-set-item-title">启用客户自助门户</div>
+          <el-switch
+            v-model="setData.serviceStationConfig.selfHelpEnabled"
+            @change="change($event, 'selfHelpEnabled')"
+            active-text="开启后允许外部用户通过自助门户提交服务事件"
+          ></el-switch>
+        </div>
+        <!-- 2 -->
         <div class="ruler-set-item mar-r-128">
           <div class="ruler-set-item-title">门户访问权限:</div>
           <el-radio-group
             v-model="setData.serviceStationConfig.loginValidate"
-            @change="change($event,'loginValidate')"
+            @change="change($event, 'loginValidate')"
           >
             <div class="mar-b-12">
-              <el-radio class="mar-r-16" :label="false">所有用户均可访问(短信、图片验证码或小程序授权)</el-radio>
+              <el-radio class="mar-r-16" :label="false"
+                >所有用户均可访问(短信、图片验证码或小程序授权)</el-radio
+              >
             </div>
             <div>
               <el-radio :label="true">仅允许客户列表下手机号码访问</el-radio>
             </div>
           </el-radio-group>
         </div>
-        <!-- 2 -->
-        <div class="ruler-set-item mar-r-190">
+        <!-- 3 -->
+        <div class="ruler-set-item flex-1">
           <div class="ruler-set-item-title">网页门户验证方式：</div>
           <el-radio-group
             v-model="setData.serviceStationConfig.validateBySms"
-            @change="change($event,'validateBySms')"
+            @change="change($event, 'validateBySms')"
           >
             <div class="mar-b-12">
               <el-radio class="mar-r-16" :label="false">图片验证码</el-radio>
@@ -36,38 +47,43 @@
           </el-radio-group>
         </div>
         <!-- 3 -->
-        <div class="ruler-set-item  flex-1">
+      </div>
+
+      <div class="flex-x flex-w">
+        <div class="ruler-set-item mar-r-210">
           <div class="ruler-set-item-title">允许用户查看的服务事件：</div>
           <el-radio-group
             v-model="setData.serviceStationConfig.showAllEvent"
-            @change="change($event,'showAllEvent')"
+            @change="change($event, 'showAllEvent')"
           >
             <div class="mar-b-12">
-              <el-radio class="mar-r-16" :label="false">仅显示用户在线发起的事件</el-radio>
+              <el-radio class="mar-r-16" :label="false"
+                >仅显示用户在线发起的事件</el-radio
+              >
             </div>
             <div>
               <el-radio :label="true">显示所有与该用户相关的服务事件</el-radio>
             </div>
           </el-radio-group>
         </div>
-      </div>
 
-      <div class="flex-x flex-w">
         <div class="ruler-set-item mar-r-140">
-          <div class="ruler-set-item-title">是否允许用户取消未完成的服务事件：</div>
+          <div class="ruler-set-item-title">
+            是否允许用户取消未完成的服务事件：
+          </div>
           <el-switch
             v-model="setData.serviceStationConfig.eventCancel"
-            @change="change($event,'eventCancel')"
+            @change="change($event, 'eventCancel')"
             active-text="开启后允许从自助门户取消尚未完成的服务事件"
           ></el-switch>
         </div>
-        <div class="ruler-set-item">
+        <div class="ruler-set-item flex-1">
           <div class="ruler-set-item-title">设置服务商城显示内容：</div>
           <div class="flex-x">
             <el-select
               class="w-228"
               v-model="setData.serviceStationConfig.showAllItem"
-              @change="change($event,'showAllItem')"
+              @change="change($event, 'showAllItem')"
               placeholder="仅显示选择的备件和服务项目"
             >
               <el-option
@@ -77,7 +93,9 @@
                 :value="item.value"
               ></el-option>
             </el-select>
-            <el-button class="mar-l-9" type="primary" @click="goToShopCenter">查看商城已选项目</el-button>
+            <el-button class="mar-l-9" type="primary" @click="goToShopCenter"
+              >查看商城已选项目</el-button
+            >
           </div>
         </div>
       </div>
@@ -90,7 +108,13 @@
     <div class="info-box flex-x al-start">
       <div class="flex-x min-w-406 mar-r-53 mar-b-20">
         门户网页地址：
-        <el-input id="protalUrl" class="flex-1" readonly placeholder="请输入内容" v-model="setData.protalUrl"></el-input>
+        <el-input
+          id="protalUrl"
+          class="flex-1"
+          readonly
+          placeholder="请输入内容"
+          v-model="setData.protalUrl"
+        ></el-input>
         <el-button class type="primary" @click="copyUrl">复制</el-button>
       </div>
 
@@ -122,18 +146,31 @@
         <i class="iconfont icon-fd-link mar-r-6 color-primary"></i>
         <a
           href="javascript:;"
-          @click="openLink('https://register.shb.ltd/VIP/WechatAndDing.html#DingService_setting')"
-        >绑定微信或钉钉服务窗</a>
+          @click="
+            openLink(
+              'https://register.shb.ltd/VIP/WechatAndDing.html#DingService_setting'
+            )
+          "
+          >绑定微信或钉钉服务窗</a
+        >
         <i class="iconfont icon-fabu1 mar-r-6 mar-l-16 color-primary"></i>
-        <a class href="javascript:;" @click="openLink('https://www.yuque.com/shb/help/XCX')">小程序发布指引</a>
+        <a
+          class
+          href="javascript:;"
+          @click="openLink('https://www.yuque.com/shb/help/XCX')"
+          >小程序发布指引</a
+        >
         <el-button
           v-if="!setData.weChatQRCodeUrl"
           class="mar-l-16"
           type="primary"
           @click="submitWx"
-        >填写微信授权资料</el-button>
+          >填写微信授权资料</el-button
+        >
       </div>
-      <div class="mar-b-20 color-primary" v-if="setData.weChatQRCodeUrl">您已提交了微信授权资料，如需变更请联系售后宝管理员</div>
+      <div class="mar-b-20 color-primary" v-if="setData.weChatQRCodeUrl">
+        您已提交了微信授权资料，如需变更请联系售后宝管理员
+      </div>
     </div>
     <!-- info-box end -->
 
@@ -146,6 +183,9 @@
           <div class="setting-show">
             <div class="setting-show-box-submit">
               <el-button type="primary" @click="submitSet">发布</el-button>
+              <div class="tips">
+                <i class="iconfont icon-jinggao"></i>请确定右侧信息已保存
+              </div>
             </div>
             <div class="setting-show-data-box">
               <!-- <draggable class="menu-box" v-model="dataList"> 可拖动-->
@@ -156,8 +196,15 @@
                   draggable="false"
                   @click="chooseNowSet(item)"
                 >
+                  <div v-if="item.type == 'company-card'" class="head-phone-box">
+                    <img :src="headPhone" class="head-phone" alt="" />
+                    <div :class="['head-phone-con', 'overHideCon-1', nowSettingDataId == item.id ? 'menu-box-item-check' : '']">{{item.data.name}}</div>
+                  </div>
                   <div
-                    :class="['menu-box-item',nowSettingDataId == item.id?'menu-box-item-check':'']"
+                    :class="[
+                      'menu-box-item',
+                      nowSettingDataId == item.id ? 'menu-box-item-check' : '',
+                    ]"
                   >
                     <component
                       :is="item.type"
@@ -170,7 +217,10 @@
                       @pushIcon="pushIcon"
                     ></component>
                   </div>
-                  <div v-if="index == 2 || index == 3" style="height:32px"></div>
+                  <div
+                    v-if="index == 2 || index == 3"
+                    style="height: 32px"
+                  ></div>
                 </div>
               </div>
               <!-- </draggable> -->
@@ -198,7 +248,11 @@
     <!-- setting-box end -->
 
     <!-- 填写微信信息弹窗 start-->
-    <el-dialog title="提交微信商户信息" :visible.sync="submitDialog" width="390px">
+    <el-dialog
+      title="提交微信商户信息"
+      :visible.sync="submitDialog"
+      width="390px"
+    >
       <div class="mar-b-18">打开微信商户平台，复制并提交微信商户信息</div>
       <el-form
         :model="wxRulerFormData"
@@ -209,24 +263,56 @@
         class="demo-ruleForm"
         status-icon
       >
-        <el-form-item label="APPSecret" prop="secret">
-          <el-input v-model="wxRulerFormData.secret" autocomplete="off" placeholder="请输入"></el-input>
+        <div class="mar-b-18 font-w-600">公众号相关</div>
+        <el-form-item label="APPID" prop="publicAppId">
+          <el-input
+            v-model="wxRulerFormData.publicAppId"
+            autocomplete="off"
+            placeholder="请输入"
+          ></el-input>
         </el-form-item>
-        <el-form-item label="APPID" prop="appId">
-          <el-input v-model="wxRulerFormData.appId" autocomplete="off" placeholder="请输入"></el-input>
+        <el-form-item label="APPSecret" prop="publicSecret">
+          <el-input
+            v-model="wxRulerFormData.publicSecret"
+            autocomplete="off"
+            placeholder="请输入"
+          ></el-input>
         </el-form-item>
-        <el-form-item label="公众号APPID" prop="publicAppId">
-          <el-input v-model="wxRulerFormData.publicAppId" autocomplete="off" placeholder="请输入"></el-input>
+        <div class="mar-b-18 font-w-600">小程序相关</div>
+        <el-form-item label="APPSecret">
+          <el-input
+            v-model="wxRulerFormData.secret"
+            autocomplete="off"
+            placeholder="请输入"
+          ></el-input>
         </el-form-item>
+        <el-form-item label="APPID">
+          <el-input
+            v-model="wxRulerFormData.appId"
+            autocomplete="off"
+            placeholder="请输入"
+          ></el-input>
+        </el-form-item>
+        <div class="mar-b-18 font-w-600">微信商户相关</div>
         <el-form-item label="mch_id" prop="matchId">
-          <el-input v-model="wxRulerFormData.matchId" autocomplete="off" placeholder="请输入"></el-input>
+          <el-input
+            v-model="wxRulerFormData.matchId"
+            autocomplete="off"
+            placeholder="请输入"
+          ></el-input>
         </el-form-item>
         <el-form-item label="API密钥" prop="apiSecret">
-          <el-input v-model="wxRulerFormData.apiSecret" autocomplete="off" placeholder="请输入"></el-input>
+          <el-input
+            v-model="wxRulerFormData.apiSecret"
+            autocomplete="off"
+            placeholder="请输入"
+          ></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <base-button type="ghost" @event="submitDialog = false">取消</base-button>
+        <base-button type="ghost" @event="submitDialog = false"
+          >取消</base-button
+        >
         <base-button type="primary" @event="submitWxData">确定</base-button>
       </div>
     </el-dialog>
@@ -240,7 +326,7 @@ import QRCode from "qrcodejs2";
 
 import settingMixin from "./settingShowCmp/index";
 import userImg from "@src/assets/img/myShop/logo.png";
-
+import headPhone from "@src/assets/img/myShop/headPhone.png";
 import {
   getRules,
   saveRules,
@@ -248,7 +334,7 @@ import {
   saveInfos,
   weChat,
   getEventList,
-} from "@src/api/Linkc";
+} from "@src/api/LinkcApi";
 
 export default {
   name: "my-shop",
@@ -304,6 +390,7 @@ export default {
             name: "",
             mobile: "",
             address: "",
+            companyName:""
           },
         },
         {
@@ -333,6 +420,7 @@ export default {
         apiSecret: "",
         secret: "",
         publicAppId: "",
+        publicSecret: "",
       },
       wxRuler: {
         appId: [{ required: true, message: "请输入APPID", trigger: "blur" }],
@@ -346,8 +434,12 @@ export default {
         publicAppId: [
           { required: true, message: "请输入公众号APPID", trigger: "blur" },
         ],
+        publicSecret: [
+          { required: true, message: "请输入公众号密钥", trigger: "blur" },
+        ],
       },
       eventList: [],
+      headPhone,
     };
   },
   computed: {},
@@ -611,28 +703,30 @@ export default {
       });
     },
     submitSet() {
-      this.reverData().then((res) => {
-        this.fullscreenLoading = true;
-        saveInfos(res)
-          .then((res) => {
-            if (res.status == 200) {
-              this.$message({
-                message: "发布成功，请前往移动端自助门户查看",
-                duration: 1500,
-                type: "success",
-              });
-            } else {
-              this.$notify.close();
-              this.$notify.error({
-                title: "网络错误",
-                message: res.message,
-                duration: 2000,
-              });
-            }
-          })
-          .finally(() => {
-            this.fullscreenLoading = false;
-          });
+      this.$refs.setData.saveData().then(() => {
+        this.reverData().then((res) => {
+          this.fullscreenLoading = true;
+          saveInfos(res)
+            .then((res) => {
+              if (res.status == 200) {
+                this.$message({
+                  message: "发布成功，请前往移动端自助门户查看",
+                  duration: 1500,
+                  type: "success",
+                });
+              } else {
+                this.$notify.close();
+                this.$notify.error({
+                  title: "网络错误",
+                  message: res.message,
+                  duration: 2000,
+                });
+              }
+            })
+            .finally(() => {
+              this.fullscreenLoading = false;
+            });
+        });
       });
     },
   },
@@ -650,7 +744,7 @@ export default {
   font-weight: 400;
 }
 .my-shop-box {
-  min-width: 730px;
+  min-width: 1015px;
 }
 
 .el-dialog__body {
@@ -738,17 +832,22 @@ export default {
     }
     .setting-show-box-submit {
       position: absolute;
+      width: 100%;
       left: 100%;
       margin-left: 20px;
       top: 0;
       z-index: 99;
+      .tips {
+        display: flex;
+        align-items: center;
+        font-size: 12px;
+        color: #9ba3a1;
+        margin-top: 20px;
+      }
     }
     .menu-box-item {
       border: 1px dashed transparent;
       box-sizing: border-box;
-    }
-    .menu-box-item-check {
-      border-color: $color-primary;
     }
     .setting-show {
       background: url("../../../assets/img/iphoneX.png") no-repeat center 0;
@@ -765,7 +864,33 @@ export default {
         left: 18px;
         overflow-y: scroll;
         // background: #ff0000;
+        .head-phone-box {
+          position: relative;
+          .head-phone {
+            width: 100%;
+            height: 69px;
+          }
+          .head-phone-con {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            margin: auto;
+            height: 35px;
+            line-height: 35px;
+            text-align: center;
+            font-weight: 600;
+            border: 1px dashed transparent;
+            border-bottom: none;
+            width: 100%;
+            padding: 0 30px;
+          }
+        }
       }
+    }
+
+    .menu-box-item-check {
+      border-color: $color-primary !important;
     }
   }
   .setting-data {

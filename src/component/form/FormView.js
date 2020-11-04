@@ -24,6 +24,7 @@ const FormView = {
       sectionState: {},
     }
   },
+
   methods: {
     //TODO :预览图片
     previewImage(event){

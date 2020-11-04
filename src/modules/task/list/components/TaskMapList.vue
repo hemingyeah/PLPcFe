@@ -38,7 +38,7 @@
           v-if="!allowReallot(item)"
         >
           <el-tooltip :content="getErrorNotice(item)" placement="top">
-            <i class="iconfont icon-info task-font24"></i>
+            <i class="iconfont icon-question task-icon"></i>
           </el-tooltip>
         </div>
       </div>
@@ -55,10 +55,10 @@
 </template>
 <script>
 /* Api */
-import * as TaskApi from "@src/api/TaskApi.ts";
+import * as TaskApi from '@src/api/TaskApi.ts';
 export default {
-  name: "task-map-list",
-  inject: ["initData"],
+  name: 'task-map-list',
+  inject: ['initData'],
   props: {
     mapHeight: {
       type: Number,
@@ -96,15 +96,15 @@ export default {
     /**
      * @description 拨打电话
      */
-   async makePhoneCall(phone) {
-     const params = {
-       phone,
-       taskType:'task'
-     }
-     const {code, message} = await TaskApi.dialout(params)
-     if (code) {
-       this.$platform.alert(message);
-     }
+    async makePhoneCall(phone) {
+      const params = {
+        phone,
+        taskType:'task'
+      }
+      const {code, message} = await TaskApi.dialout(params)
+      if (code) {
+        this.$platform.alert(message);
+      }
     },
     /**
      * @description 打开工单详情tab
@@ -113,11 +113,11 @@ export default {
     openTaskTab(taskId) {
       if (!taskId) return;
 
-      let fromId = window.frameElement.getAttribute("id");
+      let fromId = window.frameElement.getAttribute('id');
 
       this.$platform.openTab({
         id: `task_view_${taskId}`,
-        title: "工单详情",
+        title: '工单详情',
         close: true,
         url: `/task/view/${taskId}?noHistory=1`,
         fromId,
@@ -128,21 +128,21 @@ export default {
      */
     getErrorNotice({ inApprove, isPaused, state, executorUser }) {
       let hasAuth = this.hasAllotPermission(executorUser),
-        taskSuffixStr = "不支持转派",
-        taskPrefixStr = "";
+        taskSuffixStr = '不支持转派',
+        taskPrefixStr = '';
       // 当前工单是没有权限
-      if (inApprove) taskPrefixStr = "审批中工单";
-      if (isPaused) taskPrefixStr = "已暂停工单";
-      if (state === "taskPool") taskPrefixStr = "工单池工单";
-      if (state === "created") taskPrefixStr = "待指派工单";
-      if (state === "finished") taskPrefixStr = "已完成工单";
-      if (state === "refused") taskPrefixStr = "已拒绝工单";
-      if (state === "costed") taskPrefixStr = "已结算工单";
-      if (state === "closed") taskPrefixStr = "已关闭工单";
-      if (state === "offed") taskPrefixStr = "已取消工单";
+      if (inApprove) taskPrefixStr = '审批中工单';
+      if (isPaused) taskPrefixStr = '已暂停工单';
+      if (state === 'taskPool') taskPrefixStr = '工单池工单';
+      if (state === 'created') taskPrefixStr = '待指派工单';
+      if (state === 'finished') taskPrefixStr = '已完成工单';
+      if (state === 'refused') taskPrefixStr = '已拒绝工单';
+      if (state === 'costed') taskPrefixStr = '已结算工单';
+      if (state === 'closed') taskPrefixStr = '已关闭工单';
+      if (state === 'offed') taskPrefixStr = '已取消工单';
       // 如果没有权限
       if (!hasAuth) {
-        return "无指派权限";
+        return '无指派权限';
       }
       return taskPrefixStr + taskSuffixStr;
     },
@@ -150,20 +150,20 @@ export default {
      * 判断是否允许转交
      */
     allowReallot({ executorUser, inApprove, isPaused, state }) {
-      var hasAuth = this.hasAllotPermission(executorUser);
+      let hasAuth = this.hasAllotPermission(executorUser);
       if (!hasAuth) return false;
       // 审批中或者暂停中的不允许转派
       if (inApprove || isPaused) return false;
       // 未指派状态不允许转派
 
       if (!state) return false;
-      if (state === "taskPool") return false;
-      if (state === "created") return false;
-      if (state === "finished") return false;
-      if (state === "refused") return false;
-      if (state === "costed") return false;
-      if (state === "closed") return false;
-      if (state === "offed") return false;
+      if (state === 'taskPool') return false;
+      if (state === 'created') return false;
+      if (state === 'finished') return false;
+      if (state === 'refused') return false;
+      if (state === 'costed') return false;
+      if (state === 'closed') return false;
+      if (state === 'offed') return false;
 
       return true;
     },
@@ -190,10 +190,10 @@ export default {
         allowReallot = this.allowReallot(item);
       // 可以正常指派
       if (allowReallot) {
-        this.$set(this.mapList[index], "selected", currSelected);
+        this.$set(this.mapList[index], 'selected', currSelected);
       }
 
-      this.$emit("openInfo", { allowReallot, item});
+      this.$emit('openInfo', { allowReallot, item});
     },
   },
 };

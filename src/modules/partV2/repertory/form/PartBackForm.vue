@@ -2,17 +2,21 @@
   <el-dialog title="退回" :visible.sync="visible" width="600px">
     <el-form :model="form" :rules="rules" ref="form" 
       label-width="100px" class="common-form">
+      <el-form-item label="申请人：">
+        {{loginUser.user.displayName}}
+        <span class="notSelf" v-if="backUser.userId!==initData.userId">非本人发起</span>
+      </el-form-item>
       <el-form-item label="备件名称：">
-        <el-input type="text" :value="part.name" readonly></el-input>
+        {{part.name}}
       </el-form-item>
       <el-form-item label="备件编号：">
-        <el-input type="text" :value="part.serialNumber" readonly></el-input>
+        {{part.serialNumber}}
       </el-form-item>
       <el-form-item label="备件类别：">
-        <el-input type="text" :value="part.type" readonly></el-input>
+        {{part.type}}
       </el-form-item>
       <el-form-item label="备件规格：">
-        <el-input type="text" :value="part.standard" readonly></el-input>
+        {{part.standard}}
       </el-form-item>
       <el-form-item label="退回仓库：" prop="repertoryId">
         <el-select v-model="form.repertoryId" class="srp-list-form-item">
@@ -20,7 +24,8 @@
         </el-select>
       </el-form-item>
       <el-form-item label="持有数量：">
-        <el-input type="text" :value="holdNum" readonly></el-input>
+        {{holdNum}}
+        <!-- <el-input type="text" :value="holdNum" readonly></el-input> -->
       </el-form-item>
       <el-form-item label="退回数量：" prop="count">
         <el-input type="number" step="any" :min="0" :max="holdNum" v-model.number="form.count"></el-input>
@@ -41,6 +46,7 @@
 
 <script>
 import MathUtil from '@src/util/math';
+import { getRootWindow } from '@src/util/dom';
 
 export default {
   name: 'part-back-form',
@@ -50,6 +56,10 @@ export default {
       type: Array,
       default: []
     },
+    backUser:{
+      type:Object,
+      default:{}
+    }
   },
   data(){
     return {
@@ -92,6 +102,10 @@ export default {
     }
   },
   computed:{
+    loginUser(){
+      let rootWindow = getRootWindow(window);
+      return JSON.parse(rootWindow._init) || {};
+    },
     // TODO: 支持小数 提示
     minVariation () {
       let initData = this.initData;
@@ -139,7 +153,9 @@ export default {
           type: '退回',
           variation: this.form.count,
           repertoryId:this.form.repertoryId,
-          remark: this.form.remark
+          userId:this.backUser.userId,
+          remark: this.form.remark,
+          userName:this.backUser.userName
         }
 
         let result = await this.$http.post('/partV2/approve/apply', params)
@@ -169,3 +185,17 @@ export default {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.notSelf{
+  display: inline-block;
+  height: 22px;
+  line-height: 19px;
+  font-size: 12px;
+  padding: 2px 10px;
+  border-radius: 11px;
+  color:#FAAE14;
+  background: rgba(250,174,20,.2);
+  border:1px solid rgba(250,174,20,.16);
+}
+</style>

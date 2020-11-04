@@ -1,7 +1,7 @@
 <template>
-  <div class="form-text">
-    <input type="text" :value="value" @input="input" :placeholder="placeholder" :id="`form_${field.fieldName}`" v-if="seo" />
-    <input type="text" :value="value" @input="input" :placeholder="placeholder" :id="`form_${field.fieldName}`" disabled v-else />
+  <input type="text" :value="value" @input="input" :placeholder="placeholder" :id="`form_${field.fieldName}`" v-if="seo" />
+  <div class="form-text" v-else>
+    <input type="text" :value="value" @input="input" :placeholder="placeholder" :id="`form_${field.fieldName}`" disabled />
   </div>
 </template>
 
