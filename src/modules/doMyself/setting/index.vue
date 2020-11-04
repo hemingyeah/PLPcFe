@@ -10,7 +10,7 @@
         <!-- 1 -->
         <div class="ruler-set-item flex-x">
           <div class="flex-1">
-            <div class="ruler-set-item-title">启用客户自助门户</div>
+            <div class="ruler-set-item-title">自助门户设置</div>
             <div>开启后允许外部用户通过自助门户提交服务事件</div>
           </div>
 
@@ -31,17 +31,17 @@
           >
             <div class="mar-b-12">
               <el-radio class="mar-r-16" :label="false"
-              >所有用户均可访问(短信、图片验证码或小程序授权)</el-radio
+              >仅允许客户列表下手机号码访问</el-radio
               >
             </div>
             <div>
-              <el-radio :label="true">仅允许客户列表下手机号码访问</el-radio>
+              <el-radio :label="true">所有用户均可访问</el-radio>
             </div>
           </el-radio-group>
         </div>
         <!-- 3 -->
         <div class="ruler-set-item">
-          <div class="ruler-set-item-title">网页门户验证方式：</div>
+          <div class="ruler-set-item-title">网页门户登录验证方式：</div>
           <el-radio-group
             v-model="setData.serviceStationConfig.validateBySms"
             @change="change($event, 'validateBySms')"
@@ -194,7 +194,7 @@
               <img
                 class="cur-point"
                 :src="setData.weChatQRCodeUrl"
-                @click.stop="previewImg(setData.weChatQRCodeUrl)"
+                @click="previewImg(setData.weChatQRCodeUrl)"
                 alt
               />
               <div class="code-des">小程序入口</div>
@@ -813,7 +813,7 @@ export default {
     },
     previewImg(url) {
       if (!url) return
-      if (url.target.nodeName == 'IMG') return BaseGallery.preview(url.target)
+      if (url.target && url.target.nodeName == 'IMG') return BaseGallery.preview(url.target)
       let imgDom = document.createElement('img')
       imgDom.src = url
       BaseGallery.preview(imgDom)
@@ -859,7 +859,7 @@ export default {
   margin-bottom: 1px;
   .ruler-set-item-title {
     margin-bottom: 13px;
-    font-weight: 500;
+    font-weight: 600;
   }
   .ruler-set-item {
     margin-bottom: 24px;
@@ -867,7 +867,7 @@ export default {
 }
 .box-title {
   height: 46px;
-  font-weight: 500;
+  font-weight: 600;
   display: flex;
   align-items: center;
   font-size: 16px;
@@ -928,7 +928,7 @@ export default {
   }
   .setting-show-box-tips {
     font-size: 16px;
-    font-weight: 500;
+    font-weight: 600;
     flex: 1;
   }
   .setting-show-box-submit {
