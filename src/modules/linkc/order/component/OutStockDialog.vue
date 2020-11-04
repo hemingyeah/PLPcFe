@@ -20,7 +20,7 @@
   <!-- 发货弹窗 end-->
 </template>
 <script>
-import { repertoryOut } from "@src/api/Linkc";
+import { repertoryOut } from "@src/api/LinkcApi";
 export default {
   name: "out-stock-dialog",
   props: {

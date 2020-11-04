@@ -24,7 +24,7 @@ import ImageBlot from './imgOptions';
 Quill.register(Video, true)
 Quill.register(ImageBlot, true)
 
-//toolbar
+// toolbar
 import { toolbarOptions } from './defaultOptions';
 
 /**
@@ -87,7 +87,7 @@ export default {
                 _self.chooseFile('image'); // 上传图片 1、选择文件；2、上传；3、appendChild
               },
               video() {
-                 _self.chooseFile('video'); //上传视频
+                _self.chooseFile('video'); // 上传视频
                 
               },
             }
@@ -120,9 +120,9 @@ export default {
       }
      
     },
-    //TODO:image 上传图片 video上传视频
-    handleChange(event,uploadType){
-      let imgType = uploadType == 'image'?'图片':'视频';
+    // TODO:image 上传图片 video上传视频
+    handleChange(event, uploadType){
+      let imgType = uploadType == 'image' ? '图片' : '视频';
       const files = event.target.files;
       if(!files || !files.length) return;
 
@@ -138,7 +138,7 @@ export default {
           this.loading = false;
 
           if (res.status) return platform.alert(res.message || `${imgType}上传失败`);
-          this.insertImage(res.data,uploadType);
+          this.insertImage(res.data, uploadType);
         })
         .catch(err => {
           this.pending = false;
@@ -194,13 +194,13 @@ export default {
       if (size > 1) return existParams ? `${ ossUrl }&x-oss-process=image/resize,p_70` : `${ ossUrl }?x-oss-process=image/resize,p_70`;
       return ossUrl;
     },
-    insertImage(data,uploadType) {
+    insertImage(data, uploadType) {
       let range = this.editor.getSelection();
       let index = range.index || 0;
       let ossUrl = uploadType == 'image' ? this.genUrl(data) : data.ossUrl;
       if(uploadType == 'image'){
-        console.log("ossUrl",ossUrl)
-        this.editor.insertEmbed(index, 'image',{ src: ossUrl ,'origin': ossUrl})
+        console.log('ossUrl', ossUrl)
+        this.editor.insertEmbed(index, 'image', { src: ossUrl, 'origin': ossUrl})
       }else{
         this.editor.insertEmbed(index, uploadType, ossUrl);
       }

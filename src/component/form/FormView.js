@@ -24,6 +24,7 @@ const FormView = {
       sectionState: {},
     }
   },
+
   methods: {
     toggleDisplay(id) {
       this.sectionState[id] = !this.sectionState[id];

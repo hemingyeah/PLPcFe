@@ -877,7 +877,6 @@ export default {
 
     // this.loadData();
     window.__exports__refresh = this.loadData();
-    console.log(3333);
   },
   components: {
     [ListSearch.name]: ListSearch,

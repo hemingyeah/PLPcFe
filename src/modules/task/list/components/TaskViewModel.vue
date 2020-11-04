@@ -16,7 +16,7 @@
       <!-- 按钮 -->
       <el-checkbox v-model="checked">全员可见</el-checkbox>
       <div class="task-flex task-ai task-jend">
-          <el-button type="danger" @click="deleteViewBtn" v-show="isViewModel !== '默认'">删除视图</el-button>
+          <!-- <el-button type="danger" @click="deleteViewBtn" v-show="isViewModel !== '默认'">删除视图</el-button> -->
           <el-button @click="visible = false">取消</el-button>
           <el-button type="primary" @click="saveViewBtn"
           >保存</el-button>
@@ -127,8 +127,8 @@ export default {
       return time ? formatDate(time) : ''
     },
     // 删除
-    deleteViewBtn() {
-      TaskApi.deleteView(this.region.viewId).then((res) => {
+    deleteViewBtn(id) {
+      TaskApi.deleteView(id).then((res) => {
         this.success(res, "del");
       });
     },

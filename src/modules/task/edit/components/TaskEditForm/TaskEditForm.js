@@ -8,6 +8,7 @@ import DateUtil from '@src/util/date'
 import { findComponentDownward } from '@src/util/assist'
 import { getFieldValue2string } from '@service/TaskService.ts'
 import ObjectUtil from '@src/util/object';
+import Filter from '@src/filter/filter.js';
 import { 
   customerAddressSelectConversion,
   linkmanSelectConversion,
@@ -440,35 +441,41 @@ export default {
 
       // 是否是相同的 联系人/地址
       let isSameLinkman = productLinkman.id === linkman.id || !productLinkman.id;
+      // 地址需要判断是否 值也相同
       let isSameAddress = productAddress.id === address.id || !productAddress.id;
-
+      let productAddressText = Filter.prettyAddress(productAddress)
+      let addressText = Filter.prettyAddress(address)
+      if (productAddressText && addressText && (productAddressText == addressText)) {
+        isSameAddress = true
+      }
+      
       let confirm = false;
       
       // 联系人和地址都不相同
       if(!isSameLinkman && !isSameAddress) {
         confirm = await this.$platform.confirm(TASK_PRODUCT_LINKMAN_AND_ADDRESS_NOT_EQUAL_MESSAGE);
         if(!confirm) return
-
+        
         this.bindLinkman(productLinkman);
         this.bindAddress(productAddress);
-
+        
       }
       // 联系人不相同
       else if(!isSameLinkman) {
         confirm = await this.$platform.confirm(TASK_PRODUCT_LINKMAN_NOT_EQUAL_MESSAGE);
         if(!confirm) return
-
+        
         this.bindLinkman(productLinkman);
-
+        
       } 
       // 地址不相同
       else if(!isSameAddress) {
         confirm = await this.$platform.confirm(TASK_PRODUCT_ADDRESS_NOT_EQUAL_MESSAGE);
         if(!confirm) return
-
+        
         this.bindAddress(productAddress);
       }
-
+      
     },
     relationFieldsFilter(type = TaskFieldNameMappingEnum.Customer) {
       let relationFields = [];

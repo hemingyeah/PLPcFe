@@ -45,6 +45,9 @@
         </div>
       </template>
       <!-- end 产品 -->
+
+      <!-- TODO: 临时解决客户字段设置产品未勾选时隐藏 -->
+      <template v-else><div class="hide"></div></template>
     </template>
 
     <!-- start 计划时间 -->
@@ -107,6 +110,17 @@
       </div>
     </template>
     <!-- end 协同人 -->
+    <!-- 关联工单 -->
+    <template slot="relevance" slot-scope="{ field }">
+      <div class="form-view-row">
+        <label>{{ field.displayName }}</label>
+        <div class="form-view-row-content">
+          {{task.source}}
+          <a class="link-text" :href="`/event/view/${task.eventId}`">{{task.eventNo}}</a>
+        </div>
+      </div>
+    </template>
+    <!-- end 关联工单 -->
   </form-view>
 </template>
 
@@ -189,6 +203,16 @@ export default {
     }
   },
   methods: {
+    /** 
+    * @description 打开事件详情
+    */
+    openEventView(id) {
+      this.$platform.openTab({
+        title: '事件详情',
+        close: true,
+        url: `/event/view/${id}`,
+      })
+    },
     /** 
     * @description 修改计划时间
     */

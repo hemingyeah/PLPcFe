@@ -544,6 +544,10 @@ const FrameManager = {
     let homeTab = new Tab({ id: 'HOME', url: '/home', title: '首页', show: true })
     this.openForFrame(homeTab);
 
+    window.changeTaskVersion = (data)=>{
+      this.changeTaskVersion(data);
+    }
+
     // 处理消息跳转url
     let query = parse(window.location.search);
     let pcUrl = this.initData.pcUrl || query.pcUrl;

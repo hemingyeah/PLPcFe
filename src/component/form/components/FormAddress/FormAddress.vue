@@ -4,7 +4,7 @@
       <base-dist-picker @input="handleCitySelectorChange" :value="distValue" :placeholder="placeholder"/>
       <el-button type="button" @click="chooseMap" v-if="!disableMap" class="action-btn">地图选址</el-button>
     </div>
-    <div class="form-address-picker">
+    <div class="form-address-picker" v-if="!toggle">
       <input
         type="text"
         :value="detail"
@@ -67,6 +67,11 @@ export default {
       type: Boolean,
       default: false
     },
+    // 是否展示解析地址
+    toggle: {
+      type: Boolean,
+      default: false
+    }
   },
   data() {
     return {
