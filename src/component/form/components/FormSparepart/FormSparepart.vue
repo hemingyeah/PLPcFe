@@ -385,6 +385,7 @@ export default {
       const pms = params || {};
       pms.repertoryId = this.repertoryId || '';
       pms.with_OOS = false;
+      pms.keyWord = pms.keyword;
       return this.$http
         .get('/task/spare/list', pms)
         .then(res => {
