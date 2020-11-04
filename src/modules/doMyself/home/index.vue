@@ -175,6 +175,7 @@ img {
     position: sticky;
     position: -webkit-sticky;
     top: 10px;
+    max-width: 400px;
     .menu-title {
       font-size: 18px;
       color: #454648;
