@@ -22,29 +22,25 @@
 					:value="option">
 						<h3 class="option-item-font">{{option.taskNo}}</h3>
 						<p class="option-item-font">
-							<span v-if="option.customerEntity">
+							<span>
 								<label>客户姓名：</label>
-								<span>{{option.customerEntity.name}}</span>
+								<span>{{option.customerEntity && option.customerEntity.name}}</span>
 							</span>
-							<span v-if="option.linkMan">
+							<span>
 								<label>联系人：</label>
 								<span>{{option.linkMan.name}}</span>
 							</span>
-							<span v-if="option.linkMan">
+							<span>
 								<label>电话：</label>
 								<span>{{option.linkMan.phone}}</span>
 							</span>
 						</p>
-						<p v-if="option.products && option.products.length > 0 && option.products[0].name" class="option-item-font">
+						<p v-if="option.products && option.products.length > 0" class="option-item-font">
 							<span>
 								<label>产品：</label>
-								<span>{{option.products[0].name}}</span>
-							</span>
-						</p>
-						<p v-else-if="option.product && option.product.name" class="option-item-font">
-							<span>
-								<label>产品：</label>
-								<span>{{option.product.name}}</span>
+								<span v-for="(product, idx) in products" :key="idx">
+									{{option.products[idx].name}}{{(idx <option.products.length - 1) && ','}}
+								</span>
 							</span>
 						</p>
 				</el-option>
@@ -78,7 +74,12 @@ export default {
 			},
 			loading: false
     }
-  },
+	},
+	mounted() {
+		if(this.value && this.value.length > 0) {
+			this.options = _.cloneDeep(this.value);
+		}
+	},
   methods: {
 		searchTask(keyword) {
 			let params = {
@@ -92,8 +93,11 @@ export default {
 					this.options = res.result.content.map(task => Object.freeze({
 						label: task.taskNo,
 						value: task.id,
+						taskNo: task.taskNo,
 						taskId: task.id,
-						...task
+						templateId: task.templateId,
+						linkMan: task.linkMan || {},
+						products: task.products || []
 					}));
 				}
 			})

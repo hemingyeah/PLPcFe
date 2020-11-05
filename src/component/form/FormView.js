@@ -204,7 +204,7 @@ const FormView = {
               }}>
                 {taskNo}
               </a>
-              {index < value.length - 1 && '，'}
+              {index < value.length - 1 && ','}
             </span>
           );
         });
