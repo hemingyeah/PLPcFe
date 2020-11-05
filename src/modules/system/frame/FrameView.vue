@@ -323,7 +323,10 @@
           </div>
         </div>
       </div>
-      <version :version="releaseVersion" v-if="loadedEdition" :edition="shbEdition" />
+      <version :version="releaseVersion" v-if="loadedEdition" :edition="shbEdition" @showSystemPopup="updateSystemPopup" />
+      <!--start 系统弹窗 -->
+      <system-popup :system-data.sync="systemData" v-if="loadedSystemModal" />
+      <!--end 系统弹窗 -->
       <sale-manager
         :service-group-url="initData.serviceGroupUrl"
         :qrcode="initData.saleManagerQRCode"
@@ -352,6 +355,7 @@ import FrameManager from './FrameManager';
 import FrameTab from './component/FrameTab.vue';
 import FrameNav from './component/FrameNav.vue';
 import Version from './component/Version.vue';
+import SystemPopup from './component/SystemPopup.vue';
 import SaleManager from './component/SaleManager.vue';
 import UserGuide from './component/UserGuide.vue';
 
@@ -367,6 +371,7 @@ import { isShowDashboardScreen, isShowPlanTask, isShowLinkC, isShowMoreSperaPart
 
 /* util */
 import _ from 'lodash';
+import Axios from 'axios';
 
 const newTaskGuideStore = require('@src/component/guide/taskV2Store');
 const GuideStoreObj = {
@@ -437,10 +442,16 @@ export default {
       navBarMenus: [],
       showNavBar: false,
       loadedEdition: false,
+      loadedSystemPopup:false,
+      showSystemPopup:false,
+      systemData:[],
       shbEdition: 1
     };
   },
   computed: {
+    loadedSystemModal(){
+      return this.loadedSystemPopup && this.showSystemPopup
+    },
     wsUrl() {
       // websocket连接地址
       // return `ws://30.40.56.211:8080/websocket/asset/7416b42a-25cc-11e7-a500-00163e12f748_dd4531bf-7598-11ea-bfc9-00163e304a25`
@@ -486,6 +497,9 @@ export default {
     },
   },
   methods: {
+    updateSystemPopup(){
+      this.showSystemPopup = true
+    },
     async hangUpCall() {
       try {
         let { code, message } = await CallCenterApi.hangUpCall();
@@ -711,7 +725,18 @@ export default {
       );
       this.clearAnimation();
     },
-
+    // 获取系统弹窗
+    async getSystemPopup(){
+      try{
+        let info = await http.get('/api/app/outside/message/v1/getSysMsgAlert')
+        if(info.status == 0 && info.data.length > 0){
+          this.loadedSystemPopup = true
+          this.systemData = info.data
+        }
+      }catch(error){
+        console.error(error);
+      }
+    },
     // 获取系统消息，本地存储，超出滚动
     async getSystemMsg() {
       try {
@@ -1083,7 +1108,7 @@ export default {
       this.$refs.userGuideView.show();
     }
 
-    /*** 部分页面引导 数据处理  s*/
+    /** * 部分页面引导 数据处理  s*/
     if( this?.initData?.needResetGuide){
       let needResetGuideArr = this?.initData?.needResetGuide;
       
@@ -1125,14 +1150,16 @@ export default {
         }
       })
     }
-    /*** 部分页面引导 数据处理  e*/
+    /** * 部分页面引导 数据处理  e*/
     this.checkExports();
     this.getShbEdition()
+    this.getSystemPopup();
   },
   components: {
     [FrameNav.name]: FrameNav,
     [FrameTab.name]: FrameTab,
     [Version.name]: Version,
+    [SystemPopup.name]: SystemPopup,
     [SaleManager.name]: SaleManager,
     [NotificationCenter.name]: NotificationCenter,
     [ImportAndExport.name]: ImportAndExport,
