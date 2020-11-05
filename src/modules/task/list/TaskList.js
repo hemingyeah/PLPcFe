@@ -621,7 +621,7 @@ export default {
       }
       this.viewType = type
       this.$refs.viewPanel.mergeTaskFields(this.taskAllFields)
-      this.$refs.viewPanel.open(type, id);
+      this.$refs.viewPanel.open(type, searchModel.systemConditions);
       this.showBj = true
     },
     /**

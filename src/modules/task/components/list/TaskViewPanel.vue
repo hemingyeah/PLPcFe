@@ -25,7 +25,7 @@
         <div class="task-view-name task-view-view task-flex" v-show="type === 'view'" v-for="(item, index) in searchModelCN" :key="index">
           <span class="task-f14">{{item.key}} :</span>
           <div>
-            {{item.value}}
+            {{item.content}}
           </div>
         </div>
       </div>
@@ -60,6 +60,7 @@
           :column-num="columnNum"
           :search-model="region.searchModel"
           :config="[...config, ...taskTypeFilterFields]"
+          :taskNums="taskNums"
           @setting="_setting"
         />
         <!-- 搜索操作按钮 -->
@@ -156,6 +157,7 @@ export default {
       viewName: this.region.viewName,
       searchModelCN: [],
       type: "",
+      taskNums: [], //已经存储的视图参数索引
     };
   },
   computed: {
@@ -197,7 +199,7 @@ export default {
       // 编辑
       if (region.viewId) {
         TaskApi.editView(params).then((res) => {
-          fn()
+          fn();
         });
         return;
       }
@@ -207,21 +209,45 @@ export default {
         ...region,
         viewName: this.viewName,
       }).then((res) => {
-        fn()
+        fn();
       });
     },
     /**
      * 查看视图
      */
-    async getOneView(viewId) {
-      this.searchModelCN = []
-      const { success, result } = await TaskApi.getOneView(viewId);
-      if (success) {
-        for (let key in result.searchModelCN) {
-          this.searchModelCN.push({ key, value: result.searchModelCN[key] });
-        }
-      }
+    getOneView(systemConditions) {
+      if (!systemConditions || !systemConditions.length) return;
+      const taskList = [...this.config, ...this.taskTypeFilterFields];
+      this.searchModelCN = [];
+      this.taskNums = []
+      systemConditions.forEach((item) => {
+        taskList.forEach((value, index) => {
+          if (item.property === value.fieldName) {
+            this.taskNums.push(index)
+            // 数组类型
+            if (item.inValue) {
+              this.searchModelCN.push({
+                key: value.displayName,
+                content: item.inValue.join("，"),
+              });
+              // 时间类型
+            } else if (item.betweenValue1) {
+              this.searchModelCN.push({
+                key: value.displayName,
+                content: `${item.betweenValue1} - ${item.betweenValue2}`,
+              });
+              // 字符串类型
+            } else {
+              this.searchModelCN.push({
+                key: value.displayName,
+                content: item.value,
+              });
+            }
+          }
+        });
+      });
     },
+
     _time(time) {
       return time ? formatDate(time) : "";
     },
@@ -266,9 +292,9 @@ export default {
 
         // 空对象
         if (
-          typeof form[fn] === "object"
-          && !Array.isArray(form[fn])
-          && !Object.keys(form[fn]).length
+          typeof form[fn] === "object" &&
+          !Array.isArray(form[fn]) &&
+          !Object.keys(form[fn]).length
         ) {
           continue;
         }
@@ -281,10 +307,11 @@ export default {
           let isEmpty = isEmptyStringObject(form[fn]);
 
           if (!isEmpty) {
-            address.value = (form[fn].province || "")
-              + (form[fn].city || "")
-              + (form[fn].dist || "")
-              + (form[fn].address || "");
+            address.value =
+              (form[fn].province || "") +
+              (form[fn].city || "") +
+              (form[fn].dist || "") +
+              (form[fn].address || "");
           }
           params.systemConditions.push(address);
           continue;
@@ -344,12 +371,12 @@ export default {
         }
 
         if (
-          tv.fieldName == "level"
-          || tv.fieldName == "serviceType"
-          || tv.fieldName == "serviceContent"
-          || tv.fieldName == "paymentMethod"
-          || tv.fieldName === "createUser"
-          || tv.fieldName === "allotUser"
+          tv.fieldName == "level" ||
+          tv.fieldName == "serviceType" ||
+          tv.fieldName == "serviceContent" ||
+          tv.fieldName == "paymentMethod" ||
+          tv.fieldName === "createUser" ||
+          tv.fieldName === "allotUser"
         ) {
           params.systemConditions.push({
             property: fn,
@@ -406,12 +433,14 @@ export default {
           continue;
         }
 
-        let value = TaskOnceConvertMap[form[fn]] != undefined
-          ? TaskOnceConvertMap[form[fn]]
-          : form[fn];
-        value = TaskApproveConvertMap[value] != undefined
-          ? TaskApproveConvertMap[value]
-          : value;
+        let value =
+          TaskOnceConvertMap[form[fn]] != undefined
+            ? TaskOnceConvertMap[form[fn]]
+            : form[fn];
+        value =
+          TaskApproveConvertMap[value] != undefined
+            ? TaskApproveConvertMap[value]
+            : value;
 
         params.systemConditions.push({
           property: fn,
@@ -441,9 +470,9 @@ export default {
 
         // 空对象
         if (
-          typeof form[fn] === "object"
-          && !Array.isArray(form[fn])
-          && !Object.keys(form[fn]).length
+          typeof form[fn] === "object" &&
+          !Array.isArray(form[fn]) &&
+          !Object.keys(form[fn]).length
         ) {
           continue;
         }
@@ -456,10 +485,11 @@ export default {
           let isEmpty = isEmptyStringObject(form[fn]);
 
           if (!isEmpty) {
-            address.value = (form[fn].province || "")
-              + (form[fn].city || "")
-              + (form[fn].dist || "")
-              + (form[fn].address || "");
+            address.value =
+              (form[fn].province || "") +
+              (form[fn].city || "") +
+              (form[fn].dist || "") +
+              (form[fn].address || "");
           }
           params.conditions.push(address);
           continue;
@@ -525,53 +555,53 @@ export default {
       let operator = "";
 
       switch (formType) {
-      case "date": {
-        operator = "between";
-        break;
-      }
-      case "datetime": {
-        operator = "between";
-        break;
-      }
-      case "select": {
-        if (field.setting && field.setting.isMulti) {
-          operator = "contain";
-        } else {
-          operator = "eq";
+        case "date": {
+          operator = "between";
+          break;
         }
-        break;
-      }
-      case "user": {
-        operator = "user";
-        break;
-      }
-      case "cascader": {
-        operator = "cascader";
-        break;
-      }
-      case "address": {
-        operator = "address";
-        break;
-      }
-      case "location": {
-        operator = "location";
-        break;
-      }
-      default: {
-        operator = "like";
-        break;
-      }
+        case "datetime": {
+          operator = "between";
+          break;
+        }
+        case "select": {
+          if (field.setting && field.setting.isMulti) {
+            operator = "contain";
+          } else {
+            operator = "eq";
+          }
+          break;
+        }
+        case "user": {
+          operator = "user";
+          break;
+        }
+        case "cascader": {
+          operator = "cascader";
+          break;
+        }
+        case "address": {
+          operator = "address";
+          break;
+        }
+        case "location": {
+          operator = "location";
+          break;
+        }
+        default: {
+          operator = "like";
+          break;
+        }
       }
       return operator;
     },
-    open(type = "", id) {
+    open(type = "", systemConditions) {
       this.visible = true;
       this.type = type;
-      this.getOneView(id);
+      this.getOneView(systemConditions);
     },
     hide() {
       this.visible = false;
-      this.$emit("bj", false)
+      this.$emit("bj", false);
     },
     saveDataToStorage(key, value) {
       const data = this.getLocalStorageData();

@@ -11,6 +11,7 @@
         @del="del"
         @setting="setting"
         :item="item"
+        :taskNums="taskNums"
         :inquire-form-backup="inquireFormBackup"
         :search-model="searchModel"
       />
@@ -113,6 +114,10 @@ function setFieldOperateHandler(field = {}) {
 export default {
   name: "task-inquire",
   props: {
+    taskNums: {
+      type: Array || null,
+      default: () => [], //已经存储的视图参数索引
+    },
     inquireFormBackup: {
       type: Object,
       default: () => ({}),
@@ -145,6 +150,12 @@ export default {
     };
   },
   watch: {
+    taskNums(v) {
+      this.list = [];
+      v.forEach((item) => {
+        this.list.push(item + 1);
+      });
+    },
     config() {
       this.fields;
     },
@@ -343,6 +354,10 @@ export default {
     BatchForm: {
       name: "batch-form",
       props: {
+        taskNums: {
+          type: Array || null,
+          default: () => [], //已经存储的视图参数索引
+        },
         inquireFormBackup: {
           type: Object,
           default: () => ({}),
@@ -381,6 +396,9 @@ export default {
         };
       },
       watch: {
+        taskNums(v) {
+          //  this.selectField(this.fields[item].fieldName);
+        },
         inquireFormBackup(v) {
           if (JSON.stringify(v) === "{}") {
             this.reset();
@@ -404,32 +422,6 @@ export default {
         this.buildForm();
       },
       methods: {
-        _inPar(searchParams) {
-          let inPar = []; // 初始化的参数
-          for (let key in searchParams) {
-            if (
-              JSON.stringify(searchParams[key]) !== "[]" &&
-              searchParams[key] &&
-              key !== "pageSize" &&
-              key !== "page" &&
-              key !== "pageNum" &&
-              key !== "stateList" &&
-              key !== "whoseInfo" &&
-              key !== "isPermission" &&
-              key !== "distance" &&
-              key !== "orderDetail" &&
-              key !== "sortBy"
-            ) {
-              inPar.push({ key, value: searchParams[key] });
-            }
-          }
-          inPar.forEach((item) => {
-            if (item.key === "customerId") {
-              this.form["customer"] = item.value;
-              this.customer["id"] = item.value;
-            }
-          });
-        },
         returnDatas() {
           let data = Object.assign({}, this.form);
           data.backUp = {
@@ -512,7 +504,7 @@ export default {
             index: this.index,
           });
           this.form[val] = val == "tags" ? [] : "";
-
+          console.log(this.form)
           if (MultiFieldNames.indexOf(this.selectedField.fieldName) > -1) {
             this.form[val] = [];
           }
