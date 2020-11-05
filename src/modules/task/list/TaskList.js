@@ -11,7 +11,7 @@ import BatchEditingCustomerDialog from './components/BatchEditingCustomerDialog.
 import TaskTransfer from './components/TaskTransfer.vue';
 import TaskMap from './components/TaskMap.vue';
 import TaskView from './components/TaskView.vue'
-import guideCompoment from '@src/component/guide/guide';
+// import guideCompoment from '@src/component/guide/guide';
 
 /** model */
 import TaskStateEnum from '@model/enum/TaskStateEnum.ts';
@@ -39,7 +39,7 @@ import {
 const TASK_LIST_KEY = 'task_list';
 
 // 工单引导标识
-const { TASK_GUIDE_LIST, TASK_GUIDE_SEARCH_MODEL, TASK_GUIDE_SEARCH_MODEL_SAVE, TASK_GUIDE_DROPDOWN_MENU } = require('@src/component/guide/taskV2Store');;
+const { TASK_GUIDE_LIST, TASK_GUIDE_SEARCH_MODEL, TASK_GUIDE_SEARCH_MODEL_SAVE, TASK_GUIDE_DROPDOWN_MENU } = require('@src/component/guide/taskV2Store');
 // 埋点事件对象
 const TRACK_EVENT_MAP = {
   search: 'pc：工单列表-搜索事件',
@@ -1111,8 +1111,8 @@ export default {
         exportSearchModel: JSON.stringify({
           ...all,
           ...{
-            exportTotal: exportAll ?
-              this.taskPage.totalElements : this.selectedIds.length,
+            exportTotal: exportAll
+              ? this.taskPage.totalElements : this.selectedIds.length,
           },
         }),
       };
@@ -2232,38 +2232,38 @@ export default {
       let taskSelfFields = [];
       // 回执信息
       let taskReceiptSystemFields = [{
-          id: 5460,
-          isSystem: 1,
-          fieldName: 'spare_name',
-          field: 'spare_name',
-          displayName: '备件',
-          label: '备件',
-          formType: 'text',
-          isNull: 1,
-          isSearch: 0,
-        },
-        {
-          id: 5460,
-          isSystem: 1,
-          fieldName: 'service_name',
-          field: 'service_name',
-          displayName: '服务项目',
-          label: '服务项目',
-          formType: 'text',
-          isNull: 1,
-          isSearch: 0,
-        },
-        {
-          id: 5460,
-          isSystem: 1,
-          fieldName: 'balance_total',
-          field: 'balance_total',
-          displayName: '费用信息',
-          label: '费用信息',
-          formType: 'text',
-          isNull: 1,
-          isSearch: 0,
-        },
+        id: 5460,
+        isSystem: 1,
+        fieldName: 'spare_name',
+        field: 'spare_name',
+        displayName: '备件',
+        label: '备件',
+        formType: 'text',
+        isNull: 1,
+        isSearch: 0,
+      },
+      {
+        id: 5460,
+        isSystem: 1,
+        fieldName: 'service_name',
+        field: 'service_name',
+        displayName: '服务项目',
+        label: '服务项目',
+        formType: 'text',
+        isNull: 1,
+        isSearch: 0,
+      },
+      {
+        id: 5460,
+        isSystem: 1,
+        fieldName: 'balance_total',
+        field: 'balance_total',
+        displayName: '费用信息',
+        label: '费用信息',
+        formType: 'text',
+        isNull: 1,
+        isSearch: 0,
+      },
       ];
 
       // 工单信息逻辑
@@ -2454,9 +2454,9 @@ export default {
       selection,
       item
     }) {
-      selection.length < 1 ?
-        this.toggleSelection() :
-        this.toggleSelection([item]);
+      selection.length < 1
+        ? this.toggleSelection()
+        : this.toggleSelection([item]);
     },
     /**
      * @description 计算已选择
@@ -2481,8 +2481,8 @@ export default {
       if (row.latesetUpdateRecord) return;
 
       TaskApi.getTaskUpdateRecord({
-          taskId: row.id
-        })
+        taskId: row.id
+      })
         .then((res) => {
           if (!res || res.status) return;
 
@@ -2724,7 +2724,7 @@ export default {
     [BatchEditingCustomerDialog.name]: BatchEditingCustomerDialog,
     [TaskSearchPanel.name]: TaskSearchPanel,
     [TaskViewModel.name]: TaskViewModel,
-    [guideCompoment.name]: guideCompoment,
+    // [guideCompoment.name]: guideCompoment,
     TaskSelect,
   },
 };

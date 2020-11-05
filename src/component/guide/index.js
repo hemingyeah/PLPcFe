@@ -1,10 +1,10 @@
 import component from './Guide.vue';
 
-const Guide = {
+const GuideCompoment = {
   install(Vue){
     Vue.component(component.name, component);
   },
   component
 }
 
-export default Guide;
+export default GuideCompoment;
