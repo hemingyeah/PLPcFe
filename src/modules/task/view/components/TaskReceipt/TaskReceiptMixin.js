@@ -53,13 +53,15 @@ export default {
     * @description 显示备件
     */
     showSparepart() {
-      return this.notCustom || (!this.notCustom && this.receiptConfig.showSparepart);
+      let { showSparepart } = this.taskType?.options || {};
+      return this.notCustom || (!this.notCustom && showSparepart);
     },
     /** 
     * @description 显示服务项目
     */
     showService() {
-      return this.notCustom || (!this.notCustom && this.receiptConfig.showService);
+      let { showService } = this.taskType?.options || {};
+      return this.notCustom || (!this.notCustom && showService);
     },
     /** 
     * @description 备件费用
