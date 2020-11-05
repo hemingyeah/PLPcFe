@@ -61,7 +61,7 @@ export default {
       // 是否打开派单设置弹窗
       this.$nextTick(async () => {
         let query = parse(window.location.search) || {}
-        if(!!query.openAllotSetting) {
+        if(query.openAllotSetting) {
           await this.planTaskEditDialogOpen();
         }
       });
@@ -75,19 +75,20 @@ export default {
      * 关闭并打开新的Tab
     */
     closeAndOpenTab(url, newTabId) {
-      let id = window.frameElement.dataset.id;
-      this.$platform.closeTab(id)
-
-      let fromId = window.frameElement.getAttribute('id')
+      location.href = url;
+      // let id = window.frameElement.dataset.id;
+      // this.$platform.closeTab(id)
       
-      this.$platform.openTab({
-        id: newTabId,
-        title: '',
-        url,
-        reload: true,
-        close: true,
-        fromId
-      });
+      // let fromId = window.frameElement.getAttribute('id')
+      
+      // this.$platform.openTab({
+      //   id: newTabId,
+      //   title: '',
+      //   url,
+      //   reload: true,
+      //   close: true,
+      //   fromId
+      // });
     },
     /** 
      * @description 呼叫中心与工单数据的处理 linkman/address/customer
