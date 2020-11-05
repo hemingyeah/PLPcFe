@@ -270,7 +270,7 @@
   </div>
 </template>
 <script>
-import { getMenuListWx, setMenuListWx } from '@src/api/doMyself.js'
+import { getMenuListWx, setMenuListWx } from '@src/api/DoMyself.js'
 // 缓存数据
 let menu_arr_stash = []
 
