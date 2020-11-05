@@ -872,14 +872,6 @@ export default {
         reload: true,
       });
     },
-    goMyShop() {
-      platform.openTab({
-        id: 'my_shop',
-        title: '门户设置',
-        url: '/linkc/setting',
-        reload: true,
-      });
-    },
     goMyShopOrder() {
       platform.openTab({
         id: 'my_shop_order_list',
@@ -1083,7 +1075,7 @@ export default {
       this.$refs.userGuideView.show();
     }
 
-    /*** 部分页面引导 数据处理  s*/
+    /** * 部分页面引导 数据处理  s*/
     if( this?.initData?.needResetGuide){
       let needResetGuideArr = this?.initData?.needResetGuide;
       
@@ -1125,7 +1117,7 @@ export default {
         }
       })
     }
-    /*** 部分页面引导 数据处理  e*/
+    /** * 部分页面引导 数据处理  e*/
     this.checkExports();
     this.getShbEdition()
   },
