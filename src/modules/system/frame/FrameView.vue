@@ -897,14 +897,6 @@ export default {
         reload: true,
       });
     },
-    goMyShop() {
-      platform.openTab({
-        id: 'my_shop',
-        title: '门户设置',
-        url: '/linkc/setting',
-        reload: true,
-      });
-    },
     goMyShopOrder() {
       platform.openTab({
         id: 'my_shop_order_list',
