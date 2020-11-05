@@ -27,7 +27,7 @@
               <!-- start 工单列表切换新旧版 -->
               <template v-if="allowChangeTaskVersion">
                 <el-button
-                  @click="openReason"
+                  @click="changeTaskVersion(false)"
                   class="task-version-btn"
                   type="primary"
                   v-if="isUserTaskGray"
