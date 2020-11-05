@@ -92,7 +92,7 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
       let { longitude, latitude } = user
       // 无经纬度
       if (!longitude && !latitude) return
-
+      
       // 用户标记
       let userMarker = new AMap.Marker({
         position: [longitude, latitude],
@@ -148,7 +148,7 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
         let isSuccess = result.status == 0
         if (!isSuccess) return
         
-        this.userPage.merge(result)
+        this.userPage.list = result.data || []
         
         Log.succ(Log.End, this.fetchUsers.name)
       })
@@ -226,7 +226,7 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
   }
   
   /**
-   * @description 选择排序方式事件
+   * @description 地图初始化事件
   */
   public mapInit(): void {
     Log.succ(Log.Start, this.mapInit.name)

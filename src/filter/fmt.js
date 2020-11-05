@@ -178,6 +178,45 @@ export function fmt_h_m_s(sec = 0) {
   return temp ? temp : '--';
 }
 
+/**
+ * @description 格式化数据 (值不存在返回 默认返回0)
+ */
+export function fmt_number(value, defaultValue) {
+  if (typeof defaultValue == undefined) defaultValue = 0
+  
+  if (!value) {
+    console.warn(`Caused: ${value} is undifined or is null`)
+    return defaultValue
+  }
+  
+  if (isNaN(value)) {
+    console.warn(`Caused: ${value} is NaN`)
+    return defaultValue
+  }
+  
+  const IsErrorType = typeof value == 'string' || typeof value == 'number'
+  // 非数字类型 或 字符串
+  if (!IsErrorType) {
+    console.warn(`Caused: ${value} is not string type`)
+    return defaultValue
+  }
+  
+  let number = Number(value)
+  // 格式化的数字是NaN
+  if (isNaN(number)) {
+    console.warn(`Caused: Number(${number}) is NaN`)
+    return defaultValue
+  }
+  
+  // 非安全数值
+  if(!Lang.isSafeNumber(number)) {
+    console.warn(`Caused: ${number} is not a safeNumber`)
+    return number
+  }
+  
+  return number
+}
+
 const fmt = {
   fmt_date,
   fmt_datetime,

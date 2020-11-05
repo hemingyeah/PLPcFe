@@ -12,7 +12,13 @@ enum ComponentNameEnum {
   // 工单分配到工单池
   TaskAllotPool = 'task-allot-pool',
   // 工单指派方式
-  TaskAllotType = 'task-allot-type'
+  TaskAllotType = 'task-allot-type',
+  // 工单指派 地图
+  TaskAllotMap = 'task-allot-map',
+  // 工单指派 工单池 通知
+  TaskAllotPoolNotification = 'task-allot-pool-notification',
+  // 工单指派 工单池 统计信息
+  TaskAllotPoolInfo = 'task-allot-pool-info',
 }
 
 export default ComponentNameEnum

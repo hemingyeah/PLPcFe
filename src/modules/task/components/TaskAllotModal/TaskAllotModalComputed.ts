@@ -4,15 +4,13 @@ import TaskAllotTypeEnum from '@model/enum/TaskAllotTypeEnum'
 /* data */
 import TaskAllotModalData from '@src/modules/task/components/TaskAllotModal/TaskAllotModalData'
 
-const AllotContentComponentMap = {
-  [TaskAllotTypeEnum.Person]: ComponentNameEnum.TaskAllotExcutor,
-  [TaskAllotTypeEnum.Pool]: ComponentNameEnum.TaskAllotPool,
-  [TaskAllotTypeEnum.Auto]: ComponentNameEnum.TaskAllotAuto
-}
-
 class TaskAllotModalComputed extends TaskAllotModalData {
-  get allotContentComponent() {
-    return AllotContentComponentMap[this.allotType]
+  get allotContentStyle() {
+    return {
+      [TaskAllotTypeEnum.Person]: { display: this.allotType === TaskAllotTypeEnum.Person ? 'block' : 'none' },
+      [TaskAllotTypeEnum.Pool]: { display: this.allotType === TaskAllotTypeEnum.Pool ? 'block' : 'none' },
+      [TaskAllotTypeEnum.Auto]: { display: this.allotType === TaskAllotTypeEnum.Auto ? 'block' : 'none' },
+    }
   }
 }
 

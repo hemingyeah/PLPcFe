@@ -22,3 +22,5 @@ export const PLATN_TASK_PERFORM_NUMBER_MAX_MESSAGE: string = `执行次数不能
 export const REQUIRES_PRODUCT_MESSAGE: string = '请选择产品';
 // 计划时间不能早于现在
 export const PLAN_TIME_NOT_LESS_THEN_NOW_MEESSAGE: string = '计划时间不能早于现在';
+// 计划时间不能早于现在
+export const REQUIRE_OTHER_NOTIFICATION_USER_MEESSAGE: string = '请先选择其他需要通知的人';

@@ -1,6 +1,7 @@
 /* components */
 import TaskAllotType from '@src/modules/task/components/TaskAllotModal/TaskAllotType/TaskAllotType.tsx'
 import TaskAllotExcutor from '@src/modules/task/components/TaskAllotModal/TaskAllotExcutor/TaskAllotExcutor.tsx'
+import TaskAllotPool from '@src/modules/task/components/TaskAllotModal/TaskAllotPool/TaskAllotPool.tsx'
 import UserButton from '@src/modules/task/components/TaskAllotModal/UserButton/UserButton.tsx'
 /* enum */
 import ComponentNameEnum from '@model/enum/ComponentNameEnum'
@@ -20,6 +21,7 @@ import './TaskAllotModal.scss'
   name: ComponentNameEnum.TaskAllotModal,
   components: {
     [TaskAllotExcutor.name]: TaskAllotExcutor,
+    [TaskAllotPool.name]: TaskAllotPool,
     [TaskAllotType.name]: TaskAllotType,
     [UserButton.name]: UserButton,
   }
@@ -61,16 +63,19 @@ export default class TaskAllotModal extends TaskAllotModalRender {
         
         <div class='task-allot-content'>
           <keep-alive>
-            <component is={this.allotContentComponent}></component>
-            <task-allot-excutor
-              onSetExecutor={(user: LoginUser) => this.setExecutorUser(user)} 
-              onSetSynergy={(user: LoginUser) => this.setSynergyUser(user)} 
-              ref="TaskAllotExcutorComponent" 
-            />
+            <div class='task-allot-content-active'>
+              <task-allot-excutor
+                style={this.allotContentStyle[TaskAllotTypeEnum.Person]}
+                onSetExecutor={(user: LoginUser) => this.setExecutorUser(user)} 
+                onSetSynergy={(user: LoginUser) => this.setSynergyUser(user)} 
+                ref='TaskAllotExcutorComponent'
+              />
+              <task-allot-pool show={this.allotType === TaskAllotTypeEnum.Pool} style={this.allotContentStyle[TaskAllotTypeEnum.Pool]} />
+            </div>
           </keep-alive>
         </div>
         
-        <div slot="footer" class="dialog-footer">
+        <div slot='footer' class='dialog-footer'>
             <el-button >取 消</el-button>
             <el-button type='primary' disabled={this.pending}>确 定</el-button>
         </div>

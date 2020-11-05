@@ -1102,4 +1102,11 @@ export function revertReason(params: object) {
   return http.post(`/task/revertReason`, params)
 }
 
+/** 
+ * @description 查询指派工单池人员列表
+*/
+export function getTaskAlloyPoolUserList(params: TaskAllotUserListByTagModel): Promise<getUserListByTagResult> {
+  return http.post('/task/allotMap/userListByTag', params)
+}
+
 /* -------------  end  新工单api ---------------- */

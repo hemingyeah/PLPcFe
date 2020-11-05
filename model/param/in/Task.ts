@@ -106,5 +106,5 @@ export interface TaskAllotUserListByTagModel {
   customerId: string
   lat: string
   lng: string
-  tagId: string
+  tagId?: string
 }
