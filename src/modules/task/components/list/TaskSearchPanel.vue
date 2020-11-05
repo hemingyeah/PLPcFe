@@ -100,7 +100,7 @@ import TaskSearchForm from './TaskSearchForm.vue';
 import TaskSearchPupal from './TaskSearchPupal';
 import TaskInquire from './TaskInquire';
 
-import guideCompoment from '@src/component/guide/guide';
+import guideCompoment from '@src/component/guide/Guide';
 
 let guideCompoments = Vue.extend(guideCompoment);
 
