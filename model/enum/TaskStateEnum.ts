@@ -68,8 +68,8 @@ class TaskStateEnum extends BaseEnum {
   };
   
   static COSTED: TaskState = {
-    bgColor: '103, 194, 58',
-    color: '#67C23A',
+    bgColor: '25, 206, 111',
+    color: '#19CE6F',
     name: '已结算',
     value: 'costed',
   };

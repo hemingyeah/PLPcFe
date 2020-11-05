@@ -228,7 +228,7 @@ export function openTabForWikiEdit(wikiId = '') {
 export function openTabForWikiView(wikiId = '') {
   let fromId = getFromId();
 
-  this.$platform.openTab({
+  platform.openTab({
     id: `document_detail_${wikiId}`,
     title: '知识库详情',
     url: `/wiki/detail/page?wikiId=${wikiId}`,
@@ -262,7 +262,7 @@ export function openTabForWikiList() {
 */
 export function openTabForEventView(eventId) {
   let fromId = getFromId();
-  this.$platform.openTab({
+  platform.openTab({
     id: `event_view_${eventId}`,
     title: '事件详情',
     close: true,

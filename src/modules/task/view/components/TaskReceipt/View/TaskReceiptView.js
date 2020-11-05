@@ -84,7 +84,8 @@ export default {
     */
     hasExpense() {
       let { sparepart = [], serviceIterm = [] } = this.form;
-      return sparepart.length || serviceIterm.length;
+
+      return (sparepart && sparepart.length) || (serviceIterm && serviceIterm.length);
     },
     /** 
     * @description 是否完成审批中

@@ -425,7 +425,7 @@ export default {
     viewReceiptTab() {
       // 回执表单是否包含字段
       let hasField = this.receiptFields.length > 0;
-      return this.showReceipt && hasField && !this.notCustom;
+      return this.showReceipt && hasField;
     },
     // 处理完成审批
     approvingForComplete() {

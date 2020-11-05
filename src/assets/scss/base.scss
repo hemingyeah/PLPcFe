@@ -166,24 +166,26 @@ textarea {
 }
 .task-list-view {
   .task-list-section th {
+    border-color: #f2f2f2 !important;
     padding: 3px 0 !important;
-    border-bottom: 1px solid #f2f2f2 !important;
-    border-right: 1px solid #f2f2f2 !important;
-    &:first-child, &:last-child {
-      border-right: none !important;
-    }
+    // border-bottom: 1px solid #f2f2f2 !important;
+    // border-right: 1px solid #f2f2f2 !important;
+    // &:first-child, &:last-child {
+    //   border-right: none !important;
+    // }
     > div {
       font-size: 14px !important;
       font-weight: 500 !important;
     }
   }
   .task-list-section td {
+    border-color: #f2f2f2 !important;
     padding: 4px 0 !important;
-    border-bottom: 1px solid #f2f2f2 !important;
-    border-right: 1px solid #f2f2f2 !important;
-    &:first-child, &:last-child {
-      border-right: none !important;
-    }
+    // border-bottom: 1px solid #f2f2f2 !important;
+    // border-right: 1px solid #f2f2f2 !important;
+    // &:first-child, &:last-child {
+    //   border-right: none !important;
+    // }
     > div {
       font-size: 13px !important;
       line-height: 31px !important;

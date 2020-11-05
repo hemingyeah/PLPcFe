@@ -585,14 +585,14 @@ export default {
       this.selectId = "all"
       this.params = this.initParams();
 
-      this.taskTypes.forEach((item) => {
-        if (item.id === searchModel.templateId) {
-          this.currentTaskType = item;
-        }
-      });
-      if (!searchModel.templateId) {
-        this.currentTaskType = { id: "", name: "全部" };
-      }
+      // this.taskTypes.forEach((item) => {
+      //   if (item.id === searchModel.templateId) {
+      //     this.currentTaskType = item;
+      //   }
+      // });
+      // if (!searchModel.templateId) {
+      //   this.currentTaskType = { id: '', name: '全部' };
+      // }
       // // console.log(FormUtil.initialize(this.advanceds, searchModel))
       // // this.$refs.taskView.open(id)
       this.search(searchModel);
@@ -1296,8 +1296,8 @@ export default {
       this.currentTaskType = taskType;
       // this.selectId = "all"
       this.params = this.initParams();
-      this.createPerspective({id: this.selectId}, true)
-      // this.initialize();
+      this.initialize();
+      // this.createPerspective({id: this.selectId}, true)
     },
     /**
      * @description 检测导出条数
