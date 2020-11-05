@@ -520,8 +520,8 @@ export default {
           this.setData = res[0].data
           let qrcode = new QRCode(this.$refs.qrCodeUrl, {
             text: `${this.setData.protalUrl}`, // 需要转换为二维码的内容
-            width: 340,
-            height: 340,
+            width: 344,
+            height: 344,
             colorDark: '#000000',
             colorLight: '#ffffff',
             correctLevel: QRCode.CorrectLevel.H,
