@@ -325,14 +325,14 @@
             ></el-input>
           </el-form-item>
           <div class="mar-b-18 font-w-600">小程序相关</div>
-          <el-form-item label="APPSecret">
+          <el-form-item label="APPSecret" prop="secret">
             <el-input
               v-model="wxRulerFormData.secret"
               autocomplete="off"
               placeholder="请输入"
             ></el-input>
           </el-form-item>
-          <el-form-item label="APPID">
+          <el-form-item label="APPID" prop="appId">
             <el-input
               v-model="wxRulerFormData.appId"
               autocomplete="off"
@@ -410,6 +410,7 @@ export default {
   watch: {
     submitDialog(value) {
       if (value == false) {
+
         this.$refs['wxRulerForm'].resetFields()
       }
     },
@@ -493,14 +494,14 @@ export default {
         publicSecret: '',
       },
       wxRuler: {
-        appId: [{ required: true, message: '请输入APPID', trigger: 'blur' }],
+        // appId: [{ required: true, message: '请输入APPID', trigger: 'blur' }],
         matchId: [{ required: true, message: '请输入mch_id', trigger: 'blur' }],
         apiSecret: [
           { required: true, message: '请输入API密钥', trigger: 'blur' },
         ],
-        secret: [
-          { required: true, message: '请输入AppSecret', trigger: 'blur' },
-        ],
+        // secret: [
+        //   { required: true, message: '请输入AppSecret', trigger: 'blur' },
+        // ],
         publicAppId: [
           { required: true, message: '请输入公众号APPID', trigger: 'blur' },
         ],
