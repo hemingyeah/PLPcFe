@@ -56,10 +56,12 @@ function createPreviewComp(h, field){
     <div class={previewClass} key={currFieldId}
       onMousedown={e => this.beginSort(field, e)}>
       {fieldPreview}
-      {(field.isSystem == 0 || previewComp.forceDelete) && <button type="button" class="form-design-preview-delete"
-        onClick={e => this.deleteField(field)}>
-        <i class="iconfont icon-fe-close"></i>
-      </button>}
+      {(field.isSystem == 0 || previewComp.forceDelete) && 
+      <div class="form-design-operation">
+        <div class="form-design-preview-delete form-design-preview-btn" onClick={e => this.deleteField(field)}><i class="iconfont icon-shanchu-copy"></i></div>
+        <div class="form-design-divider-separator" role="separator"></div>
+        <div class="form-design-preview-hidden form-design-preview-btn" onClick={e => this.deleteField(field)}><i class="iconfont icon-yincangziduan"></i></div>
+      </div>}
       <div class="form-design-cover"></div>
     </div>
   )
@@ -259,7 +261,7 @@ const FormDesign = {
       if(this.fieldGroup == 1){
         groupFields = groupFields.filter(f => this.value.findIndex(v => v.formType == f.formType) == -1);
       }
-    
+
       return groupFields;
     },
     // 是否为空
@@ -727,8 +729,9 @@ const FormDesign = {
           <div class="form-design-field-wrap"
             onMousedown={e => this.beginInsert(field, e)}
             onClick={e => this.immediateInsert(field, e)}>
-            <div class="form-design-field form-design__ghost">
-              {field.name} <i class={['iconfont', `icon-fd-${field.formType}`]}></i>
+            <div class="form-design-field form-design__ghost"> 
+              <span class="anticon"><i class={['iconfont', `icon-fd-${field.formType}`]}></i></span>
+              <span>{field.name}</span>
             </div>
           </div>
         )
@@ -745,7 +748,7 @@ const FormDesign = {
     },
     renderSettingPanel(h){
       let fieldSetting = createSettingComp.call(this, h, this.currField);
-      if(null == fieldSetting) return null;
+      // if(null == fieldSetting) return null;
 
       return (
         <div class="form-design-setting" key="form-design-setting">
@@ -768,8 +771,13 @@ const FormDesign = {
           </div>
         </div>
         <div class="form-design-main">
-          <div class={['form-design-list', this.silence ? 'form-design-silence' : null]}>
-            { this.renderPreviewList(h) }
+          <div class="form-design-center">
+            <div class={['form-design-phone', this.silence ? 'form-design-silence' : null]}>
+              { this.renderPreviewList(h) }
+            </div>
+            <div class="form-design-hidden">
+              <p>已隐藏字段</p>
+            </div>
           </div>
         </div>
         { this.renderSettingPanel(h) }
@@ -782,7 +790,7 @@ const FormDesign = {
   },
   mounted(){
     this.$data.$dragEvent.ghostEl = this.$el.querySelector('.form-design-ghost');
-    this.$data.$dragEvent.containerEl = this.$el.querySelector('.form-design-list');
+    this.$data.$dragEvent.containerEl = this.$el.querySelector('.form-design-phone');
     this.getRoleListreq();
   },
   components: {...PreviewComponents, ...SettingComponents}

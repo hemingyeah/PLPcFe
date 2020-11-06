@@ -1,8 +1,10 @@
 <template>
   <div class="form-setting-panel form-ql-editor">
-    <div class="form-setting-group">
-      <h4 class="form-item-title">{{ setting.name }}</h4>
-      <!-- 富文本编辑器 -->
+    <!--富文本编辑器 -->
+    <div class="form-setting-group form-setting-group-small form-common-setting">
+      <div class="form-common-setting-panel">
+        <h4 class="form-item-title">{{ setting.name }}</h4>
+      </div>
       <base-editor :placeholder="placeHolder"  v-model="field.placeHolder" @input="getInput" ref="editor" :toolbarOptions="toolbarOptions"></base-editor>
     </div>
     <div class="form-setting-group">

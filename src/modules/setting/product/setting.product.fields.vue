@@ -4,9 +4,9 @@
       <div>
         <button type="button" class="btn btn-text setting-back-btn" @click="back"><i class="iconfont icon-arrow-left"></i> 返回</button>
         <span class="setting-header-text">|</span>
-        <button type="button" class="btn btn-primary" @click="submit" :disabled="pending">保存</button>
+        <span>配置自定义字段</span>
       </div>
-
+      <base-button type="primary" native-type="submit" :disabled="pending"  @event="submit">保存</base-button>
     </div>
     <div class="setting-product-design">
       <form-design v-model="fields" :max="maxField" mode="product"></form-design>
@@ -102,14 +102,10 @@ export default {
 html,body{
   height: 100%;
 }
-
-body{
-  padding: 10px;
-}
-
 .setting-product{
   height: 100%;
-  background-color: #fff;
+  overflow-y: hidden;
+  background: #F5F5F5;
 }
 
 .setting-header-text{
@@ -127,6 +123,7 @@ body{
 }
 
 .setting-product-design{
+  margin: 10px;
   height: calc(100% - 53px);
 }
 

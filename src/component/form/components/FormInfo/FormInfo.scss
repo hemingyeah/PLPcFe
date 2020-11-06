@@ -8,7 +8,7 @@
     }
     .ql-toolbar{
       background: #fafafa;
-      padding: 5px 0px;
+      padding: 5px 3px;
       border: 1px solid $border-color-base;
       border-radius: 4px 4px 0 0;
 
@@ -49,8 +49,6 @@
 }
 //common编辑器公共format style
 .form-ql-editor {
-  word-break: break-all;
-  // background-color: #FFF;
   padding: 3px 5px;
   .ql-editor {
     p{
