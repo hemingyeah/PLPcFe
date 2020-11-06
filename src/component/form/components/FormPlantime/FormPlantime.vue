@@ -3,7 +3,7 @@
     <el-date-picker
       :id="`form_${field.fieldName}`"
       :type="type"
-      :prefix-icon="`iconfont icon-fd-${type}`"
+      :prefix-icon="`iconfont icon-fdn-${type}`"
       :picker-options="pickerOptions"
       :value-format="formate"
       :placeholder="placeholder"

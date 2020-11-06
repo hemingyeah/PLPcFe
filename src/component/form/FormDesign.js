@@ -58,9 +58,17 @@ function createPreviewComp(h, field){
       {fieldPreview}
       {(field.isSystem == 0 || previewComp.forceDelete) && 
       <div class="form-design-operation">
-        <div class="form-design-preview-delete form-design-preview-btn" onClick={e => this.deleteField(field)}><i class="iconfont icon-shanchu-copy"></i></div>
+        <div class="form-design-preview-delete form-design-preview-btn" onClick={e => this.deleteField(field)}>
+          <el-tooltip class="item" effect="dark" content="删除" placement="top">
+            <i class="iconfont icon-shanchu-copy"></i>
+          </el-tooltip>
+        </div>
         <div class="form-design-divider-separator" role="separator"></div>
-        <div class="form-design-preview-hidden form-design-preview-btn" onClick={e => this.deleteField(field)}><i class="iconfont icon-yincangziduan"></i></div>
+        <div class="form-design-preview-hidden form-design-preview-btn" onClick={e => this.hiddenField(field)}>
+          <el-tooltip class="item" effect="dark" content="隐藏" placement="top">
+            <i class="iconfont icon-fdn-hidden"></i>
+          </el-tooltip>
+        </div>
       </div>}
       <div class="form-design-cover"></div>
     </div>
@@ -636,6 +644,12 @@ const FormDesign = {
         this.emitInput(value)
       }
     },
+    /** 隐藏字段 */
+    async hiddenField(item) {
+      let tip = item.isSystem == 0 ? '隐藏该字段后，之前所有相关数据都会被隐藏，请确认是否隐藏？' : '该字段为系统内置字段，请确认是否隐藏？'
+      if (!await Platform.confirm(tip)) return;
+
+    },
     async deleteUser(item, callback) {
       let result = await checkUser({ id : item.id })
       let isSuccess = result.status == 0
@@ -730,7 +744,7 @@ const FormDesign = {
             onMousedown={e => this.beginInsert(field, e)}
             onClick={e => this.immediateInsert(field, e)}>
             <div class="form-design-field form-design__ghost"> 
-              <span class="anticon"><i class={['iconfont', `icon-fd-${field.formType}`]}></i></span>
+              <span class="anticon"><i class={['iconfont', `icon-fdn-${field.formType}`]}></i></span>
               <span>{field.name}</span>
             </div>
           </div>
