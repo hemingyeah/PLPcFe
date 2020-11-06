@@ -24,7 +24,7 @@
 						<p class="option-item-font">
 							<span>
 								<label>客户姓名：</label>
-								<span>{{option.customerEntity && option.customerEntity.name}}</span>
+								<span>{{option.customer.name}}</span>
 							</span>
 							<span>
 								<label>联系人：</label>
@@ -38,7 +38,7 @@
 						<p v-if="option.products && option.products.length > 0" class="option-item-font">
 							<span>
 								<label>产品：</label>
-								<span v-for="(product, idx) in products" :key="idx">
+								<span v-for="(product, idx) in option.products" :key="idx">
 									{{option.products[idx].name}}{{(idx <option.products.length - 1) && ','}}
 								</span>
 							</span>
@@ -97,6 +97,7 @@ export default {
 						taskId: task.id,
 						templateId: task.templateId,
 						linkMan: task.linkMan || {},
+						customer: task.customerEntity || {},
 						products: task.products || []
 					}));
 				}
