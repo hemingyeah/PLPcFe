@@ -43,7 +43,8 @@ const RuleMap = {
   customer: select,
   sparepart: select,
   serviceIterm: select,
-  planTime
+  planTime,
+  "related_task": relatedTask
 };
 
 // 远程验证字段是否重复方法
@@ -251,6 +252,19 @@ function attachment(value, field = {}) {
   return new Promise(resolve => {
     if (field.isNull === 1) return resolve(null);
     if (!value || !value.toString().length) return resolve(`请上传${field.displayName}`);
+    resolve(null);
+  });
+}
+
+function relatedTask(value, field = {}) {
+  return new Promise(resolve => {
+    if (field.isNull === 1) return resolve(null);
+    if (!Array.isArray(value)) {
+      return resolve(`${field.displayName}数据格式有误`);
+    }
+    if (value.length <= 0) {
+      return resolve(`请选择${field.displayName}`);
+    } 
     resolve(null);
   });
 }

@@ -18,6 +18,7 @@ import FormInfo from './FormInfo';
 import FormCascader from './FormCascader';
 import FormCustomer from './FormCustomer';
 import FormRelation from './FormRelation';
+import FormRelatedTask from "./FormRelatedTask";
 
 import FormAutograph from './FormAutograph'
 import FormSparepart from './FormSparepart'
@@ -47,7 +48,8 @@ const ALL_FORM_FIELDS = [
   FormRelation,
   FormAutograph,
   FormSparepart,
-  FormServiceIterm
+  FormServiceIterm,
+  FormRelatedTask
 ].reduce((acc, val) => (Array.isArray(val) ? acc = acc.concat(val) : acc.push(val)) && acc, []);
 
 const FormFieldMap = {};
@@ -112,7 +114,7 @@ for(let i = 0; i < ALL_FORM_FIELDS.length; i++){
   FormFieldMap[formField.formType] = field;
 }
 
-const COMMON_FIELDS = ['text', 'textarea', 'number', 'select', 'cascader', 'code', 'attachment', 'user', 'date', 'datetime', 'phone', 'email', 'separator', 'address', 'location', 'info', 'autograph'];
+const COMMON_FIELDS = ['text', 'textarea', 'number', 'select', 'cascader', 'code', 'attachment', 'user', 'date', 'datetime', 'phone', 'email', 'separator', 'address', 'location', 'info','autograph','related_task'];
 // 工单字段列表，工单彻底改造完成后删除，用 COMMON_FIELDS 替代
 const TASK_FIELDS = ['text', 'textarea', 'number', 'select', 'code', 'attachment', 'user', 'date', 'datetime', 'phone'];
 

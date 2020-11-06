@@ -200,6 +200,9 @@
             <template v-else-if="column.formType === 'address'">
               {{formatCustomizeAddress(scope.row.attribute[column.field])}}
             </template>
+            <template v-else-if="column.formType == 'related_task'">
+              {{ getRelatedTask(scope.row.attribute[column.field]) }}
+            </template>
 
             <div class="pre-text" v-else-if="column.formType === 'textarea'" v-html="buildTextarea(scope.row.attribute[column.field])" @click="openOutsideLink"></div>
 
@@ -527,6 +530,9 @@ export default {
     console.log('onEvent', this.initData.fieldInfo);
   },
   methods: {
+    getRelatedTask(field) {
+      return Array.isArray(field) ? field.map(item => item.taskNo).join(',') : "";
+    },
     async makePhoneCall(phone){
       if(!this.hasCallCenterModule) return
       try {

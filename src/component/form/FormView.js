@@ -186,6 +186,44 @@ const FormView = {
         </div>
       )
     },
+    buildRelatedTask({displayName, value}) {
+      if(Array.isArray(value) && value.length > 0) {
+        let _renderContent = value.map((item, index) => {
+          let taskId = item.taskId || "";
+          let taskNo = item.taskNo || "";
+          
+          return (
+            <span>
+              <a href="javascript:;" class="link" onClick={() => {
+                this.$platform.openTab({
+                  id: `task_view_${taskId}`,
+                  title: '工单详情',
+                  close: true,
+                  url: `/task/view/${taskId}?noHistory=1`,
+                })
+              }}>
+                {taskNo}
+              </a>
+              {index < value.length - 1 && ','}
+            </span>
+          );
+        });
+        
+        return (            
+          <div class="form-view-row">
+            <label>{displayName}</label>
+            <div
+              class="form-view-row-content">
+              {_renderContent}
+            </div>
+          </div>)
+      }
+
+      return (
+        <div class="form-view-row">
+          <label>{displayName}</label>
+        </div>);
+    },
 
     openMap({address, title}) {
       if (!address) return;
@@ -337,6 +375,14 @@ const FormView = {
           ...params,
           value: fmt_datetime(value)
         };
+      }
+
+      if(formType === 'related_task') {
+        params = {
+          ...params,
+          value: value
+        };
+        return this.buildRelatedTask(params);
       }
       
       // other types: text date number datetime phone

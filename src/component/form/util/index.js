@@ -128,7 +128,7 @@ export function initialize(fields = [], origin = {}, callback){
     let dateType = setting.dateType || 'yyyy-MM-dd';
     
     // 客户和编号类型不出初始化值
-    if(field.formType == 'customer' || field.formType == 'eventNo' || field.formType == 'taskNo') return;
+    if(field.formType == 'customer' || field.formType == 'eventNo' || field.formType == 'related_task' || field.formType == 'taskNo') return;
     // 如果已经存在值 则无需初始化
     if(result[fieldName]) return;
     

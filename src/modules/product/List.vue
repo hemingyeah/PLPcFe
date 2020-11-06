@@ -140,6 +140,9 @@
             <template v-else-if="column.formType === 'location'">
               {{ scope.row.attribute[column.field] && scope.row.attribute[column.field].address}}
             </template>
+            <template v-else-if="column.formType == 'related_task'">
+              {{ getRelatedTask(scope.row.attribute[column.field]) }}
+            </template>
             <template v-else-if="column.field === 'createUser'">
               {{ scope.row.createUser && scope.row.createUser.displayName }}
             </template>
@@ -602,6 +605,9 @@ export default {
   methods: {
     getAddress(field) {
       return field.province + field.city + field.dist + field.address || ''
+    },
+    getRelatedTask(field) {
+      return Array.isArray(field) ? field.map(item => item.taskNo).join(',') : "";
     },
     openOutsideLink(e) {
       let url = e.target.getAttribute('url');

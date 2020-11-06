@@ -15,7 +15,8 @@
       <search-form :fields="fields" ref="searchForm" :form-backup="formBackup" :column-num="columnNum"></search-form>
       <slot name="footer"></slot>
     </el-form>
-</base-panel></template>
+  </base-panel>
+</template>
 
 <script>
 import { FormFieldMap, SettingComponents } from '@src/component/form/components';
@@ -514,6 +515,17 @@ export default {
                   update: event => this.update(event)
                 }
               });
+          } else if (f.formType === 'related_task') {
+            childComp = h('task-search', {
+              props: {
+                field: f,
+                value: this.form[f.fieldName],
+                disableMap: true
+              },
+              on: {
+                update: event => this.update(event)
+              }
+            });
           } else {
 
             childComp = h(
