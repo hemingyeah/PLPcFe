@@ -4,7 +4,7 @@
     <form-title-setting
       :field="field"
       :setting="setting"
-      @input="updateForDom"
+      @input="update"
     ></form-title-setting>
     <!-- end 标题 -->
     <p class="form-separator-setting-tips">您可以在表单中放置一个分割线方便分段显示信息，让页面更加直观。</p>
@@ -21,13 +21,6 @@ export default {
   mixins: [SettingMixin],
   props: settingProps,
   methods: {
-    updateForDom(event){
-      let el = event.target;
-      let prop = el.dataset.prop;
-      let value = el.value;
-      
-      this.update(value, prop)
-    },
     update(event){
       let el = event.target;
       let prop = el.dataset.prop;
