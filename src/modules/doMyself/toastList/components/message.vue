@@ -262,36 +262,34 @@
 </template>
 
 <script>
-import _ from "lodash";
-import Page from "@model/Page";
-import platform from "@src/platform";
-import { formatDate } from "@src/util/lang";
+import _ from 'lodash';
+import Page from '@model/Page';
+import platform from '@src/platform';
+import { formatDate } from '@src/util/lang';
 
-import EditContactDialog from "@src/modules/customer/view/operationDialog/EditContactDialog.vue";
+import EditContactDialog from '@src/modules/customer/view/operationDialog/EditContactDialog.vue';
 
-import { getContactList } from "@src/api/CustomerContact.js";
+import { getContactList } from '@src/api/CustomerContact.js';
 
-import SearchPanel from "../components/SearchPanel.vue";
-import AuthUtil from "@src/util/auth";
+import SearchPanel from '../components/SearchPanel.vue';
+import AuthUtil from '@src/util/auth';
 
-import { getTemplates, getRecords } from "@src/api/doMyself.js";
+import { getTemplates, getRecords } from '@src/api/DoMyself.js';
 
 /* 高级搜索面板 列数 */
-const PRODUCT_TEMPLATE_LIST_ADVANCE_SEARCH_COLUMN_NUMBER =
-  "customer_contact_search_column_number";
+const PRODUCT_TEMPLATE_LIST_ADVANCE_SEARCH_COLUMN_NUMBER = 'customer_contact_search_column_number';
 /* 高级搜索 搜索数据 */
-const STORE_USER_FOR_SEARCH_PRODUCT_TEMPLATE =
-  "store_user_for_search_product_template";
+const STORE_USER_FOR_SEARCH_PRODUCT_TEMPLATE = 'store_user_for_search_product_template';
 // 产品模板列表数据
-const PRODUCT_TEMPLATE_LIST_DATA = "product_template_list_data";
+const PRODUCT_TEMPLATE_LIST_DATA = 'product_template_list_data';
 // 产品模板列表选择
-const PRODUCT_CHECK = "productCheck";
+const PRODUCT_CHECK = 'productCheck';
 
 const link_reg = /((((https?|ftp?):(?:\/\/)?)(?:[-;:&=\+\$]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\?\+=&;:%!\/@.\w_]*)#?(?:[-\+=&;%!\?\/@.\w_]*))?)/g;
 
 let pending = false; // 记录交互pending
 export default {
-  name: "customer-conctact-message",
+  name: 'customer-conctact-message',
   props: {
     initData: {
       type: Object,
@@ -309,7 +307,7 @@ export default {
         productFields: []
       }, // 产品配置项
       searchModel: {
-        keyword: "",
+        keyword: '',
         pageSize: 10,
         pageNum: 1,
         orderDetail: {},
@@ -321,19 +319,19 @@ export default {
       panelTheMultipleSelectionShow: false,
       conversionStatus: {
         fail_send: {
-          text: "发送失败",
-          value: "fail_send",
-          className: "error-text"
+          text: '发送失败',
+          value: 'fail_send',
+          className: 'error-text'
         },
         succ_send: {
-          text: "发送成功",
-          value: "succ_send",
-          className: "success-text"
+          text: '发送成功',
+          value: 'succ_send',
+          className: 'success-text'
         },
         doing_send: {
-          text: "发送中",
-          value: "doing_send",
-          className: "loading-text"
+          text: '发送中',
+          value: 'doing_send',
+          className: 'loading-text'
         }
       }
     };
@@ -343,61 +341,61 @@ export default {
       return (
         this.initData.productFields || [
           {
-            displayName: "通知类型",
-            fieldName: "name",
-            formType: "select",
-            placeHolder: "请输入联系人姓名",
+            displayName: '通知类型',
+            fieldName: 'name',
+            formType: 'select',
+            placeHolder: '请输入联系人姓名',
             isExport: false,
             setting: {
               isMulti: false,
               dataSource: [
                 {
-                  text: "全部类型",
-                  value: ""
+                  text: '全部类型',
+                  value: ''
                 },
                 {
-                  text: "工单响应通知",
-                  value: "taskResponseHandle"
+                  text: '工单响应通知',
+                  value: 'taskResponseHandle'
                 },
                 {
-                  text: "工单完成通知（回访）",
-                  value: "autoReviewHandle"
+                  text: '工单完成通知（回访）',
+                  value: 'autoReviewHandle'
                 },
                 {
-                  text: "工单动态更新通知",
-                  value: "taskRemarkEdit"
+                  text: '工单动态更新通知',
+                  value: 'taskRemarkEdit'
                 },
                 {
-                  text: "新建事件通知",
-                  value: "eventCreateHandle"
+                  text: '新建事件通知',
+                  value: 'eventCreateHandle'
                 },
                 {
-                  text: "事件完成通知",
-                  value: "eventFinishHandle"
+                  text: '事件完成通知',
+                  value: 'eventFinishHandle'
                 },
                 {
-                  text: "定时通知",
-                  value: "remindMessageHandle"
+                  text: '定时通知',
+                  value: 'remindMessageHandle'
                 },
                 {
-                  text: "计划时间通知",
-                  value: "taskPlanSmsRemindHandle"
+                  text: '计划时间通知',
+                  value: 'taskPlanSmsRemindHandle'
                 },
                 {
-                  text: "客户短信提醒",
-                  value: "sendSms2Cus"
+                  text: '客户短信提醒',
+                  value: 'sendSms2Cus'
                 },
                 {
-                  text: "产品短信提醒",
-                  value: "sendSms2CusByPro"
+                  text: '产品短信提醒',
+                  value: 'sendSms2CusByPro'
                 },
                 {
-                  text: "自助门户验证码",
-                  value: "SSP"
+                  text: '自助门户验证码',
+                  value: 'SSP'
                 },
                 {
-                  text: "验证码",
-                  value: "SuperAdmin"
+                  text: '验证码',
+                  value: 'SuperAdmin'
                 }
               ]
             },
@@ -405,19 +403,19 @@ export default {
             orderId: 1
           },
           {
-            displayName: "手机号码",
-            fieldName: "phone",
-            formType: "text",
-            placeHolder: "请输入手机号",
+            displayName: '手机号码',
+            fieldName: 'phone',
+            formType: 'text',
+            placeHolder: '请输入手机号',
             isExport: false,
             isSystem: 1,
             orderId: 2
           },
           {
-            displayName: "模板名称",
-            fieldName: "templateId",
-            formType: "select",
-            placeHolder: "请选择客户",
+            displayName: '模板名称',
+            fieldName: 'templateId',
+            formType: 'select',
+            placeHolder: '请选择客户',
             isExport: false,
             setting: {
               isMulti: false,
@@ -427,24 +425,24 @@ export default {
             orderId: 3
           },
           {
-            displayName: "关联编号",
-            fieldName: "relevanceNumber",
-            formType: "text",
-            placeHolder: "请输入关联编号",
+            displayName: '关联编号',
+            fieldName: 'relevanceNumber',
+            formType: 'text',
+            placeHolder: '请输入关联编号',
             isExport: false,
             isSystem: 1,
             orderId: 4
           },
           {
-            displayName: "按时间查询",
-            fieldName: "time",
-            formType: "date",
-            placeHolder: "请输入关联编号",
+            displayName: '按时间查询',
+            fieldName: 'time',
+            formType: 'date',
+            placeHolder: '请输入关联编号',
             // defaultTime: ["00:00:00", "23:59:59"],
             returnData: result => {
               let obj = {
-                startTime: formatDate(result[0], "YYYY-MM-DD HH:mm:ss"),
-                endTime: formatDate(result[1], "YYYY-MM-DD HH:mm:ss")
+                startTime: formatDate(result[0], 'YYYY-MM-DD HH:mm:ss'),
+                endTime: formatDate(result[1], 'YYYY-MM-DD HH:mm:ss')
               };
               return obj;
             },
@@ -453,29 +451,29 @@ export default {
             orderId: 5
           },
           {
-            displayName: "选择状态",
-            fieldName: "sta",
-            formType: "select",
-            placeHolder: "请输入关联编号",
+            displayName: '选择状态',
+            fieldName: 'sta',
+            formType: 'select',
+            placeHolder: '请输入关联编号',
             isExport: false,
             setting: {
               isMulti: false,
               dataSource: [
                 {
-                  text: "全部",
-                  value: ""
+                  text: '全部',
+                  value: ''
                 },
                 {
-                  text: "成功",
-                  value: "succ_send"
+                  text: '成功',
+                  value: 'succ_send'
                 },
                 {
-                  text: "失败",
-                  value: "fail_send"
+                  text: '失败',
+                  value: 'fail_send'
                 },
                 {
-                  text: "发送中",
-                  value: "doing_send"
+                  text: '发送中',
+                  value: 'doing_send'
                 }
               ]
             },
@@ -498,17 +496,17 @@ export default {
   filters: {
     displaySelect(value) {
       if (!value) return null;
-      if (value && typeof value === "string") {
+      if (value && typeof value === 'string') {
         return value;
       }
       if (Array.isArray(value) && value.length) {
-        return value.join("，");
+        return value.join('，');
       }
       return null;
     },
     formatDate(val) {
-      if (!val) return "";
-      return formatDate(val, "YYYY-MM-DD HH:mm:ss");
+      if (!val) return '';
+      return formatDate(val, 'YYYY-MM-DD HH:mm:ss');
     }
   },
   mounted() {
@@ -533,52 +531,52 @@ export default {
   },
   methods: {
     getChiType(type) {
-      if (type == "taskResponseHandle") {
-        return "工单响应通知";
-      } else if (type == "autoReviewHandle") {
-        return "工单完成通知（回访）";
-      } else if (type == "taskFinaishHandle_finish") {
-        return "工单完成通知";
-      } else if (type == "taskRemarkEdit") {
-        return "工单动态更新通知";
-      } else if (type == "eventCreateHandle") {
-        return "新建事件通知";
-      } else if (type == "eventFinishHandle") {
-        return "事件完成通知";
-      } else if (type == "eventUpdateHandle") {
-        return "事件动态更新通知";
-      } else if (type == "remindMessageHandle") {
-        return "定时通知";
-      } else if (type == "taskPlanSmsRemindHandle") {
-        return "计划时间通知";
-      } else if (type == "sendSms2Cus") {
-        return "客户短信提醒";
-      } else if (type == "sendSms2CusByPro") {
-        return "产品短信提醒";
+      if (type == 'taskResponseHandle') {
+        return '工单响应通知';
+      } else if (type == 'autoReviewHandle') {
+        return '工单完成通知（回访）';
+      } else if (type == 'taskFinaishHandle_finish') {
+        return '工单完成通知';
+      } else if (type == 'taskRemarkEdit') {
+        return '工单动态更新通知';
+      } else if (type == 'eventCreateHandle') {
+        return '新建事件通知';
+      } else if (type == 'eventFinishHandle') {
+        return '事件完成通知';
+      } else if (type == 'eventUpdateHandle') {
+        return '事件动态更新通知';
+      } else if (type == 'remindMessageHandle') {
+        return '定时通知';
+      } else if (type == 'taskPlanSmsRemindHandle') {
+        return '计划时间通知';
+      } else if (type == 'sendSms2Cus') {
+        return '客户短信提醒';
+      } else if (type == 'sendSms2CusByPro') {
+        return '产品短信提醒';
         // }else if(type == 'sendBatchSms2Cus'){
         //     type = "客户批量发送短信提醒";
         // }else if(type == 'sendBatchSms2CusByPro'){
         //     type = "产品批量发送短信提醒";
-      } else if (type == "SSP") {
-        return "自助门户验证码";
-      } else if (type == "SuperAdmin") {
-        return "验证码";
-      } else {
-        return "其他";
-      }
+      } else if (type == 'SSP') {
+        return '自助门户验证码';
+      } else if (type == 'SuperAdmin') {
+        return '验证码';
+      } 
+      return '其他';
+      
     },
     getTemplate() {
       // 获取所有的模板
-      getTemplates({ pageSize: "999", pageNum: "1" }).then(res => {
+      getTemplates({ pageSize: '999', pageNum: '1' }).then(res => {
         this.productFields[2].setting.dataSource = [
           {
-            text: "全部",
-            value: ""
+            text: '全部',
+            value: ''
           },
           ...res.data.list
             .filter(
               item =>
-                item.status == "pass_approval" && item.notice == "自定义通知"
+                item.status == 'pass_approval' && item.notice == '自定义通知'
             )
             .map(item => {
               return {
@@ -590,7 +588,7 @@ export default {
       });
     },
     showAdvancedSetting() {
-      window.TDAPP.onEvent("pc：客户联系人-选择列事件");
+      window.TDAPP.onEvent('pc：客户联系人-选择列事件');
       this.$refs.advanced.open(this.columns);
     },
     buildParams() {
@@ -613,7 +611,7 @@ export default {
       }
 
       if (params.createTime && params.createTime.length) {
-        let createTime = params.createTime.split("-");
+        let createTime = params.createTime.split('-');
 
         params.createTimeStart = `${createTime[0]} 00:00:00`;
         params.createTimeEnd = `${createTime[1]} 23:59:59`;
@@ -627,45 +625,45 @@ export default {
       // return []
       return [
         {
-          label: "通知类型",
-          field: "operation",
+          label: '通知类型',
+          field: 'operation',
           show: true,
           fixed: true,
-          minWidth: "150px"
+          minWidth: '150px'
         },
         {
-          label: "接收号码",
-          field: "phones",
+          label: '接收号码',
+          field: 'phones',
           fixed: true,
           show: true
         },
         {
-          label: "发送条数",
-          field: "sendNum",
+          label: '发送条数',
+          field: 'sendNum',
           fixed: true,
           show: true
         },
         {
-          label: "发送时间",
-          field: "sendTime",
+          label: '发送时间',
+          field: 'sendTime',
           fixed: true,
           show: true
         },
         {
-          label: "关联编号",
-          field: "relevanceNumber",
+          label: '关联编号',
+          field: 'relevanceNumber',
           fixed: true,
           show: true
         },
         {
-          label: "状态",
-          field: "status",
+          label: '状态',
+          field: 'status',
           fixed: true,
           show: true
         },
         {
-          label: "说明",
-          field: "errorStatus",
+          label: '说明',
+          field: 'errorStatus',
           fixed: true,
           show: true
         }
@@ -674,7 +672,7 @@ export default {
     // 构建表格列
     buildTableColumn() {
       let localColumns = []
-        .map(i => (typeof i == "string" ? { field: i, show: true } : i))
+        .map(i => (typeof i == 'string' ? { field: i, show: true } : i))
         .reduce((acc, col) => (acc[col.field] = col) && acc, {});
       let baseColumns = this.buildTableFixedColumns();
       let columns = [...baseColumns].map(col => {
@@ -683,13 +681,12 @@ export default {
         let localField = localColumns[col.field];
 
         if (null != localField) {
-          width =
-            typeof localField.width == "number" ? `${localField.width}px` : "";
+          width = typeof localField.width == 'number' ? `${localField.width}px` : '';
           show = localField.show !== false;
         }
         col.show = show;
         col.width = width;
-        col.type = "column";
+        col.type = 'column';
 
         return col;
       });
@@ -702,7 +699,7 @@ export default {
 
       if (!checkedColumnsOldVersion) return;
 
-      let columns = checkedColumnsOldVersion.split(",");
+      let columns = checkedColumnsOldVersion.split(',');
       localStorage.removeItem(PRODUCT_CHECK);
 
       return (columns || [])
@@ -722,8 +719,8 @@ export default {
       this.columns.forEach(col => {
         let newCol = colMap[col.field];
         if (null != newCol) {
-          this.$set(col, "show", newCol.show);
-          this.$set(col, "width", newCol.width);
+          this.$set(col, 'show', newCol.show);
+          this.$set(col, 'width', newCol.width);
         }
       });
 
@@ -733,7 +730,7 @@ export default {
         width: c.width
       }));
       this.localStorageSet(
-        "columnStatus",
+        'columnStatus',
         columnsStatus,
         PRODUCT_TEMPLATE_LIST_DATA
       );
@@ -755,15 +752,15 @@ export default {
         this.$nextTick(() => {
           original.length > 0
             ? unSelected.forEach(row => {
-                this.$refs.productTemplateTable.toggleRowSelection(row, false);
-              })
+              this.$refs.productTemplateTable.toggleRowSelection(row, false);
+            })
             : this.$refs.productTemplateTable.clearSelection();
         });
         return this.$platform.alert(`最多只能选择${this.selectedLimit}条数据`);
       }
 
       this.multipleSelection = tv;
-      console.log(this.multipleSelection, "select");
+      console.log(this.multipleSelection, 'select');
 
       this.$refs.baseSelectionBar.openTooltip();
     },
@@ -789,7 +786,7 @@ export default {
       let obj = _.cloneDeep(sourceObj);
       if (except.length) {
         Object.keys(obj).forEach(key => {
-          if (typeof obj[key] === "object" && obj[key]) {
+          if (typeof obj[key] === 'object' && obj[key]) {
             obj[key] = this.deleteValueFromObject(obj[key], except);
           }
           if (!obj[key] && except.every(ex => ex !== obj[key])) {
@@ -798,7 +795,7 @@ export default {
         });
       } else {
         Object.keys(obj).forEach(key => {
-          if (typeof obj[key] === "object" && obj[key]) {
+          if (typeof obj[key] === 'object' && obj[key]) {
             obj[key] = this.deleteValueFromObject(obj[key]);
           }
           if (!obj[key]) {
@@ -828,7 +825,7 @@ export default {
       this.searchModel.pageSize = pageSize;
       this.searchModel.pageNum = 1;
 
-      this.localStorageSet("pageSize", pageSize, PRODUCT_TEMPLATE_LIST_DATA);
+      this.localStorageSet('pageSize', pageSize, PRODUCT_TEMPLATE_LIST_DATA);
       this.search();
     },
     // 跳转
@@ -839,10 +836,10 @@ export default {
     /* 获取本地数据 */
     localStorageGet(key) {
       try {
-        const dataStr = localStorage.getItem(key) || "{}";
+        const dataStr = localStorage.getItem(key) || '{}';
         return JSON.parse(dataStr);
       } catch (error) {
-        console.log("error: ", error);
+        console.log('error: ', error);
         return {};
       }
     },
@@ -858,21 +855,21 @@ export default {
           localStorage.setItem(rootKey, JSON.stringify(data));
         }
       } catch (err) {
-        console.log("localStorageSet err", err);
+        console.log('localStorageSet err', err);
       }
     },
     // 搜索
     search() {
       const params = this.buildParams();
-      this.$emit("pageLoading", true);
+      this.$emit('pageLoading', true);
       return getRecords(params)
         .then(res => {
-          this.$emit("pageLoading", false);
+          this.$emit('pageLoading', false);
           this.page = res.data;
           this.matchSelected(); // 把选中的匹配出来
         })
         .catch(err => {
-          this.$emit("pageLoading", false);
+          this.$emit('pageLoading', false);
         });
     },
     // 设置高级搜索面板 列
@@ -902,28 +899,27 @@ export default {
 
         let sortModel = {
           isSystem:
-            prop === "createTime" || prop === "updateTime" || prop === "type"
+            prop === 'createTime' || prop === 'updateTime' || prop === 'type'
               ? 1
               : 0,
-          sequence: order === "ascending" ? "ASC" : "DESC",
+          sequence: order === 'ascending' ? 'ASC' : 'DESC',
           column:
-            prop === "createTime" || prop === "updateTime" || prop === "type"
+            prop === 'createTime' || prop === 'updateTime' || prop === 'type'
               ? `productTemplate.${prop}`
               : prop
         };
 
-        const sortedField =
-          this.productTemplateConfig.productFields.filter(
-            sf => sf.fieldName === prop
-          )[0] || {};
+        const sortedField = this.productTemplateConfig.productFields.filter(
+          sf => sf.fieldName === prop
+        )[0] || {};
 
         if (
-          prop === "createTime" ||
-          prop === "updateTime" ||
-          sortedField.formType === "date" ||
-          sortedField.formType === "datetime"
+          prop === 'createTime'
+          || prop === 'updateTime'
+          || sortedField.formType === 'date'
+          || sortedField.formType === 'datetime'
         ) {
-          sortModel.type = "date";
+          sortModel.type = 'date';
         } else {
           sortModel.type = sortedField.formType;
         }
@@ -932,7 +928,7 @@ export default {
 
         this.search();
       } catch (e) {
-        console.error("product template sortChange err", e);
+        console.error('product template sortChange err', e);
       }
     },
     // 搜索参数恢复
@@ -943,21 +939,20 @@ export default {
         this.searchModel.pageSize = Number(localStorageData.pageSize);
       }
 
-      const num =
-        localStorage.getItem(
-          PRODUCT_TEMPLATE_LIST_ADVANCE_SEARCH_COLUMN_NUMBER
-        ) || 1;
+      const num = localStorage.getItem(
+        PRODUCT_TEMPLATE_LIST_ADVANCE_SEARCH_COLUMN_NUMBER
+      ) || 1;
       this.columnNum = Number(num);
     },
     panelSearchAdvancedToggle() {
-      window.TDAPP.onEvent("pc：产品模板-高级搜索事件");
+      window.TDAPP.onEvent('pc：产品模板-高级搜索事件');
       this.$refs.searchPanel.open();
 
       this.$nextTick(() => {
-        let forms = document.getElementsByClassName("advanced-search-form");
+        let forms = document.getElementsByClassName('advanced-search-form');
         for (let i = 0; i < forms.length; i++) {
           let form = forms[i];
-          form.setAttribute("novalidate", true);
+          form.setAttribute('novalidate', true);
         }
       });
     },
@@ -968,14 +963,14 @@ export default {
       this.searchModel.pageNum = 1;
       this.searchModel.moreConditions = this.$refs.searchPanel.buildParams();
 
-      this.trackEventHandler("search");
+      this.trackEventHandler('search');
       this.search();
     },
     resetParams() {
-      window.TDAPP.onEvent("pc：产品模板-重置事件");
+      window.TDAPP.onEvent('pc：产品模板-重置事件');
       this.searchIncludeMoreConditions = false;
       this.searchModel = {
-        keyword: "",
+        keyword: '',
         pageNum: 1,
         pageSize: this.page.pageSize,
         orderDetail: {},
@@ -989,24 +984,24 @@ export default {
     },
     // TalkingData事件埋点
     trackEventHandler(type) {
-      if (type === "search") {
-        window.TDAPP.onEvent("pc：短信记录-搜索事件");
+      if (type === 'search') {
+        window.TDAPP.onEvent('pc：短信记录-搜索事件');
         return;
       }
     },
     openOutsideLink(e) {
-      let url = e.target.getAttribute("url");
+      let url = e.target.getAttribute('url');
       if (!url) return;
       if (!/http/gi.test(url))
-        return this.$platform.alert("请确保输入的链接以http或者https开始");
+        return this.$platform.alert('请确保输入的链接以http或者https开始');
       this.$platform.openLink(url);
     },
     buildTextarea(value) {
       return value
         ? value.replace(link_reg, match => {
-            return `<a href="javascript:;" target="_blank" url="${match}">${match}</a>`;
-          })
-        : "";
+          return `<a href="javascript:;" target="_blank" url="${match}">${match}</a>`;
+        })
+        : '';
     },
     getRowKey(row) {
       return row.id;
@@ -1028,22 +1023,21 @@ export default {
       let loginUserId = this.initData.loginUser.userId;
       return AuthUtil.hasAuthWithDataLevel(
         this.permission,
-        "CUSTOMER_EDIT",
+        'CUSTOMER_EDIT',
         // 团队权限判断
         () => {
           let tags = Array.isArray(customer.tags) ? customer.tags : [];
           // 无团队则任何人都可编辑
           if (tags.length == 0) return true;
 
-          let loginUserTagIds =
-            this.initData.loginUser.tagIdsWithChildTag || [];
+          let loginUserTagIds = this.initData.loginUser.tagIdsWithChildTag || [];
           return tags.some(tag => loginUserTagIds.indexOf(tag.id) >= 0);
         },
         // 个人权限判断
         () => {
           return (
-            customer.createUser == loginUserId ||
-            this.isCustomerManager(customer)
+            customer.createUser == loginUserId
+            || this.isCustomerManager(customer)
           );
         }
       );
@@ -1066,15 +1060,14 @@ export default {
       let loginUserId = this.initData.loginUser.userId;
       return AuthUtil.hasAuthWithDataLevel(
         this.permission,
-        "CUSTOMER_VIEW",
+        'CUSTOMER_VIEW',
         // 团队权限判断
         () => {
           let tags = Array.isArray(customer.tags) ? customer.tags : [];
           // 无团队则任何人都可编辑
           if (tags.length == 0) return true;
 
-          let loginUserTagIds =
-            this.initData.loginUser.tagIdsWithChildTag || [];
+          let loginUserTagIds = this.initData.loginUser.tagIdsWithChildTag || [];
           return tags.some(tag => loginUserTagIds.indexOf(tag.id) >= 0);
         },
         // 个人权限判断
@@ -1136,24 +1129,24 @@ export default {
       let ids = [];
       let fileName = `${formatDate(
         new Date(),
-        "YYYY-MM-DD"
+        'YYYY-MM-DD'
       )}客户联系人数据.xlsx`;
 
       if (!exportAll) {
         if (!this.multipleSelection.length)
-          return this.$platform.alert("请选择要导出的数据");
+          return this.$platform.alert('请选择要导出的数据');
         ids = this.selectedIds;
       }
-      console.log(ids, "export");
+      console.log(ids, 'export');
       this.$refs.exportProductTemplatePanel.open(ids, fileName);
     },
     // 导出 列
     exportColumns() {
       return this.columns.map(c => {
         if (
-          c.field !== "customerAddress" &&
-          c.field !== "remindCount" &&
-          c.field !== "updateTime"
+          c.field !== 'customerAddress'
+          && c.field !== 'remindCount'
+          && c.field !== 'updateTime'
         ) {
           c.export = true;
         }
@@ -1166,14 +1159,14 @@ export default {
       let exportAll = !ids || ids.length == 0;
       let exportSearchModel = exportAll
         ? {
-            ...this.buildParams(),
-            exportTotal: this.page.total
-          }
+          ...this.buildParams(),
+          exportTotal: this.page.total
+        }
         : { exportTotal: ids.length };
 
       return {
-        productChecked: checkedArr.join(","),
-        data: exportAll ? "" : ids.join(","),
+        productChecked: checkedArr.join(','),
+        data: exportAll ? '' : ids.join(','),
         exportSearchModel: JSON.stringify(exportSearchModel)
       };
     },
@@ -1200,16 +1193,15 @@ export default {
     // match data
     matchSelected() {
       if (!this.multipleSelection.length) return;
-      const selected =
-        this.page.list.filter(c => {
-          if (this.multipleSelection.some(sc => sc.id === c.id)) {
-            this.multipleSelection = this.multipleSelection.filter(
-              sc => sc.id !== c.id
-            );
-            this.multipleSelection.push(c);
-            return c;
-          }
-        }) || [];
+      const selected = this.page.list.filter(c => {
+        if (this.multipleSelection.some(sc => sc.id === c.id)) {
+          this.multipleSelection = this.multipleSelection.filter(
+            sc => sc.id !== c.id
+          );
+          this.multipleSelection.push(c);
+          return c;
+        }
+      }) || [];
 
       this.$nextTick(() => {
         this.toggleSelection(selected);
