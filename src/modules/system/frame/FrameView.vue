@@ -571,6 +571,10 @@ export default {
   },
   methods: {
     openReason() {
+      if (localStorage.getItem('reason_bool')) {
+        this.changeTaskVersion(false)
+        return
+      }
       this.$refs.reasonPanel.open();
     },
     updateSystemPopup() {

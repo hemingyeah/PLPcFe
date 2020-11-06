@@ -80,6 +80,7 @@ export default {
       this.reason = ''
       this.remark = ''
       this.$emit('oldVersion')
+      localStorage.setItem("reason_bool", true)
     },
   },
 };
