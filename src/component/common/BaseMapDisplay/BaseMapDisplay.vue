@@ -39,6 +39,10 @@ export default {
     infoDom: {
       type: String,
       default: ''
+    },
+    renderMarkFunc: {
+      type: Function,
+      default: () => ({})
     }
   },
   data() {
@@ -61,7 +65,6 @@ export default {
     }
   },
   mounted() {
-
     this.geoCode();
   },
   methods: {
@@ -73,13 +76,23 @@ export default {
         position,
         content: this.markerDom || '<i class="bm-location-dot"></i>'
       });
-
+      
       if (this.infoDom) marker.on('mouseover', this.showInfoWindow);
-
+      
       marker.on('click', this.jumpToAmap)
-
       map = new AMap.Map(this.$refs.container, {zoom: 13, center: position});
-      map.add(marker);
+      
+      // 自定义渲染标记
+      const markers = this.renderMarkFunc ? this.renderMarkFunc(map, AMap) : []
+      // 存在自定义标记则渲染自定义标记点
+      if (Array.isArray(markers) && markers.length > 0) {
+        markers.forEach(marker => {
+          map.add(marker)
+        })
+      } else {
+        map.add(marker);
+      }
+      
     },
     geoCode() {
       const address = this.address;
