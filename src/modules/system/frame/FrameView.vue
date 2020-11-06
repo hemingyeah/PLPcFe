@@ -27,7 +27,7 @@
               <!-- start 工单列表切换新旧版 -->
               <template v-if="allowChangeTaskVersion">
                 <el-button
-                  @click="changeTaskVersion(false)"
+                  @click="openReason"
                   class="task-version-btn"
                   type="primary"
                   v-if="isUserTaskGray"
@@ -374,7 +374,12 @@
           </div>
         </div>
       </div>
-      <version :version="releaseVersion" v-if="loadedEdition" :edition="shbEdition" @showSystemPopup="updateSystemPopup" />
+      <version
+        :version="releaseVersion"
+        v-if="loadedEdition"
+        :edition="shbEdition"
+        @showSystemPopup="updateSystemPopup"
+      />
       <!--start 系统弹窗 -->
       <system-popup :system-data.sync="systemData" v-if="loadedSystemModal" />
       <!--end 系统弹窗 -->
@@ -406,12 +411,13 @@ import platform from "@src/platform";
 import http from "@src/util/http";
 import FrameManager from "./FrameManager";
 
-import FrameTab from './component/FrameTab.vue';
-import FrameNav from './component/FrameNav.vue';
-import Version from './component/Version.vue';
-import SystemPopup from './component/SystemPopup.vue';
-import SaleManager from './component/SaleManager.vue';
-import UserGuide from './component/UserGuide.vue';
+import FrameTab from "./component/FrameTab.vue";
+import FrameNav from "./component/FrameNav.vue";
+import Version from "./component/Version.vue";
+import SystemPopup from "./component/SystemPopup.vue";
+import SaleManager from "./component/SaleManager.vue";
+import UserGuide from "./component/UserGuide.vue";
+import ReasonPanel from "./component/ReasonPanel";
 
 import ImportAndExport from "./component/ImportAndExport.vue";
 
@@ -429,8 +435,8 @@ import {
 } from "@src/util/version.ts";
 
 /* util */
-import _ from 'lodash';
-import Axios from 'axios';
+import _ from "lodash";
+import Axios from "axios";
 
 const newTaskGuideStore = require("@src/component/guide/taskV2Store");
 const GuideStoreObj = {
@@ -501,15 +507,15 @@ export default {
       navBarMenus: [],
       showNavBar: false,
       loadedEdition: false,
-      loadedSystemPopup:false,
-      showSystemPopup:false,
-      systemData:[],
-      shbEdition: 1
+      loadedSystemPopup: false,
+      showSystemPopup: false,
+      systemData: [],
+      shbEdition: 1,
     };
   },
   computed: {
-    loadedSystemModal(){
-      return this.loadedSystemPopup && this.showSystemPopup
+    loadedSystemModal() {
+      return this.loadedSystemPopup && this.showSystemPopup;
     },
     wsUrl() {
       // websocket连接地址
@@ -567,8 +573,8 @@ export default {
     openReason() {
       this.$refs.reasonPanel.open();
     },
-    updateSystemPopup(){
-      this.showSystemPopup = true
+    updateSystemPopup() {
+      this.showSystemPopup = true;
     },
     async hangUpCall() {
       try {
@@ -796,14 +802,14 @@ export default {
       this.clearAnimation();
     },
     // 获取系统弹窗
-    async getSystemPopup(){
-      try{
-        let info = await http.get('/api/app/outside/message/v1/getSysMsgAlert')
-        if(info.status == 0 && info.data.length > 0){
-          this.loadedSystemPopup = true
-          this.systemData = info.data
+    async getSystemPopup() {
+      try {
+        let info = await http.get("/api/app/outside/message/v1/getSysMsgAlert");
+        if (info.status == 0 && info.data.length > 0) {
+          this.loadedSystemPopup = true;
+          this.systemData = info.data;
         }
-      }catch(error){
+      } catch (error) {
         console.error(error);
       }
     },
@@ -1172,7 +1178,7 @@ export default {
     }
 
     /** * 部分页面引导 数据处理  s*/
-    if( this?.initData?.needResetGuide){
+    if (this?.initData?.needResetGuide) {
       let needResetGuideArr = this?.initData?.needResetGuide;
 
       needResetGuideArr.forEach((item) => {
@@ -1209,7 +1215,7 @@ export default {
     }
     /** * 部分页面引导 数据处理  e*/
     this.checkExports();
-    this.getShbEdition()
+    this.getShbEdition();
     this.getSystemPopup();
   },
   components: {
