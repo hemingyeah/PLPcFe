@@ -1,6 +1,8 @@
 import _ from 'lodash';
 import { TaskFieldNameMappingEnum } from '@model/enum/FieldMappingEnum.ts';
 import { taskTypeSelectConversion } from '@src/util/conversionFunctionUtil.ts';
+/* model */
+import TaskStateEnum from '@model/enum/TaskStateEnum.ts'
 
 export default {
   /* 客户字段 */
@@ -17,6 +19,13 @@ export default {
   /* 客户关联工单的数量数据 */
   customerRelevanceTaskCountData() {
     return this.relevanceTaskCountData[TaskFieldNameMappingEnum.Customer];
+  },
+  /* 是否是已完成的工单 */
+  isFinishedTask() {
+    let state = this.task?.state || ''
+    let finishedStates = [TaskStateEnum.FINISHED.value, TaskStateEnum.COSTED.value]
+    
+    return finishedStates.indexOf(state) >= 0
   },
   /** 
    * @description 是否显示 客户关联的工单数量 按钮 

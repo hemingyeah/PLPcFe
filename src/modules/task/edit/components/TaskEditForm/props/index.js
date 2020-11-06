@@ -14,6 +14,10 @@ export default {
     type: Array,
     default: () => []
   },
+  task: {
+    type: Object,
+    default: () => ({})
+  },
   /* url地址参数数据 */
   urlParams: {
     type: Object,
