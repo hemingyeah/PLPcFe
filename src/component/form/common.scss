@@ -150,6 +150,12 @@
   border-radius: 4px;
 }
 
+.form-setting-panel-title{
+  line-height: 27px;
+  font-size: 14px;
+  font-weight: bold
+}
+
 .form-design-notification-content{
   padding-top: 10px;
   max-height: 320px;
@@ -175,7 +181,7 @@
   & > h3 {
     line-height: 24px;
     padding: 3px 0;
-    font-size: 16px;
+    font-size: 14px;
 
     border-bottom: 1px solid #ddd;
     margin: 0 0 8px 0;

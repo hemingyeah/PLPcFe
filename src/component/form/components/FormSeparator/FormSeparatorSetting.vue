@@ -1,9 +1,12 @@
 <template>
   <div class="form-setting-panel">
-    <h3>基础字段 -- {{setting.name}}</h3>
-    <div class="form-setting-group">
-      <input type="text" placeholder="请输入标题" data-prop="displayName" :value="field.displayName" @input="update" :maxlength="nameMaxLength">
-    </div>
+    <!-- start 标题 -->
+    <form-title-setting
+      :field="field"
+      :setting="setting"
+      @input="update"
+    ></form-title-setting>
+    <!-- end 标题 -->
     <p class="form-separator-setting-tips">您可以在表单中放置一个分割线方便分段显示信息，让页面更加直观。</p>
     <!--如果分割线在表单的最后，那么在生成表单和展示表单数据时该字段将会被忽略。-->
   </div>

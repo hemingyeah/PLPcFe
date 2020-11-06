@@ -103,7 +103,7 @@ function createSettingComp(h, field){
   
   if(null == compName) return (
     <div class="form-setting-panel">
-      <h3>系统字段 -- {field.displayName}</h3>   
+      <h3 class="form-setting-panel-title">{field.displayName}</h3>   
       <p class="form-design-warning">该字段为系统内置字段，暂不支持修改、删除。</p>
       {SHOW_IS_NULL_FIELD_COMP.includes(field.fieldName) && createRequired(h, field)}
     </div> 
