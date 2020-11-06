@@ -1,6 +1,12 @@
 <template>
   <div class="form-setting-panel">
-    <h3>基础字段 -- {{setting.name}}</h3>
+    <!-- start 标题 -->
+    <form-title-setting
+      :field="field"
+      :setting="setting"
+      @input="updateForDom"
+    ></form-title-setting>
+    <!-- end 标题 -->
     <div class="form-setting-group">
       <input type="text" placeholder="[必填] 请输入字段标题" data-prop="displayName" :value="field.displayName" @input="updateForDom" :maxlength="nameMaxLength">
     </div>
