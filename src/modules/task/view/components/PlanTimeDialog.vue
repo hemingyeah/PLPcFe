@@ -118,7 +118,7 @@ export default {
       TaskApi[this.action](params).then(res => {
         if (res.success) {
           let fromId = window.frameElement.getAttribute('fromid');
-          this.$platform.refreshTab(fromId);
+          // this.$platform.refreshTab(fromId);
 
           window.location.href = `/task/view/${this.task.id}`;
         } else {

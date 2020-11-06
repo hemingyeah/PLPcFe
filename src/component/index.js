@@ -49,6 +49,9 @@ import SampleTooltip from './common/SampleTooltip';
 
 import BaseEditor from './common/BaseEditor'
 
+// 自定义组件
+import GuideCompoment from './guide'
+
 import Form from './form';
 
 const components = [
@@ -96,7 +99,9 @@ const components = [
   BaseSelectionBar,
   BaseEditor,
   BaseServiceStar,
-  BaseCollapse
+  BaseCollapse,
+
+  GuideCompoment
 ];
 
 export default {

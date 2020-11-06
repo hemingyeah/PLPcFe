@@ -27,7 +27,7 @@
       <div class="team-detail-main">
         <!-- start  主体左侧 信息 -->
         <div class="team-detail-list">
-          <h3>{{ teamData.tagName }}</h3>
+          <div class="team-name">{{ teamData.tagName }}</div>
 
           <div class="team-detail-form-group">
             <div class="form-view-row">
@@ -542,7 +542,6 @@ export default {
 
       height: 100%;
       width: 400px;
-      padding-top: 55px;
 
       flex-shrink: 0;
       overflow-y: auto;
@@ -567,6 +566,16 @@ export default {
   }
 
   .team-detail-list {
+    .team-name {
+      padding: 10px 20px;
+      line-height: 24px;
+      font-size: 16px;
+      color: #333;
+      background: #eef8f8;
+      font-weight: normal;
+      width: 100%;
+      word-break: break-word;
+    }
     
     h3{
       margin: 0;

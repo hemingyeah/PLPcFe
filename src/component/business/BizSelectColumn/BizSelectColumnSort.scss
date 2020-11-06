@@ -41,9 +41,26 @@
 
 .biz-select-column-sort {
   .sortable-ghost {
-    background-color: #F5F7FA;
+    background-color: #E7F9F9;
   }
   .flip-list-move {
     transition: transform .5s;
+  }
+}
+
+.nested-draggable-name-label {
+  i {
+    font-size: $font-size-base;
+    display: none;
+  }
+}
+
+.nested-draggable-block {
+  &:hover {
+    .nested-draggable-name-label {
+      i {
+        display: block;
+      }
+    }
   }
 }

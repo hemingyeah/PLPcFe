@@ -491,11 +491,13 @@ export default {
     },
     /* 渲染工单创建dom */
     renderTaskCreatetDom(record = {}) {
-      let { content, eventNo, eventId } = record;
-      let isEventToTask = !!content.eventId;
+      let { content = {} } = record
+      let { eventId, eventNo } = content
+      let isEventToTask = Boolean(eventId)
+      
       return [
         this.renderBaseTaskAction(record),
-        isEventToTask ? <span class="link" onClick={event => openTabForEventView(eventId)}>由事件# {eventNo} 创建</span> : ''
+        isEventToTask ? <span onClick={event => openTabForEventView(eventId)}>由事件<span class="link-text"># {eventNo} </span>创建</span> : ''
       ]
     },
     /* 渲染工单修改dom */

@@ -1,5 +1,8 @@
 <template>
   <div class="task-detail-container" v-loading="loading">
+    <div class="guide-model-box" v-if="nowGuideStep < 5">
+
+    </div>
     <!-- start 顶部操作区 -->
     <div class="task-detail-header">
       <div class="task-detail-header-top" :class="{'active': !collapse}">
@@ -14,15 +17,18 @@
         <div class="task-delete-status" v-if="isDelete">已删除</div>
 
         <!-- start 工单流程信息 -->
-        <div class="progress-wrap" v-show="collapse">
-          <biz-process :value="task.state" :data="task" :flow-setting="initData.taskType.flowSetting" @change="changeTaskProcessState"></biz-process>
+        <div class="progress-wrap" v-show="collapse" id="v-task-detail-step-0">
+          <div class="guide-disable-cover" v-if="nowGuideStep == 1"></div>
+          <biz-process :value="task.state" :class="nowGuideStep == 1 ? 'guide-point bg-w':''" :data="task" :flow-setting="initData.taskType.flowSetting" @change="changeTaskProcessState"></biz-process>
         </div>
         <!-- end 工单流程信息 -->
 
         <!-- start 折叠时客户信息 -->
         <div class="customer-info-wrap" v-show="!collapse && customerField && customerField.id">
-          <div :class="['customer-name', {'link-text': allowOpenCustomerView}]" @click="openCustomerView">{{ customer.name }}</div>
-          
+          <div :class="['customer-name', {'link-text': allowOpenCustomerView}]" @click="openCustomerView">
+            {{ customer.name }}
+          </div>
+
           <div class="linkman-info" v-if="customerOption.linkman">
             <div class="form-view-row linkman-name">
               <label>联系人：</label>
@@ -38,9 +44,11 @@
               </div>
             </div>
           </div>
-          
+
           <!-- 工单状态 -->
-          <div class="task-state" v-if="!isDelete" :style="{'background-color': stateColor.bgColor, 'border-color': stateColor.bgColor, 'color': stateColor.color}">{{ stateText }}</div>
+          <div class="task-state" v-if="!isDelete" :style="{'background-color': stateColor.bgColor, 'border-color': stateColor.bgColor, 'color': stateColor.color}">
+            {{ stateText }}
+          </div>
         </div>
         <!-- end 折叠时客户信息 -->
 
@@ -50,18 +58,15 @@
             <!-- start 当前工单状态操作按钮 -->
             <div class="current-state-button" v-show="!collapse">
               <template v-for="(item, index) in stateButtonData">
-                <el-button
-                  :key="index"
-                  :type="item.type"
-                  @click="item.event"
-                  :disabled="pending"
-                  v-if="item.show"
-                >{{ item.name }}</el-button>
+                <el-button :key="index" :type="item.type" @click="item.event" :disabled="pending" v-if="item.show">
+                  {{ item.name }}
+                </el-button>
               </template>
             </div>
             <!-- end 当前工单状态操作按钮 -->
 
-            <el-button @click="openDialog('cancel')" :disabled="pending" size="mini" v-if="allowCancelTask">取消</el-button>
+            <el-button @click="openDialog('cancel')" :disabled="pending" size="mini" v-if="allowCancelTask">取消
+            </el-button>
             <el-button @click="redeploy" :disabled="pending" size="mini" v-if="allowRedeployTask">转派</el-button>
             <el-button :class="{'once-printed': task.oncePrinted == 1}" @click="printTask" :disabled="pending" size="mini" v-if="allowPrintTask">打印</el-button>
 
@@ -98,11 +103,15 @@
       </div>
       <!-- end 审批中icon -->
 
-      <div class="task-detail-header-bottom" :class="{'active': !collapse}">
+      <div class="task-detail-header-bottom" :class="{'active': !collapse, 'guide-point bg-w' : nowGuideStep == 2}" id="v-task-detail-step-1">
+        <div class="guide-disable-cover" v-if="nowGuideStep == 2"></div>
         <div class="customer-info-wrap">
-          <div :class="['customer-name', {'link-text': allowOpenCustomerView}]" @click="openCustomerView">{{ customer.name }}</div>
+          <div :class="['customer-name', {'link-text': allowOpenCustomerView}]" @click="openCustomerView">
+            {{ customer.name }}
+          </div>
           <el-tooltip v-if="showCustomerRelationTaskCount" placement="top">
-            <div slot="content" v-html="`未完成工单：${customerRelationTaskCountData.unfinished} </br> 全部工单：${customerRelationTaskCountData.all}`"></div>
+            <div slot="content" v-html="`未完成工单：${customerRelationTaskCountData.unfinished} </br> 全部工单：${customerRelationTaskCountData.all}`">
+            </div>
             <div class="relation-count-button" @click="openCustomerView">
               {{ `${customerRelationTaskCountData.unfinished}/${customerRelationTaskCountData.all}` }}
             </div>
@@ -163,22 +172,22 @@
 
           <div class="task-detail-header-bottom-list-item">
             <biz-process-time :data="task" :state="taskState"></biz-process-time>
-
-            <!-- start 当前工单状态操作按钮 -->
-            <template v-if="!isDelete">
-              <div class="state-button-group" v-show="taskState.value == task.state || (Array.isArray(taskState.value) && taskState.value.indexOf(task.state) > -1) ">
-                <template v-for="(item, index) in stateButtonData">
-                  <el-button
-                    :key="index"
-                    :type="item.type"
-                    @click="item.event"
-                    :disabled="pending"
-                    v-if="item.show"
-                  >{{ item.name }}</el-button>
-                </template>
-              </div>
-            </template>
-            <!-- end 当前工单状态操作按钮 -->
+            <div class="task-detail-action">
+              <!-- start 当前工单状态操作按钮 -->
+              <template v-if="!isDelete">
+                <div class="state-button-group" v-show="taskState.value == task.state || (Array.isArray(taskState.value) && taskState.value.indexOf(task.state) > -1) ">
+                  <template v-for="(item, index) in stateButtonData">
+                    <el-button :key="index" :type="item.type" @click="item.event" :disabled="pending" v-if="item.show">
+                      {{ item.name }}
+                    </el-button>
+                  </template>
+                </div>
+              </template>
+              <!-- end 当前工单状态操作按钮 -->
+              <p class="state-all-btn" v-show="initData.receiptTaskForUpdate.completeTime" @click="openDialog('timeAxis')">
+                查看全部时间点
+              </p>
+            </div>
           </div>
         </div>
       </div>
@@ -186,15 +195,13 @@
     <!-- end 顶部操作区 -->
 
     <!-- start 工单详情折叠面板 -->
-    <base-collapse
-      class="task-detail-main-content"
-      :show-collapse="showCollapse"
-      :direction.sync="collapseDirection">
+    <base-collapse class="task-detail-main-content" :show-collapse="showCollapse" :direction.sync="collapseDirection">
 
       <!-- start 工单详情 -->
       <template slot="left">
         <div class="task-detail-main-content-left" v-show="collapseDirection != 'left'">
-          <div class="task-detail-btn-group">
+          <div class="task-detail-btn-group" :class=" nowGuideStep == 4 ? 'task-detail-btn-group-point' : ''" id="v-task-detail-step-3">
+            <div class="guide-disable-cover" v-if="nowGuideStep == 4"></div>
             <el-tooltip :popper-options="popperOptions" content="编辑工单" placement="top" v-if="allowEditTask">
               <i class="iconfont icon-bianji1" @click="goEdit"></i>
             </el-tooltip>
@@ -206,22 +213,19 @@
             </el-tooltip>
           </div>
 
+          <div class="task-detail-step-2-box" :style="nowGuideStep == 3 ? 'width: 104px;height: 40px;background:#fff' : ''" id="v-task-detail-step-2">
+
+            <div class="task-detail-step-2" v-if="nowGuideStep == 3">
+              动态信息
+              <div style="position: relative;">
+                <div class="guide-disable-cover"></div>
+              </div>
+            </div>
+          </div>
+
           <el-tabs v-model="leftActiveTab">
             <el-tab-pane label="工单详情" name="task-view">
-              <task-view
-                :task="task"
-                :fields="fields"
-                :plan-time="planTime"
-                :is-paused="isPaused"
-                :state-text="stateText"
-                :state-color="stateColor"
-                :finished-state="finishedState"
-                :customer-option="customerOption"
-                :can-see-customer="canSeeCustomer"
-                :allow-edit-synergy="allowEditSynergy"
-                :allow-modify-plan-time="allowModifyPlanTime"
-                @modifyPlanTime="openDialog('modifyPlanTime')"
-              />
+              <task-view :task="task" :fields="fields" :plan-time="planTime" :is-paused="isPaused" :state-text="stateText" :state-color="stateColor" :finished-state="finishedState" :customer-option="customerOption" :can-see-customer="canSeeCustomer" :allow-edit-synergy="allowEditSynergy" :allow-modify-plan-time="allowModifyPlanTime" @modifyPlanTime="openDialog('modifyPlanTime')" />
             </el-tab-pane>
             <el-tab-pane :label="finishedState?'回执信息':'完成回执'" name="receipt-view" v-if="viewReceiptTab">
               <task-receipt-detail-view :share-data="propsForSubComponents" />
@@ -241,19 +245,10 @@
         <div class="task-detail-main-content-right" v-show="collapseDirection != 'right'">
           <el-tabs v-model="rightActiveTab">
             <el-tab-pane label="审核结算" name="balance-tab" v-if="viewBalanceTab">
-              <task-account
-                ref="taskAccount"
-                :share-data="propsForSubComponents"
-                @back="openDialog('back')"
-                @proposeApprove="proposeApprove"
-              />
+              <task-account ref="taskAccount" :share-data="propsForSubComponents" @back="openDialog('back')" @proposeApprove="proposeApprove" />
             </el-tab-pane>
             <el-tab-pane label="客户评价" name="feedback-tab" v-if="viewFeedbackTab">
-              <task-feedback
-                ref="taskFeedback"
-                :share-data="propsForSubComponents"
-                @proposeApprove="proposeApprove"
-              />
+              <task-feedback ref="taskFeedback" :share-data="propsForSubComponents" @proposeApprove="proposeApprove" />
             </el-tab-pane>
             <el-tab-pane label="附加组件" name="card-tab" v-if="viewTaskCardTab">
               <task-detail-card :share-data="propsForSubComponents" />
@@ -308,46 +303,67 @@
     <!-- end 拒绝工单弹窗 -->
 
     <!-- start 取消工单弹窗 -->
-    <cancel-task-dialog
-      ref="cancelTaskDialog"
-      :task-id="task.id"
-      @proposeApprove="proposeApprove"
-    />
+    <cancel-task-dialog ref="cancelTaskDialog" :task-id="task.id" @proposeApprove="proposeApprove" />
     <!-- end 取消工单弹窗 -->
 
     <!-- start 计划时间弹窗 -->
-    <plantime-dialog
-      ref="planTimeDialog"
-      :task="task"
-      :field="planTimeField"
-      :modifiable="taskConfig.taskPlanTime"
-    />
+    <plantime-dialog ref="planTimeDialog" :task="task" :field="planTimeField" :modifiable="taskConfig.taskPlanTime" />
     <!-- end 计划时间弹窗 -->
 
     <!-- start 审批弹窗 -->
-    <task-approve-dialog
-      ref="approveTaskDialog"
-      :approve-id="unFinishedAppr.id"
-      :task-id="task.id"
-    />
+    <task-approve-dialog ref="approveTaskDialog" :approve-id="unFinishedAppr.id" :task-id="task.id" />
     <!-- end 审批弹窗 -->
 
     <!-- start 工单发起审批弹窗 -->
-    <propose-approve-dialog
-      ref="proposeApprove"
-      :remark-required="taskConfig.approveRemark"
-      :task-id="task.id"
-    />
+    <propose-approve-dialog ref="proposeApprove" :remark-required="taskConfig.approveRemark" :task-id="task.id" />
     <!-- end 工单发起审批弹窗 -->
 
     <!-- start 完成回执弹窗 -->
-    <task-receipt-edit-view
-      ref="taskReceiptEdit"
-      :init-data="initData"
-      :receipt-fields="receiptFields"
-      @proposeApprove="proposeApprove"
-    />
+    <task-receipt-edit-view ref="taskReceiptEdit" :init-data="initData" :receipt-fields="receiptFields" @proposeApprove="proposeApprove" />
     <!-- end 完成回执弹窗 -->
+
+    <!-- start 查看全部时间点 -->
+    <task-time-dialog ref="timeAxis" />
+    <!-- end 查看全部时间点 -->
+
+    <!-- tour s -->
+    <v-tour v-if="showTour" name="myTour" :steps="detailSteps" :options="detailOptions" :callbacks="myCallbacks">
+      <template slot-scope="tour">
+        <transition name="fade">
+          <template v-for="(step, index) of tour.steps">
+            <v-step v-if="tour.currentStep === index" :key="index" :step="step" :previous-step="tour.previousStep" :next-step="tour.nextStep" :stop="tour.stop" :is-first="tour.isFirst" :is-last="tour.isLast" :labels="tour.labels">
+              <template>
+                <div slot="content" class="tour-content-box">
+                  <div class="tour-left-tips">
+                    {{ `${index + 1}/${detailSteps.length}` }}
+                  </div>
+                  <div class="tour-content">
+                    <div class="flex-x tour-content-head">
+                      {{detailSteps[index].title}}
+                    </div>
+                    <div class="tour-content-con">
+                      {{ detailSteps[index].content }}
+                    </div>
+                  </div>
+                </div>
+                <div slot="actions" class="tour-bottom">
+                  <!-- <div class="text" v-if="index > 0" @click="tour.previousStep">
+                    上一步
+                  </div> -->
+                  <div class="btns" v-if="index < detailSteps.length - 1" @click="tour.nextStep">
+                    下一步
+                  </div>
+                  <div v-if="index == detailSteps.length - 1" class="btns" @click="tour.stop">
+                    知道啦
+                  </div>
+                </div>
+              </template>
+            </v-step>
+          </template>
+        </transition>
+      </template>
+    </v-tour>
+    <!-- tour e -->
   </div>
 </template>
 
@@ -358,4 +374,151 @@ export default TaskDetailView;
 
 <style lang="scss">
 @import './TaskDetailView.scss';
+</style>
+
+<style lang="scss">
+.task-detail-container {
+    .v-step[data-v-7c9c03f0] {
+        background: #fff !important;
+        color: #333 !important;
+        -webkit-filter: drop-shadow(0px 9px 28px 8px rgba(0, 0, 0, 0.05)) !important;
+        filter: drop-shadow(0px 9px 28px 8px rgba(0, 0, 0, 0.05)) !important;
+        padding: 0 !important;
+        min-width: 240px !important;
+        max-width: 350px !important;
+    }
+
+    .v-step .v-step__arrow[data-v-7c9c03f0] {
+        border-color: #fff !important;
+        border-left-color: transparent !important;
+        border-right-color: transparent !important;
+    }
+
+    .tour-content-box {
+        position: relative;
+        overflow: hidden;
+        padding: 0 20px;
+        border-radius: 4px;
+
+        .tour-left-tips {
+            width: 80px;
+            height: 32px;
+            background: $color-primary;
+            color: #fff;
+            position: absolute;
+            left: -40px;
+            top: 0px;
+            line-height: 40px;
+            font-size: 12px;
+            transform-origin: center top;
+            transform: rotateZ(-45deg);
+            text-align: center;
+        }
+
+        .tour-content {
+            .tour-content-head {
+                padding-top: 32px;
+                padding-bottom: 10px;
+
+                .iconfont {
+                    font-size: 10px;
+                    margin-bottom: 2px;
+                    color: #999;
+                    cursor: pointer;
+                }
+            }
+
+            .tour-content-con {
+                text-align: start;
+                padding-bottom: 12px;
+                color: #666;
+            }
+        }
+    }
+
+    .tour-bottom {
+        height: 52px;
+        padding: 0 20px;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+
+        .btns {
+            width: 60px;
+            height: 28px;
+            background: $color-primary;
+            color: #fff;
+            text-align: center;
+            line-height: 28px;
+            border-radius: 4px;
+        }
+
+        .text {
+            color: $color-primary;
+        }
+
+        :nth-child(n) {
+            cursor: pointer;
+        }
+
+        :not(:last-child) {
+            margin-right: 12px;
+        }
+    }
+
+    /* 向上的箭头 */
+
+    .normal-arrow-top {
+        font-size: 0;
+        line-height: 0;
+        border-width: 0.5rem;
+        border-color: #fff;
+        width: 0;
+        border-top-width: 0;
+        border-style: dashed;
+        border-bottom-style: solid;
+        border-left-color: transparent;
+        border-right-color: transparent;
+        position: absolute;
+        top: -0.5rem;
+    }
+
+    .guide-model-box {
+        position: fixed;
+        width: 100%;
+        height: 100vh;
+        top: 0;
+        left: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 996;
+    }
+
+    .guide-point {
+        z-index: 997;
+        position: sticky;
+    }
+
+    .bg-w {
+        background: #fff;
+    }
+
+    .task-detail-step-2-box {
+        position: absolute;
+        top: 0;
+        left: 208px;
+        z-index: 997;
+
+        .task-detail-step-2 {
+            width: 104px;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            top: 0;
+            left: 0;
+            position: absolute;
+            background: transparent;
+        }
+    }
+}
 </style>

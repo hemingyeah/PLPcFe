@@ -166,7 +166,7 @@
 </template>
 
 <script>
-import { orderDetail } from "@src/api/Linkc";
+import { orderDetail } from "@src/api/LinkcApi";
 import { formatDate } from "@src/util/lang";
 import componentMixin from "../component/index";
 

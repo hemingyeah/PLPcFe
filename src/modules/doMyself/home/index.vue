@@ -1,39 +1,43 @@
 <template>
   <div id="doMyself-box">
-    <div class="flex-x">
+    <div class="flex-x al-start">
       <div class="left-menu">
-        <div class="menu-title">{{linkControl && isShowSelfServicePortal ? '消息中心' : '自助门户设置'}}</div>
+        <div class="menu-title">{{ '自助门户设置' }}</div>
         <template v-for="(item, index) in menuList">
           <nav
             :class="`menu-list ${nowMenu == index ? 'menu-checked' : ''}`"
             :key="index"
-            v-if="linkControl && isShowSelfServicePortal ? item.name == '客户自助门户' ? false : true : true"
             @click="changePage(index)"
           >
             <!-- <div class="left-border" v-if="nowMenu==index"></div> -->
             <div class="icon-box">
               <i
-                :class="`iconfont ${item.icon} ${
-                  nowMenu == index ? 'font-16 font-w-600' : 'font-14'
-                }`"
+                :class="
+                  `iconfont ${item.icon} ${
+                    nowMenu == index ? 'font-16 font-w-600' : 'font-14'
+                  }`
+                "
               ></i>
             </div>
             <span>{{ item.name }}</span>
           </nav>
         </template>
       </div>
+      <!-- <keep-alive> -->
+      <component :is="menuList[nowMenu].comName" ref="setData"></component>
+      <!-- </keep-alive> -->
 
-      <wx-set v-if="nowMenu === 1"></wx-set>
-      <toast-list v-if="nowMenu === 3"></toast-list>
+      <!-- <wx-set v-if="nowMenu === 1"></wx-set>
+      <toast-list v-if="nowMenu === 3"></toast-list> -->
     </div>
   </div>
 </template>
 <script>
-import toastList from "../toastList/toastList";
-import wxSet from "../wxSet/wxSet";
-import { isShowSelfServicePortal } from '@src/util/version.ts'
+import toastList from '../toastList/toastList'
+import wxSet from '../wxSet/wxSet'
+import doMyselfSet from '../setting/index'
 export default {
-  name: "do-myself-view",
+  name: 'do-myself-view',
   props: {
     initData: {
       type: Object,
@@ -43,74 +47,74 @@ export default {
   provide() {
     return {
       initData: this.initData,
-    };
+    }
   },
   data() {
     return {
       menuList: [
         {
-          name: "客户自助门户",
-          icon: "icon-Gateway",
+          name: '客户自助门户',
+          icon: 'icon-Gateway',
+          comName: 'do-myself-set',
         },
         {
-          name: "公众号设置",
-          icon: "icon-weixin2",
+          name: '公众号设置',
+          icon: 'icon-weixin2',
+          comName: 'wx-set',
         },
         {
-          name: "短信消息设置",
-          icon: "icon-duanxin3",
+          name: '短信消息设置',
+          icon: 'icon-duanxin3',
         },
         {
-          name: "消息记录",
-          icon: "icon-message",
+          name: '消息记录',
+          icon: 'icon-message',
+          comName: 'toast-list',
         },
       ],
       nowMenu: 1, // 0 客户自助门户 1 公众号设置 2 短信消息设置 3 消息记录
-    };
-  },
-  computed: {
-    // 联客商城灰度开关
-    linkControl() {
-      return this.initData.openLinkC;
-    },
-    isShowSelfServicePortal() {
-      return isShowSelfServicePortal()
     }
   },
+  computed: {},
   created() {
-    let type = window.location.href.split("/")[
-      window.location.href.split("/").length - 1
-    ];
+    let type = window.location.href.split('/')[
+      window.location.href.split('/').length - 1
+    ]
     let typeObj = {
       wxSet: 1,
       toastList: 3,
-    };
-    this.nowMenu = typeObj[type];
+      doMyselfSet: 0,
+    }
+    this.nowMenu = typeObj[type]
   },
   methods: {
     changePage(index) {
       if (this.nowMenu === index) {
-        return;
+        return
       }
       if (index === 2) {
-        window.location.href = "/setting/message/smsmessage";
+        window.location.href = '/setting/message/smsmessage'
       } else if (index === 0) {
-        window.location.href = "/setting/serviceStation/customerPortal";
+        window.location.href = '/setting/doMyself/doMyselfSet'
       } else if (index === 1) {
-        window.location.href = "/setting/doMyself/wxSet";
+        window.location.href = '/setting/doMyself/wxSet'
       } else if (index === 3) {
-        window.location.href = "/setting/doMyself/toastList";
+        window.location.href = '/setting/doMyself/toastList'
       }
-      this.nowMenu === index;
+      this.nowMenu === index
     },
   },
   components: {
     [toastList.name]: toastList,
     [wxSet.name]: wxSet,
+    [doMyselfSet.name]: doMyselfSet,
   },
-};
+}
 </script>
 <style lang="scss">
+.al-start{
+  align-items: flex-start;
+}
 .flex-1 {
   flex: 1;
 }
@@ -161,7 +165,6 @@ img {
 }
 .flex-x {
   display: flex;
-  align-items: flex-start;
   .left-menu {
     width: 25%;
     min-width: 200px;
@@ -172,6 +175,7 @@ img {
     position: sticky;
     position: -webkit-sticky;
     top: 10px;
+    max-width: 400px;
     .menu-title {
       font-size: 18px;
       color: #454648;

@@ -330,7 +330,10 @@
           </div>
         </div>
       </div>
-      <version :version="releaseVersion" v-if="loadedEdition" :edition="shbEdition" />
+      <version :version="releaseVersion" v-if="loadedEdition" :edition="shbEdition" @showSystemPopup="updateSystemPopup" />
+      <!--start 系统弹窗 -->
+      <system-popup :system-data.sync="systemData" v-if="loadedSystemModal" />
+      <!--end 系统弹窗 -->
       <sale-manager
         :service-group-url="initData.serviceGroupUrl"
         :qrcode="initData.saleManagerQRCode"
@@ -398,29 +401,36 @@
 </template>
 
 <script>
-import platform from "@src/platform";
-import http from "@src/util/http";
-import FrameManager from "./FrameManager";
+import platform from '@src/platform';
+import http from '@src/util/http';
+import FrameManager from './FrameManager';
 
-import FrameTab from "./component/FrameTab.vue";
-import FrameNav from "./component/FrameNav.vue";
-import Version from "./component/Version.vue";
-import SaleManager from "./component/SaleManager.vue";
-import UserGuide from "./component/UserGuide.vue";
-import switchCompaniesDialog from "./component/switchCompaniesDialog.vue";
+import FrameTab from './component/FrameTab.vue';
+import FrameNav from './component/FrameNav.vue';
+import Version from './component/Version.vue';
+import SystemPopup from './component/SystemPopup.vue';
+import SaleManager from './component/SaleManager.vue';
+import UserGuide from './component/UserGuide.vue';
+import switchCompaniesDialog from './component/switchCompaniesDialog.vue';
 
-import ImportAndExport from "./component/ImportAndExport.vue";
+import ImportAndExport from './component/ImportAndExport.vue';
 
-import DefaultHead from "@src/assets/img/user-avatar.png";
-import NotificationCenter from "./component/NotificationCenter.vue";
-import * as NotificationApi from "@src/api/NotificationApi";
-import * as CallCenterApi from "@src/api/CallCenterApi";
-import * as SettingApi from "@src/api/SettingApi";
+import DefaultHead from '@src/assets/img/user-avatar.png';
+import NotificationCenter from './component/NotificationCenter.vue';
+import * as NotificationApi from '@src/api/NotificationApi';
+import * as CallCenterApi from '@src/api/CallCenterApi';
+import * as SettingApi from '@src/api/SettingApi';
 
 import { isShowDashboardScreen, isShowPlanTask, isShowLinkC, isShowMoreSperaParts } from '@src/util/version.ts'
 
 /* util */
 import _ from 'lodash';
+import Axios from 'axios';
+
+const newTaskGuideStore = require('@src/component/guide/taskV2Store');
+const GuideStoreObj = {
+  newTaskGuideStore
+}
 
 const NOTIFICATION_TIME = 1000 * 60 * 10;
 
@@ -431,8 +441,8 @@ let webSocketClient = null,
 
 export default {
   mixins: [FrameManager],
-  name: "frame-view",
-  inject: ["initData"],
+  name: 'frame-view',
+  inject: ['initData'],
   data() {
     return {
       tenantInform:{},
@@ -458,7 +468,7 @@ export default {
       notification: {
         count: 0,
       },
-      systemMsg: "",
+      systemMsg: '',
       notificationShow: false,
       notificationStyle: {},
       loginUser: this.initData.user || {}, // 当前登录的用户
@@ -476,7 +486,7 @@ export default {
       operationList: [],
 
       // 后台任务
-      backgroundTaskTitle: "后台任务",
+      backgroundTaskTitle: '后台任务',
 
       showCallCenter: false,
       callData: {},
@@ -492,7 +502,7 @@ export default {
           this.timeoutObj = setTimeout(() => {
             // 这里发送一个心跳，后端收到后，返回一个心跳消息，
             // onmessage拿到返回的心跳就说明连接正常
-            webSocketClient.send(JSON.stringify({ action: "ping" }));
+            webSocketClient.send(JSON.stringify({ action: 'ping' }));
             _num--;
             if (_num === 0) {
               webSocketClient.colse();
@@ -505,17 +515,23 @@ export default {
       navBarMenus: [],
       showNavBar: false,
       loadedEdition: false,
+      loadedSystemPopup:false,
+      showSystemPopup:false,
+      systemData:[],
       shbEdition: 1
     };
   },
   computed: {
+    loadedSystemModal(){
+      return this.loadedSystemPopup && this.showSystemPopup
+    },
     wsUrl() {
       // websocket连接地址
       // return `ws://30.40.56.211:8080/websocket/asset/7416b42a-25cc-11e7-a500-00163e12f748_dd4531bf-7598-11ea-bfc9-00163e304a25`
       const currentProtocol = window.location.protocol;
-      let protocol = "ws";
-      if (currentProtocol === "https:") {
-        protocol = "wss";
+      let protocol = 'ws';
+      if (currentProtocol === 'https:') {
+        protocol = 'wss';
       }
       return `${protocol}://${window.location.hostname}/api/callcenter/outside/websocket/asset/${this.loginUser.tenantId}_${this.loginUser.userId}`;
     },
@@ -580,39 +596,42 @@ export default {
       this.switchcompaniesState = false;
     },
     refresh() {},
+    updateSystemPopup(){
+      this.showSystemPopup = true
+    },
     async hangUpCall() {
       try {
         let { code, message } = await CallCenterApi.hangUpCall();
-        if (code != 0) this.$message.error(message || "内部错误");
-        console.log("res:", code, message);
+        if (code != 0) this.$message.error(message || '内部错误');
+        console.log('res:', code, message);
       } catch (error) {
         console.error(error);
       }
     },
     // 判断当前租户是否开启呼叫中心灰度功能
     async judgeCallCenterGray() {
-      localStorage.setItem("call_center_gray", 0);
-      localStorage.setItem("call_center_module", 0);
+      localStorage.setItem('call_center_gray', 0);
+      localStorage.setItem('call_center_module', 0);
       try {
-        const { status, data } = await http.get("/setting/callCenterGray");
+        const { status, data } = await http.get('/setting/callCenterGray');
         if (status !== 0 || !data) {
           return;
         }
         if (data.callcenter) {
           // 说明开启呼叫中心灰度
-          localStorage.setItem("call_center_gray", 1);
+          localStorage.setItem('call_center_gray', 1);
           return await this.getAccountInfo()
         }
 
-        localStorage.setItem("call_center_module", 0);
-        localStorage.setItem("call_center_gray", 0);
+        localStorage.setItem('call_center_module', 0);
+        localStorage.setItem('call_center_gray', 0);
         
       } catch (error) {
         console.error(error);
       }
     },
     async getAccountInfo() {
-      localStorage.setItem("call_center_module", 0);
+      localStorage.setItem('call_center_module', 0);
       try {
         const { code, result } = await CallCenterApi.getAccountInfo();
         // result为null未申请开通
@@ -622,11 +641,11 @@ export default {
         // 审核状态：0待审核，1已审核
         if (result.verifyStatus == 1) {
           this.has_call_center_module = true;
-          localStorage.setItem("call_center_module", 1);
-          if ("WebSocket" in window) {
+          localStorage.setItem('call_center_module', 1);
+          if ('WebSocket' in window) {
             this.initWebSocket();
           } else {
-            alert("当前浏览器 Not support websocket");
+            alert('当前浏览器 Not support websocket');
           }
 
           return true
@@ -643,7 +662,7 @@ export default {
         <base-context-menu-item command="all">关闭全部</base-context-menu-item>,
       ];
 
-      if (target && target.id != "tab_HOME") {
+      if (target && target.id != 'tab_HOME') {
         menus.unshift(
           <base-context-menu-item command="itself">关闭</base-context-menu-item>
         );
@@ -682,7 +701,7 @@ export default {
       this.profilePopperVisible = false;
       try {
         let result = await http.post(
-          "/security/user/updateState",
+          '/security/user/updateState',
           { state },
           false
         );
@@ -699,10 +718,10 @@ export default {
       this.loginUser.state = state;
     },
     async logout() {
-      if (await platform.confirm("您确定要退出系统吗？")) {
+      if (await platform.confirm('您确定要退出系统吗？')) {
         window.location.href = platform.inDingTalk
-          ? "/smlogin/pc/logout"
-          : "/logout";
+          ? '/smlogin/pc/logout'
+          : '/logout';
       }
     },
     openHelpDoc(event) {
@@ -711,9 +730,9 @@ export default {
     },
     openUserView(event) {
       this.openForFrame({
-        id: "userCenter",
+        id: 'userCenter',
         url: `/mine/${this.loginUser.userId}`,
-        title: "个人中心",
+        title: '个人中心',
       });
       this.profilePopperVisible = false;
     },
@@ -728,24 +747,23 @@ export default {
     /** 检测是否有导出 */
     async checkExports() {
       try {
-        this.exportList = (await http.get("/excels/getList")) || []; // 报错
+        this.exportList = (await http.get('/excels/getList')) || []; // 报错
         // 更新操作列表
         if (!Array.isArray(this.exportList)) this.exportList = [];
         // 更新操作列表
         this.operationList = this.operationList.filter((item) => {
           return (
-            item.operate == "cancel" ||
-            (item.operate == "download" &&
-              this.exportList.some((exp) => exp.id == item.id))
+            item.operate == 'cancel'
+            || (item.operate == 'download'
+              && this.exportList.some((exp) => exp.id == item.id))
           );
         });
 
         // 以下情况需要刷新列表
         // 1. 有为导出完成的文件
         // 2. 操作列表中仍有下载的文件
-        let autoFetchExportList =
-          this.exportList.some((item) => item.isFinished == 0) ||
-          this.operationList.some((item) => item.operate == "download");
+        let autoFetchExportList = this.exportList.some((item) => item.isFinished == 0)
+          || this.operationList.some((item) => item.operate == 'download');
 
         // 如果不需要更新，清空定时器
         if (!autoFetchExportList) {
@@ -774,12 +792,12 @@ export default {
     },
     /** @deprecated */
     clearCachedIds() {
-      let cachedKey = localStorage.getItem("cachedKey");
+      let cachedKey = localStorage.getItem('cachedKey');
       let cachedKeyArray = [];
 
-      if (cachedKey) cachedKeyArray = cachedKey.split(",");
+      if (cachedKey) cachedKeyArray = cachedKey.split(',');
       cachedKeyArray.forEach((key) => localStorage.setItem(key, []));
-      localStorage.removeItem("cachedKey");
+      localStorage.removeItem('cachedKey');
     },
     // popover manage
     exportPopoverToggle(visible) {
@@ -792,21 +810,32 @@ export default {
     },
     goRoleTeam() {
       platform.openTab({
-        id: "team",
-        title: "团队管理",
-        url: "/security/tag",
+        id: 'team',
+        title: '团队管理',
+        url: '/security/tag',
         reload: true,
       });
     },
     closeNotification() {
       this.notificationShow = false;
       sessionStorage.setItem(
-        "shb_systemMsg",
+        'shb_systemMsg',
         this.notificationInfo.msgSystem.id
       );
       this.clearAnimation();
     },
-
+    // 获取系统弹窗
+    async getSystemPopup(){
+      try{
+        let info = await http.get('/api/app/outside/message/v1/getSysMsgAlert')
+        if(info.status == 0 && info.data.length > 0){
+          this.loadedSystemPopup = true
+          this.systemData = info.data
+        }
+      }catch(error){
+        console.error(error);
+      }
+    },
     // 获取系统消息，本地存储，超出滚动
     async getSystemMsg() {
       try {
@@ -814,11 +843,11 @@ export default {
         if (info.status == 0) {
           this.notificationInfo = info.data;
           this.notification.count = info.data.unReadTotalCount;
-          let msgSystem = sessionStorage.getItem("shb_systemMsg");
+          let msgSystem = sessionStorage.getItem('shb_systemMsg');
 
           if (
-            this.notificationInfo.lastMessage &&
-            (!msgSystem || msgSystem != this.notificationInfo.lastMessage.id)
+            this.notificationInfo.lastMessage
+            && (!msgSystem || msgSystem != this.notificationInfo.lastMessage.id)
           ) {
             this.notification.title = info.data.lastMessage.title;
             this.notificationShow = true;
@@ -845,7 +874,7 @@ export default {
       });
     },
     clearAnimation() {
-      this.$refs.notificationContent.style.animation = "";
+      this.$refs.notificationContent.style.animation = '';
     },
 
     /** 删除未读消息或消息已读后更新新通知数量 */
@@ -854,7 +883,7 @@ export default {
       let count_ = this.notification.count - e.count;
       // 通知总数风险把控不把非正整数暴露给用户
       if (count_ < 0) {
-        console.warn("通知消息总数为负数");
+        console.warn('通知消息总数为负数');
         count_ = 0;
       }
       count_ = Math.round(count_);
@@ -881,25 +910,25 @@ export default {
     },
     goCustomerContact() {
       platform.openTab({
-        id: "customer_contact",
-        title: "产品设置",
-        url: "/customerContact",
+        id: 'product_setting',
+        title: '产品设置',
+        url: '/setting/product/fields',
         reload: true,
       });
     },
     goProductSetting() {
       platform.openTab({
-        id: "product_setting",
-        title: "产品设置",
-        url: "/setting/product/fields",
+        id: 'customer_contact',
+        title: '产品设置',
+        url: '/customerContact',
         reload: true,
       });
     },
     goDoMyself() {
       platform.openTab({
-        id: "do_myself",
-        title: "消息中心",
-        url: "/setting/doMyself/wxSet",
+        id: 'do_myself',
+        title: '消息中心',
+        url: '/setting/doMyself/wxSet',
         reload: true,
       });
     },
@@ -945,41 +974,33 @@ export default {
     },
     goCallCenterSetting() {
       platform.openTab({
-        id: "callcenter_setting",
-        title: "呼叫中心设置",
-        url: "/setting/callcenter/setting",
+        id: 'callcenter_setting',
+        title: '呼叫中心设置',
+        url: '/setting/callcenter/setting',
         reload: true,
       });
     },
     goCallCenter() {
       platform.openTab({
-        id: "callcenter_stage",
-        title: "呼叫中心",
-        url: "/setting/callcenter/stage",
+        id: 'callcenter_stage',
+        title: '呼叫中心',
+        url: '/setting/callcenter/stage',
         reload: true,
       });
     },
     goCallCenterWorkbench() {
       platform.openTab({
-        id: "M_CALLCENTER_WORKBENCH_LIST",
-        title: "呼叫中心工作台",
-        url: "/setting/callcenter/workbench",
-        reload: true,
-      });
-    },
-    goMyShop() {
-      platform.openTab({
-        id: "my_shop",
-        title: "门户设置",
-        url: "/linkc/setting",
+        id: 'M_CALLCENTER_WORKBENCH_LIST',
+        title: '呼叫中心工作台',
+        url: '/setting/callcenter/workbench',
         reload: true,
       });
     },
     goMyShopOrder() {
       platform.openTab({
-        id: "my_shop_order_list",
-        title: "订单列表",
-        url: "/linkc/order/list",
+        id: 'my_shop_order_list',
+        title: '订单列表',
+        url: '/linkc/order/list',
         reload: true,
       });
     },
@@ -989,13 +1010,12 @@ export default {
     },
     openCallCenterWorkbench(data) {
       // console.info('data::', data);
-      let url =
-        data && data.id
-          ? `/setting/callcenter/workbench?id=${data.id}&dialCount=${data.dialCount}&linkmanName=${data.linkmanName}&callPhone=${data.callPhone}&callType=${data.callType}&callState=${data.callState}&ringTime=${data.ringTime}`
-          : "/setting/callcenter/workbench";
+      let url = data && data.id
+        ? `/setting/callcenter/workbench?id=${data.id}&dialCount=${data.dialCount}&linkmanName=${data.linkmanName}&callPhone=${data.callPhone}&callType=${data.callType}&callState=${data.callState}&ringTime=${data.ringTime}`
+        : '/setting/callcenter/workbench';
       platform.openTab({
-        id: "M_CALLCENTER_WORKBENCH_LIST",
-        title: "呼叫中心工作台",
+        id: 'M_CALLCENTER_WORKBENCH_LIST',
+        title: '呼叫中心工作台',
         url,
         reload: true,
       });
@@ -1017,25 +1037,25 @@ export default {
       // this.heartCheck.start();
 
       setTimeout(() => {
-        this.send(JSON.stringify({ action: "ping" }));
+        this.send(JSON.stringify({ action: 'ping' }));
       }, 500);
     },
     async webSocketOnMessage(e) {
       this.heartCheck.start();
       // console.info('数据内容：{0}', e.data)
       // pong 是心跳
-      if (e.data === "pong") return;
+      if (e.data === 'pong') return;
       // 这里处理接受到来电的消息
       try {
         const data = JSON.parse(e.data);
         // {"callPhone":"15267183070","callState":"Hangup","callType":"dialout","ringTime":1592636121000}
         // console.info('data:', data.callType, data.callState);
 
-        if (data.callType === "normal" || data.callType === "dialout") {
-          if (data.callState === "Hangup") {
+        if (data.callType === 'normal' || data.callType === 'dialout') {
+          if (data.callState === 'Hangup') {
             // 没接听
             this.showCallCenter = false;
-          } else if (data.callState === "Unlink" || data.callState === "Link") {
+          } else if (data.callState === 'Unlink' || data.callState === 'Link') {
             // 接听了和接听然后挂断了
             this.callData = data;
             this.showCallCenter = false;
@@ -1061,7 +1081,7 @@ export default {
         // console.info('readyState:', webSocketClient.readyState)
         webSocketClient.send(param);
       } catch (err) {
-        console.error("error", err);
+        console.error('error', err);
       }
     },
     webSocketClose(e) {
@@ -1091,7 +1111,6 @@ export default {
       // 工单列表重定向
       this.currentTaskListTab.url = `/task?newVersion=${version}`;
       this.reloadFrameTab(this.currentTaskListTab, true);
-
       this.isUserTaskGray = !this.isUserTaskGray;
     }, 1000),
     /** 
@@ -1164,10 +1183,10 @@ export default {
     window.exportPopoverToggle = this.exportPopoverToggle;
 
     window.resizeFrame = function () {
-      console.warn("此方法只用于兼容旧页面，无实际效果，不推荐调用");
+      console.warn('此方法只用于兼容旧页面，无实际效果，不推荐调用');
     };
     this.clearCachedIds();
-    sessionStorage.removeItem("shb_systemMsg");
+    sessionStorage.removeItem('shb_systemMsg');
     this.getSystemMsg();
     setInterval(() => {
       this.getSystemMsg();
@@ -1180,15 +1199,61 @@ export default {
     if (userGuide) {
       this.$refs.userGuideView.show();
     }
+
+    /** * 部分页面引导 数据处理  s*/
+    if( this?.initData?.needResetGuide){
+      let needResetGuideArr = this?.initData?.needResetGuide;
+      
+      needResetGuideArr.forEach((item) => {
+        try {
+          Object.keys(GuideStoreObj[item]).forEach((items) => {
+            localStorage.setItem(GuideStoreObj[item][items], '-1')
+          })
+        } catch (error) {
+
+        }
+      })
+    }
+
+    if( this?.initData?.needGuide){
+      let needGuideArr = this?.initData?.needGuide;
+      // let needGuideArr = ['newTaskGuideStore'];
+      needGuideArr.forEach((item) => {
+        try {
+          Object.keys(GuideStoreObj[item]).forEach((items) => {
+            localStorage.setItem(GuideStoreObj[item][items], '-1')
+          })
+        } catch (error) {
+
+        }
+      })
+    }
+
+    if( this?.initData?.needClearGuide){
+      let needClearGuideArr = this?.initData?.needClearGuide;
+      // let needGuideArr = ['newTaskGuideStore'];
+      needClearGuideArr.forEach((item) => {
+        try {
+          Object.keys(GuideStoreObj[item]).forEach((items) => {
+            localStorage.removeItem(GuideStoreObj[item][items])
+          })
+        } catch (error) {
+
+        }
+      })
+    }
+    /** * 部分页面引导 数据处理  e*/
     this.checkExports();
    
     this.getTenantInform();
     this.getShbEdition()
+    this.getSystemPopup();
   },
   components: {
     [FrameNav.name]: FrameNav,
     [FrameTab.name]: FrameTab,
     [Version.name]: Version,
+    [SystemPopup.name]: SystemPopup,
     [SaleManager.name]: SaleManager,
     [NotificationCenter.name]: NotificationCenter,
     [ImportAndExport.name]: ImportAndExport,

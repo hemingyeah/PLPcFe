@@ -17,7 +17,7 @@ router.get('/setting/doMyself/:type', async ctx => {
   //   'toast-list': '消息记录'
   // }
 
-  ctx.body = Template.renderWithHtml('消息中心', body, script, modConfig.template)
+  ctx.body = Template.renderWithHtml('自助门户设置', body, script, modConfig.template)
 });
 
 module.exports = router;

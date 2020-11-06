@@ -12,7 +12,7 @@
           content="只能处理已指派、已接受、进行中且没有处于暂停或审批状态的工单"
           placement="top"
         >
-          <i class="iconfont icon-jinggao"></i> </el-tooltip
+          <i class="iconfont icon-question task-icon"></i> </el-tooltip
         ><br />
         请选择新工单负责人或协同人，字段为空时信息将不会修改
         <p @click="checkDept(0)">

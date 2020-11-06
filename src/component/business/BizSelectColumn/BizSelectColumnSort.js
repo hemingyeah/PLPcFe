@@ -29,6 +29,7 @@ const NestedDraggable = {
   render(h) {
     return (
       <draggable 
+        animation="180"
         class="nested-draggable"
         tag="div" 
         list={ this.lists }
@@ -40,7 +41,7 @@ const NestedDraggable = {
             return (
               <div key={ uuid() } class="nested-draggable-block">
                 <div class="nested-draggable-name">
-                  <span class="nested-draggable-name-label"><i class="iconfont icon-paixu"></i></span>
+                  <span class="nested-draggable-name-label"><i class="iconfont icon-tuozhuaipaixu"></i></span>
                   <span class="nested-draggable-name-text">{ item.name }</span>
                 </div>
                 <nested-draggable lists={ item.lists }></nested-draggable>

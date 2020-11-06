@@ -455,47 +455,13 @@
         <template v-else-if="listType == 'useRecord'">
           <template v-for="column in showColumns">
             <el-table-column
-              v-if="column.field === 'taskNo'"
-              :key="column.field"
-              :label="column.label"
-              :width="column.width"
-              :min-width="column.minWidth"
-              show-overflow-tooltip
-            >
-              <template slot-scope="scope">
-                <a
-                  class="no-padding el-button no-padding el-button--text"
-                  style="color: #55B7B4;text-decoration: none;"
-                  @click.prevent="openTaskDetail2(scope.row.taskNo)">
-                  {{scope.row.taskNo}}
-                </a>
-              </template>
-            </el-table-column>
-            <el-table-column
-              v-else-if="column.field === 'customerNumber'"
-              :key="column.field"
-              :label="column.label"
-              :width="column.width"
-              :min-width="column.minWidth"
-              show-overflow-tooltip
-            >
-              <template slot-scope="scope">
-                <a
-                  class="no-padding el-button no-padding el-button--text"
-                  style="color: #55B7B4;text-decoration: none;"
-                  @click.prevent="openCustomerDetail(scope.row.customer)">
-                  {{scope.row.customerNumber}}
-                </a>
-              </template>
-            </el-table-column>
-            <el-table-column
-              v-else
               :key="column.field"
               :label="column.label"
               :width="column.width"
               :min-width="column.minWidth"
               :prop="column.field"
               show-overflow-tooltip>
+
             </el-table-column>
           </template>
         </template>
@@ -850,21 +816,6 @@ export default {
         close: true,
         fromId
       })
-    },
-    async openTaskDetail2(taskNo){
-      const result=await this.$http.get('http://30.40.56.82:3000/mock/59/outside/pc/task/getTaskIdByNo');
-      console.log(result);
-    },
-    openCustomerDetail(customerId){
-      let fromId = window.frameElement.getAttribute('id');
-
-      this.$platform.openTab({
-        id: `customer_view_${customerId}`,
-        title: '客户详情',
-        close: true,
-        url: `/customer/view/${customerId}?noHistory=1`,
-        fromId
-      });
     },
 
     //

@@ -12,11 +12,13 @@
     "serve": "node --max_old_space_size=8192 script/development.js",
     "build:new": "cnpm install & node script/production.js",
     "build:cloud": "node script/production.js",
+    "build:hbc": "node script/production.js --user=huangbc",
     "lint": "eslint --fix --ext .js,.vue src",
     "count": "cloc ./ --exclude-dir=node_modules,dist,package-lock.json",
     "comp": "node script/component.js",
     "tag": "./script/tag.sh ${1} ${2}",
-    "br": "./script/br.sh ${1} ${2} ${3}"
+    "br": "./script/br.sh ${1} ${2} ${3}",
+    "commit-lint": "./script/commit-message.sh"
   },
   "author": "dongls",
   "license": "ISC",
@@ -109,11 +111,6 @@
   "config": {
     "commitizen": {
       "path": "node_modules/cz-customizable"
-    }
-  },
-  "husky": {
-    "hooks": {
-      "commit-msg": "commitlint --config .commitlintrc.js -E HUSKY_GIT_PARAMS"
     }
   }
 }

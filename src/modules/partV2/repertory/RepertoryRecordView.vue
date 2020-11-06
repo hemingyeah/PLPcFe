@@ -299,22 +299,6 @@
                 <div class="text-overflow-hidden">{{scope.row[column.field]}}</div>
               </el-tooltip>
             </template>
-            <template v-else-if="column.field == 'taskNo'">
-              <a
-                class="no-padding el-button no-padding el-button--text"
-                style="color: #55B7B4;text-decoration: none;"
-                @click.prevent="openTaskDetail(scope.row.taskNo)">
-                {{scope.row.taskNo}}
-              </a>
-            </template>
-            <template v-else-if="column.field == 'customerNumber'">
-              <a
-                class="no-padding el-button no-padding el-button--text"
-                style="color: #55B7B4;text-decoration: none;"
-                @click.prevent="openCustomerDetail(scope.row.customer)">
-                {{scope.row.customerNumber}}
-              </a>
-            </template>
             <template v-else>{{scope.row[column.field]}}</template>
           </template>
         </el-table-column>
@@ -491,22 +475,6 @@ export default {
     }
   },
   methods: {
-    // 打开工单详情
-    openTaskDetail(taskNo){
-      console.log(taskNo);
-    },
-    // 打开客户详情
-    openCustomerDetail(customerId){
-      let fromId = window.frameElement.getAttribute('id');
-
-      this.$platform.openTab({
-        id: `customer_view_${customerId}`,
-        title: '客户详情',
-        close: true,
-        url: `/customer/view/${customerId}?noHistory=1`,
-        fromId
-      });
-    },
     cancelSelectPart(part) {
       if (!part || !part.id) return;
       this.selected = this.selected.filter(ms => ms.id !== part.id);

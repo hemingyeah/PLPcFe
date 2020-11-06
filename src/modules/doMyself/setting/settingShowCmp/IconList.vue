@@ -1,6 +1,6 @@
 <template>
   <div class="setting-show-cmp-box">
-    <draggable class="icon-list-box flex-x flex-w al-start" v-model="dataInfo">
+    <draggable class="icon-list-box flex-x flex-w al-start" handle=".can-move" v-model="dataInfo">
       <div
         :class="['can-move', 'icon-list-item', nowId==item.id?'icon-list-item-check':'']"
         v-for="(item, index) in dataInfo"
@@ -12,7 +12,7 @@
         <div class="overHideCon-1 font-10">{{item.name}}</div>
       </div>
 
-      <div class="can-move icon-list-item" v-if="dataInfo.length < 8" @click="add_dataList">
+      <div class="cur-point icon-list-item" v-if="dataInfo.length < 8" @click="add_dataList">
         <div class="icon-list-item-add">
           <i class="iconfont icon-plus-circle-fill"></i>
         </div>
@@ -22,33 +22,33 @@
   </div>
 </template>
 <script>
-import draggable from "vuedraggable";
-import _ from "lodash";
+import draggable from 'vuedraggable';
+import _ from 'lodash';
 
-import img_1 from "@src/assets/img/myShop/icon1.png";
-import img_2 from "@src/assets/img/myShop/icon2.png";
-import img_3 from "@src/assets/img/myShop/icon3.png";
-import img_4 from "@src/assets/img/myShop/icon4.png";
-import img_5 from "@src/assets/img/myShop/icon5.png";
-import img_6 from "@src/assets/img/myShop/icon6.png";
-import img_7 from "@src/assets/img/myShop/icon7.png";
-import img_8 from "@src/assets/img/myShop/icon8.png";
-import img_9 from "@src/assets/img/myShop/icon9.png";
-import img_10 from "@src/assets/img/myShop/icon10.png";
-import img_11 from "@src/assets/img/myShop/icon11.png";
-import img_12 from "@src/assets/img/myShop/icon12.png";
-import img_13 from "@src/assets/img/myShop/icon13.png";
-import img_14 from "@src/assets/img/myShop/icon14.png";
-import img_15 from "@src/assets/img/myShop/icon15.png";
-import img_16 from "@src/assets/img/myShop/icon16.png";
+import img_1 from '@src/assets/img/myShop/icon1.png';
+import img_2 from '@src/assets/img/myShop/icon2.png';
+import img_3 from '@src/assets/img/myShop/icon3.png';
+import img_4 from '@src/assets/img/myShop/icon4.png';
+import img_5 from '@src/assets/img/myShop/icon5.png';
+import img_6 from '@src/assets/img/myShop/icon6.png';
+import img_7 from '@src/assets/img/myShop/icon7.png';
+import img_8 from '@src/assets/img/myShop/icon8.png';
+import img_9 from '@src/assets/img/myShop/icon9.png';
+import img_10 from '@src/assets/img/myShop/icon10.png';
+import img_11 from '@src/assets/img/myShop/icon11.png';
+import img_12 from '@src/assets/img/myShop/icon12.png';
+import img_13 from '@src/assets/img/myShop/icon13.png';
+import img_14 from '@src/assets/img/myShop/icon14.png';
+import img_15 from '@src/assets/img/myShop/icon15.png';
+import img_16 from '@src/assets/img/myShop/icon16.png';
 
 export default {
-  name: "icon-list",
-  props: ["infoData", "cmpId", "nowSettingDataId", "eventList"],
+  name: 'icon-list',
+  props: ['infoData', 'cmpId', 'nowSettingDataId', 'eventList'],
   components: {
     draggable,
   },
-  inject: ["cancelInfoData"],
+  inject: ['cancelInfoData'],
   data() {
     return {
       dataInfo: this.infoData || [],
@@ -70,7 +70,7 @@ export default {
         img_15,
         img_16,
       },
-      nowId: "",
+      nowId: '',
     };
   },
   watch: {
@@ -83,7 +83,7 @@ export default {
     },
     nowSettingDataId(value) {
       if (value == -1 || value != this.cmpId) {
-        this.$set(this, "nowId", "");
+        this.$set(this, 'nowId', '');
       }
     },
   },
@@ -91,14 +91,14 @@ export default {
     add_dataList() {
       let id_ = new Date().getTime();
       let item = {
-        iconType: "1",
-        name: "快捷入口",
-        type: "",
+        iconType: '1',
+        name: '快捷入口',
+        type: '',
         id: id_,
         cmpId: this.cmpId,
-        eventTempId: this.eventList.length > 0 ? this.eventList[0].id : "",
+        eventTempId: this.eventList.length > 0 ? this.eventList[0].id : '',
       };
-      this.$emit("pushIcon", { id: this.cmpId, item });
+      this.$emit('pushIcon', { id: this.cmpId, item });
 
       this.changeThis(item);
     },
@@ -109,7 +109,7 @@ export default {
         return;
       }
       this.nowId = item.id;
-      this.$emit("changeThis", { id: this.cmpId, item });
+      this.$emit('changeThis', { id: this.cmpId, item });
     },
   },
 };

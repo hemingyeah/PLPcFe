@@ -42,6 +42,13 @@ export default {
       description: '',
     }
   },
+  watch:{
+    'show'(val){
+      if(!val){
+        this.$emit('showSystemPopup', true)
+      }
+    }
+  },
   computed: {
     editionText() {
       return EditionMap[this.edition] || EditionMap[1]
@@ -55,6 +62,8 @@ export default {
       if(version && (!currVersion || currVersion != version)){
         // 只有在显示提示信息后，才更新本地缓存
         if(await this.showVersion()) localStorage.setItem(VERSION_NUM_KEY, this.version);       
+      }else{
+        this.$emit('showSystemPopup', true)
       }
     },
     async showVersion(){
@@ -62,7 +71,7 @@ export default {
         let result = await http.get('/getLastVersion');
         let lastVersion = result.data || {};
         
-        this.versionNum = lastVersion.versionNum;
+        this.versionNum = lastVersion.versionNum.toLocaleLowerCase().replace('vip', '');
         this.description = lastVersion.description;
         this.show = true;
         
@@ -81,7 +90,7 @@ export default {
   mounted(){
     this.checkVersion();
 
-    //导出显示版本信息接口，方面子页面调用
+    // 导出显示版本信息接口，方面子页面调用
     window.shb_global_showVersion = this.showVersion;
   }
 }
