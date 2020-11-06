@@ -285,7 +285,7 @@ export default {
       if(!longitude || !latitude) return;
       
       this.$fast.map
-        .display({ ...content })
+        .display({ ...content }, { title: '位置信息' })
         .catch(err => console.error('openMap catch an err: ', err));
     },
     openMapForFinished(content) {
@@ -297,7 +297,7 @@ export default {
       this.$fast.map
         .display(
           { ...content }, 
-          undefined, 
+          { title: '位置信息' }, 
           undefined,
           undefined,
           (map, aMap) => {
