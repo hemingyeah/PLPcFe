@@ -365,7 +365,7 @@ export default {
     advancedSearch() {
       this.params.pageNum = 1;
       this.taskPage.list = [];
-
+      console.log(this.$refs.searchPanel.buildParams());
       this.params.moreConditions = this.$refs.searchPanel.buildParams();
       // this.$refs.searchPanel.hide();
 
@@ -1793,12 +1793,13 @@ export default {
             oncePrinted = "";
             break;
         }
-        let source=params.source.map((item)=>{
+        console.log(1111,params.source);
+        let source=params.source && params.source.length && params.source.map((item)=>{
           if(item=='API创建'){
             item='开放API'
           } 
           return item;
-        })
+        }) || [];
         // 是否审批中
         let inApprove;
         switch (params.inApprove) {
