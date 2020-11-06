@@ -85,7 +85,7 @@ export default class TaskAllotMap extends Vue {
   private buildCustomerAddressMapMarkerContent(): string {
     return '<i class="bm-location-dot"></i><div class="map-address-title">客户地址</div>';
   }
-
+  
   /**
    * @description 构建客户地址标记内容
   */

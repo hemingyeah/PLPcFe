@@ -1,5 +1,5 @@
 /* api */
-import { getTaskAlloyPoolUserList } from '@src/api/TaskApi'
+import { getTaskAlloyPoolUserList, getTaskAlloyPoolList } from '@src/api/TaskApi'
 /* components */
 import TaskAllotMap from '@src/modules/task/components/TaskAllotModal/TaskAllotMap/TaskAllotMap.tsx'
 import TaskAllotPoolNotification from '@src/modules/task/components/TaskAllotModal/TaskAllotPool/TaskAllotPoolNotification/TaskAllotPoolNotification.tsx'
@@ -11,7 +11,9 @@ import { TaskPoolNotificationTypeEnum } from '@src/modules/task/components/TaskA
 /* entity */
 import Customer from '@model/entity/Customer'
 import CustomerAddress from '@model/entity/CustomerAddress'
+import EsTask from '@model/entity/EsTask'
 import LoginUser from '@model/entity/LoginUser/LoginUser'
+import Tag from '@model/entity/Tag/Tag'
 /* image */
 // @ts-ignore
 import DefaultHead from '@src/assets/img/avatar.png'
@@ -46,6 +48,8 @@ export default class TaskAllotPool extends Vue {
   // 显示状态
   @Prop() readonly show: boolean | undefined
   
+  /* 地图用户信息弹窗 */
+  private AMapUserInfoWindow: any = null
   /* 地图的id */
   private mapId: string = 'TaskAllotPoolMapContainer'
   /* 通知方式复选 */
@@ -59,6 +63,8 @@ export default class TaskAllotPool extends Vue {
     subscriptionUserCount: 1,
     havePermissionUserCount: 2,
   }
+  /* 工单池列表 */
+  private taskPoolList: any[] = []
   /* 用户page */
   private userPage: Page =  new Page()
   
@@ -85,13 +91,23 @@ export default class TaskAllotPool extends Vue {
   }
   
   /** 
+   * @description 构建标记
+  */
+  private buildMarkers(amap: any, infoWindow: any): void {
+    // 构建人员标记
+    this.buildUserMarkers(amap)
+    // 构建工单标记
+    this.buildTaskMarkers(amap)
+  }
+  
+  /** 
    * @description 构建人员标记
    * @param {Object} amap 高德地图对象
    * @param {Object} infoWindow 高德地图窗口对象
   */
-  public buildMarkers(amap: any, infoWindow: any): void {
+  public buildUserMarkers(amap: any): void {
     if (this.userPage.list.length <= 0) {
-      return Log.warn('userPage.list is empty', this.buildMarkers.name)
+      return Log.warn('userPage.list is empty', this.buildUserMarkers.name)
     }
     
     this.userPage.list.forEach((user: LoginUser) => {
@@ -109,10 +125,84 @@ export default class TaskAllotPool extends Vue {
       })
       
       userMarker.on(EventNameEnum.Click, (event: any) => {
-        // TODO: 打开人员卡片
+        
+        this.AMapUserInfoWindow = new AMap.InfoWindow({
+          closeWhenClickMap: true,
+          isCustom: true,
+          offset: new AMap.Pixel(0, -34),
+          content: this.buildUserMarkerInfo(event)
+        })
+        
+        this.AMapUserInfoWindow.open(amap, event.target.getPosition())
       })
       
     })
+  }
+  
+  /** 
+   * @description 构建工单标记
+   * @param {Object} amap 高德地图对象
+   * @param {Object} infoWindow 高德地图窗口对象
+  */
+  public buildTaskMarkers(amap: any): void {
+    if (this.taskPoolList.length <= 0) {
+      return Log.warn('taskPoolList is empty', this.buildTaskMarkers.name)
+    }
+    
+    this.taskPoolList.forEach((task: any) => {
+      let { longitude, latitude } = task?.taddress || {}
+      // 无经纬度
+      if (!longitude && !latitude) return
+      
+      // 用户标记
+      let taskMarker = new AMap.Marker({
+        position: [longitude, latitude],
+        title: task.taskNo,
+        map: amap,
+        extData: task,
+        content: `<i class="iconfont task-pool-icon icon-address ${task.isTimeout ? 'task-pool-timeout' : ''}"></i>`
+      })
+      
+      taskMarker.on(EventNameEnum.Click, (event: any) => {
+        // TODO: 打开工单信息卡片
+      })
+      
+    })
+  }
+  
+  /**
+   * @description 构建人员信息弹窗
+  */
+  private buildUserMarkerInfo(event: any) : string {
+    let user: LoginUser = event?.target?.getExtData() || new LoginUser()
+    
+    return (
+      `
+        <div class="task-pool-user-content">
+          <div class="task-pool-user-info">
+            <span class='task-pool-user-name'>${ user.displayName }</span>
+            <span class='task-pool-user-state'>${ user.state || ''}</span>
+            <span class='task-pool-user-phone'>${ user.cellPhone || '' }</span>
+          </div>
+          <div class="task-pool-user-team">
+            服务团队: 
+            ${
+              Array.isArray(user.tagList) 
+              ? (
+                user.tagList.map((tag: Tag) => {
+                  return `<span>${tag.tagName}</span>`
+                }).join()
+              )
+              : ''
+            }
+          </div>
+          <div class="task-pool-user-count">
+            <span>未完成工单</span>
+            <span>本月已完成工单量</span>
+          </div>
+        </div>
+      `
+    )
   }
   
   /** 
@@ -165,6 +255,26 @@ export default class TaskAllotPool extends Vue {
     )
   }
   
+  /** 
+   * @description 获取工单池列表
+  */
+  private fetchTaskPoolList() {
+    return (
+      getTaskAlloyPoolList({}).then(result => {
+        let isSuccess = result.success
+        if (!isSuccess) {
+          return Platform.alert(result.message)
+        }
+        
+        this.taskPoolList = result?.result?.list.map((task: any) => {
+          let isTimeout = task.overTime ? task.overTime < new Date().getTime() : false
+          task.isTimeout = isTimeout
+          return task
+        }) || []
+      })
+    )
+  }
+  
   private handleAddNotificationUser() {
     // 判断是否选中 可以通知其他人
     if (!this.notificationCheckd || !this.notificationCheckd.includes(TaskPoolNotificationTypeEnum.SendToOtherUser)) {
@@ -191,7 +301,9 @@ export default class TaskAllotPool extends Vue {
     this.userPage = new Page()
     
     this.fetchUsers().then(() => {
-      this.mapInit()
+      this.fetchTaskPoolList().then(() => {
+        this.mapInit()
+      })
     })
   }
   
