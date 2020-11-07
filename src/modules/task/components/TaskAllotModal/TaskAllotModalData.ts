@@ -1,6 +1,7 @@
 /* entity */
 import Customer from '@model/entity/Customer'
 import LoginUser from '@model/entity/LoginUser/LoginUser'
+import TaskConfig from '@model/types/TaskConfig'
 /* enum */
 import TaskAllotTypeEnum from '@model/enum/TaskAllotTypeEnum'
 /* props */
@@ -21,6 +22,8 @@ class TaskAllotModalData extends TaskAllotModalProps {
   public showTaskAllotModal: boolean = false
   /* 协同人列表 */
   public synergyUserList: LoginUser[] = []
+  /* 工单设置 */
+  public taskConfig: TaskConfig = new TaskConfig()
 }
 
 export default TaskAllotModalData

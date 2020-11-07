@@ -40,6 +40,7 @@ class LoginUser {
   public staffId?: String = ''
   public tenantId?: String = ''
   public mainTeamId?: String = ''
+  // 未完成工单量
   public unfinishedTask?: Number | null = null
   public todayFinishedTask?: Number | null = null
   public state?: String = ''

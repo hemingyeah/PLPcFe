@@ -2,7 +2,7 @@
   <div style="padding: 10px;">
 
     <biz-select-column ref="bizSelectColumn"></biz-select-column>
-    <task-allot-modal ref="TaskAllotModal" :user-state-map="userStateMap" customer-id="e5c4741b-18e9-11eb-a442-00163e304a25"></task-allot-modal>
+    <task-allot-modal ref="TaskAllotModal" :user-state-map="userStateMap" customer-id="abd228da-014e-11eb-9baf-00163e0d174e"></task-allot-modal>
 
   </div>
 </template>

@@ -59,7 +59,7 @@ export function openTabForTaskCreate(defaultTypeId = '') {
 */
 export function openTabForCustomerView(customerId = '', isNoHistory = true) {
   let fromId = getFromId();
-
+  
   platform.openTab({
     id: `customer_view_${customerId}`,
     title: '客户详情',

@@ -11,9 +11,9 @@ import { TaskPoolNotificationTypeEnum } from '@src/modules/task/components/TaskA
 /* entity */
 import Customer from '@model/entity/Customer'
 import CustomerAddress from '@model/entity/CustomerAddress'
-import EsTask from '@model/entity/EsTask'
 import LoginUser from '@model/entity/LoginUser/LoginUser'
 import Tag from '@model/entity/Tag/Tag'
+import TaskListItem from '@model/types/TaskListItem'
 /* image */
 // @ts-ignore
 import DefaultHead from '@src/assets/img/avatar.png'
@@ -33,8 +33,21 @@ import '@src/modules/task/components/TaskAllotModal/TaskAllotPool/TaskAllotPool.
 import Log from '@src/util/log.ts'
 import Platform from '@src/util/Platform'
 import { findComponentUpward } from '@src/util/assist'
+import { openTabForTaskView, openTabForCustomerView } from '@src/util/business/openTab'
+import { xor } from 'lodash'
 
 declare let AMap: any
+
+const ENCRYPT_FIELD_VALUE = '***'
+
+// @ts-ignore
+window.openTaskViewFunc = function openTaskViewFunc(taskId: string) {
+  openTabForTaskView(taskId)
+}
+// @ts-ignore
+window.openCustomerViewFunc = function openCustomerViewFunc(customerId: string) {
+  openTabForCustomerView(customerId)
+}
 
 @Component({ 
   name: ComponentNameEnum.TaskAllotPool,
@@ -50,6 +63,8 @@ export default class TaskAllotPool extends Vue {
   
   /* 地图用户信息弹窗 */
   private AMapUserInfoWindow: any = null
+  /* 工单信息弹窗 */
+  private AMapTaskInfoWindow: any = null
   /* 地图的id */
   private mapId: string = 'TaskAllotPoolMapContainer'
   /* 通知方式复选 */
@@ -82,7 +97,7 @@ export default class TaskAllotPool extends Vue {
   get customerAddress(): CustomerAddress {
     return this.customer.customerAddress || new CustomerAddress()
   }
-
+  
   @Watch('show')
   onShowChanged(newValue: boolean) {
     if (newValue) {
@@ -124,7 +139,7 @@ export default class TaskAllotPool extends Vue {
         content: `<img class='staff-header' width='42' height='42' src='${user.head || DefaultHead}' />`
       })
       
-      userMarker.on(EventNameEnum.Click, (event: any) => {
+      userMarker.on(EventNameEnum.MouseOver, (event: any) => {
         
         this.AMapUserInfoWindow = new AMap.InfoWindow({
           closeWhenClickMap: true,
@@ -163,8 +178,15 @@ export default class TaskAllotPool extends Vue {
         content: `<i class="iconfont task-pool-icon icon-address ${task.isTimeout ? 'task-pool-timeout' : ''}"></i>`
       })
       
-      taskMarker.on(EventNameEnum.Click, (event: any) => {
-        // TODO: 打开工单信息卡片
+      taskMarker.on(EventNameEnum.MouseOver, (event: any) => {
+        this.AMapTaskInfoWindow = new AMap.InfoWindow({
+          closeWhenClickMap: true,
+          isCustom: true,
+          offset: new AMap.Pixel(0, -34),
+          content: this.buildTaskMarkerInfo(event)
+        })
+        
+        this.AMapTaskInfoWindow.open(amap, event.target.getPosition())
       })
       
     })
@@ -180,9 +202,11 @@ export default class TaskAllotPool extends Vue {
       `
         <div class="task-pool-user-content">
           <div class="task-pool-user-info">
-            <span class='task-pool-user-name'>${ user.displayName }</span>
-            <span class='task-pool-user-state'>${ user.state || ''}</span>
-            <span class='task-pool-user-phone'>${ user.cellPhone || '' }</span>
+            <div class="task-pool-user-info-left">
+              <span class='task-pool-user-name'>${user.displayName}</span>
+              <span class='task-pool-user-state'>${user.state || ''}</span>
+            </div>
+            <div class='task-pool-user-phone'>${user.cellPhone || ''}</div>
           </div>
           <div class="task-pool-user-team">
             服务团队: 
@@ -197,14 +221,52 @@ export default class TaskAllotPool extends Vue {
             }
           </div>
           <div class="task-pool-user-count">
-            <span>未完成工单</span>
-            <span>本月已完成工单量</span>
+            <span>未完成工单: ${user.unfinishedTask || ''}</span>
+            <span>本月已完成工单量: ${user.todayFinishedTask || ''}</span>
           </div>
         </div>
       `
     )
   }
   
+    /**
+   * @description 构建人员信息弹窗
+  */
+  private buildTaskMarkerInfo(event: any) : string {
+    let task: any = event?.target?.getExtData() || {}
+    let {
+      customerId = '',
+      customerName = '', 
+      taskId,
+      taskNo = '', 
+      lmName = '', 
+      lmPhone = '', 
+      customerAddress,
+      planTime = '',
+      havePermissionUserCount,
+      isTimeout
+    } = task
+    customerAddress = new CustomerAddress(customerAddress)
+    
+    return (
+      `
+      <div class="map-info-window-content map-task-content-window">
+        <div class="map-task-content-window-header">
+          <div class="customer-name link-text" onclick="openCustomerViewFunc('${customerId}')">${ customerName }</div>
+          ${isTimeout ? '<div class="map-task-content-window-header-timeout">超时接单</div>' : ''}
+        </div>
+        <p><label>工单编号：</label><span class="link-text" onclick="openTaskViewFunc('${taskId}')">${ taskNo }</span></p>
+        <p><label>联系人：</label>${ lmName }</p>
+        <p><label>电话：</label>${ lmPhone }</p>
+        <p><label>地址：</label>${ customerAddress?.toString() }</p>
+        <p><label>计划时间：</label>${ planTime || '' }</p>
+        <p><label>有权限接单人员：</label>${ havePermissionUserCount ? `${havePermissionUserCount}个` : '' }</p>
+        <div class="info-window-arrow"></div>
+      </div>
+    `
+    )
+  }
+
   /** 
    * @description 选择工单池通知其他人
   */
@@ -213,7 +275,7 @@ export default class TaskAllotPool extends Vue {
       title: '请选择通知人员',
       seeAllOrg: true,
       selected: this.taskPoolNotificationUsers,
-      max: -1
+      max: 14
     }
     
     // @ts-ignore
@@ -285,11 +347,10 @@ export default class TaskAllotPool extends Vue {
   }
   
   /**
-   * @description 地图初始化事件
+  * @description 是否加密字段
   */
-  public mapInit(): void {
-    // @ts-ignore
-    this.$refs.TaskAllotMap.outsideMapInit()
+  private isEncryptField(value: string): boolean {
+    return value === ENCRYPT_FIELD_VALUE
   }
   
   /**
@@ -307,11 +368,35 @@ export default class TaskAllotPool extends Vue {
     })
   }
   
+  /**
+   * @description 地图初始化事件
+  */
+  public mapInit(): void {
+    try {
+      // @ts-ignore
+      this.$refs.TaskAllotMap.outsideMapInit()
+    } catch (error) {
+      console.warn('mapInit -> error', error)
+    }
+  }
+  
   /** 
    * @description 工单池通知方式改变
   */
   private onNotificationCheckedChanged(value: TaskPoolNotificationTypeEnum[]): void {
     this.notificationCheckd = value
+  }
+  
+  /**
+   * @description 移除通知用户
+  */
+  private removeNotificationUser(user: LoginUser) {
+    this.taskPoolNotificationUsers = (
+      this.taskPoolNotificationUsers
+      .filter((notificationUser: LoginUser) => {
+        return notificationUser.userId !== user.userId
+      })
+    )
   }
   
   /** 
@@ -328,7 +413,12 @@ export default class TaskAllotPool extends Vue {
           : 
           (
             this.taskPoolNotificationUsers.map((user: LoginUser) => {
-              return <span>{user.displayName}</span>
+              let test = user
+              return (
+                <el-tag key={user.userId} size='mini' disable-transitions closable type='info' onClose={() => this.removeNotificationUser(user)}>
+                  {user.displayName}
+                </el-tag>
+              )
             })
           )
         }

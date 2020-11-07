@@ -13,7 +13,8 @@ import {
   getTaskSearchListResult,
   getTaskFilterWithPartResult,
   getLatestRecordResult,
-  getUserListByTagResult
+  getUserListByTagResult,
+  getTaskConfigResult
 } from '@model/param/out/Task'
 
 import GrayUtil from '@src/util/gray'
@@ -308,7 +309,7 @@ export function getCustomerByPhone(params: {} | undefined) {
 /**
  * @description 获取工单配置
  */
-export function getTaskConfig() {
+export function getTaskConfig(): Promise<getTaskConfigResult> {
   return http.get("/task/getTaskConfig", {}, false);
 }
 

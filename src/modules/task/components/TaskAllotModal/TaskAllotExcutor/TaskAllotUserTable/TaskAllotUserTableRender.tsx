@@ -21,7 +21,7 @@ class TaskAllotUserTableRender extends TaskAllotUserTableMethods {
     }
     return (
       <biz-form-remote-select
-        placeholder='请选择工单负责人'
+        placeholder='请选择人员'
         remoteMethod={this.fetchTeamUsers}
         value={this.selectTeamUsers}
         onInput={() => this.handlerTeamUsersChange()}

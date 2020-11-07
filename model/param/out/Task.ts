@@ -5,6 +5,7 @@ import TaskView from '@model/entity/TaskView'
 import Page from '@model/types/Page'
 import MsgModel from '@model/MsgModel'
 import LoginUser from '@model/entity/LoginUser/LoginUser'
+import TaskConfig from '@model/types/TaskConfig'
 
 
 /** 获取用户视图列表返回值 */
@@ -24,3 +25,6 @@ export type getLatestRecordResult = MsgModel<string>
 
 /* 获取工单指派人员列表 */
 export type getUserListByTagResult = MsgModel<LoginUser[]>
+
+/* 获取工单配置 */
+export type getTaskConfigResult = { taskConfig: TaskConfig}

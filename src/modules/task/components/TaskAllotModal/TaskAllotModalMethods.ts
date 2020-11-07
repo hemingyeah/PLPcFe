@@ -1,16 +1,18 @@
 /* api */
 import { getCustomer } from '@src/api/CustomerApi.ts'
+import { getTaskConfig } from '@src/api/TaskApi'
 /* computed */
 import TaskAllotModalComputed from '@src/modules/task/components/TaskAllotModal/TaskAllotModalComputed'
 /* enum */
 import TaskAllotTypeEnum from '@model/enum/TaskAllotTypeEnum'
 /* entity */
 import LoginUser from '@model/entity/LoginUser/LoginUser'
+import TaskConfig from '@model/types/TaskConfig'
 /* interface */
-/* computed */
 import { DepeMultiUserResult } from '@src/modules/task/components/TaskAllotModal/TaskAllotModalInterface'
 /* model */
 import { getCustomerDetailResult } from '@model/param/out/Customer'
+import { getTaskConfigResult } from '@model/param/out/Task'
 
 class TaskAllotModalMethods extends TaskAllotModalComputed {
   /** 
@@ -74,6 +76,21 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
   }
   
   /** 
+   * @description 查询工单配置
+  */
+  public fetchTaskConfig() {
+    return (
+      getTaskConfig()
+      .then((result: getTaskConfigResult) => {
+        this.taskConfig = result.taskConfig || new TaskConfig()
+      })
+      .catch(err => {
+        console.warn(err)
+      })
+    )
+  }
+  
+  /** 
    * @description 派单方式变化
   */
   public handlerAllotTypeChange(type: TaskAllotTypeEnum) {
@@ -83,14 +100,14 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
   /** 
    * @description 设为负责人
   */
-  setExecutorUser(user: LoginUser) {
+  public setExecutorUser(user: LoginUser) {
     this.executorUser = user
   }
   
   /** 
    * @description 设为协同人
   */
-  setSynergyUser(user: LoginUser) {
+  public setSynergyUser(user: LoginUser) {
     this.synergyUserList.push(user)
   }
   
@@ -99,6 +116,7 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
   */
   public show() {
     this.showTaskAllotModal = true
+    this.fetchTaskConfig()
   }
 }
 
