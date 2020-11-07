@@ -434,17 +434,21 @@ export default {
         if (this.intercept()) {
           this.selectId = mySearch
           this.filterId = viewId
-        }
-
-        result.forEach(item => {
-          if (item.id === this.selectIds.allId) {
-            this.searchParams = item.searchModel
-            if (this.intercept()) {
-              this.searchParams.state = 'allocated'
-              this.searchParams.executor = this.initData.currentUserId;
+          result.forEach(item => {
+            if (item.id === viewId) {
+              this.searchParams = item.searchModel
+              if (item.alias === '已指派') {
+                this.searchParams.executor = this.initData.currentUserId;
+              }
             }
-          }
-        })
+          })
+        } else {
+          result.forEach(item => {
+            if (item.id === this.selectIds.allId) {
+              this.searchParams = item.searchModel
+            }
+          })
+        }
         this.initialize();
       }
     },
