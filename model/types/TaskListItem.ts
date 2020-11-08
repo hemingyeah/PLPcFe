@@ -1,7 +1,6 @@
 import LoginUser from '@model/entity/LoginUser/LoginUser'
 
 class TaskListItem {
-
   /**
    * 工单编号
   */

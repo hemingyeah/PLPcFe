@@ -1,3 +1,12 @@
 .task-allot-pool-info {
   width: 200px !important;
+  &-row {
+    line-height: 48px;
+    border-bottom: 1px solid #ebeef5;
+  }
+  .el-collapse-item {
+    .el-checkbox {
+      margin: 0 15px 0 0;
+    }
+  }
 }

@@ -1,7 +1,7 @@
 /**
  * @description 加密字段
 */
-class TaskEncrptionFile implements Serializable {
+class TaskEncrptionFile {
   
   /**
    * 字段key

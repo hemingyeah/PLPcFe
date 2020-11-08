@@ -1,4 +1,4 @@
-class TaskBalanceConfig implements Serializable {
+class TaskBalanceConfig {
   /**
    * 是否开启自定义结算字段，true，不开启
   */

@@ -19,18 +19,30 @@ export default class TaskAllotPoolInfo extends Vue {
   
   @Prop() readonly info: TaskAllotPoolInfoData | undefined
   
+  private className: string = ComponentNameEnum.TaskAllotPoolInfo
+  
   render(h: CreateElement) {
     return (
-      <div class={ComponentNameEnum.TaskAllotPoolInfo}>
+      <div class={this.className}>
+        <div class={`${this.className}-row`}>
+          {`工单池工单总量: ${fmt_number(this.info?.taskPoolAllCount, '')}`}
+        </div>
+        <div class={[`${this.className}-row`, 'no-border']}>
+          {`客户服务团队待接单量: ${fmt_number(this.info?.customerTeamUnAcceptCount, '')}`}
+        </div>
         <el-collapse>
-          <el-collapse-item title={`工单池工单总量: ${fmt_number(this.info?.taskPoolAllCount, '')}`} name={TaskPoolInfoEnum.TaskPoolAllCount} disabled>
+          <el-collapse-item>
+            <template slot="title">
+              <el-checkbox></el-checkbox>
+              {`订阅工单池用户: ${fmt_number(this.info?.subscriptionUserCount, '')}`}
+            </template>
+            <div>订阅工单池用户: 列表</div>
           </el-collapse-item>
-          <el-collapse-item title={`客户服务团队待接单量: ${fmt_number(this.info?.customerTeamUnAcceptCount, '')}`} name={TaskPoolInfoEnum.CustomerTeamUnAcceptCount} disabled>
-          </el-collapse-item>
-          <el-collapse-item title={`订阅工单池用户: ${fmt_number(this.info?.subscriptionUserCount, '')}`} name={TaskPoolInfoEnum.SubscriptionUserCount}>
-          <div>订阅工单池用户: 列表</div>
-          </el-collapse-item>
-          <el-collapse-item title={`有权限接单用户: ${fmt_number(this.info?.havePermissionUserCount, '')}`} name={TaskPoolInfoEnum.HavePermissionUserCount}>
+          <el-collapse-item>
+            <template slot="title">
+              <el-checkbox></el-checkbox>
+              {`有权限接单用户: ${fmt_number(this.info?.havePermissionUserCount, '')}`}
+            </template>
             <div>有权限接单用户：列表</div>
           </el-collapse-item>
         </el-collapse>

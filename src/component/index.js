@@ -24,6 +24,7 @@ import BaseCascader from './common/BaseCascader';
 import BaseSelectionBar from './common/BaseSelectionBar';
 import BaseServiceStar from './common/BaseServiceStar';
 import BaseCollapse from './common/BaseCollapse';
+import BaseFlod from './common/BaseFlod/index.ts';
 
 
 // 可快速调用的组件
@@ -75,7 +76,7 @@ const components = [
   BaseButton,
   BaseSelect,
   BaseSteps,
-
+  
   BaseContextMenu,
   BaseTable,
   
@@ -98,8 +99,10 @@ const components = [
   BaseEditor,
   BaseServiceStar,
   BaseCollapse,
-
-  GuideCompoment
+  
+  GuideCompoment,
+  
+  ...BaseFlod,
 ];
 
 export default {

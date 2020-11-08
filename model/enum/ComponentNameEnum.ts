@@ -1,4 +1,7 @@
 enum ComponentNameEnum {
+  // 折叠
+  BaseFlod = 'base-flod',
+  BaseFlodItem = 'base-flod-item',
   // 表格高级设置 选择列
   BaseTableAdvancedSetting = 'base-table-advanced-setting',
   // 工单指派弹窗
