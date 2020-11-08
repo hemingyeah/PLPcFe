@@ -34,6 +34,15 @@
 }
 /* end 派单 导航 */
 
+/* start 负责人 */
+.task-allot-executor {
+  &-placeholder {
+    color: $text-color-secondary;
+    list-style: 30px;
+  }
+}
+/* end 负责人 */
+
 /* start 协同人 */
 .task-allot-synergy {
   &-list {

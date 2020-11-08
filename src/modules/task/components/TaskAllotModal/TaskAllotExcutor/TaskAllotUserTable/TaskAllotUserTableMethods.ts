@@ -149,6 +149,16 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
         if (!isSuccess) return
         
         this.userPage.list = result.data || []
+
+        // key : userId(string) -> value: boolean
+        this.userPageCheckedMap = (
+          this.userPage.list
+            .reduce((acc: {[x: string]: boolean}, cur: LoginUser) => {
+              // @ts-ignore
+              acc[cur.userId] = false
+              return acc
+            }, {})
+        )
         
         Log.succ(Log.End, this.fetchUsers.name)
       })
@@ -210,6 +220,20 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
     
     this.selectSortord = value
     this.initialize()
+  }
+  
+  /** 
+   * @description 设置负责人checkbox 变化
+  */
+  public handlerExcutorCheckedChange(checked: boolean, row: any): void {
+    let userId: string = row.userId || ''
+    
+    for (let key in this.userPageCheckedMap) {
+      let isChecked: boolean = checked && key == userId
+      this.userPageCheckedMap[key] = isChecked
+    }
+    
+    this.TaskAllotExcutorComponent.outsideSetSelectedExcutorUser(checked, row)
   }
   
   /**

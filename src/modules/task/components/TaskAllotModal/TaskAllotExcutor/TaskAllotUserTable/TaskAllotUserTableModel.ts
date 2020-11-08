@@ -4,7 +4,7 @@ const TaskAllotUserTableCommonColumns = [
     "label": "设为负责人",
     "field": "excutor",
     "show": true,
-    "fixed": true,
+    "fixed": false,
     "minWidth": "150px",
     "type": "column"
   },
@@ -71,6 +71,18 @@ const TaskAllotUserTableStateColumn = {
   "sortable": true,
   "minWidth": "150px",
   "type": "column"
+}
+
+export enum TaslAllotTableColumnFieldEnum {
+  Excutor = 'excutor',
+  DisplayName = 'displayName',
+  UserRole = 'userRole',
+  unfinishedTask = 'unfinishedTask',
+  TodayFinishedTask = 'todayFinishedTask',
+  PlantimeTodayTaskNum = 'plantimeTodayTaskNum',
+  FavorableRating = 'favorableRating',
+  Location = 'location',
+  Drive = 'drive',
 }
 
 /* 工单指派 企业版支持列 */

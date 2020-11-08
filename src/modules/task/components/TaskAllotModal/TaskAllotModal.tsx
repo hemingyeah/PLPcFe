@@ -52,12 +52,13 @@ export default class TaskAllotModal extends TaskAllotModalRender {
         <div class='task-allot-nav'>
           <div class='task-allot-type'>
             <span class='task-allot-nav-title'>派单方式</span>
-            <task-allot-type type={this.allotType} onChange={(value: TaskAllotTypeEnum) => this.handlerAllotTypeChange(value)} />
+            <task-allot-type 
+              type={this.allotType}
+              taskConfig={this.taskConfig}
+              onChange={(value: TaskAllotTypeEnum) => this.handlerAllotTypeChange(value)} 
+            />
           </div>
-          <div class='task-allot-executor'>
-            <span class='task-allot-nav-title'>负责人</span>
-            <user-button user={this.executorUser} />
-          </div>
+          {this.renderExcutor()}
           {this.renderSynergy()}
         </div>
         

@@ -41,6 +41,13 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
   }
   
   /** 
+   * @description 删除负责人
+  */
+  public deleteExcutorUser(user: LoginUser) {
+    this.executorUser = null
+  }
+  
+  /** 
    * @description 删除协同人
   */
   public deleteSynergyUser(user: LoginUser) {
@@ -108,7 +115,9 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
    * @description 设为协同人
   */
   public setSynergyUser(user: LoginUser) {
-    this.synergyUserList.push(user)
+    // 判断是否已存在该用户
+    const IsNotRepeat = this.synergyUserList.every(synergyUser => synergyUser.userId !== user.userId)
+    IsNotRepeat && this.synergyUserList.push(user)
   }
   
   /** 

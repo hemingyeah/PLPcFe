@@ -34,6 +34,8 @@ class TaskAllotUserTableData extends TaskAllotUserTableComponents {
   public tableKey: number = Math.random() * 1000 >> 2
   /* 用户page */
   public userPage: Page =  new Page()
+  /* 用户选择状态 */
+  public userPageCheckedMap: {[x: number]: boolean} = {}
   /* 距离选项列表 */
   public locationOptions: ElSelectOption[] = [
     { label: '5公里以内', value: '5'},

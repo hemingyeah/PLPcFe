@@ -16,6 +16,11 @@ class TaskAllotUserTableComputed extends TaskAllotUserTableData {
     return findComponentUpward(this, ComponentNameEnum.TaskAllotModal) || {}
   }
   
+  /* 工单派单负责人组件 */
+  get TaskAllotExcutorComponent() {
+    return findComponentUpward(this, ComponentNameEnum.TaskAllotExcutor) || {}
+  }
+  
   /* 选择列 组件 */
   get BaseTableAdvancedSettingComponent() { 
     return findComponentDownward(this, ComponentNameEnum.BaseTableAdvancedSetting)

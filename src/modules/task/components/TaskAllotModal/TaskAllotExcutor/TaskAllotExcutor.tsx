@@ -3,6 +3,8 @@ import TaskAllotUserTable from '@src/modules/task/components/TaskAllotModal/Task
 import UserCard from '@src/modules/task/components/TaskAllotModal/UserCard/UserCard.tsx'
 /* enum */
 import ComponentNameEnum from '@model/enum/ComponentNameEnum'
+/* entity */
+import LoginUser from '@model/entity/LoginUser/LoginUser'
 /* scss */
 import '@src/modules/task/components/TaskAllotModal/TaskAllotExcutor/TaskAllotExcutor.scss'
 /* vue */
@@ -18,11 +20,9 @@ import { CreateElement } from 'vue'
 })
 export default class TaskAllotExcutor extends Vue {
   
-  /* 当前选择的负责人 */
-  get selectExecutorUser() {
-    // @ts-ignore
-    return this.$refs.TaskAllotUserTableComponent?.selectExecutorUser
-  }
+  /* 是否显示人员卡片信息 */
+  public isShowUserCard: boolean = false
+  public selectedExcutorUser: LoginUser | null = null
   
   /**
    * @description 获取团队用户
@@ -31,6 +31,15 @@ export default class TaskAllotExcutor extends Vue {
   public outsideFetchUsers() {
     // @ts-ignore
     this.$refs.TaskAllotUserTableComponent.outsideFetchUsers()
+  }
+  
+  /**
+   * @description 设置选择的负责人
+   * -- 支持外部调用的
+  */
+  public outsideSetSelectedExcutorUser(isSelected: boolean, user: LoginUser) {
+    this.isShowUserCard = isSelected
+    this.selectedExcutorUser = isSelected ? user : null
   }
   
   render(h: CreateElement) {
@@ -42,7 +51,7 @@ export default class TaskAllotExcutor extends Vue {
           <div id='MapContainer'></div>
           
           <div class='task-allot-user-content'>
-            { this.selectExecutorUser && <user-card emitEventComponentName={ComponentNameEnum.TaskAllotExcutor} /> }
+            { this.isShowUserCard && <user-card userId={this.selectedExcutorUser?.userId} emitEventComponentName={ComponentNameEnum.TaskAllotExcutor} /> }
           </div>
           
         </div>

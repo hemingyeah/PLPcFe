@@ -4,7 +4,8 @@ import Column from '@model/types/Column'
 import { ElSelectOption, UserState } from '@src/modules/task/components/TaskAllotModal/TaskAllotExcutor/TaskAllotUserTable/TaskAllotUserTableInterface'
 /* methods */
 import TaskAllotUserTableMethods from '@src/modules/task/components/TaskAllotModal/TaskAllotExcutor/TaskAllotUserTable/TaskAllotUserTableMethods'
-
+/* model */
+import { TaslAllotTableColumnFieldEnum } from '@src/modules/task/components/TaskAllotModal/TaskAllotExcutor/TaskAllotUserTable/TaskAllotUserTableModel'
 class TaskAllotUserTableRender extends TaskAllotUserTableMethods {
   /** 
    * @description 渲染 按团队选人
@@ -127,6 +128,8 @@ class TaskAllotUserTableRender extends TaskAllotUserTableMethods {
    * @description 渲染表格列
   */
   renderTableColumnField(scope: any, column: Column) {
+    if(column.field === TaslAllotTableColumnFieldEnum.Excutor) return this.renderColumnWithExcutor(scope)
+    
     return this.renderColumnWithCommon(scope, column)
   }
   
@@ -135,6 +138,17 @@ class TaskAllotUserTableRender extends TaskAllotUserTableMethods {
   */
   renderColumnWithCommon(scope: any, column: Column) {
     return column.field ? scope.row[column.field] : ''
+  }
+  
+  /** 
+   * @description 渲染负责人表格列
+  */
+  renderColumnWithExcutor(scope: any) {
+    let { userId = '' } = scope.row
+    
+    return (
+      <el-checkbox value={this.userPageCheckedMap[userId]} onInput={(value: boolean) => this.handlerExcutorCheckedChange(value, scope.row)}></el-checkbox>
+    )
   }
 }
 

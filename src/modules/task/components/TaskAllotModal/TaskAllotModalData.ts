@@ -13,7 +13,7 @@ class TaskAllotModalData extends TaskAllotModalProps {
   /* 客户信息 */
   public customer: Customer = {}
   /* 负责人 */
-  public executorUser: LoginUser = new LoginUser()
+  public executorUser: LoginUser | null = null
   /* 是否是按团队派单 */
   public isAllotByTag: boolean = true
   /* 等待状态 */
