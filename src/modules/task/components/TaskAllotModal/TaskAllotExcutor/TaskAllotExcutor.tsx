@@ -7,6 +7,8 @@ import ComponentNameEnum from '@model/enum/ComponentNameEnum'
 import LoginUser from '@model/entity/LoginUser/LoginUser'
 /* scss */
 import '@src/modules/task/components/TaskAllotModal/TaskAllotExcutor/TaskAllotExcutor.scss'
+/* util */
+import { findComponentUpward } from '@src/util/assist'
 /* vue */
 import { Vue, Component } from 'vue-property-decorator'
 import { CreateElement } from 'vue'
@@ -24,6 +26,11 @@ export default class TaskAllotExcutor extends Vue {
   public isShowUserCard: boolean = false
   public selectedExcutorUser: LoginUser | null = null
   
+  /* 工单派单组件 */
+  get TaskAllotModalComponent() {
+    return findComponentUpward(this, ComponentNameEnum.TaskAllotModal) || {}
+  }
+  
   /**
    * @description 获取团队用户
    * -- 支持外部调用的
@@ -38,8 +45,10 @@ export default class TaskAllotExcutor extends Vue {
    * -- 支持外部调用的
   */
   public outsideSetSelectedExcutorUser(isSelected: boolean, user: LoginUser) {
+    let excutorUser = isSelected ? user : null
     this.isShowUserCard = isSelected
-    this.selectedExcutorUser = isSelected ? user : null
+    this.selectedExcutorUser = excutorUser
+    this.TaskAllotModalComponent.outsideSetExcutorUser(excutorUser)
   }
   
   render(h: CreateElement) {

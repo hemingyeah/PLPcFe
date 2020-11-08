@@ -6,6 +6,9 @@ import { ElSelectOption, UserState } from '@src/modules/task/components/TaskAllo
 import TaskAllotUserTableMethods from '@src/modules/task/components/TaskAllotModal/TaskAllotExcutor/TaskAllotUserTable/TaskAllotUserTableMethods'
 /* model */
 import { TaslAllotTableColumnFieldEnum } from '@src/modules/task/components/TaskAllotModal/TaskAllotExcutor/TaskAllotUserTable/TaskAllotUserTableModel'
+/* util */
+import { uuid } from '@src/util/string'
+
 class TaskAllotUserTableRender extends TaskAllotUserTableMethods {
   /** 
    * @description 渲染 按团队选人
@@ -14,18 +17,19 @@ class TaskAllotUserTableRender extends TaskAllotUserTableMethods {
     const scopedSlots = {
       option: (props: any) => {
         return (
-          <div>
-            {props.option.name}
+          <div key={uuid()}>
+            {props.option.displayName}
           </div>
-        );
+        )
     },
     }
     return (
       <biz-form-remote-select
-        placeholder='请选择人员'
-        remoteMethod={this.fetchTeamUsers}
         value={this.selectTeamUsers}
-        onInput={() => this.handlerTeamUsersChange()}
+        onInput={(value: any[]) => this.handlerTeamUsersChange(value)}
+        multiple
+        placeholder='请选择人员'
+        remoteMethod={() => this.fetchTeamUsers()}
         scopedSlots={scopedSlots}
       >
       </biz-form-remote-select>
@@ -147,7 +151,13 @@ class TaskAllotUserTableRender extends TaskAllotUserTableMethods {
     let { userId = '' } = scope.row
     
     return (
-      <el-checkbox value={this.userPageCheckedMap[userId]} onInput={(value: boolean) => this.handlerExcutorCheckedChange(value, scope.row)}></el-checkbox>
+      <div class='task-allot-user-table-excutor-column'>
+        <el-checkbox 
+          value={this.userPageCheckedMap[userId]} 
+          onInput={(value: boolean) => this.handlerExcutorCheckedChange(value, scope.row)}
+        >
+        </el-checkbox>
+      </div>
     )
   }
 }

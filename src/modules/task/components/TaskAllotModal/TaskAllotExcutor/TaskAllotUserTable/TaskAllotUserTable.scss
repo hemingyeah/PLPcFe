@@ -18,11 +18,37 @@
     justify-content: center;
     width: 100px;
   }
+  &-excutor-column {
+    display: flex;
+    justify-content: center;
+    .el-checkbox {
+      margin: 0;
+    }
+    .el-checkbox__inner {
+      border-radius: 50%;
+    }
+  }
 }
 
 .task-allot-user-table-block {
   .el-table__body-wrapper {
     max-height: 360px;
     overflow-y: scroll;
+  }
+}
+
+.task-allot-map{
+  &-excutor-window {
+    border-radius: 4px;
+    background-color: $color-primary;
+    color: #fff;
+    
+    line-height: 30px;
+    text-align: center;
+    
+    position: relative;
+    left: 10px;
+    
+    width: 60px;
   }
 }

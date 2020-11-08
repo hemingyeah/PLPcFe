@@ -1,7 +1,9 @@
 /* api */
-import { getUserListByTag } from '@src/api/TaskApi'
+import { getUserListByTag, getTaskAllotTeamUserList } from '@src/api/TaskApi'
 /* computed */
 import TaskAllotUserTableComputed from '@src/modules/task/components/TaskAllotModal/TaskAllotExcutor/TaskAllotUserTable/TaskAllotUserTableComputed'
+/* directive */
+import Loadmore from '@src/directive/loadmore'
 /* enum */
 import EventNameEnum from '@model/enum/EventNameEnum'
 /* entity */
@@ -19,6 +21,25 @@ import Log from '@src/util/log.ts'
 declare let AMap: any
 
 class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
+  
+  /** 
+   * @description 绑定表格滚动事件
+  */
+  public bindTableScrollEvent(): void {
+    // 滚动元素
+    let scrollEl = this.getScrollTableEl()
+    // 绑定
+    Loadmore.bind(
+      scrollEl,
+      { 
+        value: {
+          distance: 10,
+          disabled: this.isDisableLoadmore,
+          callback: () => this.fetchUsers()
+        } 
+      }
+    )
+  }
   
   /** 
    * @description 构建客户地址标记
@@ -103,7 +124,23 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
       })
       
       userMarker.on(EventNameEnum.Click, (event: any) => {
-        // TODO: 打开人员卡片
+        let user: LoginUser = event.target.getExtData()
+        /* 设置负责人信息 */
+        this.TaskAllotExcutorComponent.outsideSetSelectedExcutorUser(true, user)
+      })
+      
+      userMarker.on(EventNameEnum.MouseOver, (event: any) => {
+        let user: LoginUser = event.target.getExtData()
+        if (user.userId !== this.TaskAllotExcutorComponent.selectedExcutorUser.userId) return
+        
+        let infoWindow = new AMap.InfoWindow({
+          closeWhenClickMap: true,
+          isCustom: true,
+          offset: new AMap.Pixel(0, -34),
+          content: '<div class="task-allot-map-excutor-window">负责人</div>'
+        })
+        
+        infoWindow.open(this.AMap, event.target.getPosition())
       })
       
     })
@@ -130,6 +167,13 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
   }
   
   /** 
+   * @description 获取滚动的表格元素
+  */
+  getScrollTableEl(): Element | null {
+    return document.querySelector('.task-allot-user-table-block .el-table__body-wrapper')
+  }
+  
+  /** 
    * @description 获取用户列表
    * -- 内部调用的
   */
@@ -137,6 +181,8 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
     Log.succ(Log.Start, this.fetchUsers.name)
     
     let params = {
+      pageNum: this.userPage.pageNum,
+      pageSize: this.userPage.pageSize,
       customerId: this.customer.id || '',
       lat: String(this.customerAddress.adLatitude) || '',
       lng: String(this.customerAddress.adLongitude) || '',
@@ -148,8 +194,8 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
         let isSuccess = result.status == 0
         if (!isSuccess) return
         
-        this.userPage.list = result.data || []
-
+        this.userPage.list = this.userPage.list.concat(result.data || [])
+        
         // key : userId(string) -> value: boolean
         this.userPageCheckedMap = (
           this.userPage.list
@@ -169,9 +215,42 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
    * @description 获取团队人员列表
   */
   public fetchTeamUsers(): Promise<any> {
-    return new Promise((resolve, reject) => {
-      resolve({})
-    })
+    Log.succ(Log.Start, this.fetchTeamUsers.name)
+    
+    this.teamUserPage = new Page()
+    
+    let { customerAddress } = this
+    let { adLatitude = '', adLongitude = '' } = customerAddress || {}
+    let params = {
+      customerId: this.customer?.id,
+      keyword: '',
+      lat: adLatitude,
+      lng: adLongitude,
+      pageNum: this.teamUserPage.pageNum,
+      tagId: this.selectTeams ? this.selectTeams.map(team => team.id).join(',') : ''
+    }
+    
+    return (
+      getTaskAllotTeamUserList(params)
+        .then((result = {}) => {
+          this.teamUserPage.merge(result)
+          
+          Log.succ(Log.End, this.fetchTeamUsers.name)
+          
+          result.list = result.list.map((user: LoginUser) =>
+            Object.freeze({
+              label: user?.displayName || '',
+              value: user?.userId || '',
+              ...user
+          }))
+          
+          return result
+
+        })
+        .catch(error => {
+          console.error(error)
+        })
+    )
   }
   
   /**
@@ -186,9 +265,10 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
   /**
    * @description 选择团队成员变化事件
   */
-  public handlerTeamUsersChange(): void {
+  public handlerTeamUsersChange(users: any[]): void {
     Log.succ(Log.Start, this.handlerTeamUsersChange.name)
     
+    this.selectTeamUsers = users
     this.initialize()
   }
   
@@ -232,7 +312,7 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
       let isChecked: boolean = checked && key == userId
       this.userPageCheckedMap[key] = isChecked
     }
-    
+    /* 设置负责人信息 */
     this.TaskAllotExcutorComponent.outsideSetSelectedExcutorUser(checked, row)
   }
   
@@ -243,7 +323,8 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
     Log.succ(Log.Start, this.initialize.name)
     
     this.userPage = new Page()
-
+    this.isDisableLoadmore = false
+    
     this.fetchUsers().then(() => {
       this.mapInit()
     })
@@ -285,6 +366,16 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
   */
   public showAdvancedSetting(): void {
     this.BaseTableAdvancedSettingComponent.open(this.columns)
+  }
+  
+  /** 
+   * @description 解绑表格滚动事件
+  */
+  public unBindTableScrollEvent() {
+    // 滚动元素
+    let scrollEl = this.getScrollTableEl()
+    // 绑定
+    Loadmore.unbind(scrollEl)
   }
 }
 

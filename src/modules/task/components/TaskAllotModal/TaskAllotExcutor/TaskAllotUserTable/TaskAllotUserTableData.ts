@@ -18,6 +18,8 @@ class TaskAllotUserTableData extends TaskAllotUserTableComponents {
   public AMap: any = null
   /* 地图弹窗对象 */
   public AMapInfoWindow: any = null
+  /* 是否禁用加载更多 */
+  public isDisableLoadmore: boolean = false
   /* 当前选择的负责人 */
   public selectExecutorUser: LoginUser | null = null
   /* 当前选择的团队 */
@@ -32,6 +34,8 @@ class TaskAllotUserTableData extends TaskAllotUserTableComponents {
   public selectSortord: string = ''
   /* 表格key 随机数 */
   public tableKey: number = Math.random() * 1000 >> 2
+  /* 团队用户page */
+  public teamUserPage: Page =  new Page()
   /* 用户page */
   public userPage: Page =  new Page()
   /* 用户选择状态 */

@@ -127,8 +127,8 @@ export default class UserCard extends Vue {
               </div>
             </div>
             <div class='user-card-header-button-group'>
-              <base-button type="ghost" onEvent={this.setExecutorUser}>设为负责人</base-button>
-              <base-button type="ghost" onEvent={this.setSynergyUser}>设为协同人</base-button>
+              <base-button class='excutor-button' type='ghost' onEvent={this.setExecutorUser}>设为负责人</base-button>
+              <base-button class='synergy-button' type='ghost' onEvent={this.setSynergyUser}>设为协同人</base-button>
             </div>
           </div>
           

@@ -1,5 +1,5 @@
 /* api */
-import { getCustomer } from '@src/api/CustomerApi.ts'
+import { getCustomer, getCustomerExeinsyn } from '@src/api/CustomerApi.ts'
 import { getTaskConfig } from '@src/api/TaskApi'
 /* computed */
 import TaskAllotModalComputed from '@src/modules/task/components/TaskAllotModal/TaskAllotModalComputed'
@@ -98,6 +98,23 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
   }
   
   /** 
+   * @description 根据客户id获取客户信息和客户负责人信息和开关 
+  */
+  fetchSynergyUserWithCustomerManager() {
+    let customerId = this.customerId
+    if(!customerId) return console.warn('fetchExeinsynWithCustomerManager paramer not have customerId')
+    
+    getCustomerExeinsyn({ id: customerId}).then(result => {
+      let exeInSynOfTaskOrEvent = result?.data?.exeInSynOfTaskOrEvent;
+      // 允许自动将客户负责人带入工单或事件协同人
+      if (exeInSynOfTaskOrEvent) {
+        result?.data?.userId && this.synergyUserList.push(result.data)
+      }
+    })
+    
+  }
+  
+  /** 
    * @description 派单方式变化
   */
   public handlerAllotTypeChange(type: TaskAllotTypeEnum) {
@@ -105,9 +122,17 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
   }
   
   /** 
+   * @description 设置负责人信息
+   * -- 支持外部调用的
+  */
+  public outsideSetExcutorUser(user: LoginUser | null) {
+    this.setExecutorUser(user)
+  }
+  
+  /** 
    * @description 设为负责人
   */
-  public setExecutorUser(user: LoginUser) {
+  public setExecutorUser(user: LoginUser | null) {
     this.executorUser = user
   }
   

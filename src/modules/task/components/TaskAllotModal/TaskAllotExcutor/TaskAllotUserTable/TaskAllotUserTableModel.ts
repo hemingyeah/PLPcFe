@@ -5,7 +5,7 @@ const TaskAllotUserTableCommonColumns = [
     "field": "excutor",
     "show": true,
     "fixed": false,
-    "minWidth": "150px",
+    "minWidth": "100px",
     "type": "column"
   },
   {
@@ -48,7 +48,7 @@ const TaskAllotUserTableCommonColumns = [
     "show": true,
     "fixed": false,
     "sortable": true,
-    "minWidth": "150px",
+    "minWidth": "180px",
     "type": "column"
   },
   {

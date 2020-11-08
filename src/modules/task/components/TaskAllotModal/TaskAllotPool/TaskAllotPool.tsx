@@ -1,5 +1,5 @@
 /* api */
-import { getTaskAlloyPoolUserList, getTaskAlloyPoolList } from '@src/api/TaskApi'
+import { getTaskAllotPoolUserList, getTaskAlloyPoolList } from '@src/api/TaskApi'
 /* components */
 import TaskAllotMap from '@src/modules/task/components/TaskAllotModal/TaskAllotMap/TaskAllotMap.tsx'
 import TaskAllotPoolNotification from '@src/modules/task/components/TaskAllotModal/TaskAllotPool/TaskAllotPoolNotification/TaskAllotPoolNotification.tsx'
@@ -315,7 +315,7 @@ export default class TaskAllotPool extends Vue {
     }
     
     return (
-      getTaskAlloyPoolUserList(params).then((result: getUserListByTagResult) => {
+      getTaskAllotPoolUserList(params).then((result: getUserListByTagResult) => {
         let isSuccess = result.status == 0
         if (!isSuccess) return
         

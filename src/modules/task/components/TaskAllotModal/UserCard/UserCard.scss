@@ -1,5 +1,21 @@
 .user-card {
   padding: 20px 0 20px 20px;
+  .excutor-button {
+    border-color: $color-primary;
+    color: $color-primary;
+    &:hover {
+      color: #fff;
+    }
+  }
+  .synergy-button {
+    border-color: $color-warning;
+    color: $color-warning;
+    margin-left: 8px;
+    &:hover {
+      background-color: $color-warning;
+      color: #fff;
+    }
+  }
 }
 
 .user-card-header {

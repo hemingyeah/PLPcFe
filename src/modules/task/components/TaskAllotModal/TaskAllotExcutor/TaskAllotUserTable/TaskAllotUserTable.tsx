@@ -18,6 +18,17 @@ const TableColumnDefaultWidth = '120px'
   name: ComponentNameEnum.TaskAllotUserTable
 })
 export default class TaskAllotUserTable extends TaskAllotUserTableRender {
+  
+  mounted() {
+    this.$nextTick(() => {
+      this.bindTableScrollEvent()
+    })
+  }
+  
+  destroyed() {
+    this.unBindTableScrollEvent()
+  }
+  
   render(h: CreateElement) {
     return (
       <div class='task-allot-user-table'>

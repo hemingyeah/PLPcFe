@@ -31,6 +31,7 @@ export default class TaskAllotModal extends TaskAllotModalRender {
   
   mounted() {
     this.fetchCustomer()
+    this.fetchSynergyUserWithCustomerManager()
   }
   
   render(h: CreateElement) {
