@@ -13,7 +13,6 @@ import Customer from '@model/entity/Customer'
 import CustomerAddress from '@model/entity/CustomerAddress'
 import LoginUser from '@model/entity/LoginUser/LoginUser'
 import Tag from '@model/entity/Tag/Tag'
-import TaskListItem from '@model/types/TaskListItem'
 /* image */
 // @ts-ignore
 import DefaultHead from '@src/assets/img/avatar.png'
@@ -65,6 +64,10 @@ export default class TaskAllotPool extends Vue {
   private AMapUserInfoWindow: any = null
   /* 工单信息弹窗 */
   private AMapTaskInfoWindow: any = null
+  /* 是否在地图显示工单池订阅用户 */
+  private isShowMapTaskPoolSubscriptionUsers: boolean = false
+  /* 是否在地图显示有权限接单用户 */
+  private isShowMapTaskPoolAuthUsers: boolean = false
   /* 地图的id */
   private mapId: string = 'TaskAllotPoolMapContainer'
   /* 通知方式复选 */
@@ -80,8 +83,10 @@ export default class TaskAllotPool extends Vue {
   }
   /* 工单池列表 */
   private taskPoolList: any[] = []
-  /* 用户page */
-  private userPage: Page =  new Page()
+  /* 订阅用户page */
+  private userSubscriptionPage: Page =  new Page()
+  /* 有权限接单用户page */
+  private userAuthPage: Page =  new Page()
   
   /* 工单派单组件 */
   get TaskAllotModalComponent() {
@@ -108,9 +113,11 @@ export default class TaskAllotPool extends Vue {
   /** 
    * @description 构建标记
   */
-  private buildMarkers(amap: any, infoWindow: any): void {
-    // 构建人员标记
-    this.buildUserMarkers(amap)
+  private buildMarkers(amap: any): void {
+    // 构建工单池订阅人员标记
+    this.isShowMapTaskPoolSubscriptionUsers && this.buildUserMarkers(amap)
+    // 构建有权限接单人员标记
+    this.isShowMapTaskPoolAuthUsers && this.buildUserMarkers(amap, false)
     // 构建工单标记
     this.buildTaskMarkers(amap)
   }
@@ -119,13 +126,15 @@ export default class TaskAllotPool extends Vue {
    * @description 构建人员标记
    * @param {Object} amap 高德地图对象
    * @param {Object} infoWindow 高德地图窗口对象
+   * @param {Boolean} isSubscription 是否是订阅工单池用户列表
   */
-  public buildUserMarkers(amap: any): void {
-    if (this.userPage.list.length <= 0) {
+  public buildUserMarkers(amap: any, isSubscription: boolean = true): void {
+    let userPage = isSubscription ? this.userSubscriptionPage : this.userAuthPage
+    if (userPage.list.length <= 0) {
       return Log.warn('userPage.list is empty', this.buildUserMarkers.name)
     }
     
-    this.userPage.list.forEach((user: LoginUser) => {
+    userPage.list.forEach((user: LoginUser) => {
       let { longitude, latitude } = user
       // 无经纬度
       if (!longitude && !latitude) return
@@ -266,7 +275,7 @@ export default class TaskAllotPool extends Vue {
     `
     )
   }
-
+  
   /** 
    * @description 选择工单池通知其他人
   */
@@ -310,7 +319,8 @@ export default class TaskAllotPool extends Vue {
         let isSuccess = result.status == 0
         if (!isSuccess) return
         
-        this.userPage.list = result.data || []
+        this.userSubscriptionPage.list = result.data || []
+        this.userAuthPage.list = result.data || []
         
         Log.succ(Log.End, this.fetchUsers.name)
       })
@@ -346,6 +356,22 @@ export default class TaskAllotPool extends Vue {
     this.chooseTaskPoolNotificationUsers()
   }
   
+  /** 
+   * @description 工单池详细信息 订阅工单池用户 checkbox变化
+  */
+  private handlerTaskPoolInfoSubscriptionChanged(value: boolean): void {
+    this.isShowMapTaskPoolSubscriptionUsers = value
+    this.mapInit()
+  }
+  
+  /** 
+   * @description 工单池详细信息 有权限接单用户 checkbox变化
+  */
+  private handlerTaskPoolInfoAuthChanged(value: boolean): void {
+    this.isShowMapTaskPoolAuthUsers = value
+    this.mapInit()
+  }
+  
   /**
   * @description 是否加密字段
   */
@@ -359,7 +385,8 @@ export default class TaskAllotPool extends Vue {
   public initialize(): void {
     Log.succ(Log.Start, this.initialize.name)
     
-    this.userPage = new Page()
+    this.userSubscriptionPage = new Page()
+    this.userAuthPage = new Page()
     
     this.fetchUsers().then(() => {
       this.fetchTaskPoolList().then(() => {
@@ -432,7 +459,7 @@ export default class TaskAllotPool extends Vue {
         <task-allot-map 
           ref='TaskAllotMap' 
           idName={this.mapId} 
-          handlerCustomFunc={(amap: any, infoWindow: any) => this.buildMarkers(amap, infoWindow)} 
+          handlerCustomFunc={(amap: any) => this.buildMarkers(amap)} 
         />
         <task-allot-pool-notification 
           checked={this.notificationCheckd} 
@@ -440,7 +467,19 @@ export default class TaskAllotPool extends Vue {
           slotDefault={this.renderNotificationAddUser}
         >
         </task-allot-pool-notification>
-        <task-allot-pool-info info={this.taskPoolInfo} />
+        <task-allot-pool-info 
+          info={this.taskPoolInfo} 
+          checked={{ 
+            subscription: this.isShowMapTaskPoolSubscriptionUsers,
+            auth: this.isShowMapTaskPoolAuthUsers
+          }}
+          users={{
+            subscription: this.userSubscriptionPage.list,
+            auth: this.userAuthPage.list
+          }}
+          onSubscriptionChange={(value: boolean) => this.handlerTaskPoolInfoSubscriptionChanged(value)}
+          onAuthChange={(value: boolean) => this.handlerTaskPoolInfoAuthChanged(value)}
+        />
       </div>
     )
   }

@@ -57,6 +57,9 @@
 .task-allot-pool-info {
   left: inherit;
   right: 16px;
+
+  max-height: calc(100% - 100px);
+  overflow-y: scroll;
 }
 
 .task-pool-icon {
