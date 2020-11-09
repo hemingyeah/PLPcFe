@@ -22,7 +22,7 @@
       <!-- start 计划时间 -->
       <template slot="planTime" slot-scope="{ field, value }">
         <form-item :label="field.displayName" :validation="validation.planTime">
-          <form-plantime :picker-options="isFinishedTask ? {} : planTimeDatePickerOptions" :field="field" :value="value" @update="update"></form-plantime>
+          <form-plantime :picker-options="isVilidatePlantime ? planTimeDatePickerOptions : {}" :field="field" :value="value" @update="update"></form-plantime>
 
           <!-- start 通知客户 checkbox -->
           <div class="task-notice-customer-block" v-if="isShowNoticeCustomer">
