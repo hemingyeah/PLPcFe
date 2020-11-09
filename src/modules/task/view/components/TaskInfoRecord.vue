@@ -509,7 +509,7 @@ export default {
     },
     /* 渲染工单审批dom */
     renderTaskApproveDom(record = {}) {
-      let { content, taskNo, address, userName } = record;
+      let { content, taskNo, address, userName, longitude, latitude } = record;
       let { state } = content;
       // 工单审批状态
       let taskState = {
@@ -524,7 +524,7 @@ export default {
       let addressData = this.renderAddressRecordDom(record);
       // 地址dom
       let addressDom = isShowAddress 
-        ? address.longitude && address.latitude 
+        ? longitude && latitude 
           ? <div>{ addressData.icon }{ addressData.address }</div> 
           : <div>{ address }</div>
         : '';
