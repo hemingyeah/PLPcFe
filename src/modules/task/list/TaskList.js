@@ -114,6 +114,7 @@ export default {
       tableKey: (Math.random() * 1000) >> 2,
       taskStateEnum: TaskStateEnum,
       taskStatusFields: [
+<<<<<<< HEAD
         'onceOverTime',
         'onceRefused',
         'oncePaused',
@@ -122,6 +123,16 @@ export default {
         'oncePrinted',
         // "source",
         'positionException',
+=======
+        "onceOverTime",
+        "onceRefused",
+        "oncePaused",
+        "onceRollback",
+        "onceReallot",
+        "oncePrinted",
+        "positionException",
+        "source"
+>>>>>>> feature/gongdan
       ],
       taskTypes: [
         {
@@ -474,6 +485,7 @@ export default {
       const {params, repeatBool} = this.$refs.searchPanel.buildParams()
       this.params.pageNum = 1;
       this.taskPage.list = [];
+<<<<<<< HEAD
 
       this.params.moreConditions = params;
       this.$refs.searchPanel.hide();
@@ -482,6 +494,12 @@ export default {
         return
       }
       
+=======
+      console.log(this.$refs.searchPanel.buildParams());
+      this.params.moreConditions = this.$refs.searchPanel.buildParams();
+      // this.$refs.searchPanel.hide();
+
+>>>>>>> feature/gongdan
       this.search();
     },
     /**
@@ -2014,6 +2032,7 @@ export default {
           oncePrinted = '';
           break;
         }
+<<<<<<< HEAD
         // //创建方式
         // let source;
         // switch (params.source) {
@@ -2036,6 +2055,15 @@ export default {
         //     source = "";
         //     break;
         // }
+=======
+        console.log(1111,params.source);
+        let source=params.source && params.source.length && params.source.map((item)=>{
+          if(item=='API创建'){
+            item='开放API'
+          } 
+          return item;
+        }) || [];
+>>>>>>> feature/gongdan
         // 是否审批中
         let inApprove;
         switch (params.inApprove) {
@@ -2140,8 +2168,14 @@ export default {
           page: params.page,
           pageSize: params.pageSize,
           templateId: this.currentTaskType.id,
+<<<<<<< HEAD
           state,
 
+=======
+          state: state,
+          source,
+          eventNo: params.eventNo,
+>>>>>>> feature/gongdan
           serviceTypes: params.serviceTypes,
           serviceContents: params.serviceContents,
           levels: params.levels,

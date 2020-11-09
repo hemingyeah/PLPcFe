@@ -531,6 +531,7 @@ const allExport = [
     isGuideData: false,
     guideData: false,
   },
+<<<<<<< HEAD
   // {
   //   id: 5460,
   //   tableName: 'customer',
@@ -575,6 +576,50 @@ const allExport = [
   
 ]
 // 选择列数据or表哥title
+=======
+  {
+    id: 5460,
+    tableName: 'customer',
+    isSystem: 1,
+    fieldName: 'source',
+    exportAlias: 'source',
+    displayName: '创建方式',
+    formType: 'text',
+    defaultValue: null,
+    isNull: 1,
+    isSearch: 1,
+    placeHolder: null,
+    setting: {},
+    orderId: 1,
+    isDelete: 0,
+    guideProfessions: [],
+    show: true,
+    isGuideData: false,
+    guideData: false,
+  },
+  {
+    id: 5460,
+    tableName: 'customer',
+    isSystem: 1,
+    fieldName: 'eventNo',
+    exportAlias: 'eventNo',
+    displayName: '关联事件',
+    formType: 'text',
+    defaultValue: null,
+    isNull: 1,
+    isSearch: 1,
+    placeHolder: null,
+    setting: {},
+    orderId: 1,
+    isDelete: 0,
+    guideProfessions: [],
+    show: true,
+    isGuideData: false,
+    guideData: false,
+  },
+]
+// 选择列数据or表格
+>>>>>>> feature/gongdan
 let fields = [
   {
     id: 476,
@@ -1370,6 +1415,7 @@ let fields = [
     isGuideData: false,
     guideData: false,
   },
+<<<<<<< HEAD
   // {
   //   id: 5460,
   //   tableName: 'customer',
@@ -1408,6 +1454,46 @@ let fields = [
   //   isGuideData: false,
   //   guideData: false,
   // },
+=======
+  {
+    id: 5460,
+    tableName: 'customer',
+    isSystem: 1,
+    fieldName: 'source',
+    displayName: '创建方式',
+    formType: 'user',
+    defaultValue: null,
+    isNull: 1,
+    isSearch: 1,
+    placeHolder: null,
+    setting: {},
+    orderId: 1,
+    isDelete: 0,
+    guideProfessions: [],
+    show: true,
+    isGuideData: false,
+    guideData: false,
+  },
+  {
+    id: 5460,
+    tableName: 'customer',
+    isSystem: 1,
+    fieldName: 'eventNo',
+    displayName: '关联事件',
+    formType: 'text',
+    defaultValue: null,
+    isNull: 1,
+    isSearch: 1,
+    placeHolder: null,
+    setting: {},
+    orderId: 1,
+    isDelete: 0,
+    guideProfessions: [],
+    show: true,
+    isGuideData: false,
+    guideData: false,
+  },
+>>>>>>> feature/gongdan
 ];
 
 
@@ -2502,6 +2588,7 @@ const Inquire = [
     isGuideData: false,
     guideData: false,
   },
+<<<<<<< HEAD
   // {
   //   id: 5460,
   //   tableName: 'customer',
@@ -2528,21 +2615,38 @@ const Inquire = [
   //   isGuideData: false,
   //   guideData: false,
   // },
+=======
+>>>>>>> feature/gongdan
   {
     id: 5460,
     tableName: 'customer',
     isSystem: 1,
+<<<<<<< HEAD
     fieldName: 'exceptionType',
     displayName: '超时工单',
     formType: 'select',
     // formType: "user",
+=======
+    fieldName: 'source',
+    displayName: '创建方式',
+    formType: 'select',
+>>>>>>> feature/gongdan
     defaultValue: null,
     isNull: 1,
     isSearch: 1,
     placeHolder: null,
     setting: {isMulti: false, dataSource:[
+<<<<<<< HEAD
       '暂停',
       '超时'
+=======
+      '全部',
+      '导入创建',
+      '手动创建',
+      'API创建',
+      '由事件创建',
+      '计划任务创建'
+>>>>>>> feature/gongdan
     ]},
     orderId: 1,
     isDelete: 0,
@@ -2551,6 +2655,7 @@ const Inquire = [
     isGuideData: false,
     guideData: false,
   },
+<<<<<<< HEAD
 
   // {
   //   id: 5460,
@@ -2572,6 +2677,28 @@ const Inquire = [
   //   isGuideData: false,
   //   guideData: false,
   // },
+=======
+  {
+    id: 5460,
+    tableName: 'customer',
+    isSystem: 1,
+    fieldName: 'eventNo',
+    displayName: '关联事件',
+    formType: 'text',
+    // formType: "user",
+    defaultValue: null,
+    isNull: 1,
+    isSearch: 1,
+    placeHolder: null,
+    setting: {},
+    orderId: 1,
+    isDelete: 0,
+    guideProfessions: [],
+    show: true,
+    isGuideData: false,
+    guideData: false,
+  },
+>>>>>>> feature/gongdan
 ];
 // 顶部筛选id
 const selectIds = {
