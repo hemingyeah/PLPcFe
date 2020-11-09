@@ -676,6 +676,7 @@ export default {
       for (let i = 0; i < notSystemFields.length; i++) {
         tv = notSystemFields[i];
         fn = tv.fieldName;
+        !tv.operator ? (tv["operator"] = this.matchOperator(tv)) : "";
         if (!form[fn] || (Array.isArray(form[fn]) && !form[fn].length)) {
           continue;
         }
@@ -689,24 +690,7 @@ export default {
           continue;
         }
 
-        if (tv.formType === "address") {
-          let address = {
-            property: fn,
-            operator: tv.operatorValue,
-          };
-          let isEmpty = isEmptyStringObject(form[fn]);
-
-          if (!isEmpty) {
-            address.value =
-              (form[fn].province || "") +
-              (form[fn].city || "") +
-              (form[fn].dist || "") +
-              (form[fn].address || "");
-          }
-          params.conditions.push(address);
-          continue;
-        }
-
+        // FIXME: 同下面 datetime
         if (tv.formType === "date") {
           params.conditions.push({
             property: fn,
@@ -725,16 +709,16 @@ export default {
           });
           continue;
         }
-
-        if (tv.formType === "user") {
+        if (tv.formType === "user" && Array.isArray(form[fn])) {
           params.conditions.push({
             property: fn,
             operator: "user",
-            value: form[fn],
+            inValue: form[fn],
           });
           continue;
         }
 
+        // FIXME: 这里 form[fn] 为 字 符串的时候 error
         if (tv.formType === "datetime") {
           params.conditions.push({
             property: fn,
@@ -744,24 +728,11 @@ export default {
           });
           continue;
         }
-
-        //
-        if (params.conditions && params.conditions.length) {
-          params.conditions = params.conditions.filter((item) => {
-            return fn !== item.property;
-          });
-          params.conditions.push({
-            property: fn,
-            operator: tv.operatorValue,
-            value: form[fn],
-          });
-        } else {
-          params.conditions.push({
-            property: fn,
-            operator: tv.operatorValue,
-            value: form[fn],
-          });
-        }
+        params.conditions.push({
+          property: fn,
+          operator: tv.operator,
+          value: form[fn],
+        });
       }
     },
     /**

@@ -24,8 +24,11 @@
       <div class="task-flex task-ai">
         <div class="task-view-name task-view-view task-flex" v-show="type === 'view'" v-for="(item, index) in searchModelCN" :key="index">
           <span class="task-f14">{{item.key}} :</span>
-          <div>
+          <div v-if="item.fieldName !== 'area'">
             {{item.content}}
+          </div>
+          <div v-else>
+            {{item.province}}{{item.city}}{{item.dist}}
           </div>
         </div>
       </div>
@@ -60,7 +63,7 @@
           :column-num="columnNum"
           :search-model="region.searchModel"
           :config="[...config, ...taskTypeFilterFields]"
-          :taskNums="taskNums"
+          :taskNums="searchModelCN"
           @setting="_setting"
         />
         <!-- 搜索操作按钮 -->
@@ -98,6 +101,14 @@ import {
   TaskOnceConvertMap,
   TaskApproveConvertMap,
 } from "@src/modules/task/model/TaskConvertMap.ts";
+
+import {
+  ApproveTextConvert,
+  OncePrintedTextConvert,
+  StateTextConvert,
+  FlagTextConvert,
+  AllotTypeTextConvert,
+} from "@src/modules/task/model/TaskTextConvertMap.ts";
 
 const TASK_HISTORY_KEY = "task_history_list";
 const TaskInquireConvertFieldNamesToConditionsMap = {
@@ -157,7 +168,6 @@ export default {
       viewName: this.region.viewName,
       searchModelCN: [],
       type: "",
-      taskNums: [], //已经存储的视图参数索引
     };
   },
   computed: {
@@ -219,33 +229,125 @@ export default {
       if (!systemConditions || !systemConditions.length) return;
       const taskList = [...this.config, ...this.taskTypeFilterFields];
       this.searchModelCN = [];
-      this.taskNums = []
+      let address;
       systemConditions.forEach((item) => {
         taskList.forEach((value, index) => {
-          if (item.property === value.fieldName) {
-            this.taskNums.push(index)
+          if (
+            item.property === value.fieldName ||
+            (item.property === "customerId" &&
+              value.fieldName === "customer") ||
+            (item.property === "tlmId" && value.fieldName === "tlmName") ||
+            (item.property === "productId" && value.fieldName === "product") ||
+            (item.property === "executorUser" &&
+              value.fieldName === "executor") ||
+            (item.property === "synergies" &&
+              value.fieldName === "synergyId") ||
+            (item.property === "allotType" &&
+              value.fieldName === "allotTypeStr") ||
+            (item.property === "flag" && value.fieldName === "onceException") ||
+            ((item.property === "province" ||
+              item.property === "city" ||
+              item.property === "dist") &&
+              value.fieldName === "area")
+          ) {
             // 数组类型
             if (item.inValue) {
-              this.searchModelCN.push({
-                key: value.displayName,
-                content: item.inValue.join("，"),
-              });
+              if (item.property === "state") {
+                this.searchModelCN.push({
+                  key: value.displayName,
+                  content: item.inValue
+                    .map((v) => {
+                      return StateTextConvert[v];
+                    })
+                    .join("，"),
+                  fieldName: value.fieldName,
+                  formType: value.formType,
+                });
+              } else if (item.property === "flag") {
+                this.searchModelCN.push({
+                  key: value.displayName,
+                  content: item.inValue
+                    .map((v) => {
+                      return FlagTextConvert[v];
+                    })
+                    .join("，"),
+                  fieldName: value.fieldName,
+                  formType: value.formType,
+                });
+              } else if (item.property === "allotType") {
+                this.searchModelCN.push({
+                  key: value.displayName,
+                  content: item.inValue
+                    .map((v) => {
+                      return AllotTypeTextConvert[v];
+                    })
+                    .join("，"),
+                  fieldName: value.fieldName,
+                  formType: value.formType,
+                });
+              } else {
+                this.searchModelCN.push({
+                  key: value.displayName,
+                  content: item.inValue.join("，"),
+                  fieldName: value.fieldName,
+                  formType: value.formType,
+                });
+              }
               // 时间类型
             } else if (item.betweenValue1) {
               this.searchModelCN.push({
                 key: value.displayName,
-                content: `${item.betweenValue1} - ${item.betweenValue2}`,
+                content: `${item.betweenValue1
+                  .split("-")
+                  .join("/")} - ${item.betweenValue2.split("-").join("/")}`,
+                fieldName: value.fieldName,
+                formType: value.formType,
               });
               // 字符串类型
             } else {
-              this.searchModelCN.push({
-                key: value.displayName,
-                content: item.value,
-              });
+              if (item.property === "inApprove") {
+                this.searchModelCN.push({
+                  key: value.displayName,
+                  content: ApproveTextConvert[item.value],
+                  fieldName: value.fieldName,
+                  formType: value.formType,
+                });
+              } else if (
+                item.property === "oncePrinted" ||
+                item.property === "onceReallot"
+              ) {
+                this.searchModelCN.push({
+                  key: value.displayName,
+                  content: OncePrintedTextConvert[item.value],
+                  fieldName: value.fieldName,
+                  formType: value.formType,
+                });
+              } else if (item.property === "province") {
+                address = {
+                  key: value.displayName,
+                  fieldName: "area",
+                  formType: "address",
+                };
+                address[item.property] = item.value
+              } else if (item.property === "city") {
+                address[item.property] = item.value
+              } else if (item.property === "dist") {
+                address[item.property] = item.value
+              } else {
+                this.searchModelCN.push({
+                  key: value.displayName,
+                  content: item.value,
+                  fieldName: value.fieldName,
+                  formType: value.formType,
+                });
+              }
             }
           }
         });
       });
+      if (address) {
+        this.searchModelCN.push(address)
+      }
     },
 
     _time(time) {
@@ -269,6 +371,7 @@ export default {
     buildTaskInquireParams() {
       let params = {
         systemConditions: [],
+        conditions: [],
       };
       const taskInquireList = this.$refs.taskInquireParams.returnInquireFields();
       const form = this.$refs.taskInquireParams.returnData();
@@ -300,28 +403,43 @@ export default {
         }
 
         if (tv.formType === "address") {
-          let address = {
-            property: fn,
-            operator: tv.operatorValue,
-          };
+          let address = [];
           let isEmpty = isEmptyStringObject(form[fn]);
 
           if (!isEmpty) {
-            address.value =
-              (form[fn].province || "") +
-              (form[fn].city || "") +
-              (form[fn].dist || "") +
-              (form[fn].address || "");
+            if (form[fn].province) {
+              address.push({
+                property: "province",
+                operator: tv.operatorValue,
+                value: form[fn].province,
+              });
+            }
+            if (form[fn].city) {
+              address.push({
+                property: "city",
+                operator: tv.operatorValue,
+                value: form[fn].city,
+              });
+            }
+            if (form[fn].dist) {
+              address.push({
+                property: "dist",
+                operator: tv.operatorValue,
+                value: form[fn].dist,
+              });
+            }
           }
-          params.systemConditions.push(address);
+          params.systemConditions = [...params.systemConditions, ...address];
           continue;
         }
 
         if (tv.fieldName == "tags") {
           let condition = {
-            property: fn,
+            property: "tagIds",
             operator: tv.operatorValue,
-            inValue: form[fn].map((tag) => tag.id),
+            inValue: form[fn].map((tag) => {
+              return tag.id;
+            }),
           };
           params.systemConditions.push(condition);
           continue;
@@ -331,11 +449,32 @@ export default {
           let condition = {
             property: fn,
             operator: tv.operatorValue,
-            inValue: form[fn].map((exception) =>
-              TaskStateEnum.getValue(exception)
+            inValue: form[fn].map((stateName) =>
+              TaskStateEnum.getValue(stateName)
             ),
           };
           params.systemConditions.push(condition);
+          continue;
+        }
+
+        if (tv.fieldName === "exceptionType") {
+          let exceptionType;
+          switch (form[fn]) {
+            case "暂停":
+              exceptionType = 1;
+              break;
+            case "超时":
+              exceptionType = 2;
+              break;
+            default:
+              exceptionType = 0;
+              break;
+          }
+          params.systemConditions.push({
+            property: "exceptionType",
+            operator: tv.operatorValue,
+            value: exceptionType,
+          });
           continue;
         }
 
@@ -348,20 +487,27 @@ export default {
           continue;
         }
 
+        if (tv.fieldName === "paymentMethod") {
+          params.conditions.push({
+            property: fn,
+            operator: tv.operatorValue,
+            inValue: form[fn],
+          });
+          continue;
+        }
+
         if (tv.fieldName == "allotTypeStr") {
           params.systemConditions.push({
             property: "allotType",
             operator: tv.operatorValue,
-            inValue: form[fn].map(
-              (exception) => AllotTypeConvertMap[exception] || ""
-            ),
+            inValue: form[fn].map((type) => AllotTypeConvertMap[type]),
           });
           continue;
         }
 
         if (tv.fieldName == "onceException") {
           params.systemConditions.push({
-            property: "flag",
+            property: "flags",
             operator: tv.operatorValue,
             inValue: form[fn].map(
               (exception) => FlagConvertMap[exception] || ""
@@ -370,37 +516,13 @@ export default {
           continue;
         }
 
-        if (
-          tv.fieldName == "level" ||
-          tv.fieldName == "serviceType" ||
-          tv.fieldName == "serviceContent" ||
-          tv.fieldName == "paymentMethod" ||
-          tv.fieldName === "createUser" ||
-          tv.fieldName === "allotUser"
-        ) {
-          params.systemConditions.push({
-            property: fn,
-            operator: tv.operatorValue,
-            inValue: form[fn],
-          });
-          continue;
-        }
-
-        if (tv.fieldName === "executor") {
-          params.systemConditions.push({
-            property: "executorUser",
-            operator: tv.operatorValue,
-            inValue: form[fn],
-          });
-          continue;
-        }
-
         if (tv.fieldName === "synergyId") {
-          params.systemConditions.push({
+          let condition = {
             property: "synergies",
             operator: tv.operatorValue,
             inValue: form[fn],
-          });
+          };
+          params.systemConditions.push(condition);
           continue;
         }
 
@@ -408,7 +530,7 @@ export default {
           params.systemConditions.push({
             property: fn,
             operator: tv.operatorValue,
-            betweenValue1: formatDate(form[fn][0], "YYYY-MM-DD HH:mm:ss"),
+            betweenValue1: `${formatDate(form[fn][0], "YYYY-MM-DD")} 00:00:00`,
             betweenValue2: `${formatDate(form[fn][1], "YYYY-MM-DD")} 23:59:59`,
           });
           continue;
@@ -418,8 +540,20 @@ export default {
           params.systemConditions.push({
             property: fn,
             operator: tv.operatorValue,
-            betweenValue1: formatDate(form[fn][0], "YYYY-MM-DD HH:mm:ss"),
+            betweenValue1: `${formatDate(form[fn][0], "YYYY-MM-DD")} 00:00:00`,
             betweenValue2: `${formatDate(form[fn][1], "YYYY-MM-DD")} 23:59:59`,
+          });
+          continue;
+        }
+
+        if (
+          MultiFieldNames.indexOf(tv.formType) !== -1 ||
+          tv.formType === "user"
+        ) {
+          params.systemConditions.push({
+            property: fn,
+            operator: tv.operatorValue,
+            inValue: form[fn],
           });
           continue;
         }
@@ -447,23 +581,13 @@ export default {
           operator: tv.operatorValue,
           value,
         });
-        params.systemConditions = [
-          ...new Set(
-            params.systemConditions.map((item) => {
-              item = JSON.stringify(item);
-              return item;
-            })
-          ),
-        ].map((item) => {
-          item = JSON.parse(item);
-          return item;
-        });
       }
 
       // 自定义条件
       for (let i = 0; i < notSystemFields.length; i++) {
         tv = notSystemFields[i];
         fn = tv.fieldName;
+        !tv.operator ? (tv["operator"] = this.matchOperator(tv)) : "";
         if (!form[fn] || (Array.isArray(form[fn]) && !form[fn].length)) {
           continue;
         }
@@ -477,24 +601,7 @@ export default {
           continue;
         }
 
-        if (tv.formType === "address") {
-          let address = {
-            property: fn,
-            operator: tv.operatorValue,
-          };
-          let isEmpty = isEmptyStringObject(form[fn]);
-
-          if (!isEmpty) {
-            address.value =
-              (form[fn].province || "") +
-              (form[fn].city || "") +
-              (form[fn].dist || "") +
-              (form[fn].address || "");
-          }
-          params.conditions.push(address);
-          continue;
-        }
-
+        // FIXME: 同下面 datetime
         if (tv.formType === "date") {
           params.conditions.push({
             property: fn,
@@ -513,7 +620,16 @@ export default {
           });
           continue;
         }
+        if (tv.formType === "user" && Array.isArray(form[fn])) {
+          params.conditions.push({
+            property: fn,
+            operator: "user",
+            inValue: form[fn],
+          });
+          continue;
+        }
 
+        // FIXME: 这里 form[fn] 为 字 符串的时候 error
         if (tv.formType === "datetime") {
           params.conditions.push({
             property: fn,
@@ -523,24 +639,11 @@ export default {
           });
           continue;
         }
-
-        //
-        if (params.conditions && params.conditions.length) {
-          params.conditions = params.conditions.filter((item) => {
-            return fn !== item.property;
-          });
-          params.conditions.push({
-            property: fn,
-            operator: tv.operatorValue,
-            value: form[fn],
-          });
-        } else {
-          params.conditions.push({
-            property: fn,
-            operator: tv.operatorValue,
-            value: form[fn],
-          });
-        }
+        params.conditions.push({
+          property: fn,
+          operator: tv.operator,
+          value: form[fn],
+        });
       }
 
       return params;
@@ -594,7 +697,7 @@ export default {
       }
       return operator;
     },
-    open(type = "", systemConditions) {
+    open(type = "", systemConditions = "") {
       this.visible = true;
       this.type = type;
       this.getOneView(systemConditions);

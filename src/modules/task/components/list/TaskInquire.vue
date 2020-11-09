@@ -11,7 +11,6 @@
         @del="del"
         @setting="setting"
         :item="item"
-        :taskNums="taskNums"
         :inquire-form-backup="inquireFormBackup"
         :search-model="searchModel"
       />
@@ -151,10 +150,7 @@ export default {
   },
   watch: {
     taskNums(v) {
-      this.list = [];
-      v.forEach((item) => {
-        this.list.push(item + 1);
-      });
+      this.list = v;
     },
     config() {
       this.fields;
@@ -354,10 +350,6 @@ export default {
     BatchForm: {
       name: "batch-form",
       props: {
-        taskNums: {
-          type: Array || null,
-          default: () => [], //已经存储的视图参数索引
-        },
         inquireFormBackup: {
           type: Object,
           default: () => ({}),
@@ -383,7 +375,7 @@ export default {
           default: 1,
         },
         item: {
-          type: Number | String,
+          type: Number | String | Object,
           default: "",
         },
       },
@@ -396,9 +388,6 @@ export default {
         };
       },
       watch: {
-        taskNums(v) {
-          //  this.selectField(this.fields[item].fieldName);
-        },
         inquireFormBackup(v) {
           if (JSON.stringify(v) === "{}") {
             this.reset();
@@ -406,6 +395,7 @@ export default {
           }
         },
         item(v) {
+          this.customizeParams();
           if (!v) {
             this.reset();
           }
@@ -418,10 +408,53 @@ export default {
         },
       },
       mounted() {
+        this.customizeParams();
         this.reset();
         this.buildForm();
       },
       methods: {
+        /*自定义视图参数 */
+        customizeParams() {
+          if (this.item.fieldName) {
+            const {
+              fieldName,
+              content,
+              formType,
+              province,
+              city,
+              dist,
+            } = this.item;
+            this.selectField(fieldName);
+            let types = [
+              "level",
+              "serviceContent",
+              "serviceType",
+              "paymentMethod",
+              "onceException",
+              "allotTypeStr",
+              "state",
+              "user",
+              "cascader",
+            ];
+            if (types.indexOf(fieldName) !== -1 || types.indexOf(formType) !== -1) {
+              this.form[fieldName] = content.split("，");
+            } else if (formType === "datetime") {
+              this.form[fieldName] = content.split("-");
+            } else if (fieldName === "area") {
+              this.form[fieldName] = {
+                addressType: 0,
+                province,
+                city,
+                dist,
+              };
+            } else {
+              this.form[fieldName] = content;
+            }
+          } else {
+            this.form = {};
+          }
+          console.log(this.item);
+        },
         returnDatas() {
           let data = Object.assign({}, this.form);
           data.backUp = {
@@ -431,7 +464,7 @@ export default {
           return data;
         },
         reset() {
-          this.form = {};
+          // this.form = {};
           // if (this.fields.length) {
           //   this.selectField(this.fields[0].fieldName);
           // }
@@ -441,8 +474,29 @@ export default {
           if (Object.keys(this.form).length === this.fields.length) return;
 
           this.fields.forEach((f) => {
-            if (MultiFieldNames.indexOf(f.fieldName) > -1) {
-              this.form[f.fieldName] = [];
+            if (!this.form[f.fieldName] || !this.form[f.fieldName].length) {
+              // 地址的默认值初始化为对象
+              let tv = "";
+              if (f.formType == "customerAddress" || f.formType == "address")
+                tv = {};
+              if (f.formType == "date" || f.formType == "datetime") tv = [];
+              if (f.formType === "link") {
+                tv = {};
+              }
+              if (f.fieldName === "tags") {
+                tv = [];
+              }
+              if (f.formType === "area" || f.formType === "cascader") {
+                tv = [];
+              }
+
+              if (f.formType === "user") {
+                tv = [];
+              }
+              if (MultiFieldNames.indexOf(f.fieldName) > -1) {
+                this.form[f.fieldName] = [];
+              }
+              this.form[f.fieldName] = tv;
             }
           });
         },
@@ -504,7 +558,6 @@ export default {
             index: this.index,
           });
           this.form[val] = val == "tags" ? [] : "";
-          console.log(this.form)
           if (MultiFieldNames.indexOf(this.selectedField.fieldName) > -1) {
             this.form[val] = [];
           }

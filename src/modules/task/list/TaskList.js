@@ -146,7 +146,7 @@ export default {
       nowGuideStep:5,
       guideSearchModelSave: false,
       guideDropdownMenu: false,
-      isGuide:false
+      isGuide:false,
     };
   },
   computed: {
@@ -483,6 +483,7 @@ export default {
      */
     /* 其他,列表 */
     otherLists(result) {
+      this.otherList = []
       result.map((item, index) => {
         if (
           item.id === "1e930239-1ea3-11e7-8d4e-00163e304a25"
@@ -621,8 +622,20 @@ export default {
       }
       this.viewType = type
       this.$refs.viewPanel.mergeTaskFields(this.taskAllFields)
-      this.$refs.viewPanel.open(type, searchModel.systemConditions);
-      this.showBj = true
+      this.currentTaskType.id = searchModel ? searchModel.templateId : ''
+      this.getTaskOpen(() => {
+        this.$refs.viewPanel.open(type, searchModel && [...searchModel.systemConditions, ...searchModel.conditions]);
+        this.showBj = true
+      })
+    },
+    /**
+     * 请求 getTaskTemplateFields and fetchTaskFields 接口
+     */
+    getTaskOpen(fn) {
+      Promise.all([this.fetchTaskFields(), this.fetchTaskReceiptFields()])
+      .then((res) => {
+        fn()
+      })
     },
     /**
      * @description 删除视图
@@ -639,8 +652,10 @@ export default {
      * 保存视图
      */
     saveView() {
-      this.searchParams.systemConditions = this.$refs.viewPanel.buildTaskInquireParams().systemConditions
-      if (!this.searchParams.systemConditions.length) {
+      const {conditions,systemConditions} = this.$refs.viewPanel.buildTaskInquireParams()
+      this.searchParams.systemConditions = systemConditions
+      this.searchParams.conditions = conditions
+      if (!systemConditions.length && !conditions.length) {
         this.$platform.alert("请您先设置查询条件");
         return
       }
