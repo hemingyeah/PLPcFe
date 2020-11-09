@@ -1082,4 +1082,11 @@ export function getOneView(params: string) {
   return http.get(`${fixedPrefixTaskPath}/outside/pc/view/getOneView/${params}`);
 }
 
+/**
+ * @description 旧版切换原因
+ */
+export function revertReason(params: object) {
+  return http.post(`/task/revertReason`, params)
+}
+
 /* -------------  end  新工单api ---------------- */

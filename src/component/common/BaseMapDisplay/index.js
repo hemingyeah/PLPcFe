@@ -8,16 +8,20 @@ const BaseMapDisplayComp = Vue.extend(BaseMapDisplay);
 
 /**
  *
- * @param {*} address
- * @param {*} options
+ * @param {Object} address 地址信息
+ * @param {Object} options 配置
+ * @param {String} markerDom 标记dom
+ * @param {String} infoDom 相信信息dom
+ * @param {Function} renderMarkFunc 自定义渲染mark方法
  */
-function display(address, options = {}, markerDom, infoDom){  
+function display(address, options = {}, markerDom, infoDom, renderMarkFunc){
   let instance = new BaseMapDisplayComp({
     propsData: {
       address,
       options,
       markerDom,
-      infoDom
+      infoDom,
+      renderMarkFunc
     }
   });
   

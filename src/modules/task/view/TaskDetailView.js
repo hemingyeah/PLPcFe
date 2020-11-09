@@ -524,7 +524,12 @@ export default {
         task: this.task,
         auth: this.permission,
         receiptFields: this.receiptFields,
-        isFinishApproving: this.approvingForComplete
+        isFinishApproving: this.approvingForComplete,
+        linkman: {
+          lmName: this.lmName,
+          lmPhone: this.lmPhone
+        },
+        address: this.address
       }
     },
     /** 
