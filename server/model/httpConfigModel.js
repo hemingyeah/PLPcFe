@@ -2,10 +2,10 @@ const { isNotLocalEnv } = require('./proxyConfigModel');
 const https = require(isNotLocalEnv ? 'https' : 'http');
 // 默认配置
 const DEFAULT_OPIONS = {
-  host: '30.40.59.106',
-  port: 8888,
+  host: '127.0.0.1',
+  port: 8080,
   headers:{
-    'cookie':'VIPPUBLINKJSESSIONID=a084bc30-4788-4293-9fbd-54716dae5115'
+    'cookie':'VIPPUBLINKJSESSIONID=588f226d-f8b2-461f-9734-3c9f88e6e674'
   }
 };
 // https agent

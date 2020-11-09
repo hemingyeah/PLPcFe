@@ -15,7 +15,7 @@
     <div class="form-preview-group">
       <label> 解析地址 <span class="form-preview-notNull" v-if="field.isNull == 0">*</span><i class="iconfont icon-yidongduanxianshi" v-if="field.isAppShow === 1"></i></label>
       <div class="form-preview-mock">
-        <p class="form-preview-control" style="margin-top: 10px">{{field.placeHolder}}</p>
+        <p class="form-preview-control">{{field.placeHolder}}</p>
       </div>
     </div>
   </div>

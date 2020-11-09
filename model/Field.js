@@ -23,6 +23,7 @@ export default class Field{
     this.enabled = options.enabled || 1;
     this.isDelete = options.isDelete || 0;
 
+    this.isHidden = options.isHidden || 0;
     // 客户、产品的字段id
     this.fieldId = options.id;
     this.tableChsName = options.tableChsName;

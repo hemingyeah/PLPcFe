@@ -232,7 +232,7 @@ const FormView = {
     },
   
     mapFieldToDom(field, createElement) {
-      let {formType, fieldName, displayName, isSystem} = field;
+      let {formType, fieldName, displayName, isSystem ,isHidden} = field;
       if (formType === 'separator') {
         const cn = `iconfont icon-nav-down ${!this.sectionState[field.id] && 'reversal'}`;
         return displayName ? (
@@ -242,6 +242,8 @@ const FormView = {
           </h4>
         ) : null;
       }
+      //如果为隐藏的字段不显示
+      if(isHidden == 1) return null;
       
       const originalObj = this.value;
       

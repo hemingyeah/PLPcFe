@@ -4,8 +4,9 @@
       <div>
         <button type="button" class="btn btn-text setting-back-btn" @click="back"><i class="iconfont icon-arrow-left"></i> 返回</button>
         <span class="setting-header-text">|</span>
-        <base-button type="primary" native-type="submit" :disabled="pending"  @event="submit">保存</base-button>
+        <span>配置自定义字段</span>
       </div>
+      <base-button type="primary" native-type="submit" :disabled="pending"  @event="submit">保存</base-button>
     </div>
     <div class="setting-customer-design">
       <form-design v-model="fields" :max="maxField" mode="customer"></form-design>

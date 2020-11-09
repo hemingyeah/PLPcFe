@@ -68,6 +68,8 @@ export default class FormField{
     this.isSystem = typeof params.isSystem == 'number' ? params.isSystem : 0;
     // 工单专属字段： 是否在移动端显示 0 - 不显示，1 - 显示
     this.isAppShow = typeof params.isAppShow == 'number' ? params.isAppShow : 0;
+    // 是否隐藏   1 - 隐藏，0 - 不隐藏
+    this.isHidden = typeof params.isHidden == 'number' ? params.isHidden : 0; 
 
     // formType 为select时需要补全一下字段
     let {options, isMulti, dependencies} = fillPropForSelect(params)
@@ -114,6 +116,7 @@ export default class FormField{
     option.placeHolder = field.placeHolder;
     option.isSystem = field.isSystem;
     option.isAppShow = field.isAppShow;
+    option.isHidden = field.isHidden;
 
     if(field.relation_options) {
       option.relation_options = field.relation_options;

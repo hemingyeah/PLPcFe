@@ -12,7 +12,7 @@ import {
 
 import {
   cloneDeep, 
-  isEmpty 
+  isEmpty
 } from 'lodash';
 
 import { 
@@ -37,9 +37,11 @@ function createPreviewComp(h, field){
   }
 
   // 根据字段配置创建预览内容
-  
   // todo 临时解决
   if (!previewComp) return;
+
+  //TODO 隐藏字段不渲染
+  if(field.isHidden == 1) return;
   
   let fieldPreview = h(previewComp.preview, {
     'class': 'form-design__ghost',
@@ -58,15 +60,15 @@ function createPreviewComp(h, field){
       {fieldPreview}
       {(field.isSystem == 0 || previewComp.forceDelete) && 
       <div class="form-design-operation">
-        <div class="form-design-preview-delete form-design-preview-btn" onClick={e => this.deleteField(field)}>
-          <el-tooltip class="item" effect="dark" content="删除" placement="top">
-            <i class="iconfont icon-shanchu-copy"></i>
-          </el-tooltip>
-        </div>
-        <div class="form-design-divider-separator" role="separator"></div>
         <div class="form-design-preview-hidden form-design-preview-btn" onClick={e => this.hiddenField(field)}>
           <el-tooltip class="item" effect="dark" content="隐藏" placement="top">
             <i class="iconfont icon-fdn-hidden"></i>
+          </el-tooltip>
+        </div>
+        <div class="form-design-divider-separator" role="separator"></div>
+        <div class="form-design-preview-delete form-design-preview-btn" onClick={e => this.deleteField(field)}>
+          <el-tooltip class="item" effect="dark" content="删除" placement="top">
+            <i class="iconfont icon-shanchu-copy"></i>
           </el-tooltip>
         </div>
       </div>}
@@ -94,6 +96,7 @@ function getSettingComp(field, comp){
 /** 创建字段设置组件 */
 function createSettingComp(h, field){
   if(null == field) return null;
+  if(field.isHidden == 1) return null;
   
   let formType = field.formType;
   let comp = FieldManager.findField(formType);
@@ -257,7 +260,8 @@ const FormDesign = {
       insertedField: null,
       // 插入前的值
       originValue: null,
-      autographMax: config.AUTOGRAPH_MAX_LENGTH_MAX
+      autographMax: config.AUTOGRAPH_MAX_LENGTH_MAX,
+      show:false
     }
   },
   computed: {
@@ -275,6 +279,10 @@ const FormDesign = {
     // 是否为空
     isEmpty(){
       return !Array.isArray(this.value) || this.value.length == 0;
+    },
+    //已隐藏字段
+    hiddenFields() {
+     return this.value.filter(item => item.isHidden == 1);
     }
   },
   methods: {
@@ -646,9 +654,14 @@ const FormDesign = {
     },
     /** 隐藏字段 */
     async hiddenField(item) {
-      let tip = item.isSystem == 0 ? '隐藏该字段后，之前所有相关数据都会被隐藏，请确认是否隐藏？' : '该字段为系统内置字段，请确认是否隐藏？'
+      let tip = item.isSystem == 0 ? '隐藏后该字段将不在页面上展示，请确认是否隐藏？' : '该字段为系统内置字段，请确认是否隐藏？'
       if (!await Platform.confirm(tip)) return;
 
+      let value = this.value;
+      let index = value.indexOf(item);
+      value[index].isHidden = value[index].isHidden == 1 ? 0 : 1;
+
+      this.emitInput(value)
     },
     async deleteUser(item, callback) {
       let result = await checkUser({ id : item.id })
@@ -770,9 +783,66 @@ const FormDesign = {
         </div>
       )
     },
+    //渲染已隐藏字段弹窗dom
+    renderBaseModal(h){
+      if(!this.show) return null;
+      const scopedSlots = {
+        default:({row,column})=>{
+          return  <el-button type="text" size="small" onClick={()=>this.onRestoreField(row)}>恢复</el-button>
+        }
+      }
+      return (
+        <base-modal
+         appendToBody={ true }
+         class="base-hidden-modal"
+         title="已隐藏字段" 
+         show={ this.show } 
+         onClose={ this.onCloseBaseModal }
+         width="400px"
+        >
+          <el-table data={this.hiddenFields} header-row-class-name="base-table-header-v3" row-class-name="base-table-row-v3" border>
+            <el-table-column prop="displayName" label="已隐藏字段"/>
+            <el-table-column label="操作" width="100" scopedSlots={ scopedSlots }/> 
+         </el-table>
+        </base-modal>
+      );
+    },
     updateOptions(field, event) {
       if(!field.setting.customerOption) return;
       field.setting.customerOption[event.prop] = event.value;
+    },
+    /** 
+     * @description 保存隐藏字段设置弹窗
+    */
+    async onRestoreField(row) {
+      let value = this.value;
+      let index = value.indexOf(row);
+      value[index].isHidden = value[index].isHidden == 1 ? 0 : 1;
+
+      this.emitInput(this.value)
+      this.$platform.notification({
+        title: '操作成功',
+        type: 'success',
+      }); 
+    },
+    /** 
+     * @description 关闭弹窗
+    */
+    onCloseBaseModal() {
+      this.show = false;
+    },
+    /** 
+     * @description 显示弹窗
+    */
+    onShowBaseModal() {
+      if(this.hiddenFields.length==0) return this.$platform.confirm('暂无隐藏字段');
+      this.show = true;
+    },
+    /** 
+     * @description 保存隐藏字段设置弹窗
+    */
+    onSaveBaseModal() {
+      this.show = false;
     }
   },
   render(h){
@@ -784,13 +854,14 @@ const FormDesign = {
             { this.renderFieldList(this.filterFields) }
           </div>
         </div>
-        <div class="form-design-main">
+        <div class="form-design-main">    
+          <div class="form-design-hidden" onClick={this.onShowBaseModal }>
+          { this.hiddenFields.length > 0 && (
+            <p><i class="iconfont icon-fdn-hidden"></i>查看已隐藏字段</p> )} 
+          </div>
           <div class="form-design-center">
             <div class={['form-design-phone', this.silence ? 'form-design-silence' : null]}>
               { this.renderPreviewList(h) }
-            </div>
-            <div class="form-design-hidden">
-              <p>已隐藏字段</p>
             </div>
           </div>
         </div>
@@ -799,6 +870,7 @@ const FormDesign = {
           <div class="form-design__template"></div>
           <div class="form-design-cover"></div>
         </div>
+        { this.renderBaseModal(h) }
       </div>
     );
   },

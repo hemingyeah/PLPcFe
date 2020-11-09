@@ -73,7 +73,7 @@ export default {
         if(!FormUtil.notification(message, this.$createElement)) return;
 
         this.pending = true;
-
+     
         let result = await http.post('/setting/product/saveFields', fields);
         if(result.status == 0){
           platform.notification({

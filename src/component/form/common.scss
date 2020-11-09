@@ -85,7 +85,6 @@
   width: calc(100% - 700px);
   min-width: 500px;
   height: calc(100% - 20px);
-  padding: 30px 0px;
   margin: 0px 10px;
   border-top: none;
   border-bottom: none;
@@ -116,27 +115,25 @@
       border-top: none;
       background-color: #F2F2F2;
       box-shadow: none;
-      padding-bottom: 51px;
+      padding-bottom: 12px;
   
       &::-webkit-scrollbar-thumb {
         border-radius: 3px;
       }
   
     }
-    .form-design-hidden{
-      width: calc(100% - 42px);
-      height: 41px;
-      line-height: 41px;
-      position: absolute;
-      left: 17px;
-      background: #fff;
-      bottom: 41px;
-      padding-left: 11px;
-      color: #13C2C2;
-      cursor: pointer;
-      z-index: 999;
+  }
+  .form-design-hidden{
+    font-size: 12px;
+    color: #13C2C2;
+    height: 40px;
+    text-align: right;
+    margin: 12px 12px 0 0;
+    cursor: pointer;
+    .iconfont{
+      font-size: 12px;
+      margin-right: 5px;
     }
-  
   }
 
 }
@@ -414,7 +411,7 @@
 .form-design-divider-separator{
   width: 1px;
   height: .9em;
-  margin: 5px 4px 0 4px;
+  margin: 5px 6px 0 6px;
   vertical-align: middle;
   background-color: #D9D9D9;
 }
@@ -603,4 +600,11 @@
   // background-color: #fff;
   min-height: 600px;
   min-width: 800px;
+}
+.base-hidden-modal{
+  .base-modal-body {
+    margin: 23px auto;
+    width: 350px;
+  
+  }
 }
