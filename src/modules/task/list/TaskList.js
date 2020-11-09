@@ -627,8 +627,8 @@ export default {
       this.viewType = type
       this.$refs.viewPanel.mergeTaskFields(this.taskAllFields)
       this.currentTaskType.id = searchModel ? searchModel.templateId : ''
-      this.getTaskOpen(() => {
-        this.$refs.viewPanel.open(type, searchModel && [...searchModel.systemConditions, ...searchModel.conditions]);
+      this.getTaskOpen((taskFields, taskReceiptFields) => {
+        this.$refs.viewPanel.open(type, searchModel && [...searchModel.systemConditions, ...searchModel.conditions], {taskFields, taskReceiptFields});
         this.showBj = true
       })
     },
@@ -638,7 +638,7 @@ export default {
     getTaskOpen(fn) {
       Promise.all([this.fetchTaskFields(), this.fetchTaskReceiptFields()])
       .then((res) => {
-        fn()
+        fn(this.seoSetList, res[1])
       })
     },
     /**
@@ -1374,7 +1374,6 @@ export default {
           field.label = field.displayName;
           field.field = field.fieldName;
         });
-        this.$set(this, "taskFields", result || []);
         return result;
       });
     },
@@ -1393,7 +1392,6 @@ export default {
           field.label = field.displayName;
           field.field = field.fieldName;
         });
-        this.$set(this, "taskReceiptFields", result || []);
         return result;
       });
     },
@@ -1545,6 +1543,9 @@ export default {
       // this.loading = true;
       Promise.all([this.fetchTaskFields(), this.fetchTaskReceiptFields()])
         .then((res) => {
+          this.$set(this, "taskFields", res[0] || []);
+          this.$set(this, "taskReceiptFields", res[1] || []);
+
           this.planTimeType = res[0].filter((item) => {
             return item.displayName === "计划时间";
           })[0].setting.dateType;

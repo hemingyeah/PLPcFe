@@ -374,7 +374,7 @@
         </div>
       </task-search-panel>
       <!-- end 高级搜索 -->
-
+      
       <!-- S 新建视图 -->
       <task-view-panel
         :init-data="initData"
@@ -383,7 +383,6 @@
         :task_view_list="task_view_list"
         :region="region"
         @bj="showBj = false"
-        :customizeTasks="customizeTasks"
         :customize-list="[...taskFields, ...taskReceiptFields]"
         ref="viewPanel"
       >

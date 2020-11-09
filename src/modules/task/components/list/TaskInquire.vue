@@ -415,7 +415,7 @@ export default {
       methods: {
         /*自定义视图参数 */
         customizeParams() {
-          if (this.item.fieldName) {
+          if (this.item && this.item.fieldName) {
             const {
               fieldName,
               content,
@@ -453,7 +453,6 @@ export default {
           } else {
             this.form = {};
           }
-          console.log(this.item);
         },
         returnDatas() {
           let data = Object.assign({}, this.form);
@@ -550,6 +549,7 @@ export default {
           this.$forceUpdate();
         },
         selectField(val) {
+          console.log(this.fields)
           this.selectedField = this.fields.filter(
             (f) => f.fieldName === val
           )[0];

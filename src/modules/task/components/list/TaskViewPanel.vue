@@ -62,7 +62,7 @@
           type="creat"
           :column-num="columnNum"
           :search-model="region.searchModel"
-          :config="[...config, ...taskTypeFilterFields]"
+          :config="customizeViewList"
           :taskNums="searchModelCN"
           @setting="_setting"
         />
@@ -168,6 +168,7 @@ export default {
       viewName: this.region.viewName,
       searchModelCN: [],
       type: "",
+      customizeViewList: []
     };
   },
   computed: {
@@ -225,9 +226,9 @@ export default {
     /**
      * 查看视图
      */
-    getOneView(systemConditions) {
+    getOneView(systemConditions, customizeViewList) {
       if (!systemConditions || !systemConditions.length) return;
-      const taskList = [...this.config, ...this.taskTypeFilterFields];
+      const taskList = customizeViewList;
       this.searchModelCN = [];
       let address;
       systemConditions.forEach((item) => {
@@ -348,10 +349,6 @@ export default {
       if (address) {
         this.searchModelCN.push(address)
       }
-    },
-
-    _time(time) {
-      return time ? formatDate(time) : "";
     },
 
     _selfFields() {
@@ -697,10 +694,13 @@ export default {
       }
       return operator;
     },
-    open(type = "", systemConditions = "") {
+    open(type = "", systemConditions = "", {taskFields, taskReceiptFields}) {
       this.visible = true;
       this.type = type;
-      this.getOneView(systemConditions);
+      this.customizeViewList = [...taskFields, ...taskReceiptFields.filter((item) => {
+        return item.isSystem == 0 && item.isSearch;
+      })]
+      this.getOneView(systemConditions, [...taskFields, ...taskReceiptFields]);
     },
     hide() {
       this.visible = false;
