@@ -154,7 +154,7 @@ export function packToForm(fields, data){
 
     if (field.formType === TaskFieldNameMappingEnum.PlanTime && value) {
       let { dateType = 'date' } = field.setting;
-      value = dateType == 'date' ? value.replace(' 00:00:00', '') : value;
+      value = dateType == 'date' ? value.substr(0, 10) : value;
     }
 
     if (fieldName === TaskFieldNameMappingEnum.Attachment && value) {
