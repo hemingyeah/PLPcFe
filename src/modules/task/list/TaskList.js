@@ -434,17 +434,21 @@ export default {
         if (this.intercept()) {
           this.selectId = mySearch
           this.filterId = viewId
-        }
-
-        result.forEach(item => {
-          if (item.id === this.selectIds.allId) {
-            this.searchParams = item.searchModel
-            if (this.intercept()) {
-              this.searchParams.state = 'allocated'
-              this.searchParams.executor = this.initData.currentUserId;
+          result.forEach(item => {
+            if (item.id === viewId) {
+              this.searchParams = item.searchModel
+              if (item.alias === '已指派') {
+                this.searchParams.executor = this.initData.currentUserId;
+              }
             }
-          }
-        })
+          })
+        } else {
+          result.forEach(item => {
+            if (item.id === this.selectIds.allId) {
+              this.searchParams = item.searchModel
+            }
+          })
+        }
         this.initialize();
       }
     },
@@ -585,7 +589,7 @@ export default {
       this.searchParams = searchModel
       this.searchParams_spare = searchModel
       this.selectId = 'all'
-      this.params = this.initParams();
+      this.params = this.initParams(this.params.pageSize);
 
       // this.taskTypes.forEach((item) => {
       //   if (item.id === searchModel.templateId) {
@@ -617,7 +621,7 @@ export default {
       this.selectId = 'all'
       this.searchParams_spare = searchModel
       this.getTaskCountByState(searchModel);
-      this.params = this.initParams();
+      this.params = this.initParams(this.params.pageSize);
       this.search(searchModel);
       this.buildColumns();
       // 埋点
@@ -1242,7 +1246,7 @@ export default {
       this.searchParams = {...this.searchParams_spare, ...{templateId: taskType.id}}
       this.currentTaskType = taskType;
       this.selectId = 'all'
-      this.params = this.initParams();
+      this.params = this.initParams(this.params.pageSize);
       this.initialize();
       // this.createPerspective({id: this.selectId}, true)
     },
@@ -1590,7 +1594,9 @@ export default {
       this.taskPage.list = [];
       this.params.page = 1;
       this.params.pageNum = 1;
-      this.params.pageSize = 10
+      if (!this.params.pageSize) {
+        this.params.pageSize = 10
+      }
     },
     /**
      * @description 初始化参数
@@ -2177,6 +2183,7 @@ export default {
         }
         this.params.keyword = '';
         searchModel['page'] = params.page;
+        searchModel['pageSize'] = params.pageSize
 
         searchModel.createTimeStart = this._time(searchModel.createTimeStart || searchModel.timeStart);
         searchModel.createTimeEnd = this._time(searchModel.createTimeEnd || searchModel.timeEnd);

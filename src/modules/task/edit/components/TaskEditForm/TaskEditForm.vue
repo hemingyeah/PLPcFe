@@ -22,11 +22,11 @@
       <!-- start 计划时间 -->
       <template slot="planTime" slot-scope="{ field, value }">
         <form-item :label="field.displayName" :validation="validation.planTime">
-          <form-plantime :picker-options="planTimeDatePickeroptions" :field="field" :value="value" @update="update"></form-plantime>
+          <form-plantime :picker-options="isFinishedTask ? {} : planTimeDatePickerOptions" :field="field" :value="value" @update="update"></form-plantime>
 
           <!-- start 通知客户 checkbox -->
           <div class="task-notice-customer-block" v-if="isShowNoticeCustomer">
-            <el-checkbox :value="value.tick" @input="noticeCustomerCheckdChange">同时通知客户</el-checkbox>
+            <el-checkbox :value="value ? value.tick : false" @input="noticeCustomerCheckdChange">同时通知客户</el-checkbox>
             <el-tooltip placement="top" content="勾选后，将会向用户发送短信通知：尊敬的客户您好，{tenant}计划{time}安排{user}联系电话{umobile}为您提供服务，客服电话{phone}。">
               <i class="iconfont icon-info"></i>
             </el-tooltip>

@@ -563,3 +563,23 @@ body {
     transform: rotate(45deg);
   }
 }
+
+
+.amap-container {
+  .user-head {
+    border-radius: 50%;
+    height: 42px;
+    width: 42px;
+  }
+  .amap-user-name {
+    background-color: #fff;
+    border-radius: 4px;
+    height: 30px;
+    width: 80px;
+    line-height: 30px;
+    text-align: center;
+    
+    position: relative;
+    left: 10px;
+  }
+}

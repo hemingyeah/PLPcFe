@@ -41,6 +41,12 @@ export default {
   props,
   data() {
     data.validation = this.buildValidation();
+    data.planTimeDatePickerOptions = {
+      disabledDate(time) {
+        return time.getTime() < new Date(new Date().toLocaleDateString()).getTime()
+      }
+    }
+    
     return data
   },
   computed,
@@ -163,7 +169,7 @@ export default {
           if(isDateTimeType) {
             let planTime = DateUtil.parseDateTime(value).getTime();
             let nowTime = new Date().getTime();
-            errorMessage = planTime < nowTime ? PLAN_TIME_NOT_LESS_THEN_NOW_MEESSAGE : '';
+            errorMessage = planTime < nowTime && !that.isFinishedTask ? PLAN_TIME_NOT_LESS_THEN_NOW_MEESSAGE : '';
           }
 
           return new Promise((resolve, reject) => {
