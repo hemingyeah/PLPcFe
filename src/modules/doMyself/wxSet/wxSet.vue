@@ -110,9 +110,9 @@
   </div>
 </template>
 <script>
-import menuSet from "./components/menuSet";
-import toastTemplate from "./components/toastTemplate";
-import setArrItemRight from "./components/setArrItemRight";
+import menuSet from './components/menuSet';
+import toastTemplate from './components/toastTemplate';
+import setArrItemRight from './components/setArrItemRight';
 import {
   getAuthInfoWX,
   saveWxMessage,
@@ -120,28 +120,28 @@ import {
   taskTypeList,
   saveSendTime,
   cancleAuthorizer
-} from "@src/api/doMyself.js";
-import { Message } from "shb-element-ui";
+} from '@src/api/DoMyself.js';
+import { Message } from 'shb-element-ui';
 let loadKeyArr = [];
 let loadTypeArr = [];
 let setRaduisArr = [
-  "smsEventAllot",
-  "smsEventFinish",
-  "smsTaskResponse",
-  "smsTaskFinish",
-  "taskPlanTimeRemind"
+  'smsEventAllot',
+  'smsEventFinish',
+  'smsTaskResponse',
+  'smsTaskFinish',
+  'taskPlanTimeRemind'
 ];
 let setSelectArr = [
-  "eventAllotEventTypeList",
-  "eventFinishEventTypeList",
-  "taskResponseTaskTypeList",
-  "taskFinishTaskTypeList",
-  "taskPlanTimeTaskTypeList"
+  'eventAllotEventTypeList',
+  'eventFinishEventTypeList',
+  'taskResponseTaskTypeList',
+  'taskFinishTaskTypeList',
+  'taskPlanTimeTaskTypeList'
 ];
 let timeOut;
 let inputTimeOut;
 export default {
-  name: "wx-set",
+  name: 'wx-set',
   watch: {
     topType: {
       handler(newValue, oldValue) {},
@@ -153,54 +153,54 @@ export default {
     return {
       topType: 0, // 微信设置顶部切换 0 绑定公众号 1 公众号通知
       haveWx: -1,
-      concatWxUrl: "", // 授权微信公众号的链接
+      concatWxUrl: '', // 授权微信公众号的链接
       totalActive: false,
       fullscreenLoading: false, // 整屏loading
       wxInfo: {},
       toastSetArr: [
         {
-          title: "事件分配通知",
-          childTitle: "当事件被分配时,发送给客户联系人",
+          title: '事件分配通知',
+          childTitle: '当事件被分配时,发送给客户联系人',
           options: [],
           select: [],
-          pleasHolder: "全部事件类型",
+          pleasHolder: '全部事件类型',
           radius: false,
           time: null
         },
         {
-          title: "事件完成通知",
-          childTitle: "当事件被标记为完成时,发送给客户联系人",
+          title: '事件完成通知',
+          childTitle: '当事件被标记为完成时,发送给客户联系人',
           options: [],
           select: [],
-          pleasHolder: "全部事件类型",
+          pleasHolder: '全部事件类型',
           radius: false,
           time: null
         },
         {
-          title: "工单响应通知",
-          childTitle: "当工单被接收时,发送给客户联系人",
+          title: '工单响应通知',
+          childTitle: '当工单被接收时,发送给客户联系人',
           options: [],
           select: [],
-          pleasHolder: "全部工单类型",
+          pleasHolder: '全部工单类型',
           radius: false,
           time: null
         },
         {
-          title: "工单完成通知",
-          childTitle: "进行中的工单被标记为完成时,发送给客户联系人",
+          title: '工单完成通知',
+          childTitle: '进行中的工单被标记为完成时,发送给客户联系人',
           options: [],
           select: [],
-          pleasHolder: "全部工单类型",
+          pleasHolder: '全部工单类型',
           radius: false,
           time: null
         },
         {
-          title: "工单计划时间提醒客户",
+          title: '工单计划时间提醒客户',
           options: [],
           select: [],
-          pleasHolder: "全部工单类型",
+          pleasHolder: '全部工单类型',
           radius: false,
-          time: ""
+          time: ''
         }
       ],
       eventArr: [],
@@ -212,7 +212,7 @@ export default {
   },
   computed: {},
   created() {
-    sessionStorage.removeItem("wx_auth_auth_page_close");
+    sessionStorage.removeItem('wx_auth_auth_page_close');
     this.getWxInfo();
   },
   methods: {
@@ -221,9 +221,9 @@ export default {
       this.fullscreenLoading = data;
     },
     getWxInfo() {
-      if (sessionStorage.getItem("wx_auth_auth_page_close") === "true") {
+      if (sessionStorage.getItem('wx_auth_auth_page_close') === 'true') {
         this.scanQrCode = false;
-        sessionStorage.removeItem("wx_auth_auth_page_close");
+        sessionStorage.removeItem('wx_auth_auth_page_close');
         return;
       }
       if (!this.scanQrCode) {
@@ -248,21 +248,21 @@ export default {
             // 未绑定公众号
             this.haveWx = 0;
             this.scanQrCode = false;
-            this.$platform.closeTab("wx_auth");
-            this.$platform.alert(res.data.message || "系统错误");
+            this.$platform.closeTab('wx_auth');
+            this.$platform.alert(res.data.message || '系统错误');
             return;
           } else if (res.data.status === 3) {
             clearTimeout(timeOut);
             // 未绑定公众号
             this.haveWx = 0;
             this.scanQrCode = false;
-            this.$platform.closeTab("wx_auth");
-            this.$platform.alert(res.data.message || "系统错误");
+            this.$platform.closeTab('wx_auth');
+            this.$platform.alert(res.data.message || '系统错误');
             return;
           }
           this.haveWx = 1;
           if (this.scanQrCode) {
-            this.$platform.closeTab("wx_auth");
+            this.$platform.closeTab('wx_auth');
           }
           this.scanQrCode = false;
           this.wxInfo = res.data.data;
@@ -299,7 +299,7 @@ export default {
           }
         })
         .catch(err => {
-          console.log(err, "erro");
+          console.log(err, 'erro');
         })
         .finally(res => {
           this.pageLoading(false);
@@ -310,17 +310,17 @@ export default {
       if (e === true) {
         if (this.wxInfo.serviceTypeInfo != 2) {
           return this.$platform.alert(
-            "您的公众号不是认证服务号，无法开启该功能。若要使用该功能，请绑定认证服务号。"
+            '您的公众号不是认证服务号，无法开启该功能。若要使用该功能，请绑定认证服务号。'
           );
         }
         const res_plat = await this.$platform.confirm(
-          "请确认：开启后，如果您原本就有消息模板，它们将会被去除。"
+          '请确认：开启后，如果您原本就有消息模板，它们将会被去除。'
         );
         if (!res_plat) return;
       }
       this.pageLoading(true);
       saveWxMessage({
-        message: "wxRemindMaster",
+        message: 'wxRemindMaster',
         state: e
       })
         .then(res => {
@@ -363,8 +363,8 @@ export default {
       clearTimeout(inputTimeOut);
       inputTimeOut = setTimeout(() => {
         if (!/^(([0-9]+)|([0-9]+\.[0-9]{0,2}))$/.test(e)) {
-          this.$platform.alert("时间需为正数且最多保留两位小数");
-          this.toastSetArr[4].time = "";
+          this.$platform.alert('时间需为正数且最多保留两位小数');
+          this.toastSetArr[4].time = '';
           return;
         }
         saveSendTime({
@@ -377,10 +377,10 @@ export default {
         return;
       }
       this.scanQrCode = true;
-      let fromId = window.frameElement.getAttribute("id");
+      let fromId = window.frameElement.getAttribute('id');
       this.$platform.openTab({
-        id: "wx_auth",
-        title: "微信授权",
+        id: 'wx_auth',
+        title: '微信授权',
         url: this.concatWxUrl,
         reload: true,
         close: true,
@@ -400,8 +400,8 @@ export default {
             this.pageLoading(false);
             this.getWxInfo();
             Message.success({
-              message: "成功解除绑定",
-              type: "success"
+              message: '成功解除绑定',
+              type: 'success'
             });
           })
           .catch(err => {
@@ -410,7 +410,7 @@ export default {
 
         // this.$eventBus.$emit("customer_info_record.update_record_list");
       } catch (e) {
-        console.error(e, "err");
+        console.error(e, 'err');
       }
     },
     changeMenuArr(e) {

@@ -47,10 +47,10 @@
   </base-modal>
 </template>
 <script>
-import guideCompoment from "@src/component/guide/guide";
-import { storageGet, storageSet } from "@src/util/storage";
+// import guideCompoment from '@src/component/guide/guide';
+import { storageGet, storageSet } from '@src/util/storage';
 
-const { TASK_GUIDE_SEARCH_PUPAL } = require("@src/component/guide/taskV2Store");
+const { TASK_GUIDE_SEARCH_PUPAL } = require('@src/component/guide/taskV2Store');
 export default {
   name: "task-search-pupal",
   props: {
@@ -66,9 +66,9 @@ export default {
       type: Array, // 用于判断
     }
   },
-  components: {
-    [guideCompoment.name]: guideCompoment,
-  },
+  // components: {
+  //   [guideCompoment.name]: guideCompoment,
+  // },
   watch: {
     taskTypeFilterFields(v) {
       this.customizeList = v

@@ -11,7 +11,7 @@ import BatchEditingCustomerDialog from "./components/BatchEditingCustomerDialog.
 import TaskTransfer from "./components/TaskTransfer.vue";
 import TaskMap from "./components/TaskMap.vue";
 import TaskView from "./components/TaskView.vue"
-import guideCompoment from "@src/component/guide/guide";
+// import guideCompoment from "@src/component/guide/guide";
 import TaskViewPane from "@src/modules/task/components/list/TaskViewPanel.vue";
 
 /** model */
@@ -2804,7 +2804,7 @@ export default {
     [BatchEditingCustomerDialog.name]: BatchEditingCustomerDialog,
     [TaskSearchPanel.name]: TaskSearchPanel,
     [TaskViewModel.name]: TaskViewModel,
-    [guideCompoment.name]: guideCompoment,
+    // [guideCompoment.name]: guideCompoment,
     [TaskViewPane.name]: TaskViewPane,
     TaskSelect,
   },

@@ -13,7 +13,7 @@ export function getTemplates(params = {}) {
 }
 
 export function getRecords(params = {}) {
-  return http.get("/vipsms/getRecords", params)
+  return http.get('/vipsms/getRecords', params)
 }
 
 // toast/com/wxMessage.vue
