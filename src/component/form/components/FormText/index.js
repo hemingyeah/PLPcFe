@@ -10,7 +10,6 @@ import CustomerPhoneExtendSetting from './extend/CustomerPhoneExtendSetting.vue'
 import ProductNameExtendSetting from './extend/ProductNameExtendSetting.vue';
 import CustomerNameExtendSearch from './extend/CustomerNameExtendSearch.vue';
 import LinkmanExtendSearch from './extend/LinkmanExtendSearch.vue';
-import TaskExtendSearch from './extend/TaskExtendSearch.vue';
 
 let FormTextField = {
   formType: 'text', // 字段类型
@@ -27,8 +26,7 @@ let FormTextField = {
       'product_name_setting': ProductNameExtendSetting,
       'customer_lmPhone_setting': CustomerPhoneExtendSetting,
       'customer_search': CustomerNameExtendSearch,
-      'linkman_search': LinkmanExtendSearch,
-      'task_search': TaskExtendSearch
+      'linkman_search': LinkmanExtendSearch
     }
   }
 };
