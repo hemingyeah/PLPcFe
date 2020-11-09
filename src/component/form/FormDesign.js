@@ -837,12 +837,6 @@ const FormDesign = {
     onShowBaseModal() {
       if(this.hiddenFields.length==0) return this.$platform.confirm('暂无隐藏字段');
       this.show = true;
-    },
-    /** 
-     * @description 保存隐藏字段设置弹窗
-    */
-    onSaveBaseModal() {
-      this.show = false;
     }
   },
   render(h){
