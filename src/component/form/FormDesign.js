@@ -553,7 +553,7 @@ const FormDesign = {
       if (direction <= 0) {
         for (let i = 0; i < previewDoms.length; i++) {
           let dom = previewDoms[i];
-          if (dom.offsetTop + (dom.offsetHeight / 2) > offsetTop) {
+          if (dom.offsetTop + (dom.offsetHeight / 2) > offsetTop + dragEvent.offsetY) {
             // 如果前一位置是当前位置，直接返回前一位置
             return i - 1 == currIndex ? currIndex : i;
           }
@@ -568,7 +568,7 @@ const FormDesign = {
         
         for (let i = 0; i < previewDoms.length; i++) {
           let dom = previewDoms[i];
-          if (dom.offsetTop + (dom.offsetHeight / 2) < offsetTop) {
+          if (dom.offsetTop + (dom.offsetHeight / 2) < offsetTop + dragEvent.offsetY) {
             index = i;
           }
         }
