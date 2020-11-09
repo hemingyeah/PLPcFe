@@ -12,7 +12,7 @@ type RegExpExecResult = RegExpExecArray | null | any
  * @param {String} errorMessage 错误信息
  * @param {Boolean} showMathString 是否显示匹配的字符串
 */
-function commonValidate(reg: RegExp, str: string, errorMessage: string, showMathString: boolean = true): ValidateResult {
+function commonValidate(reg: RegExp, str: string, errorMessage: string, showMathString: boolean = false): ValidateResult {
   let error: RegExpExecResult = reg.exec(str)
   // 验证成功会返回 null
   if (error === null) return ValidateResult.succ()
@@ -30,67 +30,66 @@ function commonValidate(reg: RegExp, str: string, errorMessage: string, showMath
  * @param {String} defaultNumber 默认数字，字段名字替代的
 */
 export default function validate(str: string, defaultNumber?: number | string) {
-  // 验证是否为空
-  if (!str) {
-    return ValidateResult.fail('计算表达式不能为空')
-  }
-  
   // 连续运算符
   const ContinuousReg = /[\+\-\*\/]{2,}/
   if (ContinuousReg.test(str) ) {
-    return commonValidate(ContinuousReg, str, '重复的运算符, 运算符不能连接在一起')
+    return commonValidate(ContinuousReg, str, '运算符不能连续出现，请在中间插入运算对象')
   }
   
   // 验证连续的字段名
-  const ContinuousFieldsReg = new RegExp(`${defaultNumber}${defaultNumber}`, 'g')
+  const ContinuousFieldsReg = new RegExp(`[${defaultNumber}]{2,}`)
   if (ContinuousFieldsReg.test(str)) {
     // FIXME: 下面这行代码虽然看起来无意义，但是不要去除, 有问题可以解开或者注释 或 @月初
-    ContinuousFieldsReg.test(str)
-    return commonValidate(ContinuousFieldsReg, str, '重复的运算对象, 运算对象不能连接在一起', false)
+    // ContinuousFieldsReg.test(str)
+    return commonValidate(ContinuousFieldsReg, str, '运算对象不能连续出现, 请在中间插入运算符号')
   }
   
   // 空括号
   const EmptyBracketReg = /\(\)/
-  if (ContinuousReg.test(str) ) {
-    return commonValidate(EmptyBracketReg, str, '括号内容为空')
+  if (EmptyBracketReg.test(str)) {
+    return commonValidate(EmptyBracketReg, str, '括号中内容为空，请插入运算元素')
   }
   
   // 左括号( 后面是运算符 
   const LeftBracketAfterWithFormulaReg = /\([\+\-\*\/]/
   if (LeftBracketAfterWithFormulaReg.test(str)) {
-    return commonValidate(LeftBracketAfterWithFormulaReg, str, '左括号右侧不能和运算符号一起，须间隔显示')
+    return commonValidate(LeftBracketAfterWithFormulaReg, str, '左括号右侧不能和运算符号连续')
   }
   
   // 右括号 ) 前面是运算符
   const RightBracketBeforeWithFormulaReg = /[\+\-\*\/]\)/
   if (RightBracketBeforeWithFormulaReg.test(str)) {
-    return commonValidate(RightBracketBeforeWithFormulaReg, str, '右括号左侧不能和运算符号一起，须间隔显示')
+    return commonValidate(RightBracketBeforeWithFormulaReg, str, '右括号左侧不能和运算符号连续')
   }
   
   // 左括号 ( 前面不是运算符
   const LeftBracketBeforeReg = /[^\+\-\*\/\()]\(/
-  if (/[^\+\-\*\/\()]\(/.test(str) && str[0] != '(') {
-    return commonValidate(LeftBracketBeforeReg, str, '括号须和表达式一起使用')
+  if (LeftBracketBeforeReg.test(str) && str[0] != '(') {
+    return commonValidate(LeftBracketBeforeReg, str, '左括号前面必须是运算符号')
   }
   
   // 右括号 ) 后面不是运算符
   const RightBracketAfterReg = /\)[^\+\-\*\/\)]/
   if (RightBracketAfterReg.test(str)) {
-    return commonValidate(RightBracketAfterReg, str, '括号须和表达式一起使用')
+    return commonValidate(RightBracketAfterReg, str, '右括号后面必须是运算符号')
   }
   
   // 长度为1 且 是符号
   // @ts-ignore
   if (str.length === 1 && ['+', '-', '*', '/', '(', ')'].includes(str)) {
-    return ValidateResult.fail(`运算符须和运算对象一起使用 ${str}`, 0, str)
+    return ValidateResult.fail('公式不合规，请修正', 0, str)
   }
-  
-  // 没有公式 运算符号
-  const FormulaReg = /[\(\)\+\-\*\/]{1,}/g
-  if (FormulaReg.test(str)) {
-    // FIXME: 下面这行代码虽然看起来无意义，但是不要去除, 有问题可以解开或者注释 或 @月初
-    // FormulaReg.test(str)
-    return commonValidate(FormulaReg, str, '没有选择运算符号或运算符号没有运算字段一起使用')
+
+  // 运算符开头
+  const startWithReg = /^[\*\/]/
+  if (startWithReg.test(str)) {
+    return commonValidate(startWithReg, str, '运算符号不能开头')
+  }
+
+  // 运算符结尾
+  const endWithReg = /[\*\/\+\-\(]$/
+  if (endWithReg.test(str)) {
+    return commonValidate(endWithReg, str, '运算符号不能结尾')
   }
   
   /** 错误情况，括号不配对 */
@@ -112,13 +111,15 @@ export default function validate(str: string, defaultNumber?: number | string) {
       if (leftBracketStack.length > 0) {
         leftBracketStack.pop()
       } else {
-        return ValidateResult.fail(`没有匹配的左括号 ${SignOperatorEnum.LeftBracket}`, i, SignOperatorEnum.RightBracket)
+        // return ValidateResult.fail(`没有匹配的左括号 ${SignOperatorEnum.LeftBracket}`, i, SignOperatorEnum.RightBracket)
+        return ValidateResult.fail('括号不匹配', i, SignOperatorEnum.RightBracket)
       }
     }
   }
   // 如果堆栈中存在左括号，则说明没有匹配的右括号
   if (leftBracketStack.length > 0) {
-    return ValidateResult.fail(`没有匹配的右括号 ${SignOperatorEnum.RightBracket}`, leftBracketIndex, SignOperatorEnum.LeftBracket)
+    // return ValidateResult.fail(`没有匹配的右括号 ${SignOperatorEnum.RightBracket}`, leftBracketIndex, SignOperatorEnum.LeftBracket)
+    return ValidateResult.fail('括号不匹配', leftBracketIndex, SignOperatorEnum.LeftBracket)
   }
   
   return ValidateResult.succ()
