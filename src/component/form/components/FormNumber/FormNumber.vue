@@ -27,19 +27,20 @@ export default {
     getInput() {
       return this.$refs.input || this.$refs.textarea;
     },
-    // nativeInputValue() {
-    //   return this.value === null || this.value === undefined ? '' : String(this.value);
-    // },
+    nativeInputValue() {
+      return this.value === null || this.value === undefined ? '' : String(this.value);
+    },
   },
   watch: {
     // native input value is set explicitly
     // do not use v-model / :value in template
-    // nativeInputValue() {
-    //   this.setNativeInputValue();
-    // },
+    nativeInputValue() {
+      this.setNativeInputValue();
+    },
   },
   mounted() {
     const InputEl = this.$refs.input;
+
     InputEl.addEventListener('paste', this.pasteEventHandler)
   },
   beforeDestroy() {
@@ -49,7 +50,7 @@ export default {
     input(event){
       let oldValue = null;
       let newValue = event.target.value;
-      console.log(newValue);
+      
       if(newValue == this.nativeInputValue) return;
 
       if (newValue === '') {
@@ -61,28 +62,26 @@ export default {
       this.$emit('update', {newValue, oldValue, field: this.field});
       this.$emit('input', newValue);
     },
-    // setNativeInputValue() {
-    //   const input = this.getInput;
+    setNativeInputValue() {
+      const input = this.getInput;
 
-    //   if (!input) return;
-    //   if (input.value === this.nativeInputValue) return;
+      if (!input) return;
+      if (input.value === this.nativeInputValue) return;
 
-    //   input.value = this.nativeInputValue;
-    // },
+      input.value = this.nativeInputValue;
+    },
     pasteEventHandler(event) {
-      console.log(2222,event);
       try {
         let number = event.clipboardData.getData('text')
         let newValue = number
-        console.log(333,number);
-        console.log(444,FORM_FIELD_TEXT_MAX_LENGTH);
+        
         if (number.length > FORM_FIELD_TEXT_MAX_LENGTH) {
           newValue = number.slice(0, FORM_FIELD_TEXT_MAX_LENGTH)
         }
 
         this.$emit('update', { newValue, field: this.field });
         this.$emit('input', newValue);
-
+        event.preventDefault(); //阻止粘贴默认事件造成，复制2次的问题
       } catch (error) {
         console.warn('form-number: paste -> error', error)
       }
