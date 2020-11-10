@@ -682,7 +682,8 @@ export default {
             let fromId = window.frameElement.getAttribute('fromid');
             // this.$platform.refreshTab(fromId);
 
-            location.href = '/task';
+            // location.href = '/task';
+            this.closeAndOpenTab('/task', 'M_TASK_ALL');
           } else {
             this.$platform.alert(res.message);
             this.pending = false;
@@ -890,7 +891,6 @@ export default {
     },
     // 打开弹窗
     openDialog(action) {
-      console.log(action);
       if (action === 'cancel') {
         this.$refs.cancelTaskDialog.openDialog();
       } else if (action === 'acceptFromPool' || action === 'accept' || action === 'modifyPlanTime') {
@@ -1026,6 +1026,24 @@ export default {
         { name: '审批', type: 'primary', show: this.allowApprove, event: () => { this.openDialog('approve') } },
         { name: '撤回审批', type: 'default', show: this.allowoffApprove, event: this.offApprove }
       ]
+    },
+    /** 
+     * 关闭并打开新的Tab
+    */
+    closeAndOpenTab(url, newTabId) {
+      let id = window.frameElement.dataset.id;
+      this.$platform.closeTab(id);
+    
+      let fromId = window.frameElement.getAttribute('id');
+    
+      this.$platform.openTab({
+        id: newTabId,
+        title: '',
+        url,
+        reload: true,
+        close: true,
+        fromId
+      });
     }
   },
   created() {
