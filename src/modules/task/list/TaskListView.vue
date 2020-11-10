@@ -518,7 +518,7 @@
             {{ multipleSelection.length }}
           </span>
           条
-          <span class="task-c2" @click="toggleSelection">清空</span>
+          <span class="task-c2 task-pointer" @click="toggleSelection">清空</span>
         </div>
         <!-- start content 列表表格 -->
         <div class="guide-box">
