@@ -283,6 +283,10 @@ const FormDesign = {
     //已隐藏字段
     hiddenFields() {
      return this.value.filter(item => item.isHidden == 1);
+    },
+    //未隐藏字段
+    unHiddenFields() {
+      return this.value.filter(item => item.isHidden !== 1);
     }
   },
   methods: {
@@ -581,8 +585,8 @@ const FormDesign = {
     /** 字段排序 */
     sort(dragIndex, enterIndex) {
       if (dragIndex < 0 || enterIndex < 0 || dragIndex == enterIndex) return;
-      
-      let arr = cloneDeep(this.value);
+
+      let arr = cloneDeep(this.unHiddenFields);
       
       let distance = dragIndex < enterIndex ? 1 : 0
       let dragField = arr[dragIndex]; // 拖拽的字段

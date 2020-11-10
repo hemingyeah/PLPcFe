@@ -234,7 +234,7 @@ const FormView = {
     mapFieldToDom(field, createElement) {
       let {formType, fieldName, displayName, isSystem ,isHidden} = field;
       if (formType === 'separator') {
-        const cn = `iconfont icon-nav-down ${!this.sectionState[field.id] && 'reversal'}`;
+        const cn = `iconfont icon-fdn-select ${!this.sectionState[field.id] && 'reversal'}`;
         return displayName ? (
           <h4 class="section-title">
             {displayName}

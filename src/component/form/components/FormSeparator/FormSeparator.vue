@@ -1,6 +1,7 @@
 <template>
   <div class="form-separator">
     <span>{{field.displayName || ''}}</span>
+     <i class="iconfont icon-fdn-select"></i>
   </div>
 </template>
 
@@ -23,7 +24,10 @@ export default {
   margin: 20px 0;
   text-align: left;
   background: #eef8f8;
-
+  display: flex;
+  justify-content: space-between;
+  color: #55B7B4;
+  padding-right: 10px;
   & > span{
     margin: 0;
     font-size: 14px;
