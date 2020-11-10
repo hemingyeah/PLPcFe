@@ -8,9 +8,9 @@
           class="search-input"
           placeholder="搜索订单编号商品名称"
           v-model="searchModel.keyWord"
-          @keyup.enter.native="searchModel.pageNum=1,search()"
+          @keyup.enter.native="(searchModel.pageNum = 1), search()"
         >
-          <el-button slot="append" @click="searchModel.pageNum=1,search()">
+          <el-button slot="append" @click="(searchModel.pageNum = 1), search()">
             <i class="iconfont icon-search"></i>
           </el-button>
         </el-input>
@@ -36,7 +36,8 @@
                 <span style="float: left">{{ item.label }}</span>
                 <span
                   style="float: left; color: #8492a6; font-size: 13px; margin-left:12px;"
-                >{{ stateNumObj[stateObj[item.value].key]}}</span>
+                >{{ stateNumObj[stateObj[item.value].key] }}</span
+                >
               </el-option>
             </el-select>
           </div>
@@ -55,7 +56,12 @@
                 value-format="yyyy-MM-dd"
               ></el-date-picker>
             </div>
-            <el-button class="mar-l-10" type="primary" @click="searchModel.pageNum=1,search()">搜索</el-button>
+            <el-button
+              class="mar-l-10"
+              type="primary"
+              @click="(searchModel.pageNum = 1), search()"
+            >搜索</el-button
+            >
             <el-button @click="resetParams">重置</el-button>
           </div>
         </div>
@@ -63,8 +69,13 @@
     </div>
     <!-- search-modal-box end -->
 
+    
+
     <!-- start 产品模板列表 -->
-    <div class="product-template-list-view mar-t-12" ref="productTemplateListPage">
+    <div
+      class="product-template-list-view mar-t-12"
+      ref="productTemplateListPage"
+    >
       <!-- start 搜索 -->
       <div class="product-template-list-search-group">
         <!-- start  搜索header -->
@@ -173,21 +184,37 @@
                   <template v-if="column.conType === 'goods'">
                     <div class="flex-x">
                       <div class="flex-x goods-img-list flex-1">
-                        <template v-for="(item, index) in scope.row[column.field]">
+                        <template
+                          v-for="(item, index) in scope.row[column.field]"
+                        >
                           <img
                             :key="index"
                             v-if="index <= 4"
-                            :src="item.thumbnailUrl ? `${item.thumbnailUrl}?x-oss-process=image/resize,m_fill,h_32,w_32` : defaultImg"
+                            :src="
+                              item.thumbnailUrl
+                                ? `${
+                                  item.thumbnailUrl
+                                }?x-oss-process=image/resize,m_fill,h_32,w_32`
+                                : defaultImg
+                            "
                             @click.stop="previewImg(item.thumbnailUrl)"
                           />
                         </template>
                         <div
                           class="flex-1 overHideCon-1"
-                          v-if="scope.row[column.field].length==1"
-                        >{{scope.row[column.field][0].name}}</div>
-                        <div>{{scope.row[column.field].length>5?`+${scope.row[column.field].length-5}`:''}}</div>
+                          v-if="scope.row[column.field].length == 1"
+                        >
+                          {{ scope.row[column.field][0].name }}
+                        </div>
+                        <div>
+                          {{
+                            scope.row[column.field].length > 5
+                              ? `+${scope.row[column.field].length - 5}`
+                              : ''
+                          }}
+                        </div>
                       </div>
-                      <div>共{{scope.row.goodsCount}}件</div>
+                      <div>共{{ scope.row.goodsCount }}件</div>
                     </div>
                   </template>
                   <template v-else-if="column.conType === 'btnArray'">
@@ -196,10 +223,13 @@
                         v-for="(item, index) in column.btnArr"
                         :key="index"
                         href
-                        :class="`view-detail-btn ${index>0?'mar-l-10':''}`"
+                        :class="
+                          `view-detail-btn ${index > 0 ? 'mar-l-10' : ''}`
+                        "
                         :style="item.styleType(scope.row)"
                         @click.stop.prevent="item.click(scope.row)"
-                      >{{item.name}}</a>
+                      >{{ item.name }}</a
+                      >
                     </div>
                   </template>
                   <template v-else-if="column.conType === 'click'">
@@ -209,21 +239,31 @@
                       :style="`color:${item.color}`"
                       @click.stop.prevent="column.click(scope.row)"
                       v-if="hasViewCustomerAuth(scope.row)"
-                    >{{scope.row[column.field]}}</a>
-                    <p v-else>{{scope.row[column.field]}}</p>
+                    >{{ scope.row[column.field] }}</a
+                    >
+                    <p v-else>{{ scope.row[column.field] }}</p>
                   </template>
-                  <template
-                    v-else-if="column.field === 'createTime'"
-                  >{{ scope.row.createTime | formatDate }}</template>
+                  <template v-else-if="column.field === 'createTime'">{{
+                    scope.row.createTime | formatDate
+                  }}</template>
                   <template v-else-if="column.field === 'logisticsState'">
                     <div class="flex-x">
                       <div
-                        :class="[`status-tips-${scope.row.logisticsState}`,'status-tips-box']"
-                      >{{scope.row.logisticsState ? stateObj[scope.row.logisticsState].name : ''}}</div>
+                        :class="[
+                          `status-tips-${scope.row.logisticsState}`,
+                          'status-tips-box',
+                        ]"
+                      >
+                        {{
+                          scope.row.logisticsState
+                            ? stateObj[scope.row.logisticsState].name
+                            : ''
+                        }}
+                      </div>
                     </div>
                   </template>
 
-                  <template v-else>{{scope.row[column.field]}}</template>
+                  <template v-else>{{ scope.row[column.field] }}</template>
                 </template>
               </el-table-column>
             </template>
@@ -235,7 +275,8 @@
         <div class="table-footer">
           <div class="list-info">
             共
-            <span class="level-padding">{{ page.total || 0 }}</span>记录
+            <span class="level-padding">{{ page.total || 0 }}</span
+            >记录
             <!-- ，已选中
           <span
             class="product-template-selected-count"
@@ -283,13 +324,18 @@
           </h3>
 
           <div class="product-template-selected-panel">
-            <div class="product-template-selected-tip" v-if="multipleSelection.length <= 0">
+            <div
+              class="product-template-selected-tip"
+              v-if="multipleSelection.length <= 0"
+            >
               <img src="@src/assets/img/no-data.png" />
               <p>暂无选中的数据，请从列表中选择。</p>
             </div>
             <template v-else>
               <div class="product-template-selected-list">
-                <div class="product-template-selected-row product-template-selected-head">
+                <div
+                  class="product-template-selected-row product-template-selected-head"
+                >
                   <span class="product-template-selected-name">名称</span>
                   <span class="product-template-selected-sn">电话</span>
                 </div>
@@ -298,8 +344,12 @@
                   v-for="item in multipleSelection"
                   :key="item.id"
                 >
-                  <span class="product-template-selected-name">{{ item.name }}</span>
-                  <span class="product-template-selected-sn">{{ item.phone }}</span>
+                  <span class="product-template-selected-name">{{
+                    item.name
+                  }}</span>
+                  <span class="product-template-selected-sn">{{
+                    item.phone
+                  }}</span>
                   <button
                     type="button"
                     class="product-template-selected-delete"
@@ -320,46 +370,53 @@
     </div>
     <!-- end 产品模板列表 -->
 
-    <goods-dialog ref="goodsDialog" :info-data="goodsInfo" @confirm="goodsConfirm"></goods-dialog>
-    <out-stock-dialog ref="outStockDialog" :info-data="outStockInfo" @confirm="outStockConfirm"></out-stock-dialog>
+    <goods-dialog
+      ref="goodsDialog"
+      :info-data="goodsInfo"
+      @confirm="goodsConfirm"
+    ></goods-dialog>
+    <out-stock-dialog
+      ref="outStockDialog"
+      :info-data="outStockInfo"
+      @confirm="outStockConfirm"
+    ></out-stock-dialog>
+
   </div>
 </template>
 <script>
-import _ from "lodash";
-import Page from "@model/Page";
-import platform from "@src/platform";
-import { formatDate } from "@src/util/lang";
+import _ from 'lodash';
+import Page from '@model/Page';
+import platform from '@src/platform';
+import { formatDate } from '@src/util/lang';
 
-import { orderList, orderNum } from "@src/api/LinkcApi";
-import componentMixin from "../component/index";
-import BaseGallery from "../../../../../packages/BaseGallery";
+import { orderList, orderNum } from '@src/api/LinkcApi';
+import componentMixin from '../component/index';
+import BaseGallery from '../../../../../packages/BaseGallery';
 
 // import SearchPanel from "../components/SearchPanel.vue";
-import AuthUtil from "@src/util/auth";
-import defaultImg from "@src/assets/img/myShop/default.png";
+import AuthUtil from '@src/util/auth';
+import defaultImg from '@src/assets/img/myShop/default.png';
 
 /* 高级搜索面板 列数 */
-const PRODUCT_TEMPLATE_LIST_ADVANCE_SEARCH_COLUMN_NUMBER =
-  "customer_contact_search_column_number";
+const PRODUCT_TEMPLATE_LIST_ADVANCE_SEARCH_COLUMN_NUMBER = 'customer_contact_search_column_number';
 /* 高级搜索 搜索数据 */
-const STORE_USER_FOR_SEARCH_PRODUCT_TEMPLATE =
-  "store_user_for_search_product_template";
+const STORE_USER_FOR_SEARCH_PRODUCT_TEMPLATE = 'store_user_for_search_product_template';
 // 产品模板列表数据
-const MYSHOP_ORDER_LIST_TEMPLATE_DATA = "myshop_order_list_template_data";
+const MYSHOP_ORDER_LIST_TEMPLATE_DATA = 'myshop_order_list_template_data';
 // 产品模板列表选择
-const MY_SHOP_ORDER_CHECK = "myShopOrderCheck";
+const MY_SHOP_ORDER_CHECK = 'myShopOrderCheck';
 
 // 页面刷新记住当前页面信息
-const MY_SHOP_ORDER_SEARCH_MODEL = "my_shop_order_search_model";
+const MY_SHOP_ORDER_SEARCH_MODEL = 'my_shop_order_search_model';
 
-const MY_SHOP_ORDER_SEARCH_MODEL_REAL = "my_shop_order_search_model_real";
+const MY_SHOP_ORDER_SEARCH_MODEL_REAL = 'my_shop_order_search_model_real';
 
 const link_reg = /((((https?|ftp?):(?:\/\/)?)(?:[-;:&=\+\$]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\?\+=&;:%!\/@.\w_]*)#?(?:[-\+=&;%!\?\/@.\w_]*))?)/g;
 
 let pending = false; // 记录交互pending
 
 export default {
-  name: "my-shop",
+  name: 'my-shop',
   props: {
     initData: {
       type: Object,
@@ -372,37 +429,37 @@ export default {
       defaultImg,
       fullscreenLoading: false,
       search_checkbox: [
-        { label: "待发货", value: 1, num: 0 },
-        { label: "待收货", value: 2, num: 0 },
-        { label: "已完成", value: 3, num: 0 },
+        { label: '待发货', value: 1, num: 0 },
+        { label: '待收货', value: 2, num: 0 },
+        { label: '已完成', value: 3, num: 0 },
       ],
       stateNumObj: {},
       pickerOptions: {
         shortcuts: [
           {
-            text: "昨天",
+            text: '昨天',
             onClick(picker) {
               const start = new Date();
               start.setTime(start.getTime() - 3600 * 1000 * 24);
-              picker.$emit("pick", [start, start]);
+              picker.$emit('pick', [start, start]);
             },
           },
           {
-            text: "最近一周",
+            text: '最近一周',
             onClick(picker) {
               const end = new Date();
               const start = new Date();
               start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
-              picker.$emit("pick", [start, end]);
+              picker.$emit('pick', [start, end]);
             },
           },
           {
-            text: "最近一个月",
+            text: '最近一个月',
             onClick(picker) {
               const end = new Date();
               const start = new Date();
               start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
-              picker.$emit("pick", [start, end]);
+              picker.$emit('pick', [start, end]);
             },
           },
         ],
@@ -417,7 +474,7 @@ export default {
         productFields: [],
       }, // 产品配置项
       searchModel: {
-        keyWord: "",
+        keyWord: '',
         pageSize: 10,
         pageNum: 1,
         orderDetail: {},
@@ -438,7 +495,7 @@ export default {
     if (localStorage.getItem(MY_SHOP_ORDER_SEARCH_MODEL_REAL)) {
       this.$set(
         this,
-        "searchModel",
+        'searchModel',
         JSON.parse(localStorage.getItem(MY_SHOP_ORDER_SEARCH_MODEL))
       );
       localStorage.removeItem(MY_SHOP_ORDER_SEARCH_MODEL_REAL);
@@ -475,8 +532,8 @@ export default {
   },
   filters: {
     formatDate(val) {
-      if (!val) return "";
-      return formatDate(val, "YYYY-MM-DD HH:mm:ss");
+      if (!val) return '';
+      return formatDate(val, 'YYYY-MM-DD HH:mm:ss');
     },
   },
   methods: {
@@ -484,20 +541,20 @@ export default {
       let weekTime = [];
 
       weekTime.push(
-        formatDate(new Date() - 7 * 24 * 60 * 60 * 1000, "YYYY-MM-DD")
+        formatDate(new Date() - 7 * 24 * 60 * 60 * 1000, 'YYYY-MM-DD')
       );
-      weekTime.push(formatDate(new Date(), "YYYY-MM-DD"));
+      weekTime.push(formatDate(new Date(), 'YYYY-MM-DD'));
       return weekTime;
     },
     showAdvancedSetting() {
-      window.TDAPP.onEvent("pc：客户联系人-选择列事件");
+      window.TDAPP.onEvent('pc：客户联系人-选择列事件');
       this.$refs.advanced.open(this.columns);
     },
     openTab(id) {
-      let fromId = window.frameElement.getAttribute("id");
+      let fromId = window.frameElement.getAttribute('id');
       platform.openTab({
-        id: "my_shop_order_detail",
-        title: "订单详情",
+        id: 'my_shop_order_detail',
+        title: '订单详情',
         url: `/linkc/order/detail?id=${id}`,
         reload: true,
         fromId,
@@ -516,12 +573,15 @@ export default {
       }
 
       if (Object.keys(sm.moreConditions).length > 0) {
-        if (sm.moreConditions.orderTime && sm.moreConditions.orderTime.length > 0) {
-          sm.moreConditions["startTime"] = sm.moreConditions.orderTime[0];
-          sm.moreConditions["endTime"] = sm.moreConditions.orderTime[1];
-        }else{
-          sm.moreConditions["startTime"] = '';
-          sm.moreConditions["endTime"] = '';
+        if (
+          sm.moreConditions.orderTime
+          && sm.moreConditions.orderTime.length > 0
+        ) {
+          sm.moreConditions['startTime'] = sm.moreConditions.orderTime[0];
+          sm.moreConditions['endTime'] = sm.moreConditions.orderTime[1];
+        } else {
+          sm.moreConditions['startTime'] = '';
+          sm.moreConditions['endTime'] = '';
         }
         delete sm.moreConditions.orderTime;
         params = {
@@ -531,7 +591,7 @@ export default {
       }
 
       if (params.createTime && params.createTime.length) {
-        let createTime = params.createTime.split("-");
+        let createTime = params.createTime.split('-');
 
         params.createTimeStart = `${createTime[0]} 00:00:00`;
         params.createTimeEnd = `${createTime[1]} 23:59:59`;
@@ -545,60 +605,60 @@ export default {
       // return []
       return [
         {
-          label: "商品",
-          field: "goodsInfos",
-          conType: "goods",
+          label: '商品',
+          field: 'goodsInfos',
+          conType: 'goods',
           show: true,
-          minWidth: "450px",
+          minWidth: '450px',
         },
         {
-          label: "订单编号",
-          field: "orderNum",
-          width: "220px",
-          show: true,
-        },
-        {
-          label: "下单时间",
-          field: "createTime",
-          width: "160px",
+          label: '订单编号',
+          field: 'orderNum',
+          width: '220px',
           show: true,
         },
         {
-          label: "实付金额",
-          field: "payAmount",
-          width: "140px",
+          label: '下单时间',
+          field: 'createTime',
+          width: '160px',
           show: true,
         },
         {
-          label: "订单状态",
-          field: "logisticsState",
-          width: "100px",
+          label: '实付金额',
+          field: 'payAmount',
+          width: '140px',
           show: true,
         },
         {
-          label: "操作",
-          field: "btnArray",
-          conType: "btnArray",
-          align: "center",
-          width: "140px",
+          label: '订单状态',
+          field: 'logisticsState',
+          width: '100px',
+          show: true,
+        },
+        {
+          label: '操作',
+          field: 'btnArray',
+          conType: 'btnArray',
+          align: 'center',
+          width: '140px',
           btnArr: [
             {
-              name: "查看详情",
+              name: '查看详情',
               styleType: (obj) => {
                 return obj.isMain
-                  ? "color:#999;cursor: not-allowed;"
-                  : "color:#55b7b4";
+                  ? 'color:#999;cursor: not-allowed;'
+                  : 'color:#55b7b4';
               },
               click: (obj) => {
                 this.openTab(obj.orderId);
               },
             },
             {
-              name: "出库",
+              name: '出库',
               styleType: (obj) => {
                 return obj.repertoryState != 2
-                  ? "color:#999;cursor: not-allowed;"
-                  : "color:#55b7b4";
+                  ? 'color:#999;cursor: not-allowed;'
+                  : 'color:#55b7b4';
               },
               click: (obj) => {
                 if (pending || obj.repertoryState != 2) return;
@@ -607,11 +667,11 @@ export default {
               },
             },
             {
-              name: "发货",
+              name: '发货',
               styleType: (obj) => {
                 return obj.logisticsState != 1
-                  ? "color:#999;cursor: not-allowed;"
-                  : "color:#55b7b4";
+                  ? 'color:#999;cursor: not-allowed;'
+                  : 'color:#55b7b4';
               },
               click: (obj) => {
                 if (pending || obj.logisticsState != 1) return;
@@ -628,7 +688,7 @@ export default {
     // 构建表格列
     buildTableColumn() {
       let localColumns = []
-        .map((i) => (typeof i == "string" ? { field: i, show: true } : i))
+        .map((i) => (typeof i == 'string' ? { field: i, show: true } : i))
         .reduce((acc, col) => (acc[col.field] = col) && acc, {});
       let baseColumns = this.buildTableFixedColumns();
       let columns = [...baseColumns].map((col) => {
@@ -637,13 +697,12 @@ export default {
         let localField = localColumns[col.field];
 
         if (null != localField) {
-          width =
-            typeof localField.width == "number" ? `${localField.width}px` : "";
+          width = typeof localField.width == 'number' ? `${localField.width}px` : '';
           show = localField.show !== false;
         }
         col.show = show;
         col.width = width;
-        col.type = "column";
+        col.type = 'column';
 
         return col;
       });
@@ -656,7 +715,7 @@ export default {
 
       if (!checkedColumnsOldVersion) return;
 
-      let columns = checkedColumnsOldVersion.split(",");
+      let columns = checkedColumnsOldVersion.split(',');
       localStorage.removeItem(MY_SHOP_ORDER_CHECK);
 
       return (columns || [])
@@ -676,8 +735,8 @@ export default {
       this.columns.forEach((col) => {
         let newCol = colMap[col.field];
         if (null != newCol) {
-          this.$set(col, "show", newCol.show);
-          this.$set(col, "width", newCol.width);
+          this.$set(col, 'show', newCol.show);
+          this.$set(col, 'width', newCol.width);
         }
       });
 
@@ -687,7 +746,7 @@ export default {
         width: c.width,
       }));
       this.localStorageSet(
-        "columnStatus",
+        'columnStatus',
         columnsStatus,
         MYSHOP_ORDER_LIST_TEMPLATE_DATA
       );
@@ -725,8 +784,8 @@ export default {
         this.$nextTick(() => {
           original.length > 0
             ? unSelected.forEach((row) => {
-                this.$refs.productTemplateTable.toggleRowSelection(row, false);
-              })
+              this.$refs.productTemplateTable.toggleRowSelection(row, false);
+            })
             : this.$refs.productTemplateTable.clearSelection();
         });
         return this.$platform.alert(`最多只能选择${this.selectedLimit}条数据`);
@@ -759,7 +818,7 @@ export default {
       let obj = _.cloneDeep(sourceObj);
       if (except.length) {
         Object.keys(obj).forEach((key) => {
-          if (typeof obj[key] === "object" && obj[key]) {
+          if (typeof obj[key] === 'object' && obj[key]) {
             obj[key] = this.deleteValueFromObject(obj[key], except);
           }
           if (!obj[key] && except.every((ex) => ex !== obj[key])) {
@@ -768,7 +827,7 @@ export default {
         });
       } else {
         Object.keys(obj).forEach((key) => {
-          if (typeof obj[key] === "object" && obj[key]) {
+          if (typeof obj[key] === 'object' && obj[key]) {
             obj[key] = this.deleteValueFromObject(obj[key]);
           }
           if (!obj[key]) {
@@ -799,7 +858,7 @@ export default {
       this.searchModel.pageNum = 1;
 
       this.localStorageSet(
-        "pageSize",
+        'pageSize',
         pageSize,
         MYSHOP_ORDER_LIST_TEMPLATE_DATA
       );
@@ -813,10 +872,10 @@ export default {
     /* 获取本地数据 */
     localStorageGet(key) {
       try {
-        const dataStr = localStorage.getItem(key) || "{}";
+        const dataStr = localStorage.getItem(key) || '{}';
         return JSON.parse(dataStr);
       } catch (error) {
-        console.log("error: ", error);
+        console.log('error: ', error);
         return {};
       }
     },
@@ -832,11 +891,12 @@ export default {
           localStorage.setItem(rootKey, JSON.stringify(data));
         }
       } catch (err) {
-        console.log("localStorageSet err", err);
+        console.log('localStorageSet err', err);
       }
     },
     // 搜索
     search() {
+      console.log(this.data1);
       const params = this.buildParams();
       // console.log(params, "searchP");
       this.fullscreenLoading = true;
@@ -847,7 +907,7 @@ export default {
           } else {
             this.$notify.close();
             this.$notify.error({
-              title: "网络错误",
+              title: '网络错误',
               message: res.message,
               duration: 2000,
             });
@@ -875,28 +935,27 @@ export default {
 
         let sortModel = {
           isSystem:
-            prop === "createTime" || prop === "updateTime" || prop === "type"
+            prop === 'createTime' || prop === 'updateTime' || prop === 'type'
               ? 1
               : 0,
-          sequence: order === "ascending" ? "ASC" : "DESC",
+          sequence: order === 'ascending' ? 'ASC' : 'DESC',
           column:
-            prop === "createTime" || prop === "updateTime" || prop === "type"
+            prop === 'createTime' || prop === 'updateTime' || prop === 'type'
               ? `productTemplate.${prop}`
               : prop,
         };
 
-        const sortedField =
-          this.productTemplateConfig.productFields.filter(
-            (sf) => sf.fieldName === prop
-          )[0] || {};
+        const sortedField = this.productTemplateConfig.productFields.filter(
+          (sf) => sf.fieldName === prop
+        )[0] || {};
 
         if (
-          prop === "createTime" ||
-          prop === "updateTime" ||
-          sortedField.formType === "date" ||
-          sortedField.formType === "datetime"
+          prop === 'createTime'
+          || prop === 'updateTime'
+          || sortedField.formType === 'date'
+          || sortedField.formType === 'datetime'
         ) {
-          sortModel.type = "date";
+          sortModel.type = 'date';
         } else {
           sortModel.type = sortedField.formType;
         }
@@ -905,18 +964,18 @@ export default {
 
         this.search();
       } catch (e) {
-        console.error("product template sortChange err", e);
+        console.error('product template sortChange err', e);
       }
     },
     panelSearchAdvancedToggle() {
-      window.TDAPP.onEvent("pc：产品模板-高级搜索事件");
+      window.TDAPP.onEvent('pc：产品模板-高级搜索事件');
       this.$refs.searchPanel.open();
 
       this.$nextTick(() => {
-        let forms = document.getElementsByClassName("advanced-search-form");
+        let forms = document.getElementsByClassName('advanced-search-form');
         for (let i = 0; i < forms.length; i++) {
           let form = forms[i];
-          form.setAttribute("novalidate", true);
+          form.setAttribute('novalidate', true);
         }
       });
     },
@@ -929,10 +988,10 @@ export default {
       this.search();
     },
     resetParams() {
-      window.TDAPP.onEvent("pc：订单管理-重置事件");
+      window.TDAPP.onEvent('pc：订单管理-重置事件');
       this.searchIncludeMoreConditions = false;
       this.searchModel = {
-        keyWord: "",
+        keyWord: '',
         pageNum: 1,
         pageSize: this.page.pageSize,
         orderDetail: {},
@@ -946,18 +1005,18 @@ export default {
       this.search();
     },
     openOutsideLink(e) {
-      let url = e.target.getAttribute("url");
+      let url = e.target.getAttribute('url');
       if (!url) return;
       if (!/http/gi.test(url))
-        return this.$platform.alert("请确保输入的链接以http或者https开始");
+        return this.$platform.alert('请确保输入的链接以http或者https开始');
       this.$platform.openLink(url);
     },
     buildTextarea(value) {
       return value
         ? value.replace(link_reg, (match) => {
-            return `<a href="javascript:;" target="_blank" url="${match}">${match}</a>`;
-          })
-        : "";
+          return `<a href="javascript:;" target="_blank" url="${match}">${match}</a>`;
+        })
+        : '';
     },
     getRowKey(row) {
       return row.id;
@@ -979,22 +1038,21 @@ export default {
       let loginUserId = this.initData.loginUser.userId;
       return AuthUtil.hasAuthWithDataLevel(
         this.permission,
-        "CUSTOMER_EDIT",
+        'CUSTOMER_EDIT',
         // 团队权限判断
         () => {
           let tags = Array.isArray(customer.tags) ? customer.tags : [];
           // 无团队则任何人都可编辑
           if (tags.length == 0) return true;
 
-          let loginUserTagIds =
-            this.initData.loginUser.tagIdsWithChildTag || [];
+          let loginUserTagIds = this.initData.loginUser.tagIdsWithChildTag || [];
           return tags.some((tag) => loginUserTagIds.indexOf(tag.id) >= 0);
         },
         // 个人权限判断
         () => {
           return (
-            customer.createUser == loginUserId ||
-            this.isCustomerManager(customer)
+            customer.createUser == loginUserId
+            || this.isCustomerManager(customer)
           );
         }
       );
@@ -1017,15 +1075,14 @@ export default {
       let loginUserId = this.initData.loginUser.userId;
       return AuthUtil.hasAuthWithDataLevel(
         this.permission,
-        "CUSTOMER_VIEW",
+        'CUSTOMER_VIEW',
         // 团队权限判断
         () => {
           let tags = Array.isArray(customer.tags) ? customer.tags : [];
           // 无团队则任何人都可编辑
           if (tags.length == 0) return true;
 
-          let loginUserTagIds =
-            this.initData.loginUser.tagIdsWithChildTag || [];
+          let loginUserTagIds = this.initData.loginUser.tagIdsWithChildTag || [];
           return tags.some((tag) => loginUserTagIds.indexOf(tag.id) >= 0);
         },
         // 个人权限判断
@@ -1087,12 +1144,12 @@ export default {
       let ids = [];
       let fileName = `${formatDate(
         new Date(),
-        "YYYY-MM-DD"
+        'YYYY-MM-DD'
       )}客户联系人数据.xlsx`;
 
       if (!exportAll) {
         if (!this.multipleSelection.length)
-          return this.$platform.alert("请选择要导出的数据");
+          return this.$platform.alert('请选择要导出的数据');
         ids = this.selectedIds;
       }
       // console.log(ids, "export");
@@ -1102,9 +1159,9 @@ export default {
     exportColumns() {
       return this.columns.map((c) => {
         if (
-          c.field !== "customerAddress" &&
-          c.field !== "remindCount" &&
-          c.field !== "updateTime"
+          c.field !== 'customerAddress'
+          && c.field !== 'remindCount'
+          && c.field !== 'updateTime'
         ) {
           c.export = true;
         }
@@ -1117,14 +1174,14 @@ export default {
       let exportAll = !ids || ids.length == 0;
       let exportSearchModel = exportAll
         ? {
-            ...this.buildParams(),
-            exportTotal: this.page.total,
-          }
+          ...this.buildParams(),
+          exportTotal: this.page.total,
+        }
         : { exportTotal: ids.length };
 
       return {
-        productChecked: checkedArr.join(","),
-        data: exportAll ? "" : ids.join(","),
+        productChecked: checkedArr.join(','),
+        data: exportAll ? '' : ids.join(','),
         exportSearchModel: JSON.stringify(exportSearchModel),
       };
     },
@@ -1151,16 +1208,15 @@ export default {
     // match data
     matchSelected() {
       if (!this.multipleSelection.length) return;
-      const selected =
-        this.page.list.filter((c) => {
-          if (this.multipleSelection.some((sc) => sc.id === c.id)) {
-            this.multipleSelection = this.multipleSelection.filter(
-              (sc) => sc.id !== c.id
-            );
-            this.multipleSelection.push(c);
-            return c;
-          }
-        }) || [];
+      const selected = this.page.list.filter((c) => {
+        if (this.multipleSelection.some((sc) => sc.id === c.id)) {
+          this.multipleSelection = this.multipleSelection.filter(
+            (sc) => sc.id !== c.id
+          );
+          this.multipleSelection.push(c);
+          return c;
+        }
+      }) || [];
 
       this.$nextTick(() => {
         this.toggleSelection(selected);
@@ -1183,7 +1239,7 @@ export default {
         } else {
           this.$notify.close();
           this.$notify.error({
-            title: "网络错误",
+            title: '网络错误',
             message: res.message,
             duration: 2000,
           });
@@ -1194,7 +1250,7 @@ export default {
 };
 </script>
 <style lang="scss">
-@import url("../../assets/public.scss");
+@import url('../../assets/public.scss');
 label {
   margin-bottom: 0;
 }
@@ -1258,7 +1314,7 @@ label {
       .search-date {
         height: 32px;
         width: 340px;
-        .el-range-separator{
+        .el-range-separator {
           padding: 0;
         }
       }
