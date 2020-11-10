@@ -37,7 +37,7 @@ import {
 } from '@src/modules/task/model/TaskConvertMap.ts';
 
 const TASK_LIST_KEY = 'task_list';
-
+const MAXCHECK = 500
 // 工单引导标识
 const { TASK_GUIDE_LIST, TASK_GUIDE_SEARCH_MODEL, TASK_GUIDE_SEARCH_MODEL_SAVE, TASK_GUIDE_DROPDOWN_MENU } = require('@src/component/guide/taskV2Store');
 // 埋点事件对象
@@ -571,6 +571,7 @@ export default {
             } = await TaskApi.deleteTask(selectedIds);
             if (success) {
               $platform.alert('删除成功');
+              this.multipleSelection = []
               this.getTaskCountByState(this.searchParams)
               this.initialize();
             }
@@ -1444,7 +1445,7 @@ export default {
         original.every((oc) => oc.id !== c.id)
       );
 
-      if (tv.length > this.selectedLimit) {
+      if (tv.length > MAXCHECK) {
         this.$nextTick(() => {
           original.length > 0
             ? unSelected.forEach((row) => {
@@ -1452,7 +1453,7 @@ export default {
             })
             : this.$refs.multipleTable.clearSelection();
         });
-        return this.$platform.alert(`最多只能选择${this.selectedLimit}条数据`);
+        return this.$platform.alert(`最多只能选择${MAXCHECK}条数据`);
       }
       this.multipleSelection = tv;
       // this.$refs.baseSelectionBar.openTooltip();
