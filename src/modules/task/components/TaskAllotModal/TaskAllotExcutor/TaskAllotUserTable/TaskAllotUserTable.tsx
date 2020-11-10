@@ -1,3 +1,5 @@
+/* components */
+import ContactUserItem from '@src/component/common/BaseContact/ContactUserItem.vue';
 /* enum */
 import ComponentNameEnum from '@model/enum/ComponentNameEnum'
 /* scss */
@@ -15,7 +17,10 @@ import TaskAllotUserTableRender from '@src/modules/task/components/TaskAllotModa
 const TableColumnDefaultWidth = '120px'
 
 @Component({ 
-  name: ComponentNameEnum.TaskAllotUserTable
+  name: ComponentNameEnum.TaskAllotUserTable,
+  components: {
+    [ContactUserItem.name]: ContactUserItem
+  }
 })
 export default class TaskAllotUserTable extends TaskAllotUserTableRender {
   
@@ -49,6 +54,7 @@ export default class TaskAllotUserTable extends TaskAllotUserTableRender {
             row-class-name="base-table-row-v3"
             key={this.tableKey}
             rowKey={uuid()}
+            onSort-change={(option: any) => this.handlerTableSortChange(option)}
             stripe
           >
             {

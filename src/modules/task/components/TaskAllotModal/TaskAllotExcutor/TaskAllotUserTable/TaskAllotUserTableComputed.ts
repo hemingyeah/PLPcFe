@@ -43,7 +43,7 @@ class TaskAllotUserTableComputed extends TaskAllotUserTableData {
   
   /* 用户状态 对象 */
   get userStateMap() {
-    return this.TaskAllotModalComponent?.userStateMap || {}
+    return this.TaskAllotModalComponent?.stateColorMap || {}
   }
   
   /* 用户状态 列表 */

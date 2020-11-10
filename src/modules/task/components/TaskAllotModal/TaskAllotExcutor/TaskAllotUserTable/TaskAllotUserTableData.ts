@@ -20,6 +20,8 @@ class TaskAllotUserTableData extends TaskAllotUserTableComponents {
   public AMapInfoWindow: any = null
   /* 是否禁用加载更多 */
   public isDisableLoadmore: boolean = false
+  /* 表格排序数据 */
+  public orderDetail: any = {}
   /* 当前选择的负责人 */
   public selectExecutorUser: LoginUser | null = null
   /* 当前选择的团队 */
@@ -48,6 +50,16 @@ class TaskAllotUserTableData extends TaskAllotUserTableComponents {
     { label: '50公里以内', value: '50'},
     { label: '其他', value: ''},
   ]
+  /* 距离 其他数据 */
+  public locationOtherData: {
+    minValue: number | null,
+    maxValue: number | null,
+    isChecked?: boolean
+  } = { 
+    minValue: null,
+    maxValue: null,
+    isChecked: false
+  }
   /* 排序方式列表 */
   public sortordOptions: ElSelectOption[] = [
     { label: '距离最近', value: '5'},

@@ -48,7 +48,15 @@ export default class TaskAllotExcutor extends Vue {
     let excutorUser = isSelected ? user : null
     this.isShowUserCard = isSelected
     this.selectedExcutorUser = excutorUser
-    this.TaskAllotModalComponent.outsideSetExcutorUser(excutorUser)
+  }
+  
+  /**
+   * @description 向上 设置选择的负责人
+   * -- 支持外部调用的
+  */
+  public outsideUpwardSetSelectedExcutorUser(isSelected: boolean, user: LoginUser) {
+    this.outsideSetSelectedExcutorUser(isSelected, user)
+    this.TaskAllotModalComponent.outsideSetExcutorUser(isSelected ? user : null)
   }
   
   render(h: CreateElement) {

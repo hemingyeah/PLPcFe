@@ -6,6 +6,8 @@ import TaskConfig from '@model/types/TaskConfig'
 import TaskAllotTypeEnum from '@model/enum/TaskAllotTypeEnum'
 /* props */
 import TaskAllotModalProps from '@src/modules/task/components/TaskAllotModal/TaskAllotModalProps'
+/* types */
+import StateColorMap from '@model/types/StateColor'
 
 class TaskAllotModalData extends TaskAllotModalProps {
   /* 派单方式 */
@@ -22,6 +24,8 @@ class TaskAllotModalData extends TaskAllotModalProps {
   public showTaskAllotModal: boolean = false
   /* 协同人列表 */
   public synergyUserList: LoginUser[] = []
+  /* 工作状态 */
+  public stateColorMap: StateColorMap = {}
   /* 工单设置 */
   public taskConfig: TaskConfig = new TaskConfig()
 }

@@ -1,6 +1,7 @@
 /* api */
 import { getCustomer, getCustomerExeinsyn } from '@src/api/CustomerApi.ts'
 import { getTaskConfig } from '@src/api/TaskApi'
+import { getStateColorMap } from '@src/api/SettingApi'
 /* computed */
 import TaskAllotModalComputed from '@src/modules/task/components/TaskAllotModal/TaskAllotModalComputed'
 /* enum */
@@ -13,6 +14,8 @@ import { DepeMultiUserResult } from '@src/modules/task/components/TaskAllotModal
 /* model */
 import { getCustomerDetailResult } from '@model/param/out/Customer'
 import { getTaskConfigResult } from '@model/param/out/Task'
+/* types */
+import StateColorMap from '@model/types/StateColor'
 
 class TaskAllotModalMethods extends TaskAllotModalComputed {
   /** 
@@ -100,7 +103,7 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
   /** 
    * @description 根据客户id获取客户信息和客户负责人信息和开关 
   */
-  fetchSynergyUserWithCustomerManager() {
+  public fetchSynergyUserWithCustomerManager() {
     let customerId = this.customerId
     if(!customerId) return console.warn('fetchExeinsynWithCustomerManager paramer not have customerId')
     
@@ -112,6 +115,17 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
       }
     })
     
+  }
+  
+  /** 初始化工作状态的颜色 */
+  public fetchStateColor(): Promise<any> {
+    return (
+      getStateColorMap()
+        .then((res: StateColorMap) => {
+          this.stateColorMap = res || {}
+        })
+        .catch(err => console.error(err))
+    )
   }
   
   /** 

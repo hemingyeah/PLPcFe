@@ -27,7 +27,7 @@ enum AuthEnum {
   // 工单回访
   TASK_FEEDBACK = 'TASK_FEEDBACK',
   // 通知公告查看？
-  VIP_INFO_NOTICE_SELECT = 'VIP_INFO_NOTICE_SELECT'
+  VIP_INFO_NOTICE_SELECT = 'VIP_INFO_NOTICE_SELECT',
   // 登录PC端
   LOGIN_PC = 'LOGIN_PC',
   // 短信配置

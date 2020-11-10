@@ -186,7 +186,8 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
       customerId: this.customer.id || '',
       lat: String(this.customerAddress.adLatitude) || '',
       lng: String(this.customerAddress.adLongitude) || '',
-      tagId: this.selectTeams.map(team => team.id).join()
+      tagId: this.selectTeams.map(team => team.id).join(),
+      orderDetail: this.orderDetail
     }
     
     return (
@@ -214,7 +215,7 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
   /** 
    * @description 获取团队人员列表
   */
-  public fetchTeamUsers(): Promise<any> {
+  public fetchTeamUsers(selectParams: { keyword: string, pageNum: number, pageSize: number }): Promise<any> {
     Log.succ(Log.Start, this.fetchTeamUsers.name)
     
     this.teamUserPage = new Page()
@@ -223,10 +224,10 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
     let { adLatitude = '', adLongitude = '' } = customerAddress || {}
     let params = {
       customerId: this.customer?.id,
-      keyword: '',
+      keyword: selectParams.keyword,
       lat: adLatitude,
       lng: adLongitude,
-      pageNum: this.teamUserPage.pageNum,
+      pageNum: selectParams.pageNum,
       tagId: this.selectTeams ? this.selectTeams.map(team => team.id).join(',') : ''
     }
     
@@ -244,8 +245,10 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
               ...user
           }))
           
+          this.isDisableLoadmore = !result.hasNextPage
+          
           return result
-
+          
         })
         .catch(error => {
           console.error(error)
@@ -292,6 +295,26 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
     this.initialize()
   }
   
+  /** 
+   * @description 排序变化
+  */
+  public handlerTableSortChange(option: { prop?: any, order?: any } = {}) {
+    console.log('hbc: handlerTableSortChange -> option', option)
+    const { prop, order } = option
+    if (!order) {
+      this.orderDetail = {}
+      return this.fetchUsers()
+    }
+    
+    let sortModel = {
+      sequence: order === 'ascending' ? 'ASC' : 'DESC',
+      column: prop,
+    }
+    
+    this.orderDetail = sortModel
+    this.initialize()
+  }
+  
   /**
    * @description 选择排序方式事件
   */
@@ -313,7 +336,7 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
       this.userPageCheckedMap[key] = isChecked
     }
     /* 设置负责人信息 */
-    this.TaskAllotExcutorComponent.outsideSetSelectedExcutorUser(checked, row)
+    this.TaskAllotExcutorComponent.outsideUpwardSetSelectedExcutorUser(checked, row)
   }
   
   /**

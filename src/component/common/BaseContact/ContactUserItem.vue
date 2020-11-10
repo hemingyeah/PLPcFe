@@ -19,9 +19,9 @@
             :class="{'base-tree-node-arrow-down': isExpandTagName}" 
             @click.stop="toggleTagName"
           >
-          <i class="iconfont icon-arrow-right">
-          </i>
-        </span>
+            <i class="iconfont icon-arrow-right">
+            </i>
+          </span>
         </p>
       </div>
       <div class="contact-user-addition" v-if="showLocation">

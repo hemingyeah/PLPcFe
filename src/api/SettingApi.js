@@ -7,3 +7,10 @@ import http from '@src/util/HttpUtil';
 export function getSettingEdition(params = {}) {
   return http.get('/setting/edition', params)
 }
+
+/** 
+ * 获取用户状态
+*/
+export function getStateColorMap() {
+  return http.get('/setting/getStateColorMap')
+}

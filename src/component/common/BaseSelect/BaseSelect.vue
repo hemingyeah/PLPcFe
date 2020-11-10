@@ -4,7 +4,7 @@
       <div class="base-select-main-content multiple-layout el-select" @click.stop="focusInput" v-if="multiple"
            :class="{'error': error, 'wrapper-is-focus': isFocus, 'clearable-layout': clearable}">
 
-        <el-tag size="mini" closable v-for="tag in value" :key="tag.value" @close="removeTag(tag)" disable-transitions type="info">
+        <el-tag size="mini" closable v-for="(tag, index) in value" :key="`${tag.value}_${index}`" @close="removeTag(tag)" disable-transitions type="info">
           {{tag.label}}
         </el-tag>
         <span v-if="value.length <= 0" class="placeholder-text">
@@ -38,7 +38,7 @@
 
         <ul class="option-list" v-loadmore="loadmoreOptions" ref="list">
 
-          <li v-for="op in optionList" :key="op.value" @click="selectTag(op)" :class="{'selected': value.some(user => user.value ===op.value)}">
+          <li v-for="(op, index) in optionList" :key="`${op.value}_${index}`" @click="selectTag(op)" :class="{'selected': value.some(user => user.value ===op.value)}">
             <slot name="option" :option="op" v-if="optionSlot"> </slot>
             <template v-else>{{op.label}}</template>
             <div class="checked"></div>
@@ -54,6 +54,8 @@
 <script>
 import Clickoutside from '@src/util/clickoutside';
 import Page from '@model/Page';
+/* util */
+import { uuid } from '@src/util/string'
 
 /**
  * Todo

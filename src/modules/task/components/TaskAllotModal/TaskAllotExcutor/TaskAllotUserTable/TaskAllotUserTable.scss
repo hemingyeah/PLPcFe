@@ -7,10 +7,20 @@
   .el-select {
     flex: 1;
   }
+  
+  .base-select-container {
+    .list-wrapper {
+      width: 300px;
+      left: -75px;
+    }
+  }
+  .contact-user-avatar-margin {
+    margin-top: 0;
+  }
 }
 
 .task-allot-user-table {
-  max-height: 462px;
+  max-height: 412px;
   &-column {
     cursor: pointer;
     display: flex;
@@ -32,7 +42,7 @@
 
 .task-allot-user-table-block {
   .el-table__body-wrapper {
-    max-height: 360px;
+    max-height: 330px;
     overflow-y: scroll;
   }
 }
@@ -50,5 +60,26 @@
     left: 10px;
     
     width: 60px;
+  }
+}
+
+.task-allot-user-table-location-select-other {
+  height: 80px;
+  .el-input {
+    width: 90px;
+    margin: 0 10px;
+  }
+  .el-checkbox {
+    margin-left: 10px;
+  }
+  .el-checkbox__inner {
+    height: 20px;
+    width: 20px;
+    &::after {
+      height: 12px;
+      left: 6px;
+      top: 0;
+      width: 7px;
+    }
   }
 }

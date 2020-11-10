@@ -29,7 +29,8 @@ import './TaskAllotModal.scss'
 
 export default class TaskAllotModal extends TaskAllotModalRender {
   
-  mounted() {
+  async mounted() {
+    await this.fetchStateColor()
     this.fetchCustomer()
     this.fetchSynergyUserWithCustomerManager()
   }
