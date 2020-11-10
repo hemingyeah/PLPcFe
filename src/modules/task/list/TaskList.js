@@ -1906,9 +1906,12 @@ export default {
           };
         }
         // 系统字段查询条件
-        const {
-          systemConditions = []
-        } = params
+        const { systemConditions = [] } = params
+        systemConditions && systemConditions.forEach((item)=>{
+          if(item.value == 'API创建'){
+            item.value = '开放API'
+          }
+        })
         // 自定义
         const conditions = params.conditions || [];
         // 创建时间
@@ -2015,10 +2018,16 @@ export default {
           oncePrinted = '';
           break;
         }
-        let source=params.source instanceof Array && params.source && params.source.length && params.source.map((item)=>{
+        let source=[];
+        if(params.source){
+          if(!(params.source instanceof Array)){
+            source.push(params.source);
+          }
+        }
+        source=source && source instanceof Array && source.length && source.map((item)=>{
           if(item=='API创建'){
             item='开放API'
-          } 
+          }
           return item;
         }) || [];
         // 是否审批中
