@@ -2018,18 +2018,20 @@ export default {
           oncePrinted = '';
           break;
         }
-        let source=[];
+        let source;
         if(params.source){
-          if(!(params.source instanceof Array)){
-            source.push(params.source);
+          if(params.source instanceof Array){
+            source=params.source.length && params.source.map((item)=>{
+              if(item=='API创建'){
+                item='开放API'
+              }
+              return item
+            }) || [];
+          }else{
+            source=params.source;
+            source==='API创建' && (source='开放API')
           }
         }
-        source=source && source instanceof Array && source.length && source.map((item)=>{
-          if(item=='API创建'){
-            item='开放API'
-          }
-          return item;
-        }) || [];
         // 是否审批中
         let inApprove;
         switch (params.inApprove) {
