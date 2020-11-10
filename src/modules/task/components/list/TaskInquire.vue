@@ -197,18 +197,14 @@ export default {
       if (!this.$refs.batchForm) return {};
       this.$refs.batchForm.forEach((item) => {
         for (let key in item.returnDatas()) {
-          console.log(item.returnDatas())
-          if (item.returnDatas()[key]) {
+          const value = item.returnDatas()[key]
+          if (value && JSON.stringify(value) !== '{}' && JSON.stringify(value) !== '[]') {
             data[key] = item.returnDatas()[key];
           } else if (key === "tags" && item.returnDatas()[key].length) {
-            data[key] = item.returnDatas()[key];
-          } else {
             data[key] = item.returnDatas()[key];
           }
         }
       });
-      console.log('所有值', data)
-      return
       return data;
     },
     returnInquireFields() {
