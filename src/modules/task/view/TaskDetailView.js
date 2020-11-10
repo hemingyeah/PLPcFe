@@ -7,6 +7,7 @@ import { getRootWindow } from '@src/util/dom';
 import TaskStateEnum from '@model/enum/TaskStateEnum.ts';
 import Filter from '@src/filter/filter.js';
 import { parse } from '@src/util/querystring';
+import { randomString } from '@src/util/lang';
 import { isShowReport } from '@src/util/version.ts'
 import {
   storageGet,
@@ -682,8 +683,7 @@ export default {
             let fromId = window.frameElement.getAttribute('fromid');
             // this.$platform.refreshTab(fromId);
 
-            // location.href = '/task';
-            this.closeAndOpenTab('/task', 'M_TASK_ALL');
+            this.closeAndOpenTab('/task');
           } else {
             this.$platform.alert(res.message);
             this.pending = false;
@@ -792,7 +792,7 @@ export default {
           let fromId = window.frameElement.getAttribute('fromid');
           // this.$platform.refreshTab(fromId);
 
-          location.href = '/task?viewId=12fcb144-1ea3-11e7-8d4e-00163e304a25&mySearch=execute';
+          this.closeAndOpenTab('/task?viewId=12fcb144-1ea3-11e7-8d4e-00163e304a25&mySearch=execute');
         } else {
           this.$platform.alert(res.message);
           this.pending = false;
@@ -1030,14 +1030,20 @@ export default {
     /** 
      * 关闭并打开新的Tab
     */
-    closeAndOpenTab(url, newTabId) {
+    closeAndOpenTab(url) {
       let id = window.frameElement.dataset.id;
       this.$platform.closeTab(id);
-    
+
+      // 生成工单列表随机id
+      let taskListTabId = `M_TASK_ALL_${randomString(16)}`;
+
+      let rootWindow = getRootWindow(window);
+      rootWindow.pushTaskListIds(taskListTabId);
+
       let fromId = window.frameElement.getAttribute('id');
     
       this.$platform.openTab({
-        id: newTabId,
+        id: taskListTabId,
         title: '',
         url,
         reload: true,
