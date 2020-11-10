@@ -2433,7 +2433,6 @@ const Inquire = [
     isSearch: 1,
     placeHolder: null,
     setting: {isMulti: false, dataSource:[
-      '全部',
       '导入创建',
       '手动创建',
       'API创建',
