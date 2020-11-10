@@ -197,6 +197,7 @@ export default {
       if (!this.$refs.batchForm) return {};
       this.$refs.batchForm.forEach((item) => {
         for (let key in item.returnDatas()) {
+          console.log(item.returnDatas())
           if (item.returnDatas()[key]) {
             data[key] = item.returnDatas()[key];
           } else if (key === "tags" && item.returnDatas()[key].length) {
@@ -206,6 +207,8 @@ export default {
           }
         }
       });
+      console.log('所有值', data)
+      return
       return data;
     },
     returnInquireFields() {
@@ -306,6 +309,7 @@ export default {
         }
         return v;
       });
+      console.log(this.list)
     },
     setting({ item, index }) {
       // type 0 = 初始化 1筛选
@@ -454,6 +458,7 @@ export default {
             } else {
               this.form[fieldName] = content;
             }
+            console.log(this.form)
           } else {
             this.selectedField = {}
             this.form = {};
@@ -476,7 +481,6 @@ export default {
         buildForm() {
           localStorage.setItem("fields_length", this.fields.length);
           if (Object.keys(this.form).length === this.fields.length) return;
-
           this.fields.forEach((f) => {
             if (!this.form[f.fieldName] || !this.form[f.fieldName].length) {
               // 地址的默认值初始化为对象

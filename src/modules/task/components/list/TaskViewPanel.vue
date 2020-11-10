@@ -110,6 +110,18 @@ import {
   AllotTypeTextConvert,
 } from "@src/modules/task/model/TaskTextConvertMap.ts";
 
+const MultiFieldNames = [
+  "serviceType",
+  "serviceContent",
+  "level",
+  "paymentMethod",
+  "state",
+  "allotTypeStr",
+  "onceException",
+  "paymentMethod",
+  "tag",
+];
+
 const TASK_HISTORY_KEY = "task_history_list";
 const TaskInquireConvertFieldNamesToConditionsMap = {
   customer: "customerId",
@@ -354,7 +366,7 @@ export default {
           }
         });
       });
-      
+
       if (address) {
         this.searchModelCN.push(address);
       }
@@ -380,7 +392,7 @@ export default {
         conditions: [],
       };
       const taskInquireList = this.$refs.taskInquireParams.returnInquireFields();
-      const form = this.$refs.taskInquireParams.returnData();
+      const form = {...this.$refs.taskInquireParams.returnData()};
       this.formBackup = Object.assign(this.formBackup, {
         ...this.$refs.taskInquireParams.returnData(),
       });
