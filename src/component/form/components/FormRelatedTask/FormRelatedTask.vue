@@ -11,7 +11,7 @@
 			loading-text="载入更多结果......"
 			no-data-text="未找到结果"
 			@change="updateTask"
-			:popper-append-to-body="false"
+			:popper-append-to-body="true"
 			:placeholder="placeholder"
 			:remote-method="searchTask"
 			:loading="loading">
@@ -69,10 +69,10 @@ export default {
   data() {
     return {
 			options: [],
-			page: {
-				pageSize: 10
-			},
-			loading: false
+      loading: false,
+      
+      page: 1,
+      pageSize: 10
     }
 	},
 	mounted() {
@@ -83,9 +83,10 @@ export default {
   methods: {
 		searchTask(keyword) {
 			let params = {
-				...this.page,
+        page: this.page,
+        pageSize: this.pageSize,
 				keyword
-			};
+      };
 			this.loading = true;
 			search(params).then(res => {
 				if (!res || !res.result || !res.result.content) return;
@@ -99,7 +100,7 @@ export default {
 						linkMan: task.linkMan || {},
 						customer: task.customerEntity || {},
 						products: task.products || []
-					}));
+          }));
 				}
 			})
 			.catch(e => console.error(e))
@@ -108,7 +109,6 @@ export default {
 			});
 		},
 		updateTask(newValue) {
-			console.log("newValue", newValue);
 			let oldValue = null;
       this.$emit('update', {newValue, oldValue, field: this.field});
       this.$emit('input', newValue);
@@ -120,42 +120,43 @@ export default {
 <style lang="scss" scoped>
 .form-related-task{
   width: 100%;
-	.option-item{
-		.el-select-dropdown__item{
-			* {
-				margin: 0;
-			}
-			height: auto !important;
-			padding: 10px 12px;
-			h3 {
-				font-size: 14px;
-				font-weight: 500;
-				line-height: 24px;
-			}
-
-			p {
-				display: flex;
-				justify-content: space-between;
-				line-height: 24px;
-
-				& > span {
-					width: 50%;
-					display: flex;
-					justify-content: flex-start;
-					font-size: 12px;
-					color: #666666;
-					padding-right: 10px;
-
-					& > label {
-						padding: 0;
-						width: auto !important;
-					}
-					& > span {
-						@include text-ellipsis();
-					}
-				}
-			}
-		}
-	}
 }
+
+.el-select-dropdown__item{
+  * {
+    margin: 0;
+  }
+  width: 580px;
+  height: auto !important;
+  padding: 10px 12px;
+  h3 {
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 24px;
+  }
+
+  p {
+    display: flex;
+    justify-content: space-between;
+    line-height: 24px;
+
+    & > span {
+      width: 50%;
+      display: flex;
+      justify-content: flex-start;
+      font-size: 12px;
+      color: #666666;
+      padding-right: 10px;
+
+      & > label {
+        padding: 0;
+        width: auto !important;
+      }
+      & > span {
+        @include text-ellipsis();
+      }
+    }
+  }
+}
+
 </style>

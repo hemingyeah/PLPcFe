@@ -118,9 +118,13 @@ export default {
     * 1.数字类型
     * 2.且 保存过
     * 3.且 不能是当前数字控件
+    * 4.且 未隐藏
     */
     numberFields() {
-      return this.fields.filter(field => field.formType === 'number' && field.id && field.id != this.field.id);
+      return this.fields.filter(field => {
+        let { id, formType, isHidden } = field;
+        return formType === 'number' && id && id != this.field.id && !isHidden;
+      })
     }
   },
   methods: {

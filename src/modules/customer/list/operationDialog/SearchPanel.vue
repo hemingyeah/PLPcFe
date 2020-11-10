@@ -515,17 +515,6 @@ export default {
                   update: event => this.update(event)
                 }
               });
-          } else if (f.formType === 'related_task') {
-            childComp = h('task-search', {
-              props: {
-                field: f,
-                value: this.form[f.fieldName],
-                disableMap: true
-              },
-              on: {
-                update: event => this.update(event)
-              }
-            });
           } else {
 
             childComp = h(

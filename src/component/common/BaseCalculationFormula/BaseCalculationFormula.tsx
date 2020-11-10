@@ -8,15 +8,17 @@ import SignOperatorEnum from './SignOperatorEnum'
 /* util */
 import * as MathUtil from 'mathjs'
 import validate from './validate'
-import Platform from '@src/platform'
+import _ from 'lodash'
 /* vue */
-import { Vue, Component, Prop } from 'vue-property-decorator'
+import { Vue, Component, Prop, Emit } from 'vue-property-decorator'
 import { CreateElement } from 'vue'
 /* scss */
 import './BaseCalculationFormula.scss'
 
 /* 计算公式每项 */
 class CalculationFormulaItem {
+  // 名称
+  name: string = ''
   // 值
   value: string = ''
   // 是否为操作符
@@ -24,7 +26,8 @@ class CalculationFormulaItem {
   // 当前项是否是错误的
   isError: boolean = false
   
-  constructor(value: string, isOperator: boolean, isError?: boolean) {
+  constructor(name: string, value: string, isOperator: boolean, isError?: boolean) {
+    this.name = name || ''
     this.value = value || ''
     this.isOperator = isOperator || false
     this.isError = isError || false
@@ -39,16 +42,14 @@ class CalculationFormulaItem {
 export default class BaseCalculationFormula extends Vue {
 
   /* 支持运算的字段列表 */
-  @Prop() fieldNames: string[] | undefined
+  @Prop({default: []}) calculationFields: Array<any> | undefined
   
   /* 计算公式数组 */
   private calculationFormula: CalculationFormulaItem[] = []
-  /* 运算字段对象 */
-  private calculationFields: string[] = ['字段1', '字段2', '字段3']
   /* 默认数值 用来代替字段名字 */
   private defaultNumber: number | string = 0
   /* 错误提示 */
-  private errorMessage: string = '公式不合规，请修正'
+  private errorMessage: string = ''
   /* 计算公式符号列表 (暂不支持自定义，所以先写死了) */
   private operatorList: SignOperatorEnum[] = [
     SignOperatorEnum.Add,
@@ -84,6 +85,11 @@ export default class BaseCalculationFormula extends Vue {
   private cancel(): void {
     this.show = false
   }
+
+  @Emit('confirm')    
+  private saveFormula() {
+    return  _.cloneDeep(this.calculationFormula)
+  }
   
   /** 
    * @description 确定
@@ -91,21 +97,19 @@ export default class BaseCalculationFormula extends Vue {
   private confirm(): void {
     let result = validate(this.calculationFormulaFormatted, this.defaultNumber)
     let isSuccess = result.isSuccess
+
+    // 清空错误信息
+    this.calculationFormula.map(item => item.isError = false)
+    this.errorMessage = ''
     
     // 失败
     if (!isSuccess) {
-      this.setErrorMessage(result)
+      return this.setErrorMessage(result)
     }
     
-    // 成功 do some things...
-    console.log('success', result)
-    // 解析值
-    try {
-      console.log(MathUtil.evaluate(this.calculationFormulaFormatted))
-    } catch (error) {
-      console.error('MathUtil.evaluate -> error', error)
-    }
-
+    // 成功
+    this.show = false
+    this.saveFormula()
   }
   
   /** 
@@ -113,21 +117,23 @@ export default class BaseCalculationFormula extends Vue {
    * @param {SignOperatorEnum} operator 操作符
   */
   private handleOperatorClick(operator: SignOperatorEnum): void {
-    this.calculationFormula.push(new CalculationFormulaItem(operator, true))
+    this.calculationFormula.push(new CalculationFormulaItem(operator, operator, true))
   }
   
   /** 
    * @description 运算字段点击
    * @param {SignOperatorEnum} operator 操作符
   */
-  private handleFieldClick(fieldName: string): void {
-    this.calculationFormula.push(new CalculationFormulaItem(fieldName, false))
+  private handleFieldClick(displayName: string, fieldName: string): void {
+    this.calculationFormula.push(new CalculationFormulaItem(displayName, fieldName, false))
   }
   
   /**
    * @description 显示
   */
-  private open(): void {
+  private open(formula: []): void {
+    this.calculationFormula = _.cloneDeep(formula)
+    this.errorMessage = ''
     this.show = true
   }
   
@@ -136,6 +142,13 @@ export default class BaseCalculationFormula extends Vue {
   */
   private reset(): void {
     this.calculationFormula = []
+  }
+
+  /**
+   * @description 删除
+  */
+  private delete(): void {
+    this.calculationFormula.pop()
   }
   
   /** 
@@ -146,7 +159,7 @@ export default class BaseCalculationFormula extends Vue {
     let errorDataLength = (errorData && errorData.length) || 0
     
     // 错误提示
-    Platform.alert(errorMessage)
+    this.errorMessage = errorMessage || ''
     
     // 设置错误信息
     let startIndex = errorIndex || 0
@@ -161,7 +174,7 @@ export default class BaseCalculationFormula extends Vue {
   private renderOperator() {
     return (
       <div class='calculation-formula-operators'>
-        运算符号
+        运算符号:
         {
           this.operatorList.map((operator: SignOperatorEnum) => {
             return (
@@ -181,12 +194,16 @@ export default class BaseCalculationFormula extends Vue {
   private renderField() {
     return (
       <div class='calculation-formula-fields'>
-        运算对象
+        <el-tooltip placement="top">
+          <div slot="content">表单中已配置的【数字】和【下拉菜单】类型的字段可以作为<br />运算的对象，其中下拉菜单的选项必须是数值才可以支持计算</div>
+          <i class="iconfont icon-question"></i>
+        </el-tooltip>
+        运算对象:
         {
-          this.calculationFields.map((fieldName: string) => {
+          this.calculationFields && this.calculationFields.map(({ displayName, fieldName }) => {
             return (
-            <span onClick={() => this.handleFieldClick(fieldName)}>
-              {fieldName}
+            <span onClick={() => this.handleFieldClick(displayName, fieldName)}>
+              {displayName}
             </span>
             )
           })
@@ -201,22 +218,41 @@ export default class BaseCalculationFormula extends Vue {
   private renderCalculationFormula() {
     return (
       <div class='calculation-formula-block'>
-        计算公式
-        <draggable 
-          class='nested-draggable'
-          tag='div'
-          list={ this.calculationFormula }
-        >
-          {
-            this.calculationFormula.map((item: any) => {
-              return (
-                <span class={{ error: item.isError }}>
-                  {item.value}
-                </span>
-              )
-            })
-          }
-        </draggable>
+        <div class='calculation-formula-content'>
+          <div class='calculation-formula-title'>计算公式=</div>
+          <draggable 
+            class='nested-draggable'
+            tag='div'
+            list={ this.calculationFormula }
+          >
+            {
+              this.calculationFormula.map((item: any) => {
+                return (
+                  <span class={{ operator: item.isOperator }}>
+                    {item.name}
+                  </span>
+                )
+              })
+            }
+          </draggable>
+        </div>
+        <div class='calculation-formula-action'>
+          <span class='formula-remove-btn' onClick={this.delete}>
+            <i class='iconfont icon-shanchu2'></i>
+          </span>
+          <span class='formula-clear-btn' onClick={this.reset}>清空</span>
+        </div>
+      </div>
+    )
+  }
+
+  /** 
+  * @description 渲染计算公式错误提示
+  */
+  private renderErrorMessage() {
+    return this.errorMessage && (
+      <div class='calculation-formula-error'>
+        {this.errorMessage}
       </div>
     )
   }
@@ -238,12 +274,12 @@ export default class BaseCalculationFormula extends Vue {
     return (
       <base-modal {...attrs}>
         {this.renderCalculationFormula()}
+        {this.renderErrorMessage()}
         {this.renderField()}
         {this.renderOperator()}
         <div slot="footer" class="dialog-footer">
           <el-button type="ghost" onClick={this.cancel}>取消</el-button>
-          <el-button type="warning" onClick={this.reset}>重置</el-button>
-          <el-button type="primary" onClick={this.confirm}>确定</el-button>
+          <el-button type="primary" onClick={this.confirm}>保存</el-button>
         </div>
       </base-modal>
     )
