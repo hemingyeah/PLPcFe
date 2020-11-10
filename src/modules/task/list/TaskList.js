@@ -1793,8 +1793,7 @@ export default {
             oncePrinted = "";
             break;
         }
-        console.log(1111,params.source);
-        let source=params.source && params.source.length && params.source.map((item)=>{
+        let source=params.source instanceof Array && params.source && params.source.length && params.source.map((item)=>{
           if(item=='API创建'){
             item='开放API'
           } 
