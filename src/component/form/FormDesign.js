@@ -812,7 +812,7 @@ const FormDesign = {
       field.setting.customerOption[event.prop] = event.value;
     },
     /** 
-     * @description 保存隐藏字段设置弹窗
+     * @description 恢复已隐藏字段
     */
     async onRestoreField(row) {
       let value = this.value;
@@ -843,9 +843,11 @@ const FormDesign = {
     return (
       <div class="form-design">
         <div class="form-design-panel">
-          { this.renderTabHeader() }
-          <div class="form-design-tabs-content">
-            { this.renderFieldList(this.filterFields) }
+          <div class="form-design-left"> 
+            { this.renderTabHeader() }
+            <div class="form-design-tabs-content">
+              { this.renderFieldList(this.filterFields) }
+            </div>
           </div>
         </div>
         <div class="form-design-main">    
