@@ -431,7 +431,6 @@ const BizSelectColumn = {
         }
 
       })
-
       this.close();
       this.$emit('save', { type: 'column', data: columns })
     },

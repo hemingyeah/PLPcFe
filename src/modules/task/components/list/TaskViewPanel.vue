@@ -168,7 +168,7 @@ export default {
       viewName: this.region.viewName,
       searchModelCN: [],
       type: "",
-      customizeViewList: []
+      customizeViewList: [],
     };
   },
   computed: {
@@ -227,10 +227,18 @@ export default {
      * 查看视图
      */
     getOneView(systemConditions, customizeViewList) {
-      if (!systemConditions || !systemConditions.length) return;
       const taskList = customizeViewList;
-      this.searchModelCN = [];
+      this.searchModelCN = [
+        {
+          key: '',
+          content: '',
+          fieldName: '',
+          formType: '',
+        },
+      ];
       let address;
+      if (!systemConditions || !systemConditions.length) return;
+      this.searchModelCN = []
       systemConditions.forEach((item) => {
         taskList.forEach((value, index) => {
           if (
@@ -329,11 +337,11 @@ export default {
                   fieldName: "area",
                   formType: "address",
                 };
-                address[item.property] = item.value
+                address[item.property] = item.value;
               } else if (item.property === "city") {
-                address[item.property] = item.value
+                address[item.property] = item.value;
               } else if (item.property === "dist") {
-                address[item.property] = item.value
+                address[item.property] = item.value;
               } else {
                 this.searchModelCN.push({
                   key: value.displayName,
@@ -346,8 +354,9 @@ export default {
           }
         });
       });
+      
       if (address) {
-        this.searchModelCN.push(address)
+        this.searchModelCN.push(address);
       }
     },
 
@@ -694,12 +703,15 @@ export default {
       }
       return operator;
     },
-    open(type = "", systemConditions = "", {taskFields, taskReceiptFields}) {
+    open(type = "", systemConditions = "", { taskFields, taskReceiptFields }) {
       this.visible = true;
       this.type = type;
-      this.customizeViewList = [...taskFields, ...taskReceiptFields.filter((item) => {
-        return item.isSystem == 0 && item.isSearch;
-      })]
+      this.customizeViewList = [
+        ...taskFields,
+        ...taskReceiptFields.filter((item) => {
+          return item.isSystem == 0 && item.isSearch;
+        }),
+      ];
       this.getOneView(systemConditions, [...taskFields, ...taskReceiptFields]);
     },
     hide() {

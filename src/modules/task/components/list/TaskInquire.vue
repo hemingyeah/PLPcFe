@@ -150,7 +150,7 @@ export default {
   },
   watch: {
     taskNums(v) {
-      this.list = v;
+      this.list = v
     },
     config() {
       this.fields;
@@ -435,10 +435,14 @@ export default {
               "state",
               "user",
               "cascader",
+              "createUser",
+              "allotUser",
+              "executor",
+              "synergyId"
             ];
             if (types.indexOf(fieldName) !== -1 || types.indexOf(formType) !== -1) {
               this.form[fieldName] = content.split("，");
-            } else if (formType === "datetime") {
+            } else if (formType === "datetime" || formType === "date") {
               this.form[fieldName] = content.split("-");
             } else if (fieldName === "area") {
               this.form[fieldName] = {
@@ -451,6 +455,7 @@ export default {
               this.form[fieldName] = content;
             }
           } else {
+            this.selectedField = {}
             this.form = {};
           }
         },
@@ -549,7 +554,6 @@ export default {
           this.$forceUpdate();
         },
         selectField(val) {
-          console.log(this.fields)
           this.selectedField = this.fields.filter(
             (f) => f.fieldName === val
           )[0];

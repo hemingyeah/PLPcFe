@@ -419,7 +419,7 @@ export default {
     /**
      * 获取视图
      */
-    async getUserViews() {
+    async getUserViews(type) {
       const {
         success,
         result
@@ -447,7 +447,9 @@ export default {
             }
           })
         }
-        this.initialize();
+        if (!type) {
+          this.initialize();
+        }
       }
     },
     /**
@@ -664,7 +666,7 @@ export default {
         return
       }
 
-      this.$refs.viewPanel.saveViewBtn(() => {
+      this.$refs.viewPanel.saveViewBtn(async () => {
         this.params.pageNum = 1;
         this.taskPage.list = [];
         this.$refs.viewPanel.hide();
