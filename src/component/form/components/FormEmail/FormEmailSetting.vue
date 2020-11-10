@@ -7,14 +7,35 @@
       @input="updateForDom"
     ></form-title-setting>
     <!-- end 标题 -->
-    <div class="form-setting-group">
-      <textarea placeholder="请在此添加描述信息" rows="3" data-prop="placeHolder" :value="field.placeHolder" @input="updateForDom" :maxlength="placeholderMaxLength"></textarea>
+
+    <!-- start 描述信息 -->
+    <form-describe-setting
+      :field="field"
+      @input="updateForDom"
+    ></form-describe-setting>
+    <!-- end 描述信息 -->
+
+    <!-- start 校验 -->
+    <div class="form-setting-group form-setting-item">
+      <h4 class="form-item-title">校验</h4>
+      <div class="form-item-box">
+        <!-- 必填 -->
+        <form-required-setting :field="field" @input="update"></form-required-setting>
+      </div>
     </div>
-    <div class="form-setting-group">
-      <el-checkbox :value="field.isNull" @input="update($event, 'isNull')" :true-label="0" :false-label="1">必填</el-checkbox>
-      <el-checkbox :value="field.isSearch" @input="update($event, 'isSearch')" :true-label="1" :false-label="0">搜索</el-checkbox>
-      <mobile-show-setting v-if="isTaskMode" :field="field" :fields="fields" @input="update"></mobile-show-setting>
+    <!-- end 校验 -->
+
+    <!-- start 字段权限 -->
+    <div class="form-setting-group form-setting-item">
+      <h4 class="form-item-title">字段权限</h4>
+      <div class="form-item-box">
+        <!-- 移动端列表展示 -->
+        <mobile-show-setting  :field="field" :fields="fields" @input="update" v-if="isTaskMode"></mobile-show-setting>
+        <!-- 支持高级搜索 -->
+        <form-search-setting :field="field" @input="update"></form-search-setting>
+      </div>
     </div>
+    <!-- end 字段权限 -->
   </div>
 </template>
 
