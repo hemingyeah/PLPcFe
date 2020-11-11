@@ -411,9 +411,9 @@ export default {
     editTargetRepertory(){
       this.show=true;
       this.targetId=this.propData.data.targetId;
-      if(this.targetList.length===0){
-        this.$emit('getTargetList');
-      }
+      // if(this.targetList.length===0){
+      //   this.$emit('getTargetList');
+      // }
     },
     // 跳转到出入库记录
     toWareRecord(data){

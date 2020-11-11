@@ -843,7 +843,7 @@
         @open='partDearOpen'
         :close-on-click-modal="false"
       >
-        <part-deal-with-form ref="partDealWithForm" :partDealKey='partDealKey' @updateDetail='updateDetail' @getTargetList='getTargetList' :targetList='targetList' :loginUserId='userId' :prop-data="partDealData"></part-deal-with-form>
+        <part-deal-with-form ref="partDealWithForm" :partDealKey='partDealKey' @updateDetail='updateDetail' :targetList='targetList' :loginUserId='userId' :prop-data="partDealData"></part-deal-with-form>
 
         <div
           slot="footer"
@@ -1309,11 +1309,11 @@ export default {
   },
   methods: {
     // 获取目标仓库
-    getTargetList(){
-      return this.$http.get('/partV2/repertory/listForTeam').then(result => {
-        this.targetList = result || [];
-      })
-    },
+    // getTargetList(){
+    //   return this.$http.get('/partV2/repertory/listForTeam').then(result => {
+    //     this.targetList = result || [];
+    //   })
+    // },
     // 批量办理
     mulHandle(value){
       if(value.length===0){
@@ -1715,6 +1715,14 @@ export default {
           let allRepertory = res[1];
           let list = res[2];
           allPerson = this.userApply.options;
+
+          this.targetList=res[0].filter(item=>{
+            if(Array.isArray(item.manager)){
+              const exist=item.manager.find(mItem=>mItem.userId === this.initData.userId);
+              if(exist) return item;
+            }
+          });
+          console.log(this.targetList,111);
 
           this.page.list = list.map(item => {
             let tv = allRepertory.filter(r => r.id === item.targetId);
