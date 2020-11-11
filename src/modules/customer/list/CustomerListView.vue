@@ -251,7 +251,7 @@
     <send-message-dialog ref="messageDialog" :selected-ids="selectedIds" :sms-rest="smsRest"></send-message-dialog>
     <batch-editing-customer-dialog
       ref="batchEditingCustomerDialog"
-      :config="{fields: initData.fieldInfo, defaultAddress: defaultAddress}"
+      :config="{fields: fieldInfo, defaultAddress: defaultAddress}"
       :callback="search"
       :selected-ids="selectedIds"
     ></batch-editing-customer-dialog>
@@ -351,7 +351,7 @@
     <base-table-advanced-setting ref="advanced" @save="modifyColumnStatus" />
 
     <search-panel :config="{
-      fields: this.initData.fieldInfo,
+      fields: fieldInfo,
     }" ref="searchPanel">
       <div class="advanced-search-btn-group" slot="footer">
         <base-button type="ghost" @event="resetParams">重置</base-button>
@@ -410,7 +410,8 @@ export default {
       selectedLimit: 500,
       columnNum: 1,
       tableKey: (Math.random() * 1000) >> 2,
-      hasCallCenterModule:localStorage.getItem('call_center_module') == 1
+      hasCallCenterModule:localStorage.getItem('call_center_module') == 1,
+      fieldInfo: []
     };
   },
   computed: {
@@ -478,7 +479,7 @@ export default {
       return {
         customerAddressConfig: initData.customerAddressConfig,
         customerConfig: initData.customerConfig,
-        fieldInfo: (initData.fieldInfo || []).sort(
+        fieldInfo: (this.fieldInfo || []).sort(
           (a, b) => a.orderId - b.orderId
         )
       };
@@ -513,7 +514,18 @@ export default {
       return null;
     }
   },
-  mounted() {
+  async mounted() {
+    try {
+      // 获取客户表单字段列表
+      let result = await CustomerApi.getCustomerFields({isFromSetting: false});
+      if (result.succ) {
+        this.fieldInfo = result.data;
+      }
+
+    } catch(err) {
+      console.error('customer list get fields error', err);
+    }
+
     const {
       adProvince,
       adCity,
@@ -527,7 +539,6 @@ export default {
     // 对外开放刷新方法，用于其他tab刷新本tab数据
     // TODO: [tab_spec]标准化刷新方式
     window.__exports__refresh = this.search;
-    console.log('onEvent', this.initData.fieldInfo);
   },
   methods: {
     getRelatedTask(field) {

@@ -14,6 +14,8 @@ import * as util from '../util/customer'
 
 import platform from '@src/platform';
 
+import * as CustomerApi from '@src/api/CustomerApi';
+
 export default {
   name: 'customer-edit-view',
   inject: ['initData'],
@@ -23,7 +25,8 @@ export default {
       pending: false,
       loadingPage: false,
       form: {},
-      init: false
+      init: false,
+      fieldInfo: []
     };
   },
   computed: {
@@ -31,7 +34,7 @@ export default {
       return this.initData.action;
     },
     fields() {
-      let originFields = this.initData.fieldInfo || [];
+      let originFields = this.fieldInfo || [];
       let sortedFields = originFields.sort((a, b) => a.orderId - b.orderId)
         .map(f => {
           if (f.formType === 'address' && f.isSystem) {
@@ -129,6 +132,12 @@ export default {
     window.submit = this.submit;
 
     try {
+      // 获取客户表单字段列表
+      let result = await CustomerApi.getCustomerFields({isFromSetting: true});
+      if (result.succ) {
+        this.fieldInfo = result.data;
+      }
+
       // 初始化默认值
       this.initFormData();
       this.init = true;
