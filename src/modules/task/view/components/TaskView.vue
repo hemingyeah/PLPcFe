@@ -113,7 +113,6 @@
     <!-- 创建方式 -->
     <template slot="source" slot-scope="{ field }">
       <div class="form-view-row">
-        {{task}}
         <label>{{ field.displayName }}</label>
         <div class="form-view-row-content">
           {{task.source}}
