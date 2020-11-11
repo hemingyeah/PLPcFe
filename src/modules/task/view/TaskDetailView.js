@@ -1056,6 +1056,11 @@ export default {
         fieldName: 'allotUser',
         formType: 'user',
         isSystem: 1,
+      }, {
+        displayName: '创建方式',
+        fieldName: 'source',
+        formType: 'user',
+        isSystem: 1,
       }];
 
       this.fields.forEach(field => {

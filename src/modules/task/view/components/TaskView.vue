@@ -107,6 +107,15 @@
       </div>
     </template>
     <!-- end 协同人 -->
+
+    <!-- start 创建方式 -->
+    <template slot="source" slot-scope="{ field }">
+      <div class="form-view-row">
+        <label>{{ field.displayName }}</label>
+        <div class="form-view-row-content">{{ task.source }}</div>
+      </div>
+    </template>
+    <!-- end 创建方式 -->
   </form-view>
 </template>
 
