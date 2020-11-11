@@ -623,10 +623,7 @@
 
                 <!-- 关联事件 -->
                 <template v-else-if="column.field === 'eventNo'">
-                  <div
-                    :class="{
-                      'view-detail-btn task-client': scope.row.linkAuth,
-                    }"
+                  <div class="view-detail-btn task-client"
                     @click.stop="openEventTab(scope.row)"
                   >
                     {{ scope.row["eventNo"]}}
