@@ -1,6 +1,6 @@
 import {randomString} from '@src/util/lang';
 import Field from '@model/Field';
-import { isSelect, isMultiSelect } from './util';
+import { isSelect, isMultiSelect ,isCascader} from './util';
 import * as FormInfoConfig from './components/FormInfo/config';
 
 /** 补全formType 为select时的所需字段 */
@@ -82,6 +82,11 @@ export default class FormField{
     // // 处理客户地址
     if (this.fieldName === 'customerAddress' && this.isSystem && !params.setting.customerAddressConfig) {
       this.setting.customerAddressConfig = {};
+    }
+    
+    //多级菜单设置默认项
+    if(isCascader(params)){
+      this.setting = { maxDeep: 2, dataSource:[{value:"一级选项 1",children:[{ value : "二级选项 1"}]}]}
     }
   
     // 辅助字段

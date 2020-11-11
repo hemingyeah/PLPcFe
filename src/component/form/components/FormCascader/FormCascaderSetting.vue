@@ -67,8 +67,8 @@ export default {
       
       this.update(value, prop);
     },
-    update(value, prop){
-      this.$emit('input', {value, prop});
+    update(value, prop, isSetting = false) {
+      this.$emit('input', {value, prop, isSetting});
     },
     open(){
       let source = this.field.setting.dataSource || [];

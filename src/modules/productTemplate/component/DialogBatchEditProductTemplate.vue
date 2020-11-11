@@ -110,8 +110,9 @@ export default {
       if (!this.selectedIds.length) {
         return this.$platform.alert('请选择需要批量编辑的产品模板');
       }
-
+      this.reset();
       this.visible = true;
+      
     },
     buildParams() {
       let tv = null;
@@ -204,7 +205,6 @@ export default {
         }
       },
       mounted() {
-        this.reset();
         this.buildForm();
       },
       methods: {

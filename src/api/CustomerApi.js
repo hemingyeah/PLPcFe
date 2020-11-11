@@ -180,3 +180,12 @@ export function getCustomerList(params) {
   let customerPreFixedPath = GrayUtil.getCustomerApiPath();
   return http.post(`${customerPreFixedPath}/customer/list`, params);
 }
+
+/**
+ * 客户表单属性列表
+ * @param {String} params.isFromSetting -- 是否用于设置页面，是：true 否：false
+ * @returns Promise<>
+ */
+export function getCustomerFields(params) {
+  return http.get('/customer/getCustomerFields', params);
+}

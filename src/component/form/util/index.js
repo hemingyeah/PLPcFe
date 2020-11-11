@@ -60,6 +60,13 @@ export function isMultiSelect(field){
     || field.formType == 'selectMulti';
 }
 
+/** 是否为多级菜单类型 */
+export function isCascader(field){
+  let setting = field.setting || {};
+
+  return field.formType == 'cascader' && JSON.stringify(setting) == '{}'
+}
+
 /** 是否为单选类型 */
 export function isSelect(field){
   let setting = field.setting || {};

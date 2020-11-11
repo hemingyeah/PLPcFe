@@ -225,7 +225,7 @@
     <batch-edit-product-template-dialog
       ref="batchEditProductTemplateDialog"
       :fields="productFields"
-      :config="{fields: initData.productFields, productTypes: initData.productConfig.productTypes}"
+      :config="{fields: fieldsInfo, productTypes: initData.productConfig.productTypes}"
       :callback="search"
       :selected-ids="selectedIds">
 
@@ -243,7 +243,7 @@ import Page from '@model/Page';
 import platform from '@src/platform'
 import { formatDate } from '@src/util/lang';
 
-import { getProductTemplateList, productTemplateDelete } from '@src/api/ProductApi.js'
+import { getProductTemplateList, productTemplateDelete, getProductFields } from '@src/api/ProductApi.js'
 
 import SearchPanel from './component/SearchPanel.vue';
 import DialogBatchEditProductTemplate from './component/DialogBatchEditProductTemplate.vue';
@@ -328,12 +328,13 @@ export default {
           conditions: [],
         },
       },
+      fieldsInfo:[]
     }
   },
   computed: {
     // 高级搜索 占位符
     advancedSearchPlaceholder() {
-      let fields = this.initData.productFields || [];
+      let fields = this.fieldsInfo || [];
       return {
         name: fields.filter(f => f.fieldName == 'name')[0].placeHolder || '',
         serialNumber: fields.filter(f => f.fieldName == 'serialNumber')[0].placeHolder || '',
@@ -360,7 +361,7 @@ export default {
       return this.multipleSelection.map(item => item.id) || [];
     },
     productFields() {
-      return (this.initData.productFields || [])
+      return (this.fieldsInfo || [])
         .filter(f => f.formType !== 'separator')
         .map(f => {
 
@@ -398,20 +399,23 @@ export default {
       return formatDate(val, 'YYYY-MM-DD HH:mm:ss')
     },
   },
-  mounted() {
+  async mounted() {
     this.auth = (this.initData && this.initData.authorities) || {};
 
-
+    const { status, data, message } = await getProductFields({isFromSetting:false});
+    if( status == 0 ){
+      this.fieldsInfo = data;
+    }
     this.productTemplateConfig = {
       productConfig: (this.initData && this.initData.productConfig) || {productType: []},
-      productFields: (this.initData.productFields || []).sort((a, b) => a.orderId - b.orderId)
+      productFields: (this.fieldsInfo || []).sort((a, b) => a.orderId - b.orderId)
     };
     this.inputRemoteSearch.type.options = [...this.productTemplateConfig.productConfig.productType];
 
     this.paramsSearchRevert();
     this.columns = this.buildTableColumn();
     this.search();
-
+  
     // [tab_spec]标准化刷新方式
     window.__exports__refresh = this.search;
   },
@@ -1062,7 +1066,7 @@ export default {
     },
     getRowKey(row) {
       return row.id
-    },
+    }
   },
   components: {
     [DialogBatchEditProductTemplate.name]: DialogBatchEditProductTemplate,
