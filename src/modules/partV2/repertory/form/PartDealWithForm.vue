@@ -394,6 +394,9 @@ export default {
   methods: {
     // 确认修改目标仓库
     submitEditTarget(){
+      if(!this.targetId){
+        return this.$platform.alert('请选择目标仓库');
+      }
       const params={
         approveNo:this.propData.data.approveNo,
         repertoryId:this.targetId
@@ -410,10 +413,12 @@ export default {
     // 修改目标仓库 弹出
     editTargetRepertory(){
       this.show=true;
-      this.targetId=this.propData.data.targetId;
-      // if(this.targetList.length===0){
-      //   this.$emit('getTargetList');
-      // }
+      const exist=this.targetList.find(item=>item.id===this.propData.data.targetId);
+      if(exist){
+        this.targetId=this.propData.data.targetId;
+      }else{
+        this.targetId='';
+      }
     },
     // 跳转到出入库记录
     toWareRecord(data){
