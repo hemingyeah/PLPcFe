@@ -33,3 +33,8 @@ export function getRelationsByApproveNos(params={}){
 export function approveBatchByApproveNos(params={}){
   return http.post(`${urlHead}/outside/dd/part/approveList/approveBatchByApproveNos`,params);
 }
+
+// 修改退回时目标库
+export function updateBackTarget(params){
+  return http.post(`${urlHead}/outside/dd/part/approveList/updateBackTarget`,params);
+}
