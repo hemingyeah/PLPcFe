@@ -236,21 +236,28 @@ export default {
       });
     },
     /**
+     * 客户
+     */
+    async getSimpleCustomerList(params, fn) {
+      const res = await TaskApi.getSimpleCustomerList(params);
+      fn(res);
+    },
+    /**
      * 查看视图
      */
     getOneView(systemConditions, customizeViewList) {
       const taskList = customizeViewList;
       this.searchModelCN = [
         {
-          key: '',
-          content: '',
-          fieldName: '',
-          formType: '',
+          key: "",
+          content: "",
+          fieldName: "",
+          formType: "",
         },
       ];
       let address;
       if (!systemConditions || !systemConditions.length) return;
-      this.searchModelCN = []
+      this.searchModelCN = [];
       systemConditions.forEach((item) => {
         taskList.forEach((value, index) => {
           if (
@@ -269,7 +276,8 @@ export default {
             ((item.property === "province" ||
               item.property === "city" ||
               item.property === "dist") &&
-              value.fieldName === "area")
+              value.fieldName === "area") ||
+            (item.property === "tagIds" && value.fieldName === "tags")
           ) {
             // 数组类型
             if (item.inValue) {
@@ -306,6 +314,18 @@ export default {
                   fieldName: value.fieldName,
                   formType: value.formType,
                 });
+              } else if (item.property === "createUser") {
+                console.log("createUser");
+              } else if (item.property === "allotUser") {
+                console.log("allotUser");
+              } else if (item.property === "executor") {
+                console.log("executor");
+              } else if (item.property === "synergies") {
+                console.log("synergies");
+              } else if (item.property === "tagIds") {
+                console.log("tagIds");
+              } else if (item.property === "user") {
+                console.log("user");
               } else {
                 this.searchModelCN.push({
                   key: value.displayName,
@@ -354,6 +374,27 @@ export default {
                 address[item.property] = item.value;
               } else if (item.property === "dist") {
                 address[item.property] = item.value;
+              } else if (item.property === "customerId") {
+                // this.getSimpleCustomerList([item.value], res => {
+                //   console.log(res)
+                // })
+                this.searchModelCN.push({
+                  key: value.displayName,
+                  content: '测试新建',
+                  fieldName: value.fieldName,
+                  formType: value.formType,
+                  id: item.value
+                });
+              } else if (item.property === "productId") {
+                this.searchModelCN.push({
+                  key: value.displayName,
+                  content: '24224',
+                  fieldName: value.fieldName,
+                  formType: value.formType,
+                  id: item.value
+                });
+              } else if (item.property === "tlmId") {
+                console.log("tlmId");
               } else {
                 this.searchModelCN.push({
                   key: value.displayName,
@@ -392,7 +433,7 @@ export default {
         conditions: [],
       };
       const taskInquireList = this.$refs.taskInquireParams.returnInquireFields();
-      const form = {...this.$refs.taskInquireParams.returnData()};
+      const form = { ...this.$refs.taskInquireParams.returnData() };
       this.formBackup = Object.assign(this.formBackup, {
         ...this.$refs.taskInquireParams.returnData(),
       });

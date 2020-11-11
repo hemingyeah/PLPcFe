@@ -1088,5 +1088,38 @@ export function getOneView(params: string) {
 export function revertReason(params: object) {
   return http.post(`/task/revertReason`, params)
 }
+/**
+ * 获取负责人 协同人 派单人 创建人
+ */
+export function getSimpleUserListByIds(params: object = []) {
+  return http.post(`/outside/user/getSimpleUserListByIds`, params)
+}
+/**
+ * 获取联系人
+ */
+
+export function getLinkmanListByIds(params: object = []) {
+  return http.post(`/outside/pc/customer/getLinkmanListByIds`, params)
+}
+
+/**
+* 获取产品
+*/
+export function getSimpleProductList(params: object = []) {
+  return http.post(`/outside/pc/getSimpleProductList`, params)
+}
+
+/**
+ * 获取客户人
+ */
+export function getSimpleCustomerList(params: object = []) {
+  return http.post(`/outside/pc/customer/getSimpleCustomerList`, params)
+}
+/**
+* 获取团队服务
+*/
+export function getSimpleTagListByIds(params: object = []) {
+  return http.post(`/outside/tag/getSimpleTagListByIds`, params)
+}
 
 /* -------------  end  新工单api ---------------- */

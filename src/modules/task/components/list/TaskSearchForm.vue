@@ -161,7 +161,6 @@ export default {
           },
         });
       } else if (f.formType === "user") {
-        console.log(f.fieldName, this.form[f.fieldName])
         childComp = h("user-search", {
           props: {
             multiple: true,

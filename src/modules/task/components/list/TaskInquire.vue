@@ -415,6 +415,7 @@ export default {
       methods: {
         /*自定义视图参数 */
         customizeParams() {
+          this.form['backUp'] = {customer:{}, product: {}}
           if (this.item && this.item.fieldName) {
             const {
               fieldName,
@@ -423,6 +424,7 @@ export default {
               province,
               city,
               dist,
+              id,
             } = this.item;
             this.selectField(fieldName);
             let types = [
@@ -438,12 +440,21 @@ export default {
               "createUser",
               "allotUser",
               "executor",
-              "synergyId"
+              "synergyId",
+              "tags"
             ];
             if (types.indexOf(fieldName) !== -1 || types.indexOf(formType) !== -1) {
               this.form[fieldName] = content.split("，");
             } else if (formType === "datetime" || formType === "date") {
               this.form[fieldName] = content.split("-");
+            } else if (fieldName === 'customer') {
+              this.form[fieldName] = id;
+              this.form['backUp'].customer = {name: content, value: id};
+              this.customer = {name: content, value: id}
+            } else if (fieldName === 'product') {
+              this.form[fieldName] = id;
+              this.form['backUp'].product = {name: content, value: id};
+              this.product = {name: content, value: id}
             } else if (fieldName === "area") {
               this.form[fieldName] = {
                 addressType: 0,
