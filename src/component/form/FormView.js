@@ -232,7 +232,7 @@ const FormView = {
     },
   
     mapFieldToDom(field, createElement) {
-      let {formType, fieldName, displayName, isSystem ,isHidden} = field;
+      let {formType, fieldName, displayName, isSystem, isHidden, isVisible} = field;
       if (formType === 'separator') {
         const cn = `iconfont icon-fdn-select ${!this.sectionState[field.id] && 'reversal'}`;
         return displayName ? (
@@ -242,8 +242,11 @@ const FormView = {
           </h4>
         ) : null;
       }
-      //如果为隐藏的字段不显示
+      // 如果为隐藏的字段不显示
       if(isHidden == 1) return null;
+
+      // 判断是否可见
+      if(!isVisible) return null;    
       
       const originalObj = this.value;
       

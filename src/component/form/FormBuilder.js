@@ -96,7 +96,10 @@ const FormBuilder = {
         if(util.isHiddenField(field, this.value, this.fields)) return null;
 
         //判断是否是已隐藏字段
-        if(field.isHidden == 1) return null
+        if(field.isHidden == 1) return null;
+
+        //判断是否可见
+        if(!field.isVisible) return null;
 
         let comp = FieldManager.findField(field.formType);
         if(comp == null) {
