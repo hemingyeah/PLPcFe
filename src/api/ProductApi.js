@@ -347,10 +347,20 @@ function searchCustomerLinkmanForProduct(params) {
   return http.get(`${productPreFixedPath}/product/linkmanRelation`, params);
 }
 
+/**
+ * 获取产品自定义字段
+ * @param isFromSetting 是否用于设置页面，是：true 否：false
+ */
+function getProductFields(isFromSetting = false) {
+  let productPreFixedPath = GrayUtil.getCustomerApiPath();
+  return http.get(`${productPreFixedPath}/getProductFields/${isFromSetting}`);
+}
+
 
 /** ------------ end 产品模板 ----------------------- */
 
 export {
+  getProductFields,
   getTaskOfProduct,
   getPlanOfProduct,
   getRecordOfProduct,

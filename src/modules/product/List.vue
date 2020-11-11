@@ -298,6 +298,7 @@ import BatchUpdateDialog from './components/BatchUpdateDialog.vue';
 import SearchPanel from './components/SearchPanel.vue';
 
 import {
+  getProductFields,
   getProduct,
   deleteProductByIds,
   getUpdateRecord,
@@ -336,6 +337,7 @@ export default {
         },
       },
 
+      dynamicFields: [],
       filterTeams: [],
       tableKey: Math.random() * 1000 >> 2,
     }
@@ -415,7 +417,7 @@ export default {
           orderId: 10001
         })
       }
-      let field = this.initData.productFields.filter(item => item.formType == 'customer')[0]
+      let field = this.dynamicFields.filter(item => item.formType == 'customer')[0]
       if(field && field.setting.customerOption?.linkman) {
         fixedFields.push({
           displayName: '联系人',
@@ -443,8 +445,7 @@ export default {
         })
       }
 
-      return (this.initData.productFields || [])
-        .concat(fixedFields)
+      return this.dynamicFields.concat(fixedFields)
         .filter(f => f.formType !== 'separator' && f.formType !== 'info')
         .map(f => {
 
@@ -585,9 +586,18 @@ export default {
     },
 
   },
-  mounted() {
-    this.revertStorage();
+  async mounted() {
     this.buildColumns();
+
+    // 获取产品动态字段
+    try {
+      let res = await getProductFields();
+      this.dynamicFields = res.data || [];
+      this.buildColumns();
+    } catch (error) {
+      console.error('product-list fetch product fields error',error);
+    }
+    this.revertStorage();
     this.search();
 
     if(!this.viewedPermission) {
@@ -597,7 +607,7 @@ export default {
     // [tab_spec]标准化刷新方式
     window.__exports__refresh = this.search;
 
-    this.$eventBus.$on('product_list.update_product_list_remind_count', this.updateProductRemindCount)
+    this.$eventBus.$on('product_list.update_product_list_remind_count', this.updateProductRemindCount) 
   },
   beforeDestroy() {
     this.$eventBus.$off('product_list.update_product_list_remind_count', this.updateProductRemindCount)
