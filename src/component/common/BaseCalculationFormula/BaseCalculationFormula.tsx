@@ -8,7 +8,7 @@ import SignOperatorEnum from './SignOperatorEnum'
 /* util */
 import * as MathUtil from 'mathjs'
 import validate from './validate'
-import _ from 'lodash'
+import * as _ from 'lodash'
 /* vue */
 import { Vue, Component, Prop, Emit } from 'vue-property-decorator'
 import { CreateElement } from 'vue'

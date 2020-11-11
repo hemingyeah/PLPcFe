@@ -11,6 +11,7 @@
 <script>
 
 import {
+  getProductFields,
   createProduct
 } from '@src/api/ProductApi';
 import * as FormUtil from '@src/component/form/util';
@@ -29,6 +30,8 @@ export default {
       init: false,
       submitting: false,
       form: {},
+
+      dynamicFields: []
     }
   },
   computed: {
@@ -40,11 +43,19 @@ export default {
           formType: 'select',
           isSystem: 1
         },
-        ...this.initData.productFields
+        ...this.dynamicFields
       ]
     },
   },
   async mounted() {
+    // 获取产品动态字段
+    try {
+      let res = await getProductFields();
+      this.dynamicFields = res.data || [];
+    } catch (error) {
+      console.error('product-edit-modal fetch product fields error',error);
+    }
+
     window.submit = this.submit;
 
     try {

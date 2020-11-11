@@ -361,6 +361,7 @@ function getProductFields(params) {
 /** ------------ end 产品模板 ----------------------- */
 
 export {
+  getProductFields,
   getTaskOfProduct,
   getPlanOfProduct,
   getRecordOfProduct,

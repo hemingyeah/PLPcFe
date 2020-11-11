@@ -159,7 +159,7 @@ export default {
       loading: false,
       showWholeName: -1, // -1代表不显示展开icon 0代表收起 1代表展开
       statisticalData: {},
-
+      fieldInfo: [],
       attentionUsers: [] // 该客户的关注用户,
     }
   },
@@ -216,7 +216,7 @@ export default {
       //   tableName: 'customer',
       //   tenantId: '7416b42a-25cc-11e7-a500-00163e12f748'
       // });
-      const fields = (this.initData.fieldInfo || []).sort(
+      const fields = (this.fieldInfo || []).sort(
         (a, b) => a.orderId - b.orderId
       )
       return [
@@ -736,6 +736,18 @@ export default {
           this.selectedRemind.sendRoleSetting || {}
         )
       })
+    }
+  },
+  async created() {
+    try {
+      // 获取客户表单字段列表
+      let result = await CustomerApi.getCustomerFields({isFromSetting: false});
+      if (result.succ) {
+        this.fieldInfo = result.data;
+      }
+
+    } catch(err) {
+      console.error('customer list get fields error', err);
     }
   },
   mounted() {

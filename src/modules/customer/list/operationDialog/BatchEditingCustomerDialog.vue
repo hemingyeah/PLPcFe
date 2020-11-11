@@ -121,6 +121,7 @@ export default {
         return this.$platform.alert('请选择需要批量编辑的客户');
       }
 
+      this.reset()
       this.visible = true;
     },
     buildParams() {
@@ -210,7 +211,7 @@ export default {
         }
       },
       mounted() {
-        this.reset();
+        // this.reset();
         this.buildForm();
       },
       methods: {
@@ -222,6 +223,7 @@ export default {
         },
         reset() {
           this.form = {};
+          if (!this.fields.length) return
           this.selectField(this.fields[0].fieldName)
         },
         dispatch({type, bubbles = false, params = {}}) {
