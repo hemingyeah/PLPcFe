@@ -35,6 +35,7 @@
                   type="primary"
                   style="float:right;"
                   @event="submitEditTarget"
+                  :disabled='pending'
                 >确 定</base-button>
                 <base-button
                   class="mar-r-15"
@@ -388,7 +389,8 @@ export default {
         { lable: "申请人", value: this.propData.data.prosperName },
         { lable: "目标仓库", value: this.propData.data.targetName },
         { lable: "办理状态", value: this.getStateText(this.propData.data.state),state:this.propData.data.state }
-      ]
+      ],
+      pending:false
     };
   },
   methods: {
@@ -397,11 +399,13 @@ export default {
       if(!this.targetId){
         return this.$platform.alert('请选择目标仓库');
       }
+      this.pending=true;
       const params={
         approveNo:this.propData.data.approveNo,
         repertoryId:this.targetId
       }
       updateBackTarget(params).then(res=>{
+        this.pending=false;
         if(res.code===0){
           this.show=false;
           this.$emit('updateDetail',this.propData.data);
