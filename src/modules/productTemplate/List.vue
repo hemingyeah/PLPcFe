@@ -120,6 +120,9 @@
             <template v-else-if="column.formType === 'location'">
               {{ scope.row.attribute[column.field] && scope.row.attribute[column.field].address}}
             </template>
+            <template v-else-if="column.formType == 'related_task'">
+              {{ getRelatedTask(scope.row.attribute[column.field]) }}
+            </template>
             <template v-else-if="column.formType === 'address'">
               {{ scope.row.attribute[column.field] && scope.row.attribute[column.field].all}}
             </template>
@@ -423,6 +426,9 @@ export default {
     window.__exports__refresh = this.search;
   },
   methods: {
+    getRelatedTask(field) {
+      return Array.isArray(field) ? field.map(item => item.taskNo).join(',') : "";
+    },
     showAdvancedSetting(){
       window.TDAPP.onEvent('pc：产品管理-选择列事件');
 

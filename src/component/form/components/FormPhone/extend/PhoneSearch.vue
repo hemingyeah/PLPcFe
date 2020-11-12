@@ -1,5 +1,5 @@
 <template>
-  <div class="form-phone">
+  <div class="form-text">
     <input
       type="text"
       :value="value"
@@ -7,19 +7,16 @@
       @compositionend="compositionend"
       @input="inputEvent"
       :placeholder="placeholder"
-      :maxlength="field.maxlength ? field.maxlength : maxlength"
-      :id="`form_${field.fieldName}`" 
-      autocomplete="off"
-      :disabled="disabled"/>
+      :id="`form_${field.fieldName}`"
+      autocomplete="off"/>
   </div>
 </template>
 
 <script>
 import FormMixin from '@src/component/form/mixin/form';
-import { FORM_FIELD_TEXT_MAX_LENGTH } from '@src/model/const/Number.ts';
 
 export default {
-  name: 'form-phone',
+  name: 'phone-search',
   mixins: [FormMixin],
   props: {
     value: {
@@ -31,7 +28,6 @@ export default {
     return {
       // 是否是输入中文
       $isInputZh: false,
-      maxlength: FORM_FIELD_TEXT_MAX_LENGTH
     }
   },
   methods: {
@@ -51,33 +47,15 @@ export default {
       this.input(event);
     }
   },
-  mounted() {
-    let defaultValueConfig = (this.field && this.field.setting && this.field.setting.defaultValueConfig) || {};
-    // 默认值为登录账号电话号码 而且值为空
-    if(!!defaultValueConfig.isCurrentPhone && !this.value) {
-      let value = "";
-      try {
-        let loginUser = window.parent.loginUser || {};
-        value = loginUser.cellPhone || "";
-      } catch (error) {
-        value = "";
-      }
-
-      this.inputForValue(value);
-    }
-  }
 }
 </script>
 
 <style lang="scss">
-.form-phone{
-  width: 100%;
-
-  input{
+  .form-text{
     width: 100%;
-    &:disabled{
-      -webkit-text-fill-color: #b2b2b2;
+
+    input{
+      width: 100%;
     }
   }
-}
 </style>
