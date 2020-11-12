@@ -92,7 +92,7 @@ export default {
     },
     //获取客户表单属性列表
     getFieldsInfoReq() {
-      getCustomerFields({isFromSetting:false}).then((res)=>{
+      getCustomerFields({isFromSetting:true}).then((res)=>{
         const { status, data, message } = res;
         if(status == 0){
           const fields = data || [];

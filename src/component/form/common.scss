@@ -135,6 +135,8 @@
     margin: 12px 12px 0 0;
     cursor: pointer;
     font-family: PingFangSC-Medium; 
+    display: flex;
+    justify-content: flex-end;
     .iconfont{
       font-size: 12px;
       margin-right: 5px;

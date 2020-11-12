@@ -12,8 +12,15 @@ export const MULTI_LINE_MAX_LEN = FORM_FIELD_TEXTAREA_MAX_LENGTH;
 export const TEL_REG = /^(((0\d{2,3}-{0,1})?\d{7,8})|(\d{6}))$/;
 // 手机号
 export const PHONE_REG = /^((1[3578496]\d{9})|([+][0-9-]{1,30}))$/;
-// 日期格式
-export const DATE_REG = /^\d{4}-\d{1,2}-\d{1,2}$/;
+// 日期格式 yyyy-MM-dd
+export const DATE_REG = /^[1-9]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/;
+// 日期格式 yyyy-MM-dd HH:mm:ss
+export const DATE_SS_REG = /^[1-9]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])\s{1}(20|21|22|23|[0-1]\d):[0-5]\d(:[0-5]\d)?$/;
+// 日期格式 yyyy-MM-dd HH:mm
+export const DATE_mm_REG = /^[1-9]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])\s{1}(20|21|22|23|[0-1]\d):[0-5]\d?$/;
+// 日期格式 yyyy-MM
+export const DATE_YY_REG = /^[1-9]\d{3}-(0[1-9]|1[0-2])?$/;
+
 // 日期时间格式
 export const DATETIME_REG = /^\d{4}-\d{1,2}-\d{1,2}\s\d{2}:\d{2}:\d{2}$/;
 // 邮箱格式
@@ -45,6 +52,7 @@ const RuleMap = {
   serviceIterm: select,
   planTime,
   formula,
+  cascader,
   'related_task': relatedTask
 };
 
@@ -103,6 +111,20 @@ function select(value, field = {}) {
     if (value == null || !value.toString().length) return resolve(`请选择${field.displayName}`);
     resolve(null);
   })
+}
+
+
+/** 多选验证 */
+function cascader(value, field = {}){
+
+  return new Promise(resolve => {
+    let setting = field.setting || {};
+    let maxDeep = setting.maxDeep || 2;
+    if(((field.isNull == 1 && value.length > 0) || field.isNull == 0) && value.length < maxDeep) return resolve(`请补全${field.displayName}`);
+    if(value == null || !value.toString().length) return resolve(`请选择${field.displayName}`);
+    resolve(null);
+  
+  });
 }
 
 /** 多行文本验证，500字以内 */
@@ -167,9 +189,21 @@ function email(value, field = {}) {
 
 function date(value, field = {}) {
   return new Promise(resolve => {
+    let setting = field.setting || {};
+    let dateType = setting.dateType || 'yyyy-MM-dd';
     if (field.isNull === 1) return resolve(null);
     if (!value || !value.toString().length) return resolve(`请选择${field.displayName}`);
-    if (!DATE_REG.test(value)) return resolve('请输入正确格式的日期');
+    let REG_TYPE = DATE_REG;
+    if( dateType == 'yyyy-MM-dd HH:mm:ss'){
+      REG_TYPE = DATE_SS_REG;
+    }
+    if( dateType == 'yyyy-MM-dd HH:mm'){
+      REG_TYPE = DATE_mm_REG;
+    }
+    if( dateType == 'yyyy-MM'){
+      REG_TYPE = DATE_YY_REG;
+    }
+    if (!REG_TYPE.test(value)) return resolve('请输入正确格式的日期');
     resolve(null);
   });
 }

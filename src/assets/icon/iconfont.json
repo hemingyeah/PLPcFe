@@ -6,6 +6,27 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "18192549",
+      "name": "calculator",
+      "font_class": "fdn-formula",
+      "unicode": "e6cf",
+      "unicode_decimal": 59087
+    },
+    {
+      "icon_id": "18139123",
+      "name": "产品详情-产品提醒",
+      "font_class": "chanpinxiangqing-chanpintixing",
+      "unicode": "e6ce",
+      "unicode_decimal": 59086
+    },
+    {
+      "icon_id": "18139115",
+      "name": "产品详情-计划任务",
+      "font_class": "chanpinxiangqing-jihuarenwu",
+      "unicode": "e6cd",
+      "unicode_decimal": 59085
+    },
+    {
       "icon_id": "18082356",
       "name": "运算-删除",
       "font_class": "shanchu2",

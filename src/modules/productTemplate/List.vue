@@ -111,6 +111,9 @@
             <template v-else-if="column.formType === 'select'">
               {{ scope.row[column.field] | displaySelect }}
             </template>
+            <template v-else-if="column.formType === 'cascader' && scope.row.attribute[column.field]">
+              {{ scope.row[column.field] | displaySelect }}
+            </template>
             <template v-else-if="column.formType === 'user'">
               {{ scope.row[column.field] && (scope.row[column.field].displayName || scope.row[column.field].name) }}
             </template>
