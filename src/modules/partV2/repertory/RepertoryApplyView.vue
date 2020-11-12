@@ -843,7 +843,7 @@
         @open='partDearOpen'
         :close-on-click-modal="false"
       >
-        <part-deal-with-form ref="partDealWithForm" :partDealKey='partDealKey' @updateDetail='updateDetail' :targetList='targetList' :loginUserId='userId' :prop-data="partDealData"></part-deal-with-form>
+        <part-deal-with-form ref="partDealWithForm" :partDealKey='partDealKey' @updateDetail='updateDetail' :targetList='targetList' :prop-data="partDealData"></part-deal-with-form>
 
         <div
           slot="footer"
@@ -1722,7 +1722,6 @@ export default {
               if(exist) return item;
             }
           });
-          console.log(this.targetList,111);
 
           this.page.list = list.map(item => {
             let tv = allRepertory.filter(r => r.id === item.targetId);

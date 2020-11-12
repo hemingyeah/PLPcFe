@@ -8,7 +8,7 @@
         <div v-else-if="item.lable==='目标仓库'" class="form-only-see-input">
           {{item.value}}
           <el-popover
-            v-if="propData.data.type==='退回' && (propData.data.state==='suspending' || propData.data.state==='dealing')"
+            v-if="propData.data.type==='退回' && (propData.data.state==='suspending' || propData.data.state==='dealing') && isRepertoryAdmin"
             width="50%"
             trigger="click"
             v-model="show"
@@ -50,7 +50,7 @@
         </div>
         <div v-else-if="item.lable==='申请人'">
           {{item.value}}
-          <span v-if="propData.data.type==='退回' && loginUserId!==propData.arr[0].propser" class="form-only-see-state form-only-see-suspending">非本人发起</span>
+          <span v-if="propData.data.type==='退回' && notOneself" class="form-only-see-state form-only-see-suspending">非本人发起</span>
         </div>
         <div v-else class="form-only-see-input">{{item.value}}</div>
       </div>
@@ -193,7 +193,6 @@ export default {
       type:Number
     },
     targetList:Array,
-    loginUserId:String
   },
   watch:{
     partDealKey(newVal){
@@ -211,6 +210,10 @@ export default {
           { lable: "办理状态", value: this.getStateText(this.propData.data.state),state:this.propData.data.state }
         ];
          this.formArr[4].value=this.propData.data.targetName;
+
+         this.isRepertoryAdmin=this.targetList.find(item=>item.id===this.propData.data.targetId);
+
+         this.notOneself=this.propData.arr.find(item=>item.propserName!==this.propData.data.sourceTargetName);
       })
     }
   },
@@ -220,6 +223,10 @@ export default {
           this.selects=[];
           this.$refs.selectTable.toggleAllSelection();
         }
+
+        this.isRepertoryAdmin=this.targetList.find(item=>item.id===this.propData.data.targetId);
+
+        this.notOneself=this.propData.arr.find(item=>item.propserName!==this.propData.data.sourceTargetName);
     })
   },
   computed: {
@@ -390,7 +397,9 @@ export default {
         { lable: "目标仓库", value: this.propData.data.targetName },
         { lable: "办理状态", value: this.getStateText(this.propData.data.state),state:this.propData.data.state }
       ],
-      pending:false
+      pending:false,
+      isRepertoryAdmin:null,   // 是否是目标仓库的管理员
+      notOneself:true,  // 是否是本人发起
     };
   },
   methods: {
