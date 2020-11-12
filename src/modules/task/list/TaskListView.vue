@@ -559,11 +559,11 @@
                 "
                 :key="column.field"
                 :label="column.label"
-                :min-width="column.minWidth || '120px'"
+                :min-width="column.minWidth"
                 :prop="column.field"
                 :sortable="column.sortable"
                 :show-overflow-tooltip="column.field !== 'name'"
-                :width="column.width || '125px'"
+                :width="column.width"
                 :resizable="true"
               >
                 <template slot-scope="scope">

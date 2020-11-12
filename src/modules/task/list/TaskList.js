@@ -926,7 +926,7 @@ export default {
       let columns = fields
         .map((field) => {
           let sortable = false;
-          let minWidth = null;
+          let minWidth = 120;
 
           if (['date', 'datetime', 'number'].indexOf(field.formType) >= 0) {
             sortable = 'custom';
@@ -958,14 +958,18 @@ export default {
           }
 
           if (
-            ['customer', 'taddress', 'templateName'].indexOf(field.fieldName) >= 0
+            ['taddress', 'templateName'].indexOf(field.fieldName) >= 0
           ) {
             minWidth = 200;
           }
 
-          if (['taskNo', 'customer'].indexOf(field.fieldName) !== -1) {
+          if (['taskNo'].indexOf(field.fieldName) !== -1) {
             minWidth = 250;
             sortable = 'custom';
+          }
+          if (field.fieldName === 'customer') {
+            sortable = 'custom';
+            minWidth = 125;
           }
           if (field.fieldName === 'taskNo') {
             field.width = 216
