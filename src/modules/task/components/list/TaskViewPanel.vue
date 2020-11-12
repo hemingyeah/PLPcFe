@@ -240,8 +240,40 @@ export default {
      * 客户
      */
     async getSimpleCustomerList(params, fn) {
-      const res = await TaskApi.getSimpleCustomerList(params);
-      fn(res);
+      const { result } = await TaskApi.getSimpleCustomerList(params);
+      fn(result[0]);
+    },
+    /**服务团队 */
+    async getSimpleTagListByIds(params, fn) {
+      const { result } = await TaskApi.getSimpleTagListByIds(params);
+      fn(result);
+    },
+    /**
+     * 用户
+     */
+    async getSimpleUserListByIds(params, fn) {
+      const { result } = await TaskApi.getSimpleUserListByIds(params);
+      fn(
+        result
+          .map((item) => {
+            return item.displayName;
+          })
+          .join("，")
+      );
+    },
+    /**
+     * 产品
+     */
+    async getSimpleProductList(params, fn) {
+      const { result } = await TaskApi.getSimpleProductList(params);
+      fn(result[0]);
+    },
+    /**
+     * 联系人
+     */
+    async getLinkmanListByIds(params, fn) {
+      const { result } = await TaskApi.getLinkmanListByIds(params);
+      fn(result[0]);
     },
     /**
      * 查看视图
@@ -316,29 +348,69 @@ export default {
                   formType: value.formType,
                 });
               } else if (item.property === "createUser") {
-                console.log("createUser");
+                this.getSimpleUserListByIds(item.inValue, (content) => {
+                  this.searchModelCN.push({
+                    key: value.displayName,
+                    content,
+                    fieldName: value.fieldName,
+                    formType: value.formType,
+                    ids: item.inValue,
+                  });
+                });
               } else if (item.property === "allotUser") {
-                this.searchModelCN.push({
-                  key: value.displayName,
-                  content: ["陈迪浩"].join("，"),
-                  fieldName: value.fieldName,
-                  formType: value.formType,
-                  ids: item.inValue,
+                this.getSimpleUserListByIds(item.inValue, (content) => {
+                  this.searchModelCN.push({
+                    key: value.displayName,
+                    content,
+                    fieldName: value.fieldName,
+                    formType: value.formType,
+                    ids: item.inValue,
+                  });
                 });
               } else if (item.property === "executor") {
-                console.log("executor");
+                this.getSimpleUserListByIds(item.inValue, (content) => {
+                  this.searchModelCN.push({
+                    key: value.displayName,
+                    content,
+                    fieldName: value.fieldName,
+                    formType: value.formType,
+                    ids: item.inValue,
+                  });
+                });
               } else if (item.property === "synergies") {
-                console.log("synergies");
+                this.getSimpleUserListByIds(item.inValue, (content) => {
+                  this.searchModelCN.push({
+                    key: value.displayName,
+                    content,
+                    fieldName: value.fieldName,
+                    formType: value.formType,
+                    ids: item.inValue,
+                  });
+                });
               } else if (item.property === "tagIds") {
-                this.searchModelCN.push({
-                  key: value.displayName,
-                  content: ["陈杰"].join("，"),
-                  fieldName: value.fieldName,
-                  formType: value.formType,
-                  ids: item.inValue,
+                this.getSimpleTagListByIds(item.inValue, (res) => {
+                  this.searchModelCN.push({
+                    key: value.displayName,
+                    content: res
+                      .map((item) => {
+                        return item.tagName;
+                      })
+                      .join("，"),
+                    fieldName: value.fieldName,
+                    formType: value.formType,
+                    ids: item.inValue,
+                  });
                 });
               } else if (item.property === "user") {
-                console.log("user");
+                this.getSimpleUserListByIds(item.inValue, (content) => {
+                  this.searchModelCN.push({
+                    key: value.displayName,
+                    content,
+                    fieldName: value.fieldName,
+                    formType: value.formType,
+                    ids: item.inValue,
+                  });
+                });
               } else {
                 this.searchModelCN.push({
                   key: value.displayName,
@@ -395,31 +467,34 @@ export default {
               } else if (item.property === "dist") {
                 address[item.property] = item.value;
               } else if (item.property === "customerId") {
-                this.getSimpleCustomerList([item.value], res => {
-                  console.log(res)
-                })
-                this.searchModelCN.push({
-                  key: value.displayName,
-                  content: "测试新建",
-                  fieldName: value.fieldName,
-                  formType: value.formType,
-                  id: item.value,
+                this.getSimpleCustomerList([item.value], ({ name }) => {
+                  this.searchModelCN.push({
+                    key: value.displayName,
+                    content: name,
+                    fieldName: value.fieldName,
+                    formType: value.formType,
+                    id: item.value,
+                  });
                 });
               } else if (item.property === "productId") {
-                this.searchModelCN.push({
-                  key: value.displayName,
-                  content: "24224",
-                  fieldName: value.fieldName,
-                  formType: value.formType,
-                  id: item.value,
+                this.getSimpleProductList([item.value], ({ name }) => {
+                  this.searchModelCN.push({
+                    key: value.displayName,
+                    content: name,
+                    fieldName: value.fieldName,
+                    formType: value.formType,
+                    id: item.value,
+                  });
                 });
               } else if (item.property === "tlmId") {
-                this.searchModelCN.push({
-                  key: value.displayName,
-                  content: "孙聪",
-                  fieldName: value.fieldName,
-                  formType: value.formType,
-                  id: item.value,
+                this.getLinkmanListByIds([item.value], ({ name }) => {
+                  this.searchModelCN.push({
+                    key: value.displayName,
+                    content: name,
+                    fieldName: value.fieldName,
+                    formType: value.formType,
+                    id: item.value,
+                  });
                 });
               } else {
                 this.searchModelCN.push({
