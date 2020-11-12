@@ -116,7 +116,11 @@
         <label>{{ field.displayName }}</label>
         <div class="form-view-row-content">
           {{task.source}}
-          <a class="link-text" :href="`/event/view/${task.eventId}`">{{task.eventNo}}</a>
+          <a class="link-text" :href="`/event/view/${task.eventId}`">
+            <template v-if="task.eventNo">
+              #{{task.eventNo}}
+            </template>
+          </a>
         </div>
       </div>
     </template>
