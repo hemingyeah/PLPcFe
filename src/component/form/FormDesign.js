@@ -596,7 +596,8 @@ const FormDesign = {
       let insertIndex = arr.indexOf(enterField);
       arr.splice(insertIndex + distance, 0, dragField);
       
-      this.emitInput(arr)
+      let newArr = [...arr,...this.hiddenFields]
+      this.emitInput(newArr)
       this.chooseField(dragField)
     },
     /** 选中字段 */

@@ -36,7 +36,7 @@ export default {
 <style lang="scss">
 .form-textarea-preview{
   .form-preview-control{
-    height: 92px;
+    height: 68px;
     white-space: normal;
   }
 }

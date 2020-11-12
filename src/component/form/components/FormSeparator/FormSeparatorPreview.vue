@@ -22,7 +22,7 @@ export default {
   padding: 0;
   .form-design-separator{
     background-color: #eef8f8;
-    color: #55B7B4;
+    color: $color-primary;
     height: 32px;
     line-height: 32px;
     padding: 0 10px;

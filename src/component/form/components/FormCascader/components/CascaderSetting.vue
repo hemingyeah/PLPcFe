@@ -77,7 +77,7 @@
       ref="bulkImport"
       :is-import-now="isImportNow"
       @success="importSucc"
-      :action="`/excels/multileve/menu/import?maxDeep=${maxDeep}`"
+      :action="`/excels/multileve/menu/import/template?maxDeep=${maxDeep}`"
     >
       <div slot="tip">
         <div class="base-import-warn">
