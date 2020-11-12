@@ -591,7 +591,7 @@ export default {
 
     // 获取产品动态字段
     try {
-      let res = await getProductFields();
+      let res = await getProductFields({isFromSetting:false});
       this.dynamicFields = res.data || [];
       this.buildColumns();
     } catch (error) {

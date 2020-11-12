@@ -472,7 +472,7 @@ export default {
   async mounted() {
     try {
       // 获取产品自定义字段
-      let res = await getProductFields();
+      let res = await getProductFields({isFromSetting: false});
       this.dynamicProductFields = res.data || [];
     } catch (error) {
       console.error('product-view fetch product fields error',error);

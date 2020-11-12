@@ -74,7 +74,7 @@ export default {
   async mounted() {
     try {
       // 获取产品自定义字段
-      let res = await getProductFields(true);
+      let res = await getProductFields({isFromSetting: true});
       this.dynamicProductFields = res.data || [];
     } catch (e) {
       console.error('product-add_edit fetch product fields error', e);
