@@ -2,7 +2,7 @@ import './BizSelectColumn.scss'
 
 import BizSelectColumnSort from './BizSelectColumnSort'
 
-import guideCompoment from '@src/component/guide/guide';
+// import guideCompoment from '@src/component/guide/guide';
 
 
 const { TASK_GUIDE_SELECT_COLUMN } = require('@src/component/guide/taskV2Store');
@@ -32,7 +32,7 @@ function convertColumnWithSave(field = {}) {
 const BizSelectColumn = {
   name: 'biz-select-column',
   data() {
-    let  guideSelectColumn = !storageGet(TASK_GUIDE_SELECT_COLUMN) ? true : false;
+    let guideSelectColumn = !storageGet(TASK_GUIDE_SELECT_COLUMN);
     return {
       columnSortList: [],
       columnTree: {},
@@ -511,7 +511,7 @@ const BizSelectColumn = {
         </div>
         <div style="position: relative;">
           {/* 新人引导 start*/}
-          <guide-compoment style={ `display : ${this.guideSelectColumn ? 'inline-block' : 'none'}` }  content={'随心拖拽，自己配置列表的显示字段和顺序'} onlyOne={ true } haveStep={ false } finishBtn={'OK'} gStyle={'width:240px;top:100px;margin:auto;left:0;right:0;'} stopStep={ this.guide_stopStep } finishBtnFn={ this.guide_finishBtnFn }></guide-compoment>
+          <guide-compoment style={ `display : ${this.guideSelectColumn ? 'inline-block' : 'none'}` } content={'随心拖拽，自己配置列表的显示字段和顺序'} onlyOne={ true } haveStep={ false } finishBtn={'OK'} gStyle={'width:240px;top:100px;margin:auto;left:0;right:0;'} stopStep={ this.guide_stopStep } finishBtnFn={ this.guide_finishBtnFn }></guide-compoment>
           {/* 新人引导 end*/}
           <biz-select-column-sort lists={ this.columnSortList }>
             <div slot="title" class="biz-select-column-sort-title">
@@ -536,7 +536,7 @@ const BizSelectColumn = {
   },
   components: {
     [BizSelectColumnSort.name]: BizSelectColumnSort,
-    [guideCompoment.name]:guideCompoment
+    // [guideCompoment.name]:guideCompoment
   }
 }
 

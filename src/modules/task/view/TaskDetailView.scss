@@ -174,8 +174,13 @@ body {
   // 查看全部时间点
   .state-all-btn{
     cursor: pointer;
-    margin-bottom: 6px;
+    margin: 0 0 6px 6px;
     color: $color-primary;
+    display: inline-block;
+  }
+
+  .state-button-group {
+    display: inline-block;
   }
   
 
@@ -556,5 +561,25 @@ body {
     border-top-color: #fff;
     border-left-color: #fff;
     transform: rotate(45deg);
+  }
+}
+
+
+.amap-container {
+  .user-head {
+    border-radius: 50%;
+    height: 42px;
+    width: 42px;
+  }
+  .amap-user-name {
+    background-color: #fff;
+    border-radius: 4px;
+    height: 30px;
+    width: 80px;
+    line-height: 30px;
+    text-align: center;
+    
+    position: relative;
+    left: 10px;
   }
 }

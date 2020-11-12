@@ -1,10 +1,14 @@
 .my-shop-box {
-    margin: 12px;
+    margin:0 12px;
     min-width: 650px;
 }
 
 .al-end {
     align-items: flex-end;
+}
+
+.al-s {
+  align-items: stretch;
 }
 
 .flex-x {
@@ -284,6 +288,10 @@
 .w-33-present {
     width: 33.33%;
     box-sizing: border-box;
+}
+
+.h-32{
+  height: 32px;
 }
 
 .overHideCon-1 {

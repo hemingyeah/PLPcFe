@@ -696,7 +696,7 @@
                         class="view-detail-btn"
                         @click.stop.prevent="
                           openUserTab(
-                            presonDisplayObj('useId', column.field, scope.row)
+                            presonDisplayObj('userId', column.field, scope.row)
                           )
                         "
                       >

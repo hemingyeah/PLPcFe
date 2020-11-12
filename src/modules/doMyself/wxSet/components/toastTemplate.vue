@@ -114,14 +114,14 @@
   </div>
 </template>
 <script>
-import Page from "@model/Page";
-import _ from "lodash";
+import Page from '@model/Page';
+import _ from 'lodash';
 import {
   getToastTemplateList,
   setToastTemplateList
-} from "@src/api/doMyself.js";
+} from '@src/api/DoMyself.js';
 export default {
-  name: "toast-template",
+  name: 'toast-template',
   data() {
     return {
       type: 1, // 页面状态 0 列表形态 1 编辑形态
@@ -158,18 +158,18 @@ export default {
       if (!this.visible) {
         return;
       }
-      if (this.form.first === "" || this.form.remark === "") {
+      if (this.form.first === '' || this.form.remark === '') {
         return;
       }
       let { first, remark, id } = { ...this.form };
-      this.$emit("pageLoading", true);
+      this.$emit('pageLoading', true);
       // 编辑模板
       setToastTemplateList({
         id,
         first,
         remark
       }).then(res => {
-        this.$emit("pageLoading", false);
+        this.$emit('pageLoading', false);
         this.visible = false;
         this.getTemp();
       });

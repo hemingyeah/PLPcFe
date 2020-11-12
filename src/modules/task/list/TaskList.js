@@ -11,7 +11,7 @@ import BatchEditingCustomerDialog from './components/BatchEditingCustomerDialog.
 import TaskTransfer from './components/TaskTransfer.vue';
 import TaskMap from './components/TaskMap.vue';
 import TaskView from './components/TaskView.vue'
-import guideCompoment from '@src/component/guide/guide';
+// import guideCompoment from '@src/component/guide/guide';
 
 /** model */
 import TaskStateEnum from '@model/enum/TaskStateEnum.ts';
@@ -434,17 +434,21 @@ export default {
         if (this.intercept()) {
           this.selectId = mySearch
           this.filterId = viewId
-        }
-
-        result.forEach(item => {
-          if (item.id === this.selectIds.allId) {
-            this.searchParams = item.searchModel
-            if (this.intercept()) {
-              this.searchParams.state = 'allocated'
-              this.searchParams.executor = this.initData.currentUserId;
+          result.forEach(item => {
+            if (item.id === viewId) {
+              this.searchParams = item.searchModel
+              if (item.alias === '已指派') {
+                this.searchParams.executor = this.initData.currentUserId;
+              }
             }
-          }
-        })
+          })
+        } else {
+          result.forEach(item => {
+            if (item.id === this.selectIds.allId) {
+              this.searchParams = item.searchModel
+            }
+          })
+        }
         this.initialize();
       }
     },
@@ -585,16 +589,16 @@ export default {
       this.searchParams = searchModel
       this.searchParams_spare = searchModel
       this.selectId = 'all'
-      this.params = this.initParams();
+      this.params = this.initParams(this.params.pageSize);
 
-      this.taskTypes.forEach((item) => {
-        if (item.id === searchModel.templateId) {
-          this.currentTaskType = item;
-        }
-      });
-      if (!searchModel.templateId) {
-        this.currentTaskType = { id: '', name: '全部' };
-      }
+      // this.taskTypes.forEach((item) => {
+      //   if (item.id === searchModel.templateId) {
+      //     this.currentTaskType = item;
+      //   }
+      // });
+      // if (!searchModel.templateId) {
+      //   this.currentTaskType = { id: '', name: '全部' };
+      // }
       // // console.log(FormUtil.initialize(this.advanceds, searchModel))
       // // this.$refs.taskView.open(id)
       this.search(searchModel);
@@ -617,7 +621,7 @@ export default {
       this.selectId = 'all'
       this.searchParams_spare = searchModel
       this.getTaskCountByState(searchModel);
-      this.params = this.initParams();
+      this.params = this.initParams(this.params.pageSize);
       this.search(searchModel);
       this.buildColumns();
       // 埋点
@@ -1242,8 +1246,9 @@ export default {
       this.searchParams = {...this.searchParams_spare, ...{templateId: taskType.id}}
       this.currentTaskType = taskType;
       this.selectId = 'all'
-      this.params = this.initParams();
+      this.params = this.initParams(this.params.pageSize);
       this.initialize();
+      // this.createPerspective({id: this.selectId}, true)
     },
     /**
      * @description 检测导出条数
@@ -1589,7 +1594,9 @@ export default {
       this.taskPage.list = [];
       this.params.page = 1;
       this.params.pageNum = 1;
-      this.params.pageSize = 10
+      if (!this.params.pageSize) {
+        this.params.pageSize = 10
+      }
     },
     /**
      * @description 初始化参数
@@ -1829,7 +1836,7 @@ export default {
     /**
      * 创建视角
      */
-    createPerspective(item){
+    createPerspective(item, bool = false){
       this.loading = true;
       this.selectId = item.id;
       const {initData} = this
@@ -1855,7 +1862,7 @@ export default {
         this.searchParams.synergyId = initData.currentUserId;
         break;
       }
-      this.search(this.searchParams, false);
+      this.search(this.searchParams, bool);
     },
     /**
      * @description 搜索
@@ -2176,6 +2183,7 @@ export default {
         }
         this.params.keyword = '';
         searchModel['page'] = params.page;
+        searchModel['pageSize'] = params.pageSize
 
         searchModel.createTimeStart = this._time(searchModel.createTimeStart || searchModel.timeStart);
         searchModel.createTimeEnd = this._time(searchModel.createTimeEnd || searchModel.timeEnd);
@@ -2750,7 +2758,7 @@ export default {
     [BatchEditingCustomerDialog.name]: BatchEditingCustomerDialog,
     [TaskSearchPanel.name]: TaskSearchPanel,
     [TaskViewModel.name]: TaskViewModel,
-    [guideCompoment.name]: guideCompoment,
+    // [guideCompoment.name]: guideCompoment,
     TaskSelect,
   },
 };

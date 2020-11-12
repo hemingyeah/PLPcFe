@@ -34,6 +34,8 @@ import Page from '@model/Page';
 import { openTabForEventView } from '@src/util/business/openTab';
 /* enum */
 import { TaskEventNameMappingEnum } from '@model/enum/EventNameMappingEnum.ts';
+/* image */
+import DefaultHead from '@src/assets/img/avatar.png'
 
 function createAttachmentDom(h, attachments){
   return attachments && attachments.length > 0 
@@ -69,6 +71,9 @@ export default {
     }
   },
   computed: {
+    address() {
+      return this.shareData?.address || '';
+    },
     auth() {
       return this.shareData?.auth || {};
     },
@@ -88,12 +93,18 @@ export default {
     allowTaskView() {
       return this.initData?.canViewTask === true;
     },
+    customer() {
+      return this.task?.customer || {};
+    },
     /** 添加备注权限 */
     editComment(){
       return this.allowTaskView && this.allowOperate;
     },
     loginUser(){
       return this.initData?.loginUser || {};
+    },
+    linkman() {
+      return this.shareData?.linkman || {};
     },
     task() {
       return this.shareData?.task || {};
@@ -128,6 +139,40 @@ export default {
       let isCreator = item.userId == user.userId
 
       return !isDelete && (this.allTaskEdit || isCreator) && this.allowOperate;
+    },
+    buildMapMarkerContent() {
+      return '<i class="bm-location-dot"></i><div class="map-address-title">客户地址</div>';
+    },
+    buildMapCustomerInfoContent() {
+      return `
+        <div class="map-info-window-content">
+          <div class="customer-name">${ this.customer.name || '' }</div>
+          <p><label>联系人：</label>${ this.linkman.lmName || '' }</p>
+          <p><label>电话：</label>${ this.linkman.lmPhone || '' }</p>
+          <p><label>地址：</label>${ this.address || '' }</p>
+          <div class="info-window-arrow"></div>
+        </div>
+      `;
+    },
+    buildCommonMarker(map, aMap, longitude, latitude, markerContent, infoWindowContent) {
+      let position = new aMap.LngLat(longitude, latitude);
+      let marker = new aMap.Marker({
+        position,
+        content: markerContent
+      })
+      
+      marker.on('mouseover', (event) => {
+        let infoWindow = new aMap.InfoWindow({
+          closeWhenClickMap: true,
+          isCustom: true,
+          offset: new aMap.Pixel(0, -34),
+          content: infoWindowContent
+        })
+        
+        infoWindow.open(map, event.target.getPosition());
+      })
+      
+      return marker
     },
     /** 
      * @description 创建备注
@@ -240,8 +285,56 @@ export default {
       if(!longitude || !latitude) return;
       
       this.$fast.map
-        .display({ ...content })
+        .display({ ...content }, { title: '位置信息' })
         .catch(err => console.error('openMap catch an err: ', err));
+    },
+    openMapForFinished(content) {
+      let longitude = content.longitude;
+      let latitude = content.latitude;
+      
+      if(!longitude || !latitude) return;
+      
+      this.$fast.map
+        .display(
+          { ...content }, 
+          { title: '位置信息' }, 
+          undefined,
+          undefined,
+          (map, aMap) => {
+            return this.renderMarks(content, map, aMap);
+          }
+        )
+        .catch(err => {
+          console.error('openMap catch an err: ', err)
+        });
+    },
+    /** 
+     * @description 构建用户标记
+    */
+    renderMarks(record, map, aMap) {
+      let { longitude, latitude } = record
+      let markers = []
+      // 完成时地址
+      if (longitude && latitude) {
+        let markerContent = `<img class='user-head' src=${record.userHead || DefaultHead} />`
+        let infoWindowContent = `<div class='amap-user-name'>${record.userName}</div>`
+        let marker = this.buildCommonMarker(map, aMap, longitude, latitude, markerContent, infoWindowContent)
+        
+        markers.push(marker)
+      }
+      
+      // 工单客户地址
+      let address = this.task.taddress || {};
+      let customerLongitude = address.longitude;
+      let customerLatitude = address.latitude;
+      if(customerLongitude && customerLatitude) {
+        let marker = this.buildCommonMarker(
+          map, aMap, customerLongitude, customerLatitude, this.buildMapMarkerContent(), this.buildMapCustomerInfoContent()
+        )
+        markers.push(marker)
+      }
+      
+      return markers
     },
     recordPageListConvertHandler(list = []) {
       list.forEach(record => {
@@ -252,11 +345,18 @@ export default {
         }
       })
     },
-    renderAddressRecordDom(record = {}) {
+    /** 
+     * @description 渲染地址dom
+     * @param {Object} record 记录数据
+     * @param {Boolean} isFinished 是否是完成状态 特殊处理
+    */
+    renderAddressRecordDom(record = {}, isFinished = false) {
       let address = trimAll(record.address || '');
       let { latitude, longitude } = record;
       let isShowAddress = address && latitude && longitude;
-      let icon = isShowAddress ? <i class="iconfont icon-address" onClick={e => this.openMap(record)}></i> : '';
+      let openMapFunc = isFinished ? this.openMapForFinished : this.openMap
+      let icon = isShowAddress ? <i class="iconfont icon-address" onClick={e => {openMapFunc(record)}}></i> : '';
+      
       return { address, icon, isShowAddress }
     },
     /* 渲染指派转派 */
@@ -370,8 +470,9 @@ export default {
     },
     /* 渲染开始和完成 */
     renderStartOrFinishDom(record = {}) {
-      let { content, address } = record;
-      let addressData = this.renderAddressRecordDom(record);
+      let { content, address, action } = record;
+      let isFinished = action == '完成'
+      let addressData = this.renderAddressRecordDom(record, isFinished);
       let isPositionException = content.isPositionException == 'true';
       let className = isPositionException ? 'task-position-exception' : '';
       let startOrFinshRecord = [
@@ -491,11 +592,13 @@ export default {
     },
     /* 渲染工单创建dom */
     renderTaskCreatetDom(record = {}) {
-      let { content, eventNo, eventId } = record;
-      let isEventToTask = !!content.eventId;
+      let { content = {} } = record
+      let { eventId, eventNo } = content
+      let isEventToTask = Boolean(eventId)
+      
       return [
         this.renderBaseTaskAction(record),
-        isEventToTask ? <span class="link" onClick={event => openTabForEventView(eventId)}>由事件# {eventNo} 创建</span> : ''
+        isEventToTask ? <span onClick={event => openTabForEventView(eventId)}>由事件<span class="link-text"># {eventNo} </span>创建</span> : ''
       ]
     },
     /* 渲染工单修改dom */
