@@ -1798,20 +1798,27 @@ export default {
             oncePrinted = "";
             break;
         }
-        let source;
-        if(params.source){
-          if(params.source instanceof Array){
-            source=params.source.length && params.source.map((item)=>{
-              if(item=='API创建'){
-                item='开放API'
-              }
-              return item
-            }) || [];
-          }else{
-            source=params.source;
-            source==='API创建' && (source='开放API')
-          }
-        }
+        let source = params.source && params.source instanceof Array && params.source.length && params.source.map((item)=>{
+                if(item=='API创建'){
+                  item='开放API'
+                }
+                return item
+              }) || [];
+        
+        // let source;
+        // if(params.source){
+        //   if(params.source instanceof Array){
+        //     source=params.source.length && params.source.map((item)=>{
+        //       if(item=='API创建'){
+        //         item='开放API'
+        //       }
+        //       return item
+        //     }) || [];
+        //   }else{
+        //     source=params.source;
+        //     source==='API创建' && (source='开放API')
+        //   }
+        // }
         // 是否审批中
         let inApprove;
         switch (params.inApprove) {
