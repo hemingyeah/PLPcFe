@@ -111,7 +111,7 @@
     </template>
     <!-- end 协同人 -->
     <!-- 创建方式 -->
-    <template slot="source" slot-scope="{ field }">
+    <template slot="source" slot-scope="{ field }" v-if="task.source">
       <div class="form-view-row">
         <label>{{ field.displayName }}</label>
         <div class="form-view-row-content">
