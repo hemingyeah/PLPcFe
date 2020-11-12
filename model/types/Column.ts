@@ -18,6 +18,8 @@ interface Column {
   label?: string
   // 最小宽度
   minWidth?: string | null
+  // 宽
+  width?: string | null
   // 是否显示，基本用于表格
   show?: boolean
   // 是否支持排序

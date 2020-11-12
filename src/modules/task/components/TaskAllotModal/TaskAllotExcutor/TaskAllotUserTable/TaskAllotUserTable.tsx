@@ -25,13 +25,11 @@ const TableColumnDefaultWidth = '120px'
 export default class TaskAllotUserTable extends TaskAllotUserTableRender {
   
   mounted() {
+    // 绑定事件
     this.$nextTick(() => {
       this.bindTableScrollEvent()
+      this.bindLocationSelectClickEvent()
     })
-  }
-  
-  destroyed() {
-    this.unBindTableScrollEvent()
   }
   
   render(h: CreateElement) {
@@ -40,7 +38,7 @@ export default class TaskAllotUserTable extends TaskAllotUserTableRender {
         <div class='task-allot-user-filter'>
           {this.isAllotByTag && this.renderTeamSelect()}
           {this.isAllotByTag && this.renderChooseUserByTeam()}
-          {!this.isAllotByTag && this.renderChooseUserByDepartment()}
+          {!this.isAllotByTag && this.renderChooseUserByDept()}
           {this.renderLocationSelect()}
           {this.renderWorkStateSelect()}
           {this.renderSortordSelect()}
@@ -77,7 +75,7 @@ export default class TaskAllotUserTable extends TaskAllotUserTableRender {
             }
           </el-table>
         </div>
-        <base-table-advanced-setting ref='BaseTableAdvancedSettingComponent' />
+        <base-table-advanced-setting onSave={(value: any) => this.saveTaskAllotTableColumn(value)} ref='BaseTableAdvancedSettingComponent' />
       </div>
     )
   }

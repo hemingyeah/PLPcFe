@@ -6,21 +6,53 @@ import TaskAllotUserTableComputed from '@src/modules/task/components/TaskAllotMo
 import Loadmore from '@src/directive/loadmore'
 /* enum */
 import EventNameEnum from '@model/enum/EventNameEnum'
+import HookEnum from '@model/enum/HookEnum'
 /* entity */
 import CustomerAddress from '@model/entity/CustomerAddress'
 import LoginUser from '@model/entity/LoginUser/LoginUser'
 /* image */
 // @ts-ignore
 import DefaultHead from '@src/assets/img/avatar.png'
+/* interface */
+import { DepeMultiUserResult } from '@src/modules/task/components/TaskAllotModal/TaskAllotModalInterface'
 /* model */
 import Page from '@model/Page'
 import { getUserListByTagResult } from '@model/param/out/Task'
+import Column from '@model/types/Column'
 /* util */
+import * as _ from 'lodash'
 import Log from '@src/util/log.ts'
+import { storageGet, storageSet } from '@src/util/storage.ts'
 
 declare let AMap: any
 
 class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
+  /** 
+   * @description 绑定位置select 点击事件
+   * TODO: 可以包装成组件实现 或者是 函数
+  */
+  public bindLocationSelectClickEvent(): void {
+    let minInputEl = document.querySelector('.task-allot-user-table-location-select-other .location-min-input .el-input__inner')
+    let maxInputEl = document.querySelector('.task-allot-user-table-location-select-other .location-max-input .el-input__inner')
+    let confirmBtntEl = document.querySelector('.task-allot-user-table-location-select-other .location-confirm-button')
+    
+    const InputEventFunc = (event: Event) => {
+      // 阻止事件冒泡
+      event.stopPropagation() 
+    }
+    
+    // 添加事件
+    minInputEl?.addEventListener(EventNameEnum.Click, InputEventFunc)
+    maxInputEl?.addEventListener(EventNameEnum.Click, InputEventFunc)
+    confirmBtntEl?.addEventListener(EventNameEnum.Click, InputEventFunc)
+    
+    // 销毁事件
+    this.$once(HookEnum.Destroyed, () => {
+      minInputEl?.removeEventListener(EventNameEnum.Click, InputEventFunc)
+      maxInputEl?.removeEventListener(EventNameEnum.Click, InputEventFunc)
+      confirmBtntEl?.removeEventListener(EventNameEnum.Click, InputEventFunc)
+    })
+  }
   
   /** 
    * @description 绑定表格滚动事件
@@ -39,6 +71,12 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
         } 
       }
     )
+    
+    // 解除绑定
+    this.$once(HookEnum.Destroyed, () => {
+      Loadmore.unbind(scrollEl)
+    })
+
   }
   
   /** 
@@ -144,6 +182,43 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
       })
       
     })
+  }
+  
+  /** 
+   * @description 部门选择人员
+  */
+  public chooseDepartmentUsers(): void {
+    let options = {
+      title: '请选择人员',
+      seeAllOrg: true,
+      selected: this.selectDeptUsers,
+      max: 14
+    }
+    
+    // @ts-ignore
+    this.$fast.contact.choose('dept', options)
+      .then((result: DepeMultiUserResult) => {
+        let isSuccess = result.status == 0
+        if (!isSuccess) return
+        
+        // 部门人员
+        this.selectDeptUsers = result?.data?.users || []
+        // 初始化
+        this.initialize()
+      })
+      .catch((err: any) => {
+        console.error(err)
+      })
+  }
+  
+  /**
+   * @description 移除部门人员用户
+   * -- 支持防抖
+  */
+  public debouncedRemoveDepartmentUser(user: any) {
+    _.debounce(() => {
+      this.removeDepartmentUser(user)
+    }, 250)()
   }
   
   /**
@@ -382,6 +457,57 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
     Log.succ(Log.Start, this.outsideFetchUsers.name)
     
     this.initialize()
+  }
+  
+  /**
+   * @description 移除部门人员用户
+  */
+  public removeDepartmentUser(user: LoginUser) {
+    this.selectDeptUsers = (
+      this.selectDeptUsers
+      .filter((departmentUser: LoginUser) => {
+        return departmentUser.userId !== user.userId
+      })
+    )
+    
+    this.initialize()
+  }
+  
+  /**
+   * @description 保存数据到缓存
+  */
+  saveDataToStorage(key: string, data: any) {
+    // TODO: loginUser Id
+    storageSet(key, data)
+  }
+  
+  /**
+   * @description 保存指派表格列
+  */
+  public saveTaskAllotTableColumn(value: { type: string, data: any[] }) {
+    let columns = value.data || []
+    let columnMap = columns.reduce(
+      (acc, col) => (acc[col.field] = col) && acc,
+      {}
+    )
+    
+    this.columns.forEach((col: Column) => {
+      let newCol = columnMap[col.field || '']
+      
+      if (newCol) {
+        this.$set(col, 'show', newCol.show)
+        this.$set(col, 'width', newCol.width)
+      }
+      
+    })
+      
+    const showColumns = this.columns.map((column: Column) => ({
+      field: column.field,
+      show: column.show,
+      width: column.width
+    })) 
+    
+    this.saveDataToStorage('columnStatus', showColumns);
   }
   
   /** 

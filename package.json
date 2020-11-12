@@ -86,6 +86,7 @@
     "element-ui": "2.11.1",
     "fecha": "^2.3.3",
     "koa2-origin-cors": "^1.0.2",
+    "localforage": "^1.9.0",
     "lodash": "^4.17.15",
     "mathjs": "^6.2.3",
     "popper.js": "^1.14.5",

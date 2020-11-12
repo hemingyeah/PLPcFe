@@ -2,6 +2,7 @@
 .task-allot-user-filter {
   display: flex;
   
+  .task-allot-table-user,
   .biz-team-select,
   .base-select-container,
   .el-select {
@@ -81,5 +82,30 @@
       top: 0;
       width: 7px;
     }
+  }
+  .location-confirm-button {
+    margin-left: 20px;
+  }
+}
+
+.task-allot-table-user-input {
+  cursor: pointer;
+  border-radius: 2px;
+  border: 1px solid #e0e1e2;
+  font-size: $font-size-base;
+  line-height: 28px;
+  padding: 0 10px;
+    
+  span {
+    display: inline-block;
+  }
+    
+  .el-tag {
+    margin-left: 5px;
+  }
+
+  &-placeholder {
+    color: $text-color-secondary;
+    font-size: $font-size-small;
   }
 }

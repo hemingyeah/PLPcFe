@@ -28,6 +28,8 @@ class TaskAllotUserTableData extends TaskAllotUserTableComponents {
   public selectTeams: Tag[] = []
   /* 当前选择的团队人员列表 */
   public selectTeamUsers: LoginUser[] = []
+  /* 当前选择的部门人员列表 */
+  public selectDeptUsers: LoginUser[] = []
   /* 当前选择的距离 */
   public selectLocation: any = '5'
   /* 当前选择的工作状态 */

@@ -437,10 +437,8 @@ export default class TaskAllotPool extends Vue {
         {
           isNotificationUsersEmpty 
           ? <span class='task-allot-pool-notification-placeholder'>请选择人员</span>
-          : 
-          (
+          : (
             this.taskPoolNotificationUsers.map((user: LoginUser) => {
-              let test = user
               return (
                 <el-tag key={user.userId} size='mini' disable-transitions closable type='info' onClose={() => this.removeNotificationUser(user)}>
                   {user.displayName}
