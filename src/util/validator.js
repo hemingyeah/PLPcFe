@@ -49,9 +49,9 @@ const RuleMap = {
 };
 
 // 远程验证字段是否重复方法
-let repeatRemoteValidate = _.debounce(function(mode, field, value, changeStatus, resolve) {
+let repeatRemoteValidate = _.debounce(function(mode, field, value, id, changeStatus, resolve) {
   let api = fieldValidateMap[mode];
-  let params = { fieldName: field.fieldName, fieldValue: value };
+  let params = { fieldName: field.fieldName, fieldValue: value, id };
 
   // api不存在
   if (!api) return;
@@ -89,7 +89,7 @@ function text(value, field = {}, origin = {}, mode, changeStatus){
 
   return new Promise((resolve, reject) => {
     validate.then((res) => {
-      res === null ? repeatRemoteValidate(mode, field, value, changeStatus, resolve) : resolve(res);
+      res === null ? repeatRemoteValidate(mode, field, value, origin.id, changeStatus, resolve) : resolve(res);
     }).catch(err => {
       console.error('text validate err', err);
     })
@@ -127,7 +127,7 @@ function textarea(value, field = {}, origin = {}, mode, changeStatus) {
 
   return new Promise((resolve, reject) => {
     validate.then((res) => {
-      res === null ? repeatRemoteValidate(mode, field, value, changeStatus, resolve) : resolve(res);
+      res === null ? repeatRemoteValidate(mode, field, value, origin.id, changeStatus, resolve) : resolve(res);
     }).catch(err => {
       console.error('textarea validate err', err);
     })
@@ -149,7 +149,7 @@ function phone(value, field = {}, origin = {}, mode, changeStatus) {
 
   return new Promise((resolve, reject) => {
     validate.then((res) => {
-      res === null ? repeatRemoteValidate(mode, field, value, changeStatus, resolve) : resolve(res);
+      res === null ? repeatRemoteValidate(mode, field, value, origin.id, changeStatus, resolve) : resolve(res);
     }).catch(err => {
       console.error('phone validate err', err);
     })
@@ -242,7 +242,7 @@ function number(value, field = {}, origin = {}, mode, changeStatus) {
 
   return new Promise((resolve, reject) => {
     validate.then((res) => {
-      res === null ? repeatRemoteValidate(mode, field, value, changeStatus, resolve) : resolve(res);
+      res === null ? repeatRemoteValidate(mode, field, value, origin.id, changeStatus, resolve) : resolve(res);
     }).catch(err => {
       console.error('number validate err', err);
     })
