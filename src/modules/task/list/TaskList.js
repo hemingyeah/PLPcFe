@@ -435,8 +435,10 @@ export default {
           result.forEach(item => {
             if (item.id === viewId) {
               this.searchParams = item.searchModel
+              this.searchParams_spare = item.searchModel
               if (item.alias === '已指派') {
                 this.searchParams.executor = this.initData.currentUserId;
+                this.searchParams_spare = this.initData.currentUserId
               }
             }
           })
@@ -444,6 +446,7 @@ export default {
           result.forEach(item => {
             if (item.id === this.selectIds.allId) {
               this.searchParams = item.searchModel
+              this.searchParams_spare = item.searchModel
             }
           })
         }
@@ -2098,47 +2101,17 @@ export default {
           inApprove = "";
           break;
         }
-        // 工单类型
-        let state;
-        switch (params.state) {
-        case "全部":
-          state = "";
-          break;
-        case "待指派":
-          state = "created";
-          break;
-        case "已指派":
-          state = "allocated";
-          break;
-        case "已接受":
-          state = "accepted";
-          break;
-        case "进行中":
-          state = "processing";
-          break;
-        case "已完成":
-          state = "finished";
-          break;
-        case "已拒绝":
-          state = "refused";
-          break;
-        case "已结算":
-          state = "costed";
-          break;
-        case "已关闭":
-          state = "closed";
-          break;
-        case "已取消":
-          state = "offed";
-          break;
-        case "工单池":
-          state = "taskPool";
-          break;
-        case "未完成":
-          state = "unfinished";
-          break;
-        default:
-          break;
+        let stateType = {};
+        if (params.states) {
+          stateType = {
+            state: '',
+            stateList: []
+          }
+        } else {
+          stateType = {
+            state: this.searchParams_spare.state,
+            stateList: this.searchParams_spare.stateList
+          }
         }
 
         const par = {
@@ -2189,12 +2162,11 @@ export default {
           page: params.page,
           pageSize: params.pageSize,
           templateId: this.currentTaskType.id,
-          state,
 
           serviceTypes: params.serviceTypes,
           serviceContents: params.serviceContents,
           levels: params.levels,
-          stateList: params.states && params.states.map(stateName => TaskStateEnum.getValue(stateName)),
+          searchStateList: params.states && params.states.map(stateName => TaskStateEnum.getValue(stateName)),
           allotTypes: params.allotTypeStrs && params.allotTypeStrs.map(type => AllotTypeConvertMap[type]),
           flags: params.onceExceptions && params.onceExceptions.map(exception => FlagConvertMap[exception] || ""),
           createUserIds: this.getUserIdsWithSubmit(searchModel.createUser, params, "createUser"),
@@ -2224,6 +2196,8 @@ export default {
             this.searchParams[key] = this.searchParams_spare[key]
           }
         }
+
+        this.searchParams = {...this.searchParams, ...stateType}
 
         /* E 高级搜索条件*/
       } else {
