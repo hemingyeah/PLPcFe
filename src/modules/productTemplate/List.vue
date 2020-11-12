@@ -114,8 +114,14 @@
             <template v-else-if="column.formType === 'user' && scope.row.attribute[column.field]">
               {{ getUserName(column, scope.row.attribute[column.field]) }}
             </template>
+            <template v-else-if="column.formType === 'cascader' && scope.row.attribute[column.field]">
+              {{ scope.row[column.field] | displaySelect }}
+            </template>
             <template v-else-if="column.formType === 'location'">
               {{ scope.row.attribute[column.field] && scope.row.attribute[column.field].address}}
+            </template>
+            <template v-else-if="column.formType == 'related_task'">
+              {{ getRelatedTask(scope.row.attribute[column.field]) }}
             </template>
             <template v-else-if="column.formType === 'address'">
               {{ scope.row.attribute[column.field] && scope.row.attribute[column.field].all}}
@@ -420,6 +426,9 @@ export default {
     window.__exports__refresh = this.search;
   },
   methods: {
+    getRelatedTask(field) {
+      return Array.isArray(field) ? field.map(item => item.taskNo).join(',') : '';
+    },
     showAdvancedSetting(){
       window.TDAPP.onEvent('pc：产品管理-选择列事件');
 
@@ -859,10 +868,10 @@ export default {
       if (tv.length > this.selectedLimit) {
         this.$nextTick(() => {
           original.length > 0
-          ? unSelected.forEach(row => {
+            ? unSelected.forEach(row => {
               this.$refs.productTemplateTable.toggleRowSelection(row, false);
             })
-          : this.$refs.productTemplateTable.clearSelection();
+            : this.$refs.productTemplateTable.clearSelection();
         })
         return this.$platform.alert(`最多只能选择${this.selectedLimit}条数据`);
       }

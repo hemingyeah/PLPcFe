@@ -18,6 +18,9 @@
 <script>
 import FormMixin from '@src/component/form/mixin/form';
 import pickerOption from './pickerOption';
+/* utils */
+import { fmt_data_time } from '@src/util/lang'; 
+
 export default {
   name: 'form-date',
   mixins: [FormMixin],
@@ -38,6 +41,16 @@ export default {
       if(dateTypeObj && JSON.stringify(dateTypeObj) !== '{}') return dateTypeObj;
       return { type:'date',format: "yyyy-MM-dd" }  
     }
+  },
+  mounted() {
+    let { defaultValueConfig, dateType} = this.field.setting || {};
+    let { isCurrentDate } = defaultValueConfig || {};
+
+    // 日期 若设置默认值，将系统时间设为默认值
+    if( JSON.stringify(defaultValueConfig) !== '{}' && isCurrentDate == 1){
+      let defaultValue = fmt_data_time(new Date(),dateType);
+      this.choose(defaultValue);
+     }   
   },
   methods: {
     choose(newValue) {

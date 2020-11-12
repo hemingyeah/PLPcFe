@@ -856,9 +856,9 @@ const FormDesign = {
           </div>
         </div>
         <div class="form-design-main">    
-          <div class="form-design-hidden" onClick={this.onShowBaseModal }>
+          <div class="form-design-hidden">
           { this.hiddenFields.length > 0 && (
-            <p><i class="iconfont icon-fdn-hidden"></i>查看已隐藏字段</p> )} 
+            <p onClick={this.onShowBaseModal }><i class="iconfont icon-fdn-hidden"></i>查看已隐藏字段</p> )} 
           </div>
           <div class="form-design-center">
             <div class={['form-design-phone', this.silence ? 'form-design-silence' : null]}>

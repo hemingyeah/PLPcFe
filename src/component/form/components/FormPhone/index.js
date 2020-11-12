@@ -2,6 +2,8 @@ import FormPhoneSetting from './FormPhoneSetting.vue';
 import FormPhonePreview from './FormPhonePreview.vue';
 import FormPhone from './FormPhone.vue';
 
+import PhoneSearch from './extend/PhoneSearch';
+
 let FormPhoneField = {
   formType: 'phone', // 字段类型
   name: '电话',
@@ -9,7 +11,10 @@ let FormPhoneField = {
   component: {
     setting: FormPhoneSetting,
     preview: FormPhonePreview,
-    build: FormPhone
+    build: FormPhone,
+    extend: {
+      'phone_search': PhoneSearch
+    }
   }
 };
 
