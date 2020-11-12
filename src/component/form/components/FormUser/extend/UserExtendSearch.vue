@@ -6,8 +6,8 @@
     filterable
     remote
     reserve-keyword
-    :placeholder="field.placeHolder?field.placeHolder:'请输入关键词搜索'"
-    :clearable="field.noClearable?false:true"
+    :placeholder="field.placeHolder ? field.placeHolder : '请输入关键词搜索'"
+    :clearable="field.noClearable ? false : true"
     :loading="loading"
     :multiple="multiple"
     :remote-method="searchUser"
@@ -16,7 +16,7 @@
       v-for="item in options"
       :key="item.id"
       :label="item.name"
-      :value="field.returnData?item[field.returnData]:item.id"
+      :value="field.returnData ? item[field.returnData] : item.id"
     ></el-option>
   </el-select>
 </template>
@@ -34,19 +34,34 @@ export default {
     },
     value: {
       type: String | Array,
-      default: ''
-    }
+      default: "",
+    },
+    userList: {
+      type: Array,
+      default: () => [],
+    },
+  },
+  watch: {
+    /*判断是否自定义视图进来的 */
+    userList(v) {
+      if (Array.isArray(v) && v.length) {
+        this.options = v;
+      }
+    },
   },
   data() {
     return {
       loading: false,
-      options: []
+      options: [],
     };
   },
   created() {
     let options = sessionStorage.getItem(`${this.field.fieldName}_options`);
-
-    this.options = JSON.parse(options || "[]");
+    if (Array.isArray(this.userList) && this.userList.length) {
+      this.options = this.userList;
+    } else {
+      this.options = JSON.parse(options || "[]");
+    }
   },
   methods: {
     choose(newValue) {
@@ -58,11 +73,11 @@ export default {
       this.$emit("input", { keyword, field: this.field });
       this.$http
         .get("/customer/userTag/list", { keyword, pageNum: 1 })
-        .then(res => {
+        .then((res) => {
           this.options = res.list.map(({ displayName, userId }) =>
             Object.freeze({
               name: displayName,
-              id: userId
+              id: userId,
             })
           );
 
@@ -72,11 +87,11 @@ export default {
           );
           this.loading = false;
         })
-        .catch(err =>
+        .catch((err) =>
           console.error("searchCustomerManager function catch err", err)
         );
-    }
-  }
+    },
+  },
 };
 </script>
 

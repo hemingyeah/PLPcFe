@@ -108,6 +108,7 @@ import {
   StateTextConvert,
   FlagTextConvert,
   AllotTypeTextConvert,
+  ExceptionTypeTextConvert,
 } from "@src/modules/task/model/TaskTextConvertMap.ts";
 
 const MultiFieldNames = [
@@ -317,13 +318,25 @@ export default {
               } else if (item.property === "createUser") {
                 console.log("createUser");
               } else if (item.property === "allotUser") {
-                console.log("allotUser");
+                this.searchModelCN.push({
+                  key: value.displayName,
+                  content: ["陈迪浩"].join("，"),
+                  fieldName: value.fieldName,
+                  formType: value.formType,
+                  ids: item.inValue,
+                });
               } else if (item.property === "executor") {
                 console.log("executor");
               } else if (item.property === "synergies") {
                 console.log("synergies");
               } else if (item.property === "tagIds") {
-                console.log("tagIds");
+                this.searchModelCN.push({
+                  key: value.displayName,
+                  content: ["陈杰"].join("，"),
+                  fieldName: value.fieldName,
+                  formType: value.formType,
+                  ids: item.inValue,
+                });
               } else if (item.property === "user") {
                 console.log("user");
               } else {
@@ -363,6 +376,13 @@ export default {
                   fieldName: value.fieldName,
                   formType: value.formType,
                 });
+              } else if (item.property === "exceptionType") {
+                this.searchModelCN.push({
+                  key: value.displayName,
+                  content: ExceptionTypeTextConvert[item.value],
+                  fieldName: value.fieldName,
+                  formType: value.formType,
+                });
               } else if (item.property === "province") {
                 address = {
                   key: value.displayName,
@@ -375,26 +395,32 @@ export default {
               } else if (item.property === "dist") {
                 address[item.property] = item.value;
               } else if (item.property === "customerId") {
-                // this.getSimpleCustomerList([item.value], res => {
-                //   console.log(res)
-                // })
+                this.getSimpleCustomerList([item.value], res => {
+                  console.log(res)
+                })
                 this.searchModelCN.push({
                   key: value.displayName,
-                  content: '测试新建',
+                  content: "测试新建",
                   fieldName: value.fieldName,
                   formType: value.formType,
-                  id: item.value
+                  id: item.value,
                 });
               } else if (item.property === "productId") {
                 this.searchModelCN.push({
                   key: value.displayName,
-                  content: '24224',
+                  content: "24224",
                   fieldName: value.fieldName,
                   formType: value.formType,
-                  id: item.value
+                  id: item.value,
                 });
               } else if (item.property === "tlmId") {
-                console.log("tlmId");
+                this.searchModelCN.push({
+                  key: value.displayName,
+                  content: "孙聪",
+                  fieldName: value.fieldName,
+                  formType: value.formType,
+                  id: item.value,
+                });
               } else {
                 this.searchModelCN.push({
                   key: value.displayName,

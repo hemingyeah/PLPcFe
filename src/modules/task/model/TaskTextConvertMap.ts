@@ -37,3 +37,8 @@ export const AllotTypeTextConvert = {
   '2': '工单池派单',
   '3': '自动派单'
 }
+/*超时工单 */
+export const ExceptionTypeTextConvert = {
+  '1': '暂停',
+  "2": '超时'
+}

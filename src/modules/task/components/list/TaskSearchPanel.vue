@@ -309,7 +309,6 @@ export default {
         ...this.$refs.taskInquireParams.returnData(),
         ...this.$refs.searchForm.returnData(),
       };
-      console.log(form)
       this.formBackup = Object.assign({}, this.$refs.searchForm.returnData());
       this.inquireFormBackup = Object.assign(
         {},

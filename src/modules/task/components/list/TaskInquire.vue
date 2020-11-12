@@ -150,7 +150,7 @@ export default {
   },
   watch: {
     taskNums(v) {
-      this.list = v
+      this.list = v;
     },
     config() {
       this.fields;
@@ -197,8 +197,12 @@ export default {
       if (!this.$refs.batchForm) return {};
       this.$refs.batchForm.forEach((item) => {
         for (let key in item.returnDatas()) {
-          const value = item.returnDatas()[key]
-          if (value && JSON.stringify(value) !== '{}' && JSON.stringify(value) !== '[]') {
+          const value = item.returnDatas()[key];
+          if (
+            value &&
+            JSON.stringify(value) !== "{}" &&
+            JSON.stringify(value) !== "[]"
+          ) {
             data[key] = item.returnDatas()[key];
           } else if (key === "tags" && item.returnDatas()[key].length) {
             data[key] = item.returnDatas()[key];
@@ -305,7 +309,7 @@ export default {
         }
         return v;
       });
-      console.log(this.list)
+      console.log(this.list);
     },
     setting({ item, index }) {
       // type 0 = 初始化 1筛选
@@ -385,6 +389,7 @@ export default {
           customer: {},
           form: {},
           product: {},
+          userList: []
         };
       },
       watch: {
@@ -415,7 +420,7 @@ export default {
       methods: {
         /*自定义视图参数 */
         customizeParams() {
-          this.form['backUp'] = {customer:{}, product: {}}
+          this.form["backUp"] = { customer: {}, product: {} };
           if (this.item && this.item.fieldName) {
             const {
               fieldName,
@@ -425,9 +430,10 @@ export default {
               city,
               dist,
               id,
+              ids,
             } = this.item;
             this.selectField(fieldName);
-            let types = [
+            const types = [
               "level",
               "serviceContent",
               "serviceType",
@@ -435,26 +441,49 @@ export default {
               "onceException",
               "allotTypeStr",
               "state",
-              "user",
               "cascader",
+            ];
+            const personnel = [
               "createUser",
               "allotUser",
               "executor",
               "synergyId",
-              "tags"
+              "user",
             ];
-            if (types.indexOf(fieldName) !== -1 || types.indexOf(formType) !== -1) {
+            if (personnel.indexOf(fieldName) !== -1) {
+              this.form[fieldName] = ids;
+              ids.forEach((item, i) => {
+                this.userList.push({
+                  id: item,
+                  name: content.split("，")[i]
+                })
+              })
+            } else if (
+              types.indexOf(fieldName) !== -1 ||
+              types.indexOf(formType) !== -1
+            ) {
               this.form[fieldName] = content.split("，");
+            } else if (fieldName === "tlmName") {
+              this.form[fieldName] = id;
+              this.userList = [{id, name: content}]
             } else if (formType === "datetime" || formType === "date") {
               this.form[fieldName] = content.split("-");
-            } else if (fieldName === 'customer') {
+            } else if (fieldName === "customer") {
               this.form[fieldName] = id;
-              this.form['backUp'].customer = {name: content, value: id};
-              this.customer = {name: content, value: id}
-            } else if (fieldName === 'product') {
+              this.form["backUp"].customer = { name: content, value: id };
+              this.customer = { name: content, value: id };
+            } else if (fieldName === "product") {
               this.form[fieldName] = id;
-              this.form['backUp'].product = {name: content, value: id};
-              this.product = {name: content, value: id}
+              this.form["backUp"].product = { name: content, value: id };
+              this.product = { name: content, value: id };
+            } else if (fieldName === "tags") {
+              this.form[fieldName] = [];
+              ids.forEach((item, i) => {
+                this.form[fieldName].push({
+                  id: item,
+                  tagName: content.split("，")[i],
+                });
+              });
             } else if (fieldName === "area") {
               this.form[fieldName] = {
                 addressType: 0,
@@ -465,9 +494,9 @@ export default {
             } else {
               this.form[fieldName] = content;
             }
-            console.log(this.form)
+            console.log(this.form);
           } else {
-            this.selectedField = {}
+            this.selectedField = {};
             this.form = {};
           }
         },
@@ -669,6 +698,7 @@ export default {
                 field: f,
                 value: this.form[f.fieldName],
                 disableMap: true,
+                userList: this.userList
               },
               on: {
                 update: (event) => this.update(event),
@@ -697,6 +727,7 @@ export default {
                 field: f,
                 value: this.form[f.fieldName],
                 disableMap: true,
+                userList: this.userList
               },
               on: {
                 update: (event) => this.update(event),

@@ -582,7 +582,7 @@ export default {
     },
     /* 其他, 选择 */
     checkOther(params) {
-      const { name, id, searchModel, title } = params;
+      const { name, id, searchModel, title, selectedCols } = params;
       this.region["viewId"] = id;
       this.otherText = name;
       this.filterId = "";
@@ -604,17 +604,41 @@ export default {
       // // console.log(FormUtil.initialize(this.advanceds, searchModel))
       // // this.$refs.taskView.open(id)
       this.search(searchModel);
-      this.buildColumns();
+      // this.buildColumns();
+
+      if (selectedCols) {
+        let firsts = [], lasts = []
+        selectedCols.split(',').forEach(item => {
+          this.columns.forEach(value => {
+            if (item === value.fieldName) {
+              firsts.push(value)
+            }
+          })
+        })
+
+        this.columns.forEach(value => {
+          let bool = selectedCols.split(',').some(item => {return item === value.fieldName})
+          if (!bool) {
+            lasts.push(value)
+          }
+        })
+
+        this.columns = []
+        this.$nextTick(() => {
+          this.columns = [...firsts.map(item => {item.show = true; return item}), ...lasts.map(item => {item.show = false; return item})].map(item => {
+            return item
+          })
+        })
+      }
     },
     /**
      * 新建视图展示
      */
     creatViewPanel({ region, id, name, searchModel }, type) {
-      const selectCols = [];
-      this.columns.map((item, index) => {
-        if (item.show) {
-          selectCols.push(item.fieldName);
-        }
+      const selectCols = this.columns.filter((item) => {
+        return item.show
+      }).map(item => {
+        return item.fieldName
       });
       this.region = {
         viewName: name || "",
@@ -804,53 +828,6 @@ export default {
      */
     updatEedit() {
       this.initialize();
-    },
-    /**
-     * 存为视图和编辑视图
-     */
-    editView({region, id}) {
-      const {params, repeatBool} = this.$refs.searchPanel.buildParams()
-      let bool, bool_text;
-      for(let key in params) {
-        if (key !== "conditions" && key !== "productAddress" && key !== "systemConditions") {
-          bool_text = key
-        }
-      }
-      for(let key in params) {
-        if(!bool_text) {
-          bool = true
-          if (params["conditions"].length || params["systemConditions"].length || (params["productAddress"] && params["productAddress"].province)) {
-            bool = false
-          }
-        }
-      }
-      if (bool && !id) {
-        this.$platform.alert("请您先设置筛选条件后再保存视图");
-        return
-      }
-
-      if (repeatBool) {
-        this.$platform.alert("筛选条件条件不能相同");
-        return
-      }
-
-      this.params.moreConditions = params;
-      this.search("", true, true)
-      const selectCols = [];
-      this.columns.map((item, index) => {
-        if (item.show) {
-          selectCols.push(item.fieldName);
-        }
-      });
-      this.region["searchModel"] = this.searchParams;
-      this.region["selectedCols"] = selectCols.join(",");
-      if (id) {
-        this.region["viewId"] = id;
-        this.isViewModel = region;
-        this.$refs.searchPanel.open()
-        return
-      }
-      this.$refs.viewModel.open();
     },
     /**
      * @description 工单列表展示
@@ -2061,7 +2038,7 @@ export default {
           break;
         }
         // 超时工单
-        let exceptionType;
+        let exceptionType; 
         switch (params.exceptionType) {
         case "暂停":
           exceptionType = 1;
@@ -2714,7 +2691,6 @@ export default {
       let columns = event.data || []
 
       this.columns = []
-
       this.$nextTick(() => {
         this.$set(this, "columns", columns.slice());
         this.saveColumnStatusToStorage()
