@@ -191,7 +191,7 @@
               {{scope.row.attribute[column.field] | displaySelect}}
             </template>
             <template v-else-if="column.formType === 'user' && scope.row.attribute[column.field]">
-              {{scope.row.attribute[column.field].displayName || scope.row.attribute[column.field].name}}
+              {{ getUserName(column, scope.row.attribute[column.field]) }}
             </template>
             <template v-else-if="column.formType === 'location'">
               {{ scope.row.attribute[column.field] && scope.row.attribute[column.field].address}}
@@ -448,6 +448,7 @@ export default {
           && c.field !== 'remindCount'
           && c.field !== 'updateTime'
           && c.formType !== 'info'
+          && c.formType !== 'autograph'
         ) {
           c.export = true;
         }
@@ -542,7 +543,19 @@ export default {
   },
   methods: {
     getRelatedTask(field) {
-      return Array.isArray(field) ? field.map(item => item.taskNo).join(',') : "";
+      return Array.isArray(field) ? field.map(item => item.taskNo).join(',') : '';
+    },
+    // 处理人员显示
+    getUserName(field, value) {
+      let { isMultiple } = field.setting || {};
+
+      if(!isMultiple) {
+        let user = value || {};
+        return user.displayName || user.name;
+      }
+
+      let newValue = Array.isArray(value) ? value : [];
+      return newValue.map(i => i.displayName || i.name).join(',');
     },
     async makePhoneCall(phone){
       if(!this.hasCallCenterModule) return
@@ -993,6 +1006,7 @@ export default {
             && f.formType !== 'attachment'
             && f.formType !== 'separator'
             && f.formType !== 'info'
+            && f.formType !== 'autograph'
         )
         .map(field => {
           let sortable = false;
@@ -1016,6 +1030,7 @@ export default {
           }
 
           return {
+            ...field,
             label: field.displayName,
             field: field.fieldName,
             formType: field.formType,

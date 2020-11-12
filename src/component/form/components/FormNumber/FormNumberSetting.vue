@@ -127,6 +127,15 @@ export default {
       })
     }
   },
+  mounted() {
+    // 处理最大值和最小值关联表单的字段已被删除
+    let { min, max } = this.limitConig;
+    let minIndex = this.numberFields.findIndex(item => item.fieldName == min);
+    let maxIndex = this.numberFields.findIndex(item => item.fieldName == max);
+
+    if (min && minIndex == -1) this.limitConig.min = '';
+    if (max && maxIndex == -1) this.limitConig.max = '';
+  },
   methods: {
     updateForDom(event){
       let el = event.target;

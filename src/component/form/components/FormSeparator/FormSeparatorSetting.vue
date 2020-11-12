@@ -7,7 +7,7 @@
       @input="update"
     ></form-title-setting>
     <!-- end 标题 -->
-    <p class="form-setting-separator-tips">你可以在表单中放置一个分割线方便分段显示信息，让页面更加直观，效果图示：</p>
+    <p class="form-setting-separator-tips">您可以在表单中放置一个分割线方便分段显示信息，让页面更加直观，效果图示：</p>
     <div class="form-setting-separator-show">
       <img src="@src/assets/img/form/separatorShow.png" class="unselect" alt="分割线控件效果图" width="100%"/>
     </div>

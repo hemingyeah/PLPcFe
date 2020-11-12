@@ -63,7 +63,12 @@ export default {
       let form = parent?.value || {};
 
       // 处理计算公式，最多保留3位小数
-      let formulaStr = this.formula.map(item => item.isOperator ? item.value : (form[item.value] ? form[item.value] : 0)).join('');
+      let formulaStr = this.formula.map(item => {
+        let { isOperator, value } = item;
+        let fieldValue = form[value] || 0;
+        return isOperator ? value : (!isNaN(Number(fieldValue)) ? fieldValue : 0);
+      }).join('');
+      
       let formulaVal = MathUtil.evaluate(formulaStr);
       let value = !isNaN(formulaVal) ? formulaVal.toString() : '';
       

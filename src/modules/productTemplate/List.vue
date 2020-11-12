@@ -111,8 +111,8 @@
             <template v-else-if="column.formType === 'select'">
               {{ scope.row[column.field] | displaySelect }}
             </template>
-            <template v-else-if="column.formType === 'user'">
-              {{ scope.row[column.field] && (scope.row[column.field].displayName || scope.row[column.field].name) }}
+            <template v-else-if="column.formType === 'user' && scope.row.attribute[column.field]">
+              {{ getUserName(column, scope.row.attribute[column.field]) }}
             </template>
             <template v-else-if="column.formType === 'location'">
               {{ scope.row.attribute[column.field] && scope.row.attribute[column.field].address}}
@@ -362,7 +362,7 @@ export default {
     },
     productFields() {
       return (this.fieldsInfo || [])
-        .filter(f => f.formType !== 'separator')
+        .filter(f => f.formType !== 'separator' && f.formType !== 'autograph')
         .map(f => {
 
           // 调整字段顺序
@@ -502,7 +502,7 @@ export default {
 
       let baseColumns = this.buildTableFixedColumns();
       let customizedColumns = this.productTemplateConfig.productFields
-        .filter(f => !f.isSystem && f.formType !== 'attachment' && f.formType !== 'separator' && f.formType !== 'info' && f.fieldName !== 'customer')
+        .filter(f => !f.isSystem && f.formType !== 'attachment' && f.formType !== 'separator' && f.formType !== 'info' && f.fieldName !== 'customer' && f.formType !== 'autograph')
         .map(field => {
           let sortable = false;
           let minWidth = null;
@@ -525,6 +525,7 @@ export default {
           }
 
           return {
+            ...field,
             label: field.displayName,
             field: field.fieldName,
             formType: field.formType,
@@ -1066,6 +1067,18 @@ export default {
     },
     getRowKey(row) {
       return row.id
+    },
+    // 处理人员显示
+    getUserName(field, value) {
+      let { isMultiple } = field.setting || {};
+
+      if(!isMultiple) {
+        let user = value || {};
+        return user.displayName || user.name;
+      }
+
+      let newValue = Array.isArray(value) ? value : [];
+      return newValue.map(i => i.displayName || i.name).join(',');
     }
   },
   components: {

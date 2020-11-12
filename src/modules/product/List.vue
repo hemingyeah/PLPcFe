@@ -135,7 +135,7 @@
               {{formatCustomizeAddress(scope.row.attribute[column.field])}}
             </template>
             <template v-else-if="column.formType === 'user' && scope.row.attribute[column.field]">
-              {{scope.row.attribute[column.field].displayName || scope.row.attribute[column.field].name}}
+              {{ getUserName(column, scope.row.attribute[column.field]) }}
             </template>
             <template v-else-if="column.formType === 'location'">
               {{ scope.row.attribute[column.field] && scope.row.attribute[column.field].address}}
@@ -446,7 +446,7 @@ export default {
       }
 
       return this.dynamicFields.concat(fixedFields)
-        .filter(f => f.formType !== 'separator' && f.formType !== 'info')
+        .filter(f => f.formType !== 'separator' && f.formType !== 'info' && f.formType !== 'autograph')
         .map(f => {
 
           // 调整字段顺序
@@ -617,7 +617,19 @@ export default {
       return field.province + field.city + field.dist + field.address || ''
     },
     getRelatedTask(field) {
-      return Array.isArray(field) ? field.map(item => item.taskNo).join(',') : "";
+      return Array.isArray(field) ? field.map(item => item.taskNo).join(',') : '';
+    },
+    // 处理人员显示
+    getUserName(field, value) {
+      let { isMultiple } = field.setting || {};
+
+      if(!isMultiple) {
+        let user = value || {};
+        return user.displayName || user.name;
+      }
+
+      let newValue = Array.isArray(value) ? value : [];
+      return newValue.map(i => i.displayName || i.name).join(',');
     },
     openOutsideLink(e) {
       let url = e.target.getAttribute('url');
@@ -926,7 +938,7 @@ export default {
         .reduce((acc, col) => (acc[col.field] = col) && acc, {});
 
       this.columns = this.productFields
-        .filter(f => f.formType !== 'attachment' && f.formType !== 'separator' && f.formType !== 'info')
+        .filter(f => f.formType !== 'attachment' && f.formType !== 'separator' && f.formType !== 'info' && f.formType !== 'autograph')
         .map(field => {
           let sortable = false;
           let minWidth = null;
