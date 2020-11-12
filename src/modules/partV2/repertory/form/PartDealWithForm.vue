@@ -127,7 +127,7 @@
             <template v-else-if="item.field==='price'">{{countPrice(scope.row)}}</template>
             <template v-else-if="item.field==='mulNumber'">{{scope.row.solvedVariation}}/{{scope.row.variation}}</template>
             <template v-else-if="item.field==='child_2'">{{scope.row.sparepart[item.prop]}}</template>
-            <template v-else-if="item.field==='sourceTargetName'">{{propData.data.sourceTargetName}}</template>
+            <template v-else-if="item.field==='sourceTargetName'">{{scope.row.sourceName}}</template>
             <template v-else>{{scope.row[item.prop]}}</template>
           </template>
         </el-table-column>
