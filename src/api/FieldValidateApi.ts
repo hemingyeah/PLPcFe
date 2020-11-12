@@ -1,6 +1,6 @@
 import http from '@src/util/http';
 
-let fixedPrefixPath = '/api/app';
+let fixedPrefixPath = '/api/customer';
 
 /**
  * 客户自定义字段唯一校验
