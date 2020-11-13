@@ -219,6 +219,10 @@ export default {
         }
         break;
       }
+      case 'cascader': {
+        operator = 'cascader';
+        break;
+      }
       case 'user': {
         operator = 'user';
         break;
@@ -436,7 +440,9 @@ export default {
             if (field.formType === 'select' && field.displayName === '服务团队') {
               tv = []
             }
-
+            if (field.formType === 'cascader' ) {
+              tv = []
+            }
             form[field.fieldName] = this.formBackup[field.fieldName] || tv;
 
 

@@ -15,7 +15,8 @@
       <search-form :fields="fields" ref="searchForm" :form-backup="formBackup" :columnNum="columnNum"></search-form>
       <slot name="footer"></slot>
     </el-form>
-</base-panel></template>
+</base-panel>
+</template>
 
 <script>
 import { FormFieldMap, SettingComponents } from '@src/component/form/components';
@@ -145,6 +146,10 @@ export default {
       }
       case 'user': {
         operator = 'user';
+        break;
+      }
+      case 'cascader': {
+        operator = 'cascader';
         break;
       }
       case 'address': {
@@ -323,7 +328,9 @@ export default {
             if (field.formType === 'tags') {
               tv = []
             }
-
+            if (field.formType === 'cascader' ) {
+              tv = []
+            }
             form[field.fieldName] = this.formBackup[field.fieldName] || tv;
 
             this.$set(this.form, field.fieldName, this.formBackup[field.fieldName] || tv)

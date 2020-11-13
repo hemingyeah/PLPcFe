@@ -261,6 +261,10 @@ export default {
         }
         break;
       }
+      case 'cascader': {
+        operator = 'cascader';
+        break;
+      }
       case 'user': {
         operator = 'user';
         break;
@@ -484,7 +488,9 @@ export default {
             if (field.formType === 'area') {
               tv = []
             }
-
+            if (field.formType === 'cascader' ) {
+              tv = []
+            }
             form[field.fieldName] = this.formBackup[field.fieldName] || tv;
 
             this.$set(
