@@ -59,6 +59,7 @@ export default {
       let fields = [...this.config.fields, ...this.selfFields]
         .filter(f => f.isSearch || f.isSystem)
         .map(field => {
+          let key = '';
           f = _.cloneDeep(field);
 
           let formType = f.formType;
@@ -74,12 +75,17 @@ export default {
           if (formType === 'updateTime') {
             f.displayName = '更新时间';
           }
+
+          if(formType === 'related_task') {
+            key = 'taskNo';
+          }
           return Object.freeze({
             ...f,
             isNull: 1,
             formType,
             originalFormType: f.formType,
-            operator: this.matchOperator(f)
+            operator: this.matchOperator(f),
+            key
           });
         })
         .sort((a, b) => a.orderId - b.orderId);
@@ -275,6 +281,10 @@ export default {
       }
       case 'location': {
         operator = 'location';
+        break;
+      }
+      case 'related_task': {
+        operator = 'array_contain';
         break;
       }
       default: {
