@@ -150,7 +150,7 @@ const FrameManager = {
             this.currUrl = prevTab.url;
           }
         }
-        if (frameTab.id === "wx_auth") {
+        if (frameTab.id === 'wx_auth') {
           // 监听 微信授权页面关闭关闭轮询事件
           sessionStorage.setItem('wx_auth_auth_page_close', true);
         }
@@ -230,7 +230,9 @@ const FrameManager = {
         if (typeof iframe.contentWindow.__exports__refresh == 'function') {
           return iframe.contentWindow.__exports__refresh().then(() => {
             tab.loading = false;
-            tab.title = iframe.contentWindow.document.title;
+            if (iframe?.contentWindow?.document) {
+              tab.title = iframe.contentWindow.document.title;
+            }
           })
             .catch(err => console.error(err));
         }

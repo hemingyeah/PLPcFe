@@ -82,7 +82,7 @@ export default {
 
         this.$emit('update', { newValue, field: this.field });
         this.$emit('input', newValue);
-
+        event.preventDefault(); //阻止粘贴默认事件造成，复制2次的问题
       } catch (error) {
         console.warn('form-number: paste -> error', error)
       }
