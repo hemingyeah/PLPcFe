@@ -345,7 +345,24 @@ export default {
           }
 
           const f = event.field;
-          this.form[f.fieldName] = event.newValue;
+          if (f.children && f.children.length > 0) {
+            f.children.forEach(item => {
+              this.form[item] = "";
+            });
+          }
+          if (f.returnData) {
+            let result = f.returnData(event.newValue);
+            this.form = {
+              ...this.form,
+              ...result,
+              [f.fieldName]: event.newValue
+            };
+          } else {
+            this.form = {
+              ...this.form,
+              [f.fieldName]: event.newValue
+            };
+          }
         },
         renderInput(h, field) {
           const f = {
