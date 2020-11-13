@@ -243,7 +243,7 @@ const FormView = {
       if(isHidden == 1) return null;
 
       // 判断是否可见
-      if(!isVisible) return null;    
+      if(isVisible == false) return null;    
       
       const originalObj = this.value;
       

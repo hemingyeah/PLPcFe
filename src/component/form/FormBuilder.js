@@ -99,7 +99,7 @@ const FormBuilder = {
         if(field.isHidden == 1) return null;
 
         //判断是否可见
-        if(!field.isVisible) return null;
+        if(field.isVisible == false) return null;
 
         let comp = FieldManager.findField(field.formType);
         if(comp == null) {
