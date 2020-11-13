@@ -110,17 +110,21 @@
       </div>
     </template>
     <!-- end 协同人 -->
-    <!-- 关联工单 -->
-    <template slot="relevance" slot-scope="{ field }">
+    <!-- 创建方式 -->
+    <template slot="source" slot-scope="{ field }" v-if="task.source">
       <div class="form-view-row">
         <label>{{ field.displayName }}</label>
         <div class="form-view-row-content">
           {{task.source}}
-          <a class="link-text" :href="`/event/view/${task.eventId}`">{{task.eventNo}}</a>
+          <a class="link-text" :href="`/event/view/${task.eventId}`">
+            <template v-if="task.eventNo">
+              #{{task.eventNo}}
+            </template>
+          </a>
         </div>
       </div>
     </template>
-    <!-- end 关联工单 -->
+    <!-- end 创建方式 -->
   </form-view>
 </template>
 

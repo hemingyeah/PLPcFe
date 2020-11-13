@@ -115,6 +115,14 @@ export default {
       if (storageGet(TASK_GUIDE_SEARCH_PUPAL) && storageGet(TASK_GUIDE_SEARCH_PUPAL) > 0) this.guideSearchPupal = false;
       else this.guideSearchPupal = true, storageSet(TASK_GUIDE_SEARCH_PUPAL, '1');
       this.visible = true;
+      const searchField = localStorage.getItem('task-search-field')
+      if (searchField) {
+        this.checkSystemList = [...new Set(JSON.parse(searchField).checkSystemList)]
+        this.checkCustomizeList = [...new Set(JSON.parse(searchField).checkCustomizeList)]
+      }  else {
+        this.checkSystemList = []
+        this.checkCustomizeList = []
+      }
     },
     handleCheckAllSysChange(v) {
       this.checkSystemList = v ? this.systemList.map(item => {return item.displayName}) : []
@@ -128,6 +136,7 @@ export default {
         this.checkSystemList = [...new Set(JSON.parse(searchField).checkSystemList)]
         this.checkCustomizeList = [...new Set(JSON.parse(searchField).checkCustomizeList)]
       }
+      this.$emit('visible', false)
     },
 
     checkList() {

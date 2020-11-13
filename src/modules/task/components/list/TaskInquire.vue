@@ -540,8 +540,9 @@ export default {
           if (f.formType === 'select') {
             f.setting.isMulti = false;
           }
-
+ 
           let childComp = null;
+
           if (f.fieldName == 'customer') {
             let value = this.form[f.fieldName];
             childComp = h('search-customer-select', {
@@ -635,6 +636,7 @@ export default {
                 },
               }
             );
+
           }
           return h(
             'form-item',

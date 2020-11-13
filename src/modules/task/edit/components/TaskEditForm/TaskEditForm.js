@@ -169,7 +169,7 @@ export default {
           if(isDateTimeType) {
             let planTime = DateUtil.parseDateTime(value).getTime();
             let nowTime = new Date().getTime();
-            errorMessage = planTime < nowTime && !that.isFinishedTask ? PLAN_TIME_NOT_LESS_THEN_NOW_MEESSAGE : '';
+            errorMessage = planTime < nowTime && that.isVilidatePlantime ? PLAN_TIME_NOT_LESS_THEN_NOW_MEESSAGE : '';
           }
 
           return new Promise((resolve, reject) => {

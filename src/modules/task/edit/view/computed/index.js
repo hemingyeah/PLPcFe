@@ -117,7 +117,11 @@ export default {
       isCopyTask: this.isCopyTask,
       isFromPlan: this.isFromPlan,
       isFromEvent: this.isFromEvent,
-      isTaskCreate: this.isTaskCreate
+      isTaskCreate: this.isTaskCreate,
+      isTaskEdit: this.isTaskEdit,
+      isPlanTaskEdit: this.isPlanTaskEdit,
+      isFromCustomer: this.isFromCustomer,
+      isFromProduct: this.isFromProduct,
     }
   },
   task() {
