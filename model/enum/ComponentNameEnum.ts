@@ -22,6 +22,8 @@ enum ComponentNameEnum {
   TaskAllotPoolNotification = 'task-allot-pool-notification',
   // 工单指派 工单池 统计信息
   TaskAllotPoolInfo = 'task-allot-pool-info',
+  // 新建分配规则
+  AllotRuleModal = 'allot-rule-modal'
 }
 
 export default ComponentNameEnum

@@ -46,15 +46,15 @@ export default class TaskAllotAuto extends Vue {
     
     let matchResultBeforeList: AutoDispatchListItem[]  = []
     let item: AutoDispatchListItem | null = null
-    let matchSucessfully = false
+    let matchSuccessfully = false
     // 遍历过滤结果
     for (let i = 0; i < this.autoDispatchResultList.length; i++) {
       item = this.autoDispatchResultList[i]
       // 根据规则id判断是否匹配成功
-      matchSucessfully = this.isMatchSucessfully(item)
+      matchSuccessfully = this.isMatchSuccessfully(item)
       matchResultBeforeList.push(item)
       // 匹配成功
-      if (matchSucessfully) {
+      if (matchSuccessfully) {
         this.matchRole = item
         this.matchRoleIndex = i
         break
@@ -109,7 +109,7 @@ export default class TaskAllotAuto extends Vue {
   /** 
    * @description 判断是否验证成功
   */
-  private isMatchSucessfully(item: AutoDispatchListItem): boolean {
+  private isMatchSuccessfully = (item: AutoDispatchListItem): boolean => {
     // 根据规则id判断是否匹配成功
     return Boolean(item.finalRuleId)
   }
@@ -118,11 +118,12 @@ export default class TaskAllotAuto extends Vue {
    * @description 渲染自动匹配内容
   */
   private renderAutoMatch(h: CreateElement, item: AutoDispatchListItem, index: number) {
-    let matchSucessfully = this.isMatchSucessfully(item)
+    let matchSuccessfully = this.isMatchSuccessfully(item)
     // 渲染未匹配成功dom
-    if (!matchSucessfully) {
+    if (!matchSuccessfully) {
       return this.renderUnMathItem(item)
     }
+    
     
     return this.renderMathItem(item)
   }
@@ -139,10 +140,10 @@ export default class TaskAllotAuto extends Vue {
    * @description 渲染自动匹配头部
   */
   private renderHead(h: CreateElement, item: AutoDispatchListItem, index: number) {
-    let matchSucessfully = this.isMatchSucessfully(item)
+    let matchSuccessfully = this.isMatchSuccessfully(item)
     let isBefore = index < this.matchRoleIndex
     // 渲染未匹配成功dom
-    if (!matchSucessfully) {
+    if (!matchSuccessfully) {
       let classNames = ['base-timeline-head', 'base-timeline-head-no-match']
       isBefore && classNames.push('base-timeline-head-before')
       
@@ -193,7 +194,7 @@ export default class TaskAllotAuto extends Vue {
     this.fetchAutoDispatchResultList()
   }
   
-  render(h: CreateElement) {    
+  render(h: CreateElement) {
     return (
       <div class={this.className}>
         <div class={`${this.className}-header`}>

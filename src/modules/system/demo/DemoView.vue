@@ -2,13 +2,14 @@
   <div style="padding: 10px;">
 
     <biz-select-column ref="bizSelectColumn"></biz-select-column>
-    <task-allot-modal ref="TaskAllotModal" :user-state-map="userStateMap" customer-id="abd228da-014e-11eb-9baf-00163e0d174e"></task-allot-modal>
-
+    <!-- <task-allot-modal ref="TaskAllotModal" :user-state-map="userStateMap" customer-id="abd228da-014e-11eb-9baf-00163e0d174e"></task-allot-modal> -->
+    <allot-rule-modal ref='CreateAllotRuleModal'></allot-rule-modal>
   </div>
 </template>
 
 <script>
 import TaskAllotModal from '@src/modules/task/components/TaskAllotModal/TaskAllotModal.tsx'
+import AllotRuleModal from '@src/modules/task/components/AllotRuleModal/AllotRuleModal.tsx'
 
 export default {
   name: 'demo-view',
@@ -33,13 +34,18 @@ export default {
   methods: {
     openAllotDialog() {
       this.$refs.TaskAllotModal.show()
-    }
+    },
+    openCreateDialog() {
+      this.$refs.CreateAllotRuleModal.show()
+    },
   },
   mounted() {
-    this.openAllotDialog()
+    // this.openAllotDialog()
+    this.openCreateDialog()
   },
   components: {
-    [TaskAllotModal.name]: TaskAllotModal
+    [TaskAllotModal.name]: TaskAllotModal,
+    [AllotRuleModal.name]: AllotRuleModal
   }
 };
 </script>
