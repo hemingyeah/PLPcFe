@@ -2,6 +2,7 @@
 import TaskAllotType from '@src/modules/task/components/TaskAllotModal/TaskAllotType/TaskAllotType.tsx'
 import TaskAllotExcutor from '@src/modules/task/components/TaskAllotModal/TaskAllotExcutor/TaskAllotExcutor.tsx'
 import TaskAllotPool from '@src/modules/task/components/TaskAllotModal/TaskAllotPool/TaskAllotPool.tsx'
+import TaskAllotAuto from '@src/modules/task/components/TaskAllotModal/TaskAllotAuto/TaskAllotAuto.tsx'
 import UserButton from '@src/modules/task/components/TaskAllotModal/UserButton/UserButton.tsx'
 /* enum */
 import ComponentNameEnum from '@model/enum/ComponentNameEnum'
@@ -22,6 +23,7 @@ import './TaskAllotModal.scss'
   components: {
     [TaskAllotExcutor.name]: TaskAllotExcutor,
     [TaskAllotPool.name]: TaskAllotPool,
+    [TaskAllotAuto.name]: TaskAllotAuto,
     [TaskAllotType.name]: TaskAllotType,
     [UserButton.name]: UserButton,
   }
@@ -74,6 +76,7 @@ export default class TaskAllotModal extends TaskAllotModalRender {
                 ref='TaskAllotExcutorComponent'
               />
               <task-allot-pool show={this.allotType === TaskAllotTypeEnum.Pool} style={this.allotContentStyle[TaskAllotTypeEnum.Pool]} />
+              <task-allot-auto show={this.allotType === TaskAllotTypeEnum.Auto} style={this.allotContentStyle[TaskAllotTypeEnum.Auto]}></task-allot-auto>
             </div>
           </keep-alive>
         </div>

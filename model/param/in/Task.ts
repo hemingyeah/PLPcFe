@@ -108,3 +108,11 @@ export interface TaskAllotUserListByTagModel {
   lng: string
   tagId?: string
 }
+
+/* 自动派单-获取预估列表结果model */
+export interface TaskAutoDispatchResultListModel {
+  // 工单id
+  taskId: string
+  // 必填默认值 参数做了校验   如传入：auto_dispatch
+  executorId: string
+}

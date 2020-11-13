@@ -4,7 +4,8 @@ import {
   PlanTaskCreateAndEditModel,
   TaskSearchListModel,
   TaskGetCardDetailListModel,
-  TaskAllotUserListByTagModel
+  TaskAllotUserListByTagModel,
+  TaskAutoDispatchResultListModel
 } from "@model/param/in/Task"
 
 import { 
@@ -14,7 +15,8 @@ import {
   getTaskFilterWithPartResult,
   getLatestRecordResult,
   getUserListByTagResult,
-  getTaskConfigResult
+  getTaskConfigResult,
+  getAutoDispatchResultListResult
 } from '@model/param/out/Task'
 
 import GrayUtil from '@src/util/gray'
@@ -1124,6 +1126,13 @@ export function getTaskAlloyPoolList(params: any): Promise<any> {
  */
 export function getTaskAllotTeamUserList(params: any): Promise<any> {
   return http.post('/task/customerTag/dispatch/list', params)
+}
+
+/**
+ * @description 自动派单-获取预估列表结果
+ */
+export function getAutoDispatchResultList(params: TaskAutoDispatchResultListModel): Promise<getAutoDispatchResultListResult> {
+  return http.post('http://30.40.61.216:3000/mock/59/outside/pc/task/autoDispatchResultList', params)
 }
 
 /* -------------  end  新工单api ---------------- */

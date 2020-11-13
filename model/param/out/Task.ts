@@ -6,6 +6,7 @@ import Page from '@model/types/Page'
 import MsgModel from '@model/MsgModel'
 import LoginUser from '@model/entity/LoginUser/LoginUser'
 import TaskConfig from '@model/types/TaskConfig'
+import AutoDispatchListItem from '@model/types/AutoDispatchListItem'
 
 
 /** 获取用户视图列表返回值 */
@@ -28,3 +29,6 @@ export type getUserListByTagResult = MsgModel<LoginUser[]>
 
 /* 获取工单配置 */
 export type getTaskConfigResult = { taskConfig: TaskConfig}
+
+/* 自动派单-获取预估列表结果 */
+export type getAutoDispatchResultListResult =Result<AutoDispatchListItem[]>

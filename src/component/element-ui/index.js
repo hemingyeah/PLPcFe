@@ -48,7 +48,7 @@ import {
   Notification,
   Upload,
   Collapse,
-  CollapseItem
+  CollapseItem,
 } from 'shb-element-ui';
 
 import CollapseTransition from 'shb-element-ui/lib/transitions/collapse-transition';
