@@ -8,7 +8,6 @@
       :placeholder="placeholder" 
       :value="value"
       @input="input"
-      :disabled="disabled"
     >
   </div>
 </template>
@@ -19,7 +18,7 @@ import FormMixin from '@src/component/form/mixin/form';
 import { FORM_FIELD_TEXT_MAX_LENGTH } from '@src/model/const/Number.ts';
 
 export default {
-  name: 'form-number',
+  name: 'number-search',
   mixins: [FormMixin],
   props: {
     value: [String, Number]
@@ -30,7 +29,7 @@ export default {
     },
     nativeInputValue() {
       return this.value === null || this.value === undefined ? '' : String(this.value);
-    }
+    },
   },
   watch: {
     // native input value is set explicitly
@@ -82,7 +81,7 @@ export default {
 
         this.$emit('update', { newValue, field: this.field });
         this.$emit('input', newValue);
-        event.preventDefault(); //阻止粘贴默认事件造成，复制2次的问题
+
       } catch (error) {
         console.warn('form-number: paste -> error', error)
       }
@@ -96,9 +95,6 @@ export default {
   width: 100%;
   input{
     width: 100%;
-    &:disabled{
-      -webkit-text-fill-color: #b2b2b2;
-    }
   }
 }
 </style>
