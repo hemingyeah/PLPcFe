@@ -1,38 +1,39 @@
 <template>
   <div class="form-related-task">
 		<el-select
-			:value="value"
+			:value="taskValue"
 			style="width: 100%"
 			multiple
 			filterable
 			remote
 			reserve-keyword
+      default-first-option
+			popper-append-to-body
 			popper-class="option-item"
 			loading-text="载入更多结果......"
 			no-data-text="未找到结果"
 			@change="updateTask"
-			:popper-append-to-body="true"
 			:placeholder="placeholder"
 			:remote-method="searchTask"
 			:loading="loading">
 				<el-option
 					v-for="option in options"
 					:key="option.value"
-					:label="option.label"
+					:label="option.taskNo"
 					:value="option">
 						<h3 class="option-item-font">{{option.taskNo}}</h3>
 						<p class="option-item-font">
 							<span>
 								<label>客户姓名：</label>
-								<span>{{option.customer.name}}</span>
+								<span>{{option.customer && option.customer.name}}</span>
 							</span>
 							<span>
 								<label>联系人：</label>
-								<span>{{option.linkMan.name}}</span>
+								<span>{{option.linkMan && option.linkMan.name}}</span>
 							</span>
 							<span>
 								<label>电话：</label>
-								<span>{{option.linkMan.phone}}</span>
+								<span>{{option.linkMan && option.linkMan.phone}}</span>
 							</span>
 						</p>
 						<p v-if="option.products && option.products.length > 0" class="option-item-font">
@@ -68,6 +69,7 @@ export default {
   },
   data() {
     return {
+      taskValue: [],
 			options: [],
       loading: false,
       
@@ -77,7 +79,11 @@ export default {
 	},
 	mounted() {
 		if(this.value && this.value.length > 0) {
-			this.options = _.cloneDeep(this.value);
+      let taskValue = _.cloneDeep(this.value);
+      this.taskValue = taskValue.map(item => {
+        item.value = item.taskNo;
+        return item;
+      })
 		}
 	},
   methods: {
@@ -92,14 +98,14 @@ export default {
 				if (!res || !res.result || !res.result.content) return;
 				if (res.result.content) {
 					this.options = res.result.content.map(task => Object.freeze({
-						label: task.taskNo,
-						value: task.id,
+						// label: task.taskNo,
+						value: task.taskNo,
 						taskNo: task.taskNo,
 						taskId: task.id,
 						templateId: task.templateId,
-						linkMan: task.linkMan || {},
-						customer: task.customerEntity || {},
-						products: task.products || []
+						// linkMan: task.linkMan || {},
+						// customer: task.customerEntity || {},
+						// products: task.products || []
           }));
 				}
 			})
@@ -109,9 +115,17 @@ export default {
 			});
 		},
 		updateTask(newValue) {
-			let oldValue = null;
-      this.$emit('update', {newValue, oldValue, field: this.field});
-      this.$emit('input', newValue);
+      console.log('newValue', newValue);
+      this.taskValue = newValue;
+      let oldValue = null;
+
+      this.inputForValue(newValue.map(item => {
+        return {
+          taskId: item.taskId,
+          taskNo: item.taskNo,
+          templateId: item.templateId
+        }
+      }));
 		}
   },
 }
