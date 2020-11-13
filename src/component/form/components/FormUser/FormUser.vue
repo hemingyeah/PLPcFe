@@ -54,23 +54,23 @@ export default {
       return this.multiple || isMultiple == 1;
     },
     displayName(){
-      if(!this._multiple) {
-        let user = this.value || {};
-        return user.displayName || user.name;
+      // 多选
+      if(Array.isArray(this.value)) {
+        return this.value.map(i => i.displayName || i.name).join(',');
       }
-
-      let value = Array.isArray(this.value) ? this.value : [];
-      return value.map(i => i.displayName || i.name).join(',')
+      
+      let user = this.value || {};
+      return user.displayName || user.name;
     },
     // 根据userId判断是否为空
     isEmpty(){
-      if(!this._multiple) {
-        let value = this.value || {};
-        return !value.userId;
+      // 多选
+      if(Array.isArray(this.value)) {
+        return this.value.length <= 0;
       }
 
-      let value = this.value || [];
-      return value.length <= 0
+      let value = this.value || {};
+      return !value.userId;
     },
     /** 
     * @description 显示离职人员

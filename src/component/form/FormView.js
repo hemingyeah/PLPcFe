@@ -69,15 +69,12 @@ const FormView = {
       
       // 人员
       if (field.formType === 'user') {
-        let { isMultiple } = field.setting || {};
-
         // 多选
-        if(isMultiple == 1) {
-          let valueArr = Array.isArray(value) ? value : [];
-          return valueArr.map(i => i.displayName || i.name).join(',');
+        if(Array.isArray(value)) {
+          return value.map(i => i.displayName || i.name).join(',');
         }
-        
-        return value && (value.displayName || value.name)
+      
+        return value && (value.displayName || value.name);
       }
       
       return value;
