@@ -2,7 +2,7 @@ import FormFormulaSetting from './FormFormulaSetting.vue';
 import FormFormulaPreview from './FormFormulaPreview.vue';
 import FormFormula from './FormFormula.vue';
 
-import FormNumber from './../FormNumber/FormNumber.vue';
+import NumberSearch from './../FormNumber/extend/NumberSearch.vue';
 
 let FormCalculationFormulaField = {
   // 字段类型
@@ -14,7 +14,7 @@ let FormCalculationFormulaField = {
     preview: FormFormulaPreview,
     build: FormFormula,
     extend: {
-      'formula_search': FormNumber
+      'formula_search': NumberSearch
     }
   }
 };
