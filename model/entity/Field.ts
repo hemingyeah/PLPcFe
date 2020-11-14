@@ -89,6 +89,8 @@ interface Field {
   // 自增Id
   iid?: string
   
+  id?: string
+  
   /**
    * 设置信息，保存预制列表等数据
   */

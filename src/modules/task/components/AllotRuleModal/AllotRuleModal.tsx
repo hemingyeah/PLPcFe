@@ -13,12 +13,15 @@ import {
   AllotGroupSelectDefaultOptions, 
   AllotGroupSelectTagOptions,
   AllotOrderOptions,
-  TagOpeartorOptions
+  ConditionOpeartorOptions,
+  EqualOpeartorOptions
 } from '@src/modules/task/components/AllotRuleModal/AllotRuleModalModel'
+import { TaskFieldNameMappingEnum, FieldTypeMappingEnum } from '@model/enum/FieldMappingEnum'
 /* entity */
 import LoginUser from '@model/entity/LoginUser/LoginUser'
 import Role from '@model/entity/Role/Role'
 import Tag from '@model/entity/Tag/Tag'
+import Field from '@model/entity/Field'
 import TaskType from '@model/entity/TaskType'
 /* interface */
 import { RoleForm } from '@src/modules/task/components/AllotRuleModal/AllotRuleModalInterface'
@@ -29,6 +32,8 @@ import ElSelectOption from '@model/types/ElSelectOption'
 /* util */
 import { uuid } from '@src/util/string'
 
+const SelectFieldNames = [TaskFieldNameMappingEnum.ServiceContent, TaskFieldNameMappingEnum.ServiceType, TaskFieldNameMappingEnum.Level]
+
 @Component({
   name: ComponentNameEnum.AllotRuleModal
 })
@@ -38,6 +43,8 @@ export default class AllotRuleModal extends Vue {
   private allotOrderOptions: ElSelectOption[] = AllotOrderOptions
   /* css类名 */
   private className: string = ComponentNameEnum.AllotRuleModal
+  /* 工单类型开启字段列表 */
+  private enabledFields: Field[] = []
   /* 表单数据 */
   private form: RoleForm = {
     groupType: AllotGroupEnum.User,
@@ -52,7 +59,12 @@ export default class AllotRuleModal extends Vue {
     type: RuleTypeEnum.Type,
     typeData: {
       [RuleTypeEnum.Type]: undefined,
-      [RuleTypeEnum.Select]: [],
+      [RuleTypeEnum.Select]: {
+        taskType: undefined,
+        field: '',
+        operator: undefined,
+        value: ''
+      },
       [RuleTypeEnum.Tag]: { 
         operator: AllotOperatorEnum.Contains,
         tags: []
@@ -62,7 +74,7 @@ export default class AllotRuleModal extends Vue {
   /* 等待状态 */
   private pending: boolean = false
   /* 操作符选项列表 */
-  private tagOpeartorOptions: ElSelectOption[] = TagOpeartorOptions
+  private tagOpeartorOptions: ElSelectOption[] = ConditionOpeartorOptions
   /* 显示创建分配规则弹窗的状态 */
   private showAllotRuleModal: boolean = false
   
@@ -76,6 +88,57 @@ export default class AllotRuleModal extends Vue {
         ? [...AllotGroupSelectDefaultOptions, ...AllotGroupSelectTagOptions] 
         : [...AllotGroupSelectDefaultOptions]
     )
+  }
+  
+  /* 工单类型开启字段select列表 */
+  get enabledFieldsOptions(): ElSelectOption[] {
+    return (
+      this.enabledFields.filter((field: Field) => {
+        // 是否是select类型
+        let isSelectType: boolean = (
+          // @ts-ignore
+          SelectFieldNames.indexOf(field.fieldName) >= 0
+          || field.formType === FieldTypeMappingEnum.Select
+        )
+        
+        return isSelectType
+        
+      }).map((field: Field) => {
+        // 是否是多选类型
+        let isMulti = this.isMulti(field)
+        
+        return {
+          label: `${field.displayName}(${isMulti ? '多选' : '单选'})`,
+          value: field.fieldName
+        }
+        
+      })
+    )
+  }
+  
+  /* 当前选择的字段 */
+  get taskTypeSelectedField(): Field {
+    let { field } = this.form.typeData[RuleTypeEnum.Select]
+    let selectedField = this.enabledFields.filter((f: Field) => f.fieldName == field)[0] || {}
+    
+    return selectedField
+  }
+
+  /* 当前选择的字段 对应的操作符 配置列表 */
+  get taskTypeSelectedFieldOperatorOptions(): ElSelectOption[] {
+    // 是否是多选类型
+    let isMulti = this.isMulti(this.taskTypeSelectedField)
+    
+    return isMulti ? ConditionOpeartorOptions : EqualOpeartorOptions
+  }
+  
+  /* 当前选择的字段 对应的值 配置列表 */
+  get taskTypeSelectedFieldValueOptions(): ElSelectOption[] {
+    let { dataSource = [] } = this.taskTypeSelectedField?.setting || {}
+    
+    return dataSource.map((item: string) => {
+      return { label: item, value: item}
+    })
   }
   
   /** 
@@ -117,6 +180,26 @@ export default class AllotRuleModal extends Vue {
         return result
       })
     )
+  }
+  
+  /** 
+   * @description 获取工单类型开启的系统字段列表
+  */
+  private fetchEnabledFields(): void {
+    let params: { typeId: string, tableName: string } = {
+      typeId: this.form.typeData[RuleTypeEnum.Select].taskType?.[0]?.id || 'allSelect',
+      tableName: 'task'
+    }
+    
+    SettingApi.getSettingTaskTypeEnabledFields(params)
+      .then((result: Field[]) => {
+        this.enabledFields = result || []
+        this.form.typeData[RuleTypeEnum.Select].field = this.enabledFieldsOptions?.[0].value
+        this.setFormTypeData()
+      })
+      .catch(error => {
+        console.warn(error)
+      })
   }
   
   /** 
@@ -169,10 +252,27 @@ export default class AllotRuleModal extends Vue {
   }
   
   /** 
-   * @description 工单类型变化
+   * @description 按工单类型 工单类型变化
   */
-  private handlerTaskTypeSelectChanged(value: TaskType) { 
+  private handlerTaskTypeSelectChanged(value: TaskType[]) { 
     this.form.typeData[RuleTypeEnum.Type] = value
+  }
+  
+  /** 
+   * @description 按特定条件 工单类型变化工单类型变化
+  */
+  private handlerCustomTaskTypeSelectChanged(value: TaskType[]) { 
+    this.form.typeData[RuleTypeEnum.Select] = {
+      taskType: value,
+      operator: undefined,
+      field: '',
+      value: ''
+    }
+    this.fetchEnabledFields()
+  }
+  
+  private isMulti(field: Field) {
+    return field?.setting?.isMulti === true
   }
   
   /** 
@@ -206,8 +306,77 @@ export default class AllotRuleModal extends Vue {
    * @description 渲染 规则类型 按照工单类型
   */
   private renderAllotTypeWithTaskType() {
+    let text = '当工单类型符合以下条件时：'
+    let value = this.form.typeData[RuleTypeEnum.Type]
+    let changedHandler = this.handlerTaskTypeSelectChanged
+    
+    return this.renderTaskTypesSelect(value, changedHandler, text)
+  }
+  
+  /** 
+   * @description 渲染 规则类型 按照特定条件
+  */
+  private renderAllotTypeWithConditions() {
+    let text = '选择工单类型，当工单类型为：'
+    let { taskType, field, operator, value } = this.form.typeData[RuleTypeEnum.Select]
+    let changedHandler = this.handlerCustomTaskTypeSelectChanged
+    
+    return (
+      <div>
+        {this.renderTaskTypesSelect(taskType, changedHandler, text)}
+        <div>
+          选择应用条件，当字段
+          <el-select 
+            value={field} 
+            onInput={(value: string) => {
+              this.form.typeData[RuleTypeEnum.Select].field = value
+              this.setFormTypeData()
+            }}
+          >
+            {
+              this.enabledFieldsOptions.map((option: ElSelectOption) => {
+                return (
+                  <el-option key={uuid()} label={option.label} value={option.value} />
+                )
+              })
+            }
+          </el-select>
+          <el-select
+            value={operator} 
+            onInput={(value: AllotOperatorEnum) => {this.form.typeData[RuleTypeEnum.Select].operator = value}}
+          >
+            {
+              this.taskTypeSelectedFieldOperatorOptions.map((option: ElSelectOption) => {
+                return (
+                  <el-option key={uuid()} label={option.label} value={option.value} />
+                )
+              })
+            }
+          </el-select>
+          <el-select
+            value={value} 
+            onInput={(value: string) => this.form.typeData[RuleTypeEnum.Select].value = value}
+          >
+            {
+              this.taskTypeSelectedFieldValueOptions.map((option: ElSelectOption) => {
+                return (
+                  <el-option key={uuid()} label={option.label} value={option.value} />
+                )
+              })
+            }
+          </el-select>
+        </div>
+      </div>
+    )
+  }
+  
+  private renderTaskTypesSelect(
+    value: TaskType[] | undefined, 
+    changedHandler: (value: TaskType[]) => void,
+    text?: string
+  ) {
     const ScopedSlots = {
-      option: (props: { option: Role }) => {
+      option: (props: { option: TaskType }) => {
         return (
           <div key={props.option.id}>
             {props.option.name}
@@ -215,27 +384,19 @@ export default class AllotRuleModal extends Vue {
         )
       }
     }
-    let value = this.form.typeData[RuleTypeEnum.Type]
     
     return (
       <div>
-        <span>选择工单类型，当工单类型为：</span>
+        <span>{text}</span>
         <biz-form-remote-select
           value={value}
-          onInput={this.handlerTaskTypeSelectChanged}
+          onInput={changedHandler}
           placeholder='全部工单类型'
           remoteMethod={this.fetchTaskTypes}
           scopedSlots={ScopedSlots}
         />
       </div>
     )
-  }
-  
-  /** 
-   * @description 渲染 规则类型 按照特定条件
-  */
-  private renderAllotTypeWithConditions() {
-    
   }
   
   /** 
@@ -407,6 +568,15 @@ export default class AllotRuleModal extends Vue {
         }
       </el-select>
     )
+  }
+  
+  private setFormTypeData() {
+    this.form.typeData[RuleTypeEnum.Select].operator = this.taskTypeSelectedFieldOperatorOptions[0].value
+    this.form.typeData[RuleTypeEnum.Select].value = this.taskTypeSelectedFieldValueOptions?.[0].value || ''
+  }
+  
+  mounted() {
+    this.fetchEnabledFields()
   }
   
   

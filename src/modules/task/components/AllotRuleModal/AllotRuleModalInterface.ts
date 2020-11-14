@@ -22,8 +22,18 @@ export interface RoleForm {
   // 派单类型数据
   typeData: {
     // 工单类型
-    [RuleTypeEnum.Type]: TaskType | undefined,
-    [RuleTypeEnum.Select]: any,
+    [RuleTypeEnum.Type]: TaskType[] | undefined,
+    // 特定条件
+    [RuleTypeEnum.Select]: {
+      // 工单类型
+      taskType: TaskType[] | undefined,
+      // 字段
+      field: string,
+      // 操作符
+      operator: AllotOperatorEnum | string | undefined,
+      // 值
+      value: string
+    },
     // 按客户所属服务团队
     [RuleTypeEnum.Tag]: {
       // 操作符

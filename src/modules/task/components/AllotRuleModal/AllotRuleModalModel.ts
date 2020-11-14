@@ -44,6 +44,10 @@ export enum AllotOperatorEnum {
   Contains = '包含',
   // 不包含
   UnContains = '不包含',
+  // 等于
+  Equal = '等于',
+  // 不等于
+  UnEqual = '不等于',
 }
 
 /* 分配select默认选项列表 */
@@ -68,8 +72,14 @@ export const AllotOrderOptions: ElSelectOption[] = [
   { label: '按顺序平均分配', value: AllotOrderEnum.Polling }
 ]
 
-/* 按照客户所属团队 操作符选项列表 */
-export const TagOpeartorOptions: ElSelectOption[] = [
+/* 包含 操作符选项列表 */
+export const ConditionOpeartorOptions: ElSelectOption[] = [
   { label: '包含', value: AllotOperatorEnum.Contains },
   { label: '不包含', value: AllotOperatorEnum.UnContains },
+]
+
+/* 等于 操作符选项列表 */
+export const EqualOpeartorOptions: ElSelectOption[] = [
+  { label: '等于', value: AllotOperatorEnum.Equal },
+  { label: '不等于', value: AllotOperatorEnum.UnEqual },
 ]
