@@ -23,15 +23,15 @@
 					:value="option">
 						<h3 class="option-item-font">{{option.taskNo}}</h3>
 						<p class="option-item-font">
-							<span>
+							<span v-if="option.customer">
 								<label>客户姓名：</label>
 								<span>{{option.customer && option.customer.name}}</span>
 							</span>
-							<span>
+							<span v-if="option.linkMan">
 								<label>联系人：</label>
 								<span>{{option.linkMan && option.linkMan.name}}</span>
 							</span>
-							<span>
+							<span v-if="option.linkMan">
 								<label>电话：</label>
 								<span>{{option.linkMan && option.linkMan.phone}}</span>
 							</span>
@@ -83,7 +83,8 @@ export default {
       this.taskValue = taskValue.map(item => {
         item.value = item.taskNo;
         return item;
-      })
+      });
+      this.options = taskValue;
 		}
 	},
   methods: {
@@ -98,14 +99,13 @@ export default {
 				if (!res || !res.result || !res.result.content) return;
 				if (res.result.content) {
 					this.options = res.result.content.map(task => Object.freeze({
-						// label: task.taskNo,
-						value: task.taskNo,
-						taskNo: task.taskNo,
+            value: task.id,
+            taskNo: task.taskNo,
 						taskId: task.id,
 						templateId: task.templateId,
-						// linkMan: task.linkMan || {},
-						// customer: task.customerEntity || {},
-						// products: task.products || []
+						linkMan: task.linkMan || {},
+						customer: task.customerEntity || {},
+						products: task.products || []
           }));
 				}
 			})

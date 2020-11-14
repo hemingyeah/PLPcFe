@@ -191,7 +191,7 @@ const FormView = {
           
           return (
             <span>
-              <a href="javascript:;" class="link" onClick={() => {
+              <a href="javascript:;" class="link-text" style="margin: 0" onClick={() => {
                 this.$platform.openTab({
                   id: `task_view_${taskId}`,
                   title: '工单详情',
