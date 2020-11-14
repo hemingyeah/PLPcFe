@@ -28,3 +28,10 @@ export function getSettingUserList(params) {
 export function getSettingRoleList(params) {
   return http.get('/setting/role/list', params)
 }
+
+/** 
+ * 获取工单类型列表
+*/
+export function getSettingTaskTypeList(params) {
+  return http.get('/setting/taskType/list', params)
+}
