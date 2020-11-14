@@ -33,6 +33,8 @@ export const fieldValidateMap = {
   product: FieldValidateApi.fieldRepeatProduct
 }
 
+let remoteValidateDebounceFunc = null
+
 const RuleMap = {
   text,
   select,
@@ -57,23 +59,46 @@ const RuleMap = {
 };
 
 // 远程验证字段是否重复方法
-let repeatRemoteValidate = _.debounce(function(mode, field, value, id, changeStatus, resolve) {
-  let api = fieldValidateMap[mode];
-  let params = { fieldName: field.fieldName, fieldValue: value, id };
+let repeatRemoteValidate = (mode, field, value, id, changeStatus, resolve, isSample = true, formBuilderComponent = {}) => {
+  
+  const remoteFunc = () => {
+    let api = fieldValidateMap[mode];
+    let params = { fieldName: field.fieldName, fieldValue: value, id };
+    
+    // api不存在
+    if (!api) return;
+    
+    changeStatus(true);
+    return api(params).then(res => {
+      changeStatus(false);
+      return resolve(res.succ ? (res.data == 1 ? `${field.displayName}不允许重复` : null) : null);
+    })
+      .catch(err => console.error(err))
+  }
+  
+  if (isSample) {
+    let { remoteValidateData } = formBuilderComponent
+    let { validateFunc, field } = remoteValidateData
+    
+    if (!validateFunc) {
+      validateFunc = _.debounce(remoteFunc, 500)
+      
+      formBuilderComponent.outsideSetRemoteValidateData({
+        field,
+        validateFunc
+      })
+    }
+    
+    validateFunc()
+    
+  } else {
+    remoteFunc()
+  }
 
-  // api不存在
-  if (!api) return;
-
-  changeStatus(true);
-  return api(params).then(res => {
-    changeStatus(false);
-    return resolve(res.succ ? (res.data == 1 ? `${field.displayName}不允许重复` : null) : null);
-  })
-    .catch(err => console.error(err))
-}, 500)
+}
 
 /** 单行文本验证，50字以内 */
-function text(value, field = {}, origin = {}, mode, changeStatus){
+function text(value, field = {}, origin = {}, mode, changeStatus, isSample = true, formBuilderComponent = {}){
   let { isRepeat, defaultValueConfig } = field.setting || {};
 
   // 默认值是否允许修改
@@ -91,13 +116,15 @@ function text(value, field = {}, origin = {}, mode, changeStatus){
     if(!value || value.toString().length == 0) return resolve(`请输入${field.displayName}`);
     resolve(null);
   })
-
+  
   // 不需要校验重复性
   if (!isRepeat || !mode || !value || notModifyValue) return validate;
-
+  
   return new Promise((resolve, reject) => {
     validate.then((res) => {
-      res === null ? repeatRemoteValidate(mode, field, value, origin.id, changeStatus, resolve) : resolve(res);
+      res === null 
+        ? repeatRemoteValidate(mode, field, value, origin.id, changeStatus, resolve, isSample, formBuilderComponent) 
+        : resolve(res);
     }).catch(err => {
       console.error('text validate err', err);
     })
@@ -128,7 +155,7 @@ function cascader(value, field = {}){
 }
 
 /** 多行文本验证，500字以内 */
-function textarea(value, field = {}, origin = {}, mode, changeStatus) {
+function textarea(value, field = {}, origin = {}, mode, changeStatus, isSample = true, formBuilderComponent = {}) {
   let { isRepeat, defaultValueConfig } = field.setting || {};
 
   // 默认值是否允许修改
@@ -149,7 +176,7 @@ function textarea(value, field = {}, origin = {}, mode, changeStatus) {
 
   return new Promise((resolve, reject) => {
     validate.then((res) => {
-      res === null ? repeatRemoteValidate(mode, field, value, origin.id, changeStatus, resolve) : resolve(res);
+      res === null ? repeatRemoteValidate(mode, field, value, origin.id, changeStatus, resolve, isSample, formBuilderComponent) : resolve(res);
     }).catch(err => {
       console.error('textarea validate err', err);
     })
@@ -157,7 +184,7 @@ function textarea(value, field = {}, origin = {}, mode, changeStatus) {
 }
 
 // 验证电话手机格式
-function phone(value, field = {}, origin = {}, mode, changeStatus) {
+function phone(value, field = {}, origin = {}, mode, changeStatus, isSample = true, formBuilderComponent = {}) {
   let { isRepeat } = field.setting || {};
   let validate = new Promise(resolve => {
     if(field.isNull && !value) return resolve(null);
@@ -171,7 +198,7 @@ function phone(value, field = {}, origin = {}, mode, changeStatus) {
 
   return new Promise((resolve, reject) => {
     validate.then((res) => {
-      res === null ? repeatRemoteValidate(mode, field, value, origin.id, changeStatus, resolve) : resolve(res);
+      res === null ? repeatRemoteValidate(mode, field, value, origin.id, changeStatus, resolve, isSample, formBuilderComponent) : resolve(res);
     }).catch(err => {
       console.error('phone validate err', err);
     })
@@ -227,27 +254,27 @@ function planTime(value, field = {}) {
   });
 }
 
-function number(value, field = {}, origin = {}, mode, changeStatus) {
+function number(value, field = {}, origin = {}, mode, changeStatus, isSample = true, formBuilderComponent = {}) {
   let { decimalConfig, limitConig, defaultValueConfig, isRepeat } = field.setting || {};
-
+  
   // 默认值是否允许修改
   let { isNotModify } = defaultValueConfig || {};
   let notModifyValue = isNotModify == 1 && !!field.defaultValue;
-
-
+  
+  
   let validate = new Promise(resolve => {
     // 默认值且不允许修改时 不做校验
     if (notModifyValue) return resolve(null);
-
+    
     // 校验小数位数
     if (typeof decimalConfig == 'object') {
       let { digit, isLimit } = decimalConfig;
       let decimal = MathUtil.decimalNumber(value);
-
+      
       // 勾选小数位数且设置了小数位数
       if (isLimit == 1 && digit != '' && decimal > Number(digit)) return resolve(`仅允许输入${digit}位小数`);
     }
-
+      
     // 校验数值范围
     if (typeof limitConig == 'object' && value) {
       let { isLimit, type, max, min } = limitConig;
@@ -270,13 +297,13 @@ function number(value, field = {}, origin = {}, mode, changeStatus) {
     if (typeof Number(value) !== 'number') return resolve('请输入数字');
     resolve(null);
   });
-
+  
   // 不需要校验重复性
   if (!isRepeat || !mode || !value || notModifyValue) return validate;
-
+  
   return new Promise((resolve, reject) => {
     validate.then((res) => {
-      res === null ? repeatRemoteValidate(mode, field, value, origin.id, changeStatus, resolve) : resolve(res);
+      res === null ? repeatRemoteValidate(mode, field, value, origin.id, changeStatus, resolve, isSample, formBuilderComponent) : resolve(res);
     }).catch(err => {
       console.error('number validate err', err);
     })
@@ -384,12 +411,16 @@ function extend(value, field = {}) {
 /**
  * 根据字段类型验证值
  * @param {*} value 值
- * @param {*} formType 字段类型 
+ * @param {*} field 字段
+ * @param {*} origin 原始数据
+ * @param {String} mode 模式
+ * @param {Function} changeStatus 改变状态方法
+ * @param {Boolean} isSample 是否是简单模式 (简单模式的概念是单个字段的单个验证)
  * @returns Promise<message> 
  */
-function validate(value, field, origin = {}, mode, changeStatus){
+function validate(value, field, origin = {}, mode, changeStatus, isSample = true, formBuilderComponent = {}){
   let fn = RuleMap[field.formType];
-  if(typeof fn == 'function') return fn(value, field, origin, mode, changeStatus);
+  if(typeof fn == 'function') return fn(value, field, origin, mode, changeStatus, isSample, formBuilderComponent)
 
   return Promise.resolve(null)
 }
@@ -409,7 +440,7 @@ export function createRemoteValidate(api, build, delay = 500){
     })
       .catch(err => console.error(err))
   }, delay);
-
+  
   return function(value, field, changeStatus){
     let params = typeof build == 'function' ? build(value, field) : {};
     return new Promise(resolve => invoke(params, resolve, changeStatus))

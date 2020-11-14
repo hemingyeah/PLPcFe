@@ -44,6 +44,13 @@ const FormBuilder = {
   },
   data(){
     return {
+      /* 远程验证数据 */
+      remoteValidateData: {
+        // 字段
+        field: null,
+        // 方法
+        validateFunc: null,
+      },
       validateMap: {} // 所有注册的验证方法
     }
   },
@@ -55,9 +62,9 @@ const FormBuilder = {
     /**
      * 检测所有字段的结果，都验证通过，返回true, 否则返回false
      */
-    validate(){
+    validate(isSample = true){
       let promises = Object.keys(this.validateMap).map(key => {
-        return this.validateMap[key]()
+        return this.validateMap[key](isSample)
       });
       return Promise.all(promises)
         .then(results => results.every(msg => !msg))
@@ -66,8 +73,8 @@ const FormBuilder = {
     /** 注册待验证的组件 */
     addFieldHandler(event){
       event.stopPropagation();
-
-      let {fieldName, validate, field} = event.detail;
+      
+      let { fieldName, validate } = event.detail;
       if (event.detail && event.detail.field && event.detail.field.formType === 'info') {
         return;
       }
@@ -78,7 +85,10 @@ const FormBuilder = {
       
       let {fieldName} = event.detail;
       delete this.validateMap[fieldName];
-    }
+    },
+    outsideSetRemoteValidateData(data) {
+      this.$set(this, 'remoteValidateData', data)
+    } 
   },
   render(h){
     let formGroups = this.fields
