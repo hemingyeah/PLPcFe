@@ -14,3 +14,17 @@ export function getSettingEdition(params = {}) {
 export function getStateColorMap() {
   return http.get('/setting/getStateColorMap')
 }
+
+/** 
+ * 获取用户列表
+*/
+export function getSettingUserList(params) {
+  return http.get('/setting/user/list', params)
+}
+
+/** 
+ * 获取角色列表
+*/
+export function getSettingRoleList(params) {
+  return http.get('/setting/role/list', params)
+}

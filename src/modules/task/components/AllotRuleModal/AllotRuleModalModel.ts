@@ -36,5 +36,5 @@ export const AllotGroupSelectDefaultOptions: ElSelectOption[] = [
 /* 分配select团队选项列表 */
 export const AllotGroupSelectTagOptions: ElSelectOption[] = [
   { label: '客户所属服务团队', value: AllotGroupEnum.CustomerTag },
-  { label: 'CustomerTagLeader', value: AllotGroupEnum.CustomerTagLeader }
+  { label: '客户所属服务团队主管', value: AllotGroupEnum.CustomerTagLeader }
 ]

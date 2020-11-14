@@ -1,9 +1,14 @@
+/* api */
+import * as SettingApi from '@src/api/SettingApi'
 /* vue */
 import { Vue, Component, Prop, Emit } from 'vue-property-decorator'
 import { CreateElement } from 'vue'
 /* enum */
 import ComponentNameEnum from '@model/enum/ComponentNameEnum'
 import { RuleTypeEnum, AllotGroupEnum, AllotGroupSelectDefaultOptions, AllotGroupSelectTagOptions } from '@src/modules/task/components/AllotRuleModal/AllotRuleModalModel'
+/* entity */
+import LoginUser from '@model/entity/LoginUser/LoginUser'
+import Role from '@model/entity/Role/Role'
 /* interface */
 import { RoleForm } from '@src/modules/task/components/AllotRuleModal/AllotRuleModalInterface'
 /* scss */
@@ -23,7 +28,13 @@ export default class AllotRuleModal extends Vue {
   /* 表单数据 */
   private form: RoleForm = {
     // 分配给
-    group: AllotGroupEnum.User,
+    groupType: AllotGroupEnum.User,
+    groupData: {
+      [AllotGroupEnum.User]: [],
+      [AllotGroupEnum.Role]: [],
+      [AllotGroupEnum.Tag]: [],
+      [AllotGroupEnum.TagLeader]: []
+    },
     // 规则类型
     type: RuleTypeEnum.Type
   }
@@ -42,11 +53,46 @@ export default class AllotRuleModal extends Vue {
     )
   }
   
+  private fetchUsers(params: any) {
+    return SettingApi.getSettingUserList(params)
+  }  
+  
+  private fetchRoles(params: any) {
+    return (
+      SettingApi.getSettingRoleList(params).then((result = {}) => {
+        result.list = result.list.map((role: Role) =>
+          Object.freeze({
+            label: role.name || '',
+            value: role.id || '',
+            ...role
+        }))
+        return result
+      })
+    )
+  }
+  
   /** 
    * @description 规则类型变化
   */
   private handlerTypeChange(type: RuleTypeEnum) {
+    // 设置规则类型的数据
     this.form.type = type
+    // 初始化 分配给 数据
+    this.form.groupType = AllotGroupEnum.User
+  }
+  
+  /** 
+   * @description 人员列表变化
+  */
+  private handlerUserSelectChanged(value: LoginUser[]) { 
+    this.form.groupData[AllotGroupEnum.User] = value
+  }
+  
+  /** 
+   * @description 角色列表变化
+  */
+  private handlerRoleSelectChanged(value: Role[]) { 
+    this.form.groupData[AllotGroupEnum.Role] = value
   }
   
   /** 
@@ -59,13 +105,11 @@ export default class AllotRuleModal extends Vue {
   /** 
    * @description 渲染 分配对象
   */
-  public renderAllotGroup() {
-    // 数据变化
-    const HandlerGroupChange = (value: AllotGroupEnum) => this.form.group = value
-    
+  public renderAllotGroup() {    
     return (
       <div>
         {this.renderAllotGroupSelect()}
+        {this.renderAllotGroupSelectForm()}
       </div>
     )
   }
@@ -75,10 +119,10 @@ export default class AllotRuleModal extends Vue {
   */
   public renderAllotGroupSelect() {
     // 数据变化
-    const HandlerGroupChange = (value: AllotGroupEnum) => this.form.group = value
+    const HandlerGroupChange = (value: AllotGroupEnum) => this.form.groupType = value
     
     return (
-      <el-select value={this.form.group} onInput={HandlerGroupChange}>
+      <el-select value={this.form.groupType} onInput={HandlerGroupChange}>
         {
           this.allotGroupOptions.map((option: ElSelectOption) => {
             return (
@@ -89,6 +133,63 @@ export default class AllotRuleModal extends Vue {
       </el-select>
     )
   }
+  
+  /** 
+   * @description 渲染 分配给 select选择对应的表单
+  */
+  private renderAllotGroupSelectForm() {
+    // 人员列表
+    if (this.form.groupType === AllotGroupEnum.User) {
+      return this.renderAllotGroupUserSelect()
+    }
+    
+    // 角色列表
+    if (this.form.groupType === AllotGroupEnum.Role) {
+      return this.renderAllotGroupRoleSelect()
+    }
+  }
+  
+  private renderAllotGroupUserSelect() {
+    let value = this.form.groupData[AllotGroupEnum.User]
+    
+    return (
+      <biz-user-select 
+        value={value}
+        onInput={this.handlerUserSelectChanged}
+        fetch={this.fetchUsers} 
+        multiple
+      />
+    )
+  }
+  
+  private renderAllotGroupRoleSelect() {
+    const ScopedSlots = {
+      option: (props: { option: Role }) => {
+        return (
+          <div key={props.option.id}>
+            {props.option.name}
+          </div>
+        )
+      }
+    }
+    let value = this.form.groupData[AllotGroupEnum.Role]
+    
+    return (
+      <biz-form-remote-select
+        value={value}
+        onInput={this.handlerRoleSelectChanged}
+        multiple
+        placeholder='请选择角色'
+        remoteMethod={this.fetchRoles}
+        scopedSlots={ScopedSlots}
+      />
+    )
+  }
+  
+  private renderAllotGroupTeamSelect() {
+    
+  }
+  
   
   render(h: CreateElement) {
     const attrs = {
