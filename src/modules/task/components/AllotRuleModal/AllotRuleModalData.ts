@@ -12,7 +12,7 @@ import {
   ConditionOpeartorOptions
 } from '@src/modules/task/components/AllotRuleModal/AllotRuleModalModel'
 /* interface */
-import { RoleForm } from '@src/modules/task/components/AllotRuleModal/AllotRuleModalInterface'
+import { RuleForm } from '@src/modules/task/components/AllotRuleModal/AllotRuleModalInterface'
 /* types */
 import ElSelectOption from '@model/types/ElSelectOption'
 
@@ -24,7 +24,7 @@ class AllotRuleModalData extends Vue {
   /* 工单类型开启字段列表 */
   public enabledFields: Field[] = []
   /* 表单数据 */
-  public form: RoleForm = {
+  public form: RuleForm = {
     name: '',
     groupType: AllotGroupEnum.User,
     groupData: {

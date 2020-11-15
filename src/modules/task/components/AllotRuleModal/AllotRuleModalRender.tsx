@@ -260,7 +260,6 @@ class AllotRuleModalRender extends AllotRuleModalMethods {
       <biz-form-remote-select
         value={value}
         onInput={(value: Role[]) => this.handlerRoleSelectChanged(value)}
-        multiple
         placeholder='请选择角色'
         remoteMethod={this.fetchRoles}
         scopedSlots={ScopedSlots}
@@ -280,8 +279,7 @@ class AllotRuleModalRender extends AllotRuleModalMethods {
     return (
       <biz-team-select 
         value={value} 
-        onInput={(value: Tag[]) => this.handlerTeamChanged(value, isLeader)} 
-        multiple 
+        onInput={(value: Tag[]) => this.handlerTeamChanged(value, isLeader)}
       />
     )
   }

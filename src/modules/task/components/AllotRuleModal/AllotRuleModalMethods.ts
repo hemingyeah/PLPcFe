@@ -10,11 +10,112 @@ import Field from '@model/entity/Field'
 import Role from '@model/entity/Role/Role'
 import Tag from '@model/entity/Tag/Tag'
 import TaskType from '@model/entity/TaskType'
+import DispatchRule from '@model/entity/DispatchRule'
+/* interface */
+import { RuleParams } from '@src/modules/task/components/AllotRuleModal/AllotRuleModalInterface'
 /* util */
 import validate from '@src/modules/task/components/AllotRuleModal/AllotRuleModalVidate'
 import Platform from '@src/util/Platform'
 
+const RuleAccordingMap = {
+  [RuleTypeEnum.Type]: '工单类型',
+  [RuleTypeEnum.Select]: '选择项',
+  [RuleTypeEnum.Tag]: '客户团队'
+}
+
 class AllotRuleModalMethods extends AllotRuleModalComputed {
+  
+  /** 
+   * @description 构建参数
+  */
+  public buildParams(): RuleParams {
+    let { name, groupType, groupData, order, type, typeData } = this.form
+    // 后续需要注意 默认规则
+    let according: string = RuleAccordingMap[type]
+    let params: RuleParams = {
+      module: DispatchRule.Task,
+      // 规则名称
+      name,
+      // 规则类型
+      according,
+      // 条件
+      condition: {
+        // 分配给
+        group: groupType,
+        // 排序方式
+        orderBy: order
+      },
+      candidate: {}
+    }
+    
+    /* start 构造 condition */
+    // 按工单类型
+    if (type === RuleTypeEnum.Type) {
+      let taskTypes = typeData[RuleTypeEnum.Type]
+      params.condition.typeInfo = taskTypes.map((taskType: TaskType) => {
+        return { id: taskType.id, name: taskType.name}
+      })
+    }
+    
+    // 按特定条件
+    if (type === RuleTypeEnum.Select) {
+      let { field, value, operator, taskType } = typeData[RuleTypeEnum.Select]
+      params.condition.fieldName = field
+      params.condition.operator = operator
+      params.condition.value = value
+      if (taskType && taskType.length > 0) {
+        params.condition.templateId = taskType[0].id
+        params.condition.templateName = taskType[0].name
+      }
+    }
+    
+    // 按客户所属团队
+    if (type === RuleTypeEnum.Tag) {
+      let { tags, operator } = typeData[RuleTypeEnum.Tag]
+      params.condition.operator = operator
+      params.condition.tagInfo = tags.map((tag: Tag) => {
+        return { id: tag.id, name: tag.tagName }
+      })
+    }
+    /* end 构造 condition */
+    
+    /* start 构造candidate */
+    // 指定人员
+    if (groupType === AllotGroupEnum.User) {
+      let users = groupData[AllotGroupEnum.User]
+      params.candidate.info = users.map((user: LoginUser) => {
+        return { userId: user.userId, userName: user.displayName, times: 0 }
+      })
+    }
+    
+    // 指定角色 
+    if (groupType === AllotGroupEnum.Role) {
+      let roles = groupData[AllotGroupEnum.Role]
+      let role = roles[0] || {}
+      params.candidate.groupId = role.id
+      params.candidate.groupName = role.name
+    }
+    
+    // 指定服务团队
+    if (groupType === AllotGroupEnum.Tag) {
+      let tags = groupData[AllotGroupEnum.Tag]
+      let tag = tags[0] || {}
+      params.candidate.groupId = tag.id
+      params.candidate.groupName = tag.tagName
+    }
+    
+    // 指定服务团队主管
+    if (groupType === AllotGroupEnum.TagLeader) {
+      let tags = groupData[AllotGroupEnum.TagLeader]
+      let tag = tags[0] || {}
+      params.candidate.groupId = tag.id
+      params.candidate.groupName = tag.tagName
+    }
+    /* end 构造candidate */
+    
+    return params
+  }
+  
   /** 
    * @description 获取用户列表
   */
@@ -74,6 +175,14 @@ class AllotRuleModalMethods extends AllotRuleModalComputed {
       .catch(error => {
         console.warn(error)
       })
+  }
+  
+  /**
+   * @description 规则名称变化
+  */
+  public handlerNameChange(value: string) {
+    // 设置规则名称
+    this.form.name = value
   }
   
   /**
@@ -149,6 +258,25 @@ class AllotRuleModalMethods extends AllotRuleModalComputed {
     return field?.setting?.isMulti === true
   }
   
+  public ruleCreate(params: RuleParams) {
+    SettingApi.saveSettingDispatchRule(params)
+      .then((result = {}) => {
+        let isSuccess = result.succ
+        if (!isSuccess) {
+          Platform.alert(result.message)
+        }
+        
+        // 创建成功
+        console.log('chengg')
+      })
+      .catch(error => {
+        console.warn('AllotRuleModalMethods -> ruleCreate -> error', error)
+      })
+      .finally(() => {
+        this.pending = false
+      })
+  }
+  
   /** 
    * @description 显示弹窗
   */
@@ -162,12 +290,23 @@ class AllotRuleModalMethods extends AllotRuleModalComputed {
   }
   
   public submit() {
+    if (this.pending) return
+    
+    this.pending = true
+    
     validate(this.form)
       .then((validated: boolean) => {
-        if (!validated) return
+        if (!validated) {
+          return this.pending = false
+        }
+        
+        let params: RuleParams = this.buildParams()
+        // 目前只支持创建规则
+        this.ruleCreate(params)
       })
       .catch((error: string) => {
         Platform.alert(error)
+        this.pending = false
       }) 
   }
 }

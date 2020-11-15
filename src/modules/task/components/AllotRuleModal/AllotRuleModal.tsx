@@ -35,7 +35,8 @@ export default class AllotRuleModal extends AllotRuleModalRender {
         <el-form ref='form' model={this.form} label-width='140px' label-position='left'>
           
           <el-form-item label='名称：' required>
-            <el-input value={this.form.name} maxlength={50}></el-input>
+            <el-input value={this.form.name} onInput={(value: string) => this.handlerNameChange(value)}  maxlength={50}>
+            </el-input>
           </el-form-item>
           
           <el-form-item label='规则类型：' required>
@@ -51,9 +52,13 @@ export default class AllotRuleModal extends AllotRuleModalRender {
             {this.renderAllotGroup()}
           </el-form-item>
           
-          <el-form-item label='派单优先顺序：' required>
-            {this.renderAllotOrder()}
-          </el-form-item>
+          {
+            !this.isCustomerManager && (
+              <el-form-item label='派单优先顺序：' required>
+                {this.renderAllotOrder()}
+              </el-form-item>
+            )
+          }
           
         </el-form>
         

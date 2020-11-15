@@ -35,6 +35,7 @@ export function getSettingRoleList(params) {
 export function getSettingTaskTypeList(params) {
   return http.get('/setting/taskType/list', params)
 }
+
 /** 
  * 获取工单类型字段 不含被删除的系统字段
 */
@@ -42,3 +43,9 @@ export function getSettingTaskTypeEnabledFields(params) {
   return http.get('/setting/taskType/getEnabledFields', params)
 }
 
+/** 
+ * 新建分配规则
+*/
+export function saveSettingDispatchRule(params) {
+  return http.post('/setting/dispatchRule/task/save', params)
+}

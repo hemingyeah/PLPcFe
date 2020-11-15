@@ -6,7 +6,7 @@ import Role from '@model/entity/Role/Role'
 import Tag from '@model/entity/Tag/Tag'
 import TaskType from '@model/entity/TaskType'
 
-export interface RoleForm {
+export interface RuleForm {
   // 名称
   name: string,
   // 分配给
@@ -28,7 +28,7 @@ export interface RoleForm {
     // 特定条件
     [RuleTypeEnum.Select]: {
       // 工单类型
-      taskType: TaskType[] | undefined,
+      taskType: TaskType[],
       // 字段
       field: string,
       // 操作符
@@ -43,5 +43,39 @@ export interface RoleForm {
       // 团队列表
       tags: Tag[]
     },
+  }
+}
+
+export interface RuleParams {
+  // 模块
+  module: string | 'task'
+  // 名称
+  name: string,
+  // 规则类型
+  according: string,
+  // 条件
+  condition: {
+    group: AllotGroupEnum,
+    orderBy: AllotOrderEnum,
+    // 按工单类型
+    typeInfo?: { id: string | undefined, name: string | undefined }[]
+    // 按特定条件 字段
+    fieldName?: string
+    // 按特定条件 字段值
+    value?: string
+    // 按特定条件 工单类型id
+    templateId?: string
+    // 按特定条件 工单类型名称
+    templateName?: string
+    // 按特定条件 或 按客户团队 操作符
+    operator?: string
+    // 按客户团队
+    tagInfo?: { id: string | undefined, name: string | undefined }[]
+  },
+  // 候选
+  candidate: {
+    info?: { userId: string | undefined, userName: string | undefined, times: number}[],
+    groupId?: string,
+    groupName?: string
   }
 }

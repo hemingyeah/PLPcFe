@@ -5,12 +5,12 @@ class Tag {
   
   public static serialVersionUID: any
   
-  public id?: String = ''
-  public tenantId?: String= ''
+  public id?: string = ''
+  public tenantId?: string= ''
   // 标签名字
-  public tagName?: String = ''
+  public tagName?: string = ''
   // 标签颜色
-  public tagColor?: String = ''
+  public tagColor?: string = ''
   // 创建时间
   public createTime?: Date | string = ''
   // 团队主管

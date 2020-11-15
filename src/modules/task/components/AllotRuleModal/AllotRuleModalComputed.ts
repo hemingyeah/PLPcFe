@@ -6,7 +6,8 @@ import {
   ConditionOpeartorOptions,   
   AllotGroupSelectDefaultOptions, 
   AllotGroupSelectTagOptions,
-  EqualOpeartorOptions
+  EqualOpeartorOptions,
+  AllotGroupEnum
 } from '@src/modules/task/components/AllotRuleModal/AllotRuleModalModel'
 import { TaskFieldNameMappingEnum, FieldTypeMappingEnum } from '@model/enum/FieldMappingEnum'
 /* entity */
@@ -57,6 +58,11 @@ class AllotRuleModalComputed extends AllotRuleModalData {
         
       })
     )
+  }
+  
+  /* 是否为 指定客户负责人 */
+  get isCustomerManager(): boolean {
+    return this.form.groupType === AllotGroupEnum.CustomerManager
   }
   
   /* 当前选择的字段 */
