@@ -1,4 +1,12 @@
 {
+  "jsx": "preserve",
+  "jsxFactory": "h",
+  "allowSyntheticDefaultImports": true,
+  "experimentalDecorators": true,
+  "sourceMap": true,
+  "module": "es2015",
+  "moduleResolution": "node",
+  "target": "es5",
   "compilerOptions": {
     // 与 Vue 的浏览器支持保持一致
     "target": "esnext",

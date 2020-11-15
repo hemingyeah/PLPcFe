@@ -67,7 +67,7 @@
     "sass-loader": "^7.1.0",
     "sass-resources-loader": "^2.0.0",
     "shelljs": "^0.8.2",
-    "ts-loader": "^5.3.3",
+    "ts-loader": "^8.0.0",
     "typescript": "^3.2.4",
     "url-loader": "^1.1.2",
     "vue-loader": "15.5.1",
