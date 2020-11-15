@@ -16,6 +16,8 @@ import { RuleParams } from '@src/modules/task/components/AllotRuleModal/AllotRul
 /* util */
 import validate from '@src/modules/task/components/AllotRuleModal/AllotRuleModalVidate'
 import Platform from '@src/util/Platform'
+/* vue */
+import { Emit } from 'vue-property-decorator'
 
 const RuleAccordingMap = {
   [RuleTypeEnum.Type]: '工单类型',
@@ -114,6 +116,19 @@ class AllotRuleModalMethods extends AllotRuleModalComputed {
     /* end 构造candidate */
     
     return params
+  }
+  
+  /** 
+   * @description 关闭弹窗
+  */
+  public close(): void {
+    this.showAllotRuleModal = false
+  }
+  
+  /* 创建成功 */
+  @Emit('success')
+  public emitSuccess() {
+    this.close()
   }
   
   /** 
@@ -267,7 +282,7 @@ class AllotRuleModalMethods extends AllotRuleModalComputed {
         }
         
         // 创建成功
-        console.log('chengg')
+        this.emitSuccess()
       })
       .catch(error => {
         console.warn('AllotRuleModalMethods -> ruleCreate -> error', error)

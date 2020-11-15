@@ -314,7 +314,7 @@ const BizUserSelect = {
     if (this.$data.$popper) {
       this.$data.$popper.destroy();
       if (this.$refs.popper && this.$refs.popper.parentNode == this.$data.$parentEl) {
-        this.$data.$parentEl.removeChild(this.$refs.popper);
+        this.$data.$parentEl && this.$data.$parentEl.removeChild(this.$refs.popper);
       }
     }
   },

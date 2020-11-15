@@ -18,6 +18,27 @@ import { uuid } from '@src/util/string'
 import LoginUser from '@model/entity/LoginUser/LoginUser'
 
 class AllotRuleModalRender extends AllotRuleModalMethods {
+  
+  /** 
+   * @description 工单类型清除按钮
+  */
+  public renderTaskTypeClear() {
+    /* 是否为空 */
+    let isTaskTypeEmpty = this.form.typeData[RuleTypeEnum.Select].taskType.length <= 0
+    if (isTaskTypeEmpty) return null
+    
+    return (
+      <button 
+        type='button' 
+        class='biz-user-select-clear task-type-select-clear' 
+        key='task-type-clear'
+        onClick={() => this.form.typeData[RuleTypeEnum.Select].taskType = []}
+      >
+        <i class="iconfont icon-yemianshanchu"></i>
+      </button>
+    )
+  }
+  
   /** 
    * @description 渲染 规则类型 对应的列表
   */
@@ -46,7 +67,7 @@ class AllotRuleModalRender extends AllotRuleModalMethods {
     let value = this.form.typeData[RuleTypeEnum.Type]
     let changedHandler = (value: TaskType[]) => this.handlerTaskTypeSelectChanged(value)
     
-    return this.renderTaskTypesSelect(value, changedHandler, text)
+    return this.renderTaskTypesSelect(value, changedHandler, true, text)
   }
   
   /** 
@@ -58,10 +79,10 @@ class AllotRuleModalRender extends AllotRuleModalMethods {
     let changedHandler = (value: TaskType[]) => this.handlerCustomTaskTypeSelectChanged(value)
     
     return (
-      <div>
-        {this.renderTaskTypesSelect(taskType, changedHandler, text)}
-        <div>
-          选择应用条件，当字段
+      <div class={`${this.className}-condition`}>
+        {this.renderTaskTypesSelect(taskType, changedHandler, false, text)}
+        <div class={`${this.className}-condition-field`}>
+          <span>选择应用条件，当字段</span>
           <el-select 
             value={field} 
             onInput={(value: string) => {
@@ -109,6 +130,7 @@ class AllotRuleModalRender extends AllotRuleModalMethods {
   public renderTaskTypesSelect(
     value: TaskType[] | undefined, 
     changedHandler: (value: TaskType[]) => void,
+    multiple: boolean = true,
     text?: string
   ) {
     const ScopedSlots = {
@@ -122,15 +144,17 @@ class AllotRuleModalRender extends AllotRuleModalMethods {
     }
     
     return (
-      <div>
+      <div class={`${this.className}-task-type`}>
         <span>{text}</span>
         <biz-form-remote-select
+          multiple={multiple}
           value={value}
           onInput={changedHandler}
           placeholder='全部工单类型'
           remoteMethod={this.fetchTaskTypes}
           scopedSlots={ScopedSlots}
         />
+        {!multiple && this.renderTaskTypeClear()}
       </div>
     )
   }
@@ -143,8 +167,8 @@ class AllotRuleModalRender extends AllotRuleModalMethods {
     let { tags, operator } = tagData
     
     return (
-      <div>
-        <div>
+      <div class={`${this.className}-customer-tag`}>
+        <div class={`${this.className}-customer-tag-operator`}>
           当客户所属团队
           {
             <el-select value={operator} onInput={(value: AllotOperatorEnum) => this.handlerOperatorSelectChanged(value)}>
@@ -173,7 +197,7 @@ class AllotRuleModalRender extends AllotRuleModalMethods {
   */
   public renderAllotGroup() {    
     return (
-      <div>
+      <div class={`${this.className}-group`}>
         {this.renderAllotGroupSelect()}
         {this.renderAllotGroupSelectForm()}
       </div>
@@ -274,7 +298,7 @@ class AllotRuleModalRender extends AllotRuleModalMethods {
     let value = (
       isLeader 
         ? this.form.groupData[AllotGroupEnum.TagLeader]
-        : this.form.groupData[AllotGroupEnum.Role]
+        : this.form.groupData[AllotGroupEnum.Tag]
     )
     return (
       <biz-team-select 
@@ -292,7 +316,7 @@ class AllotRuleModalRender extends AllotRuleModalMethods {
     const HandlerOrderChange = (value: AllotOrderEnum) => this.form.order = value
     
     return (
-      <el-select value={this.form.order} onInput={HandlerOrderChange}>
+      <el-select class={`${this.className}-order`} value={this.form.order} onInput={HandlerOrderChange}>
         {
           this.allotOrderOptions.map((option: ElSelectOption) => {
             return (

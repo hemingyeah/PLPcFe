@@ -32,11 +32,15 @@ export default class AllotRuleModal extends AllotRuleModalRender {
     
     return (
       <base-modal class={this.className} show={this.showAllotRuleModal} {...attrs}>
-        <el-form ref='form' model={this.form} label-width='140px' label-position='left'>
+        <el-form ref='form' model={this.form} label-width='200px' label-position='left'>
           
           <el-form-item label='名称：' required>
-            <el-input value={this.form.name} onInput={(value: string) => this.handlerNameChange(value)}  maxlength={50}>
-            </el-input>
+            <el-input 
+              placeholder='规则名称 [最多十个字] '
+              value={this.form.name} 
+              onInput={(value: string) => this.handlerNameChange(value)}  
+              maxlength={10}
+            />
           </el-form-item>
           
           <el-form-item label='规则类型：' required>
@@ -63,8 +67,12 @@ export default class AllotRuleModal extends AllotRuleModalRender {
         </el-form>
         
         <div slot='footer' class='dialog-footer'>
-            <el-button >取 消</el-button>
-            <el-button type='primary' disabled={this.pending} onClick={() => this.submit()}>确 定</el-button>
+          <el-button onClick={() => this.close()}>
+            取 消
+          </el-button>
+          <el-button type='primary' disabled={this.pending} onClick={() => this.submit()}>
+            确 定
+          </el-button>
         </div>
         
       </base-modal>
