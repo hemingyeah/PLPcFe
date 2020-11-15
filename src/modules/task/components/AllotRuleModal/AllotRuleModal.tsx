@@ -19,19 +19,10 @@ export default class AllotRuleModal extends AllotRuleModalRender {
   }
   
   render(h: CreateElement) {
-    const attrs = {
-      props: {
-        title: '新建分配规则'
-      },
-      on: {
-        'update:show': (val: boolean) => {
-          this.showAllotRuleModal = val
-        }
-      }
-    }
+    const attrs = this.getAttributes() 
     
     return (
-      <base-modal class={this.className} show={this.showAllotRuleModal} {...attrs}>
+      <base-modal class={this.className} id={this.className} show={this.showAllotRuleModal} {...attrs}>
         <el-form ref='form' model={this.form} label-width='200px' label-position='left'>
           
           <el-form-item label='名称：' required>

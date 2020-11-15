@@ -1,9 +1,8 @@
 <template>
   <div style="padding: 10px;">
-
+    
     <biz-select-column ref="bizSelectColumn"></biz-select-column>
-    <!-- <task-allot-modal ref="TaskAllotModal" :user-state-map="userStateMap" customer-id="abd228da-014e-11eb-9baf-00163e0d174e"></task-allot-modal> -->
-    <allot-rule-modal ref='CreateAllotRuleModal'></allot-rule-modal>
+    <task-allot-modal ref="TaskAllotModal" :user-state-map="userStateMap" customer-id="abd228da-014e-11eb-9baf-00163e0d174e"></task-allot-modal>
   </div>
 </template>
 
@@ -40,8 +39,8 @@ export default {
     },
   },
   mounted() {
-    // this.openAllotDialog()
-    this.openCreateDialog()
+    this.openAllotDialog()
+    // this.openCreateDialog()
   },
   components: {
     [TaskAllotModal.name]: TaskAllotModal,

@@ -1,5 +1,7 @@
 /* api */
 import { getAutoDispatchResultList } from '@src/api/TaskApi'
+/* components */
+import AllotRuleModal from '@src/modules/task/components/AllotRuleModal/AllotRuleModal.tsx'
 /* enum */
 import ComponentNameEnum from '@model/enum/ComponentNameEnum'
 /* model */
@@ -16,7 +18,10 @@ import { Vue, Component, Prop } from 'vue-property-decorator'
 import { CreateElement } from 'vue'
 
 @Component({ 
-  name: ComponentNameEnum.TaskAllotAuto 
+  name: ComponentNameEnum.TaskAllotAuto,
+  components: {
+    [AllotRuleModal.name]: AllotRuleModal
+  }
 })
 export default class TaskAllotAuto extends Vue {
   /* 工单信息 */
@@ -85,6 +90,8 @@ export default class TaskAllotAuto extends Vue {
     
     this.pending = true
     this.isUsedResult = false
+    this.isShowUnMatchResult = false
+    
     let params: TaskAutoDispatchResultListModel = this.buildParams()
     
     getAutoDispatchResultList(params)
@@ -115,6 +122,14 @@ export default class TaskAllotAuto extends Vue {
   }
   
   /** 
+   * @description 打开新建分配规则弹窗
+  */
+  private openRuleDialog() {
+    // @ts-ignore
+    this.$refs.AllotRuleModal && this.$refs.AllotRuleModal.show()
+  }
+  
+  /** 
    * @description 渲染自动匹配内容
   */
   private renderAutoMatch(h: CreateElement, item: AutoDispatchListItem, index: number) {
@@ -123,7 +138,6 @@ export default class TaskAllotAuto extends Vue {
     if (!matchSuccessfully) {
       return this.renderUnMathItem(item)
     }
-    
     
     return this.renderMathItem(item)
   }
@@ -170,7 +184,7 @@ export default class TaskAllotAuto extends Vue {
         </div>
         <div>
           提交后，系统会按分配规则重新匹配，可能会出现与预估的负责人不一致的情况。您可以
-          <el-checkbox value={this.isUsedResult} onInput={(value: boolean) => this.isUsedResult = value}>
+          <el-checkbox value={this.isUsedResult} onInput={(value: boolean) => { this.isUsedResult = value }}>
             使用预估结果
           </el-checkbox>
         </div>
@@ -195,11 +209,20 @@ export default class TaskAllotAuto extends Vue {
   }
   
   render(h: CreateElement) {
+    const attrs = {
+      directives: [
+        {
+          name: 'loading',
+          value: this.pending
+        }
+      ]
+    }
+    
     return (
-      <div class={this.className}>
+      <div class={this.className} {...attrs}>
         <div class={`${this.className}-header`}>
           <el-button type='primary' onClick={this.fetchAutoDispatchResultList}>重新匹配</el-button>
-          <el-button type='ghost'>添加新规则</el-button>
+          <el-button type='ghost' onClick={this.openRuleDialog}>添加新规则</el-button>
         </div>
         <div class={`${this.className}-content`}>
           <base-timeline 
@@ -214,6 +237,7 @@ export default class TaskAllotAuto extends Vue {
             { this.isShowUnMatchResult ? '收起' : '查看更多' }
           </el-button>
         </div>
+        <allot-rule-modal onSuccess={this.fetchAutoDispatchResultList} ref='AllotRuleModal'></allot-rule-modal>
       </div>
     )
   }

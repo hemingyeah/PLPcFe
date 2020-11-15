@@ -3,7 +3,7 @@ import * as SettingApi from '@src/api/SettingApi'
 /* computed */
 import AllotRuleModalComputed from '@src/modules/task/components/AllotRuleModal/AllotRuleModalComputed'
 /* enum */
-import { RuleTypeEnum, AllotGroupEnum, AllotOperatorEnum } from '@src/modules/task/components/AllotRuleModal/AllotRuleModalModel'
+import { RuleTypeEnum, AllotGroupEnum, AllotOperatorEnum, AllotOrderEnum } from '@src/modules/task/components/AllotRuleModal/AllotRuleModalModel'
 /* entity */
 import LoginUser from '@model/entity/LoginUser/LoginUser'
 import Field from '@model/entity/Field'
@@ -12,7 +12,7 @@ import Tag from '@model/entity/Tag/Tag'
 import TaskType from '@model/entity/TaskType'
 import DispatchRule from '@model/entity/DispatchRule'
 /* interface */
-import { RuleParams } from '@src/modules/task/components/AllotRuleModal/AllotRuleModalInterface'
+import { RuleForm, RuleParams } from '@src/modules/task/components/AllotRuleModal/AllotRuleModalInterface'
 /* util */
 import validate from '@src/modules/task/components/AllotRuleModal/AllotRuleModalVidate'
 import Platform from '@src/util/Platform'
@@ -26,6 +26,38 @@ const RuleAccordingMap = {
 }
 
 class AllotRuleModalMethods extends AllotRuleModalComputed {
+  
+  /**
+   * @description 构建form
+  */
+  public buildForm(): RuleForm {
+    return {
+      name: '',
+      groupType: AllotGroupEnum.User,
+      groupData: {
+        [AllotGroupEnum.User]: [],
+        [AllotGroupEnum.Role]: [],
+        [AllotGroupEnum.Tag]: [],
+        [AllotGroupEnum.TagLeader]: []
+      },
+      order: AllotOrderEnum.UnfinishedTask,
+      // 规则类型
+      type: RuleTypeEnum.Type,
+      typeData: {
+        [RuleTypeEnum.Type]: [],
+        [RuleTypeEnum.Select]: {
+          taskType: [],
+          field: '',
+          operator: undefined,
+          value: ''
+        },
+        [RuleTypeEnum.Tag]: { 
+          operator: AllotOperatorEnum.Contains,
+          tags: []
+        },
+      }
+    }
+  }
   
   /** 
    * @description 构建参数
@@ -132,6 +164,28 @@ class AllotRuleModalMethods extends AllotRuleModalComputed {
   }
   
   /** 
+   * @description 获取属性
+  */
+  public getAttributes() {
+    return {
+      props: {
+        title: '新建分配规则'
+      },
+      on: {
+        'update:show': (val: boolean) => {
+          this.showAllotRuleModal = val
+        }
+      },
+      directives: [
+        {
+          name: 'loading',
+          value: this.pending
+        }
+      ]
+    }
+  }
+  
+  /** 
    * @description 获取用户列表
   */
   public fetchUsers(params: any) {
@@ -176,6 +230,8 @@ class AllotRuleModalMethods extends AllotRuleModalComputed {
    * @description 获取工单类型开启的系统字段列表
   */
   public fetchEnabledFields(): void {
+    this.pending = true
+    
     let params: { typeId: string, tableName: string } = {
       typeId: this.form.typeData[RuleTypeEnum.Select].taskType?.[0]?.id || 'allSelect',
       tableName: 'task'
@@ -189,6 +245,9 @@ class AllotRuleModalMethods extends AllotRuleModalComputed {
       })
       .catch(error => {
         console.warn(error)
+      })
+      .finally(() => {
+        this.pending = false
       })
   }
   
@@ -269,10 +328,6 @@ class AllotRuleModalMethods extends AllotRuleModalComputed {
     this.fetchEnabledFields()
   }
   
-  public isMulti(field: Field) {
-    return field?.setting?.isMulti === true
-  }
-  
   public ruleCreate(params: RuleParams) {
     SettingApi.saveSettingDispatchRule(params)
       .then((result = {}) => {
@@ -296,6 +351,8 @@ class AllotRuleModalMethods extends AllotRuleModalComputed {
    * @description 显示弹窗
   */
   public show() {
+    this.form = this.buildForm()
+    this.fetchEnabledFields()
     this.showAllotRuleModal = true
   }
   
