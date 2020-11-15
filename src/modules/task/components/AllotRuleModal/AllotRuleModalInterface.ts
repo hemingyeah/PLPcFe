@@ -7,6 +7,8 @@ import Tag from '@model/entity/Tag/Tag'
 import TaskType from '@model/entity/TaskType'
 
 export interface RoleForm {
+  // 名称
+  name: string,
   // 分配给
   groupType: AllotGroupEnum,
   groupData: {
@@ -22,7 +24,7 @@ export interface RoleForm {
   // 派单类型数据
   typeData: {
     // 工单类型
-    [RuleTypeEnum.Type]: TaskType[] | undefined,
+    [RuleTypeEnum.Type]: TaskType[],
     // 特定条件
     [RuleTypeEnum.Select]: {
       // 工单类型

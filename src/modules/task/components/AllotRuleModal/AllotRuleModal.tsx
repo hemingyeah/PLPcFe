@@ -31,6 +31,8 @@ import '@src/modules/task/components/AllotRuleModal/AllotRuleModal.scss'
 import ElSelectOption from '@model/types/ElSelectOption'
 /* util */
 import { uuid } from '@src/util/string'
+import validate from '@src/modules/task/components/AllotRuleModal/AllotRuleModalVidate'
+import Platform from '@src/util/Platform'
 
 const SelectFieldNames = [TaskFieldNameMappingEnum.ServiceContent, TaskFieldNameMappingEnum.ServiceType, TaskFieldNameMappingEnum.Level]
 
@@ -47,6 +49,7 @@ export default class AllotRuleModal extends Vue {
   private enabledFields: Field[] = []
   /* 表单数据 */
   private form: RoleForm = {
+    name: '',
     groupType: AllotGroupEnum.User,
     groupData: {
       [AllotGroupEnum.User]: [],
@@ -58,9 +61,9 @@ export default class AllotRuleModal extends Vue {
     // 规则类型
     type: RuleTypeEnum.Type,
     typeData: {
-      [RuleTypeEnum.Type]: undefined,
+      [RuleTypeEnum.Type]: [],
       [RuleTypeEnum.Select]: {
-        taskType: undefined,
+        taskType: [],
         field: '',
         operator: undefined,
         value: ''
@@ -575,6 +578,16 @@ export default class AllotRuleModal extends Vue {
     this.form.typeData[RuleTypeEnum.Select].value = this.taskTypeSelectedFieldValueOptions?.[0].value || ''
   }
   
+  private submit() {
+    validate(this.form)
+      .then((validated: boolean) => {
+        if (!validated) return
+      })
+      .catch((error: string) => {
+        Platform.alert(error)
+      }) 
+  }
+  
   mounted() {
     this.fetchEnabledFields()
   }
@@ -597,7 +610,7 @@ export default class AllotRuleModal extends Vue {
         <el-form ref='form' model={this.form} label-width='140px' label-position='left'>
           
           <el-form-item label='名称：' required>
-            <el-input maxlength={50}></el-input>
+            <el-input value={this.form.name} maxlength={50}></el-input>
           </el-form-item>
           
           <el-form-item label='规则类型：' required>
@@ -621,7 +634,7 @@ export default class AllotRuleModal extends Vue {
         
         <div slot='footer' class='dialog-footer'>
             <el-button >取 消</el-button>
-            <el-button type='primary' disabled={this.pending}>确 定</el-button>
+            <el-button type='primary' disabled={this.pending} onClick={this.submit}>确 定</el-button>
         </div>
         
       </base-modal>
