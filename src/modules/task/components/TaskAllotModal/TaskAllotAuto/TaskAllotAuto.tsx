@@ -232,10 +232,15 @@ export default class TaskAllotAuto extends Vue {
             headRender={this.renderHead}
             recordRender={this.renderAutoMatch}
           />
-        { this.isMatchResultEmpty && <div>暂无匹配结果</div> }
-          <el-button onClick={() => this.isShowUnMatchResult = !this.isShowUnMatchResult}>
-            { this.isShowUnMatchResult ? '收起' : '查看更多' }
-          </el-button>
+        { 
+          this.isMatchResultEmpty 
+            ? <div class={`${this.className}-empty`}>暂无匹配结果</div>
+            : (
+              <el-button onClick={() => this.isShowUnMatchResult = !this.isShowUnMatchResult}>
+                { this.isShowUnMatchResult ? '收起' : '查看更多' }
+              </el-button>
+            )
+        }
         </div>
         <allot-rule-modal onSuccess={this.fetchAutoDispatchResultList} ref='AllotRuleModal'></allot-rule-modal>
       </div>

@@ -43,13 +43,50 @@ export default class UserCard extends Vue {
   @Prop() userId: string | undefined
   
   // 时间
-  private timeRange: string = ''
+  private timeRange: Date[] = []
   // 用户信息
   private user: TaskAllotUser | null = null
 
   @Watch('userId', { immediate: true })
   onUserIdChanged(newVal: string, oldVal: string) {
     this.fetchUserTaskData()
+  }
+  
+  /**
+   * @description 设置负责人人
+  */
+  @Emit(UserCardEmitEventEnum.SetExecutor)
+  private setExecutorUser() {
+    // 支持由自定义组件 发出事件
+    if (this.emitEventComponentName) {
+      dispatch.call(this, this.emitEventComponentName, UserCardEmitEventEnum.SetExecutor, this.user)
+    }
+    
+    return this.user
+  }
+  
+  /**
+    * @description 设置协同人
+  */
+  @Emit(UserCardEmitEventEnum.SetSynergy)
+  private setSynergyUser() {
+    // 支持由自定义组件 发出事件
+    if (this.emitEventComponentName) {
+      dispatch.call(this, this.emitEventComponentName, UserCardEmitEventEnum.SetSynergy, this.user)
+    }
+    
+    return this.user
+  }
+
+  private computedStartAndEndTime() {
+    const day = 3600 * 1000 * 24
+    const start = new Date()
+    const end = new Date()
+    
+    end.setTime(end.getTime())
+    start.setTime(end.getTime() - day * 30)
+    
+    this.timeRange = [start, end]
   }
   
   /** 
@@ -75,34 +112,13 @@ export default class UserCard extends Vue {
   /** 
    * @description 选择时间变化
   */
-  private handlerTimeChange(value: string): void {
+  private handlerTimeChange(value: Date[]): void {
     this.timeRange = value
   }
   
-  /**
-   * @description 设置负责人人
-  */
-  @Emit(UserCardEmitEventEnum.SetExecutor)
-  private setExecutorUser() {
-    // 支持由自定义组件 发出事件
-    if (this.emitEventComponentName) {
-      dispatch.call(this, this.emitEventComponentName, UserCardEmitEventEnum.SetExecutor, this.user)
-    }
-    
-    return this.user
-  }
-  
-  /**
-   * @description 设置协同人
-  */
-  @Emit(UserCardEmitEventEnum.SetSynergy)
-  private setSynergyUser() {
-    // 支持由自定义组件 发出事件
-    if (this.emitEventComponentName) {
-      dispatch.call(this, this.emitEventComponentName, UserCardEmitEventEnum.SetSynergy, this.user)
-    }
-    
-    return this.user
+  mounted() {
+    this.computedStartAndEndTime()
+    this.fetchUserTaskData()
   }
   
   render(h: CreateElement) {
@@ -138,6 +154,7 @@ export default class UserCard extends Vue {
               unlink-panels
               start-placeholder='开始日期'
               end-placeholder='结束日期'
+              clearable={false}
               picker-options={PickerOptions}
               value={this.timeRange}
               onInput={this.handlerTimeChange}

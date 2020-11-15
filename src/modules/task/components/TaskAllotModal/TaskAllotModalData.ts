@@ -11,7 +11,7 @@ import StateColorMap from '@model/types/StateColor'
 
 class TaskAllotModalData extends TaskAllotModalProps {
   /* 派单方式 */
-  public allotType: TaskAllotTypeEnum = TaskAllotTypeEnum.Auto
+  public allotType: TaskAllotTypeEnum = TaskAllotTypeEnum.Person
   /* 客户信息 */
   public customer: Customer = {}
   /* 负责人 */

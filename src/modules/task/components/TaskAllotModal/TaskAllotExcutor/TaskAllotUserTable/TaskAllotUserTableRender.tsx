@@ -84,7 +84,7 @@ class TaskAllotUserTableRender extends TaskAllotUserTableMethods {
   */
   public renderTeamSelect() {
     return (
-      <biz-team-select value={this.selectTeams} onInput={() => this.handlerTeamChange()} multiple />
+      <biz-team-select value={this.selectTeams} onInput={() => this.handlerTeamChange()} multiple collapse />
     )
   }
   
@@ -191,6 +191,7 @@ class TaskAllotUserTableRender extends TaskAllotUserTableMethods {
   public renderWorkStateSelect() {
     return (
       <el-select
+        collapse-tags
         multiple
         placeholder="请选择工作状态"
         value={this.selectUserState}

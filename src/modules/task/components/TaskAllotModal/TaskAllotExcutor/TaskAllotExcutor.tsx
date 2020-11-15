@@ -23,8 +23,11 @@ import { CreateElement } from 'vue'
 export default class TaskAllotExcutor extends Vue {
   
   /* 是否显示人员卡片信息 */
-  public isShowUserCard: boolean = false
-  public selectedExcutorUser: LoginUser | null = null
+  private isShowUserCard: boolean = false
+  /* 等待状态 */
+  private pending: boolean = false
+  /* 选择的负责人信息 */
+  private selectedExcutorUser: LoginUser | null = null
   
   /* 工单派单组件 */
   get TaskAllotModalComponent() {
@@ -59,10 +62,30 @@ export default class TaskAllotExcutor extends Vue {
     this.TaskAllotModalComponent.outsideSetExcutorUser(isSelected ? user : null)
   }
   
+  /**
+   * @description 设置等待状态
+   * -- 支持外部调用的
+  */
+  public outsideSetPending(pending: boolean): void {
+    this.pending = pending
+  }
+  
   render(h: CreateElement) {
+    const attrs = {
+      directives: [
+        {
+          name: 'loading',
+          value: this.pending
+        }
+      ]
+    }
+    
     return (
-      <div class={ComponentNameEnum.TaskAllotExcutor}>
-        <task-allot-user-table ref='TaskAllotUserTableComponent' />
+      <div class={ComponentNameEnum.TaskAllotExcutor} {...attrs}>
+        <task-allot-user-table 
+          ref='TaskAllotUserTableComponent'
+          changePending={this.outsideSetPending}
+        />
         <div class='task-allot-map'>
           
           <div id='MapContainer'></div>

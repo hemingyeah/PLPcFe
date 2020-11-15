@@ -25,6 +25,8 @@ const TableColumnDefaultWidth = '120px'
 export default class TaskAllotUserTable extends TaskAllotUserTableRender {
   
   mounted() {
+    // 构建列
+    this.buildColumns()
     // 绑定事件
     this.$nextTick(() => {
       this.bindTableScrollEvent()

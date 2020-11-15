@@ -38,17 +38,7 @@ export default class TaskAllotModal extends TaskAllotModalRender {
   }
   
   render(h: CreateElement) {
-    const attrs = {
-      class: 'task-allot-modal',
-      props: {
-        title: '派单'
-      },
-      on: {
-        'update:show': (val: any) => {
-          this.showTaskAllotModal = val
-        }
-      }
-    }
+    const attrs = this.getAttributes()
     
     return (
       <base-modal show={this.showTaskAllotModal} {...attrs}>

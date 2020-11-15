@@ -12,8 +12,13 @@ import { TaskAllotUserTableEnterpriseEditionColumns, TaskAllotUserTableStandEdit
 import Column from '@model/types/Column'
 /* util */
 import { isEnterpriseEdition } from '@src/util/version'
+/* vue */
+import { Prop } from 'vue-property-decorator'
 
 class TaskAllotUserTableData extends TaskAllotUserTableComponents {
+  /* 改变等待状态的方法 */
+  @Prop() readonly changePending: Function | undefined
+  
   /* 地图对象 */
   public AMap: any = null
   /* 地图弹窗对象 */

@@ -980,7 +980,7 @@ export default {
         .map(field => {
           let sortable = false;
           let minWidth = null;
-
+          
           if (['date', 'datetime', 'number'].indexOf(field.formType) >= 0) {
             sortable = 'custom';
             minWidth = 100;

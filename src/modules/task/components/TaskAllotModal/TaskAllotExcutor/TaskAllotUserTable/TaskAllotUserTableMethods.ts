@@ -7,6 +7,8 @@ import Loadmore from '@src/directive/loadmore'
 /* enum */
 import EventNameEnum from '@model/enum/EventNameEnum'
 import HookEnum from '@model/enum/HookEnum'
+import StorageModuleEnum from '@model/enum/StorageModuleEnum'
+import StorageKeyEnum from '@model/enum/StorageKeyEnum'
 /* entity */
 import CustomerAddress from '@model/entity/CustomerAddress'
 import LoginUser from '@model/entity/LoginUser/LoginUser'
@@ -169,7 +171,7 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
       
       userMarker.on(EventNameEnum.MouseOver, (event: any) => {
         let user: LoginUser = event.target.getExtData()
-        if (user.userId !== this.TaskAllotExcutorComponent.selectedExcutorUser.userId) return
+        if (user.userId !== this.TaskAllotExcutorComponent?.selectedExcutorUser?.userId) return
         
         let infoWindow = new AMap.InfoWindow({
           closeWhenClickMap: true,
@@ -181,6 +183,24 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
         infoWindow.open(this.AMap, event.target.getPosition())
       })
       
+    })
+  }
+  
+  /** 
+   * @description 构建列
+  */
+  public async buildColumns() {
+    let localColumns = await this.getDataToStorage(StorageKeyEnum.TaskAllotTableColumns, [])
+    if (localColumns.length <= 0) return
+    
+    let columnMap = localColumns.reduce((acc: any, current: Column) => {
+      acc[current.field || ''] = current
+      return acc
+    }, {})
+    
+    this.columns = this.columns.map((column: Column) => {
+      column.show = columnMap[column.field || '']?.show || false
+      return column
     })
   }
   
@@ -332,6 +352,13 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
   }
   
   /**
+   * @description 从缓存获取数据
+  */
+  public async getDataToStorage(key: string, data: any) {
+    return await storageGet(key, data, StorageModuleEnum.Task)
+  }
+  
+  /**
    * @description 选择团队变化事件
   */
   public handlerTeamChange(): void {
@@ -422,10 +449,18 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
     
     this.userPage = new Page()
     this.isDisableLoadmore = false
+    this.changePending && this.changePending(true)
     
-    this.fetchUsers().then(() => {
-      this.mapInit()
-    })
+    this.fetchUsers()
+      .then(() => {
+        this.mapInit()
+      })
+      .catch((err: any) => {
+        console.error(err)
+      })
+      .finally(() => {
+        this.changePending && this.changePending(false)
+      })
   }
   
   /**
@@ -476,9 +511,9 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
   /**
    * @description 保存数据到缓存
   */
-  saveDataToStorage(key: string, data: any) {
+  public saveDataToStorage(key: string, data: any) {
     // TODO: loginUser Id
-    storageSet(key, data)
+    storageSet(key, data, StorageModuleEnum.Task)
   }
   
   /**
@@ -507,7 +542,7 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
       width: column.width
     })) 
     
-    this.saveDataToStorage('columnStatus', showColumns);
+    this.saveDataToStorage(StorageKeyEnum.TaskAllotTableColumns, showColumns);
   }
   
   /** 

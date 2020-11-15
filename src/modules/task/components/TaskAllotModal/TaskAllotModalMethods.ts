@@ -62,6 +62,29 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
     )
   }
   
+  /** 
+   * @description 获取属性列表
+  */
+  public getAttributes() {
+    return {
+      class: 'task-allot-modal',
+      props: {
+        title: '派单'
+      },
+      on: {
+        'update:show': (val: any) => {
+          this.showTaskAllotModal = val
+        }
+      },
+      directives: [
+        {
+          name: 'loading',
+          value: this.pending
+        }
+      ]
+    }
+  }
+  
   /**
    * @description 获取客户信息
   */
