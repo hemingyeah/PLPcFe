@@ -222,7 +222,7 @@ export default {
       }
 
       for(let i = 0;i < notSystemFields.length;i++) {
-        let key = null;
+        let objectAttributes = [];
         tv = notSystemFields[i];
         fn = tv.fieldName;
 
@@ -278,14 +278,14 @@ export default {
         }
 
         if (tv.originalFormType === 'related_task') {
-          key = "taskNo";
+          objectAttributes.push("taskNo");
         }
 
         params.conditions.push({
           property: fn,
           operator: tv.operator,
           value: form[fn],
-          key
+          objectAttributes
         });
       }
 
