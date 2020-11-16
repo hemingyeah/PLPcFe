@@ -2,7 +2,7 @@
   <div class="product-template-edit-container" v-loading.fullscreen.lock="loadingPage">
 
     <!-- start 新建编辑表单 -->
-    <form @submit.prevent="submit" class="base-form" mode="productTemplate" v-if="init" novalidate>
+    <form @submit.prevent="submit" class="base-form" v-if="init" novalidate>
 
       <!-- start 页面顶部按钮 -->
       <div class="page-title">
@@ -15,7 +15,7 @@
       <!-- end 页面顶部按钮 -->
 
       <!-- start form builder -->
-      <form-builder ref="productTemplateEditForm" :fields="fields" mode="product" :value="form" @update="update">
+      <form-builder ref="productTemplateEditForm" :fields="fields" mode="productTemplate" :value="form" @update="update">
 
         <!-- start 产品类型 -->
         <template slot="type" slot-scope="{field}">

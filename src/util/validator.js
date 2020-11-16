@@ -353,7 +353,11 @@ function relatedTask(value, field = {}) {
 function user(value, field = {}) {
   return new Promise(resolve => {
     if (field.isNull === 1) return resolve(null);
-    if (!value || Object.keys(value).length == 0) return resolve(`请选择${field.displayName}`);
+
+    // 判断是否为空值
+    let isEmpty = Array.isArray(value) ? (value.length <= 0 || !value[0].userId) : !value.userId;
+
+    if (!value || isEmpty) return resolve(`请选择${field.displayName}`);
     resolve(null);
   });
 }
