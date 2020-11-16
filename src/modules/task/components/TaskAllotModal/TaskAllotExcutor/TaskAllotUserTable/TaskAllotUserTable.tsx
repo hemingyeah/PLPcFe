@@ -27,10 +27,11 @@ export default class TaskAllotUserTable extends TaskAllotUserTableRender {
   mounted() {
     // 构建列
     this.buildColumns()
+    // 还原排序方式
+    this.revertSort()
     // 绑定事件
     this.$nextTick(() => {
       this.bindTableScrollEvent()
-      this.bindLocationSelectClickEvent()
     })
   }
   
@@ -64,7 +65,7 @@ export default class TaskAllotUserTable extends TaskAllotUserTableRender {
                     fixed={column.fixed}
                     label={column.label}
                     key={column.field}
-                    minWidth={column.minWidth || TableColumnDefaultWidth}
+                    minWidth={column.width ? `${column.width}px` : TableColumnDefaultWidth}
                     prop={column.field}
                     resizable={true}
                     sortable={column.sortable}

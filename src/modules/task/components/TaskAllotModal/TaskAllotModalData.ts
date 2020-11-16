@@ -21,6 +21,8 @@ class TaskAllotModalData extends TaskAllotModalProps {
   public isAllotByTag: boolean = true
   /* 匹配的规则结果 */
   public matchRule: AutoDispatchListItem | null = null
+  /* 最大协同人数量 */
+  public readonly maxSynergyUserCount: number = 14
   /* 等待状态 */
   public pending: boolean = false
   /* 是否显示派单弹窗 */

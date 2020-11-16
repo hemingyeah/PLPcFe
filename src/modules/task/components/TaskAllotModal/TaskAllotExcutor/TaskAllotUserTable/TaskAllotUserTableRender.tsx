@@ -5,13 +5,11 @@ import { ElSelectOption, UserState } from '@src/modules/task/components/TaskAllo
 /* methods */
 import TaskAllotUserTableMethods from '@src/modules/task/components/TaskAllotModal/TaskAllotExcutor/TaskAllotUserTable/TaskAllotUserTableMethods'
 /* model */
-import { MAX_GREATER_THAN__MIN_MESSAGE, REQUIRED_MIN_MESSAGE, REQUIRED_MAX_MESSAGE } from '@src/model/const/Alert'
 import { TaslAllotTableColumnFieldEnum } from '@src/modules/task/components/TaskAllotModal/TaskAllotExcutor/TaskAllotUserTable/TaskAllotUserTableModel'
 /* types */
 import Column from '@model/types/Column'
 /* util */
 import { uuid } from '@src/util/string'
-import Platform from '@src/util/platform'
 
 class TaskAllotUserTableRender extends TaskAllotUserTableMethods {
   /** 
@@ -109,6 +107,7 @@ class TaskAllotUserTableRender extends TaskAllotUserTableMethods {
                 key={locationOption.value} 
                 value={locationOption.value}
                 label={locationOption.label}
+                disabled={isOtherOption}
               >
                 { 
                   isOtherOption
@@ -122,64 +121,48 @@ class TaskAllotUserTableRender extends TaskAllotUserTableMethods {
       </el-select>
     )
   }
-
+  
   /** 
    * @description 渲染选择位置 其他选项
   */
   renderLocationOtherOption() {
-    const HandlerMinValueChanged = (value: number) => { this.locationOtherData.minValue = Number(value) }
-    const HandlerMaxValueChanged = (value: number) => { this.locationOtherData.maxValue = Number(value) }
-    const HandlerConfirmed = () => {
-      let { minValue = 0, maxValue = 0 } = this.locationOtherData
-      let minValueIsNull = minValue == null
-      let maxValueIsNull = maxValue == null
-      // 效验
-      let validated = minValueIsNull || maxValueIsNull || Boolean(maxValue && minValue && maxValue > minValue)
-      this.locationOtherData.isChecked = validated
-      
-      // 最小值提示
-      if (minValueIsNull) {
-        return Platform.alert(REQUIRED_MIN_MESSAGE)
-      }
-      // 最大值提示
-      if (maxValueIsNull) {
-        return Platform.alert(REQUIRED_MAX_MESSAGE)
-      }
-      // 最大值大于最小值提示
-      if (!validated) {
-        return Platform.alert(MAX_GREATER_THAN__MIN_MESSAGE)
-      }
-      // 失焦 ，隐藏select下拉框
-      // @ts-ignore
-      this.$refs.TaskAllotTableLocaionSelect.blur()
-      this.selectLocation = this.locationOptions[this.locationOptions.length - 1].value
+    const numberReg = /^\d+[.]?\d{1,3}$/
+    const numberHandler = (value: string): number | null => {
+      let number = Number(value)
+      return (
+        value === '' 
+          ? null
+          : numberReg.test(value)
+            ? number
+            : Number(number.toFixed(3))
+      )
     }
+    const HandlerMinValueChanged = (value: string) => { this.locationOtherData.minValue = numberHandler(value) }
+    const HandlerMaxValueChanged = (value: string) => { this.locationOtherData.maxValue = numberHandler(value) }
     
     return (
       <div>
         <span>其他</span>
         <div>
-          <el-input 
+          <el-input
+            autocomplete="off"
             class='location-min-input' 
             placeholder='最小值' 
-            type='number' 
-            min={0} 
-            step={1} 
-            value={this.locationOtherData.minValue} 
-            onInput={HandlerMinValueChanged} 
+            type='number'
+            value={this.locationOtherData.minValue}
+            onInput={HandlerMinValueChanged}
           />
             —
-          <el-input 
+          <el-input
+            autocomplete="off"
             class='location-max-input' 
             placeholder='最大值' 
-            type='number' 
-            min={0} 
-            step={1} 
-            value={this.locationOtherData.maxValue} 
+            type='number'
+            value={this.locationOtherData.maxValue}
             onInput={HandlerMaxValueChanged} 
           />
           KM
-          <el-button class='location-confirm-button' onClick={HandlerConfirmed}>确定</el-button>
+          <el-button class='location-confirm-button' onClick={() => this.handlerLocationOtherChange()}>确定</el-button>
         </div>
       </div>
     )

@@ -21,26 +21,30 @@ import { DepeMultiUserResult } from '@src/modules/task/components/TaskAllotModal
 import Page from '@model/Page'
 import { getUserListByTagResult } from '@model/param/out/Task'
 import Column from '@model/types/Column'
+import { MAX_GREATER_THAN__MIN_MESSAGE, REQUIRED_MIN_MESSAGE, REQUIRED_MAX_MESSAGE } from '@src/model/const/Alert'
 /* util */
 import * as _ from 'lodash'
+import Platform from '@src/util/platform'
 import Log from '@src/util/log.ts'
 import { storageGet, storageSet } from '@src/util/storage.ts'
 
 declare let AMap: any
 
 class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
-  /** 
+  /**
+   * @deprecated 
    * @description 绑定位置select 点击事件
    * TODO: 可以包装成组件实现 或者是 函数
   */
   public bindLocationSelectClickEvent(): void {
-    let minInputEl = document.querySelector('.task-allot-user-table-location-select-other .location-min-input .el-input__inner')
-    let maxInputEl = document.querySelector('.task-allot-user-table-location-select-other .location-max-input .el-input__inner')
-    let confirmBtntEl = document.querySelector('.task-allot-user-table-location-select-other .location-confirm-button')
+    let className: string = 'task-allot-user-table-location-select-other'
+    let minInputEl = document.querySelector(`.${className} .location-min-input .el-input__inner`)
+    let maxInputEl = document.querySelector(`.${className} .location-max-input .el-input__inner`)
+    let confirmBtntEl = document.querySelector(`.${className} .location-confirm-button`)
     
     const InputEventFunc = (event: Event) => {
       // 阻止事件冒泡
-      event.stopPropagation() 
+      event.stopPropagation()
     }
     
     // 添加事件
@@ -200,6 +204,7 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
     
     this.columns = this.columns.map((column: Column) => {
       column.show = columnMap[column.field || '']?.show || false
+      column.width = columnMap[column.field || '']?.width || undefined
       return column
     })
   }
@@ -264,7 +269,7 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
   /** 
    * @description 获取滚动的表格元素
   */
-  getScrollTableEl(): Element | null {
+  public getScrollTableEl(): Element | null {
     return document.querySelector('.task-allot-user-table-block .el-table__body-wrapper')
   }
   
@@ -386,6 +391,37 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
     this.selectLocation = value
     this.initialize()
   }
+
+  /**
+   * @description 选择距离其他 事件
+  */
+  public handlerLocationOtherChange() {
+    let { minValue, maxValue } = this.locationOtherData
+    let minValueIsNull = minValue == null
+    let maxValueIsNull = maxValue == null
+    
+    // 效验
+    // @ts-ignore
+    let validated = minValueIsNull || maxValueIsNull || Boolean(maxValue > minValue)
+    this.locationOtherData.isChecked = validated
+    
+    // 最小值提示
+    if (minValueIsNull) {
+      return Platform.alert(REQUIRED_MIN_MESSAGE)
+    }
+    // 最大值提示
+    if (maxValueIsNull) {
+      return Platform.alert(REQUIRED_MAX_MESSAGE)
+    }
+    // 最大值大于最小值提示
+    if (!validated) {
+      return Platform.alert(MAX_GREATER_THAN__MIN_MESSAGE)
+    }
+    // 失焦 ，隐藏select下拉框
+    // @ts-ignore
+    this.$refs.TaskAllotTableLocaionSelect.blur()
+    this.selectLocation = this.locationOptions[this.locationOptions.length - 1].value
+  }
   
   /**
    * @description 选择用户工作状态事件
@@ -424,6 +460,7 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
     Log.succ(Log.Start, this.handlerSortordChange.name)
     
     this.selectSortord = value
+    this.saveDataToStorage(StorageKeyEnum.TaskAllotTableSort, value)
     this.initialize()
   }
   
@@ -508,6 +545,13 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
     this.initialize()
   }
   
+  /** 
+   * @description 还原排序方式数据
+  */
+  public async revertSort() {
+    this.selectSortord = await this.getDataToStorage(StorageKeyEnum.TaskAllotTableSort, '')
+  }
+  
   /**
    * @description 保存数据到缓存
   */
@@ -526,21 +570,20 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
       {}
     )
     
-    this.columns.forEach((col: Column) => {
-      let newCol = columnMap[col.field || '']
+    this.columns = this.columns.map((column: Column) => {
+      let newCol = columnMap[column.field || ''] || {}
       
-      if (newCol) {
-        this.$set(col, 'show', newCol.show)
-        this.$set(col, 'width', newCol.width)
-      }
+      column.show = newCol.show
+      column.width = newCol.width
       
+      return column
     })
-      
+    
     const showColumns = this.columns.map((column: Column) => ({
       field: column.field,
       show: column.show,
       width: column.width
-    })) 
+    }))
     
     this.saveDataToStorage(StorageKeyEnum.TaskAllotTableColumns, showColumns);
   }

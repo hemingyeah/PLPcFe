@@ -52,6 +52,16 @@
     .user-button {
       margin: 0 5px 5px 0;
     }
+    &-item {
+      display: flex;
+      & > span {
+        color: #999;
+        display: block;
+        width: 20px;
+        font-size: 22px;
+        line-height: 40px;
+      }
+    }
   }
 }
 /* end 协同人 */
@@ -77,3 +87,11 @@
   }
 }
 /* end 审批弹窗 */
+
+.last-user-button {
+  margin-left: 20px;
+  margin-bottom: 20px;
+}
+.empty-user-button {
+  margin-left: 0;
+}

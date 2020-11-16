@@ -14,7 +14,8 @@ const TaskAllotUserTableCommonColumns = [
     "show": true,
     "fixed": false,
     "minWidth": "150px",
-    "type": "column"
+    "type": "column",
+    "disabled": true
   },
   {
     "label": "员工角色",

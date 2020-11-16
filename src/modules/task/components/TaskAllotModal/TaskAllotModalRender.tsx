@@ -34,11 +34,24 @@ class TaskAllotModalRender extends TaskAllotModalMethods {
         <span class='task-allot-nav-title'>选择工单协同人</span>
         <div class='task-allot-synergy-list'>
           {
-            this.synergyUserList.map((synergyUser: LoginUser) => {
-              return <user-button user={synergyUser} userDeleteFunc={(user: LoginUser) => this.deleteSynergyUser(user)} /> 
+            this.synergyUserList.map((synergyUser: LoginUser, index: number) => {
+              return (
+                <div class='task-allot-synergy-list-item'>
+                  <user-button user={synergyUser} userDeleteFunc={(user: LoginUser) => this.deleteSynergyUser(user)} /> 
+                  { index < this.synergyUserList.length - 1 ? <span>+</span> : null }
+                </div>
+              )
             })
           }
-          <user-button onClick={() => this.chooseSynergyUser()} /> 
+          {
+            this.synergyUserList.length < this.maxSynergyUserCount
+            && (
+              <user-button
+                class={['last-user-button', this.synergyUserList.length % 2 == 0 ? 'empty-user-button' : '']} 
+                onClick={() => this.chooseSynergyUser()} 
+              />
+            )
+          }
         </div>
       </div>
     )

@@ -83,7 +83,7 @@ export default class UserCard extends Vue {
     const start = new Date()
     const end = new Date()
     
-    end.setTime(end.getTime())
+    end.setTime(end.getTime() - day)
     start.setTime(end.getTime() - day * 30)
     
     this.timeRange = [start, end]

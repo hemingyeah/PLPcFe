@@ -73,7 +73,7 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
       title: '请选择协同人',
       seeAllOrg: true,
       selected: this.synergyUserList,
-      max: 14
+      max: this.maxSynergyUserCount
     }
     
     // @ts-ignore

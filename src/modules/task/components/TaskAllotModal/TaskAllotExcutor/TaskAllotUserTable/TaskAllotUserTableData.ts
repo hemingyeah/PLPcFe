@@ -59,11 +59,11 @@ class TaskAllotUserTableData extends TaskAllotUserTableComponents {
   ]
   /* 距离 其他数据 */
   public locationOtherData: {
-    minValue: number | null,
-    maxValue: number | null,
+    minValue: number | null ,
+    maxValue: number | null ,
     isChecked?: boolean
   } = { 
-    minValue: null,
+    minValue: 0,
     maxValue: null,
     isChecked: false
   }
