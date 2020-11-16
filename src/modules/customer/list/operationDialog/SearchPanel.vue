@@ -352,6 +352,15 @@ export default {
           continue;
         }
 
+        if (tv.formType === 'cascader') {
+          params.conditions.push({
+            property: fn,
+            operator: tv.operator,
+            inValue: form[fn]
+          });
+          continue;
+        }
+
         if (tv.formType === 'address') {
           let address = {
             property: fn,
