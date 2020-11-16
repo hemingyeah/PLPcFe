@@ -1,0 +1,16 @@
+.task-receipt-view-container {
+  .payment-info-row {
+    white-space: nowrap;
+    
+    .payment-method {
+      img {
+        height: 25px;
+        vertical-align: middle;
+      }
+    }
+  }
+
+  .btn-group {
+    text-align: right;
+  }
+}

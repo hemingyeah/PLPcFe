@@ -8,7 +8,7 @@ mtracker();
 Vue.prototype.$http = http;
 Vue.prototype.$eventBus = new Vue();
 
-//处理注入的参数
+// 处理注入的参数
 let initData = {};
 
 try {
@@ -17,6 +17,8 @@ try {
   console.error(error)
   console.error('no init data')
 }
+
+console.log(123, JSON.stringify(initData))
 
 const PageComponent = Vue.extend(ProductList);
 const app = new PageComponent({

@@ -370,7 +370,7 @@
 import draggable from 'vuedraggable'
 import _ from 'lodash'
 import QRCode from 'qrcodejs2'
-import BaseGallery from 'packages/BaseGallery'
+// import BaseGallery from 'packages/BaseGallery'
 
 
 import settingMixin from './settingShowCmp/index'
@@ -813,11 +813,12 @@ export default {
       })
     },
     previewImg(url) {
-      if (!url) return
-      if (url.target && url.target.nodeName == 'IMG') return BaseGallery.preview(url.target)
-      let imgDom = document.createElement('img')
-      imgDom.src = url
-      BaseGallery.preview(imgDom)
+      this.$previewImg(url)
+      // if (!url) return
+      // if (url.target && url.target.nodeName == 'IMG') return BaseGallery.preview(url.target)
+      // let imgDom = document.createElement('img')
+      // imgDom.src = url
+      // BaseGallery.preview(imgDom)
     },
   },
   components: {

@@ -31,6 +31,7 @@ const taskRouter = require('./task');
 const sparePartRouter = require('./sparePart');
 
 const linkcRouter = require('./linkc')
+const productV2Router = require('./productV2')
 
 router.get('/', async (ctx) => {
   let modConfig = modules['system.frame'];
@@ -238,6 +239,8 @@ router.use('', customerContact.routes(), customerContact.allowedMethods());
 router.use('', taskRouter.routes(), taskRouter.allowedMethods());
 router.use('', sparePartRouter.routes(), sparePartRouter.allowedMethods());
 router.use('', linkcRouter.routes(), sparePartRouter.allowedMethods());
+router.use('', productV2Router.routes(), sparePartRouter.allowedMethods());
+
 
 router.all('/*', (ctx) => {
   return HttpClient.proxy(ctx);

@@ -25,6 +25,13 @@
       >
         <i class="iconfont icon-circle-delete"></i>
       </div>
+      <div
+        class="choose-box-arrow-down"
+        :class="{ 'choose-box-arrow-up': focusType }"
+        v-else
+      >
+        <i class="iconfont icon-up"></i>
+      </div>
     </div>
     <div
       class="select-box"
@@ -36,15 +43,12 @@
       ></div>
       <div class="select-box-con">
         <el-input
+          ref="comLenovoInput"
           v-if="!topShow"
           v-model="keyword"
           :disabled="pending"
         ></el-input>
-        <div
-          :class="topShow ? 'mar-b-12' : 'mar-t-12'"
-          v-if="!reflash"
-          ref="showData"
-        >
+        <div :class="topShow ? 'mar-b-12' : 'mar-t-12'" ref="showData">
           <div class="data-box" @scroll="scrollData">
             <slot
               name="select"
@@ -62,10 +66,13 @@
                 <div>{{ item[listShowKey] }}</div>
               </div>
             </template>
-            <div v-if="!page.hasNextPage && !pending">
+            <div v-if="page.list.length > 0 && !page.hasNextPage && !pending">
               没有更多的数据啦
             </div>
-            <div class="nothing-box" v-if="page.list.length <= 0 && !pending">
+            <div
+              class="nothing-box"
+              v-if="page.list.length <= 0 && !pending && searched"
+            >
               暂无数据
             </div>
           </div>
@@ -82,7 +89,6 @@
       </div>
     </div>
   </div>
-
 
   <!-- 
     demo
@@ -162,6 +168,18 @@
 <script>
 import Page from '@model/Page';
 import _ from 'lodash';
+const thisData = {
+  page: { ...new Page(), pageSize: 30 }, // page 对象
+  keyword: '',
+  reflash: true,
+  pending: false,
+  nowChooseIndex: {},
+  focusType: false,
+  topShow: false,
+  searched: false,
+  dataLast: true,
+};
+let notSearch = false;
 export default {
   name: 'com-lenovoselect',
   props: {
@@ -184,6 +202,10 @@ export default {
       type: String,
       default: 'value',
     },
+    searchKey: {
+      type: String,
+      default: 'keyword',
+    },
     comRuturnData: {
       type: Array,
       default: () => {
@@ -202,23 +224,31 @@ export default {
     },
   },
   data() {
-    return {
-      page: { ...new Page(), pageSize: 30 }, // page 对象
-      keyword: '',
-      reflash: true,
-      pending: false,
-      nowChooseIndex: {},
-      focusType: false,
-      topShow: false,
-    };
+    return thisData;
   },
   watch: {
     keyword: _.debounce(function(newVal, oldVal) {
       this.loadData(true);
     }, 800),
+    nowChooseItem(newVal, oldVal) {
+      let obj = {};
+      if (newVal.length > 0) {
+        newVal.forEach((item, index) => {
+          obj[item[this.listKey]] = index;
+        });
+      }
+      this.nowChooseIndex = obj;
+    },
   },
   created() {
     document.addEventListener('click', this.blur);
+    let obj = {};
+    if (this.nowChooseItem.length > 0) {
+      this.nowChooseItem.forEach((item, index) => {
+        obj[item[this.listKey]] = index;
+      });
+    }
+    this.nowChooseIndex = obj;
   },
   beforeDestroy() {
     document.removeEventListener('click', this.blur);
@@ -226,6 +256,8 @@ export default {
 
   methods: {
     loadData: _.debounce(function(reflash = false) {
+      if (notSearch) return;
+      notSearch = false;
       if (!this.page?.hasNextPage) return;
       let { pageNum, pageSize } = this.page;
       let now_data = this.page.list;
@@ -238,7 +270,7 @@ export default {
       this.searchData({
         pageNum,
         pageSize,
-        keyword: this.keyword,
+        [this.searchKey]: this.keyword,
       })
         .then((res) => {
           res.list = [...now_data, ...res.list];
@@ -246,8 +278,11 @@ export default {
           this.page = res;
           this.page.pageSize = 30;
           this.reflash = false;
+          this.searched = true;
           this.$nextTick(() => {
-            if (this.$refs.showData.scrollHeight < 300) {
+            let scrollHeight = this.$refs.showData.scrollHeight * 1;
+            if (scrollHeight < 300 && this.dataLast == true) {
+              this.dataLast = false;
               this.loadData();
             }
           });
@@ -260,15 +295,16 @@ export default {
         .finally((res) => {
           this.pending = false;
           this.reflash = false;
+          this.searched = true;
         });
     }, 500),
     chooseItem(e) {
-      if (this.nowChooseIndex[e.orderId] > -1) {
+      if (this.nowChooseIndex[e[this.listKey]] > -1) {
         this.nowChooseItem.splice(this.nowChooseIndex[e[this.listKey]], 1);
-        delete this.nowChooseIndex[e[this.listKey]];
+        // delete this.nowChooseIndex[e[this.listKey]];
       } else {
         this.nowChooseItem.push(e);
-        this.nowChooseIndex[e[this.listKey]] = this.nowChooseItem.length - 1;
+        // this.nowChooseIndex[e[this.listKey]] = this.nowChooseItem.length - 1;
       }
     },
     scrollData(e) {
@@ -285,6 +321,9 @@ export default {
         if (bottomH < 370) {
           this.topShow = true;
         }
+        this.$nextTick(() => {
+          this.$refs.comLenovoInput.$el.querySelector('input').focus();
+        });
       }
       this.focusType = !this.focusType;
     },
@@ -298,22 +337,31 @@ export default {
       }
     },
     deleteAll() {
-      this.nowChooseIndex = {};
+      // this.nowChooseIndex = {};
       this.nowChooseItem.splice(0, this.nowChooseItem.length);
     },
     deleteItem(index) {
-      let key = this.nowChooseItem[index][this.listKey];
-      delete this.nowChooseIndex[key];
+      // let key = this.nowChooseItem[index][this.listKey];
+      // delete this.nowChooseIndex[key];
       this.nowChooseItem.splice(index, 1);
+    },
+    resetSerchList() {
+      this.page = { ...new Page(), pageSize: 30 };
+      this.keyword = '';
+      this.reflash = true;
+      this.searched = false;
+      notSearch = true;
     },
   },
 };
 </script>
 <style lang="scss" scoped>
+$arrow-border: 8px;
+$base-slect-box-top: 38px;
 .com-lenovoselect-box {
   width: 100%;
   min-width: 120px;
-  height: 36px;
+  height: 32px;
   padding: 0 12px;
   box-sizing: border-box;
   display: flex;
@@ -322,7 +370,7 @@ export default {
   position: relative;
   .choose-warp {
     width: 100%;
-    height: 36px;
+    height: 32px;
   }
   .choose-box {
     overflow-x: scroll;
@@ -336,13 +384,14 @@ export default {
         margin-left: 10px;
       }
       max-width: 180px;
+      background: #f5f5f5;
+      border-radius: 3px;
       padding: 2px 10px;
-      border-radius: 20px;
-      background: #999;
+      font-size: 12px;
       flex-shrink: 0;
-      color: #fff;
       .choose-item-close {
         margin-left: 10px;
+        color: #d9d9d9;
         cursor: pointer;
       }
     }
@@ -350,21 +399,35 @@ export default {
 
   .choose-box-close {
     width: 15px;
-    height: 36px;
+    height: 32px;
     padding-left: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     .iconfont {
-      color: #666;
+      color: #d9d9d9;
+    }
+  }
+  .choose-box-arrow-down {
+    @extend .choose-box-close;
+
+    .iconfont {
+      transition: all 0.8s;
+      transform: rotateZ(-180deg);
+      font-size: 12px;
+    }
+  }
+  .choose-box-arrow-up {
+    .iconfont {
+      transform: rotateZ(0);
     }
   }
 
   .select-box {
     position: absolute;
     z-index: 996;
-    top: 50px;
+    top: ($base-slect-box-top + $arrow-border);
     background: #fff;
     width: 100%;
     height: 0;
@@ -380,7 +443,7 @@ export default {
     .normal-arrow-top {
       font-size: 0;
       line-height: 0;
-      border-width: 12px;
+      border-width: $arrow-border;
       border-color: #fff;
       width: 0;
       border-top-width: 0;
@@ -389,13 +452,13 @@ export default {
       border-left-color: transparent;
       border-right-color: transparent;
       position: absolute;
-      top: -12px;
+      top: -$arrow-border;
       left: 20px;
     }
     .normal-arrow-bottom {
-      border-top-width: 12px;
+      border-top-width: $arrow-border;
       border-bottom-width: 0;
-      bottom: -12px;
+      bottom: -$arrow-border;
       top: auto;
     }
 
@@ -420,7 +483,7 @@ export default {
   }
   .select-box-show-top {
     top: auto;
-    bottom: 50px;
+    bottom: ($base-slect-box-top + $arrow-border);
   }
 }
 .com-lenovoselect-box-focus {
