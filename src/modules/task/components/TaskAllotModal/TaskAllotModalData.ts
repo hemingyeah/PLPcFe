@@ -8,16 +8,19 @@ import TaskAllotTypeEnum from '@model/enum/TaskAllotTypeEnum'
 import TaskAllotModalProps from '@src/modules/task/components/TaskAllotModal/TaskAllotModalProps'
 /* types */
 import StateColorMap from '@model/types/StateColor'
+import AutoDispatchListItem from '@model/types/AutoDispatchListItem'
 
 class TaskAllotModalData extends TaskAllotModalProps {
   /* 派单方式 */
-  public allotType: TaskAllotTypeEnum = TaskAllotTypeEnum.Person
+  public allotType: TaskAllotTypeEnum = TaskAllotTypeEnum.Auto
   /* 客户信息 */
   public customer: Customer = {}
   /* 负责人 */
   public executorUser: LoginUser | null = null
   /* 是否是按团队派单 */
   public isAllotByTag: boolean = true
+  /* 匹配的规则结果 */
+  public matchRule: AutoDispatchListItem | null = null
   /* 等待状态 */
   public pending: boolean = false
   /* 是否显示派单弹窗 */

@@ -1135,4 +1135,18 @@ export function getAutoDispatchResultList(params: TaskAutoDispatchResultListMode
   return http.post('http://30.40.61.216:3000/mock/59/outside/pc/task/autoDispatchResultList', params)
 }
 
+/**
+ * @description 自动派单-审批结果
+ */
+export function getTaskAutoDispatchApprove(params: any): Promise<any> {
+  return http.post('http://30.40.61.216:3000/mock/59/task/approve/autoDispatch', params)
+}
+
+/**
+ * @description 自动派单-提交开始派单
+ */
+export function taskAutoDispatch(params: any): Promise<any> {
+  return http.post('http://30.40.61.216:3000/mock/59/outside/pc/task/autoDispatch', params)
+}
+
 /* -------------  end  新工单api ---------------- */

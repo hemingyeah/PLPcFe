@@ -38,7 +38,7 @@ class TaskAllotUserTableComputed extends TaskAllotUserTableData {
   
   /* 是否是按团队派单 */
   get isAllotByTag() {
-    return this.TaskAllotModalComponent?.taskConfig?.isAllotByTag === true
+    return this.TaskAllotModalComponent?.taskConfig?.allotByTag === true
   }
   
   /* 用户状态 对象 */

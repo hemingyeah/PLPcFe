@@ -14,7 +14,7 @@ import AutoDispatchListItem from '@model/types/AutoDispatchListItem'
 /* util */
 import Platform from '@src/util/Platform'
 /* vue */
-import { Vue, Component, Prop } from 'vue-property-decorator'
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator'
 import { CreateElement } from 'vue'
 
 @Component({ 
@@ -24,6 +24,8 @@ import { CreateElement } from 'vue'
   }
 })
 export default class TaskAllotAuto extends Vue {
+  /* 改变匹配的规则 */
+  @Prop() readonly changeMatchRule: Function | undefined
   /* 工单信息 */
   @Prop() readonly task: any | undefined
   
@@ -36,11 +38,16 @@ export default class TaskAllotAuto extends Vue {
   /* 是否使用匹配出的预估结果 */
   private isUsedResult: boolean = false
   /* 匹配的规则 */
-  private matchRole: AutoDispatchListItem | null = null
+  private matchRule: AutoDispatchListItem | null = null
   /* 匹配成功的索引 */
-  private matchRoleIndex: number = -1
+  private matchRuleIndex: number = -1
   /* 等待状态 */
   private pending: boolean = false
+  
+  @Watch('isUsedResult')
+  onIsUsedResultChanged(newVal: string) {
+    this.changeMatchRule && this.changeMatchRule(newVal ? this.matchRule : null)
+  }
   
   /* 自动派单根据是否显示未匹配的筛选列表 匹配结果用于显示的列表 */
   get autoDispatchResultFilterList(): AutoDispatchListItem[] {
@@ -60,8 +67,8 @@ export default class TaskAllotAuto extends Vue {
       matchResultBeforeList.push(item)
       // 匹配成功
       if (matchSuccessfully) {
-        this.matchRole = item
-        this.matchRoleIndex = i
+        this.matchRule = item
+        this.matchRuleIndex = i
         break
       }
     }
@@ -146,7 +153,7 @@ export default class TaskAllotAuto extends Vue {
    * @description 渲染类名
   */
   private renderClassName(h: CreateElement, item: AutoDispatchListItem, index: number): string[] {
-    let isBefore = index < this.matchRoleIndex
+    let isBefore = index < this.matchRuleIndex
     return isBefore ? ['base-timeline-item-before'] : []
   }
   
@@ -155,7 +162,7 @@ export default class TaskAllotAuto extends Vue {
   */
   private renderHead(h: CreateElement, item: AutoDispatchListItem, index: number) {
     let matchSuccessfully = this.isMatchSuccessfully(item)
-    let isBefore = index < this.matchRoleIndex
+    let isBefore = index < this.matchRuleIndex
     // 渲染未匹配成功dom
     if (!matchSuccessfully) {
       let classNames = ['base-timeline-head', 'base-timeline-head-no-match']
@@ -234,7 +241,7 @@ export default class TaskAllotAuto extends Vue {
           />
         { 
           this.isMatchResultEmpty 
-            ? <div class={`${this.className}-empty`}>暂无匹配结果</div>
+            ? <div class={`${this.className}-empty`}>未匹配到任何规则，请使用「重新匹配」功能刷新结果或更换派单方式</div>
             : (
               <el-button onClick={() => this.isShowUnMatchResult = !this.isShowUnMatchResult}>
                 { this.isShowUnMatchResult ? '收起' : '查看更多' }

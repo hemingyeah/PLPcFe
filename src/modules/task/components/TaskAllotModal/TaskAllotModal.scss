@@ -65,3 +65,15 @@
   width: 100%;
 }
 /* end 指派给负责人 内容 */
+
+/* start 审批弹窗 */
+.task-need-approve-dialog {
+  .base-modal-body {
+    padding: 20px;
+    .base-modal-content,
+    textarea {
+      width: 100%;
+    }
+  }
+}
+/* end 审批弹窗 */

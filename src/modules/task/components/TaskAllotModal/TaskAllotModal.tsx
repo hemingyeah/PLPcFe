@@ -4,6 +4,7 @@ import TaskAllotExcutor from '@src/modules/task/components/TaskAllotModal/TaskAl
 import TaskAllotPool from '@src/modules/task/components/TaskAllotModal/TaskAllotPool/TaskAllotPool.tsx'
 import TaskAllotAuto from '@src/modules/task/components/TaskAllotModal/TaskAllotAuto/TaskAllotAuto.tsx'
 import UserButton from '@src/modules/task/components/TaskAllotModal/UserButton/UserButton.tsx'
+import ProposeApproveDialog from '@src/modules/task/view/components/ProposeApproveDialog.vue'
 /* enum */
 import ComponentNameEnum from '@model/enum/ComponentNameEnum'
 import TaskAllotTypeEnum from '@model/enum/TaskAllotTypeEnum'
@@ -17,6 +18,8 @@ import { Component } from 'vue-property-decorator'
 import TaskAllotModalRender from '@src/modules/task/components/TaskAllotModal/TaskAllotModalRender.tsx'
 /* scss */
 import './TaskAllotModal.scss'
+/* type */
+import AutoDispatchListItem from '@model/types/AutoDispatchListItem'
 
 @Component({
   name: ComponentNameEnum.TaskAllotModal,
@@ -26,6 +29,7 @@ import './TaskAllotModal.scss'
     [TaskAllotAuto.name]: TaskAllotAuto,
     [TaskAllotType.name]: TaskAllotType,
     [UserButton.name]: UserButton,
+    [ProposeApproveDialog.name]: ProposeApproveDialog
   }
 })
 
@@ -66,14 +70,21 @@ export default class TaskAllotModal extends TaskAllotModalRender {
                 ref='TaskAllotExcutorComponent'
               />
               <task-allot-pool show={this.allotType === TaskAllotTypeEnum.Pool} style={this.allotContentStyle[TaskAllotTypeEnum.Pool]} />
-              <task-allot-auto show={this.allotType === TaskAllotTypeEnum.Auto} style={this.allotContentStyle[TaskAllotTypeEnum.Auto]}></task-allot-auto>
+              <task-allot-auto 
+                show={this.allotType === TaskAllotTypeEnum.Auto} 
+                style={this.allotContentStyle[TaskAllotTypeEnum.Auto]}
+                changeMatchRule={(rule: AutoDispatchListItem | null) => this.outsideSetMatchRule(rule)}
+              >
+              </task-allot-auto>
             </div>
           </keep-alive>
         </div>
         
+        <propose-approve-dialog ref='ApproveDialog' taskId={this?.task?.id} />
+        
         <div slot='footer' class='dialog-footer'>
-            <el-button >取 消</el-button>
-            <el-button type='primary' disabled={this.pending}>确 定</el-button>
+            <el-button onClick={() => this.close()}>取 消</el-button>
+            <el-button type='primary' disabled={this.pending} onClick={() => this.submit()}>确 定</el-button>
         </div>
         
       </base-modal>
