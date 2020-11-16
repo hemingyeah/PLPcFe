@@ -12,7 +12,7 @@ import AutoDispatchListItem from '@model/types/AutoDispatchListItem'
 
 class TaskAllotModalData extends TaskAllotModalProps {
   /* 派单方式 */
-  public allotType: TaskAllotTypeEnum = TaskAllotTypeEnum.Auto
+  public allotType: TaskAllotTypeEnum = TaskAllotTypeEnum.Person
   /* 客户信息 */
   public customer: Customer = {}
   /* 负责人 */

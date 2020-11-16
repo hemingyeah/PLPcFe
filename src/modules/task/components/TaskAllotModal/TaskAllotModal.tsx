@@ -41,7 +41,7 @@ export default class TaskAllotModal extends TaskAllotModalRender {
     this.fetchSynergyUserWithCustomerManager()
   }
   
-  render(h: CreateElement) {
+  render(h: CreateElement) {    
     const attrs = this.getAttributes()
     
     return (

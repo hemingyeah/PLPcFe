@@ -104,8 +104,8 @@ export interface TaskSearchListModel extends EsTaskSearchInput {
 /* 工单指派 查询人员列表model */
 export interface TaskAllotUserListByTagModel {
   customerId: string
-  lat: string
-  lng: string
+  lat: string | number | null
+  lng: string | number | null
   tagId?: string
 }
 

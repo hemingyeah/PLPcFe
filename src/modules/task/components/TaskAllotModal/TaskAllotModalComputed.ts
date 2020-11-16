@@ -32,6 +32,11 @@ class TaskAllotModalComputed extends TaskAllotModalData {
     )
   }
   
+  /* 客户id */
+  get customerId() {
+    return this.task?.customer?.id || ''
+  }
+  
   /** 
    * @description 是否是工单创建人
   */

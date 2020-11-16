@@ -28,7 +28,7 @@ class TaskAllotUserTableComputed extends TaskAllotUserTableData {
   
   /* 客户 */
   get customer(): Customer {
-    return this.TaskAllotModalComponent.customer || {}
+    return this.TaskAllotModalComponent?.task?.customer || {}
   }
   
   /* 客户地址 */

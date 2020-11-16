@@ -279,8 +279,8 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
       pageNum: this.userPage.pageNum,
       pageSize: this.userPage.pageSize,
       customerId: this.customer.id || '',
-      lat: String(this.customerAddress.adLatitude) || '',
-      lng: String(this.customerAddress.adLongitude) || '',
+      lat: this.customerAddress.adLatitude || '',
+      lng: this.customerAddress.adLongitude || '',
       tagId: this.selectTeams.map(team => team.id).join(),
       orderDetail: this.orderDetail
     }
