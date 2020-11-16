@@ -148,7 +148,6 @@ export default {
           f.fieldName !== 'customerAddress' &&
           f.fieldName !== 'lmName')
         .map(field => {
-
           f = _.cloneDeep(field);
 
           let formType = f.formType;
@@ -175,7 +174,7 @@ export default {
             formType,
             originalFormType: f.formType,
             orderId: f.isSystem ? f.orderId - 100 : f.orderId,
-            operator: this.matchOperator(f)
+            operator: this.matchOperator(f),
           })
         })
         .sort((a, b) => a.orderId - b.orderId);
@@ -233,6 +232,10 @@ export default {
       }
       case 'location': {
         operator = 'location';
+        break;
+      }
+      case 'related_task': {
+        operator = 'array_eq';
         break;
       }
       default: {
@@ -320,6 +323,7 @@ export default {
       }
 
       for(let i = 0;i < notSystemFields.length;i++) {
+        let key = null;
         tv = notSystemFields[i];
         fn = tv.fieldName;
 
@@ -375,11 +379,16 @@ export default {
           continue;
         }
 
+        if (tv.originalFormType === 'related_task') {
+          key = "taskNo";
+        }
+
 
         params.conditions.push({
           property: fn,
           operator: tv.operator,
           value: form[fn],
+          key
         });
       }
 

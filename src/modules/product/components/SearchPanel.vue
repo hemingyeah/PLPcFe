@@ -74,12 +74,13 @@ export default {
           if (formType === 'updateTime') {
             f.displayName = '更新时间';
           }
+
           return Object.freeze({
             ...f,
             isNull: 1,
             formType,
             originalFormType: f.formType,
-            operator: this.matchOperator(f)
+            operator: this.matchOperator(f),
           });
         })
         .sort((a, b) => a.orderId - b.orderId);
@@ -277,6 +278,10 @@ export default {
         operator = 'location';
         break;
       }
+      case 'related_task': {
+        operator = 'array_eq';
+        break;
+      }
       default: {
         operator = 'like';
         break;
@@ -356,6 +361,7 @@ export default {
       }
 
       for (let i = 0; i < notSystemFields.length; i++) {
+        let key = null;
         tv = notSystemFields[i];
         fn = tv.fieldName;
 
@@ -419,10 +425,15 @@ export default {
           continue;
         }
 
+        if (tv.originalFormType === 'related_task') {
+          key = "taskNo";
+        }
+
         params.conditions.push({
           property: fn,
           operator: tv.operator,
-          value: form[fn]
+          value: form[fn],
+          key
         });
       }
       // 返回接口数据

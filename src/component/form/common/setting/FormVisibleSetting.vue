@@ -31,7 +31,7 @@ export default {
     visibleConfig() {
       return this.field.setting.visibleConfig || { visible: 0, role: [] }
     },
-   /** 
+    /** 
     * @description 获取角色列表
     */
     roleList() {

@@ -61,6 +61,7 @@
       :calculation-fields="calculationFields"
       @confirm="saveFormula"
     />
+
   </div>
 </template>
 
@@ -70,7 +71,7 @@ import SettingMixin from '@src/component/form/mixin/setting';
 /* props */
 import { settingProps } from '@src/component/form/components/props';
 /* components */
-import BaseCalculationFormula from '@src/component/common/BaseCalculationFormula/BaseCalculationFormula.tsx';
+import BaseCalculationFormula from '@src/component/common/BaseCalculationFormula/BaseCalculationFormula.tsx'
 
 export default {
   name: 'form-formula-setting',
@@ -111,7 +112,7 @@ export default {
     }
   },
   components: {
-    [BaseCalculationFormula.name]: BaseCalculationFormula
+    BaseCalculationFormula
   }
 }
 </script>

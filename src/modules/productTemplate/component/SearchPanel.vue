@@ -62,7 +62,6 @@ export default {
       return [...this.config.fields, ...this.selfFields]
         .filter(f => (f.isSearch || f.isSystem) && f.fieldName !== 'qrcodeId' && f.fieldName !== 'customer')
         .map(field => {
-
           f = Object.assign({}, field);
 
           let formType = f.formType;
@@ -160,6 +159,10 @@ export default {
         operator = 'location';
         break;
       }
+      case 'related_task': {
+        operator = 'array_eq';
+        break;
+      }
       default: {
         operator = 'like';
         break;
@@ -215,6 +218,7 @@ export default {
       }
 
       for(let i = 0;i < notSystemFields.length;i++) {
+        let key = null;
         tv = notSystemFields[i];
         fn = tv.fieldName;
 
@@ -269,10 +273,15 @@ export default {
           continue;
         }
 
+        if (tv.originalFormType === 'related_task') {
+          key = "taskNo";
+        }
+
         params.conditions.push({
           property: fn,
           operator: tv.operator,
           value: form[fn],
+          key
         });
       }
 

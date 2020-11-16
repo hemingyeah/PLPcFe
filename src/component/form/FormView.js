@@ -69,15 +69,12 @@ const FormView = {
       
       // 人员
       if (field.formType === 'user') {
-        let { isMultiple } = field.setting || {};
-
         // 多选
-        if(isMultiple == 1) {
-          let valueArr = Array.isArray(value) ? value : [];
-          return valueArr.map(i => i.displayName || i.name).join(',');
+        if(Array.isArray(value)) {
+          return value.map(i => i.displayName || i.name).join(',');
         }
-        
-        return value && (value.displayName || value.name)
+      
+        return value && (value.displayName || value.name);
       }
       
       return value;
@@ -194,7 +191,7 @@ const FormView = {
           
           return (
             <span>
-              <a href="javascript:;" class="link" onClick={() => {
+              <a href="javascript:;" class="link-text" style="margin: 0" onClick={() => {
                 this.$platform.openTab({
                   id: `task_view_${taskId}`,
                   title: '工单详情',

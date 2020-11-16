@@ -38,7 +38,6 @@ class CalculationFormulaItem {
   name: 'base-calculation-formula',
   components: { draggable }
 })
-
 export default class BaseCalculationFormula extends Vue {
 
   /* 支持运算的字段列表 */
