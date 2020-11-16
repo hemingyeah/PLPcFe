@@ -62,7 +62,6 @@ export default {
       return [...this.config.fields, ...this.selfFields]
         .filter(f => (f.isSearch || f.isSystem) && f.fieldName !== 'qrcodeId' && f.fieldName !== 'customer')
         .map(field => {
-          let key = '';
           f = Object.assign({}, field);
 
           let formType = f.formType;
@@ -79,17 +78,12 @@ export default {
             f.displayName = '更新时间';
           }
 
-          if(formType === 'related_task') {
-            key = 'taskNo';
-          }
-
           return Object.freeze({
             ...f,
             isNull: 1,
             formType,
             originalFormType: f.formType,
-            operator: this.matchOperator(f),
-            key
+            operator: this.matchOperator(f)
           })
         })
         .sort((a, b) => a.orderId - b.orderId);
@@ -166,7 +160,7 @@ export default {
         break;
       }
       case 'related_task': {
-        operator = 'array_contain';
+        operator = 'array_eq';
         break;
       }
       default: {
@@ -224,6 +218,7 @@ export default {
       }
 
       for(let i = 0;i < notSystemFields.length;i++) {
+        let key = null;
         tv = notSystemFields[i];
         fn = tv.fieldName;
 
@@ -270,10 +265,15 @@ export default {
           continue;
         }
 
+        if (tv.originalFormType === 'related_task') {
+          key = "taskNo";
+        }
+
         params.conditions.push({
           property: fn,
           operator: tv.operator,
           value: form[fn],
+          key
         });
       }
 
