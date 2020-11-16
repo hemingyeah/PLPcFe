@@ -114,11 +114,11 @@
               {{scope.row | formatTags}}
             </template>
             <!-- 自定义的选择类型字段显示， 与type 区别-->
-            <template v-else-if="column.formType === 'cascader' && scope.row.attribute[column.field]">
+            <template v-else-if="column.formType === 'cascader'">
               {{ scope.row[column.field] | displaySelect }}
             </template>
             <template v-else-if="column.formType === 'select' && !column.isSystem">
-              {{scope.row.attribute[column.field] | displaySelect}}
+              {{scope.row.attribute[column.field] | displaySelect}} 
             </template>
             <template v-else-if="column.field === 'updateTime'">
               <template v-if="scope.row.latesetUpdateRecord">

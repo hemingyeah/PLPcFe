@@ -49,7 +49,9 @@ export default {
     // 日期 若设置默认值，将系统时间设为默认值
     if( JSON.stringify(defaultValueConfig) !== '{}' && isCurrentDate == 1){
       let defaultValue = fmt_data_time(new Date(),dateType);
-      this.choose(defaultValue);
+      if(!this.value){
+        this.choose(defaultValue);
+      }    
      }   
   },
   methods: {
