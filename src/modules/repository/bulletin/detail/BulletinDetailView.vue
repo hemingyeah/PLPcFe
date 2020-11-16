@@ -21,7 +21,19 @@
           </div> -->
 
           <span class="management" v-if="allowEdit">
-            <i class="iconfont icon-qingkongshanchu icon-operating" @click="deleteArticle();trackEventHandler('delete')"></i>
+            <i
+              class="iconfont icon-qingkongshanchu icon-operating"
+              @click="deleteArticle();trackEventHandler('delete')"
+            ></i>
+          </span>
+
+          <span
+            class="open"
+            v-if="allowEdit && linkControl && isShowSelfServicePortal"
+            @click="changeRelease();trackEventHandler('share')"
+          >
+            <i class="iconfont icon-quanziguanli icon-article-share" style="margin-right:4px"></i>
+            {{detail.circleState == 1 ? '取消发布' : '发布到圈子'}}
           </span>
 
           <span class="open" @click="openFrame" v-if="isList">新页面打开</span>
@@ -107,8 +119,9 @@
 </template>
 
 <script>
-import * as RepositoryApi from '@src/api/Repository'
-import * as Lang from '@src/util/lang/index.js';
+import * as RepositoryApi from "@src/api/Repository";
+import * as Lang from "@src/util/lang/index.js";
+import { isShowSelfServicePortal } from '@src/util/version.ts'
 
 export default {
   name: 'bullet-detail',
@@ -371,13 +384,17 @@ export default {
     height () {
       return this.isList ? '100%' : '100vh';
     },
-
     padding () {
       return this.isList ? '0 50px' : '0 100px';
     },
-
     marginLeft () {
       return this.reads.reads.length > 0 ? '20px' : '0'
+    },
+    linkControl() {
+      return this.initData.openLinkC;
+    },
+    isShowSelfServicePortal() {
+      return isShowSelfServicePortal()
     }
   }
 }

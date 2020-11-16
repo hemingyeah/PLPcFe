@@ -210,7 +210,7 @@
                 <template v-else-if="column.field === 'standard'">
                   {{scope.row.sparepart && scope.row.sparepart.standard}}
                 </template>
-                <template v-else-if="column.field === 'operate' && (scope.row.repertoryCount - scope.row.occupyNum) > 0 ">
+                <template v-else-if="column.field === 'operate' && (scope.row.repertoryCount - scope.row.occupyNum) > 0 && isShowPartBack">
                   <el-button type="text" class="no-padding" @click="partBack(scope.row)">退回</el-button>
                 </template>
                 <template v-else-if="column.isSystem === 0">
@@ -273,6 +273,9 @@ const TRANSFER_LIST_DATA = 'transfer-list-data';
 import {parse} from '@src/util/querystring';
 import BatchEditingDialog from '../component/BatchEditingDialog.vue';
 import PartBackForm from '../component/PartBackForm.vue'; 
+
+import { isShowPartBack } from '@src/util/version.ts'
+
 let query;
 export default {
   name: 'transfer-detai-view',
@@ -339,6 +342,10 @@ export default {
     /* 已选择 id列表 */
     selectedIds() {
       return this.multipleSelection.map(item => item.id) || [];
+    },
+    /* 是否显示备件退回 */
+    isShowPartBack() {
+      return isShowPartBack()
     }
   },
   filters: {

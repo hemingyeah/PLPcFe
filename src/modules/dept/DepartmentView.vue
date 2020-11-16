@@ -3,13 +3,13 @@
   <div class="department-container" v-loading.fullscreen.lock="loading">
     <!-- start 主要内容 -->
     <div class="department-main">
-      <div :class="{'department-left': true, 'department-state': isWeChat!=2}">
+      <div :class="{'department-left': true, 'department-state': isWeChat!=2 && isWeChat!=3}">
         <el-button
           type="primary"
           @click="synchronousWeChat"
           :loading="synchronousState"
           class="base-button"
-          v-if="isWeChat==2"
+          v-if="isWeChat==2 || isWeChat==3"
         >{{synchronousState?'同步中':'同步企业微信通讯录'}}</el-button>
         <el-tabs type="card" v-model="activeName" @tab-click="handleClick">
           <el-tab-pane label="组织架构" name="tag">
@@ -235,7 +235,7 @@
                       type="text"
                       @click="createTransTab('event', scope.row.userId)"
                     >去转交</el-button>
-                    <el-button type="text" @click="resume(scope.row.userId)" v-if="isWeChat!=2">恢复</el-button>
+                    <el-button type="text" @click="resume(scope.row.userId)" v-if="isWeChat!=2 && isWeChat!=3">恢复</el-button>
                   </template>
                 </el-table-column>
               </template>
@@ -362,14 +362,14 @@
         <!-- end 部门 header -->
 
         <!-- start 下级部门 -->
-        <div class="department-child-block">
+        <div class="department-child-block" v-if="isShowCreateChildrenTeam">
           <div class="department-child-block-header">
             <div class="department-child-block-header-text">
               <i class="iconfont icon-bumen"></i>
               <span>下级部门</span>
             </div>
 
-            <div class="department-child-block-header-btn dept-edit-del">
+            <div class="department-child-block-header-btn dept-edit-del" v-if="isShowCreateChildrenTeam">
               <base-button type="ghost" @event="addDepartment">添加子部门</base-button>
               <!-- <base-button type="danger" @event="delDepartment" v-if="subDepartments.length > 0"> 删除 </base-button> -->
             </div>
@@ -443,7 +443,7 @@
               <i class="iconfont icon-renyuan"></i>
               <span>成员信息</span>
             </div>
-            <base-button type="primary" @event="openCreateUserPanel" v-if="isWeChat!=2">新建成员账号</base-button>
+            <base-button type="primary" @event="openCreateUserPanel" v-if="isWeChat!=2 && isWeChat!=3">新建成员账号</base-button>
             <!-- <div class="department-user-block-header-btn">
               <base-button type="primary" @event="openCreateUserPanel" v-if="allowAddUser"> 添加成员 </base-button>
               <base-button type="primary" @event="chooseDepartmentMulti"> 调整部门 </base-button>
@@ -544,12 +544,12 @@
                     type="text"
                     style="color:#FB602C"
                     @click="deleteDeptUser(scope.row)"
-                    v-if="isWeChat!=2"
+                    v-if="isWeChat!=2 && isWeChat!=3"
                   >删除</el-button>
                   <el-button
                     type="text"
                     @click="userResetPwdConfirm(scope.row.userId)"
-                    v-if="isWeChat!=2"
+                    v-if="isWeChat!=2 && isWeChat!=3"
                   >重置密码</el-button>
                 </template>
               </el-table-column>
@@ -713,6 +713,7 @@ import DepartmentEditPanel from "./component/DepartmentEditPanel.vue";
 import ModifyName from "./component/ModifyName";
 
 /* utils */
+import { isShowCreateChildrenTeam } from '@src/util/version.ts'
 import _ from "lodash";
 import http from "@src/util/http";
 import Page from "@model/Page";
@@ -882,6 +883,9 @@ export default {
       // 主部门下面成员不能移除
       return this.selectedDept.parentId;
     },
+    isShowCreateChildrenTeam() {
+      return isShowCreateChildrenTeam(this.initData)
+    }
   },
   mounted() {
     this.initialize();

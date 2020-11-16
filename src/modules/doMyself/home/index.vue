@@ -2,19 +2,21 @@
   <div id="doMyself-box">
     <div class="flex-x">
       <div class="left-menu">
-        <div class="menu-title">自助门户设置</div>
-        <nav
-          :class="`menu-list ${nowMenu==index?'menu-checked':''}`"
-          v-for="(item,index) in menuList"
-          :key="index"
-          @click="changePage(index)"
-        >
-          <!-- <div class="left-border" v-if="nowMenu==index"></div> -->
-          <div class="icon-box">
-            <i :class="`iconfont ${item.icon} ${nowMenu==index?'font-16 font-w-600':'font-14'}`"></i>
-          </div>
-          <span>{{item.name}}</span>
-        </nav>
+        <div class="menu-title">{{linkControl && isShowSelfServicePortal ? '消息中心' : '自助门户设置'}}</div>
+        <template v-for="(item, index) in menuList">
+          <nav
+            :class="`menu-list ${nowMenu==index?'menu-checked':''}`"
+            :key="index"
+            v-if="linkControl && isShowSelfServicePortal ? item.name == '客户自助门户' ? false : true : true"
+            @click="changePage(index)"
+          >
+            <!-- <div class="left-border" v-if="nowMenu==index"></div> -->
+            <div class="icon-box">
+              <i :class="`iconfont ${item.icon} ${nowMenu==index?'font-16 font-w-600':'font-14'}`"></i>
+            </div>
+            <span>{{item.name}}</span>
+          </nav>
+        </template>
       </div>
 
       <wx-set v-if="nowMenu===1"></wx-set>
@@ -25,6 +27,7 @@
 <script>
 import toastList from "../toastList/toastList";
 import wxSet from "../wxSet/wxSet";
+import { isShowSelfServicePortal } from '@src/util/version.ts'
 export default {
   name: "do-myself-view",
   props: {
@@ -55,6 +58,15 @@ export default {
       ],
       nowMenu: 1 // 0 客户自助门户 1 公众号设置 2 短信消息设置 3 消息记录
     };
+  },
+  computed: {
+    // 联客商城灰度开关
+    linkControl() {
+      return this.initData.openLinkC;
+    },
+    isShowSelfServicePortal() {
+      return isShowSelfServicePortal()
+    }
   },
   created() {
     let type = window.location.href.split("/")[

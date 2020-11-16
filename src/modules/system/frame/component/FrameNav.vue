@@ -81,6 +81,9 @@ export default {
   computed: {
     logoImg(){
       return this.collapse ? MiniLogo : Logo;
+    },
+    isShowCardWorkTime() {
+      return isShowCardWorkTime()
     }
   },
   methods: {
@@ -220,7 +223,7 @@ export default {
       if (remindHeight < (minHeight / 2)) return ''; 
 
       return `max-height: ${remindHeight}px; overflow-y: auto;`;
-    }
+    },
   },
   mounted() {
     this.setMenuOffsetData();
@@ -237,7 +240,7 @@ export default {
           this.menus = _.cloneDeep(m);          
         }
       }
-    }
+    },
   },
 }
 </script>
