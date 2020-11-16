@@ -15,7 +15,7 @@
       <!-- end 页面顶部按钮 -->
 
       <!-- start form builder -->
-      <form-builder ref="productTemplateEditForm" :fields="fields" mode="product" :value="form" @update="update">
+      <form-builder ref="productTemplateEditForm" :fields="fields" mode="productTemplate" :value="form" @update="update">
 
         <!-- start 产品类型 -->
         <template slot="type" slot-scope="{field}">
@@ -232,7 +232,7 @@ export default {
     },
     // 提交
     submit() {
-      this.$refs.productTemplateEditForm.validate()
+      this.$refs.productTemplateEditForm.validate(false)
         .then(valid => {
           if (!valid) return Promise.reject('productTemplateEditForm validate fail.');
 

@@ -624,15 +624,13 @@ export default {
     },
     // 处理人员显示
     getUserName(field, value) {
-      let { isMultiple } = field.setting || {};
-
-      if(!isMultiple) {
-        let user = value || {};
-        return user.displayName || user.name;
+      // 多选
+      if(Array.isArray(value)) {
+        return value.map(i => i.displayName || i.name).join(',');
       }
-
-      let newValue = Array.isArray(value) ? value : [];
-      return newValue.map(i => i.displayName || i.name).join(',');
+      
+      let user = value || {};
+      return user.displayName || user.name;
     },
     openOutsideLink(e) {
       let url = e.target.getAttribute('url');

@@ -264,7 +264,7 @@ export default {
       })
     },
     validate() {
-      return this.$refs.form.validate()
+      return this.$refs.form.validate(false)
         .then(valid => {
           return valid
         })

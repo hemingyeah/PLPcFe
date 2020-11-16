@@ -163,6 +163,10 @@ export default {
         operator = 'array_eq';
         break;
       }
+      case 'formula': {
+        operator = 'eq';
+        break;
+      }
       default: {
         operator = 'like';
         break;
