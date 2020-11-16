@@ -90,7 +90,8 @@ export function genPlaceholder(field, defaultText = ''){
     text += (isSelect(field) || isMultiSelect(field)) ? '[必选] ' : '[必填] '
   }
 
-  if(field.placeholder) return text + field.placeholder;
+  let placeholder = field.placeholder || field.placeHolder;
+  if(placeholder) return text + placeholder;
 
   let key = field.formType;
   if(isDate(field)) key = 'date';
