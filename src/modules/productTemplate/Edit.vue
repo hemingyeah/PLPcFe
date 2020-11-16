@@ -2,7 +2,7 @@
   <div class="product-template-edit-container" v-loading.fullscreen.lock="loadingPage">
 
     <!-- start 新建编辑表单 -->
-    <form @submit.prevent="submit" class="base-form" v-if="init" novalidate>
+    <form @submit.prevent="submit" class="base-form" mode="productTemplate" v-if="init" novalidate>
 
       <!-- start 页面顶部按钮 -->
       <div class="page-title">

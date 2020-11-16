@@ -169,6 +169,10 @@ export default {
         operator = 'array_contain';
         break;
       }
+      case 'formula': {
+        operator = 'eq';
+        break;
+      }
       default: {
         operator = 'like';
         break;

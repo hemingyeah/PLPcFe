@@ -30,7 +30,8 @@ export const LINK_REG = /(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a
 
 export const fieldValidateMap = {
   customer: FieldValidateApi.fieldRepeatCustomer,
-  product: FieldValidateApi.fieldRepeatProduct
+  product: FieldValidateApi.fieldRepeatProduct,
+  productTemplate: FieldValidateApi.fieldRepeatProductTemplate
 }
 
 let remoteValidateDebounceFunc = null
