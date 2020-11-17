@@ -1,7 +1,7 @@
 <template>
   <div class="form-related-task">
 		<el-select
-			:value="taskValue"
+			v-model="taskValue"
 			style="width: 100%"
 			multiple
 			filterable
@@ -12,6 +12,8 @@
 			popper-class="option-item"
 			loading-text="载入更多结果......"
 			no-data-text="未找到结果"
+      autocomplete="on"
+      value-key="taskId"
 			@change="updateTask"
 			:placeholder="placeholder"
 			:remote-method="searchTask"
@@ -74,21 +76,29 @@ export default {
       loading: false,
       
       page: 1,
-      pageSize: 10
+      pageSize: 20
     }
-	},
+  },
+  watch: {
+    value(val) {
+      this.init(val);
+    }
+  },
 	mounted() {
-		if(this.value && this.value.length > 0) {
-      let taskValue = _.cloneDeep(this.value);
-      this.taskValue = taskValue.map(item => {
-        item.value = item.taskNo;
-        return item;
-      });
-      this.options = taskValue;
-		}
+    this.init(this.value);
 	},
   methods: {
-		searchTask(keyword) {
+    init(val) {
+      if(val && val.length > 0) {
+        let taskValue = _.cloneDeep(val);
+        this.taskValue = taskValue.map(item => {
+          item.value = item.taskNo;
+          return item;
+        });
+        this.options = taskValue;
+      }
+    },
+		searchTask(keyword = '') {
 			let params = {
         page: this.page,
         pageSize: this.pageSize,
@@ -115,10 +125,6 @@ export default {
 			});
 		},
 		updateTask(newValue) {
-      console.log('newValue', newValue);
-      this.taskValue = newValue;
-      let oldValue = null;
-
       this.inputForValue(newValue.map(item => {
         return {
           taskId: item.taskId,
