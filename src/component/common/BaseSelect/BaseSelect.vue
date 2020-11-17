@@ -4,8 +4,8 @@
       <div class="base-select-main-content multiple-layout el-select" @click.stop="focusInput" v-if="multiple"
            :class="{'error': error, 'wrapper-is-focus': isFocus, 'clearable-layout': clearable}">
 
-        <el-tag size="mini" closable v-for="tag in value" :key="tag.value" @close="removeTag(tag)" disable-transitions type="info">
-          {{tag.label}}
+        <el-tag size="mini" closable v-for="tag in value" :key="getValueKey(tag)" @close="removeTag(tag)" disable-transitions type="info">
+          {{tag.label || tag[valueKey]}}
         </el-tag>
         <span v-if="value.length <= 0" class="placeholder-text">
           {{ placeholder }}
@@ -38,7 +38,7 @@
 
         <ul class="option-list" v-loadmore="loadmoreOptions" ref="list">
 
-          <li v-for="op in optionList" :key="op.value" @click="selectTag(op)" :class="{'selected': value.some(user => user.value ===op.value)}">
+          <li v-for="op in optionList" :key="getValueKey(op)" @click="selectTag(op)" :class="{'selected': value.some(user => user[valueKey] ===op[valueKey])}">
             <slot name="option" :option="op" v-if="optionSlot"> </slot>
             <template v-else>{{op.label}}</template>
             <div class="checked"></div>
@@ -75,6 +75,10 @@ export default {
     value: {
       type: Array,
       default: () => ([]),
+    },
+    valueKey: {
+      type: String,
+      default: 'value'
     },
     error: {
       type: Boolean,
@@ -140,6 +144,9 @@ export default {
     },
   },
   methods: {
+    getValueKey(op){
+      return op[this.valueKey];
+    },
     focusInput() {
       if (!this.disabled) {
         this.isFocus = true;
@@ -156,7 +163,7 @@ export default {
       this.$emit('input', []);
     },
     removeTag(tag) {
-      const newVal = this.value.filter(t => t.value !== tag.value);
+      const newVal = this.value.filter(t => t[this.valueKey] !== tag[this.valueKey]);
       this.$emit('input', newVal);
     },
     selectTag(tag) {
@@ -168,10 +175,10 @@ export default {
         this.resetStatus();
 
       } else {
-        if (this.value.every(t => t.value !== tag.value)) {
+        if (this.value.every(t => t[this.valueKey] !== tag[this.valueKey])) {
           newValue.push(tag);
         } else {
-          newValue = newValue.filter(t => t.value !== tag.value);
+          newValue = newValue.filter(t => t[this.valueKey] !== tag[this.valueKey]);
         }
       }
 

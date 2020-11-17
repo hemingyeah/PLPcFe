@@ -18,6 +18,10 @@ const BizFormRemoteSelect = {
       type: Function,
       default: () => ({})
     },
+    valueKey: {
+      type: String,
+      default: 'value'
+    },
     value: {
       type: Array,
       default: () => []
@@ -26,7 +30,7 @@ const BizFormRemoteSelect = {
       type: Boolean,
       default: false
     },
-    disabled: {
+    inputDisabled: {
       type: Boolean,
       default: false
     }
@@ -50,13 +54,14 @@ const BizFormRemoteSelect = {
     return (
       <div class="biz-form-remote-select">
         <base-select
+          value-key={ this.valueKey }
           onInput={ this.input }
           placeholder={ this.placeholder }
           remoteMethod={ this.remoteMethod }
           value={ this.value }
           scopedSlots={ this.$scopedSlots }
           multiple={ this.multiple }
-          disabled={ this.disabled }
+          disabled={ this.inputDisabled }
         >
         </base-select>
         { this.cleared && this.value.length > 0 && clearButton }
