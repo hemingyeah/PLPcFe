@@ -319,6 +319,7 @@ export default {
     }
 
     .list-wrapper {
+      border-radius: 4px;
       position: absolute;
       left: 0;
       top: calc(100% + 13px);

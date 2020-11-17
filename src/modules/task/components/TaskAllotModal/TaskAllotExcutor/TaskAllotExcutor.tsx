@@ -7,10 +7,12 @@ import ComponentNameEnum from '@model/enum/ComponentNameEnum'
 import LoginUser from '@model/entity/LoginUser/LoginUser'
 /* scss */
 import '@src/modules/task/components/TaskAllotModal/TaskAllotExcutor/TaskAllotExcutor.scss'
+/* types */
+import StateColorMap from '@model/types/StateColor'
 /* util */
 import { findComponentUpward } from '@src/util/assist'
 /* vue */
-import { Vue, Component } from 'vue-property-decorator'
+import { Vue, Component, Prop } from 'vue-property-decorator'
 import { CreateElement } from 'vue'
 
 @Component({ 
@@ -21,6 +23,8 @@ import { CreateElement } from 'vue'
   }
 })
 export default class TaskAllotExcutor extends Vue {
+  /* 工作状态颜色数组 */
+  @Prop() readonly stateColorMap: StateColorMap | undefined
   
   /* 是否显示人员卡片信息 */
   private isShowUserCard: boolean = false
@@ -91,7 +95,15 @@ export default class TaskAllotExcutor extends Vue {
           <div id='MapContainer'></div>
           
           <div class='task-allot-user-content'>
-            { this.isShowUserCard && <user-card userId={this.selectedExcutorUser?.userId} emitEventComponentName={ComponentNameEnum.TaskAllotExcutor} /> }
+            { this.isShowUserCard 
+              && (
+                <user-card
+                  stateColorMap={this.stateColorMap}
+                  userId={this.selectedExcutorUser?.userId}
+                  emitEventComponentName={ComponentNameEnum.TaskAllotExcutor} 
+                /> 
+              )
+            }
           </div>
           
         </div>

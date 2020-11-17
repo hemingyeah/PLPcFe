@@ -1,3 +1,5 @@
+/* enum */
+import ComponentNameEnum from '@model/enum/ComponentNameEnum'
 /* entity */
 import LoginUser from '@model/entity/LoginUser/LoginUser'
 /* image */
@@ -9,7 +11,7 @@ import { CreateElement } from 'vue'
 /* scss */
 import '@src/modules/task/components/TaskAllotModal/UserButton/UserButton.scss'
 
-@Component({ name: 'user-button' })
+@Component({ name: ComponentNameEnum.UserButton })
 export default class UserButton extends Vue {
   /* 用户删除方法 */
   @Prop() userDeleteFunc: Function | undefined

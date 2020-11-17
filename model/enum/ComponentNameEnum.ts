@@ -23,7 +23,11 @@ enum ComponentNameEnum {
   // 工单指派 工单池 统计信息
   TaskAllotPoolInfo = 'task-allot-pool-info',
   // 新建分配规则
-  AllotRuleModal = 'allot-rule-modal'
+  AllotRuleModal = 'allot-rule-modal',
+  // 工单指派人员卡片
+  UserCard = 'user-card',
+  // 工单指派人员按钮
+  UserButton = 'user-button'
 }
 
 export default ComponentNameEnum

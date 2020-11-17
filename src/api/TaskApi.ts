@@ -5,7 +5,8 @@ import {
   TaskSearchListModel,
   TaskGetCardDetailListModel,
   TaskAllotUserListByTagModel,
-  TaskAutoDispatchResultListModel
+  TaskAutoDispatchResultListModel,
+  TaskUserCardSearchModel
 } from "@model/param/in/Task"
 
 import { 
@@ -16,7 +17,8 @@ import {
   getLatestRecordResult,
   getUserListByTagResult,
   getTaskConfigResult,
-  getAutoDispatchResultListResult
+  getAutoDispatchResultListResult,
+  getTaskUserCardInfoResult
 } from '@model/param/out/Task'
 
 import GrayUtil from '@src/util/gray'
@@ -1147,6 +1149,13 @@ export function getTaskAutoDispatchApprove(params: any): Promise<any> {
  */
 export function taskAutoDispatch(params: any): Promise<any> {
   return http.post('http://30.40.61.216:3000/mock/59/outside/pc/task/autoDispatch', params)
+}
+
+/**
+ * @description 工单指派-获取人员卡片信息
+ */
+export function getTaskUserCardInfo(params: TaskUserCardSearchModel): Promise<getTaskUserCardInfoResult> {
+  return http.post('http://30.40.61.216:3000/mock/59/outside/es/task/getUserCardInfo', params)
 }
 
 /* -------------  end  新工单api ---------------- */

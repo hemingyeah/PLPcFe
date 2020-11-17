@@ -1,12 +1,12 @@
 import Result from '@model/Result'
 import EsTask from '@model/entity/EsTask'
 import TaskView from '@model/entity/TaskView'
-
 import Page from '@model/types/Page'
 import MsgModel from '@model/MsgModel'
 import LoginUser from '@model/entity/LoginUser/LoginUser'
 import TaskConfig from '@model/types/TaskConfig'
 import AutoDispatchListItem from '@model/types/AutoDispatchListItem'
+import UserCardInfo from '@model/entity/UserCardInfo'
 
 
 /** 获取用户视图列表返回值 */
@@ -32,3 +32,6 @@ export type getTaskConfigResult = { taskConfig: TaskConfig}
 
 /* 自动派单-获取预估列表结果 */
 export type getAutoDispatchResultListResult =Result<AutoDispatchListItem[]>
+
+/* 工单指派-获取人员卡片信息 */
+export type getTaskUserCardInfoResult =Result<UserCardInfo>

@@ -65,6 +65,7 @@ export default class TaskAllotModal extends TaskAllotModalRender {
             <div class='task-allot-content-active'>
               <task-allot-excutor
                 style={this.allotContentStyle[TaskAllotTypeEnum.Person]}
+                stateColorMap={this.stateColorMap}
                 onSetExecutor={(user: LoginUser) => this.setExecutorUser(user)} 
                 onSetSynergy={(user: LoginUser) => this.setSynergyUser(user)} 
                 ref='TaskAllotExcutorComponent'

@@ -1,8 +1,12 @@
 .user-card {
+  width: 470px;
   padding: 20px 0 20px 20px;
   .excutor-button {
     border-color: $color-primary;
     color: $color-primary;
+    height: 32px;
+    width: 88px;
+    padding: 0 3px !important;
     &:hover {
       color: #fff;
     }
@@ -11,6 +15,9 @@
     border-color: $color-warning;
     color: $color-warning;
     margin-left: 8px;
+    height: 32px;
+    width: 88px;
+    padding: 0 3px !important;
     &:hover {
       background-color: $color-warning;
       color: #fff;
@@ -21,7 +28,7 @@
 .user-card-header {
   border-bottom: 1px solid $border-color-base;
   display: flex;
-  padding: 12px;
+  padding: 12px 12px 12px 0;
   &-head {
     display: flex;
     align-items: center;
@@ -39,9 +46,10 @@
 }
 
 .user-card-header-content {
+  color: $text-color-regular;
   &-name {
     font-size: $font-size-base;
-    font-weight: 500;
+    font-weight: 600;
     line-height: 20px;
   }
   &-state {
@@ -49,14 +57,32 @@
       display: inline-block;
       margin-right: 10px;
     }
+    .user-state-round {
+      border-radius: 50%;
+      height: 12px;
+      width: 12px;
+    }
   }
   &-name, &-state, &-team {
     line-height: 20px;
   }
 }
 
+.user-card-header-content {
+  &-top {
+    display: flex;
+    &-left {
+      flex: 1;
+    }
+    .user-card-header-button-group {
+      width: 200px;
+    }
+  }
+}
+
 .user-card-time,
 .user-card-detail {
+  color: $text-color-primary;
   margin-top: 12px;
   margin-right: 100px;
 }

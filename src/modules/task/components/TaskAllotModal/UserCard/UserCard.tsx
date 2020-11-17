@@ -1,54 +1,57 @@
+/* api */
+import * as TaskApi from '@src/api/TaskApi'
+/* enum */
+import DateFormatEnum from '@model/enum/DateFormatEnum'
+import ComponentNameEnum from '@model/enum/ComponentNameEnum'
 /* entity */
 import LoginUser from '@model/entity/LoginUser/LoginUser'
+import UserCardInfo from '@model/entity/UserCardInfo'
 /* image */
 // @ts-ignore
 import DefaultHead from '@src/assets/img/avatar.png'
 /* model */
 import { PickerOptions } from '@src/modules/task/components/TaskAllotModal/UserCard/UserCardModel'
+import { getTaskUserCardInfoResult } from '@model/param/out/Task'
 /* vue */
 import { Vue, Component, Prop, Emit, Watch } from 'vue-property-decorator'
 import { CreateElement } from 'vue'
 /* scss */
 import '@src/modules/task/components/TaskAllotModal/UserCard/UserCard.scss'
+/* types */
+import StateColorMap from '@model/types/StateColor'
 /* util */
 import { dispatch } from '@src/util/emitter'
+import DateUtil from '@src/util/date'
+import Platform from '@src/util/Platform'
 
 enum UserCardEmitEventEnum {
   SetExecutor = 'setExecutor',
   SetSynergy = 'setSynergy'
 }
 
-interface TaskAllotUser extends LoginUser {
-  // 未完成工单量
-  unFinishedTaskCount: number,
-  // 已完成工单量
-  finishTaskCount: number,
-  // 平均响应用时
-  averageResponseTime: number | string,
-  // 平均工作用时
-  averageWorkTime: number | string,
-  // 拒单率
-  rejectionRate: number | string
-  // 转派率
-  allotRate: number | string,
-  // 好评率
-  favorableRate: number | string
-}
-
-@Component({ name: 'user-card' })
+@Component({ name: ComponentNameEnum.UserCard })
 export default class UserCard extends Vue {
   // 向外发布事件的 组件名字
   @Prop() emitEventComponentName: string | undefined
+  // 工作状态颜色数组
+  @Prop() readonly stateColorMap: StateColorMap | undefined
   // 用户id
   @Prop() userId: string | undefined
   
+  // 等待状态
+  private pending: boolean = false
   // 时间
   private timeRange: Date[] = []
-  // 用户信息
-  private user: TaskAllotUser | null = null
-
-  @Watch('userId', { immediate: true })
-  onUserIdChanged(newVal: string, oldVal: string) {
+  // 用户卡片信息
+  private userCardInfo: UserCardInfo = new UserCardInfo()
+  
+  /* 用户信息 */
+  get user(): LoginUser {
+    return this.userCardInfo.user
+  }
+  
+  @Watch('userId')
+  onUserIdChanged() {
     this.fetchUserTaskData()
   }
   
@@ -59,7 +62,12 @@ export default class UserCard extends Vue {
   private setExecutorUser() {
     // 支持由自定义组件 发出事件
     if (this.emitEventComponentName) {
-      dispatch.call(this, this.emitEventComponentName, UserCardEmitEventEnum.SetExecutor, this.user)
+      dispatch.call(
+        this, 
+        this.emitEventComponentName, 
+        UserCardEmitEventEnum.SetExecutor, 
+        this.user
+      )
     }
     
     return this.user
@@ -72,12 +80,20 @@ export default class UserCard extends Vue {
   private setSynergyUser() {
     // 支持由自定义组件 发出事件
     if (this.emitEventComponentName) {
-      dispatch.call(this, this.emitEventComponentName, UserCardEmitEventEnum.SetSynergy, this.user)
+      dispatch.call(
+        this, 
+        this.emitEventComponentName, 
+        UserCardEmitEventEnum.SetSynergy, 
+        this.user
+      )
     }
     
     return this.user
   }
-
+  
+  /** 
+   * @description 计算开始和结束时间
+  */
   private computedStartAndEndTime() {
     const day = 3600 * 1000 * 24
     const start = new Date()
@@ -88,25 +104,55 @@ export default class UserCard extends Vue {
     
     this.timeRange = [start, end]
   }
+
+  /** 
+   * @description 获取属性列表
+  */
+  public getAttributes() {
+    return {
+      directives: [
+        {
+          name: 'loading',
+          value: this.pending
+        }
+      ]
+    }
+  }
   
   /** 
    * @description 获取人员工单信息
   */
   private fetchUserTaskData() {
-    this.user = {
-      displayName: '黄宝成',
-      tagList: [{tagName: '测试团队'}],
-      state: '工作中',
-      cellPhone: '17664666980',
-      userId: this.userId || '',
-      unFinishedTaskCount: 1,
-      finishTaskCount: 2,
-      averageResponseTime: '2h',
-      averageWorkTime: '3h',
-      rejectionRate: '30%',
-      allotRate: '20%',
-      favorableRate: '10%'
+    let params = {
+      executorId: this.userId || '',
+      startTime: DateUtil.format(this.timeRange[0], DateFormatEnum.YTD),
+      endTime: DateUtil.format(this.timeRange[1], DateFormatEnum.YTD)
     }
+    
+    this.pending = true
+    
+    TaskApi.getTaskUserCardInfo(params)
+      .then((data: getTaskUserCardInfoResult) => {
+        let isSuccess = data.success
+        if (!isSuccess) {
+          Platform.alert(data.message)
+        }
+        
+        this.userCardInfo = data.result
+      })
+      .catch((error) => {
+        console.error(error)
+      })
+      .finally(() => {
+        this.pending = false
+      })
+  }
+  
+  /** 
+   * @description 格式化显示文字
+  */
+  private formatDisplayText(value: any, text?: string) {
+    return value ? `${value}${text || ''}` : (value || UserCardInfo.Placeholder)
   }
   
   /** 
@@ -114,6 +160,7 @@ export default class UserCard extends Vue {
   */
   private handlerTimeChange(value: Date[]): void {
     this.timeRange = value
+    this.fetchUserTaskData()
   }
   
   mounted() {
@@ -122,29 +169,45 @@ export default class UserCard extends Vue {
   }
   
   render(h: CreateElement) {
+    const attrs = this.getAttributes()
+    
     return (
-      <div class='user-card'>
+      <div class='user-card' {...attrs}>
           
           <div class='user-card-header'>
             <div class='user-card-header-head'>
               <img src={this.user?.head || DefaultHead} />
             </div>
             <div class='user-card-header-content'>
-              <div class='user-card-header-content-name'>
-                {this?.user?.displayName}
+              <div class='user-card-header-content-top'>
+
+                <div class='user-card-header-content-top-left'>
+                  <div class='user-card-header-content-name'>
+                    {this?.user?.displayName}
+                  </div>
+                  
+                  <div class='user-card-header-content-state'>
+                    <i class='iconfont icon-zhuangtai'></i>
+                    <span class='user-state-round' style={{
+                      backgroundColor: this.stateColorMap && this.stateColorMap[this.user?.state || '']
+                    }}>
+                    </span>
+                    <span>{this.user?.state}</span>
+                    <span>{this.user?.cellPhone}</span>
+                  </div>
+                </div>
+                
+                <div class='user-card-header-button-group'>
+                  <base-button class='excutor-button' type='ghost' onEvent={this.setExecutorUser}>设为负责人</base-button>
+                  <base-button class='synergy-button' type='ghost' onEvent={this.setSynergyUser}>设为协同人</base-button>
+                </div>
+                
               </div>
-              <div class='user-card-header-content-state'>
-                <i class='iconfont icon-zhuangtai'></i>
-                <span>{this.user?.state}</span>
-                <span>{this.user?.cellPhone}</span>
-              </div>
+              
               <div class='user-card-header-content-team'>
-                { this.user?.tagList && this?.user?.tagList.map(tag => tag.tagName).join(',') }
+                { this.userCardInfo.department.join(', ') }
               </div>
-            </div>
-            <div class='user-card-header-button-group'>
-              <base-button class='excutor-button' type='ghost' onEvent={this.setExecutorUser}>设为负责人</base-button>
-              <base-button class='synergy-button' type='ghost' onEvent={this.setSynergyUser}>设为协同人</base-button>
+              
             </div>
           </div>
           
@@ -163,19 +226,33 @@ export default class UserCard extends Vue {
           
           <div class='user-card-detail'>
             <div class='user-card-detail-row'>
-              <div class='user-card-detail-row-item'>未完成工单量: {this.user?.unFinishedTaskCount} 个</div>
-              <div class='user-card-detail-row-item'>已完成工单量: {this.user?.finishTaskCount} 个</div>
+              <div class='user-card-detail-row-item'>
+                未完成工单量: {this.formatDisplayText(this.userCardInfo.unfinished, '个')}
+              </div>
+              <div class='user-card-detail-row-item'>
+                已完成工单量: {this.formatDisplayText(this.userCardInfo.finished, '个')}
+              </div>
             </div>
             <div class='user-card-detail-row'>
-              <div class='user-card-detail-row-item'>平均响应用时: {this.user?.averageResponseTime}</div>
-              <div class='user-card-detail-row-item'>平均工作用时: {this.user?.averageWorkTime}</div>
+              <div class='user-card-detail-row-item'>
+                平均响应用时: {this.userCardInfo.rangeAccept}
+              </div>
+              <div class='user-card-detail-row-item'>
+                平均工作用时: {this.userCardInfo.rangeWork}
+              </div>
             </div>
             <div class='user-card-detail-row'>
-              <div class='user-card-detail-row-item'>拒单率: {this.user?.rejectionRate} %</div>
-              <div class='user-card-detail-row-item'>转派率: {this.user?.allotRate} %</div>
+              <div class='user-card-detail-row-item'>
+                拒单率: {this.formatDisplayText(this.userCardInfo.refuse, '%')}
+              </div>
+              <div class='user-card-detail-row-item'>
+                转派率: {this.formatDisplayText(this.userCardInfo.allot, '%')}
+              </div>
             </div>
             <div class='user-card-detail-row'>
-              <div class='user-card-detail-row-item'>好评率: {this.user?.favorableRate} %</div>
+              <div class='user-card-detail-row-item'>
+                好评率: {this.formatDisplayText(this.userCardInfo.degree, '%')}
+              </div>
             </div>
           </div>
           

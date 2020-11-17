@@ -116,3 +116,13 @@ export interface TaskAutoDispatchResultListModel {
   // 必填默认值 参数做了校验   如传入：auto_dispatch
   executorId: string
 }
+
+/* 自动派单-获取预估列表结果model */
+export interface TaskUserCardSearchModel {
+  // 人员id
+  executorId: string
+  // 开始时间 示例： 2020-10-01
+  startTime: string
+  // 结束时间 示例： 2020-10-01
+  endTime: string
+}

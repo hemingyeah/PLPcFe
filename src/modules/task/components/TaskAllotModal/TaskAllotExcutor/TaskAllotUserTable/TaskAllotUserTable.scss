@@ -12,11 +12,15 @@
   .base-select-container {
     .list-wrapper {
       width: 300px;
-      left: -75px;
     }
   }
   .contact-user-avatar-margin {
     margin-top: 0;
+  }
+  .option-list li {
+    &:hover {
+      background-color: transparent;
+    }
   }
 }
 
