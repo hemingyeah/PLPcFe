@@ -41,7 +41,7 @@ export default {
     fields() {
       let tv = null;
 
-      let formTypes = ['attachment', 'separator', 'location', 'info'];
+      let formTypes = ['attachment', 'separator', 'location', 'info', 'autograph'];
 
       let fields = (this.config.fields || [])
         .filter(f => (

@@ -42,7 +42,7 @@ export default {
   computed: {
     fields() {
       let tv = null;
-      let formTypes = ['attachment', 'separator', 'location', 'info'];
+      let formTypes = ['attachment', 'separator', 'location', 'info','autograph'];
       let fieldNames = ['createUser', 'createTime', 'updateTime', 'productTemplate', 'tags', 'remindCount', 'qrcodeId', 'linkmanName', 'phone', 'address'];
 
       let fields = (this.config.fields || [])
@@ -59,7 +59,6 @@ export default {
         });
 
       if (!fields || !fields.length) return [];
-
       return fields.sort((a, b) => a.orderId - b.orderId);
     },
     productTypes() {
