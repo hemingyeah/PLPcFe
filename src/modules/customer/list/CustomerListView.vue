@@ -191,7 +191,7 @@
               {{scope.row.attribute[column.field] | displaySelect}}
             </template>
             <template v-else-if="column.formType === 'cascader' && scope.row.attribute[column.field]">
-              {{scope.row.attribute[column.field] | displaySelect}}
+              {{scope.row.attribute[column.field] | displayCascader}}
             </template>
             <template v-else-if="column.formType === 'user' && scope.row.attribute[column.field]">
               {{ getUserName(column, scope.row.attribute[column.field]) }}
@@ -514,6 +514,16 @@ export default {
       }
       if (Array.isArray(value) && value.length) {
         return value.join('，');
+      }
+      return null;
+    },
+    displayCascader(value) {
+      if (!value) return null;
+      if (value && typeof value === 'string') {
+        return value;
+      }
+      if (Array.isArray(value) && value.length) {
+        return value.join('/');
       }
       return null;
     }

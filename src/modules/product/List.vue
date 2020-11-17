@@ -115,7 +115,7 @@
             </template>
             <!-- 自定义的选择类型字段显示， 与type 区别-->
             <template v-else-if="column.formType === 'cascader'">
-              {{ scope.row[column.field] | displaySelect }}
+              {{ scope.row.attribute[column.field] | displayCascader }}
             </template>
             <template v-else-if="column.formType === 'select' && !column.isSystem">
               {{scope.row.attribute[column.field] | displaySelect}} 
@@ -587,6 +587,16 @@ export default {
       }
       return null;
     },
+    displayCascader(value) {
+      if (!value) return null;
+      if (value && typeof value === 'string') {
+        return value;
+      }
+      if (Array.isArray(value) && value.length) {
+        return value.join('/');
+      }
+      return null;
+    }
 
   },
   async mounted() {

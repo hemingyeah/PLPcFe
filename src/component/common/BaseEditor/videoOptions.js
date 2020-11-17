@@ -14,6 +14,7 @@ class Video extends BlockEmbed {
     node.setAttribute('x5-video-player-type', 'h5')
    
     // node.setAttribute('style', 'object-fit: cover')
+    node.setAttribute('style', 'background: #000')
     node.setAttribute('poster', `${value}?x-oss-process=video/snapshot,t_1000,f_jpg,m_fast`)
     node.setAttribute('src', this.sanitize(value))
     return node

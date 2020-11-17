@@ -115,7 +115,7 @@
               {{ getUserName(column, scope.row.attribute[column.field]) }}
             </template>
             <template v-else-if="column.formType === 'cascader' && scope.row.attribute[column.field]">
-              {{ scope.row[column.field] | displaySelect }}
+              {{ scope.row.attribute[column.field] | displayCascader }}
             </template>
             <template v-else-if="column.formType === 'location'">
               {{ scope.row.attribute[column.field] && scope.row.attribute[column.field].address}}
@@ -397,6 +397,16 @@ export default {
       }
       if (Array.isArray(value) && value.length) {
         return value.join('，');
+      }
+      return null;
+    },
+    displayCascader(value) {
+      if (!value) return null;
+      if (value && typeof value === 'string') {
+        return value;
+      }
+      if (Array.isArray(value) && value.length) {
+        return value.join('/');
       }
       return null;
     },
