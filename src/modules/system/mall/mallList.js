@@ -6,7 +6,7 @@ export default {
   name: "mall-list",
   data() {
     return {
-      editableTabsValue: '1'
+      editableTabsValue: '1', //tab切换
     }
   },
   components: {
