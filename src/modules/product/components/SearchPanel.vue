@@ -365,7 +365,7 @@ export default {
       }
 
       for (let i = 0; i < notSystemFields.length; i++) {
-        let objectAttributes = [];
+        let key = null;
         tv = notSystemFields[i];
         fn = tv.fieldName;
 
@@ -430,14 +430,14 @@ export default {
         }
 
         if (tv.originalFormType === 'related_task') {
-          objectAttributes.push("taskNo");
+          key = "taskNo";
         }
 
         params.conditions.push({
           property: fn,
           operator: tv.operator,
           value: form[fn],
-          objectAttributes
+          key
         });
       }
       // 返回接口数据
