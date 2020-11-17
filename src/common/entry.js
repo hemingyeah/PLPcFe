@@ -1,6 +1,7 @@
 /** 各入口文件应该引入该文件替代手动引入 */
 import '@src/assets/scss/index.scss'
 import '@src/common/polyfill';
+import '@src/modules/linkc/assets/public.scss';
 
 import Vue from 'vue';
 

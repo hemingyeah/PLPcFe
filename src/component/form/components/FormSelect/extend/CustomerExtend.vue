@@ -4,11 +4,28 @@
       <el-select
         :value="value"
         filterable
-        :placeholder="`${extendData[field.mainKey]==='' || extendData[field.mainKey]===undefined ?`请先选择${field.extendDisplayName}`:field.placeholder}`"
-        :disabled="extendData[field.mainKey]==='' || extendData[field.mainKey]===undefined?true:false"
+        :placeholder="
+          `${
+            extendData[field.mainKey] === '' ||
+            extendData[field.mainKey] === undefined
+              ? `请先选择${field.extendDisplayName}`
+              : field.placeholder
+          }`
+        "
+        :disabled="
+          extendData[field.mainKey] === '' ||
+            extendData[field.mainKey] === undefined
+            ? true
+            : false
+        "
         @change="update"
       >
-        <el-option v-for="item in options" :key="item.id" :label="item.value" :value="item.value"></el-option>
+        <el-option
+          v-for="item in options"
+          :key="item.id"
+          :label="item.value"
+          :value="item.value"
+        ></el-option>
       </el-select>
       <!-- <el-select
         :value="value"
@@ -34,7 +51,7 @@
         :content="field.formRight.con"
         placement="bottom"
       >
-        <i :class="['mar-l-15','iconfont','point',field.formRight.icon]"></i>
+        <i :class="['mar-l-15', 'iconfont', 'point', field.formRight.icon]"></i>
       </el-tooltip>
     </div>
   </div>
@@ -56,22 +73,22 @@ export default {
     ...settingProps,
     values: {
       type: String,
-      default: () => ''
+      default: () => '',
     },
     extendData: {
-      type: Object
+      type: Object,
     },
     extendDisplayName: {
       type: String,
-      default: () => ''
+      default: () => '',
     },
     /** 用于获取FormDesign实例 */
-    getContext: Function
+    getContext: Function,
   },
   computed: {
-    value(){
-      return this.values
-    }
+    value() {
+      return this.values;
+    },
   },
   watch: {
     extendData: {
@@ -81,14 +98,14 @@ export default {
         }
       },
       deep: true,
-      immediate: true
+      immediate: true,
     },
   },
   data() {
     return {
       options: [],
       loading: false,
-      extend_data: ''
+      extend_data: '',
     };
   },
   mounted() {},
@@ -98,9 +115,9 @@ export default {
       this.$http[this.field.searchType === 'GET' ? 'get' : 'post'](
         this.field.searchUrl,
         this.extendData || {}
-      ).then(res => {
+      ).then((res) => {
         if (res.list.length > 0) {
-          res.list = res.list.map(res_ => {
+          res.list = res.list.map((res_) => {
             if (this.field.resTranslate) {
               res_ = this.field.resTranslate(res_);
             }
@@ -124,14 +141,17 @@ export default {
     },
     filterBlur() {
       //
-    }
-  }
+    },
+  },
 };
 </script>
 <style lang="scss">
 .flex-x {
   display: flex;
   align-items: center;
+}
+.flex-1 {
+  flex: 1;
 }
 .mar-l-15 {
   margin-left: 15px;

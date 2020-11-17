@@ -14,7 +14,6 @@
 .flex-x {
   display: flex;
 }
-
 .flex-y {
   display: flex;
   flex-direction: column;
@@ -65,6 +64,14 @@
   margin-left: 16px;
 }
 
+.mar-l-20 {
+  margin-left: 20px;
+}
+
+.mar-l-28 {
+  margin-left: 28px;
+}
+
 .mar-l-32 {
   margin-left: 32px;
 }
@@ -112,6 +119,7 @@
 .mar-r-16 {
   margin-right: 16px !important;
 }
+
 
 .mar-r-20 {
   margin-right: 20px;
@@ -358,5 +366,9 @@
   top: 0;
   bottom: 0;
   margin: auto;
+}
+
+.box-12-t-b{
+  padding: 12px 0;
 }
 

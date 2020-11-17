@@ -18,7 +18,6 @@ try {
   console.error('no init data')
 }
 
-console.log(123, JSON.stringify(initData))
 
 const PageComponent = Vue.extend(ProductList);
 const app = new PageComponent({

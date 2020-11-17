@@ -176,7 +176,8 @@
                   >
                   <a href="javascript:;" @click="goTaskList">工单列表</a>
                   <a href="javascript:;" @click="goProductMenu">产品目录</a>
-                  <a href="javascript:;" @click="goProductList"新>产品列表</a>
+                  <a href="javascript:;" @click="goProductList">产品列表</a>
+                  <a href="javascript:;" @click="goProductMenuField">产品目录表单</a>
                   <!-- <a href="javascript:;" @click="goCallCenterSetting">呼叫中心设置</a>
                   <a href="javascript:;" @click="goCallCenterWorkbench">呼叫工作台</a>
                   <a href="javascript:;" @click="goCallCenter">呼叫中心</a> -->
@@ -1001,6 +1002,14 @@ export default {
         id: 'productV2_list',
         title: '产品目录',
         url: '/productV2/list',
+        reload: true,
+      });
+    },
+    goProductMenuField() {
+      platform.openTab({
+        id: 'productV2_set_field',
+        title: '产品目录表单',
+        url: '/productV2/productMenu/settingField',
         reload: true,
       });
     },

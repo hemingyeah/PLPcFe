@@ -1,6 +1,6 @@
 import Vue from '@src/common/entry';
 import http from '@src/util/http';
-import TaskDetailView from './TaskDetailView.vue';
+import HomeView from './ProductDetailView.vue';
 
 import VueTour from 'vue-tour';
 require('vue-tour/dist/vue-tour.css');
@@ -22,7 +22,7 @@ const app = new Vue({
   provide: {
     initData: Object.freeze(initData)
   },
-  render: h => h(TaskDetailView),
+  render: h => h(HomeView),
   el: '#app'
 })
 
