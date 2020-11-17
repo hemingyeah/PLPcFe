@@ -2,12 +2,13 @@
 import * as TaskApi from "@src/api/TaskApi.ts";
 
 /* util */
-import AuthUtil from "@src/util/auth";
-import { getRootWindow } from "@src/util/dom";
-import TaskStateEnum from "@model/enum/TaskStateEnum.ts";
-import Filter from "@src/filter/filter.js";
-import { parse } from "@src/util/querystring";
-import { isShowReport } from "@src/util/version.ts"
+import AuthUtil from '@src/util/auth';
+import { getRootWindow } from '@src/util/dom';
+import TaskStateEnum from '@model/enum/TaskStateEnum.ts';
+import Filter from '@src/filter/filter.js';
+import { parse } from '@src/util/querystring';
+import { randomString } from '@src/util/lang';
+import { isShowReport } from '@src/util/version.ts'
 import {
   storageGet,
   storageSet
@@ -682,7 +683,7 @@ export default {
             let fromId = window.frameElement.getAttribute("fromid");
             // this.$platform.refreshTab(fromId);
 
-            location.href = "/task";
+            this.closeAndOpenTab('/task');
           } else {
             this.$platform.alert(res.message);
             this.pending = false;
@@ -791,7 +792,7 @@ export default {
           let fromId = window.frameElement.getAttribute("fromid");
           // this.$platform.refreshTab(fromId);
 
-          location.href = "/task?viewId=12fcb144-1ea3-11e7-8d4e-00163e304a25&mySearch=execute";
+          this.closeAndOpenTab('/task?viewId=12fcb144-1ea3-11e7-8d4e-00163e304a25&mySearch=execute');
         } else {
           this.$platform.alert(res.message);
           this.pending = false;
@@ -890,8 +891,7 @@ export default {
     },
     // 打开弹窗
     openDialog(action) {
-      console.log(action);
-      if (action === "cancel") {
+      if (action === 'cancel') {
         this.$refs.cancelTaskDialog.openDialog();
       } else if (action === "acceptFromPool" || action === "accept" || action === "modifyPlanTime") {
         this.$refs.planTimeDialog.openDialog(action);
@@ -1026,6 +1026,30 @@ export default {
         { name: "审批", type: "primary", show: this.allowApprove, event: () => { this.openDialog("approve") } },
         { name: "撤回审批", type: "default", show: this.allowoffApprove, event: this.offApprove }
       ]
+    },
+    /** 
+     * 关闭并打开新的Tab
+    */
+    closeAndOpenTab(url) {
+      let id = window.frameElement.dataset.id;
+      this.$platform.closeTab(id);
+
+      // 生成工单列表随机id
+      let taskListTabId = `M_TASK_ALL_${randomString(16)}`;
+
+      let rootWindow = getRootWindow(window);
+      rootWindow.pushTaskListIds(taskListTabId);
+
+      let fromId = window.frameElement.getAttribute('id');
+    
+      this.$platform.openTab({
+        id: taskListTabId,
+        title: '',
+        url,
+        reload: true,
+        close: true,
+        fromId
+      });
     }
   },
   created() {
@@ -1089,13 +1113,12 @@ export default {
         fieldName: "allotUser",
         formType: "user",
         isSystem: 1,
-      }, 
-      // {
-      //   displayName: '创建方式',
-      //   fieldName: 'relevance',
-      //   isSystem: 1,
-      // }
-      ];
+      }, {
+        displayName: '创建方式',
+        fieldName: 'source',
+        formType: 'user',
+        isSystem: 1,
+      }];
 
       this.fields.forEach(field => {
         if (field.fieldName == "attachment") {

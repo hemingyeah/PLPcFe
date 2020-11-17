@@ -511,6 +511,7 @@ export default {
       showSystemPopup: false,
       systemData: [],
       shbEdition: 1,
+      taskListIds: ['M_TASK_ALL']
     };
   },
   computed: {
@@ -558,7 +559,7 @@ export default {
     /** 激活状态的工单列表 */
     currentTaskListTab() {
       let taskList = this.frameTabs.filter(
-        (tab) => tab.id === "M_TASK_ALL" && tab.show
+        (tab) => this.taskListIds.indexOf(tab.id) > -1 && tab.show
       );
       return taskList[0] || {};
     },
@@ -1156,12 +1157,16 @@ export default {
       this.navBarMenus = menus;
       this.showNavBar = true;
     },
+    pushTaskListIds(id) {
+      this.taskListIds.push(id);
+    }
   },
   created() {
     // TODO: 迁移完成后删除
     window.updateUserState = this.updateUserState;
     window.showExportList = this.checkExports;
     window.exportPopoverToggle = this.exportPopoverToggle;
+    window.pushTaskListIds = this.pushTaskListIds;
 
     window.resizeFrame = function () {
       console.warn("此方法只用于兼容旧页面，无实际效果，不推荐调用");

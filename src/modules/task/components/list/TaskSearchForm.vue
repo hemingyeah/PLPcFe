@@ -16,15 +16,7 @@ import SearchProductSelect from "./SearchProductSelect.vue";
 import SearchCustomerSelect from "./SearchCustomerSelect.vue";
 import { formatDate } from "@src/util/lang";
 
-const MultiFieldNames = [
-  "serviceType",
-  "serviceContent",
-  "level",
-  "paymentMethod",
-  "state",
-  "allotTypeStr",
-  "onceException",
-];
+const MultiFieldNames = ['serviceType', 'serviceContent', 'level', 'paymentMethod', 'state', 'allotTypeStr', 'onceException', 'paymentMethod','source']
 
 export default {
   name: "task-search-form",

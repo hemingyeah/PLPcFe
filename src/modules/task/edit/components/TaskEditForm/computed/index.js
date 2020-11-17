@@ -20,12 +20,11 @@ export default {
   customerRelevanceTaskCountData() {
     return this.relevanceTaskCountData[TaskFieldNameMappingEnum.Customer];
   },
-  /* 是否是已完成的工单 */
-  isFinishedTask() {
-    let state = this.task?.state || ''
-    let finishedStates = [TaskStateEnum.FINISHED.value, TaskStateEnum.COSTED.value]
-    
-    return finishedStates.indexOf(state) >= 0
+  /* 是否效验计划时间 */
+  isVilidatePlantime() {
+    let { isTaskEdit, isPlanTaskEdit } = this.state || {}
+    // 非编辑状态
+    return !isPlanTaskEdit && !isTaskEdit
   },
   /** 
    * @description 是否显示 客户关联的工单数量 按钮 

@@ -577,11 +577,11 @@
                 "
                 :key="column.field"
                 :label="column.label"
-                :min-width="column.minWidth || '120px'"
+                :min-width="column.minWidth"
                 :prop="column.field"
                 :sortable="column.sortable"
                 :show-overflow-tooltip="column.field !== 'name'"
-                :width="column.width || '125px'"
+                :width="column.width"
                 :resizable="true"
               >
                 <template slot-scope="scope">
@@ -634,42 +634,37 @@
                       }}
                     </div>
                   </template>
-
-                  <!-- 创建方式 -->
-                  <!-- <template v-else-if="column.field === 'source'">
+                <!-- 创建方式 -->
+                <template v-else-if="column.field === 'source'">
                   <span>{{ scope.row["source"]}}</span>
-                </template> -->
+                </template>
 
-                  <!-- 关联事件 -->
-                  <!-- <template v-else-if="column.field === 'eventNo'">
-                  <div
-                    :class="{
-                      'view-detail-btn task-client': scope.row.linkAuth,
-                    }"
+                <!-- 关联事件 -->
+                <template v-else-if="column.field === 'eventNo'">
+                  <div class="view-detail-btn task-client"
                     @click.stop="openEventTab(scope.row)"
                   >
                     {{ scope.row["eventNo"]}}
                   </div>
-                </template> -->
-
-                  <!-- 联系人 -->
-                  <template v-else-if="column.field === 'tlmName'">
-                    <div>
-                      {{ scope.row["linkMan"] && scope.row["linkMan"].name }}
-                    </div>
-                  </template>
-                  <!-- 电话 -->
-                  <template v-else-if="column.field === 'tlmPhone'">
-                    <div>
-                      {{ scope.row["linkMan"] && scope.row["linkMan"].phone }}
-                    </div>
-                  </template>
-                  <!-- 自定义的选择类型字段显示， 与type 区别-->
-                  <template
-                    v-else-if="column.formType === 'select' && !column.isSystem"
-                  >
-                    {{ scope.row.attribute[column.field] | displaySelect }}
-                  </template>
+                </template>
+                <!-- 联系人 -->
+                <template v-else-if="column.field === 'tlmName'">
+                  <div>
+                    {{ scope.row["linkMan"] && scope.row["linkMan"].name }}
+                  </div>
+                </template>
+                <!-- 电话 -->
+                <template v-else-if="column.field === 'tlmPhone'">
+                  <div>
+                    {{ scope.row["linkMan"] && scope.row["linkMan"].phone }}
+                  </div>
+                </template>
+                <!-- 自定义的选择类型字段显示， 与type 区别-->
+                <template
+                  v-else-if="column.formType === 'select' && !column.isSystem"
+                >
+                  {{ scope.row.attribute[column.field] | displaySelect }}
+                </template>
 
                   <!-- 更新时间 -->
                   <template v-else-if="column.field === 'updateTime'">

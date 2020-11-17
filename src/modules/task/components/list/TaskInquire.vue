@@ -75,6 +75,7 @@ const MultiFieldNames = [
   "synergyId",
   "createUser",
   "executor",
+  "source",
 ];
 
 function setFieldOperateHandler(field = {}) {
@@ -653,9 +654,10 @@ export default {
           if (MultiFieldNames.indexOf(this.selectedField.fieldName) > -1) {
             f.setting.isMulti = true;
           }
-
+ 
           let childComp = null;
-          if (f.fieldName == "customer") {
+
+          if (f.fieldName == 'customer') {
             let value = this.form[f.fieldName];
             childComp = h("search-customer-select", {
               props: {
@@ -752,6 +754,7 @@ export default {
                 },
               }
             );
+
           }
           return h(
             "form-item",

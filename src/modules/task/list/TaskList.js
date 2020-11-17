@@ -122,8 +122,8 @@ export default {
         "onceRollback",
         "onceReallot",
         "oncePrinted",
-        // "source",
         "positionException",
+        "source"
       ],
       taskTypes: [
         {
@@ -976,7 +976,7 @@ export default {
       let columns = fields
         .map((field) => {
           let sortable = false;
-          let minWidth = null;
+          let minWidth = 120;
 
           if (["date", "datetime", "number"].indexOf(field.formType) >= 0) {
             sortable = "custom";
@@ -1008,16 +1008,20 @@ export default {
           }
 
           if (
-            ["customer", "taddress", "templateName"].indexOf(field.fieldName) >= 0
+            ['taddress', 'templateName'].indexOf(field.fieldName) >= 0
           ) {
             minWidth = 200;
           }
 
-          if (["taskNo", "customer"].indexOf(field.fieldName) !== -1) {
+          if (['taskNo'].indexOf(field.fieldName) !== -1) {
             minWidth = 250;
             sortable = "custom";
           }
-          if (field.fieldName === "taskNo") {
+          if (field.fieldName === 'customer') {
+            sortable = 'custom';
+            minWidth = 125;
+          }
+          if (field.fieldName === 'taskNo') {
             field.width = 216
           }
           return {
@@ -1957,9 +1961,12 @@ export default {
           };
         }
         // 系统字段查询条件
-        const {
-          systemConditions = []
-        } = params
+        const { systemConditions = [] } = params
+        systemConditions && systemConditions.forEach((item)=>{
+          if(item.value == 'API创建'){
+            item.value = '开放API'
+          }
+        })
         // 自定义
         const conditions = params.conditions || [];
         // 创建时间
@@ -2066,28 +2073,12 @@ export default {
           oncePrinted = "";
           break;
         }
-        // //创建方式
-        // let source;
-        // switch (params.source) {
-        //   case "由事件创建":
-        //     source = '由事件创建';
-        //     break;
-        //   case "API创建":
-        //     source = '开放API';
-        //     break;
-        //   case "导入创建":
-        //     source = '导入创建';
-        //     break;
-        //   case "手动创建":
-        //     source = '手动创建';
-        //     break;
-        //   case "计划任务创建":
-        //     source = '计划任务创建';
-        //     break;
-        //   default:
-        //     source = "";
-        //     break;
-        // }
+        let source = params.source && params.source instanceof Array && params.source.length && params.source.map((item)=>{
+                if(item=='API创建'){
+                  item='开放API'
+                }
+                return item
+              }) || [];
         // 是否审批中
         let inApprove;
         switch (params.inApprove) {
@@ -2162,7 +2153,8 @@ export default {
           page: params.page,
           pageSize: params.pageSize,
           templateId: this.currentTaskType.id,
-
+          source,
+          eventNo: params.eventNo,
           serviceTypes: params.serviceTypes,
           serviceContents: params.serviceContents,
           levels: params.levels,
