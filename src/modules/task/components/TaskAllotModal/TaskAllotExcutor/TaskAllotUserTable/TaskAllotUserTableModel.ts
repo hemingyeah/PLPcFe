@@ -19,7 +19,7 @@ const TaskAllotUserTableCommonColumns = [
   },
   {
     "label": "员工角色",
-    "field": "userRole",
+    "field": "roles",
     "show": true,
     "fixed": false,
     "minWidth": "150px",
@@ -27,7 +27,7 @@ const TaskAllotUserTableCommonColumns = [
   },
   {
     "label": "未完成工单",
-    "field": "unfinishedTask",
+    "field": "ufinish",
     "show": true,
     "fixed": false,
     "sortable": true,
@@ -36,7 +36,7 @@ const TaskAllotUserTableCommonColumns = [
   },
   {
     "label": "今日已完成",
-    "field": "todayFinishedTask",
+    "field": "finish",
     "show": true,
     "fixed": false,
     "sortable": true,
@@ -45,7 +45,7 @@ const TaskAllotUserTableCommonColumns = [
   },
   {
     "label": "计划时间当天工单量",
-    "field": "plantimeTodayTaskNum",
+    "field": "plan",
     "show": true,
     "fixed": false,
     "sortable": true,
@@ -54,7 +54,7 @@ const TaskAllotUserTableCommonColumns = [
   },
   {
     "label": "好评率",
-    "field": "favorableRating",
+    "field": "degree",
     "show": true,
     "fixed": false,
     "sortable": true,
@@ -66,7 +66,7 @@ const TaskAllotUserTableCommonColumns = [
 /* 工单指派 工作状态列 */
 const TaskAllotUserTableStateColumn = {
   "label": "工作状态",
-  "field": "userState",
+  "field": "state",
   "show": true,
   "fixed": false,
   "sortable": true,
@@ -74,24 +74,24 @@ const TaskAllotUserTableStateColumn = {
   "type": "column"
 }
 
-export enum TaslAllotTableColumnFieldEnum {
-  Excutor = 'excutor',
-  DisplayName = 'displayName',
-  UserRole = 'userRole',
-  unfinishedTask = 'unfinishedTask',
-  TodayFinishedTask = 'todayFinishedTask',
-  PlantimeTodayTaskNum = 'plantimeTodayTaskNum',
-  FavorableRating = 'favorableRating',
-  Location = 'location',
-  Drive = 'drive',
+/* 工单指派 直线列 */
+const TaskAllotUserTableLineLocationColumn = {
+  "label": "距离",
+  "field": "lineDistance",
+  "show": true,
+  "fixed": false,
+  "sortable": true,
+  "minWidth": "150px",
+  "type": "column"
 }
 
 /* 工单指派 企业版支持列 */
 export const TaskAllotUserTableEnterpriseEditionColumns = [
   ...TaskAllotUserTableCommonColumns,
+  TaskAllotUserTableLineLocationColumn,
   {
     "label": "距客户(KM)",
-    "field": "location",
+    "field": "distance",
     "show": true,
     "fixed": false,
     "sortable": true,
@@ -100,7 +100,7 @@ export const TaskAllotUserTableEnterpriseEditionColumns = [
   },
   {
     "label": "距客户车程",
-    "field": "drive",
+    "field": "duration",
     "show": true,
     "fixed": false,
     "sortable": true,
@@ -113,14 +113,68 @@ export const TaskAllotUserTableEnterpriseEditionColumns = [
 /* 工单指派 标准版 vip版 支持列 */
 export const TaskAllotUserTableStandEditionColumns = [
   ...TaskAllotUserTableCommonColumns,
-  {
-    "label": "距客户(KM)",
-    "field": "location",
-    "show": true,
-    "fixed": false,
-    "sortable": true,
-    "minWidth": "150px",
-    "type": "column"
-  },
+  TaskAllotUserTableLineLocationColumn,
   TaskAllotUserTableStateColumn
 ]
+
+export enum TaslAllotTableColumnFieldEnum {
+  // 负责人
+  Excutor = 'excutor',
+  // 名称
+  DisplayName = 'displayName',
+  // 权限
+  Roles = 'roles',
+  // 未完成
+  Ufinish = 'ufinish',
+  // 已完成
+  Finish = 'finish',
+  // 计划时间
+  Plan = 'plan',
+  // 工作状态
+  State = 'state',
+  // 好评率
+  Degree = 'degree',
+  // 直线距离
+  LineDistance = 'lineDistance',
+  // 驾车距离
+  Distance = 'distance',
+  // 驾车时间
+  Duration = 'duration',
+}
+
+
+/* 工单指派 人员列表 排序方式 */
+export enum AllotSortedEnum {
+  // 距离最近
+  Distance = 0,
+  // 30天内好评率最高
+  TaskDegreePercentByMonth = 1,
+  // 30天工作用时最短
+  TaskWorkUsedTimeByMonth = 2,
+  // 30天接单最多
+  ExecutorTaskByMonth = 3,
+  // 30天完成最多
+  FinishTaskByMonth = 4,
+  // 30天完成响应最快
+  TaskAcceptTimeByMonth = 5,
+  // 未完成工单
+  UnfinishedTask = 6,
+  // 今日已完成
+  FinishTaskByToday = 7,
+  // 计划时间当天工单量
+  PlanTaskByToday = 8
+}
+
+/* 工单指派 人员列表 距离 */
+export enum AllotLocationEnum {
+  // 5公里
+  Five = 5,
+  // 10公里
+  Ten = 10,
+  // 20公里
+  Twenty = 20,
+  // 50公里
+  Fifty = 50,
+  // 其他
+  Other = 0
+}

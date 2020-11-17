@@ -19,6 +19,8 @@ import { getTaskConfigResult } from '@model/param/out/Task'
 /* types */
 import StateColorMap from '@model/types/StateColor'
 import AutoDispatchListItem from '@model/types/AutoDispatchListItem'
+/* util */
+import Log from '@src/util/log.ts'
 
 class TaskAllotModalMethods extends TaskAllotModalComputed {
   
@@ -186,9 +188,13 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
       return console.warn('Caused: TaskAllotModal fetchCustomer not have customerId')
     }
     
+    Log.succ(Log.Start, `TaskAllotModalMethods -> ${this.fetchCustomer.name}`)
+    
     getCustomer(id).then((result: getCustomerDetailResult) => {
       let isSuccess = result.status == 0
       if (!isSuccess) return
+      
+      Log.succ(Log.End, `TaskAllotModalMethods -> ${this.fetchCustomer.name}`)
       
       this.customer = Object.freeze(result.data || {})
       

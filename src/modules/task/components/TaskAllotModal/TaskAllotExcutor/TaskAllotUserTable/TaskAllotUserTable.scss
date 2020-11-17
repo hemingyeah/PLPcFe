@@ -113,3 +113,11 @@
     font-size: $font-size-small;
   }
 }
+
+.task-allot-user-table-column-field {
+  text-align: center;
+  &-label {
+    color: $color-primary;
+    font-size: $font-size-base;
+  }
+}

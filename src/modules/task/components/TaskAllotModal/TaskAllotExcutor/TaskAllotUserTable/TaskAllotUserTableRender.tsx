@@ -10,6 +10,7 @@ import { TaslAllotTableColumnFieldEnum } from '@src/modules/task/components/Task
 import Column from '@model/types/Column'
 /* util */
 import { uuid } from '@src/util/string'
+import { isString } from '@src/util/type'
 
 class TaskAllotUserTableRender extends TaskAllotUserTableMethods {
   /** 
@@ -96,7 +97,7 @@ class TaskAllotUserTableRender extends TaskAllotUserTableMethods {
         placeholder='请选择距离'
         ref='TaskAllotTableLocaionSelect'
         value={this.selectLocation}
-        onInput={(value: string) => this.handlerLocationChange(value)}
+        onInput={(value: number) => this.handlerLocationChange(value)}
       >
         {
           this.locationOptions.map((locationOption: ElSelectOption) => {
@@ -199,7 +200,7 @@ class TaskAllotUserTableRender extends TaskAllotUserTableMethods {
       <el-select
         placeholder="请选择排序方式"
         value={this.selectSortord}
-        onInput={(value: string) => this.handlerSortordChange(value)}
+        onInput={(value: number) => this.handlerSortordChange(value)}
       > 
         {
           this.sortordOptions.map((sortordOption: ElSelectOption) => {
@@ -228,16 +229,69 @@ class TaskAllotUserTableRender extends TaskAllotUserTableMethods {
    * @description 渲染表格列
   */
   renderTableColumnField(scope: any, column: Column) {
-    if(column.field === TaslAllotTableColumnFieldEnum.Excutor) return this.renderColumnWithExcutor(scope)
+    let value = null
     
-    return this.renderColumnWithCommon(scope, column)
+    try {
+      value = JSON.parse(scope.row[column.field || ''])
+    } catch (error) {
+      value = column.field ? scope.row[column.field] : ''
+    }
+    
+    // 负责人
+    if (column.field === TaslAllotTableColumnFieldEnum.Excutor) return this.renderColumnWithExcutor(scope)
+    // 人员名称
+    if (column.field === TaslAllotTableColumnFieldEnum.DisplayName) return this.renderColumnWithDisplayName(scope)
+    // 工作状态
+    if (column.field === TaslAllotTableColumnFieldEnum.State) return this.renderColumnWithState(value)
+    // 数组类型
+    let isStringArray = Array.isArray(value) && value.every(item => isString(item))
+    if (isStringArray) return this.renderColumnWithStringArray(value)
+    
+    return this.renderColumnWithCommon(value)
   }
   
   /** 
-   * @description 选择通用表格列
+   * @description 渲染通用表格列
   */
-  renderColumnWithCommon(scope: any, column: Column) {
-    return column.field ? scope.row[column.field] : ''
+  renderColumnWithCommon(value: string) {
+    return value
+  }
+  
+  /** 
+   * @description 渲染数组表格列
+  */
+  renderColumnWithStringArray(value: string[]): string {
+    return value.join(', ')
+  }
+  
+  /** 
+   * @description 渲染工作状态表格列
+  */
+  renderColumnWithState(value: string) {
+    return (
+      <div class='user-card-header-content-state'>
+        <span class='user-state-round' style={{
+          backgroundColor: this.userStateMap && this.userStateMap[value]
+        }}>
+        </span>
+        <span>{value}</span>
+      </div>
+    )
+  }
+  
+  /** 
+   * @description 渲染人员名称表格列
+  */
+  renderColumnWithDisplayName(scope: any) {
+    let { displayName = '', label = [] } = scope.row || {}
+    return (
+      <div class='task-allot-user-table-column-field'>
+        <div class='task-allot-user-table-column-field-name'>{displayName}</div>
+        <div class='task-allot-user-table-column-field-label'>
+          { label.join(', ')}
+        </div>
+      </div>
+    )
   }
   
   /** 

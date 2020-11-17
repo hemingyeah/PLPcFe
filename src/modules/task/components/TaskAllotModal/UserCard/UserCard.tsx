@@ -180,14 +180,13 @@ export default class UserCard extends Vue {
             </div>
             <div class='user-card-header-content'>
               <div class='user-card-header-content-top'>
-
+                
                 <div class='user-card-header-content-top-left'>
                   <div class='user-card-header-content-name'>
                     {this?.user?.displayName}
                   </div>
                   
                   <div class='user-card-header-content-state'>
-                    <i class='iconfont icon-zhuangtai'></i>
                     <span class='user-state-round' style={{
                       backgroundColor: this.stateColorMap && this.stateColorMap[this.user?.state || '']
                     }}>

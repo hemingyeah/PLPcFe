@@ -1,10 +1,11 @@
 /* api */
-import { getUserListByTag, getTaskAllotTeamUserList } from '@src/api/TaskApi'
+import { getTaskAllotUserInfo, getTaskAllotTeamUserList } from '@src/api/TaskApi'
 /* computed */
 import TaskAllotUserTableComputed from '@src/modules/task/components/TaskAllotModal/TaskAllotExcutor/TaskAllotUserTable/TaskAllotUserTableComputed'
 /* directive */
 import Loadmore from '@src/directive/loadmore'
 /* enum */
+import EelementTableSortOrderEnum from '@model/enum/ElementTableSortOrderEnum'
 import EventNameEnum from '@model/enum/EventNameEnum'
 import HookEnum from '@model/enum/HookEnum'
 import StorageModuleEnum from '@model/enum/StorageModuleEnum'
@@ -19,16 +20,52 @@ import DefaultHead from '@src/assets/img/avatar.png'
 import { DepeMultiUserResult } from '@src/modules/task/components/TaskAllotModal/TaskAllotModalInterface'
 /* model */
 import Page from '@model/Page'
-import { getUserListByTagResult } from '@model/param/out/Task'
 import Column from '@model/types/Column'
+import { getTaskAllotUserInfoResult } from '@model/param/out/Task'
 import { MAX_GREATER_THAN__MIN_MESSAGE, REQUIRED_MIN_MESSAGE, REQUIRED_MAX_MESSAGE } from '@src/model/const/Alert'
+import { AllotSortedEnum, AllotLocationEnum, TaslAllotTableColumnFieldEnum } from './TaskAllotUserTableModel'
 /* util */
 import * as _ from 'lodash'
 import Platform from '@src/util/platform'
 import Log from '@src/util/log.ts'
 import { storageGet, storageSet } from '@src/util/storage.ts'
+import { isString, isObject, isArray } from '@src/util/type'
+import { openTabForTaskView, openTabForCustomerView } from '@src/util/business/openTab'
 
 declare let AMap: any
+
+const SortedMap: { [x: string]: number } = {
+  [TaslAllotTableColumnFieldEnum.Ufinish]: AllotSortedEnum.UnfinishedTask,
+  [TaslAllotTableColumnFieldEnum.Finish]: AllotSortedEnum.FinishTaskByToday,
+  [TaslAllotTableColumnFieldEnum.Plan]: AllotSortedEnum.PlanTaskByToday,
+}
+
+// @ts-ignore
+window.openCustomerViewFunc = function openCustomerViewFunc(customerId: string) {
+  openTabForCustomerView(customerId)
+}
+
+/** 
+ * @description 解析对象
+ * -- 临时写的
+*/
+function parseObject(value: any): any {
+  // 是否为数组
+  if (isArray(value)) return value.map((item: any) => parseObject(item))
+  // 是否字符串
+  if (isString(value)) return value
+  // 是否是对象
+  if (!isObject(value)) return value
+  
+  let newValue: any = {}
+  
+  for(let key in value) {
+    let item = value[key]
+    newValue[key] = parseObject(item)
+  }
+  
+  return newValue
+}
 
 class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
   /**
@@ -129,13 +166,13 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
    * @description 构建客户地址标记内容
   */
   public buildCustomerAddressMapMarkerInfo(): string {
-    let { lmName, lmPhone, customerAddress, name } = this.customer
+    let { lmName, lmPhone, customerAddress, name, id } = this.customer
     customerAddress = new CustomerAddress(customerAddress)
     
     return (
       `
         <div class="map-info-window-content">
-          <div class="customer-name">${ name }</div>
+          <div class="customer-name" onclick="openCustomerViewFunc('${id}')">${ name }</div>
           <p><label>联系人：</label>${ lmName }</p>
           <p><label>电话：</label>${ lmPhone }</p>
           <p><label>地址：</label>${ customerAddress?.toString() }</p>
@@ -251,7 +288,7 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
   */
   public getMapCenter(): Array<number> {
     let { customerAddress } = this
-    let { adLatitude, adLongitude } = customerAddress
+    let { adLatitude, adLongitude } = customerAddress || {}
     let center = []
     
     // 是否为有效地址
@@ -274,29 +311,78 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
   }
   
   /** 
+   * @description 获取位置参数
+  */
+  public getParamDistance(): number[] {
+    let m = 1000
+    
+    try {
+      // 5公里以内
+      if (this.selectLocation === AllotLocationEnum.Five) {
+        return [0, AllotLocationEnum.Five * m]
+      }
+      // 10公里以内
+      if (this.selectLocation === AllotLocationEnum.Ten) {
+        return [0, AllotLocationEnum.Ten * m]
+      }
+      // 20公里以内
+      if (this.selectLocation === AllotLocationEnum.Twenty) {
+        return [0, AllotLocationEnum.Twenty * m]
+      }
+      // 50公里以内
+      if (this.selectLocation === AllotLocationEnum.Fifty) {
+        return [0, AllotLocationEnum.Fifty * m]
+      }
+      
+      // 其他
+      return [Number(this.locationOtherData.minValue) * m, Number(this.locationOtherData.maxValue) * m]
+      
+    } catch (error) {
+      console.error('TaskAllotUserTableMethods -> err', error)
+      return [0, AllotLocationEnum.Fifty * m]
+    }
+    
+  }
+  
+  /** 
    * @description 获取用户列表
    * -- 内部调用的
   */
   public fetchUsers(): Promise<any> {
     Log.succ(Log.Start, this.fetchUsers.name)
     
+    let distance = this.getParamDistance()
+    let users: LoginUser[] = this.isAllotByTag ? this.selectTeamUsers : this.selectDeptUsers
+    let orderDetail: any = (
+      Object.keys(this.orderDetail).length > 0 
+        ? this.orderDetail
+        : { code: this.selectSortord, order: true  }
+    )
     let params = {
-      pageNum: this.userPage.pageNum,
-      pageSize: this.userPage.pageSize,
+      order: orderDetail.order,
+      code: orderDetail.code,
       customerId: this.customer.id || '',
-      lat: this.customerAddress.adLatitude || '',
-      lng: this.customerAddress.adLongitude || '',
-      tagId: this.selectTeams.map(team => team.id).join(),
-      orderDetail: this.orderDetail
+      lat: Number(this.customerAddress.adLatitude),
+      lng: Number(this.customerAddress.adLongitude),
+      pageNum: ++this.userPage.pageNum,
+      pageSize: this.userPage.pageSize,
+      startDistance: String(distance[0]),
+      endDistance: String(distance[1]),
+      states: this.selectUserState,
+      tagIds: this.selectTeams.map(team => (team.id || '')),
+      userIds: users.map(user => user.userId)
     }
     
     return (
-      getUserListByTag(params).then((result: getUserListByTagResult) => {
-        let isSuccess = result.status == 0
-        if (!isSuccess) return
-        
-        this.userPage.list = this.userPage.list.concat(result.data || [])
-        
+      getTaskAllotUserInfo(params).then((data: getTaskAllotUserInfoResult) => {
+        let isSuccess = data.success
+        if (!isSuccess) {
+          return Platform.alert(data.message)
+        }
+        // 解析数据
+        data.result?.list ? data.result.list = parseObject(data.result.list) : null
+        // 合并数据
+        this.userPage.merge(data.result)
         // key : userId(string) -> value: boolean
         this.userPageCheckedMap = (
           this.userPage.list
@@ -306,6 +392,8 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
               return acc
             }, {})
         )
+        
+        this.isDisableLoadmore = !(data.result.hasNextPage)
         
         Log.succ(Log.End, this.fetchUsers.name)
       })
@@ -345,8 +433,6 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
               ...user
           }))
           
-          this.isDisableLoadmore = !result.hasNextPage
-          
           return result
           
         })
@@ -385,13 +471,13 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
   /**
    * @description 选择距离变化事件
   */
-  public handlerLocationChange(value: string): void {
+  public handlerLocationChange(value: number): void {
     Log.succ(Log.Start, this.handlerLocationChange.name)
     
     this.selectLocation = value
     this.initialize()
   }
-
+  
   /**
    * @description 选择距离其他 事件
   */
@@ -420,7 +506,7 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
     // 失焦 ，隐藏select下拉框
     // @ts-ignore
     this.$refs.TaskAllotTableLocaionSelect.blur()
-    this.selectLocation = this.locationOptions[this.locationOptions.length - 1].value
+    this.selectLocation = Number(this.locationOptions[this.locationOptions.length - 1].value)
   }
   
   /**
@@ -437,28 +523,30 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
    * @description 排序变化
   */
   public handlerTableSortChange(option: { prop?: any, order?: any } = {}) {
-    console.log('hbc: handlerTableSortChange -> option', option)
     const { prop, order } = option
     if (!order) {
       this.orderDetail = {}
-      return this.fetchUsers()
+      return this.initialize()
     }
     
-    let sortModel = {
-      sequence: order === 'ascending' ? 'ASC' : 'DESC',
-      column: prop,
+    let isDescending: boolean = order === EelementTableSortOrderEnum.DESC
+    
+    let orderDetail = {
+      order: !isDescending,
+      code: SortedMap[prop],
     }
     
-    this.orderDetail = sortModel
+    this.orderDetail = orderDetail
     this.initialize()
   }
   
   /**
    * @description 选择排序方式事件
   */
-  public handlerSortordChange(value: string): void {
+  public handlerSortordChange(value: number): void {
     Log.succ(Log.Start, this.handlerSortordChange.name)
     
+    this.orderDetail = {}
     this.selectSortord = value
     this.saveDataToStorage(StorageKeyEnum.TaskAllotTableSort, value)
     this.initialize()
@@ -484,7 +572,7 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
   public initialize(): void {
     Log.succ(Log.Start, this.initialize.name)
     
-    this.userPage = new Page()
+    this.userPage = new Page({ pageNum: 0 })
     this.isDisableLoadmore = false
     this.changePending && this.changePending(true)
     
@@ -549,7 +637,7 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
    * @description 还原排序方式数据
   */
   public async revertSort() {
-    this.selectSortord = await this.getDataToStorage(StorageKeyEnum.TaskAllotTableSort, '')
+    this.selectSortord = await this.getDataToStorage(StorageKeyEnum.TaskAllotTableSort, AllotSortedEnum.Distance)
   }
   
   /**
@@ -589,7 +677,7 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
   }
   
   /** 
-   * @description 显示高级设置 选择里
+   * @description 显示高级设置 选择列
   */
   public showAdvancedSetting(): void {
     this.BaseTableAdvancedSettingComponent.open(this.columns)

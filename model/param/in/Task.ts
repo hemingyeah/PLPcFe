@@ -126,3 +126,25 @@ export interface TaskUserCardSearchModel {
   // 结束时间 示例： 2020-10-01
   endTime: string
 }
+
+/* 工单派单-获取人员列表搜索model */
+export interface TaskAllotUserSearchModel {
+  // 客户id
+  customerId: string
+  // true 正序 false 倒序  默认正序
+  order?: boolean
+  // 开始距离  1km 传1000
+  startDistance?: string
+  // 结束距离 参考 开始距离
+  endDistance?: string
+  // 工作状态集合
+  states?: string[],
+  tagIds?: string[],
+  // 团队id集合
+  // 员工id集合
+  userIds?: string[],
+  // 只能排序 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8
+  code: number,
+  lng?: number,
+  lat?: number
+}

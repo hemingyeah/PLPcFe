@@ -11,6 +11,7 @@ import '@src/modules/task/components/TaskAllotModal/TaskAllotExcutor/TaskAllotEx
 import StateColorMap from '@model/types/StateColor'
 /* util */
 import { findComponentUpward } from '@src/util/assist'
+import Log from '@src/util/log.ts'
 /* vue */
 import { Vue, Component, Prop } from 'vue-property-decorator'
 import { CreateElement } from 'vue'
@@ -43,6 +44,7 @@ export default class TaskAllotExcutor extends Vue {
    * -- 支持外部调用的
   */
   public outsideFetchUsers() {
+    Log.succ(Log.End, `TaskAllotExcutor -> ${this.outsideFetchUsers.name}`)
     // @ts-ignore
     this.$refs.TaskAllotUserTableComponent.outsideFetchUsers()
   }
@@ -86,7 +88,7 @@ export default class TaskAllotExcutor extends Vue {
     
     return (
       <div class={ComponentNameEnum.TaskAllotExcutor} {...attrs}>
-        <task-allot-user-table 
+        <task-allot-user-table
           ref='TaskAllotUserTableComponent'
           changePending={this.outsideSetPending}
         />

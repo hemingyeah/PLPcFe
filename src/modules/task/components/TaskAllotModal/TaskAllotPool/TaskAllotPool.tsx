@@ -33,7 +33,6 @@ import Log from '@src/util/log.ts'
 import Platform from '@src/util/Platform'
 import { findComponentUpward } from '@src/util/assist'
 import { openTabForTaskView, openTabForCustomerView } from '@src/util/business/openTab'
-import { xor } from 'lodash'
 
 declare let AMap: any
 

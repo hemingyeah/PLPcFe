@@ -7,5 +7,5 @@ export interface UserState {
 }
 
 export interface ElSelectOption {
-  [x: string]: string
+  [x: string]: string | number
 }

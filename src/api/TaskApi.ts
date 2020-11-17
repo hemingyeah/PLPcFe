@@ -6,7 +6,8 @@ import {
   TaskGetCardDetailListModel,
   TaskAllotUserListByTagModel,
   TaskAutoDispatchResultListModel,
-  TaskUserCardSearchModel
+  TaskUserCardSearchModel,
+  TaskAllotUserSearchModel
 } from "@model/param/in/Task"
 
 import { 
@@ -18,7 +19,8 @@ import {
   getUserListByTagResult,
   getTaskConfigResult,
   getAutoDispatchResultListResult,
-  getTaskUserCardInfoResult
+  getTaskUserCardInfoResult,
+  getTaskAllotUserInfoResult
 } from '@model/param/out/Task'
 
 import GrayUtil from '@src/util/gray'
@@ -1156,6 +1158,13 @@ export function taskAutoDispatch(params: any): Promise<any> {
  */
 export function getTaskUserCardInfo(params: TaskUserCardSearchModel): Promise<getTaskUserCardInfoResult> {
   return http.post('http://30.40.61.216:3000/mock/59/outside/es/task/getUserCardInfo', params)
+}
+
+/**
+ * @description 工单指派-获取人员列表信息
+ */
+export function getTaskAllotUserInfo(params: TaskAllotUserSearchModel): Promise<getTaskAllotUserInfoResult> {
+  return http.post('http://30.40.61.216:3000/mock/59/outside/es/task/getAllotUserInfo', params)
 }
 
 /* -------------  end  新工单api ---------------- */

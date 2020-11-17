@@ -7,7 +7,7 @@ import Tag from '@model/entity/Tag/Tag'
 import { ElSelectOption } from '@src/modules/task/components/TaskAllotModal/TaskAllotExcutor/TaskAllotUserTable/TaskAllotUserTableInterface'
 /* model */
 import Page from '@model/Page'
-import { TaskAllotUserTableEnterpriseEditionColumns, TaskAllotUserTableStandEditionColumns } from '@src/modules/task/components/TaskAllotModal/TaskAllotExcutor/TaskAllotUserTable/TaskAllotUserTableModel'
+import { AllotSortedEnum, AllotLocationEnum, TaskAllotUserTableEnterpriseEditionColumns, TaskAllotUserTableStandEditionColumns } from '@src/modules/task/components/TaskAllotModal/TaskAllotExcutor/TaskAllotUserTable/TaskAllotUserTableModel'
 /* types */
 import Column from '@model/types/Column'
 /* util */
@@ -26,7 +26,7 @@ class TaskAllotUserTableData extends TaskAllotUserTableComponents {
   /* 是否禁用加载更多 */
   public isDisableLoadmore: boolean = false
   /* 表格排序数据 */
-  public orderDetail: any = {}
+  public orderDetail: { order: boolean, code: number } | {} = {}
   /* 当前选择的负责人 */
   public selectExecutorUser: LoginUser | null = null
   /* 当前选择的团队 */
@@ -36,26 +36,26 @@ class TaskAllotUserTableData extends TaskAllotUserTableComponents {
   /* 当前选择的部门人员列表 */
   public selectDeptUsers: LoginUser[] = []
   /* 当前选择的距离 */
-  public selectLocation: any = '5'
+  public selectLocation: number = AllotLocationEnum.Five
   /* 当前选择的工作状态 */
   public selectUserState: string[] = []
   /* 当前选择的排序方式 */
-  public selectSortord: string = ''
+  public selectSortord: number = AllotSortedEnum.Distance
   /* 表格key 随机数 */
   public tableKey: number = Math.random() * 1000 >> 2
   /* 团队用户page */
   public teamUserPage: Page =  new Page()
   /* 用户page */
-  public userPage: Page =  new Page()
+  public userPage: Page =  new Page({ pageNum: 0 })
   /* 用户选择状态 */
   public userPageCheckedMap: {[x: number]: boolean} = {}
   /* 距离选项列表 */
   public locationOptions: ElSelectOption[] = [
-    { label: '5公里以内', value: '5'},
-    { label: '10公里以内', value: '10'},
-    { label: '20公里以内', value: '20'},
-    { label: '50公里以内', value: '50'},
-    { label: '其他', value: ''},
+    { label: '5公里以内', value: AllotLocationEnum.Five },
+    { label: '10公里以内', value: AllotLocationEnum.Ten },
+    { label: '20公里以内', value: AllotLocationEnum.Twenty },
+    { label: '50公里以内', value: AllotLocationEnum.Fifty },
+    { label: '其他', value: AllotLocationEnum.Other },
   ]
   /* 距离 其他数据 */
   public locationOtherData: {
@@ -69,11 +69,12 @@ class TaskAllotUserTableData extends TaskAllotUserTableComponents {
   }
   /* 排序方式列表 */
   public sortordOptions: ElSelectOption[] = [
-    { label: '距离最近', value: '5'},
-    { label: '30天内好评率最高', value: '10'},
-    { label: '30天工作用时最短', value: '20'},
-    { label: '30天内接单最多', value: '50'},
-    { label: '30天内完成最多', value: '30'},
+    { label: '距离最近', value: AllotSortedEnum.Distance },
+    { label: '30天内好评率最高', value: AllotSortedEnum.TaskDegreePercentByMonth },
+    { label: '30天工作用时最短', value: AllotSortedEnum.TaskWorkUsedTimeByMonth },
+    { label: '30天内接单最多', value: AllotSortedEnum.ExecutorTaskByMonth },
+    { label: '30天内接单响应最快', value: AllotSortedEnum.TaskAcceptTimeByMonth },
+    { label: '30天内完成最多', value: AllotSortedEnum.FinishTaskByMonth },
   ]
   /* 表格列 */
   public columns: Column[] = (
