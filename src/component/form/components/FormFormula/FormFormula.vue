@@ -151,6 +151,8 @@ export default {
   
   input {
     width: 100%;
+    padding-right: 26px;
+    
     &:disabled {
       -webkit-text-fill-color: #b2b2b2;
     }
@@ -162,7 +164,7 @@ export default {
 
     position: absolute;
     top: 7px;
-    right: -20px;
+    right: 6px;
   }
 }
 </style>

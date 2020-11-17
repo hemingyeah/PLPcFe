@@ -130,17 +130,17 @@ export default {
           [sf.fieldName]: form[sf.fieldName].map(({id, tagName}) => ({id, tagName}))
         })
       }
-      if (sf.formType === 'user') {
-        tv = form[sf.fieldName];
+      // if (sf.formType === 'user') {
+      //   tv = form[sf.fieldName];
 
-        params.mapJson = JSON.stringify({
-          [sf.fieldName]: {
-            userId: tv.userId,
-            displayName: tv.displayName,
-            staffId: tv.staffId
-          },
-        })
-      }
+      //   params.mapJson = JSON.stringify({
+      //     [sf.fieldName]: {
+      //       userId: tv.userId,
+      //       displayName: tv.displayName,
+      //       staffId: tv.staffId
+      //     },
+      //   })
+      // }
       if (sf.fieldName === 'manager') {
         tv = form[sf.fieldName];
 
