@@ -42,11 +42,13 @@ export default {
   computed: {
     fields() {
       let tv = null;
-      let formTypes = ['attachment', 'separator', 'location', 'info', 'autograph'];
+      let formTypes = ['attachment', 'separator', 'location', 'info', 'autograph', 'formula', 'related_task'];
       let fieldNames = ['customer', 'updateTime', 'productTemplate', 'tags', 'remindCount', 'qrcodeId'];
+      let isNotModify = ['text', 'textarea', 'number'];
 
       let fields = (this.config.fields || [])
         .filter(f => formTypes.indexOf(f.formType) < 0 && !fieldNames.some(key => key === f.fieldName))
+        .filter(f => !(isNotModify.indexOf(f.formType) > -1 && f.setting.defaultValueConfig && !!f.setting.defaultValueConfig.isNotModify))
         .map(f => {
           tv = Object.assign({}, f);
 

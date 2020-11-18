@@ -13,7 +13,7 @@
 <script>
 
 import {formatDate} from '@src/util/lang';
-import { FormFieldMap,  } from '@src/component/form/components';
+import { FormFieldMap } from '@src/component/form/components';
 import * as Utils from '@src/component/form/util';
 import * as CustomerApi from '@src/api/CustomerApi';
 import FormItem from '@src/component/form/FormItem.vue';
@@ -41,13 +41,12 @@ export default {
     fields() {
       let tv = null;
 
-      let formTypes = ['attachment', 'separator', 'location', 'info', 'autograph'];
+      let formTypes = ['attachment', 'separator', 'location', 'info', 'autograph', 'formula', 'related_task'];
+      let isNotModify = ['text', 'textarea', 'number'];
 
       let fields = (this.config.fields || [])
-        .filter(f => (
-          f.fieldName !== 'serialNumber' &&
-          formTypes.indexOf(f.formType) < 0
-        ))
+        .filter(f => f.fieldName !== 'serialNumber' && formTypes.indexOf(f.formType) < 0)
+        .filter(f => !(isNotModify.indexOf(f.formType) > -1 && f.setting.defaultValueConfig && !!f.setting.defaultValueConfig.isNotModify))
         .map(f => {
           tv = Object.assign({}, f);
 
