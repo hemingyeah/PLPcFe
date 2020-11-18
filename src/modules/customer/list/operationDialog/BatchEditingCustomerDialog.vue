@@ -43,10 +43,12 @@ export default {
 
       let formTypes = ['attachment', 'separator', 'location', 'info', 'autograph', 'formula', 'related_task'];
       let isNotModify = ['text', 'textarea', 'number'];
+      let isRepeat = ['text', 'textarea', 'number','phone'];
 
       let fields = (this.config.fields || [])
         .filter(f => f.fieldName !== 'serialNumber' && formTypes.indexOf(f.formType) < 0)
         .filter(f => !(isNotModify.indexOf(f.formType) > -1 && f.setting.defaultValueConfig && !!f.setting.defaultValueConfig.isNotModify))
+        .filter(f => !(isRepeat.indexOf(f.formType) > -1 && f.setting.isRepeat == 1))
         .map(f => {
           tv = Object.assign({}, f);
 
