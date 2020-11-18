@@ -392,15 +392,6 @@ export default {
       justify-content: flex-end;
     }
 
-    .base-modal {
-      overflow: initial;
-      .base-modal-header{
-        border-radius: 50% 50% 0 0;
-      }
-      .base-modal-body{
-        overflow: initial;
-      }
-    }
   }
 
 </style>
