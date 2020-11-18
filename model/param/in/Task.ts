@@ -175,3 +175,23 @@ export interface TaskAllotModel {
     userId: string
   }[]
 }
+
+/* 工单指派转派 团队列表 */
+export interface TaskTagListSearchModel {
+  pageSize: number,
+  pageNum: number,
+  keyword: string,
+  onlyParent: boolean
+  customerId: string
+}
+
+/* 工单指派转派 团队人员列表 */
+export interface TaskTagUserListSearchModel {
+  pageNum: number,
+  keyword: string,
+  customerId: string
+  lat?: string | number,
+  lng?: string | number,
+  // 以逗号分隔
+  tagId: string
+}

@@ -6,6 +6,7 @@ import { ElSelectOption, UserState } from '@src/modules/task/components/TaskAllo
 import TaskAllotUserTableMethods from '@src/modules/task/components/TaskAllotModal/TaskAllotExcutor/TaskAllotUserTable/TaskAllotUserTableMethods'
 /* model */
 import { TaslAllotTableColumnFieldEnum } from '@src/modules/task/components/TaskAllotModal/TaskAllotExcutor/TaskAllotUserTable/TaskAllotUserTableModel'
+import { TaskTagListSearchModel } from '@model/param/in/Task'
 /* types */
 import Column from '@model/types/Column'
 /* util */
@@ -83,14 +84,20 @@ class TaskAllotUserTableRender extends TaskAllotUserTableMethods {
   */
   public renderTeamSelect() {
     return (
-      <biz-team-select value={this.selectTeams} onInput={() => this.handlerTeamChange()} multiple collapse />
+      <biz-team-select 
+        value={this.selectTeams} 
+        fetchFunc={(params: TaskTagListSearchModel) => this.fetchTagList(params)} 
+        onInput={() => this.handlerTeamChange()} 
+        multiple 
+        collapse 
+      />
     )
   }
   
   /** 
    * @description 渲染选择位置
   */
-  public renderLocationSelect() {    
+  public renderLocationSelect() {
     return (
       <el-select
         class='task-allot-user-table-location-select'

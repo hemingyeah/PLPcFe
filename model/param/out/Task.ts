@@ -10,6 +10,7 @@ import UserCardInfo from '@model/entity/UserCardInfo'
 import PageInfo from '@model/entity/PageInfo'
 import TaskAllotUserInfo from '@model/entity/TaskAllotUserInfo'
 import TaskApprove from '@model/entity/TaskApprove'
+import Tag from '@model/entity/Tag/Tag'
 
 
 /** 获取用户视图列表返回值 */
@@ -47,3 +48,6 @@ export type getTaskAllotApproveResult = Result<TaskApprove>
 
 /* 工单指派-指派 */
 export type getTaskAllotResult = Result<{ state: string, stateDisplayName: string }>
+
+/* 工单指派-转派 团队列表信息 */
+export type getTaskTagListResult = PageInfo<Tag[]>

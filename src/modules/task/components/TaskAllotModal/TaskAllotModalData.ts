@@ -2,6 +2,7 @@
 import Customer from '@model/entity/Customer'
 import LoginUser from '@model/entity/LoginUser/LoginUser'
 import TaskConfig from '@model/types/TaskConfig'
+import TaskAllotUserInfo from '@model/entity/TaskAllotUserInfo'
 /* enum */
 import TaskAllotTypeEnum from '@model/enum/TaskAllotTypeEnum'
 /* props */
@@ -16,7 +17,7 @@ class TaskAllotModalData extends TaskAllotModalProps {
   /* 客户信息 */
   public customer: Customer = {}
   /* 负责人 */
-  public executorUser: LoginUser | null = null
+  public executorUser: LoginUser | TaskAllotUserInfo | null = null
   /* 是否是按团队派单 */
   public isAllotByTag: boolean = true
   /* 匹配的规则结果 */

@@ -4,6 +4,7 @@ import UserCard from '@src/modules/task/components/TaskAllotModal/UserCard/UserC
 /* enum */
 import ComponentNameEnum from '@model/enum/ComponentNameEnum'
 /* entity */
+import TaskAllotUserInfo from '@model/entity/TaskAllotUserInfo'
 import LoginUser from '@model/entity/LoginUser/LoginUser'
 /* scss */
 import '@src/modules/task/components/TaskAllotModal/TaskAllotExcutor/TaskAllotExcutor.scss'
@@ -32,7 +33,7 @@ export default class TaskAllotExcutor extends Vue {
   /* 等待状态 */
   private pending: boolean = false
   /* 选择的负责人信息 */
-  private selectedExcutorUser: LoginUser | null = null
+  private selectedExcutorUser: TaskAllotUserInfo | null = null
   
   /* 工单派单组件 */
   get TaskAllotModalComponent() {
@@ -53,7 +54,7 @@ export default class TaskAllotExcutor extends Vue {
    * @description 设置选择的负责人
    * -- 支持外部调用的
   */
-  public outsideSetSelectedExcutorUser(isSelected: boolean, user: LoginUser) {
+  public outsideSetSelectedExcutorUser(isSelected: boolean, user: TaskAllotUserInfo) {
     let excutorUser = isSelected ? user : null
     this.isShowUserCard = isSelected
     this.selectedExcutorUser = excutorUser
@@ -63,7 +64,7 @@ export default class TaskAllotExcutor extends Vue {
    * @description 向上 设置选择的负责人
    * -- 支持外部调用的
   */
-  public outsideUpwardSetSelectedExcutorUser(isSelected: boolean, user: LoginUser) {
+  public outsideUpwardSetSelectedExcutorUser(isSelected: boolean, user: any) {
     this.outsideSetSelectedExcutorUser(isSelected, user)
     this.TaskAllotModalComponent.outsideSetExcutorUser(isSelected ? user : null)
   }

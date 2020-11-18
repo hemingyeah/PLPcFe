@@ -9,7 +9,9 @@ import {
   TaskUserCardSearchModel,
   TaskAllotUserSearchModel,
   TaskAllotApproveGetModel,
-  TaskAllotModel
+  TaskAllotModel,
+  TaskTagListSearchModel,
+  TaskTagUserListSearchModel
 } from "@model/param/in/Task"
 
 import { 
@@ -24,7 +26,8 @@ import {
   getTaskUserCardInfoResult,
   getTaskAllotUserInfoResult,
   getTaskAllotApproveResult,
-  getTaskAllotResult
+  getTaskAllotResult,
+  getTaskTagListResult
 } from '@model/param/out/Task'
 
 import GrayUtil from '@src/util/gray'
@@ -1132,7 +1135,14 @@ export function getTaskAlloyPoolList(params: any): Promise<any> {
 /**
  * @description 查询指派工单团队人员列表
  */
-export function getTaskAllotTeamUserList(params: any): Promise<any> {
+export function getTaskAllotDispatchTeamUserList(params: TaskTagUserListSearchModel): Promise<any> {
+  return http.post('/task/customerTag/dispatch/list', params)
+}
+
+/**
+ * @description 查询转派工单团队人员列表
+ */
+export function getTaskAllotRedeployTeamUserList(params: TaskTagUserListSearchModel): Promise<any> {
   return http.post('/task/customerTag/dispatch/list', params)
 }
 
@@ -1185,5 +1195,18 @@ export function taskAllotExcutor(params: TaskAllotModel): Promise<getTaskAllotRe
   return http.post('http://30.40.61.216:3000/mock/59/outside/dd/task/allot', params)
 }
 
+/**
+ * @description 工单指派-团队列表
+ */
+export function getTaskDispatchTagList(params: TaskTagListSearchModel): Promise<getTaskTagListResult> {
+  return http.get('/task/tag/dispatch/customerTagList', params)
+}
+
+/**
+ * @description 工单转派-团队列表
+ */
+export function getTaskRedeployTagList(params: TaskTagListSearchModel): Promise<getTaskTagListResult> {
+  return http.get('/task/tag/redeploy/customerTagList', params)
+}
 
 /* -------------  end  新工单api ---------------- */

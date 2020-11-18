@@ -7,6 +7,8 @@ class TaskAllotUserInfo {
   distance: string = ''
   // 指派人名字
   displayName: string = ''
+  // 头像
+  head: string = ''
   // 指派人角色列表 json 数组
   roles: string = ''
   // 满意度
@@ -25,6 +27,10 @@ class TaskAllotUserInfo {
   tags: string = ''	
   // 指派人标签列表 json 数组
   label: string = ''
+  // 经度
+  lng: string = ''
+  // 纬度
+  lat: string = ''
 }
 
 export default TaskAllotUserInfo

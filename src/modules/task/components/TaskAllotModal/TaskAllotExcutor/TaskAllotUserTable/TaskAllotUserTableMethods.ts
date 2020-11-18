@@ -1,5 +1,5 @@
 /* api */
-import { getTaskAllotUserInfo, getTaskAllotTeamUserList } from '@src/api/TaskApi'
+import { getTaskAllotUserInfo, getTaskAllotDispatchTeamUserList, getTaskDispatchTagList, getTaskRedeployTagList } from '@src/api/TaskApi'
 /* computed */
 import TaskAllotUserTableComputed from '@src/modules/task/components/TaskAllotModal/TaskAllotExcutor/TaskAllotUserTable/TaskAllotUserTableComputed'
 /* directive */
@@ -21,8 +21,9 @@ import { DepeMultiUserResult } from '@src/modules/task/components/TaskAllotModal
 /* model */
 import Page from '@model/Page'
 import Column from '@model/types/Column'
-import { getTaskAllotUserInfoResult } from '@model/param/out/Task'
+import { getTaskAllotUserInfoResult, getTaskTagListResult } from '@model/param/out/Task'
 import { MAX_GREATER_THAN__MIN_MESSAGE, REQUIRED_MIN_MESSAGE, REQUIRED_MAX_MESSAGE } from '@src/model/const/Alert'
+import { TaskTagListSearchModel } from '@model/param/in/Task'
 import { AllotSortedEnum, AllotLocationEnum, TaslAllotTableColumnFieldEnum } from './TaskAllotUserTableModel'
 /* util */
 import * as _ from 'lodash'
@@ -31,6 +32,7 @@ import Log from '@src/util/log.ts'
 import { storageGet, storageSet } from '@src/util/storage.ts'
 import { isString, isObject, isArray } from '@src/util/type'
 import { openTabForTaskView, openTabForCustomerView } from '@src/util/business/openTab'
+import TaskAllotUserInfo from '@model/entity/TaskAllotUserInfo'
 
 declare let AMap: any
 
@@ -190,14 +192,16 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
       return Log.warn('userPage.list is empty', this.buildUserMarkers.name)
     }
     
-    this.userPage.list.forEach((user: LoginUser) => {
-      let { longitude, latitude } = user
+    this.userPage.list.forEach((user: TaskAllotUserInfo) => {
+      let { lat, lng } = user
       // 无经纬度
-      if (!longitude && !latitude) return
+      if (!lat && !lng) {
+        return console.warn(`${user.displayName} not have lat and lng`)
+      }
       
       // 用户标记
       let userMarker = new AMap.Marker({
-        position: [longitude, latitude],
+        position: [Number(lng), Number(lat)],
         title: user.displayName,
         map: this.AMap,
         extData: user,
@@ -205,14 +209,14 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
       })
       
       userMarker.on(EventNameEnum.Click, (event: any) => {
-        let user: LoginUser = event.target.getExtData()
+        let user: TaskAllotUserInfo = event.target.getExtData()
         /* 设置负责人信息 */
         this.TaskAllotExcutorComponent.outsideSetSelectedExcutorUser(true, user)
       })
       
       userMarker.on(EventNameEnum.MouseOver, (event: any) => {
-        let user: LoginUser = event.target.getExtData()
-        if (user.userId !== this.TaskAllotExcutorComponent?.selectedExcutorUser?.userId) return
+        let user: TaskAllotUserInfo = event.target.getExtData()
+        if (user.userId !== this.TaskAllotModalComponent?.executorUser?.userId) return
         
         let infoWindow = new AMap.InfoWindow({
           closeWhenClickMap: true,
@@ -345,6 +349,26 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
   }
   
   /** 
+   * @description 获取团队列表
+  */
+  public fetchTagList(params: TaskTagListSearchModel) {
+    // TODO: 指派 转派需要区分
+    let fetchTagListFunc = getTaskDispatchTagList
+    
+    params.customerId = this.customer.id || ''
+    
+    return (
+      fetchTagListFunc(params)
+        .then((data: getTaskTagListResult) => {
+          return data
+        })
+        .catch((err: any) => {
+          console.log(err)
+        })
+    )
+  }
+  
+  /** 
    * @description 获取用户列表
    * -- 内部调用的
   */
@@ -411,16 +435,18 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
     let { customerAddress } = this
     let { adLatitude = '', adLongitude = '' } = customerAddress || {}
     let params = {
-      customerId: this.customer?.id,
+      customerId: this.customer?.id || '',
       keyword: selectParams.keyword,
       lat: adLatitude,
       lng: adLongitude,
       pageNum: selectParams.pageNum,
       tagId: this.selectTeams ? this.selectTeams.map(team => team.id).join(',') : ''
     }
+    // TODO: 区分指派 转派 
+    let fetchTeamUsersFunc = getTaskAllotDispatchTeamUserList
     
     return (
-      getTaskAllotTeamUserList(params)
+      fetchTeamUsersFunc(params)
         .then((result = {}) => {
           this.teamUserPage.merge(result)
           

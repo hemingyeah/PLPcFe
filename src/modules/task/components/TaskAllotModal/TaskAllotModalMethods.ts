@@ -11,6 +11,7 @@ import Approve from '@model/entity/Approve'
 import LoginUser from '@model/entity/LoginUser/LoginUser'
 import TaskConfig from '@model/types/TaskConfig'
 import TaskApprove from '@model/entity/TaskApprove'
+import TaskAllotUserInfo from '@model/entity/TaskAllotUserInfo'
 /* interface */
 import { 
   AutoDispatchApproveParams, 
@@ -370,7 +371,7 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
    * @description 设置负责人信息
    * -- 支持外部调用的
   */
-  public outsideSetExcutorUser(user: LoginUser | null) {
+  public outsideSetExcutorUser(user: LoginUser | TaskAllotUserInfo | null) {
     this.setExecutorUser(user)
   }
 
@@ -385,7 +386,7 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
   /** 
    * @description 设为负责人
   */
-  public setExecutorUser(user: LoginUser | null) {
+  public setExecutorUser(user: LoginUser | TaskAllotUserInfo | null) {
     this.executorUser = user
   }
   
