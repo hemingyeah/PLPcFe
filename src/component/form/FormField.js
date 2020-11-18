@@ -84,9 +84,14 @@ export default class FormField{
       this.setting.customerAddressConfig = {};
     }
     
-    //多级菜单设置默认项
+    // 多级菜单设置默认项
     if(isCascader(params)){
-      this.setting = { maxDeep: 2, dataSource:[{value:"一级选项 1",children:[{ value : "二级选项 1"}]}]}
+      this.setting = { maxDeep: 2, dataSource:[{value:'一级选项 1', children:[{ value : '二级选项 1'}]}]}
+    }
+
+    // 计算公式设置默认不允许修改
+    if (this.formType == 'formula' && !this.setting.defaultValueConfig) {
+      this.setting.defaultValueConfig = { isNotModify: 1 };
     }
   
     // 辅助字段
