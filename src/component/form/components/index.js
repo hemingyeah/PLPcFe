@@ -116,7 +116,7 @@ for(let i = 0; i < ALL_FORM_FIELDS.length; i++){
   FormFieldMap[formField.formType] = field;
 }
 
-const COMMON_FIELDS = ['text', 'textarea', 'number', 'select', 'cascader', 'code', 'attachment', 'user', 'date', 'datetime', 'phone', 'email', 'separator', 'address', 'location', 'info', 'autograph', 'related_task', 'formula'];
+const COMMON_FIELDS = ['text', 'textarea', 'number', 'select', 'cascader', 'attachment', 'user', 'date', 'datetime', 'phone', 'email', 'separator', 'address', 'location', 'info', 'autograph', 'related_task', 'formula'];
 // 工单字段列表，工单彻底改造完成后删除，用 COMMON_FIELDS 替代
 const TASK_FIELDS = ['text', 'textarea', 'number', 'select', 'code', 'attachment', 'user', 'date', 'datetime', 'phone'];
 

@@ -94,6 +94,7 @@
 import SettingMixin from '@src/component/form/mixin/setting';
 import { settingProps } from '@src/component/form/components/props';
 
+const DECIMAL_MIN_LENGTH = 1;
 const DECIMAL_MAX_LENGTH = 5;
 
 export default {
@@ -129,12 +130,16 @@ export default {
   },
   mounted() {
     // 处理最大值和最小值关联表单的字段已被删除
-    let { min, max } = this.limitConig;
-    let minIndex = this.numberFields.findIndex(item => item.fieldName == min);
-    let maxIndex = this.numberFields.findIndex(item => item.fieldName == max);
+    let { min, max, type } = this.limitConig;
 
-    if (min && minIndex == -1) this.limitConig.min = '';
-    if (max && maxIndex == -1) this.limitConig.max = '';
+    // 关联表单字段
+    if (type == 2) {
+      let minIndex = this.numberFields.findIndex(item => item.fieldName == min);
+      let maxIndex = this.numberFields.findIndex(item => item.fieldName == max);
+
+      if (min && minIndex == -1) this.limitConig.min = '';
+      if (max && maxIndex == -1) this.limitConig.max = '';
+    }
   },
   methods: {
     updateForDom(event){
@@ -153,14 +158,15 @@ export default {
     */
     decimalLimit(event) {
       let value = event.target.value;
+      let overlimit = Number(value) > DECIMAL_MAX_LENGTH || Number(value) < DECIMAL_MIN_LENGTH;
 
-      if (Number(value) > DECIMAL_MAX_LENGTH) {
+      if (value && overlimit) {
         value = '';
 
         this.$platform.notification({
           type: 'error',
           title: '提示',
-          message: `小数位数仅能${DECIMAL_MAX_LENGTH}位以内`
+          message: `小数位数只能输入${DECIMAL_MIN_LENGTH}到${DECIMAL_MAX_LENGTH}位`
         })
       }
 
