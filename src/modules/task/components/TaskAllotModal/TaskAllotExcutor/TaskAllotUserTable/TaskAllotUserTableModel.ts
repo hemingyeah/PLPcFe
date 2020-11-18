@@ -5,7 +5,7 @@ const TaskAllotUserTableCommonColumns = [
     "field": "excutor",
     "show": true,
     "fixed": false,
-    "minWidth": "100px",
+    "width": "100px",
     "type": "column"
   },
   {
@@ -13,7 +13,7 @@ const TaskAllotUserTableCommonColumns = [
     "field": "displayName",
     "show": true,
     "fixed": false,
-    "minWidth": "150px",
+    "width": "150px",
     "type": "column",
     "disabled": true
   },
@@ -22,7 +22,7 @@ const TaskAllotUserTableCommonColumns = [
     "field": "roles",
     "show": true,
     "fixed": false,
-    "minWidth": "150px",
+    "width": "150px",
     "type": "column"
   },
   {
@@ -31,7 +31,7 @@ const TaskAllotUserTableCommonColumns = [
     "show": true,
     "fixed": false,
     "sortable": true,
-    "minWidth": "150px",
+    "width": "150px",
     "type": "column"
   },
   {
@@ -40,7 +40,7 @@ const TaskAllotUserTableCommonColumns = [
     "show": true,
     "fixed": false,
     "sortable": true,
-    "minWidth": "150px",
+    "width": "150px",
     "type": "column"
   },
   {
@@ -49,7 +49,7 @@ const TaskAllotUserTableCommonColumns = [
     "show": true,
     "fixed": false,
     "sortable": true,
-    "minWidth": "180px",
+    "width": "180px",
     "type": "column"
   },
   {
@@ -58,7 +58,7 @@ const TaskAllotUserTableCommonColumns = [
     "show": true,
     "fixed": false,
     "sortable": true,
-    "minWidth": "150px",
+    "width": "150px",
     "type": "column"
   }
 ]
@@ -70,7 +70,7 @@ const TaskAllotUserTableStateColumn = {
   "show": true,
   "fixed": false,
   "sortable": true,
-  "minWidth": "150px",
+  "width": "150px",
   "type": "column"
 }
 
@@ -81,7 +81,7 @@ const TaskAllotUserTableLineLocationColumn = {
   "show": true,
   "fixed": false,
   "sortable": true,
-  "minWidth": "150px",
+  "width": "150px",
   "type": "column"
 }
 
@@ -94,8 +94,8 @@ export const TaskAllotUserTableEnterpriseEditionColumns = [
     "field": "distance",
     "show": true,
     "fixed": false,
-    "sortable": true,
-    "minWidth": "150px",
+    "sortable": false,
+    "width": "150px",
     "type": "column"
   },
   {
@@ -103,8 +103,8 @@ export const TaskAllotUserTableEnterpriseEditionColumns = [
     "field": "duration",
     "show": true,
     "fixed": false,
-    "sortable": true,
-    "minWidth": "150px",
+    "sortable": false,
+    "width": "150px",
     "type": "column"
   },
   TaskAllotUserTableStateColumn

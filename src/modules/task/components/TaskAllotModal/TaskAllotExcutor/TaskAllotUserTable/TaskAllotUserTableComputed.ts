@@ -32,8 +32,8 @@ class TaskAllotUserTableComputed extends TaskAllotUserTableData {
   }
   
   /* 客户地址 */
-  get customerAddress(): any {
-    return this.customer.customerAddress
+  get customerAddress(): CustomerAddress {
+    return this.customer.customerAddress || new CustomerAddress()
   }
   
   /* 是否是按团队派单 */

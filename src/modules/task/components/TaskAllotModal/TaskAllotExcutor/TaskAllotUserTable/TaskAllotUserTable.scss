@@ -46,6 +46,8 @@
 }
 
 .task-allot-user-table-block {
+  max-height: 380px;
+  overflow-y: auto;
   .el-table__body-wrapper {
     max-height: 330px;
     overflow-y: scroll;
@@ -99,6 +101,7 @@
   font-size: $font-size-base;
   line-height: 28px;
   padding: 0 10px;
+  height: 100%;
     
   span {
     display: inline-block;
@@ -119,5 +122,14 @@
   &-label {
     color: $color-primary;
     font-size: $font-size-base;
+  }
+}
+
+.task-allot-table-user-dept {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  .biz-team-select-tag {
+    height: 20px;
   }
 }

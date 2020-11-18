@@ -255,6 +255,7 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
   */
   public chooseDepartmentUsers(): void {
     let options = {
+      allot: true,
       title: '请选择人员',
       seeAllOrg: true,
       selected: this.selectDeptUsers,
@@ -297,14 +298,13 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
     
     // 是否为有效地址
     if(customerAddress.validAddress){
-      center = [adLatitude, adLongitude]
+      center = [Number(adLongitude), Number(adLatitude)]
     } else{
       // 高德地图不支持国外地址解析，那就手动设置为大首都北京吧
       center = [116.397428, 39.90923]
     }
     
-    // return center as Array<number>
-    return [116.397428, 39.90923]
+    return center
   }
   
   /** 
@@ -437,12 +437,12 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
     let params = {
       customerId: this.customer?.id || '',
       keyword: selectParams.keyword,
-      lat: adLatitude,
-      lng: adLongitude,
+      lat: Number(adLatitude),
+      lng: Number(adLongitude),
       pageNum: selectParams.pageNum,
       tagId: this.selectTeams ? this.selectTeams.map(team => team.id).join(',') : ''
     }
-    // TODO: 区分指派 转派 
+    // TODO: 区分指派 转派
     let fetchTeamUsersFunc = getTaskAllotDispatchTeamUserList
     
     return (
@@ -581,7 +581,7 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
   /** 
    * @description 设置负责人checkbox 变化
   */
-  public handlerExcutorCheckedChange(checked: boolean, row: any): void {
+  public handlerExcutorCheckedChange(checked: boolean, row: TaskAllotUserInfo): void {
     let userId: string = row.userId || ''
     
     for (let key in this.userPageCheckedMap) {
@@ -590,6 +590,10 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
     }
     /* 设置负责人信息 */
     this.TaskAllotExcutorComponent.outsideUpwardSetSelectedExcutorUser(checked, row)
+    /* 地图联动 */
+    if (row.lng && row.lat) {
+      this.AMap.setZoomAndCenter(16, [row.lng, row.lat])
+    }
   }
   
   /**

@@ -56,16 +56,7 @@ class TaskAllotUserTableRender extends TaskAllotUserTableMethods {
         {
           isUsersEmpty 
           ? <span class='task-allot-table-user-input-placeholder'>请选择人员</span>
-          : 
-          (
-            this.selectDeptUsers.map((user: LoginUser) => {
-              return (
-                <el-tag key={user.userId} size='mini' disable-transitions closable type='info' onClose={() => this.debouncedRemoveDepartmentUser(user)}>
-                  {user.displayName}
-                </el-tag>
-              )
-            })
-          )
+          : this.renderDeptUsers()
         }
       </div>
       </div>
@@ -73,10 +64,39 @@ class TaskAllotUserTableRender extends TaskAllotUserTableMethods {
   }
   
   /** 
-   * @description 渲染 按部门选人
+   * @description 渲染 部门人员
   */
-  public renderChooseUserByDepartment() {
+  public renderDeptUsers() {
+    let collapse = true
+    let user = this.selectDeptUsers[0] || {}
     
+    const AllSelectDeptUsers = (
+      this.selectDeptUsers.map((user: LoginUser) => {
+        return (
+          <el-tag key={user.userId} size='mini' disable-transitions closable type='info' onClose={() => this.debouncedRemoveDepartmentUser(user)}>
+            {user.displayName}
+          </el-tag>
+        )
+      })
+    )
+    
+    const CollapseSelectDeptUsers = (
+      <div class='task-allot-table-user-dept'>
+        <el-tag key={user.userId} size='mini' disable-transitions closable type='info' onClose={() => this.debouncedRemoveDepartmentUser(user)}>
+          {user.displayName}
+        </el-tag>
+        {
+          this.selectDeptUsers.length > 1
+          && (
+            <div class='biz-team-select-tags'>
+              <div class='biz-team-select-tag'>+{this.selectDeptUsers.length - 1}</div>
+            </div>
+          )
+        }
+      </div>
+    )
+    
+    return collapse ? CollapseSelectDeptUsers : AllSelectDeptUsers
   }
   
   /**
@@ -250,6 +270,13 @@ class TaskAllotUserTableRender extends TaskAllotUserTableMethods {
     if (column.field === TaslAllotTableColumnFieldEnum.DisplayName) return this.renderColumnWithDisplayName(scope)
     // 工作状态
     if (column.field === TaslAllotTableColumnFieldEnum.State) return this.renderColumnWithState(value)
+    // 距离或驾车距离
+    if (
+      column.field === TaslAllotTableColumnFieldEnum.LineDistance
+      || column.field === TaslAllotTableColumnFieldEnum.Distance
+    ) return this.renderColumnWithLineDistance(value)
+    // 驾车时间
+    if (column.field === TaslAllotTableColumnFieldEnum.Duration) return this.renderColumnWithLineDuration(value)
     // 数组类型
     let isStringArray = Array.isArray(value) && value.every(item => isString(item))
     if (isStringArray) return this.renderColumnWithStringArray(value)
@@ -262,6 +289,26 @@ class TaskAllotUserTableRender extends TaskAllotUserTableMethods {
   */
   renderColumnWithCommon(value: string) {
     return value
+  }
+  
+  /** 
+   * @description 渲染距离表格列
+  */
+  renderColumnWithLineDistance(value: string) {
+    let distance = Number(value) 
+    if (isNaN(distance)) return value
+    
+    return `${(distance / 1000).toFixed(3)} KM`
+  }
+
+  /** 
+   * @description 渲染驾车时间表格列
+  */
+  renderColumnWithLineDuration(value: string) {
+    let duration = Number(value) 
+    if (isNaN(duration)) return value
+    
+    return `${(duration * 3600)}小时`
   }
   
   /** 

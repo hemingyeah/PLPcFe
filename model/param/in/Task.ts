@@ -230,3 +230,21 @@ export interface TaskTagUserListSearchModel {
   // 以逗号分隔
   tagId: string
 }
+
+/* 工单指派-工单池可接单人员列表 */
+export interface TaskPoolAuthUsersGetModel {
+  // 工单id
+  taskId: string
+}
+
+/* 工单指派-工单池订阅人员列表 */
+export interface TaskPoolSubscriptionUsersGetModel {
+  // 工单类型id
+  taskTypeId: string,
+  // 客户id
+  customerId: string,
+  // 纬度
+  taskLat: string | number,
+  // 经度
+  taskLng: string | number,
+}

@@ -6,6 +6,7 @@ import ComponentNameEnum from '@model/enum/ComponentNameEnum'
 import { TaskPoolInfoEnum } from '@src/modules/task/components/TaskAllotModal/TaskAllotPool/TaskAllotPoolModel'
 /* entity */
 import LoginUser from '@model/entity/LoginUser/LoginUser'
+import TaskPoolUser from '@model/entity/TaskPoolUser'
 import Tag from '@model/entity/Tag/Tag'
 /* filter */
 import { fmt_number } from '@src/filter/fmt'
@@ -16,6 +17,15 @@ import { TaskAllotPoolInfoData } from '@src/modules/task/components/TaskAllotMod
 import DefaultHead from '@src/assets/img/avatar.png'
 /* scss */
 import '@src/modules/task/components/TaskAllotModal/TaskAllotPool/TaskAllotPoolInfo/TaskAllotPoolInfo.scss'
+/* util */
+import { openTabForUserView } from '@src/util/business/openTab'
+
+enum TaskAllotPoolInfoEmitEventEnum {
+  // 订阅人员变化
+  SubscriptionChange = 'subscriptionChange',
+  // 有权限人员变化
+  AuthChange = 'authChange'
+}
 
 @Component({ 
   name: ComponentNameEnum.TaskAllotPoolInfo
@@ -31,7 +41,7 @@ export default class TaskAllotPoolInfo extends Vue {
   /* 选中状态 */
   @Prop() readonly users: {
     subscription: LoginUser[],
-    auth: LoginUser[],
+    auth: TaskPoolUser[],
   } | undefined
 
   /* 详细信息 */
@@ -39,19 +49,20 @@ export default class TaskAllotPoolInfo extends Vue {
   
   private className: string = ComponentNameEnum.TaskAllotPoolInfo
   
-  @Emit('subscriptionChange')
+  @Emit(TaskAllotPoolInfoEmitEventEnum.SubscriptionChange)
   private handleSubscriptionCheckedChange(value: boolean) {
     return value
   }
   
-  @Emit('authChange')
+  @Emit(TaskAllotPoolInfoEmitEventEnum.AuthChange)
   private handleAuthCheckedChange(value: boolean) {
     return value
   }
   
   private renderUserItem(user: LoginUser) {
+    
     return (
-      <div class='task-pool-user-content'>
+      <div class='task-pool-user-content' onClick={() => openTabForUserView(user.userId)}>
         <div class={`${this.className}-user-head`}> <img src={user.head || DefaultHead} /></div>
         <div class="">
           <div class="task-pool-user-info">
@@ -65,16 +76,13 @@ export default class TaskAllotPoolInfo extends Vue {
             服务团队: 
             {
               Array.isArray(user.tagList) 
-              ? (
-                user.tagList.map((tag: Tag) => {
-                  return `<span>${tag.tagName}</span>`
-                }).join()
-              )
+              ? user.tagList.join(', ')
               : ''
             }
           </div>
           <div class="task-pool-user-count">
-            <span>未完成工单: {user.unfinishedTask || ''}</span>
+            {/* @ts-ignore */}
+            <span>未完成工单: {user.unFinished}</span>
           </div>
         </div>
       </div>
@@ -94,7 +102,7 @@ export default class TaskAllotPoolInfo extends Vue {
           <el-collapse-item>
             <template slot="title">
               <el-checkbox value={this.checked?.subscription} onInput={this.handleSubscriptionCheckedChange}></el-checkbox>
-              {`订阅工单池用户: ${fmt_number(this.info?.subscriptionUserCount, '')}`}
+              {`订阅工单池用户: ${fmt_number(this.users?.subscription?.length, '')}`}
             </template>
             <div>
               {
@@ -106,12 +114,12 @@ export default class TaskAllotPoolInfo extends Vue {
           <el-collapse-item>
             <template slot="title">
               <el-checkbox value={this.checked?.auth} onInput={this.handleAuthCheckedChange}></el-checkbox>
-              {`有权限接单用户: ${fmt_number(this.info?.havePermissionUserCount, '')}`}
+              {`有权限接单用户: ${fmt_number(this.users?.auth?.length, '')}`}
             </template>
             <div>
               {
                 this.users?.auth
-                && this.users.auth.map(user => this.renderUserItem(user))
+                && this.users.auth.map(info => this.renderUserItem(info.user))
               }
             </div>
           </el-collapse-item>

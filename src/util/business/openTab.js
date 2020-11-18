@@ -152,7 +152,7 @@ export function openTabForTeamChildCreate(parentData) {
  * @param {String} parentData 父团队数据
  * @param {Object} params 参数对象
 */
-export function openTabForUserView(userId, params) {
+export function openTabForUserView(userId, params = {}) {
   let fromId = getFromId();
 
   platform.openTab({

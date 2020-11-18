@@ -11,6 +11,7 @@ import PageInfo from '@model/entity/PageInfo'
 import TaskAllotUserInfo from '@model/entity/TaskAllotUserInfo'
 import TaskApprove from '@model/entity/TaskApprove'
 import Tag from '@model/entity/Tag/Tag'
+import TaskPoolUser from '@model/entity/TaskPoolUser'
 
 
 /** 获取用户视图列表返回值 */
@@ -51,6 +52,12 @@ export type getTaskAllotResult = Result<{ state: string, stateDisplayName: strin
 
 /* 工单指派-指派-工单池 */
 export type getTaskAllotTaskPoolResult = MsgModel<null>
+
+/* 工单指派-指派-工单池有权限接单人员列表 */
+export type getTaskPoolAuthUsersResult = MsgModel<TaskPoolUser[]>
+
+/* 工单指派-指派-工单池订阅人员列表 */
+export type getTaskPoolSubscriptionUsersResult = LoginUser[]
 
 /* 工单指派-转派 团队列表信息 */
 export type getTaskTagListResult = PageInfo<Tag[]>

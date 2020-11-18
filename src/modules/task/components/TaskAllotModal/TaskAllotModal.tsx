@@ -36,13 +36,7 @@ import AutoDispatchListItem from '@model/types/AutoDispatchListItem'
 })
 
 export default class TaskAllotModal extends TaskAllotModalRender {
-  
-  async mounted() {
-    await this.fetchStateColor()
-    await this.fetchCustomer()
-    this.fetchSynergyUserWithCustomerManager()
-  }
-  
+    
   render(h: CreateElement) {    
     const attrs = this.getAttributes()
     
@@ -76,10 +70,11 @@ export default class TaskAllotModal extends TaskAllotModalRender {
                 ref='TaskAllotPoolComponent'
                 show={this.allotType === TaskAllotTypeEnum.Pool}
                 style={this.allotContentStyle[TaskAllotTypeEnum.Pool]}
+                task={this.task}
                 changeNotificationChecked={(value: TaskPoolNotificationTypeEnum[]) => this.onTaskNotificationCheckedChanged(value)}
                 changeNotificationUsers={(value: LoginUser[]) => this.onTaskNotificationUsersChanged(value)}
               />
-              <task-allot-auto 
+              <task-allot-auto
                 show={this.allotType === TaskAllotTypeEnum.Auto} 
                 style={this.allotContentStyle[TaskAllotTypeEnum.Auto]}
                 changeMatchRule={(rule: AutoDispatchListItem | null) => this.outsideSetMatchRule(rule)}

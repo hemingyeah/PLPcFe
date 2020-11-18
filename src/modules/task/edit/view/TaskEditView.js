@@ -154,7 +154,12 @@ export default {
           let taskId = res.result;
           
           if (this.isAllot) {
-            this.openAllotModel({ ...params.task, id: taskId })
+            this.openAllotModel({ 
+              ...params.task, 
+              id: taskId,
+              createUser: this.initData.loginUser || {},
+              excutor: {}
+            })
           } else {
             let taskDetailPath = `/task/view/${taskId}`;
             let url = taskDetailPath
@@ -290,6 +295,7 @@ export default {
       this.$nextTick(() => {
         this.$refs.TaskAllotModal && this.$refs.TaskAllotModal.show()
       })
+      this.togglePending()
     },
     /** 
      * @description 新建计划任务弹窗
@@ -493,7 +499,7 @@ export default {
               return this.updateTaskMethod(params, isAllot);
             } 
             
-            return this.openAllotModel(this.allotTask)
+            return this.openAllotModel(this.allotTask )
           }
           
           if (this.isTaskCreate) {
@@ -565,7 +571,13 @@ export default {
           let taskId = this.editId;
           
           if (isAllot) {
-            this.openAllotModel({ ...params.task, id: taskId })
+            this.openAllotModel({ 
+              ...params.task, 
+              templateId: this.task.templateId, 
+              id: taskId,
+              createUser: this.task.createUser,
+              excutor: this.task.excutor
+            })
           } else {
             let taskDetailPath = `/task/view/${taskId}`
             let url = taskDetailPath;

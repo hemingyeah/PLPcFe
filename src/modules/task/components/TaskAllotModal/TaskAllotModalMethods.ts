@@ -420,6 +420,15 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
   }
   
   /** 
+   * @description 初始化
+  */
+  public async initialize() {
+    await this.fetchStateColor()
+    await this.fetchCustomer()
+    this.fetchSynergyUserWithCustomerManager()
+  }
+  
+  /** 
    * @description 工单池通知方式变动
   */
   public onTaskNotificationCheckedChanged(value: TaskPoolNotificationTypeEnum[]): void {
@@ -471,6 +480,7 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
   public show() {
     this.showTaskAllotModal = true
     this.fetchTaskConfig()
+    this.initialize()
   }
   
   /** 

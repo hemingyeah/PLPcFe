@@ -43,7 +43,7 @@ class TaskAllotModalComputed extends TaskAllotModalData {
   get isCreator() {
     let loginUser = this.loginUser || {}
     let createUser = this.task?.createUser || {}
-    return createUser.userId == loginUser.userId
+    return createUser.userId && loginUser.userId && createUser.userId == loginUser.userId
   }
   
   /** 
@@ -52,7 +52,7 @@ class TaskAllotModalComputed extends TaskAllotModalData {
   get isExecutor() {
     let loginUser = this.loginUser || {}
     let executorUser = this.task?.executor || {}
-    return executorUser.userId == loginUser.userId
+    return executorUser.userId && loginUser.userId && executorUser.userId == loginUser.userId
   }
 }
 

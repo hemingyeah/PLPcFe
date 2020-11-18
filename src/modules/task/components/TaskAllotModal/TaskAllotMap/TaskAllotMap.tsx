@@ -116,14 +116,13 @@ export default class TaskAllotMap extends Vue {
     
     // 是否为有效地址
     if(customerAddress.validAddress){
-      center = [adLatitude, adLongitude]
+      center = [Number(adLongitude), Number(adLatitude)]
     } else{
       // 高德地图不支持国外地址解析，那就手动设置为大首都北京吧
       center = [116.397428, 39.90923]
     }
     
-    // return center as Array<number>
-    return [116.397428, 39.90923]
+    return center
   }
   
   /**
