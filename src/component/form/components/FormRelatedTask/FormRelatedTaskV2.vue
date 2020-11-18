@@ -137,7 +137,7 @@ export default {
   }
   p {
     margin-bottom: 0;
-    padding-bottom: 20px;
+    padding-bottom: 10px;
   }
   &-desc {
     display: flex;
