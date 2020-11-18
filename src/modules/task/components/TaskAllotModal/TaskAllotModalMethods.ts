@@ -1,6 +1,6 @@
 /* api */
 import { getCustomer, getCustomerExeinsyn } from '@src/api/CustomerApi'
-import { getTaskConfig, getTaskAutoDispatchApprove, taskAutoDispatch } from '@src/api/TaskApi'
+import { getTaskConfig, getTaskAutoDispatchApprove, taskAutoDispatch, getTaskAllotApprove, taskAllotExcutor } from '@src/api/TaskApi'
 import { getStateColorMap } from '@src/api/SettingApi'
 /* computed */
 import TaskAllotModalComputed from '@src/modules/task/components/TaskAllotModal/TaskAllotModalComputed'
@@ -12,17 +12,32 @@ import LoginUser from '@model/entity/LoginUser/LoginUser'
 import TaskConfig from '@model/types/TaskConfig'
 import TaskApprove from '@model/entity/TaskApprove'
 /* interface */
-import { AutoDispatchApproveParams, DepeMultiUserResult, AutoDispatchParams } from '@src/modules/task/components/TaskAllotModal/TaskAllotModalInterface'
+import { 
+  AutoDispatchApproveParams, 
+  DepeMultiUserResult,
+  AutoDispatchParams, 
+  TaskAllotApproveParams, 
+  AllotExcutorParams
+} from '@src/modules/task/components/TaskAllotModal/TaskAllotModalInterface'
 /* model */
+import { TASK_NO_EXECUTOR_MESSAGE } from '@src/model/const/Alert'
 import { getCustomerDetailResult } from '@model/param/out/Customer'
-import { getTaskConfigResult } from '@model/param/out/Task'
+import { getTaskAllotApproveResult, getTaskAllotResult, getTaskConfigResult } from '@model/param/out/Task'
 /* types */
 import StateColorMap from '@model/types/StateColor'
 import AutoDispatchListItem from '@model/types/AutoDispatchListItem'
 /* util */
 import Log from '@src/util/log.ts'
+import Platform from '@src/util/Platform'
 
 class TaskAllotModalMethods extends TaskAllotModalComputed {
+  
+  /** 
+   * @description 派单成功
+  */
+  public allotSuccess() {
+    // TODO: 跳转
+  }
   
   /** 
    * @description 构建自动派单审批参数
@@ -57,6 +72,23 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
     // 有使用匹配的规则
     if (this.matchRule) {
       params.autoDispatchInfo = this.getParamsMatchRule()
+    }
+    
+    // 存在协同人信息
+    if (this.synergyUserList.length > 0) {
+      params.synergies = this.getParamsSynergies()
+    }
+    
+    return params
+  }
+  
+  /** 
+   * @description 构建派单到负责人参数
+  */
+  public buildAllotExcutorParams(): AllotExcutorParams {
+    let params: AllotExcutorParams = {
+      taskId: this.task?.id || '',
+      executorId: this.executorUser?.userId || ''
     }
     
     // 存在协同人信息
@@ -249,6 +281,25 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
     )
   }
   
+  /* 派单审批 */
+  public fetchApproveWithTaskAllot(params: TaskAllotApproveParams): Promise<TaskApprove | void> {
+    return (
+      getTaskAllotApprove(params)
+      .then((data: getTaskAllotApproveResult) => {
+        let isSuccess = data.success
+        if (!isSuccess) {
+          return Platform.alert(data.message)
+        }
+        
+        return data.result || {}
+        
+      }).catch((err) => {
+        this.pending = false
+        console.error(err)
+      })
+    )
+  }
+  
   /* 自动派单审批状态 */
   public fetchApproveWithAutoDispatch(params: AutoDispatchApproveParams): Promise<{ isNeedApprove: boolean, data: TaskApprove } | void> {
     return (
@@ -266,13 +317,38 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
     )
   }
   
+  /* 派单到负责人提交 */
+  public fetchExcutorSubmit(params: AllotExcutorParams) {
+    return (
+      taskAllotExcutor(params)
+      .then((data: getTaskAllotResult) => {
+        let isSuccess = data.success
+        if (!isSuccess) {
+          return Platform.alert(data.message)
+        }
+        
+        this.allotSuccess()
+      })
+      .catch((err: any) => {
+        console.error(err)
+      })
+      .finally(() => {
+        this.pending = false
+      })
+    )
+  }
+  
   /* 自动派单 */
   public fetchAutoDispatchSubmit(params: AutoDispatchParams) {
     return (
       taskAutoDispatch(params)
-      .then((result: any) => {
-        let isSuccess = result.success
-        console.log('hbc: TaskAllotModalMethods -> fetchAutoDispatchSubmit -> isSuccess', isSuccess)
+      .then((data: any) => {
+        let isSuccess = data.success
+        if (!isSuccess) {
+          return Platform.alert(data.message)
+        }
+        
+        this.allotSuccess()
       })
       .catch((err: any) => {
         console.error(err)
@@ -343,7 +419,7 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
   */
   public submit() {
     this.pending = true
-
+    
     // 按工单负责人
     if (this.allotType === TaskAllotTypeEnum.Person) {
       return this.submitWithExcutor()
@@ -363,8 +439,35 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
   /** 
    * @description 派单到负责人提交
   */
-  public submitWithExcutor() {
-    
+  public async submitWithExcutor() {
+    try {
+      // 验证负责人是否存在
+      let excutor = this.executorUser?.userId
+      if (!excutor) {
+        this.pending = false
+        return Platform.alert(TASK_NO_EXECUTOR_MESSAGE)
+      }
+      
+      // 验证审批
+      const params = { taskId: this.task.id }
+      let approve: TaskApprove | void = await this.fetchApproveWithTaskAllot(params)
+      if (!approve) return
+      
+      let isNeedApprove = approve.needApprove === true
+      // 有审批
+      if (isNeedApprove) {
+        this.pending = false
+        return this.showApproveDialog(approve)
+      }
+      
+      // 派单到负责人提交
+      const allotExcutorParams = this.buildAllotExcutorParams()
+      this.fetchExcutorSubmit(allotExcutorParams)
+      
+    } catch (error) {
+      this.pending = false
+      console.warn('TaskAllotModalMethods -> submitWithExcutor -> error', error)
+    }
   }
   
   /** 

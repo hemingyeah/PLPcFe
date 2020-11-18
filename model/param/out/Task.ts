@@ -9,6 +9,7 @@ import AutoDispatchListItem from '@model/types/AutoDispatchListItem'
 import UserCardInfo from '@model/entity/UserCardInfo'
 import PageInfo from '@model/entity/PageInfo'
 import TaskAllotUserInfo from '@model/entity/TaskAllotUserInfo'
+import TaskApprove from '@model/entity/TaskApprove'
 
 
 /** 获取用户视图列表返回值 */
@@ -40,3 +41,9 @@ export type getTaskUserCardInfoResult = Result<UserCardInfo>
 
 /* 工单指派-获取人员列表信息 */
 export type getTaskAllotUserInfoResult = Result<PageInfo<TaskAllotUserInfo>>
+
+/* 工单指派-指派审批信息 */
+export type getTaskAllotApproveResult = Result<TaskApprove>
+
+/* 工单指派-指派 */
+export type getTaskAllotResult = Result<{ state: string, stateDisplayName: string }>

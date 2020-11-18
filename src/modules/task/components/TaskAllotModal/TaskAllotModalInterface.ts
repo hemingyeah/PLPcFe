@@ -13,6 +13,12 @@ export interface DepeMultiUserResult {
   } 
 }
 
+/* 指派审批参数 */
+export interface TaskAllotApproveParams {
+  // 工单id
+  taskId: string,
+}
+
 /* 自动派单审批参数 */
 export interface AutoDispatchApproveParams {
   // 工单id
@@ -41,6 +47,7 @@ export interface AutoDispatchApproveParams {
   }[]
 }
 
+/* 自动派单参数 */
 export interface AutoDispatchParams {
   // 工单id
   taskId: string,
@@ -58,6 +65,27 @@ export interface AutoDispatchParams {
     finalRuleName: string	
   },
   /* 协同人列表 */
+  synergies?: {
+    // 名字
+    displayName?: string,
+    // 头像
+    head?: string,
+    // 钉钉人员id
+    staffId?: string,
+    // 用户id
+    userId: string
+  }[]
+}
+
+/* 派单到负责人参数 */
+export interface AllotExcutorParams {
+  // 工单id
+  taskId: string
+  // 负责人用户id
+  executorId: string,
+  // 转派原因
+  reason?: string,
+  // 协同人
   synergies?: {
     // 名字
     displayName?: string,

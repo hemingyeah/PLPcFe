@@ -7,7 +7,9 @@ import {
   TaskAllotUserListByTagModel,
   TaskAutoDispatchResultListModel,
   TaskUserCardSearchModel,
-  TaskAllotUserSearchModel
+  TaskAllotUserSearchModel,
+  TaskAllotApproveGetModel,
+  TaskAllotModel
 } from "@model/param/in/Task"
 
 import { 
@@ -20,7 +22,9 @@ import {
   getTaskConfigResult,
   getAutoDispatchResultListResult,
   getTaskUserCardInfoResult,
-  getTaskAllotUserInfoResult
+  getTaskAllotUserInfoResult,
+  getTaskAllotApproveResult,
+  getTaskAllotResult
 } from '@model/param/out/Task'
 
 import GrayUtil from '@src/util/gray'
@@ -1166,5 +1170,20 @@ export function getTaskUserCardInfo(params: TaskUserCardSearchModel): Promise<ge
 export function getTaskAllotUserInfo(params: TaskAllotUserSearchModel): Promise<getTaskAllotUserInfoResult> {
   return http.post('http://30.40.61.216:3000/mock/59/outside/es/task/getAllotUserInfo', params)
 }
+
+/**
+ * @description 工单指派-指派前验证是否审批接口
+ */
+export function getTaskAllotApprove(params: TaskAllotApproveGetModel): Promise<getTaskAllotApproveResult> {
+  return http.get('http://30.40.61.216:3000/mock/59/outside/pc/task/confirmAllot', params)
+}
+
+/**
+ * @description 工单指派-指派工单
+ */
+export function taskAllotExcutor(params: TaskAllotModel): Promise<getTaskAllotResult> {
+  return http.post('http://30.40.61.216:3000/mock/59/outside/dd/task/allot', params)
+}
+
 
 /* -------------  end  新工单api ---------------- */

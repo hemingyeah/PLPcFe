@@ -13,6 +13,8 @@ class TaskApprove {
   taskId: string = ''
   // 用户信息 json
   userJson: string = ''
+  // 是否需要审批
+  needApprove: boolean = false
   
   auto: boolean = false
   designatorInfo: string = ''

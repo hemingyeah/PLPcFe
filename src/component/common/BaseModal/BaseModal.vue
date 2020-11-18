@@ -39,9 +39,9 @@
 import { getScrollBarWidth, hasClass, removeClass, addClass, getStyle } from '@src/util/dom';
 
 export default {
-  name: "base-modal",
+  name: 'base-modal',
   props: {
-    show: { //是否显示组件
+    show: { // 是否显示组件
       type: Boolean,
       default: false
     },
@@ -53,16 +53,16 @@ export default {
       type: String,
       default: '640px'
     },
-    closeable: { //是否能手动关闭
+    closeable: { // 是否能手动关闭
       type: Boolean,
       default: true
     },
-    maskCloseable: {//是否允许点击遮罩关闭
+    maskCloseable: {// 是否允许点击遮罩关闭
       type: Boolean,
       default: false
     },
     bodyClass: String,
-    appendToBody: { //是否将弹窗插入body中
+    appendToBody: { // 是否将弹窗插入body中
       type: Boolean,
       default: false
     },
@@ -86,15 +86,15 @@ export default {
   },
   methods: {
     closed() {
-      this.$emit('closed'); //关闭动画结束时触发
+      this.$emit('closed'); // 关闭动画结束时触发
     },
     close() {
-      this.$emit('close'); //关闭时触发
-      //兼容sync
+      this.$emit('close'); // 关闭时触发
+      // 兼容sync
       this.$emit('update:show', false);
     },
     cancel() {
-      this.$emit('cancel'); //点击关闭按钮，或遮罩层关闭时触发
+      this.$emit('cancel'); // 点击关闭按钮，或遮罩层关闭时触发
       this.close();
     },
     maskClose() {
@@ -116,7 +116,7 @@ export default {
       let scrollBarWidth = getScrollBarWidth();
 
       if (scrollBarWidth > 0 && (bodyHasOverflow || bodyOverflowY === 'scroll') && this.withoutHiddenClass) {
-        document.body.style.paddingRight = computedBodyPaddingRight + scrollBarWidth + 'px';
+        document.body.style.paddingRight = `${computedBodyPaddingRight + scrollBarWidth }px`;
       }
       addClass(document.body, 'overflow-body-for-modal');
     },
@@ -129,15 +129,15 @@ export default {
     }
   },
   mounted() {
-    //document.addEventL.body-heightistener('keydown', this.escClose)
-
+    // document.addEventL.body-heightistener('keydown', this.escClose)
+    
     if (this.appendToBody) {
       document.body.appendChild(this.$el);
     }
   },
   destroyed() {
-    //document.removeEventListener('keydown', this.escClose)
-
+    // document.removeEventListener('keydown', this.escClose)
+    
     // if appendToBody is true, remove DOM node after destroy
     if (this.appendToBody && this.$el && this.$el.parentNode) {
       this.$el.parentNode.removeChild(this.$el);

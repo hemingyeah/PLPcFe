@@ -228,7 +228,7 @@ export default class TaskAllotAuto extends Vue {
     return (
       <div class={this.className} {...attrs}>
         <div class={`${this.className}-header`}>
-          <el-button type='primary' onClick={this.fetchAutoDispatchResultList}>重新匹配</el-button>
+          <el-button type='primary' plain onClick={this.fetchAutoDispatchResultList}>重新匹配</el-button>
           <el-button type='ghost' onClick={this.openRuleDialog}>添加新规则</el-button>
         </div>
         <div class={`${this.className}-content`}>

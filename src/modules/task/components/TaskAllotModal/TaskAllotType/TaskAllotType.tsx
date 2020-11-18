@@ -45,7 +45,7 @@ export default class TaskAllotType extends Vue {
           this.taskConfig?.taskPoolOn
             ? this.renderTaskPoolRadio()
             : (
-              <el-tooltip content='尚未启用工单池派单功能，如需开启请到系统管理-工单功能设置中配置'  placement='top'>
+              <el-tooltip content='尚未启用工单池派单功能，如需开启请到 系统管理-工单功能设置中配置'  placement='top'>
                 {this.renderTaskPoolRadio(true)}
               </el-tooltip>
             )
@@ -54,7 +54,7 @@ export default class TaskAllotType extends Vue {
           this.taskConfig?.autoDispatch
             ? this.renderAutoDispatchRadio()
             : (
-              <el-tooltip content='尚未启用自动分配功能，如需开启请到系统管理-工单功能设置中配置'  placement='top'>
+              <el-tooltip content='尚未启用自动分配功能，如需开启请到 系统管理-工单设置中开启「启用自动分配规则」设置'  placement='top'>
                 {this.renderAutoDispatchRadio(true)}
               </el-tooltip>
             )
