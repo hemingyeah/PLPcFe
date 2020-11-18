@@ -52,6 +52,7 @@ const OperatorSelectOptionsMap = {
     { label: '包含', value: 'like' },
     { label: '等于', value: 'eq' },
   ],
+  description: [{label: '包含', value: 'like'}],
   date: [{ label: '介于', value: 'between' }],
   select: [{ label: '等于', value: 'eq' }],
   cascader: [{ label: '包含', value: 'cascader' }],
@@ -69,11 +70,12 @@ function setFieldOperateHandler(field = {}) {
     formType == 'text'
     || formType == 'textarea'
     || formType === 'code'
-    || formType === 'description'
     || formType === 'relationProduct'
     || formType === 'relationCustomer'
   ) {
     field.operatorOptions = OperatorSelectOptionsMap.text.slice();
+  } else if (formType === 'description') {
+     field.operatorOptions = OperatorSelectOptionsMap.description.slice();
   } else if (formType == 'date' || formType == 'datetime') {
     field.operatorOptions = OperatorSelectOptionsMap.date.slice();
   } else if (formType == 'select' && !setting.isMult) {
