@@ -13,7 +13,7 @@
         @submit.prevent="searchModel.pageNum=1;search();trackEventHandler('search')"
       >
         <div class="product-template-list-base-search-group">
-          <el-input v-model="searchModel.keyword" placeholder="输入联系人、电话或客户名称进行搜索">
+          <el-input v-model="searchModel.keyword" placeholder="输入联系人、电话或客户名称进行搜索" v-trim:blur>
             <i slot="prefix" class="el-input__icon el-icon-search"></i>
           </el-input>
           <base-button type="primary" native-type="submit">搜索</base-button>

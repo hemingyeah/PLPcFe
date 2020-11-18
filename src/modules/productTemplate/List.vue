@@ -8,7 +8,7 @@
       <!-- start  搜索header -->
       <form class="base-search" @submit.prevent="searchModel.pageNum=1;search();trackEventHandler('search')">
         <div class="product-template-list-base-search-group">
-          <el-input v-model="searchModel.keyword" placeholder="请输入关键字">
+          <el-input v-model="searchModel.keyword" placeholder="请输入关键字" v-trim:blur>
             <i slot="prefix" class="el-input__icon el-icon-search"></i>
           </el-input>
           <base-button type="primary" native-type="submit">搜索</base-button>

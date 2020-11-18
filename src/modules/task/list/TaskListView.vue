@@ -81,6 +81,7 @@
 
               <el-input
                 v-model="params.keyword"
+                v-trim:blur
                 :placeholder="
                   taskSearchInputPlaceholderMap[keyword_select] ||
                     taskSearchInputPlaceholderMap.default

@@ -9,7 +9,7 @@
             仓库报表
           </base-button>
 
-          <el-input style="margin-left:10px" v-model="model.keyWord" placeholder="根据备件信息搜索">
+          <el-input style="margin-left:10px" v-model="model.keyWord" placeholder="根据备件信息搜索" v-trim:blur>
             <i slot="prefix" class="el-input__icon el-icon-search"></i>
           </el-input>
           <base-button style="margin-left:10px" type="primary" @event="model.pageNum=1;search();trackEventHandler('search')" native-type="submit">
