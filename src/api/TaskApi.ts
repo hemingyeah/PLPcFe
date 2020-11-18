@@ -11,7 +11,8 @@ import {
   TaskAllotApproveGetModel,
   TaskAllotModel,
   TaskTagListSearchModel,
-  TaskTagUserListSearchModel
+  TaskTagUserListSearchModel,
+  TaskAllotTaskPoolModel
 } from "@model/param/in/Task"
 
 import { 
@@ -27,7 +28,8 @@ import {
   getTaskAllotUserInfoResult,
   getTaskAllotApproveResult,
   getTaskAllotResult,
-  getTaskTagListResult
+  getTaskTagListResult,
+  getTaskAllotTaskPoolResult
 } from '@model/param/out/Task'
 
 import GrayUtil from '@src/util/gray'
@@ -1189,10 +1191,17 @@ export function getTaskAllotApprove(params: TaskAllotApproveGetModel): Promise<g
 }
 
 /**
- * @description 工单指派-指派工单
+ * @description 工单指派-指派工单-到负责人
  */
 export function taskAllotExcutor(params: TaskAllotModel): Promise<getTaskAllotResult> {
   return http.post('http://30.40.61.216:3000/mock/59/outside/dd/task/allot', params)
+}
+
+/**
+ * @description 工单指派-指派工单池
+ */
+export function taskAllotTaskPoll(params: TaskAllotTaskPoolModel): Promise<getTaskAllotTaskPoolResult> {
+  return http.post('http://30.40.61.216:3000/mock/59/task/allotTaskToPool', params)
 }
 
 /**

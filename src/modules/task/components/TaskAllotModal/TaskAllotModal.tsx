@@ -10,6 +10,8 @@ import ComponentNameEnum from '@model/enum/ComponentNameEnum'
 import TaskAllotTypeEnum from '@model/enum/TaskAllotTypeEnum'
 /* entity */
 import LoginUser from '@model/entity/LoginUser/LoginUser'
+/* model */
+import { TaskPoolNotificationTypeEnum } from '@src/modules/task/components/TaskAllotModal/TaskAllotPool/TaskAllotPoolModel'
 /* vue */
 import { CreateElement } from 'vue'
 /* vue */
@@ -64,13 +66,19 @@ export default class TaskAllotModal extends TaskAllotModalRender {
           <keep-alive>
             <div class='task-allot-content-active'>
               <task-allot-excutor
+                ref='TaskAllotExcutorComponent'
                 style={this.allotContentStyle[TaskAllotTypeEnum.Person]}
                 stateColorMap={this.stateColorMap}
                 onSetExecutor={(user: LoginUser) => this.setExecutorUser(user)} 
                 onSetSynergy={(user: LoginUser) => this.setSynergyUser(user)} 
-                ref='TaskAllotExcutorComponent'
               />
-              <task-allot-pool show={this.allotType === TaskAllotTypeEnum.Pool} style={this.allotContentStyle[TaskAllotTypeEnum.Pool]} />
+              <task-allot-pool 
+                ref='TaskAllotPoolComponent'
+                show={this.allotType === TaskAllotTypeEnum.Pool}
+                style={this.allotContentStyle[TaskAllotTypeEnum.Pool]}
+                changeNotificationChecked={(value: TaskPoolNotificationTypeEnum[]) => this.onTaskNotificationCheckedChanged(value)}
+                changeNotificationUsers={(value: LoginUser[]) => this.onTaskNotificationUsersChanged(value)}
+              />
               <task-allot-auto 
                 show={this.allotType === TaskAllotTypeEnum.Auto} 
                 style={this.allotContentStyle[TaskAllotTypeEnum.Auto]}

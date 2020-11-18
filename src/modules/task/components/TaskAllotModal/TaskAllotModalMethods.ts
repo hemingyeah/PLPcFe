@@ -1,6 +1,6 @@
 /* api */
 import { getCustomer, getCustomerExeinsyn } from '@src/api/CustomerApi'
-import { getTaskConfig, getTaskAutoDispatchApprove, taskAutoDispatch, getTaskAllotApprove, taskAllotExcutor } from '@src/api/TaskApi'
+import { getTaskConfig, getTaskAutoDispatchApprove, taskAutoDispatch, getTaskAllotApprove, taskAllotExcutor, taskAllotTaskPoll } from '@src/api/TaskApi'
 import { getStateColorMap } from '@src/api/SettingApi'
 /* computed */
 import TaskAllotModalComputed from '@src/modules/task/components/TaskAllotModal/TaskAllotModalComputed'
@@ -18,27 +18,35 @@ import {
   DepeMultiUserResult,
   AutoDispatchParams, 
   TaskAllotApproveParams, 
-  AllotExcutorParams
+  AllotExcutorParams,
+  AllotTaskPoolParams,
+  User
 } from '@src/modules/task/components/TaskAllotModal/TaskAllotModalInterface'
 /* model */
 import { TASK_NO_EXECUTOR_MESSAGE } from '@src/model/const/Alert'
 import { getCustomerDetailResult } from '@model/param/out/Customer'
-import { getTaskAllotApproveResult, getTaskAllotResult, getTaskConfigResult } from '@model/param/out/Task'
+import { getTaskAllotApproveResult, getTaskAllotResult, getTaskAllotTaskPoolResult, getTaskConfigResult } from '@model/param/out/Task'
+import { TaskPoolNotificationTypeEnum } from '@src/modules/task/components/TaskAllotModal/TaskAllotPool/TaskAllotPoolModel'
 /* types */
 import StateColorMap from '@model/types/StateColor'
 import AutoDispatchListItem from '@model/types/AutoDispatchListItem'
 /* util */
 import Log from '@src/util/log.ts'
 import Platform from '@src/util/Platform'
+/* vue */
+import { Emit } from 'vue-property-decorator'
+
+enum TaskAllotModalEmitEventEnum {
+  Success = 'success'
+}
 
 class TaskAllotModalMethods extends TaskAllotModalComputed {
   
   /** 
    * @description 派单成功
   */
-  public allotSuccess() {
-    // TODO: 跳转
-  }
+  @Emit(TaskAllotModalEmitEventEnum.Success)
+  public allotSuccess() {}
   
   /** 
    * @description 构建自动派单审批参数
@@ -90,6 +98,29 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
     let params: AllotExcutorParams = {
       taskId: this.task?.id || '',
       executorId: this.executorUser?.userId || ''
+    }
+    
+    // 存在协同人信息
+    if (this.synergyUserList.length > 0) {
+      params.synergies = this.getParamsSynergies()
+    }
+    
+    return params
+  }
+  
+  /** 
+   * @description 构建派单到工单池参数
+  */
+  public buildAllotTaskPoolParams(): AllotTaskPoolParams {
+    let params: AllotTaskPoolParams = {
+      taskId: this.task?.id || '',
+      noticeCusTag: this.taskPoolNotificationCheckd.includes(TaskPoolNotificationTypeEnum.SendToTeamUser),
+      authTaskPoolUser: this.taskPoolNotificationCheckd.includes(TaskPoolNotificationTypeEnum.SendToAuthUser),
+      otherNotifier: (
+        this.taskPoolNotificationCheckd.includes(TaskPoolNotificationTypeEnum.SendToOtherUser)
+        ? this.taskPoolNotificationUsers
+        : []
+      )
     }
     
     // 存在协同人信息
@@ -199,7 +230,7 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
   /** 
    * @description 获取协同人信息参数
   */
-  public getParamsSynergies() {
+  public getParamsSynergies(): User[] {
     return (
       this.synergyUserList.map((user: LoginUser) => {
         return {
@@ -339,6 +370,27 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
     )
   }
   
+  /* 派单到工单池提交 */
+  public fetchTaskPoolSubmit(params: AllotTaskPoolParams) {
+    return (
+      taskAllotTaskPoll(params)
+      .then((data: getTaskAllotTaskPoolResult) => {
+        let isSuccess = data.succ
+        if (!isSuccess) {
+          return Platform.alert(data.message)
+        }
+        
+        this.allotSuccess()
+      })
+      .catch((err: any) => {
+        console.error(err)
+      })
+      .finally(() => {
+        this.pending = false
+      })
+    )
+  }
+  
   /* 自动派单 */
   public fetchAutoDispatchSubmit(params: AutoDispatchParams) {
     return (
@@ -368,13 +420,27 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
   }
   
   /** 
+   * @description 工单池通知方式变动
+  */
+  public onTaskNotificationCheckedChanged(value: TaskPoolNotificationTypeEnum[]): void {
+    this.taskPoolNotificationCheckd = value
+  }
+
+  /** 
+   * @description 工单池通知人员信息变动
+  */
+  public onTaskNotificationUsersChanged(value: LoginUser[]): void {
+    this.taskPoolNotificationUsers = value
+  }
+  
+  /** 
    * @description 设置负责人信息
    * -- 支持外部调用的
   */
   public outsideSetExcutorUser(user: LoginUser | TaskAllotUserInfo | null) {
     this.setExecutorUser(user)
   }
-
+  
   /** 
    * @description 设置匹配的规则
    * -- 支持外部调用的
@@ -474,8 +540,28 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
   /** 
    * @description 派单到工单池提交
   */
-  public submitWithTaskPool() {
-    
+  public async submitWithTaskPool() {
+    try {      
+      // 验证审批
+      const params = { taskId: this.task.id }
+      let approve: TaskApprove | void = await this.fetchApproveWithTaskAllot(params)
+      if (!approve) return
+      
+      let isNeedApprove = approve.needApprove === true
+      // 有审批
+      if (isNeedApprove) {
+        this.pending = false
+        return this.showApproveDialog(approve)
+      }
+      
+      // 派单到工单池提交
+      const allotTaskPoolParams = this.buildAllotTaskPoolParams()
+      this.fetchTaskPoolSubmit(allotTaskPoolParams)
+      
+    } catch (error) {
+      this.pending = false
+      console.warn('TaskAllotModalMethods -> submitWithTaskPool -> error', error)
+    }
   }
   
   /** 

@@ -244,9 +244,9 @@ export default class TaskAllotPool extends Vue {
     let task: any = event?.target?.getExtData() || {}
     let {
       customerId = '',
-      customerName = '', 
+      customerName = '',
       taskId,
-      taskNo = '', 
+      taskNo = '',
       lmName = '', 
       lmPhone = '', 
       customerAddress,
@@ -411,6 +411,17 @@ export default class TaskAllotPool extends Vue {
   */
   private onNotificationCheckedChanged(value: TaskPoolNotificationTypeEnum[]): void {
     this.notificationCheckd = value
+  }
+  
+  /** 
+   * @description 构建数据
+   * -- 支持外部调用的
+  */
+  public outsideBuildData(): { checked: TaskPoolNotificationTypeEnum[], users: LoginUser[] } {
+    return {
+      checked: this.notificationCheckd,
+      users: this.taskPoolNotificationUsers
+    }
   }
   
   /**

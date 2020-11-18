@@ -1,5 +1,5 @@
 export interface User {
-  displayName: string
+  displayName?: string
   head?: string
   staffId?: string
   userId: string
@@ -35,16 +35,7 @@ export interface AutoDispatchApproveParams {
     finalRuleName: string	
   },
   /* 协同人列表 */
-  synergies?: {
-    // 名字
-    displayName?: string,
-    // 头像
-    head?: string,
-    // 钉钉人员id
-    staffId?: string,
-    // 用户id
-    userId: string
-  }[]
+  synergies?: User[]
 }
 
 /* 自动派单参数 */
@@ -65,35 +56,35 @@ export interface AutoDispatchParams {
     finalRuleName: string	
   },
   /* 协同人列表 */
-  synergies?: {
-    // 名字
-    displayName?: string,
-    // 头像
-    head?: string,
-    // 钉钉人员id
-    staffId?: string,
-    // 用户id
-    userId: string
-  }[]
+  synergies?: User[]
 }
 
 /* 派单到负责人参数 */
 export interface AllotExcutorParams {
   // 工单id
-  taskId: string
+  taskId: string,
   // 负责人用户id
   executorId: string,
   // 转派原因
   reason?: string,
   // 协同人
-  synergies?: {
-    // 名字
-    displayName?: string,
-    // 头像
-    head?: string,
-    // 钉钉人员id
-    staffId?: string,
-    // 用户id
-    userId: string
-  }[]
+  synergies?: User[]
+}
+
+/* 派单到工单池参数 */
+export interface AllotTaskPoolParams {
+  // 工单id
+  taskId: string,
+  // 负责人用户id
+  executorId?: string,
+  // 内容
+  content?: string,
+  // 是否通知客户团队成员
+  noticeCusTag: boolean,
+  // 通知有权限接单人员
+  authTaskPoolUser: boolean,
+  // 其他额外通知人
+  otherNotifier?: User[]
+  // 协同人
+  synergies?: User[],
 }

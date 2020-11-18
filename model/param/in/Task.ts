@@ -155,7 +155,7 @@ export interface TaskAllotApproveGetModel {
   taskId: string
 }
 
-/* 工单指派-指派前验证是否审批 */
+/* 工单指派-指派到负责人 */
 export interface TaskAllotModel {
   // 工单id
   taskId: string
@@ -163,6 +163,41 @@ export interface TaskAllotModel {
   executorId: string,
   // 转派原因
   reason?: string,
+  // 协同人
+  synergies?: {
+    // 名字
+    displayName?: string,
+    // 头像
+    head?: string,
+    // 钉钉人员id
+    staffId?: string,
+    // 用户id
+    userId: string
+  }[]
+}
+
+/* 工单指派-指派到工单池 */
+export interface TaskAllotTaskPoolModel {
+  // 工单id
+  taskId: string,
+  // 负责人用户id
+  executorId?: string,
+  // 是否通知客户团队成员
+  noticeCusTag: boolean,
+  // 通知可以接这个工单的人员
+  authTaskPoolUser: boolean,
+  // 内容
+  content?: string,
+  otherNotifier?: {
+    // 名字
+    displayName?: string,
+    // 头像
+    head?: string,
+    // 钉钉人员id
+    staffId?: string,
+    // 用户id
+    userId: string
+  }[],
   // 协同人
   synergies?: {
     // 名字

@@ -10,6 +10,7 @@ import TaskAllotModalProps from '@src/modules/task/components/TaskAllotModal/Tas
 /* types */
 import StateColorMap from '@model/types/StateColor'
 import AutoDispatchListItem from '@model/types/AutoDispatchListItem'
+import { TaskPoolNotificationTypeEnum } from '@src/modules/task/components/TaskAllotModal/TaskAllotPool/TaskAllotPoolModel'
 
 class TaskAllotModalData extends TaskAllotModalProps {
   /* 派单方式 */
@@ -34,6 +35,10 @@ class TaskAllotModalData extends TaskAllotModalProps {
   public stateColorMap: StateColorMap = {}
   /* 工单设置 */
   public taskConfig: TaskConfig = new TaskConfig()
+  /* 工单通知复选框 */
+  public taskPoolNotificationCheckd: TaskPoolNotificationTypeEnum[] = []
+  /* 工单池通知自定义人员 */
+  public taskPoolNotificationUsers: LoginUser[] = []
 }
 
 export default TaskAllotModalData
