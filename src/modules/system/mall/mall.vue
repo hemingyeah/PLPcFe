@@ -4,7 +4,7 @@
     <!-- 头部返回 -->
     <div class="task-flex mall-list-header">
       <div class="task-span1">
-        <base-button type="ghost">返回</base-button>
+        <base-button type="ghost" @event="back">返回</base-button>
       </div>
     </div>
     <!-- tab切换 -->
@@ -46,16 +46,18 @@ export default MallList;
   .el-tabs__nav {
     border-radius: 0 !important;
   }
-  .is-active {
-    position: relative;
-    &::before {
-      content: "";
-      width: 100%;
-      height: 3px;
-      position: absolute;
-      left: 0;
-      top: -1px;
-      background-color: #13C2C2;
+  &-tab {
+    .is-active {
+      position: relative;
+      &::before {
+        content: "";
+        width: 100%;
+        height: 3px;
+        position: absolute;
+        left: 0;
+        top: -1px;
+        background-color: #13C2C2;
+      }
     }
   }
 }

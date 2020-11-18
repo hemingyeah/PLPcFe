@@ -27,46 +27,175 @@
           </el-option>
         </el-select>
       </div>
-      <base-button type="primary" native-type="submit" class="task-ml12">
+      <base-button
+        type="primary"
+        native-type="submit"
+        class="task-ml12"
+        @event="search"
+      >
         搜索
       </base-button>
-      <base-button type="ghost" @event="resetParams" class="task-ml12">
+      <base-button type="ghost" class="task-ml12" @event="initialization">
         重置
       </base-button>
     </div>
     <!-- 入库 出库  -->
     <div class="spare-parts-stock task-flex task-ai task-mt12">
       <div class="task-span1">
-        <base-button type="primary" native-type="submit" class="task-mr12">
+        <base-button
+          type="primary"
+          native-type="submit"
+          class="task-mr12"
+          @event="instockBatchDialog = true"
+        >
           入库
         </base-button>
-        <base-button type="primary" native-type="submit"> 出库 </base-button>
+        <base-button type="primary" native-type="submit" @event="outstockBatch">
+          出库
+        </base-button>
       </div>
-      <el-checkbox v-model="checkedParts">仅显示已发布的备件</el-checkbox>
     </div>
     <!-- table -->
+    <div class="task-mt12">
+      <el-table
+        stripe
+        border
+        :data="tableData"
+        ref="multipleTable"
+        header-row-class-name="common-list-table-header taks-list-table-header"
+      >
+        <el-table-column
+          type="selection"
+          width="48"
+          align="center"
+          class-name="select-column"
+        ></el-table-column>
+        <el-table-column
+          v-for="(item, index) in tableNames"
+          :key="index"
+          :label="item.displayName"
+        >
+          <template slot-scope="scope">
+            <template v-if="item.fieldName === 'isShopWindow'">
+              <el-switch
+                v-model="scope.row.isShopWindow"
+                @change="
+                  updateIsShowOrIsShopWindows(
+                    scope.row.isShopWindow,
+                    scope.row.id
+                  )
+                "
+              />
+              <span>{{ scope.row.isShopWindow ? "禁用" : "启用" }}</span>
+            </template>
+            <template v-else-if="item.fieldName === 'isShow'">
+              <el-checkbox
+                v-model="scope.row.isShow"
+                @change="
+                  updateIsShowOrIsShopWindows(scope.row.isShow, scope.row.id, 0)
+                "
+              ></el-checkbox>
+            </template>
+            <template v-else-if="item.fieldName === 'images'">
+              <img
+                :src="scope.row[item.fieldName]"
+                class="spare-parts-img"
+                v-if="scope.row[item.fieldName]"
+              />
+            </template>
+            <template v-else>{{ scope.row[item.fieldName] }}</template>
+          </template>
+        </el-table-column>
+      </el-table>
+    </div>
+    <!-- 分页 -->
+    <div class="spare-parts-foot task-flex task-ai">
+      <div class="task-span1"></div>
+
+      <el-pagination
+        class="comment-list-table-footer-pagination"
+        background
+        :page-sizes="[10, 20, 50]"
+        :page-size="params.pageSize"
+        :total="pagination.total"
+        :current-page="params.pageNum"
+        @current-change="handlePageChange"
+        @size-change="handleSizeChange"
+        layout="prev, pager, next, sizes, jumper"
+      >
+      </el-pagination>
+    </div>
+
+    <!-- S 出库 -->
+    <el-dialog
+      title="批量出库操作"
+      :visible.sync="outstockBatchDialog"
+      width="940px"
+    >
+      <part-outstock-batch-form
+        v-if="outstockBatchDialog"
+        ref="outstockBatchForm"
+        :sparepart-config="sparepartConfig"
+      ></part-outstock-batch-form>
+      <div slot="footer" class="dialog-footer">
+        <base-button type="ghost" @event="outstockBatchDialog = false"
+          >取 消</base-button
+        >
+        <base-button type="primary">确 定</base-button>
+      </div>
+    </el-dialog>
+    <!-- E 出库 -->
+
+    <!-- S 入库 -->
+    <el-dialog
+      title="批量入库操作"
+      :visible.sync="instockBatchDialog"
+      width="940px"
+    >
+      <part-instockBatch-form
+        v-if="instockBatchDialog"
+        ref="instockBatchForm"
+        :repertory="manageRepertories"
+        :sparepart-config="sparepartConfig"
+      ></part-instockBatch-form>
+      <div slot="footer" class="dialog-footer">
+        <base-button type="ghost" @event="instockBatchDialog = false"
+          >取 消</base-button
+        >
+        <base-button type="primary">确 定</base-button>
+      </div>
+    </el-dialog>
+    <!-- E 入库 -->
   </div>
 </template>
 <script>
+import _ from "lodash";
+
+// components
+import PartOutStockBatchForm from "../../../partV2/repertory/form/PartOutStockBatchForm";
+import PartInStockBatchForm from "../../../partV2/repertory/form/PartInStockBatchForm";
+
+// api
+import * as SettingApi from "@src/api/SettingApi";
 // 发布状态
 const STATELIST = [
   {
-    value: 1,
+    value: 0,
     label: "全部",
   },
   {
-    value: 2,
+    value: 1,
     label: "未发布",
   },
   {
-    value: 3,
+    value: 2,
     label: "已发布",
   },
 ];
 // 库存
 const STOCK = [
   {
-    value: 1,
+    value: 0,
     label: "全部",
   },
   {
@@ -74,26 +203,210 @@ const STOCK = [
     label: "有库存",
   },
   {
-    value: 3,
+    value: 1,
     label: "无库存",
   },
 ];
 
 // table名称
-const TABLENAME = ["商品图片", "编号", "名称", "类别", "规格", "销售价", "出库价", "库存", "启用橱窗", "发布/取消"]
+const TABLENAME = [
+  {
+    displayName: "商品图片",
+    fieldName: "images",
+  },
+  {
+    displayName: "编号",
+    fieldName: "serialNumber",
+  },
+  {
+    displayName: "名称",
+    fieldName: "name",
+  },
+  {
+    displayName: "类别",
+    fieldName: "type",
+  },
+  {
+    displayName: "规格",
+    fieldName: "standard",
+  },
+  {
+    displayName: "销售价",
+    fieldName: "salePrice",
+  },
+  {
+    displayName: "出库价",
+    fieldName: "costPrice",
+  },
+  {
+    displayName: "库存",
+    fieldName: "repertoryCount",
+  },
+  {
+    displayName: "启用橱窗",
+    fieldName: "isShopWindow",
+  },
+  {
+    displayName: "发布/取消",
+    fieldName: "isShow",
+  },
+];
 
 export default {
+  inject: ["initData"],
   name: "spare-parts",
   data() {
     return {
+      params: {
+        pageNum: 1,
+        pageSize: 10,
+      }, // 列表请求参数
+      pagination: {}, //分页
       searchParts: "", // 搜索备件信息
       selectState: "", //状态
       selectStock: "", //库存
-      checkedParts: false, // 仅显示已发布的备件
+      outstockBatchDialog: false, //出库
+      instockBatchDialog: false, //入库
+      sparepartConfig: {}, // 出库数据
+      manageRepertories: [],
+      userId: "", //用户id
       selectStateList: STATELIST,
       selectStockList: STOCK,
-      tableNames: TABLENAME
+      tableNames: TABLENAME,
+      tableData: [],
     };
+  },
+  mounted() {
+    this.userId = _.cloneDeep(this.initData.userId);
+
+    this.getShopSparepartRepertory();
+    this.sparepartConfigs();
+    this.allRepertory();
+  },
+  methods: {
+    /*列表数据 */
+    async getShopSparepartRepertory() {
+      const params = {
+        ...this.params,
+      };
+      const { result } = await SettingApi.getShopSparepartRepertory(params);
+
+      const { list, total, pageNum, pageSize } = result.data;
+      this.pagination = {
+        total,
+        pageNum,
+        pageSize,
+      };
+
+      this.tableData = list.map((item) => {
+        const {
+          imageList,
+          image,
+          serialNumber,
+          name,
+          type,
+          standard,
+          salePrice,
+          costPrice,
+          isShopWindow,
+          isShow,
+          id,
+        } = item.baseSparepart;
+        let images = imageList ? JSON.parse(imageList)[0] : image;
+        return {
+          images,
+          serialNumber,
+          name,
+          type,
+          standard,
+          salePrice,
+          costPrice,
+          repertoryCount: item.repertoryCount,
+          isShopWindow: isShopWindow ? true : false,
+          isShow: isShow ? true : false,
+          id,
+        };
+      });
+    },
+    /*获取备件设置 */
+    async sparepartConfigs() {
+      const result = await SettingApi.sparepartConfig();
+      this.sparepartConfig = result;
+    },
+    /*获取仓库列表 */
+    async allRepertory() {
+      const result = await SettingApi.allRepertory();
+      let arr = Array.isArray(result) ? result : [];
+      this.manageRepertories = arr.filter((item) => {
+        return (
+          null == item.manager ||
+          item.manager.length == 0 ||
+          item.manager.some((item) => item.userId == this.userId)
+        );
+      });
+    },
+    /*出库 */
+    outstockBatch() {
+      this.outstockBatchDialog = true;
+      this.$nextTick(() => {
+        this.$refs.outstockBatchForm.receive([], this.userId);
+      });
+    },
+    search() {
+      const { selectState, searchParts, selectStock } = this;
+      this.params.pageNum = 1;
+      this.params.isShow = selectState ? selectState - 1 : "";
+      this.params.keyWord = searchParts;
+      this.params.haveStock = selectStock ? selectStock - 1 : "";
+      this.getShopSparepartRepertory();
+    },
+    /** 初始化 */
+    initialization() {
+      this.params = {
+        pageNum: 1,
+        pageSize: 10,
+      };
+      this.searchParts = "";
+      this.selectState = "";
+      this.selectStock = "";
+      this.getShopSparepartRepertory();
+    },
+    /*分页条数切换 */
+    handleSizeChange(value) {
+      this.params.pageNum = 1;
+      this.params.pageSize = value;
+      this.getShopSparepartRepertory();
+    },
+    /*分页页数切换 */
+    handlePageChange(value) {
+      this.params.pageNum = value;
+      this.getShopSparepartRepertory();
+    },
+
+    /** 发布 取消 启动 */
+    async updateIsShowOrIsShopWindows(value, id, type = 1) {
+      const params = {
+        id,
+        type,
+        flag: value ? 1 : 0,
+      };
+      const { message, code } = await SettingApi.updateIsShowOrIsShopWindows(
+        params
+      );
+      if (code) {
+        this.tableData = this.tableData.map((item) => {
+          if (item.id === id) {
+            item.isShopWindow = false;
+          }
+          return item;
+        });
+        this.$platform.alert(message);
+      }
+    },
+  },
+  components: {
+    [PartOutStockBatchForm.name]: PartOutStockBatchForm,
+    [PartInStockBatchForm.name]: PartInStockBatchForm,
   },
 };
 </script>
@@ -108,7 +421,18 @@ export default {
     margin-left: 12px;
     width: 180px;
   }
-  &—stock {
+  &-img {
+    width: 50px;
+    height: 50px;
+  }
+  &-foot {
+    margin-top: 10px;
+    > div {
+      &:first-child {
+        font-size: 13px;
+        color: #767e89;
+      }
+    }
   }
 }
 </style>
@@ -119,6 +443,11 @@ export default {
     .el-select {
       width: 100%;
     }
+  }
+  th > div {
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    border-color: #f2f2f2 !important;
   }
 }
 </style>
