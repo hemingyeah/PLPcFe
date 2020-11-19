@@ -23,7 +23,7 @@ const FORM_SELECT = {
       this.index++;
 
       options.push({
-        value: `选项${ this.index }`,
+        value: ``,
         isDefault: false
       })
 

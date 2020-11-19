@@ -29,7 +29,7 @@ function fillPropForSelect(params){
     })
 
     // 没有选项，添加默认项
-    if(options.length == 0) options.push({value: '选项1', isDefault: false},{value: '选项2', isDefault: false},{value: '选项3', isDefault: false});
+    if(options.length == 0) options.push({value: '', isDefault: false},{value: '', isDefault: false},{value: '', isDefault: false});
     
   }
 
