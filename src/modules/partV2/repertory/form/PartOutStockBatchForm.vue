@@ -130,6 +130,7 @@ export default {
         safetyStock: row.safetyStock || null,
         variation: 1
       })
+      console.log(this.form)
     },
     hasRow(row){
       return this.form.some(item => item.id == row.id)

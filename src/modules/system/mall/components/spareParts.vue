@@ -358,26 +358,62 @@ export default {
         );
       });
     },
+
     handleSelection(selection) {
-      if (selection.length > 500) {
+
+      let tv = this.computeSelection(selection);
+      // 在需要限制最多选择500个备件时，取消function内部全部注释即可
+      let original = this.selected
+        .filter(ms => this.tableData.some(cs => cs.id === ms.id));
+      let unSelected = this.tableData
+        .filter(c => original.every(oc => oc.id !== c.id));
+
+      if (tv.length > 500) {
+        this.$nextTick(() => {
+          original.length > 0
+            ? unSelected.forEach(row => {
+              this.$refs.multipleTable.toggleRowSelection(row, false);
+            })
+            : this.$refs.multipleTable.clearSelection();
+        })
         return this.$platform.alert(`最多只能选择500条数据`);
       }
-      this.selected = selection;
-      console.log(this.selected)
+      this.selected = tv;
+    },
+
+    computeSelection(selection) {
+      let tv = [];
+      tv = this.selected
+        .filter(ms => this.tableData.every(c => c.id !== ms.id));
+      tv = _.uniqWith([...tv, ...selection], _.isEqual);
+      return tv;
     },
     /**
      * 判断是否是管理员
      */
     judgeSelectManager() {
-      const { tableData } = this;
+      const { manager } = this.tableData[0].baseRepertory;
+      let isManage;
+      if (manager) {
+        isManage = JSON.parse(manager).some(item => {
+          return item.userId == this.userId
+        })
+      }
+      return isManage
     },
     /*出库 */
     outstockBatch() {
-      alert(this.allowInout);
       if (!this.allowInout) {
         this.$platform.alert("对不起，您没有该操作权限");
         return;
       }
+      if (!this.judgeSelectManager()) {
+        this.$platform.alert(
+          `尚未给您分配"${this.tableData[0].baseRepertory.name}"的管理员权限，请联系管理员或到备件库管理中设置`
+        )
+        return
+      }
+
       this.outstockBatchDialog = true;
       this.$nextTick(() => {
         this.$refs.outstockBatchForm.receive([], this.userId);
