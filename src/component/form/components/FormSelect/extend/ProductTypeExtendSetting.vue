@@ -31,8 +31,9 @@
     </div>
     <div class="form-setting-group form-select-setting-operation">
       <button type="button" class="btn-text" @click="addOption">增加选项</button>
+      <div class="btn-divider"></div>
       <button type="button" class="btn-text" @click="showBatchModal">批量编辑</button>
-    </div>
+    </div> 
 
     <base-modal 
       title="批量编辑选项" width="520px" class="form-select-setting-modal"
@@ -41,10 +42,11 @@
         <textarea :value="optionText" @input="updateOptionText" rows="10"></textarea>
         <div class="form-select-setting-warn" v-if="errMessage">{{errMessage}}</div>
       </div>
-      <template slot="footer">
+      <div slot="footer" class="dialog-footer">
         <span class="form-select-tips">每行对应一个选项</span>
-        <button type="button" class="btn btn-primary" @click="batchEdit">保存</button>
-      </template>
+        <el-button @click="batchModalShow = false">取 消</el-button>
+        <el-button type="primary" @click="batchEdit">保 存</el-button>
+      </div>
     </base-modal>
   </div>
 </template>

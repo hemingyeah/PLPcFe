@@ -493,7 +493,7 @@ const FormDesign = {
       
       if (dragEvent.mode == 'sort') {
         if (inContainer) {
-          let dragIndex = this.value.findIndex(item => item._id == this.currField._id);
+          let dragIndex = this.unHiddenFields.findIndex(item => item._id == this.currField._id);
           let enterIndex = this.calcIndex(y, dragIndex);
           this.sort(dragIndex, enterIndex);
         }
@@ -512,7 +512,7 @@ const FormDesign = {
         if (inContainer) {
           // 如果已经插入，对字段进行排序
           if (this.insertedField) {
-            let dragIndex = this.value.findIndex(item => item._id == this.insertedField._id);
+            let dragIndex = this.unHiddenFields.findIndex(item => item._id == this.insertedField._id);
             let enterIndex = this.calcIndex(y, dragIndex);
             this.sort(dragIndex, enterIndex);
             return;
@@ -557,7 +557,7 @@ const FormDesign = {
       if (direction <= 0) {
         for (let i = 0; i < previewDoms.length; i++) {
           let dom = previewDoms[i];
-          if (dom.offsetTop + (dom.offsetHeight / 2) > offsetTop + dragEvent.offsetY) {
+          if (dom.offsetTop + (dom.offsetHeight / 2) > offsetTop) {
             // 如果前一位置是当前位置，直接返回前一位置
             return i - 1 == currIndex ? currIndex : i;
           }
