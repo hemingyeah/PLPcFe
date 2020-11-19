@@ -10,7 +10,6 @@ const directive = {
     let eventName = binding.arg;
     let instance = vnode.componentInstance;
 
-    debugger;
     if(!!instance.$listeners[eventName]){
         return;
     }
