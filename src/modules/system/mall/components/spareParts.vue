@@ -62,6 +62,8 @@
         border
         :data="tableData"
         ref="multipleTable"
+        @select="handleSelection"
+        @select-all="handleSelection"
         header-row-class-name="common-list-table-header taks-list-table-header"
       >
         <el-table-column
@@ -170,6 +172,7 @@
 </template>
 <script>
 import _ from "lodash";
+import AuthUtil from "@src/util/auth";
 
 // components
 import PartOutStockBatchForm from "../../../partV2/repertory/form/PartOutStockBatchForm";
@@ -270,6 +273,8 @@ export default {
       sparepartConfig: {}, // 出库数据
       manageRepertories: [],
       userId: "", //用户id
+      auths: {}, //权限
+      selected: [],
       selectStateList: STATELIST,
       selectStockList: STOCK,
       tableNames: TABLENAME,
@@ -277,11 +282,18 @@ export default {
     };
   },
   mounted() {
-    this.userId = _.cloneDeep(this.initData.userId);
+    const { initData } = this;
+    this.userId = _.cloneDeep(initData.userId);
+    this.auths = _.cloneDeep(initData.auths) || {};
 
     this.getShopSparepartRepertory();
     this.sparepartConfigs();
     this.allRepertory();
+  },
+  computed: {
+    allowInout() {
+      return AuthUtil.hasAuth(this.auths, "VIP_SPAREPART_INOUT");
+    },
   },
   methods: {
     /*列表数据 */
@@ -325,6 +337,7 @@ export default {
           isShopWindow: isShopWindow ? true : false,
           isShow: isShow ? true : false,
           id,
+          baseRepertory: item.baseRepertory,
         };
       });
     },
@@ -345,8 +358,26 @@ export default {
         );
       });
     },
+    handleSelection(selection) {
+      if (selection.length > 500) {
+        return this.$platform.alert(`最多只能选择500条数据`);
+      }
+      this.selected = selection;
+      console.log(this.selected)
+    },
+    /**
+     * 判断是否是管理员
+     */
+    judgeSelectManager() {
+      const { tableData } = this;
+    },
     /*出库 */
     outstockBatch() {
+      alert(this.allowInout);
+      if (!this.allowInout) {
+        this.$platform.alert("对不起，您没有该操作权限");
+        return;
+      }
       this.outstockBatchDialog = true;
       this.$nextTick(() => {
         this.$refs.outstockBatchForm.receive([], this.userId);

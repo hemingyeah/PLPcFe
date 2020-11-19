@@ -50,11 +50,15 @@ router.get('/setting/task/field/taskReceipt', async ctx => {
   ctx.body = Template.renderWithData('工单回执表单设置', {}, script, modConfig.template)
 });
 
+
 router.get('/system/mall/index', async ctx => {
-  let modConfig = modules['system.mall.index'];
   let script = ['/system.mall.index.js'];
-  
-  ctx.body = Template.renderWithData('商品列表', {}, script, modConfig.template)
+  let modConfig = modules['system.mall.index'];
+  let reqHeaders = ctx.request.headers;
+  let result = await HttpClient.request('/setting/serviceStation/markSpareGray', 'get', null, {headers: reqHeaders});
+  let body = result.body;
+
+  ctx.body = Template.renderWithHtml('商品列表', body, script, modConfig.template)
 });
 
 module.exports = router;
