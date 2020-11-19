@@ -55,7 +55,13 @@ function parseObject(value: any): any {
   // 是否为数组
   if (isArray(value)) return value.map((item: any) => parseObject(item))
   // 是否字符串
-  if (isString(value)) return value
+  if (isString(value)) {
+    try {
+      return JSON.parse(value)
+    } catch (error) {
+      return value
+    }
+  }
   // 是否是对象
   if (!isObject(value)) return value
   
@@ -373,6 +379,8 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
    * -- 内部调用的
   */
   public fetchUsers(): Promise<any> {
+    if (this.isDisableLoadmore) return Promise.resolve()
+    
     Log.succ(Log.Start, this.fetchUsers.name)
     
     let distance = this.getParamDistance()
@@ -418,7 +426,8 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
         )
         
         this.isDisableLoadmore = !(data.result.hasNextPage)
-        
+        // this.bindTableScrollEvent()
+
         Log.succ(Log.End, this.fetchUsers.name)
       })
     )
@@ -533,6 +542,8 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
     // @ts-ignore
     this.$refs.TaskAllotTableLocaionSelect.blur()
     this.selectLocation = Number(this.locationOptions[this.locationOptions.length - 1].value)
+    
+    this.initialize()
   }
   
   /**

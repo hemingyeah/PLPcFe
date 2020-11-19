@@ -14,7 +14,9 @@ import {
   TaskTagUserListSearchModel,
   TaskAllotTaskPoolModel,
   TaskPoolAuthUsersGetModel,
-  TaskPoolSubscriptionUsersGetModel
+  TaskPoolSubscriptionUsersGetModel,
+  CustomerTahTaskPoolCountGetModel,
+  TaskPoolSearchModel
 } from "@model/param/in/Task"
 
 import { 
@@ -33,7 +35,9 @@ import {
   getTaskTagListResult,
   getTaskAllotTaskPoolResult,
   getTaskPoolAuthUsersResult,
-  getTaskPoolSubscriptionUsersResult
+  getTaskPoolSubscriptionUsersResult,
+  getCustomerTagTaskPoolCountResult,
+  getTaskAllotTaskPollApproveResult
 } from '@model/param/out/Task'
 
 import GrayUtil from '@src/util/gray'
@@ -1172,35 +1176,42 @@ export function taskAutoDispatch(params: any): Promise<any> {
  * @description 工单指派-获取人员卡片信息
  */
 export function getTaskUserCardInfo(params: TaskUserCardSearchModel): Promise<getTaskUserCardInfoResult> {
-  return http.post('http://30.40.61.216:3000/mock/59/outside/es/task/getUserCardInfo', params)
+  return http.post('/outside/es/task/getUserCardInfo', params)
 }
 
 /**
  * @description 工单指派-获取人员列表信息
  */
 export function getTaskAllotUserInfo(params: TaskAllotUserSearchModel): Promise<getTaskAllotUserInfoResult> {
-  return http.post('http://30.40.61.216:3000/mock/59/outside/es/task/getAllotUserInfo', params)
+  return http.post('/outside/es/task/getAllotUserInfo', params)
 }
 
 /**
  * @description 工单指派-指派前验证是否审批接口
  */
 export function getTaskAllotApprove(params: TaskAllotApproveGetModel): Promise<getTaskAllotApproveResult> {
-  return http.get('http://30.40.61.216:3000/mock/59/outside/pc/task/confirmAllot', params)
+  return http.get('/outside/pc/task/confirmAllot', params)
+}
+
+/**
+ * @description 工单指派-验证指派到工单池是否需要审批
+ */
+export function getTaskAllotTaskPoolApprove(params: TaskAllotTaskPoolModel): Promise<getTaskAllotTaskPollApproveResult> {
+  return http.post('/task/approve/allotTaskToPool', params)
 }
 
 /**
  * @description 工单指派-指派工单-到负责人
  */
 export function taskAllotExcutor(params: TaskAllotModel): Promise<getTaskAllotResult> {
-  return http.post('http://30.40.61.216:3000/mock/59/outside/dd/task/allot', params)
+  return http.post('/outside/dd/task/allot', params)
 }
 
 /**
  * @description 工单指派-指派工单池
  */
 export function taskAllotTaskPoll(params: TaskAllotTaskPoolModel): Promise<getTaskAllotTaskPoolResult> {
-  return http.post('http://30.40.61.216:3000/mock/59/task/allotTaskToPool', params)
+  return http.post('/task/allotTaskToPool', params)
 }
 
 /**
@@ -1221,14 +1232,29 @@ export function getTaskRedeployTagList(params: TaskTagListSearchModel): Promise<
  * @description 工单指派-获取工单池可以接单用户列表
  */
 export function getTaskPoolAuthUserList(params: TaskPoolAuthUsersGetModel): Promise<getTaskPoolAuthUsersResult> {
-  return http.get('http://30.40.61.216:3000/mock/59/task/taskPool/user/list', params)
+  return http.get('/task/taskPool/user/list', params)
 }
 
 /**
  * @description 工单指派-获取订阅工单池用户列表
  */
-export function getTaskPoolSubscriptionUserList(params: TaskPoolSubscriptionUsersGetModel): Promise<getTaskPoolSubscriptionUsersResult> {
-  return http.get('/dd/task/taskPool/subNotice/users', params)
+export function getTaskPoolSubscriptionUserList(): Promise<getTaskPoolSubscriptionUsersResult> {
+  return http.get('/outside/dd/task/list/taskPoolSubscriptionUserAndCount')
 }
+
+/**
+ * @description 工单指派-根据客户团队统计工单池数量
+ */
+export function getCustomerTagTaskPoolCount(params: CustomerTahTaskPoolCountGetModel): Promise<getCustomerTagTaskPoolCountResult> {
+  return http.post('/outside/es/task/getCusTagsTaskPoolCount', params)
+}
+
+/**
+ * @description 工单PC工单池查询
+ */
+export function getTaskPoolList(params: TaskPoolSearchModel): Promise<getTaskSearchListResult> {
+  return http.post('/outside/es/task/taskPool', params)
+}
+
 
 /* -------------  end  新工单api ---------------- */

@@ -184,7 +184,7 @@ export function fmt_h_m_s(sec = 0) {
 export function fmt_number(value, defaultValue) {
   if (typeof defaultValue == undefined) defaultValue = 0
   
-  if (!value) {
+  if (value == undefined || value == null) {
     console.warn(`Caused: ${value} is undifined or is null`)
     return defaultValue
   }

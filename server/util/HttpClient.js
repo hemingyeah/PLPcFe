@@ -4,6 +4,7 @@
 const colors = require('colors')
 // utils
 const { isNotLocalEnv } = require('../model/proxyConfigModel');
+const http = require('http')
 const https = require(isNotLocalEnv ? 'https' : 'http');
 const { getRequestOptions, getProxyOptions, toJSON, getBody } = require('./HttpUtil');
 
@@ -67,16 +68,18 @@ module.exports = {
   proxy(ctx, options = {}) {
     let request = ctx.request;
     let response = ctx.response;
-
+    let force = options.force
+    let protocol = force ? http : https
+    
     let rawBody = request.rawBody;
     let isMultipart = request.is('multipart/form-data');
-
-    let proxyOptions = getProxyOptions(ctx, options);
-
+    
+    let proxyOptions = getProxyOptions(ctx, options, force);
+    
     console.log(`${colors.bgYellow('proxy -> proxyOptions')}`, proxyOptions);
-
+    
     return new Promise((resolve, reject) => {
-      let req = https.request(proxyOptions, res => {
+      let req = protocol.request(proxyOptions, res => {
         // 设定response的header
         let headers = res.headers;
         for(let name in headers) {

@@ -40,10 +40,10 @@ export default class TaskAllotPoolInfo extends Vue {
   
   /* 选中状态 */
   @Prop() readonly users: {
-    subscription: LoginUser[],
+    subscription: TaskPoolUser[],
     auth: TaskPoolUser[],
   } | undefined
-
+  
   /* 详细信息 */
   @Prop() readonly info: TaskAllotPoolInfoData | undefined
   
@@ -58,8 +58,9 @@ export default class TaskAllotPoolInfo extends Vue {
   private handleAuthCheckedChange(value: boolean) {
     return value
   }
-  
-  private renderUserItem(user: LoginUser) {
+
+  private renderUserItem(info: TaskPoolUser, isObjectTagList: boolean = false) {
+    const user: LoginUser = info.user
     
     return (
       <div class='task-pool-user-content' onClick={() => openTabForUserView(user.userId)}>
@@ -75,14 +76,21 @@ export default class TaskAllotPoolInfo extends Vue {
           <div class="task-pool-user-team">
             服务团队: 
             {
-              Array.isArray(user.tagList) 
-              ? user.tagList.join(', ')
-              : ''
+              isObjectTagList 
+              ? (
+                Array.isArray(user.tagList) 
+                  ? user.tagList.map(tag => tag.tagName).join(', ')
+                  : ''
+              )
+              : (
+                Array.isArray(user.tagList) 
+                  ? user.tagList.join(', ')
+                  : ''
+              )
             }
           </div>
           <div class="task-pool-user-count">
-            {/* @ts-ignore */}
-            <span>未完成工单: {user.unFinished}</span>
+            <span>未完成工单: {info.unFinished}</span>
           </div>
         </div>
       </div>
@@ -107,7 +115,7 @@ export default class TaskAllotPoolInfo extends Vue {
             <div>
               {
                 this.users?.subscription
-                && this.users.subscription.map(user => this.renderUserItem(user))
+                && this.users.subscription.map(info => this.renderUserItem(info))
               }
             </div>
           </el-collapse-item>
@@ -119,7 +127,7 @@ export default class TaskAllotPoolInfo extends Vue {
             <div>
               {
                 this.users?.auth
-                && this.users.auth.map(info => this.renderUserItem(info.user))
+                && this.users.auth.map(info => this.renderUserItem(info, true))
               }
             </div>
           </el-collapse-item>

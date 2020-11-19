@@ -14,7 +14,7 @@ interface Pageable {
 }
 
 class Page<T> {
-  public content?: T | any[] = []
+  public content?: T | any = []
   public empty?: boolean = false
   public first?: boolean = false
   public last?: boolean = false

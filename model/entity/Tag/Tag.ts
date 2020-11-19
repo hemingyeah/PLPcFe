@@ -5,7 +5,7 @@ class Tag {
   
   public static serialVersionUID: any
   
-  public id?: string = ''
+  public id: string = ''
   public tenantId?: string= ''
   // 标签名字
   public tagName?: string = ''

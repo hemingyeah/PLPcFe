@@ -13,7 +13,8 @@ const {
 } = require(`${MODEL_PATH}/userConfigModel`);
 const {
   DEFAULT_OPIONS,
-  AGENT
+  AGENT,
+  HTTPAGENT
 } = require(`${MODEL_PATH}/httpConfigModel`);
 
 /** 如果解析失败返回原值 */
@@ -54,11 +55,11 @@ function getBody(response, body, error) {
  * 获取主机名字
  * @param {Object} options 配置项
  */
-function getHostName(options = {}) {
+function getHostName(options = {}, isForce = false) {
   let hostName = '';
 
   try {
-    hostName = isNotLocalEnv ? proxyConfig.host : options.host;
+    hostName = isNotLocalEnv && !isForce ? proxyConfig.host : options.host;
   } catch (error) {
     console.log(chalkError('getHostName error'))
   }
@@ -72,11 +73,11 @@ function getHostName(options = {}) {
  * 获取端口
  * @param {Object} options 配置项
  */
-function getPort(options = {}) {
+function getPort(options = {}, isForce = false) {
   let port = '';
 
   try {
-    port = isNotLocalEnv ? proxyConfig.port : options.port;
+    port = isNotLocalEnv && !isForce ? proxyConfig.port : options.port;
   } catch (error) {
     console.log(chalkError('getPort error'))
   }
@@ -109,7 +110,7 @@ function getRequestOptions(path, method, options = {}) {
  * @param {Object} ctx 上下文
  * @param {Object} options 配置项
  */
-function getProxyOptions(ctx, options = {}) {
+function getProxyOptions(ctx, options = {}, isForce = false) {
   let proxyOptions = {};
 
   let request = ctx.request;
@@ -123,16 +124,16 @@ function getProxyOptions(ctx, options = {}) {
   let localHeaders = Object.assign({}, request.header, DEFAULT_OPIONS.headers, options.headers);
   proxyOptions.headers = Object.assign({}, isNotLocalEnv ? originHeaders : localHeaders);
 
-  setBaseOptions(proxyOptions, options);
+  setBaseOptions(proxyOptions, options, isForce);
 
   return proxyOptions;
 }
 
-function setBaseOptions(originOptions = {}, options = {}) {
-  originOptions.host = getHostName(options);
-  originOptions.hostname = getHostName(options);
-  originOptions.port = getPort(options);
-  originOptions.agent = AGENT;
+function setBaseOptions(originOptions = {}, options = {}, isForce = false) {
+  originOptions.host = getHostName(options, isForce);
+  originOptions.hostname = getHostName(options, isForce);
+  originOptions.port = getPort(options, isForce);
+  originOptions.agent = isForce ? HTTPAGENT : AGENT;
 
   delete originOptions.headers.host;
 }

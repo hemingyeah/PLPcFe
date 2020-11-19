@@ -1,6 +1,6 @@
 /* api */
 import { getCustomer, getCustomerExeinsyn } from '@src/api/CustomerApi'
-import { getTaskConfig, getTaskAutoDispatchApprove, taskAutoDispatch, getTaskAllotApprove, taskAllotExcutor, taskAllotTaskPoll } from '@src/api/TaskApi'
+import { getTaskConfig, getTaskAutoDispatchApprove, taskAutoDispatch, getTaskAllotApprove, taskAllotExcutor, taskAllotTaskPoll, getTaskAllotTaskPoolApprove } from '@src/api/TaskApi'
 import { getStateColorMap } from '@src/api/SettingApi'
 /* computed */
 import TaskAllotModalComputed from '@src/modules/task/components/TaskAllotModal/TaskAllotModalComputed'
@@ -25,7 +25,7 @@ import {
 /* model */
 import { TASK_NO_EXECUTOR_MESSAGE } from '@src/model/const/Alert'
 import { getCustomerDetailResult } from '@model/param/out/Customer'
-import { getTaskAllotApproveResult, getTaskAllotResult, getTaskAllotTaskPoolResult, getTaskConfigResult } from '@model/param/out/Task'
+import { getTaskAllotApproveResult, getTaskAllotResult, getTaskAllotTaskPollApproveResult, getTaskAllotTaskPoolResult, getTaskConfigResult } from '@model/param/out/Task'
 import { TaskPoolNotificationTypeEnum } from '@src/modules/task/components/TaskAllotModal/TaskAllotPool/TaskAllotPoolModel'
 /* types */
 import StateColorMap from '@model/types/StateColor'
@@ -112,13 +112,20 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
    * @description 构建派单到工单池参数
   */
   public buildAllotTaskPoolParams(): AllotTaskPoolParams {
+    let taskPoolData: { checked: TaskPoolNotificationTypeEnum[], users: LoginUser[] } = (
+      // @ts-ignore
+      this.$refs?.TaskAllotPoolComponent?.outsideBuildData() 
+      || { checked: [], users: [] }
+    )
+    
     let params: AllotTaskPoolParams = {
       taskId: this.task?.id || '',
-      noticeCusTag: this.taskPoolNotificationCheckd.includes(TaskPoolNotificationTypeEnum.SendToTeamUser),
-      authTaskPoolUser: this.taskPoolNotificationCheckd.includes(TaskPoolNotificationTypeEnum.SendToAuthUser),
+      executorId: this.executorUser?.userId || '',
+      noticeCusTag: taskPoolData.checked.includes(TaskPoolNotificationTypeEnum.SendToTeamUser),
+      authTaskPoolUser: taskPoolData.checked.includes(TaskPoolNotificationTypeEnum.SendToAuthUser),
       otherNotifier: (
-        this.taskPoolNotificationCheckd.includes(TaskPoolNotificationTypeEnum.SendToOtherUser)
-        ? this.taskPoolNotificationUsers
+        taskPoolData.checked.includes(TaskPoolNotificationTypeEnum.SendToOtherUser)
+        ? taskPoolData.users
         : []
       )
     }
@@ -332,16 +339,39 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
     )
   }
   
+  /* 指派到工单池审批 */
+  public fetchTaskAllotTaskPoolApprove(params: AllotTaskPoolParams): Promise<TaskApprove | any | void> {
+    return (
+      getTaskAllotTaskPoolApprove(params)
+      .then((result: getTaskAllotTaskPollApproveResult) => {
+        let isSuccess = result.succ
+        let isNeedApprove = !isSuccess && result.message === Approve.message
+        
+        return {
+          isNeedApprove,
+          data: result.data || {}
+        }
+        
+      }).catch((err) => {
+        this.pending = false
+        console.error(err)
+      })
+    )
+  }
+  
   /* 自动派单审批状态 */
   public fetchApproveWithAutoDispatch(params: AutoDispatchApproveParams): Promise<{ isNeedApprove: boolean, data: TaskApprove } | void> {
     return (
       getTaskAutoDispatchApprove(params)
       .then((result) => {
-        let isNeedApprove = !result.succ && result.message == Approve.message
+        let isSuccess = result.succ
+        let isNeedApprove = !isSuccess && result.message === Approve.message
+        
         return {
           isNeedApprove,
           data: result.data || {}
         }
+        
       }).catch((err) => {
         this.pending = false
         console.error(err)
@@ -551,21 +581,21 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
    * @description 派单到工单池提交
   */
   public async submitWithTaskPool() {
-    try {      
+    try {
+      // 构建参数
+      const allotTaskPoolParams = this.buildAllotTaskPoolParams()
       // 验证审批
-      const params = { taskId: this.task.id }
-      let approve: TaskApprove | void = await this.fetchApproveWithTaskAllot(params)
+      let approve: { isNeedApprove: boolean, data: TaskApprove } | void = await this.fetchTaskAllotTaskPoolApprove(allotTaskPoolParams)
       if (!approve) return
       
-      let isNeedApprove = approve.needApprove === true
+      let isNeedApprove = approve.isNeedApprove === true
       // 有审批
       if (isNeedApprove) {
         this.pending = false
-        return this.showApproveDialog(approve)
+        return this.showApproveDialog(approve.data)
       }
       
       // 派单到工单池提交
-      const allotTaskPoolParams = this.buildAllotTaskPoolParams()
       this.fetchTaskPoolSubmit(allotTaskPoolParams)
       
     } catch (error) {

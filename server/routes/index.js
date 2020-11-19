@@ -85,141 +85,82 @@ router.get('/', async (ctx) => {
     script,
     modConfig.template
   );
-});
+})
 
-router.get("/demo", async (ctx) => {
-  let script = ["/system.demo.js"];
-  let modConfig = modules['system.demo']
+// router.use('/outside/es/task/taskPool', (ctx) =>
+//   HttpClient.proxy(ctx, {
+//     force: true,
+//     host: '127.0.0.1',
+//     port: 10006,
+//     headers: {
+//       cookie: 'VIPPUBLINKJSESSIONID=8f84287b-6e2a-48da-97db-2fc35bd0e51b; shbversion=shbvip; __wpkreporterwid_=9e9c908a-d12b-4d35-1a1b-37fb2d1c6772',
+//     },
+//   })
+// );
 
-  ctx.body = Template.renderWithData("demo", {}, script, modConfig.template);
-});
-
-router.get('/performance/list', async (ctx) => {
-  ctx.redirect('/performance/v2/report');
-});
-
-router.get('/window', async (ctx) => {
-  let script = ['/window.js'];
-  ctx.body = Template.renderWithData('window', {}, script);
-});
-
-router.use('/outside/weixin/*', (ctx) =>
+router.use('/outside/es/*', (ctx) =>
   HttpClient.proxy(ctx, {
-    host: '30.40.56.211',
-    port: 10007,
-    headers: {
-      cookie:
-        'VIPPUBLINKJSESSIONID=08928ba0-ea31-4ac5-a411-bf8611a8ac44; __wpkreporterwid_=864b663e-6aec-4645-3a39-06e795e7bb67; JSESSIONID=63A6296AD52983C1B1C997923E46783E',
-    },
-  })
-);
-
-router.use('/outside/es/task/search', (ctx) =>
-  HttpClient.proxy(ctx, {
-    host: '30.40.57.130',
+    force: true,
+    host: '127.0.0.1',
     port: 10006,
     headers: {
-      cookie: 'VIPPUBLINKJSESSIONID=25c91850-650b-49c9-8bc2-9f8da584992c',
+      cookie: '__wpkreporterwid_=a29f6a2c-991e-40c9-9bfc-38d3d3d15fd6; JSESSIONID=A3536B04F0DBE595A55AB8033A8AE2B7; VIPPUBLINKJSESSIONID=a644d918-3065-4760-b2a4-a47d50230230',
     },
   })
 );
 
-router.use('/outside/pc/task/editBatchTask', (ctx) =>
+router.use('/outside/pc/task/*', (ctx) =>
   HttpClient.proxy(ctx, {
-    host: '30.40.57.130',
+    force: true,
+    host: '127.0.0.1',
     port: 10012,
     headers: {
-      cookie: 'VIPPUBLINKJSESSIONID=25c91850-650b-49c9-8bc2-9f8da584992c',
+      cookie: '__wpkreporterwid_=a29f6a2c-991e-40c9-9bfc-38d3d3d15fd6; JSESSIONID=A3536B04F0DBE595A55AB8033A8AE2B7; VIPPUBLINKJSESSIONID=a644d918-3065-4760-b2a4-a47d50230230',
     },
   })
 );
 
-router.use('/outside/pc/view/getUserViews', (ctx) =>
+router.use('/outside/task/*', (ctx) =>
   HttpClient.proxy(ctx, {
-    host: '30.40.57.130',
+    force: true,
+    host: '127.0.0.1',
     port: 10012,
     headers: {
-      cookie: 'VIPPUBLINKJSESSIONID=25c91850-650b-49c9-8bc2-9f8da584992c',
+      cookie: '__wpkreporterwid_=a29f6a2c-991e-40c9-9bfc-38d3d3d15fd6; JSESSIONID=A3536B04F0DBE595A55AB8033A8AE2B7; VIPPUBLINKJSESSIONID=a644d918-3065-4760-b2a4-a47d50230230',
     },
   })
 );
 
-router.use('/outside/es/task/getTaskCountByState', (ctx) =>
+router.use('/outside/dd/*', (ctx) =>
   HttpClient.proxy(ctx, {
-    host: '30.40.57.130',
-    port: 10006,
-    headers: {
-      cookie: 'VIPPUBLINKJSESSIONID=25c91850-650b-49c9-8bc2-9f8da584992c',
-    },
-  })
-);
-
-router.use('/outside/pc/view/getOneView', (ctx) =>
-  HttpClient.proxy(ctx, {
-    host: '30.40.57.130',
+    force: true,
+    host: '127.0.0.1',
     port: 10012,
     headers: {
-      cookie: 'VIPPUBLINKJSESSIONID=25c91850-650b-49c9-8bc2-9f8da584992c',
+      cookie: '__wpkreporterwid_=fe0cddd4-415a-4200-2441-e0bcb1e62eee; Hm_lvt_2db58cd3a4e59dd1ab7d32ca59e15bdc=1604576853; VIPPUBLINKJSESSIONID=0215a313-57ff-4e24-96c0-3002e03a97cc; shbversion=shbvip',
     },
   })
 );
 
-router.use('/outside/pc/view/createTaskView', (ctx) =>
+router.use('/task/approve/allotTaskToPool', (ctx) =>
   HttpClient.proxy(ctx, {
-    host: '30.40.57.130',
-    port: 10012,
+    force: true,
+    host: '127.0.0.1',
+    port: 8080,
     headers: {
-      cookie: 'VIPPUBLINKJSESSIONID=25c91850-650b-49c9-8bc2-9f8da584992c',
+      cookie: '__wpkreporterwid_=a1b2ee96-b592-4bf2-26e4-7bd4ed06ceb2; PUBLINKJSESSIONID=4407d484-412c-4b93-a983-71de42819206; VIPPUBLINKJSESSIONID=da1308f2-2869-4aff-8519-d166a66db781; JSESSIONID=8554A74257381D76A534A6238D1A6799',
     },
   })
 );
 
-router.use('/outside/pc/view/editTaskView', (ctx) =>
+router.use('/task/taskPool/user/list', (ctx) =>
   HttpClient.proxy(ctx, {
-    host: '30.40.57.130',
-    port: 10012,
+    force: true,
+    host: '127.0.0.1',
+    port: 8080,
     headers: {
-      cookie: 'VIPPUBLINKJSESSIONID=25c91850-650b-49c9-8bc2-9f8da584992c',
+      cookie: '__wpkreporterwid_=a1b2ee96-b592-4bf2-26e4-7bd4ed06ceb2; PUBLINKJSESSIONID=4407d484-412c-4b93-a983-71de42819206; VIPPUBLINKJSESSIONID=da1308f2-2869-4aff-8519-d166a66db781; JSESSIONID=8554A74257381D76A534A6238D1A6799',
     },
-  })
-);
-
-router.use('/outside/pc/view/deleteOneView', (ctx) =>
-  HttpClient.proxy(ctx, {
-    host: '30.40.57.130',
-    port: 10012,
-    headers: {
-      cookie: 'VIPPUBLINKJSESSIONID=25c91850-650b-49c9-8bc2-9f8da584992c',
-    },
-  })
-);
-
-router.use('/outside/pc/task/delete', (ctx) =>
-  HttpClient.proxy(ctx, {
-    host: '30.40.59.137',
-    port: 10012,
-    headers: {
-      cookie: 'VIPPUBLINKJSESSIONID=25c91850-650b-49c9-8bc2-9f8da584992c',
-    },
-  })
-);
-
-// 通知中心改造
-router.use('/outside/*', (ctx) =>
-  HttpClient.proxy(ctx, {
-    host: '30.40.59.106',
-    port: 10002,
-    headers: {
-      cookie:
-        'VIPPUBLINKJSESSIONID=f560fed5-4bc4-4ff0-8638-e6666c18a31a; JSESSIONID=5442CD36355252A20E2CC1DAB778E536; __wpkreporterwid_=a99f79d5-3645-407a-3bf8-d6774e411773',
-    },
-  })
-);
-
-router.use('/approve/search', (ctx) =>
-  HttpClient.proxy(ctx, {
-    host: '47.98.255.79',
-    port: 10002,
   })
 );
 

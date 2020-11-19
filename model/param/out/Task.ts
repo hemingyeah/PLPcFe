@@ -47,17 +47,23 @@ export type getTaskAllotUserInfoResult = Result<PageInfo<TaskAllotUserInfo>>
 /* 工单指派-指派审批信息 */
 export type getTaskAllotApproveResult = Result<TaskApprove>
 
+/* 工单指派-指派工单池-审批信息 */
+export type getTaskAllotTaskPollApproveResult = MsgModel<TaskApprove>
+
 /* 工单指派-指派-负责人 */
 export type getTaskAllotResult = Result<{ state: string, stateDisplayName: string }>
 
 /* 工单指派-指派-工单池 */
 export type getTaskAllotTaskPoolResult = MsgModel<null>
 
-/* 工单指派-指派-工单池有权限接单人员列表 */
+/* 工单指派-指派-工单池 有权限接单 人员列表 */
 export type getTaskPoolAuthUsersResult = MsgModel<TaskPoolUser[]>
 
 /* 工单指派-指派-工单池订阅人员列表 */
-export type getTaskPoolSubscriptionUsersResult = LoginUser[]
+export type getTaskPoolSubscriptionUsersResult = Result<TaskPoolUser[]>
+
+/* 工单指派-指派-客户团队工单池数量 */
+export type getCustomerTagTaskPoolCountResult = Result<number>
 
 /* 工单指派-转派 团队列表信息 */
 export type getTaskTagListResult = PageInfo<Tag[]>

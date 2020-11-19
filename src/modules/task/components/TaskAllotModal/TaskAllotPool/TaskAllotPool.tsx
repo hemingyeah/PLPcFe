@@ -1,5 +1,5 @@
 /* api */
-import { getTaskAllotPoolList, getTaskPoolAuthUserList, getTaskPoolSubscriptionUserList } from '@src/api/TaskApi'
+import { getTaskPoolAuthUserList, getTaskPoolSubscriptionUserList, getCustomerTagTaskPoolCount, getTaskPoolList } from '@src/api/TaskApi'
 /* components */
 import TaskAllotMap from '@src/modules/task/components/TaskAllotModal/TaskAllotMap/TaskAllotMap.tsx'
 import TaskAllotPoolNotification from '@src/modules/task/components/TaskAllotModal/TaskAllotPool/TaskAllotPoolNotification/TaskAllotPoolNotification.tsx'
@@ -13,6 +13,7 @@ import Customer from '@model/entity/Customer'
 import CustomerAddress from '@model/entity/CustomerAddress'
 import LoginUser from '@model/entity/LoginUser/LoginUser'
 import Tag from '@model/entity/Tag/Tag'
+import TaskPoolUser from '@model/entity/TaskPoolUser'
 /* enum */
 import DateFormatEnum from '@model/enum/DateFormatEnum'
 /* image */
@@ -22,7 +23,7 @@ import DefaultHead from '@src/assets/img/avatar.png'
 import { TaskAllotPoolInfoData } from '@src/modules/task/components/TaskAllotModal/TaskAllotPool/TaskAllotPoolInterface'
 /* model */
 import Page from '@model/Page'
-import { getTaskPoolAuthUsersResult, getTaskPoolSubscriptionUsersResult, getUserListByTagResult } from '@model/param/out/Task'
+import { getCustomerTagTaskPoolCountResult, getTaskPoolAuthUsersResult, getTaskPoolSubscriptionUsersResult, getUserListByTagResult, getTaskSearchListResult } from '@model/param/out/Task'
 import { REQUIRE_OTHER_NOTIFICATION_USER_MEESSAGE } from '@src/model/const/Alert'
 import { DepeMultiUserResult } from '@src/modules/task/components/TaskAllotModal/TaskAllotModalInterface'
 /* vue */
@@ -30,12 +31,15 @@ import { Vue, Component, Watch, Prop } from 'vue-property-decorator'
 import { CreateElement } from 'vue'
 /* sccss */
 import '@src/modules/task/components/TaskAllotModal/TaskAllotPool/TaskAllotPool.scss'
+/* types */
+import StateColorMap from '@model/types/StateColor'
 /* util */
 import Log from '@src/util/log.ts'
 import { formatDate } from '@src/util/lang'
 import Platform from '@src/util/Platform'
 import { findComponentUpward } from '@src/util/assist'
 import { openTabForTaskView, openTabForCustomerView } from '@src/util/business/openTab'
+import { fmt_address } from '@src/filter/fmt'
 
 declare let AMap: any
 
@@ -61,8 +65,11 @@ window.openCustomerViewFunc = function openCustomerViewFunc(customerId: string) 
 export default class TaskAllotPool extends Vue {
   // 显示状态
   @Prop() readonly show: boolean | undefined
+  /* 工作状态颜色数组 */
+  @Prop() readonly stateColorMap: StateColorMap | undefined
   /* 工单信息 */
   @Prop() readonly task: any | undefined
+  
   
   /* 地图用户信息弹窗 */
   private AMapUserInfoWindow: any = null
@@ -138,7 +145,8 @@ export default class TaskAllotPool extends Vue {
       return Log.warn('userPage.list is empty', this.buildUserMarkers.name)
     }
     
-    userPage.list.forEach((user: LoginUser) => {
+    userPage.list.forEach((taskPoolUser: TaskPoolUser) => {
+      let user: LoginUser = taskPoolUser.user
       let { longitude, latitude } = user
       // 无经纬度
       if (!longitude && !latitude) return
@@ -148,7 +156,7 @@ export default class TaskAllotPool extends Vue {
         position: [longitude, latitude],
         title: user.displayName,
         map: amap,
-        extData: user,
+        extData: taskPoolUser,
         content: `<img class='staff-header' width='42' height='42' src='${user.head || DefaultHead}' />`
       })
       
@@ -158,7 +166,7 @@ export default class TaskAllotPool extends Vue {
           closeWhenClickMap: true,
           isCustom: true,
           offset: new AMap.Pixel(0, -34),
-          content: this.buildUserMarkerInfo(event)
+          content: this.buildUserMarkerInfo(event, amap)
         })
         
         this.AMapUserInfoWindow.open(amap, event.target.getPosition())
@@ -178,7 +186,7 @@ export default class TaskAllotPool extends Vue {
     }
     
     this.taskPoolList.forEach((task: any) => {
-      let { longitude, latitude } = task?.taddress || {}
+      let { longitude, latitude } = task?.address || {}
       // 无经纬度
       if (!longitude && !latitude) return
       
@@ -208,8 +216,9 @@ export default class TaskAllotPool extends Vue {
   /**
    * @description 构建人员信息弹窗
   */
-  private buildUserMarkerInfo(event: any) : string {
-    let user: LoginUser = event?.target?.getExtData() || new LoginUser()
+  private buildUserMarkerInfo(event: any, amap: any) : string {
+    let taskAllotUser: TaskPoolUser = event?.target?.getExtData()
+    let user = taskAllotUser.user
     
     return (
       `
@@ -217,7 +226,11 @@ export default class TaskAllotPool extends Vue {
           <div class="task-pool-user-info">
             <div class="task-pool-user-info-left">
               <span class='task-pool-user-name'>${user.displayName}</span>
-              <span class='task-pool-user-state'>${user.state || ''}</span>
+              <span class='user-state-round' style="background-color: ${this.stateColorMap && this.stateColorMap[user.state || '']}">
+              </span>
+              <span class='task-pool-user-state'>
+                ${user.state || ''}
+              </span>
             </div>
             <div class='task-pool-user-phone'>${user.cellPhone || ''}</div>
           </div>
@@ -227,15 +240,14 @@ export default class TaskAllotPool extends Vue {
               Array.isArray(user.tagList) 
               ? (
                 user.tagList.map((tag: Tag) => {
-                  return `<span>${tag.tagName}</span>`
-                }).join()
+                  return `<span>${tag.tagName || tag}</span>`
+                }).join(', ')
               )
               : ''
             }
           </div>
           <div class="task-pool-user-count">
-            <span>未完成工单: ${user.unfinishedTask || ''}</span>
-            <span>本月已完成工单量: ${user.todayFinishedTask || ''}</span>
+            <span>未完成工单: ${taskAllotUser.unFinished || ''}</span>
           </div>
         </div>
       `
@@ -252,14 +264,13 @@ export default class TaskAllotPool extends Vue {
       customerName = '',
       taskId,
       taskNo = '',
-      lmName = '', 
+      linkMan = {}, 
       lmPhone = '', 
-      customerAddress,
+      address = {},
       planTime = '',
       havePermissionUserCount,
       isTimeout
     } = task
-    customerAddress = new CustomerAddress(customerAddress)
     
     return (
       `
@@ -269,11 +280,10 @@ export default class TaskAllotPool extends Vue {
           ${isTimeout ? '<div class="map-task-content-window-header-timeout">超时接单</div>' : ''}
         </div>
         <p><label>工单编号：</label><span class="link-text" onclick="openTaskViewFunc('${taskId}')">${ taskNo }</span></p>
-        <p><label>联系人：</label>${ lmName }</p>
-        <p><label>电话：</label>${ lmPhone }</p>
-        <p><label>地址：</label>${ customerAddress?.toString() }</p>
+        <p><label>联系人：</label>${ linkMan.name || '' }</p>
+        <p><label>电话：</label>${ linkMan.phone || '' }</p>
+        <p><label>地址：</label>${ fmt_address(address) || '' }</p>
         <p><label>计划时间：</label>${ formatDate(planTime, DateFormatEnum.YTMHMS) || '' }</p>
-        <p><label>有权限接单人员：</label>${ havePermissionUserCount ? `${havePermissionUserCount}个` : '' }</p>
         <div class="info-window-arrow"></div>
       </div>
     `
@@ -319,7 +329,9 @@ export default class TaskAllotPool extends Vue {
     return (
       getTaskPoolAuthUserList(params).then((result: getTaskPoolAuthUsersResult) => {
         let isSuccess = result.succ
-        if (!isSuccess) return
+        if (!isSuccess) {
+          return Platform.alert(result.message)
+        }
         
         this.userAuthPage.list = result.data || []
         
@@ -335,20 +347,44 @@ export default class TaskAllotPool extends Vue {
   public fetchSubscriptionUsers(): Promise<any> {
     Log.succ(Log.Start, this.fetchSubscriptionUsers.name)
     
+    return (
+      getTaskPoolSubscriptionUserList().then((data: getTaskPoolSubscriptionUsersResult) => {
+        let isSuccess = data.success
+        if (!isSuccess) {
+          return Platform.alert(data.message)
+        }
+        
+        this.userSubscriptionPage.list = data.result || []
+        
+        Log.succ(Log.End, this.fetchSubscriptionUsers.name)
+      })
+    )
+  }
+  
+  /** 
+   * @description 查询客户团队工单池数量
+  */
+  private fetchCustomerTagTaskPoolCount() {
+    Log.succ(Log.Start, this.fetchCustomerTagTaskPoolCount.name)
+    
     let params = {
-      taskTypeId: this.task?.templateId || '',
-      customerId: this.customer.id || '',
-      taskLat: this.customerAddress.adLatitude || '',
-      taskLng: this.customerAddress.adLongitude || '',
+      cusTagIds: this.customer.tags?.map((tag: Tag) => tag.id) || []
     }
     
     return (
-      getTaskPoolSubscriptionUserList(params).then((result: getTaskPoolSubscriptionUsersResult) => {
-        if (!Array.isArray(result)) return
+      getCustomerTagTaskPoolCount(params)
+      .then((data: getCustomerTagTaskPoolCountResult) => {
+        let isSuccess = data.success
+        if (!isSuccess) {
+          return Platform.alert(data.message)
+        }
         
-        this.userSubscriptionPage.list = result|| []
+        this.taskPoolInfo.customerTeamUnAcceptCount = data.result
         
-        Log.succ(Log.End, this.fetchSubscriptionUsers.name)
+        Log.succ(Log.End, this.fetchCustomerTagTaskPoolCount.name)
+      })
+      .catch((err: any) => {
+        console.error(err)
       })
     )
   }
@@ -357,33 +393,22 @@ export default class TaskAllotPool extends Vue {
    * @description 获取工单池列表
   */
   private fetchTaskPoolList() {
-    let taskPoolParams = {
-      planTime: 'all',
-      createTime: 'all',
-      templateId: 'all',
-      startDistance: 0,
-      endDistance: 100,
-      sortCondition: 'distance',
-      isDescending: 'true',
-      myLatitude: 36.11097,
-      myLongitude: 120.39247,
-      pageSize: 999,
-      pageNum: 1,
-      noGeo: false,
-    }
-    
     return (
-      getTaskAllotPoolList(taskPoolParams).then(result => {
-        let isSuccess = result.success
+      getTaskPoolList({ ids: [] }).then((data: getTaskSearchListResult) => {
+        let isSuccess = data.success
         if (!isSuccess) {
-          return Platform.alert(result.message)
+          return Platform.alert(data.message)
         }
         
-        this.taskPoolList = result?.result?.list.map((task: any) => {
+        // 工单池列表数据
+        this.taskPoolList = data?.result?.content.map((task: any) => {
           let isTimeout = task.overTime ? task.overTime < new Date().getTime() : false
           task.isTimeout = isTimeout
           return task
         }) || []
+        // 工单池总量
+        this.taskPoolInfo.taskPoolAllCount = this.taskPoolList.length
+        
       })
     )
   }
@@ -437,6 +462,8 @@ export default class TaskAllotPool extends Vue {
     this.fetcAuthhUsers()
     // 查询订阅工单池人员列表
     this.fetchSubscriptionUsers()
+    // 查询客户团队统计工单池数量
+    this.fetchCustomerTagTaskPoolCount()
   }
   
   /**
@@ -447,7 +474,7 @@ export default class TaskAllotPool extends Vue {
       // @ts-ignore
       this.$refs.TaskAllotMap.outsideMapInit()
     } catch (error) {
-      console.warn('mapInit -> error', error)
+      console.warn('TaskAllotPool -> mapInit -> error', error)
     }
   }
   

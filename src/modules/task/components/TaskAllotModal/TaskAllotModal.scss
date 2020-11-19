@@ -2,7 +2,7 @@
 .task-allot-modal {
   display: flex;
   
-  .base-modal {
+  & > .base-modal {
     height: calc(100vh - 100px);
     width: calc(100% - 100px) !important;
   }

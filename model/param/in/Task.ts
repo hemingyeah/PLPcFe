@@ -248,3 +248,12 @@ export interface TaskPoolSubscriptionUsersGetModel {
   // 经度
   taskLng: string | number,
 }
+
+/* 工单指派-客户团队工单池数量 */
+export interface CustomerTahTaskPoolCountGetModel {
+  // 客户团队id列表
+  cusTagIds: string[],
+}
+
+/* 查询工单池数据 */
+export interface TaskPoolSearchModel extends EsTaskSearchInput {}

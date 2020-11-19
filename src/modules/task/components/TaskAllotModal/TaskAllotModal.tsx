@@ -70,6 +70,7 @@ export default class TaskAllotModal extends TaskAllotModalRender {
                 ref='TaskAllotPoolComponent'
                 show={this.allotType === TaskAllotTypeEnum.Pool}
                 style={this.allotContentStyle[TaskAllotTypeEnum.Pool]}
+                stateColorMap={this.stateColorMap}
                 task={this.task}
                 changeNotificationChecked={(value: TaskPoolNotificationTypeEnum[]) => this.onTaskNotificationCheckedChanged(value)}
                 changeNotificationUsers={(value: LoginUser[]) => this.onTaskNotificationUsersChanged(value)}
