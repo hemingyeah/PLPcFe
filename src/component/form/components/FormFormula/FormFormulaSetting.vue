@@ -24,7 +24,7 @@
       <div class="form-item-box">
         <div class="form-formula-setting-result" @click="openFormulaSetDialog">
           <span>计算公式=</span>
-          <span :class="['formula-item', {'operator': item.isOperator}]" v-for="(item, index) in formula" :key="index">{{ item.name }}</span>
+          <span :class="['formula-item', {'operator': item.isOperator, 'delete': item.isDelete}]" v-for="(item, index) in formula" :key="index">{{ item.name }}</span>
         </div>
         <el-checkbox v-model="defaultValueConfig.isNotModify" @change="update(defaultValueConfig, 'defaultValueConfig', true)" :true-label="1" :false-label="0">不允许修改</el-checkbox>
       </div>
@@ -84,13 +84,21 @@ export default {
     /* 支持运算的字段列表 */
     calculationFields() {
       return this.fields.filter(field => {
-        let { formType, options, isHidden } = field;
-        return (formType == 'number' || (formType == 'select' && options.every(item => !isNaN(Number(item.value))))) && !isHidden;
+        let { id, formType, options, isHidden } = field;
+        return (formType == 'number' || (formType == 'select' && options.every(item => !isNaN(Number(item.value))))) && !isHidden && id;
       });
     },
     /* 计算公式 */
     formula() {
-      return this.field.setting.formula || [];
+      let formula = this.field.setting.formula || [];
+
+      // 判断计算公式的运算对象是否已被删除，增加标识
+      formula.map(item => {
+        let index = this.fields.findIndex(field => field.fieldName == item.value);
+        item.isDelete = !item.isOperator && index == -1;
+      })
+
+      return formula;
     }
   },
   methods: {
@@ -152,6 +160,11 @@ export default {
       &:not(.operator) {
         background: $bg-color-l1;
         border-radius: 2px;
+      }
+
+      &.delete {
+        color: $color-danger;
+        background-color: rgba(245, 108, 108, 0.2) !important;
       }
     }
   }

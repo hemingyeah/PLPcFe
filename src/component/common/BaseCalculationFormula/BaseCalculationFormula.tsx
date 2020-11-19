@@ -25,12 +25,15 @@ class CalculationFormulaItem {
   isOperator: boolean = false
   // 当前项是否是错误的
   isError: boolean = false
+  // 当前项是否已被删除
+  isDelete: boolean = false
   
-  constructor(name: string, value: string, isOperator: boolean, isError?: boolean) {
+  constructor(name: string, value: string, isOperator: boolean, isError?: boolean, isDelete?: boolean) {
     this.name = name || ''
     this.value = value || ''
     this.isOperator = isOperator || false
     this.isError = isError || false
+    this.isDelete = isDelete || false
   }
 }
 
@@ -94,6 +97,13 @@ export default class BaseCalculationFormula extends Vue {
    * @description 确定
   */
   private confirm(): void {
+    // 判断是否存在已删除的无效字段
+    let invalidFields = this.calculationFormula.filter(item => item.isDelete);
+    if (invalidFields.length) {
+      this.errorMessage = '存在已被删除的无效字段，请重新配置计算公式'
+      return
+    }
+
     let result = validate(this.calculationFormulaFormatted, this.defaultNumber)
     let isSuccess = result.isSuccess
 
@@ -227,7 +237,7 @@ export default class BaseCalculationFormula extends Vue {
             {
               this.calculationFormula.map((item: any) => {
                 return (
-                  <span class={{ operator: item.isOperator }}>
+                  <span class={{ operator: item.isOperator, delete: item.isDelete }}>
                     {item.name}
                   </span>
                 )

@@ -26,6 +26,12 @@
       &:not(.operator) {
         min-width: 30px;
       }
+
+      &.delete {
+        color: $color-danger;
+        border-color: rgba(245, 108, 108, 0.2) !important;
+        background-color: rgba(245, 108, 108, 0.2) !important;
+      }
     }
   }
 
@@ -57,7 +63,7 @@
       margin-top: 0px;
 
       .calculation-formula-title {
-        min-width: 58px;
+        min-width: 66px;
       }
 
       span {
