@@ -337,7 +337,10 @@ export default {
           isShopWindow: isShopWindow ? true : false,
           isShow: isShow ? true : false,
           id,
+          relatedId:item.id,
           baseRepertory: item.baseRepertory,
+          repertoryCount: item.repertoryCount,
+          safetyStock: item.safetyStock
         };
       });
     },
@@ -413,10 +416,24 @@ export default {
         )
         return
       }
-
+      let outstockBatchFormList = this.selected.map((item) => {
+        return {
+          id: item.relatedId,
+          sparepart: {
+            id: item.id,
+            name: item.name,
+            serialNumber: item.serialNumber,
+            type: item.type,
+            standard: item.standard
+          },
+          repertory: item.baseRepertory,
+          repertoryCount: item.repertoryCount,
+          safetyStock: item.safetyStock
+        }
+      })
       this.outstockBatchDialog = true;
       this.$nextTick(() => {
-        this.$refs.outstockBatchForm.receive([], this.userId);
+        this.$refs.outstockBatchForm.receive(outstockBatchFormList || [], this.userId);
       });
     },
     search() {
