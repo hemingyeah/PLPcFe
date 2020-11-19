@@ -1188,7 +1188,6 @@ export default {
       this.outstockBatchDialog = true;
 
       this.$nextTick(() => {
-        console.log(data)
         this.$refs.outstockBatchForm.receive(data, this.userId);
       });
     },

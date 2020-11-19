@@ -46,7 +46,7 @@
           type="primary"
           native-type="submit"
           class="task-mr12"
-          @event="instockBatchDialog = true"
+          @event="instockBatch"
         >
           入库
         </base-button>
@@ -112,7 +112,18 @@
     </div>
     <!-- 分页 -->
     <div class="spare-parts-foot task-flex task-ai">
-      <div class="task-span1"></div>
+      <div class="task-span1">
+        <div class="task-c6 task-font14 task-mt8" v-show="selected.length">
+          已选择
+          <span class="task-c2">
+            {{ selected.length }}
+          </span>
+          条
+          <span class="task-c2 task-pointer" @click="toggleSelection"
+            >清空</span
+          >
+        </div>
+      </div>
 
       <el-pagination
         class="comment-list-table-footer-pagination"
@@ -143,7 +154,7 @@
         <base-button type="ghost" @event="outstockBatchDialog = false"
           >取 消</base-button
         >
-        <base-button type="primary">确 定</base-button>
+        <base-button type="primary" @event="outstockBatchSave">确 定</base-button>
       </div>
     </el-dialog>
     <!-- E 出库 -->
@@ -159,12 +170,16 @@
         ref="instockBatchForm"
         :repertory="manageRepertories"
         :sparepart-config="sparepartConfig"
+        type="mall"
+        :repertoryName="tableData[0].baseRepertory"
       ></part-instockBatch-form>
       <div slot="footer" class="dialog-footer">
         <base-button type="ghost" @event="instockBatchDialog = false"
           >取 消</base-button
         >
-        <base-button type="primary">确 定</base-button>
+        <base-button type="primary" @event="instockBatchSave"
+          >确 定</base-button
+        >
       </div>
     </el-dialog>
     <!-- E 入库 -->
@@ -337,12 +352,24 @@ export default {
           isShopWindow: isShopWindow ? true : false,
           isShow: isShow ? true : false,
           id,
-          relatedId:item.id,
+          relatedId: item.id,
           baseRepertory: item.baseRepertory,
           repertoryCount: item.repertoryCount,
-          safetyStock: item.safetyStock
+          safetyStock: item.safetyStock,
         };
       });
+
+      if (this.selected.length) {
+        this.$nextTick(() => {
+          this.selected.forEach((item) => {
+            this.tableData.forEach((v) => {
+              if (v.id === item.id) {
+                this.$refs.multipleTable.toggleRowSelection(v);
+              }
+            });
+          });
+        });
+      }
     },
     /*获取备件设置 */
     async sparepartConfigs() {
@@ -363,22 +390,23 @@ export default {
     },
 
     handleSelection(selection) {
-
       let tv = this.computeSelection(selection);
       // 在需要限制最多选择500个备件时，取消function内部全部注释即可
-      let original = this.selected
-        .filter(ms => this.tableData.some(cs => cs.id === ms.id));
-      let unSelected = this.tableData
-        .filter(c => original.every(oc => oc.id !== c.id));
+      let original = this.selected.filter((ms) =>
+        this.tableData.some((cs) => cs.id === ms.id)
+      );
+      let unSelected = this.tableData.filter((c) =>
+        original.every((oc) => oc.id !== c.id)
+      );
 
       if (tv.length > 500) {
         this.$nextTick(() => {
           original.length > 0
-            ? unSelected.forEach(row => {
-              this.$refs.multipleTable.toggleRowSelection(row, false);
-            })
+            ? unSelected.forEach((row) => {
+                this.$refs.multipleTable.toggleRowSelection(row, false);
+              })
             : this.$refs.multipleTable.clearSelection();
-        })
+        });
         return this.$platform.alert(`最多只能选择500条数据`);
       }
       this.selected = tv;
@@ -386,8 +414,9 @@ export default {
 
     computeSelection(selection) {
       let tv = [];
-      tv = this.selected
-        .filter(ms => this.tableData.every(c => c.id !== ms.id));
+      tv = this.selected.filter((ms) =>
+        this.tableData.every((c) => c.id !== ms.id)
+      );
       tv = _.uniqWith([...tv, ...selection], _.isEqual);
       return tv;
     },
@@ -398,11 +427,34 @@ export default {
       const { manager } = this.tableData[0].baseRepertory;
       let isManage;
       if (manager) {
-        isManage = JSON.parse(manager).some(item => {
-          return item.userId == this.userId
-        })
+        isManage = JSON.parse(manager).some((item) => {
+          return item.userId == this.userId;
+        });
       }
-      return isManage
+      return isManage;
+    },
+    /*清空 */
+    toggleSelection() {
+      this.selected = [];
+      this.$refs.multipleTable.clearSelection();
+    },
+    /*选中的数据 */
+    checkSelected() {
+      return this.selected.map((item) => {
+        return {
+          id: item.relatedId,
+          sparepart: {
+            id: item.id,
+            name: item.name,
+            serialNumber: item.serialNumber,
+            type: item.type,
+            standard: item.standard,
+          },
+          repertory: item.baseRepertory,
+          repertoryCount: item.repertoryCount,
+          safetyStock: item.safetyStock,
+        };
+      });
     },
     /*出库 */
     outstockBatch() {
@@ -413,29 +465,95 @@ export default {
       if (!this.judgeSelectManager()) {
         this.$platform.alert(
           `尚未给您分配"${this.tableData[0].baseRepertory.name}"的管理员权限，请联系管理员或到备件库管理中设置`
-        )
-        return
+        );
+        return;
       }
-      let outstockBatchFormList = this.selected.map((item) => {
-        return {
-          id: item.relatedId,
-          sparepart: {
-            id: item.id,
-            name: item.name,
-            serialNumber: item.serialNumber,
-            type: item.type,
-            standard: item.standard
-          },
-          repertory: item.baseRepertory,
-          repertoryCount: item.repertoryCount,
-          safetyStock: item.safetyStock
-        }
-      })
+      let outstockBatchFormList = this.checkSelected();
       this.outstockBatchDialog = true;
       this.$nextTick(() => {
-        this.$refs.outstockBatchForm.receive(outstockBatchFormList || [], this.userId);
+        this.$refs.outstockBatchForm.receive(
+          outstockBatchFormList || [],
+          this.userId
+        );
       });
     },
+    /*入库 */
+    instockBatch() {
+      if (!this.allowInout) {
+        this.$platform.alert("对不起，您没有该操作权限");
+        return;
+      }
+      if (!this.judgeSelectManager()) {
+        this.$platform.alert(
+          `尚未给您分配"${this.tableData[0].baseRepertory.name}"的管理员权限，请联系管理员或到备件库管理中设置`
+        );
+        return;
+      }
+      let instockBatchFormList = this.checkSelected();
+      this.instockBatchDialog = true;
+      this.$nextTick(() => {
+        this.$refs.instockBatchForm.receive(instockBatchFormList || []);
+      });
+    },
+    /*入库请求 */
+    instockBatchSave: _.debounce(async function () {
+      let form = this.$refs.instockBatchForm;
+      if (null == form) return;
+
+      let instock = await form.pack();
+      if (!Array.isArray(instock) || instock.length == 0) return;
+
+      this.pending = true;
+
+      try {
+        let result = await this.$http.post(
+          "/partV2/repertory/stockInOutBach",
+          instock
+        );
+
+        if (result.status == 0) {
+          this.$platform.toast("批量入库成功").then(() => {
+            this.initialization()
+            this.getShopSparepartRepertory()
+          });
+          this.instockBatchDialog = false;
+        } else {
+          this.$platform.alert(result.message);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    }, 1000),
+    /*出库请求*/
+    outstockBatchSave: _.debounce(async function () {
+      let form = this.$refs.outstockBatchForm;
+
+      if (null == form) return;
+
+      let outstock = await form.pack();
+
+      if (!Array.isArray(outstock) || outstock.length == 0) return;
+
+      this.pending = true;
+
+      try {
+        let result = await this.$http.post(
+          "/partV2/repertory/stockInOutBach",
+          outstock
+        );
+        if (result.status == 0) {
+          this.$platform.toast("批量出库成功").then(() => {
+            this.initialization()
+            this.getShopSparepartRepertory()
+          });
+          this.outstockBatchDialog = false;
+        } else {
+          this.$platform.alert(result.message);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    }, 1000),
     search() {
       const { selectState, searchParts, selectStock } = this;
       this.params.pageNum = 1;
