@@ -5,6 +5,7 @@ import TaskConfig from '@model/types/TaskConfig'
 import TaskAllotUserInfo from '@model/entity/TaskAllotUserInfo'
 /* enum */
 import TaskAllotTypeEnum from '@model/enum/TaskAllotTypeEnum'
+import ComponentNameEnum from '@model/enum/ComponentNameEnum'
 /* props */
 import TaskAllotModalProps from '@src/modules/task/components/TaskAllotModal/TaskAllotModalProps'
 /* types */
@@ -21,6 +22,8 @@ class TaskAllotModalData extends TaskAllotModalProps {
   public executorUser: LoginUser | TaskAllotUserInfo | null = null
   /* 是否是按团队派单 */
   public isAllotByTag: boolean = true
+  /* 已经加载的组件列表 TODO: 实现 keep-alive component 功能 */
+  public loadedComponents: string[] = [ComponentNameEnum.TaskAllotExcutor]
   /* 匹配的规则结果 */
   public matchRule: AutoDispatchListItem | null = null
   /* 最大协同人数量 */

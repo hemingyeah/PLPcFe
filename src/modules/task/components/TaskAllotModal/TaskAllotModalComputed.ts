@@ -2,10 +2,19 @@
 import AuthEnum from '@model/enum/AuthEnum'
 import TaskStateEnum from '@model/enum/TaskStateEnum'
 import TaskAllotTypeEnum from '@model/enum/TaskAllotTypeEnum'
+import ComponentNameEnum from '@model/enum/ComponentNameEnum'
 /* data */
 import TaskAllotModalData from '@src/modules/task/components/TaskAllotModal/TaskAllotModalData'
+/* util */
+import { findComponentDownward } from '@src/util/assist'
 
 class TaskAllotModalComputed extends TaskAllotModalData {
+  
+  /* 工单派单负责人表格组件 */
+  get TaskAllotExcutorTableComponent(): any {
+    return findComponentDownward(this, ComponentNameEnum.TaskAllotUserTable)
+  }
+  
   get allotContentStyle() {
     return {
       [TaskAllotTypeEnum.Person]: { display: this.allotType === TaskAllotTypeEnum.Person ? 'block' : 'none' },
@@ -53,6 +62,20 @@ class TaskAllotModalComputed extends TaskAllotModalData {
     let loginUser = this.loginUser || {}
     let executorUser = this.task?.executor || {}
     return executorUser.userId && loginUser.userId && executorUser.userId == loginUser.userId
+  }
+  
+  /** 
+   * @description 是否显示工单池组件
+  */
+  get isShowTaskPoolComponent() {
+    return this.loadedComponents.includes(ComponentNameEnum.TaskAllotPool)
+  }
+  
+  /** 
+   * @description 是否显示自动派单组件
+  */
+  get isShowTaskAutoDispatchComponent() {
+    return this.loadedComponents.includes(ComponentNameEnum.TaskAllotAuto)
   }
 }
 

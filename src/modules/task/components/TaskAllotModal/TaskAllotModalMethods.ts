@@ -35,6 +35,14 @@ import Log from '@src/util/log.ts'
 import Platform from '@src/util/Platform'
 /* vue */
 import { Emit } from 'vue-property-decorator'
+import ComponentNameEnum from '@model/enum/ComponentNameEnum'
+
+/* 加载的组件 */
+const LoadComponentMap = {
+  [TaskAllotTypeEnum.Person]: ComponentNameEnum.TaskAllotExcutor,
+  [TaskAllotTypeEnum.Pool]: ComponentNameEnum.TaskAllotPool,
+  [TaskAllotTypeEnum.Auto]: ComponentNameEnum.TaskAllotAuto,
+}
 
 enum TaskAllotModalEmitEventEnum {
   Success = 'success'
@@ -183,6 +191,8 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
   */
   public deleteExcutorUser(user: LoginUser) {
     this.executorUser = null
+    /* 清除选择负责人表格列表 负责人信息 */
+    this.TaskAllotExcutorTableComponent?.outsideUpwardSetClearExcutorUser()
   }
   
   /** 
@@ -447,6 +457,7 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
   */
   public handlerAllotTypeChange(type: TaskAllotTypeEnum) {
     this.allotType = type
+    this.loadedComponents.push(LoadComponentMap[type])
   }
   
   /** 
@@ -459,13 +470,15 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
   }
   
   /** 
+   * @deprecated
    * @description 工单池通知方式变动
   */
   public onTaskNotificationCheckedChanged(value: TaskPoolNotificationTypeEnum[]): void {
     this.taskPoolNotificationCheckd = value
   }
-
+  
   /** 
+   * @deprecated
    * @description 工单池通知人员信息变动
   */
   public onTaskNotificationUsersChanged(value: LoginUser[]): void {

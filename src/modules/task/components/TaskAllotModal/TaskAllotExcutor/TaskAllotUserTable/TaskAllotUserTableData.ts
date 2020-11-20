@@ -3,6 +3,7 @@ import TaskAllotUserTableComponents from '@src/modules/task/components/TaskAllot
 /* entity */
 import LoginUser from '@model/entity/LoginUser/LoginUser'
 import Tag from '@model/entity/Tag/Tag'
+import TaskAllotUserInfo from '@model/entity/TaskAllotUserInfo'
 /* interface */
 import { ElSelectOption } from '@src/modules/task/components/TaskAllotModal/TaskAllotExcutor/TaskAllotUserTable/TaskAllotUserTableInterface'
 /* model */
@@ -28,7 +29,7 @@ class TaskAllotUserTableData extends TaskAllotUserTableComponents {
   /* 表格排序数据 */
   public orderDetail: { order: boolean, code: number } | {} = {}
   /* 当前选择的负责人 */
-  public selectExecutorUser: LoginUser | null = null
+  public selectExecutorUser: TaskAllotUserInfo = new TaskAllotUserInfo()
   /* 当前选择的团队 */
   public selectTeams: Tag[] = []
   /* 当前选择的团队人员列表 */

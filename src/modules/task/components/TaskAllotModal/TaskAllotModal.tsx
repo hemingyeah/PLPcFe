@@ -10,8 +10,6 @@ import ComponentNameEnum from '@model/enum/ComponentNameEnum'
 import TaskAllotTypeEnum from '@model/enum/TaskAllotTypeEnum'
 /* entity */
 import LoginUser from '@model/entity/LoginUser/LoginUser'
-/* model */
-import { TaskPoolNotificationTypeEnum } from '@src/modules/task/components/TaskAllotModal/TaskAllotPool/TaskAllotPoolModel'
 /* vue */
 import { CreateElement } from 'vue'
 /* vue */
@@ -36,8 +34,8 @@ import AutoDispatchListItem from '@model/types/AutoDispatchListItem'
 })
 
 export default class TaskAllotModal extends TaskAllotModalRender {
-    
-  render(h: CreateElement) {    
+  
+  render(h: CreateElement) {
     const attrs = this.getAttributes()
     
     return (
@@ -59,28 +57,36 @@ export default class TaskAllotModal extends TaskAllotModalRender {
         <div class='task-allot-content'>
           <keep-alive>
             <div class='task-allot-content-active'>
-              <task-allot-excutor
-                ref='TaskAllotExcutorComponent'
-                style={this.allotContentStyle[TaskAllotTypeEnum.Person]}
-                stateColorMap={this.stateColorMap}
-                onSetExecutor={(user: LoginUser) => this.setExecutorUser(user)} 
-                onSetSynergy={(user: LoginUser) => this.setSynergyUser(user)} 
-              />
-              <task-allot-pool 
-                ref='TaskAllotPoolComponent'
-                show={this.allotType === TaskAllotTypeEnum.Pool}
-                style={this.allotContentStyle[TaskAllotTypeEnum.Pool]}
-                stateColorMap={this.stateColorMap}
-                task={this.task}
-                changeNotificationChecked={(value: TaskPoolNotificationTypeEnum[]) => this.onTaskNotificationCheckedChanged(value)}
-                changeNotificationUsers={(value: LoginUser[]) => this.onTaskNotificationUsersChanged(value)}
-              />
-              <task-allot-auto
-                show={this.allotType === TaskAllotTypeEnum.Auto} 
-                style={this.allotContentStyle[TaskAllotTypeEnum.Auto]}
-                changeMatchRule={(rule: AutoDispatchListItem | null) => this.outsideSetMatchRule(rule)}
-              >
-              </task-allot-auto>
+              <div class='task-allot-excutor-container' style={this.allotContentStyle[TaskAllotTypeEnum.Person]}>
+                <task-allot-excutor
+                  ref='TaskAllotExcutorComponent'
+                  stateColorMap={this.stateColorMap}
+                  onSetExecutor={(user: LoginUser) => this.setExecutorUser(user)} 
+                  onSetSynergy={(user: LoginUser) => this.setSynergyUser(user)} 
+                />
+              </div>
+              {
+                this.isShowTaskPoolComponent
+                && (
+                  <task-allot-pool 
+                    ref='TaskAllotPoolComponent'
+                    show={this.allotType === TaskAllotTypeEnum.Pool}
+                    style={this.allotContentStyle[TaskAllotTypeEnum.Pool]}
+                    stateColorMap={this.stateColorMap}
+                    task={this.task}
+                  />
+                )
+              }
+              {
+                this.isShowTaskAutoDispatchComponent
+                && (
+                  <task-allot-auto
+                    show={this.allotType === TaskAllotTypeEnum.Auto} 
+                    style={this.allotContentStyle[TaskAllotTypeEnum.Auto]}
+                    changeMatchRule={(rule: AutoDispatchListItem | null) => this.outsideSetMatchRule(rule)}
+                  />
+                )
+              }
             </div>
           </keep-alive>
         </div>

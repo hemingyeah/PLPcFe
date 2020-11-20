@@ -70,7 +70,6 @@ export default class TaskAllotPool extends Vue {
   /* 工单信息 */
   @Prop() readonly task: any | undefined
   
-  
   /* 地图用户信息弹窗 */
   private AMapUserInfoWindow: any = null
   /* 工单信息弹窗 */
@@ -112,13 +111,6 @@ export default class TaskAllotPool extends Vue {
   /* 客户地址 */
   get customerAddress(): CustomerAddress {
     return this.customer.customerAddress || new CustomerAddress()
-  }
-  
-  @Watch('show')
-  onShowChanged(newValue: boolean) {
-    if (newValue) {
-      this.initialize()
-    }
   }
   
   /** 
@@ -533,6 +525,10 @@ export default class TaskAllotPool extends Vue {
     )
   }
   
+  mounted() {
+    this.initialize()
+  }
+  
   render(h: CreateElement) {
     return (
       <div class={ComponentNameEnum.TaskAllotPool}>
@@ -548,6 +544,7 @@ export default class TaskAllotPool extends Vue {
         >
         </task-allot-pool-notification>
         <task-allot-pool-info 
+          stateColorMap={this.stateColorMap}
           info={this.taskPoolInfo} 
           checked={{ 
             subscription: this.isShowMapTaskPoolSubscriptionUsers,

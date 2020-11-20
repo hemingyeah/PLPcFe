@@ -99,3 +99,24 @@
 .empty-user-button {
   margin-left: 0;
 }
+
+.task-allot-excutor-container {
+  height: 100%;
+}
+
+.task-allot-excutor {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  flex-flow: column !important;
+  height: 100%;
+  
+  .task-allot-user-table {
+    width: 100%;
+    .task-allot-user-table-block {
+      width: 100%;
+    }
+  }
+  .task-allot-map{
+    flex: 1;
+  }
+}

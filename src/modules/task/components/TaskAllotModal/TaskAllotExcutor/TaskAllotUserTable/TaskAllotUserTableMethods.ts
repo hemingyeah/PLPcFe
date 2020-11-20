@@ -600,6 +600,7 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
       this.userPageCheckedMap[key] = isChecked
     }
     /* 设置负责人信息 */
+    this.selectExecutorUser = row
     this.TaskAllotExcutorComponent.outsideUpwardSetSelectedExcutorUser(checked, row)
     /* 地图联动 */
     if (row.lng && row.lat) {
@@ -658,6 +659,14 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
     Log.succ(Log.Start, this.outsideFetchUsers.name)
     
     this.initialize()
+  }
+  
+  /** 
+   * @description 清除负责人信息
+   * -- 支持向上的外部调用的方法
+  */
+  public outsideUpwardSetClearExcutorUser() {
+    this.handlerExcutorCheckedChange(false, this.selectExecutorUser)
   }
   
   /**

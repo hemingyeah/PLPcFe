@@ -17,6 +17,8 @@ import { TaskAllotPoolInfoData } from '@src/modules/task/components/TaskAllotMod
 import DefaultHead from '@src/assets/img/avatar.png'
 /* scss */
 import '@src/modules/task/components/TaskAllotModal/TaskAllotPool/TaskAllotPoolInfo/TaskAllotPoolInfo.scss'
+/* types */
+import StateColorMap from '@model/types/StateColor'
 /* util */
 import { openTabForUserView } from '@src/util/business/openTab'
 
@@ -37,7 +39,8 @@ export default class TaskAllotPoolInfo extends Vue {
     subscription: boolean,
     auth: boolean
   } | undefined
-  
+  /* 工作状态颜色数组 */
+  @Prop() readonly stateColorMap: StateColorMap | undefined
   /* 选中状态 */
   @Prop() readonly users: {
     subscription: TaskPoolUser[],
@@ -59,7 +62,7 @@ export default class TaskAllotPoolInfo extends Vue {
     return value
   }
 
-  private renderUserItem(info: TaskPoolUser, isObjectTagList: boolean = false) {
+  private renderUserItem(info: TaskPoolUser) {
     const user: LoginUser = info.user
     
     return (
@@ -69,6 +72,7 @@ export default class TaskAllotPoolInfo extends Vue {
           <div class="task-pool-user-info">
             <div class="task-pool-user-info-left">
               <span class='task-pool-user-name'>{user.displayName}</span>
+              <span class='user-state-round' style={{ backgroundColor: this.stateColorMap && this.stateColorMap[user.state || ''] }}></span>
               <span class='task-pool-user-state'>{user.state || ''}</span>
             </div>
             <div class='task-pool-user-phone'>{user.cellPhone || ''}</div>
@@ -76,17 +80,9 @@ export default class TaskAllotPoolInfo extends Vue {
           <div class="task-pool-user-team">
             服务团队: 
             {
-              isObjectTagList 
-              ? (
-                Array.isArray(user.tagList) 
-                  ? user.tagList.map(tag => tag.tagName).join(', ')
-                  : ''
-              )
-              : (
-                Array.isArray(user.tagList) 
-                  ? user.tagList.join(', ')
-                  : ''
-              )
+              Array.isArray(user.tagList) 
+              ? user.tagList.map(tag => tag.tagName).join(', ')
+              : ''
             }
           </div>
           <div class="task-pool-user-count">
@@ -127,7 +123,7 @@ export default class TaskAllotPoolInfo extends Vue {
             <div>
               {
                 this.users?.auth
-                && this.users.auth.map(info => this.renderUserItem(info, true))
+                && this.users.auth.map(info => this.renderUserItem(info))
               }
             </div>
           </el-collapse-item>
