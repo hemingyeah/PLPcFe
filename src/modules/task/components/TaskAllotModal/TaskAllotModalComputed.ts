@@ -34,7 +34,7 @@ class TaskAllotModalComputed extends TaskAllotModalData {
     let allowModify = this.taskConfig.taskSynergy
     let authorities = this.loginUser?.authorities || {}
     
-    return (
+    return Boolean(
       (states.indexOf(this.task?.state) >= 0 && allowModify && this.isExecutor)
       || this.isCreator
       || authorities[AuthEnum.TASK_EDIT]

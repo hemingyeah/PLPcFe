@@ -1,6 +1,7 @@
 .user-card {
   width: 470px;
-  padding: 20px 0 20px 20px;
+  padding: 30px 0 20px 20px;
+  position: relative;
   .excutor-button {
     border-color: $color-primary;
     color: $color-primary;
@@ -25,10 +26,20 @@
   }
 }
 
+.user-card-close {
+  color: $text-color-secondary;
+  position: absolute;
+  right: 20px;
+  top: 6px;
+  i {
+    font-size: $font-size-base;
+  }
+}
+
 .user-card-header {
   border-bottom: 1px solid $border-color-base;
   display: flex;
-  padding: 12px 12px 12px 0;
+  padding: 0 12px 12px 0;
   &-head {
     display: flex;
     align-items: center;

@@ -25,18 +25,24 @@ import DateUtil from '@src/util/date'
 import Platform from '@src/util/Platform'
 
 enum UserCardEmitEventEnum {
+  // 关闭事件
+  Close = 'close',
+  // 设置负责人事件
   SetExecutor = 'setExecutor',
+  // 设置协同人事件
   SetSynergy = 'setSynergy'
 }
 
 @Component({ name: ComponentNameEnum.UserCard })
 export default class UserCard extends Vue {
   // 向外发布事件的 组件名字
-  @Prop() emitEventComponentName: string | undefined
+  @Prop() readonly emitEventComponentName: string | undefined
   // 工作状态颜色数组
   @Prop() readonly stateColorMap: StateColorMap | undefined
+  // 是否显示 协同人按钮
+  @Prop() readonly showSynergyButton: boolean | undefined
   // 用户id
-  @Prop() userId: string | undefined
+  @Prop() readonly userId: string | undefined
   
   // 等待状态
   private pending: boolean = false
@@ -60,16 +66,7 @@ export default class UserCard extends Vue {
   */
   @Emit(UserCardEmitEventEnum.SetExecutor)
   private setExecutorUser() {
-    // 支持由自定义组件 发出事件
-    if (this.emitEventComponentName) {
-      dispatch.call(
-        this, 
-        this.emitEventComponentName, 
-        UserCardEmitEventEnum.SetExecutor, 
-        this.user
-      )
-    }
-    
+    this.dispatchEvent<LoginUser>(UserCardEmitEventEnum.SetExecutor, this.user)      
     return this.user
   }
   
@@ -78,22 +75,22 @@ export default class UserCard extends Vue {
   */
   @Emit(UserCardEmitEventEnum.SetSynergy)
   private setSynergyUser() {
-    // 支持由自定义组件 发出事件
-    if (this.emitEventComponentName) {
-      dispatch.call(
-        this, 
-        this.emitEventComponentName, 
-        UserCardEmitEventEnum.SetSynergy, 
-        this.user
-      )
-    }
-    
+    this.dispatchEvent<LoginUser>(UserCardEmitEventEnum.SetSynergy, this.user)    
     return this.user
+  }
+  
+  /**
+    * @description 关闭
+  */
+  @Emit(UserCardEmitEventEnum.Close)
+  private close() {
+    this.dispatchEvent<boolean>(UserCardEmitEventEnum.Close, false)
+    return false
   }
   
   /** 
    * @description 计算开始和结束时间
-  */
+  */  
   private computedStartAndEndTime() {
     const day = 3600 * 1000 * 24
     const start = new Date()
@@ -104,7 +101,22 @@ export default class UserCard extends Vue {
     
     this.timeRange = [start, end]
   }
-
+  
+  /** 
+   * @description 发送事件
+  */
+  private dispatchEvent<T>(eventName: UserCardEmitEventEnum, data: T): void {
+    if (!this.emitEventComponentName) return
+    
+    // 支持由自定义组件 发出事件
+    dispatch.call(
+      this,
+      this.emitEventComponentName, 
+      eventName, 
+      data
+    )
+  }
+  
   /** 
    * @description 获取属性列表
   */
@@ -173,7 +185,9 @@ export default class UserCard extends Vue {
     
     return (
       <div class='user-card' {...attrs}>
-          
+          <div class='user-card-close' onClick={() => this.close()}>
+            <i class='iconfont icon-fe-close'></i>
+          </div>
           <div class='user-card-header'>
             <div class='user-card-header-head'>
               <img src={this.user?.head || DefaultHead} />
@@ -184,6 +198,7 @@ export default class UserCard extends Vue {
                 <div class='user-card-header-content-top-left'>
                   <div class='user-card-header-content-name'>
                     {this?.user?.displayName}
+                    <i class='iconfont icon-huangguan'></i>
                   </div>
                   
                   <div class='user-card-header-content-state'>
@@ -198,7 +213,10 @@ export default class UserCard extends Vue {
                 
                 <div class='user-card-header-button-group'>
                   <base-button class='excutor-button' type='ghost' onEvent={this.setExecutorUser}>设为负责人</base-button>
-                  <base-button class='synergy-button' type='ghost' onEvent={this.setSynergyUser}>设为协同人</base-button>
+                  {
+                    this.showSynergyButton
+                    && <base-button class='synergy-button' type='ghost' onEvent={this.setSynergyUser}>设为协同人</base-button>
+                  }
                 </div>
                 
               </div>

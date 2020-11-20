@@ -60,6 +60,8 @@ export default class TaskAllotModal extends TaskAllotModalRender {
               <div class='task-allot-excutor-container' style={this.allotContentStyle[TaskAllotTypeEnum.Person]}>
                 <task-allot-excutor
                   ref='TaskAllotExcutorComponent'
+                  task={this.task}
+                  loginUser={this.loginUser}
                   stateColorMap={this.stateColorMap}
                   onSetExecutor={(user: LoginUser) => this.setExecutorUser(user)} 
                   onSetSynergy={(user: LoginUser) => this.setSynergyUser(user)} 
@@ -74,6 +76,7 @@ export default class TaskAllotModal extends TaskAllotModalRender {
                     style={this.allotContentStyle[TaskAllotTypeEnum.Pool]}
                     stateColorMap={this.stateColorMap}
                     task={this.task}
+                    loginUser={this.loginUser}
                   />
                 )
               }
@@ -82,6 +85,8 @@ export default class TaskAllotModal extends TaskAllotModalRender {
                 && (
                   <task-allot-auto
                     show={this.allotType === TaskAllotTypeEnum.Auto} 
+                    task={this.task}
+                    loginUser={this.loginUser}
                     style={this.allotContentStyle[TaskAllotTypeEnum.Auto]}
                     changeMatchRule={(rule: AutoDispatchListItem | null) => this.outsideSetMatchRule(rule)}
                   />

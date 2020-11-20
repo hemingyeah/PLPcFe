@@ -4,6 +4,8 @@ import { getAutoDispatchResultList } from '@src/api/TaskApi'
 import AllotRuleModal from '@src/modules/task/components/AllotRuleModal/AllotRuleModal.tsx'
 /* enum */
 import ComponentNameEnum from '@model/enum/ComponentNameEnum'
+/* entity */
+import InitDataLoginUser from '@model/entity/InitDataLoginUser'
 /* model */
 import { TaskAutoDispatchResultListModel } from '@model/param/in/Task'
 import { getAutoDispatchResultListResult } from '@model/param/out/Task'
@@ -16,6 +18,7 @@ import Platform from '@src/util/Platform'
 /* vue */
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator'
 import { CreateElement } from 'vue'
+import AuthEnum from '@model/enum/AuthEnum'
 
 @Component({ 
   name: ComponentNameEnum.TaskAllotAuto,
@@ -26,6 +29,8 @@ import { CreateElement } from 'vue'
 export default class TaskAllotAuto extends Vue {
   /* 改变匹配的规则 */
   @Prop() readonly changeMatchRule: Function | undefined
+  /* 当前登录用户 */
+  @Prop() readonly loginUser: InitDataLoginUser | undefined
   /* 工单信息 */
   @Prop() readonly task: any | undefined
   
@@ -79,6 +84,11 @@ export default class TaskAllotAuto extends Vue {
   /* 匹配结果为空 */
   get isMatchResultEmpty() {
     return this.autoDispatchResultList.length <= 0
+  }
+  
+  /* 是否有 系统配置的权限 */
+  get isHaveSystemSettingAuth(): boolean {
+    return Boolean(this.loginUser?.authorities?.[AuthEnum.SYSTEM_SEETING])
   }
   
   /* 构建参数 */
@@ -229,7 +239,10 @@ export default class TaskAllotAuto extends Vue {
       <div class={this.className} {...attrs}>
         <div class={`${this.className}-header`}>
           <el-button type='primary' plain onClick={this.fetchAutoDispatchResultList}>重新匹配</el-button>
-          <el-button type='ghost' onClick={this.openRuleDialog}>添加新规则</el-button>
+          {
+            this.isHaveSystemSettingAuth
+            && <el-button type='ghost' onClick={this.openRuleDialog}>添加新规则</el-button>
+          }
         </div>
         <div class={`${this.className}-content`}>
           <base-timeline 

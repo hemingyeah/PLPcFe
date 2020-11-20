@@ -331,7 +331,7 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
   }
   
   /* 派单审批 */
-  public fetchApproveWithTaskAllot(params: TaskAllotApproveParams): Promise<TaskApprove | void> {
+  public fetchApproveWithTaskAllot(params: TaskAllotApproveParams): Promise<TaskApprove | null> {
     return (
       getTaskAllotApprove(params)
       .then((data: getTaskAllotApproveResult) => {
@@ -345,12 +345,13 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
       }).catch((err) => {
         this.pending = false
         console.error(err)
+        return null
       })
     )
   }
   
   /* 指派到工单池审批 */
-  public fetchTaskAllotTaskPoolApprove(params: AllotTaskPoolParams): Promise<TaskApprove | any | void> {
+  public fetchTaskAllotTaskPoolApprove(params: AllotTaskPoolParams): Promise<TaskApprove | any | null> {
     return (
       getTaskAllotTaskPoolApprove(params)
       .then((result: getTaskAllotTaskPollApproveResult) => {
@@ -365,12 +366,13 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
       }).catch((err) => {
         this.pending = false
         console.error(err)
+        return null
       })
     )
   }
   
   /* 自动派单审批状态 */
-  public fetchApproveWithAutoDispatch(params: AutoDispatchApproveParams): Promise<{ isNeedApprove: boolean, data: TaskApprove } | void> {
+  public fetchApproveWithAutoDispatch(params: AutoDispatchApproveParams): Promise<{ isNeedApprove: boolean, data: TaskApprove } | null> {
     return (
       getTaskAutoDispatchApprove(params)
       .then((result) => {
@@ -385,6 +387,7 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
       }).catch((err) => {
         this.pending = false
         console.error(err)
+        return null
       })
     )
   }
@@ -570,7 +573,7 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
       
       // 验证审批
       const params = { taskId: this.task.id }
-      let approve: TaskApprove | void = await this.fetchApproveWithTaskAllot(params)
+      let approve: TaskApprove | null = await this.fetchApproveWithTaskAllot(params)
       if (!approve) return
       
       let isNeedApprove = approve.needApprove === true
@@ -598,7 +601,7 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
       // 构建参数
       const allotTaskPoolParams = this.buildAllotTaskPoolParams()
       // 验证审批
-      let approve: { isNeedApprove: boolean, data: TaskApprove } | void = await this.fetchTaskAllotTaskPoolApprove(allotTaskPoolParams)
+      let approve: { isNeedApprove: boolean, data: TaskApprove } | null = await this.fetchTaskAllotTaskPoolApprove(allotTaskPoolParams)
       if (!approve) return
       
       let isNeedApprove = approve.isNeedApprove === true
@@ -623,12 +626,10 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
   public async submitWithAutoDispatch() {
     try {
       const autoDispatchApproveParams: AutoDispatchApproveParams = this.buildAutoDispatchApproveParams()
-      let approve = await this.fetchApproveWithAutoDispatch(autoDispatchApproveParams) || {
-        isNeedApprove: false,
-        data: new TaskApprove()
-      }
-      const { isNeedApprove, data } = approve
+      let approve = await this.fetchApproveWithAutoDispatch(autoDispatchApproveParams) || null
+      if (!approve) return
       
+      const { isNeedApprove, data } = approve
       // 有审批
       if (isNeedApprove) {
         this.pending = false
