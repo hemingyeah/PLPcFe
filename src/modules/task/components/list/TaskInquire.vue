@@ -56,6 +56,7 @@ const OperatorSelectOptionsMap = {
     { label: "等于", value: "eq" },
   ],
   multiple: [{ label: "介于", value: "in" }],
+  description: [{ label: "包含", value: "like" }],
   date: [{ label: "介于", value: "between" }],
   select: [{ label: "等于", value: "eq" }],
   cascader: [{ label: "包含", value: "cascader" }],
@@ -87,11 +88,12 @@ function setFieldOperateHandler(field = {}) {
     field.operatorOptions = OperatorSelectOptionsMap.multiple.slice();
   } else if (fieldName == "customer" || fieldName == "product") {
     field.operatorOptions = OperatorSelectOptionsMap.select.slice();
+  } else if (formType === "description" || fieldName === "eventNo") {
+    field.operatorOptions = OperatorSelectOptionsMap.description.slice();
   } else if (
     formType == "text" ||
     formType == "textarea" ||
     formType === "code" ||
-    formType === "description" ||
     formType === "relationProduct" ||
     formType === "relationCustomer"
   ) {
@@ -161,6 +163,15 @@ export default {
         this.list = [1];
       }
     },
+    searchModelCN(v) {
+      if (v.length) {
+        this.list = v.map((item, index) => {
+          return index + 1;
+        });
+      } else {
+        this.list = [1];
+      }
+    },
   },
   computed: {
     fields() {
@@ -206,6 +217,8 @@ export default {
           ) {
             data[key] = item.returnDatas()[key];
           } else if (key === "tags" && item.returnDatas()[key].length) {
+            data[key] = item.returnDatas()[key];
+          } else {
             data[key] = item.returnDatas()[key];
           }
         }
@@ -654,10 +667,10 @@ export default {
           if (MultiFieldNames.indexOf(this.selectedField.fieldName) > -1) {
             f.setting.isMulti = true;
           }
- 
+
           let childComp = null;
 
-          if (f.fieldName == 'customer') {
+          if (f.fieldName == "customer") {
             let value = this.form[f.fieldName];
             childComp = h("search-customer-select", {
               props: {
@@ -754,7 +767,6 @@ export default {
                 },
               }
             );
-
           }
           return h(
             "form-item",

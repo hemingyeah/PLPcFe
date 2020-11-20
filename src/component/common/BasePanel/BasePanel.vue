@@ -108,6 +108,7 @@ export default {
   background-color: #fff;
   box-shadow: -1px 0 8px rgba(0, 0, 0, 0.125);
   overflow: hidden;
+  padding-bottom: 100px;
 }
 .base-panel-title {
   display: flex;
