@@ -26,7 +26,7 @@
           <span>计算公式=</span>
           <span :class="['formula-item', {'operator': item.isOperator, 'delete': item.isDelete}]" v-for="(item, index) in formula" :key="index">{{ item.name }}</span>
         </div>
-        <el-checkbox v-model="defaultValueConfig.isNotModify" @change="update(defaultValueConfig, 'defaultValueConfig', true)" :true-label="1" :false-label="0">不允许修改</el-checkbox>
+        <el-checkbox v-model="defaultValueConfig.isNotModify" @change="update(defaultValueConfig, 'defaultValueConfig', true)" :true-label="1" :false-label="0" :disabled="modifyDisabled">不允许修改</el-checkbox>
       </div>
     </div>
     <!-- end 校验 -->
@@ -81,12 +81,16 @@ export default {
     defaultValueConfig() {
       return this.field.setting.defaultValueConfig || {};
     },
+    /** 
+    * @description 不允许修改
+    * 未配置计算公式时不允许勾选
+    */
+    modifyDisabled() {
+      return this.formula.length == 0;
+    },
     /* 支持运算的字段列表 */
     calculationFields() {
-      return this.fields.filter(field => {
-        let { id, formType, options, isHidden } = field;
-        return (formType == 'number' || (formType == 'select' && options.every(item => !isNaN(Number(item.value))))) && !isHidden && id;
-      });
+      return this.fields.filter(field => field.formType == 'number' && field.id && !field.isHidden);
     },
     /* 计算公式 */
     formula() {
@@ -117,6 +121,15 @@ export default {
     },
     saveFormula(formula) {
       this.update(formula, 'formula', true);
+    }
+  },
+  watch: {
+    modifyDisabled(newValue) {
+      // 未设置计算公式，取消不允许修改的勾选
+      if (newValue) {
+        this.defaultValueConfig.isNotModify = 0;
+        this.update(this.defaultValueConfig, 'defaultValueConfig', true);
+      }
     }
   },
   components: {
