@@ -1,11 +1,22 @@
 /* api */
 import { getCustomer, getCustomerExeinsyn } from '@src/api/CustomerApi'
-import { getTaskConfig, getTaskAutoDispatchApprove, taskAutoDispatch, getTaskAllotApprove, taskAllotExcutor, taskAllotTaskPoll, getTaskAllotTaskPoolApprove } from '@src/api/TaskApi'
+import { 
+  getTaskConfig, 
+  getTaskAutoDispatchApprove, 
+  taskAutoDispatch, 
+  getTaskAllotApprove, 
+  taskAllotExcutor, 
+  taskAllotTaskPoll, 
+  getTaskAllotTaskPoolApprove, 
+  getTaskType,
+  taskReAllot
+} from '@src/api/TaskApi'
 import { getStateColorMap } from '@src/api/SettingApi'
 /* computed */
 import TaskAllotModalComputed from '@src/modules/task/components/TaskAllotModal/TaskAllotModalComputed'
 /* enum */
 import TaskAllotTypeEnum from '@model/enum/TaskAllotTypeEnum'
+import TaskActionEnum from '@model/enum/TaskActionEnum'
 /* entity */
 import Approve from '@model/entity/Approve'
 import LoginUser from '@model/entity/LoginUser/LoginUser'
@@ -23,10 +34,12 @@ import {
   User
 } from '@src/modules/task/components/TaskAllotModal/TaskAllotModalInterface'
 /* model */
-import { TASK_NO_EXECUTOR_MESSAGE } from '@src/model/const/Alert'
+import { TASK_NO_EXECUTOR_MESSAGE, TASK_NO_REALLOT_REASON_MESSAGE, TASK_REALLOT_NOT_SAME_USER_MESSAGE } from '@src/model/const/Alert'
 import { getCustomerDetailResult } from '@model/param/out/Customer'
-import { getTaskAllotApproveResult, getTaskAllotResult, getTaskAllotTaskPollApproveResult, getTaskAllotTaskPoolResult, getTaskConfigResult } from '@model/param/out/Task'
+import { getTaskAllotApproveResult, getTaskAllotResult, getTaskAllotTaskPollApproveResult, getTaskAllotTaskPoolResult, getTaskConfigResult, getTaskTypeResult } from '@model/param/out/Task'
 import { TaskPoolNotificationTypeEnum } from '@src/modules/task/components/TaskAllotModal/TaskAllotPool/TaskAllotPoolModel'
+/* service */
+import { checkApprove } from '@service/TaskService'
 /* types */
 import StateColorMap from '@model/types/StateColor'
 import AutoDispatchListItem from '@model/types/AutoDispatchListItem'
@@ -67,28 +80,6 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
     // 有使用匹配的规则
     if (this.matchRule) {
       params.estimatedMatches = this.getParamsMatchRule()
-    }
-    
-    // 存在协同人信息
-    if (this.synergyUserList.length > 0) {
-      params.synergies = this.getParamsSynergies()
-    }
-    
-    return params
-  }
-  
-  /** 
-   * @description 构建自动派单参数
-  */
-  public buildAutpDispatchParams(): AutoDispatchParams {
-    let params: AutoDispatchParams = {
-      taskId: this?.task?.id || '',
-      executorId: 'auto_dispatch'
-    }
-    
-    // 有使用匹配的规则
-    if (this.matchRule) {
-      params.autoDispatchInfo = this.getParamsMatchRule()
     }
     
     // 存在协同人信息
@@ -146,6 +137,28 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
     return params
   }
   
+  /** 
+   * @description 构建自动派单参数
+  */
+  public buildAutpDispatchParams(): AutoDispatchParams {
+    let params: AutoDispatchParams = {
+      taskId: this?.task?.id || '',
+      executorId: 'auto_dispatch'
+    }
+    
+    // 有使用匹配的规则
+    if (this.matchRule) {
+      params.autoDispatchInfo = this.getParamsMatchRule()
+    }
+    
+    // 存在协同人信息
+    if (this.synergyUserList.length > 0) {
+      params.synergies = this.getParamsSynergies()
+    }
+    
+    return params
+  }
+
   /** 
    * @description 选择协同人
   */
@@ -303,6 +316,27 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
   }
   
   /** 
+   * @description 查询工单类型配置
+  */
+  public fetchTaskType() {
+    let params = { id: this.task.templateId }
+    // 查询工单类型数据
+    return (
+      getTaskType(params)
+        .then((result: getTaskTypeResult) => {
+          let isSuccess = result.succ
+          if (!isSuccess) return
+          
+          this.taskType = result.data || null
+
+        })
+        .catch(err => {
+          console.error(err)
+        })
+    )
+  }
+  
+  /** 
    * @description 根据客户id获取客户信息和客户负责人信息和开关 
   */
   public fetchSynergyUserWithCustomerManager() {
@@ -455,6 +489,27 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
     )
   }
   
+  /* 转派工单提交 */
+  public fetchReAllotSubmit(params: AllotExcutorParams) {
+    return (
+      taskReAllot(params)
+      .then((data: getTaskAllotResult) => {
+        let isSuccess = data.success
+        if (!isSuccess) {
+          return Platform.alert(data.message)
+        }
+        
+        this.allotSuccess()
+      })
+      .catch((err: any) => {
+        console.error(err)
+      })
+      .finally(() => {
+        this.pending = false
+      })
+    )
+  }
+  
   /** 
    * @description 派单方式变化
   */
@@ -470,6 +525,16 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
     await this.fetchStateColor()
     await this.fetchCustomer()
     this.fetchSynergyUserWithCustomerManager()
+  }
+  
+  /** 
+   * @description 转派匹配负责人显示
+  */
+  public matchExcutorWithReAllot(): void {
+    if (!this.isReAllot) return
+    
+    let executor = this.task?.executor
+    this.executorUser = executor || null
   }
   
   /** 
@@ -525,6 +590,7 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
   */
   public show() {
     this.showTaskAllotModal = true
+    this.matchExcutorWithReAllot()
     this.fetchTaskConfig()
     this.initialize()
   }
@@ -542,6 +608,10 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
   */
   public submit() {
     this.pending = true
+    // 转派 提交
+    if (this.isReAllot) {
+      return this.submitWithReAllot()
+    }
     
     // 按工单负责人
     if (this.allotType === TaskAllotTypeEnum.Person) {
@@ -556,6 +626,58 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
     // 自动分配
     if (this.allotType === TaskAllotTypeEnum.Auto) {
       return this.submitWithAutoDispatch()
+    }
+  }
+  
+  /** 
+   * @description 转派提交
+  */
+  public async submitWithReAllot() {
+    try {
+      // 验证负责人是否存在
+      let executor = this.executorUser?.userId
+      if (!executor) {
+        this.pending = false
+        return Platform.alert(TASK_NO_EXECUTOR_MESSAGE)
+      }
+      // 验证负责人是否相同
+      if (executor === this.task?.executor.userId) {
+        this.pending = false
+        return Platform.alert(TASK_REALLOT_NOT_SAME_USER_MESSAGE)
+      }
+      // 验证转派说明
+      if (this.reallotRemarkNotNull && !this.reason) {
+        this.pending = false
+        return Platform.alert(TASK_NO_REALLOT_REASON_MESSAGE)
+      }
+      
+      await this.fetchTaskType()
+      
+      let flowSetting: any = this.taskType?.flowSetting || {}
+      let isNotReAllot = flowSetting?.allot?.reallotAppr == 'none'
+      let approve = new TaskApprove()
+      
+      // 开启转派审批 且 工单类型数据存在
+      if (!isNotReAllot && this.taskType) {
+        approve = checkApprove(this.taskType, TaskActionEnum.ALLOT.value, this.task, this.customer)
+        approve.action = '转派'
+        approve.reason = this.reason
+      }
+      // 是否需要审批
+      let isNeedApprove = approve.needApprove === true
+      // 有审批
+      if (isNeedApprove) {
+        this.pending = false
+        return this.showApproveDialog(approve)
+      }
+      
+      // 转派工单
+      const reAllotParams = this.buildAllotExcutorParams()
+      this.fetchReAllotSubmit(reAllotParams)
+      
+    } catch(err) {
+      this.pending = false
+      console.error(err)
     }
   }
   

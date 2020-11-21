@@ -3,6 +3,7 @@ import Customer from '@model/entity/Customer'
 import LoginUser from '@model/entity/LoginUser/LoginUser'
 import TaskConfig from '@model/types/TaskConfig'
 import TaskAllotUserInfo from '@model/entity/TaskAllotUserInfo'
+import TaskType from '@model/entity/TaskType'
 /* enum */
 import TaskAllotTypeEnum from '@model/enum/TaskAllotTypeEnum'
 import ComponentNameEnum from '@model/enum/ComponentNameEnum'
@@ -30,6 +31,8 @@ class TaskAllotModalData extends TaskAllotModalProps {
   public readonly maxSynergyUserCount: number = 14
   /* 等待状态 */
   public pending: boolean = false
+  /* 转派说明 */
+  public reason: string = ''
   /* 是否显示派单弹窗 */
   public showTaskAllotModal: boolean = false
   /* 协同人列表 */
@@ -42,6 +45,8 @@ class TaskAllotModalData extends TaskAllotModalProps {
   public taskPoolNotificationCheckd: TaskPoolNotificationTypeEnum[] = []
   /* 工单池通知自定义人员 */
   public taskPoolNotificationUsers: LoginUser[] = []
+  /* 工单类型数据 */
+  public taskType: TaskType | null = null
 }
 
 export default TaskAllotModalData

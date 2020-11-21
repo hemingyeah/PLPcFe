@@ -37,7 +37,8 @@ import {
   getTaskPoolAuthUsersResult,
   getTaskPoolSubscriptionUsersResult,
   getCustomerTagTaskPoolCountResult,
-  getTaskAllotTaskPollApproveResult
+  getTaskAllotTaskPollApproveResult,
+  getTaskTypeResult
 } from '@model/param/out/Task'
 
 import GrayUtil from '@src/util/gray'
@@ -738,7 +739,7 @@ export function deleteComponent(params: {} | undefined) {
  * @param {Object} params - 参数对象
  * @param {String} params.id - 工单id
  */
-export function getTaskType(params: {} | undefined) {
+export function getTaskType(params: {} | undefined): Promise<getTaskTypeResult> {
   return http.get("/setting/taskType/getOne", params);
 }
 
@@ -1205,6 +1206,13 @@ export function getTaskAllotTaskPoolApprove(params: TaskAllotTaskPoolModel): Pro
  */
 export function taskAllotExcutor(params: TaskAllotModel): Promise<getTaskAllotResult> {
   return http.post('/outside/pc/task/allot', params)
+}
+
+/**
+ * @description 工单转派
+ */
+export function taskReAllot(params: TaskAllotModel): Promise<getTaskAllotResult> {
+  return http.post('/outside/dd/task/reallot', params)
 }
 
 /**

@@ -12,6 +12,7 @@ import TaskAllotUserInfo from '@model/entity/TaskAllotUserInfo'
 import TaskApprove from '@model/entity/TaskApprove'
 import Tag from '@model/entity/Tag/Tag'
 import TaskPoolUser from '@model/entity/TaskPoolUser'
+import TaskType from '@model/entity/TaskType'
 
 
 /** 获取用户视图列表返回值 */
@@ -67,3 +68,6 @@ export type getCustomerTagTaskPoolCountResult = Result<number>
 
 /* 工单指派-转派 团队列表信息 */
 export type getTaskTagListResult = PageInfo<Tag[]>
+
+/* 工单-工单类型信息 */
+export type getTaskTypeResult = MsgModel<TaskType>

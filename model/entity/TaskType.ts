@@ -1,15 +1,37 @@
+import TaskActionEnum from '@model/enum/TaskActionEnum'
+import FlowSetting from '@model/types/FlowSetting'
 
+const create: string = TaskActionEnum.CREATE.value
+const allot: string = TaskActionEnum.ALLOT.value
+const accept: string =TaskActionEnum.ACCEPT.value
+const start: string = TaskActionEnum.START.value
+const finish: string = TaskActionEnum.FINISH.value
+const cost: string = TaskActionEnum.COST.value
+const review: string = TaskActionEnum.REVIEW.value
+const autoReview: string = TaskActionEnum.AUTOREVIEW.value
+const close: string = TaskActionEnum.CLOSE.value
+const off: string = TaskActionEnum.OFF.value
 
 interface TaskType {
   /* 工单类型 颜色  sample: rgb(115,127,124)  */
   defaultColors?: string[]
-  
   id: string
   name?: string
   // 配置完之前是禁用状态 配置完后点下发布则启用 初始化默认类型时set为1
   enabled?: number 
   // 流程设置
-  flowSetting?: object
+  flowSetting?: {
+    create: FlowSetting,
+    allot: FlowSetting,
+    accept: FlowSetting,
+    start: FlowSetting,
+    finish: FlowSetting,
+    cost: FlowSetting,
+    review: FlowSetting,
+    autoReview: FlowSetting,
+    close: FlowSetting,
+    off: FlowSetting,
+  }
   createTime?: string
   isDelete?: number
   //卡片设置

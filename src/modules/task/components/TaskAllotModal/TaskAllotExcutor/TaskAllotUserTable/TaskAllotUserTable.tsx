@@ -55,7 +55,8 @@ export default class TaskAllotUserTable extends TaskAllotUserTableRender {
             row-class-name="base-table-row-v3"
             key={this.tableKey}
             rowKey={uuid()}
-            onSort-change={(option: any) => this.handlerTableSortChange(option)}
+            onHeader-dragend={(newWidth: number, oldWidth: number, column: any) => this.handlerHeaderDragend(newWidth, oldWidth, column)}
+            onSort-change={(option: any) => this.handlerTableSortChanged(option)}
             stripe
           >
             {

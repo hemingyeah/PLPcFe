@@ -77,6 +77,13 @@ class TaskAllotModalComputed extends TaskAllotModalData {
   get isShowTaskAutoDispatchComponent() {
     return this.loadedComponents.includes(ComponentNameEnum.TaskAllotAuto)
   }
+  
+  /** 
+   * @description 转派说明是否必填
+  */
+  get reallotRemarkNotNull(): boolean {
+    return this.taskConfig?.reallotRemarkNotNull === true
+  }
 }
 
 export default TaskAllotModalComputed

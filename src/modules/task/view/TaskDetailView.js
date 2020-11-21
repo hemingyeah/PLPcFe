@@ -28,6 +28,7 @@ import TaskFeedback from './components/TaskFeedback';
 import TaskCard from './components/TaskCard';
 import TaskView from './components/TaskView.vue';
 import TaskTimeDialog from './components/TaskTimeDialog.vue';
+import TaskAllotModal from '@src/modules/task/components/TaskAllotModal/TaskAllotModal.tsx'
 
 /* enum */
 import { TaskEventNameMappingEnum } from '@model/enum/EventNameMappingEnum.ts';
@@ -830,13 +831,11 @@ export default {
     },
     // 指派工单
     allot() {
-      this.pending = true;
-      location.href = `/task/allotTask?id=${this.task.id}`;
+      this.$refs.TaskAllotModal.show()
     },
     // 转派工单
     redeploy() {
-      this.pending = true;
-      location.href = `/task/redeploy?id=${this.task.id}`;
+      this.$refs.TaskAllotModal.show()
     },
     // 打印工单
     printTask() {
@@ -1178,6 +1177,7 @@ export default {
     [TaskFeedback.name]: TaskFeedback,
     [TaskCard.name]: TaskCard,
     [TaskView.name]: TaskView,
-    [TaskTimeDialog.name]: TaskTimeDialog
+    [TaskTimeDialog.name]: TaskTimeDialog,
+    TaskAllotModal
   }
 }

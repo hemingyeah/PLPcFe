@@ -42,22 +42,14 @@ export default class TaskAllotType extends Vue {
       <div class={ComponentNameEnum.TaskAllotType}>
         <el-radio value={this.type} onInput={this.handlerTypeChange} label="checkTaskPerson">指派给工单负责人</el-radio>
         {
-          this.taskConfig?.taskPoolOn
-            ? this.renderTaskPoolRadio()
-            : (
-              <el-tooltip content='尚未启用工单池派单功能，如需开启请到 系统管理-工单功能设置中配置'  placement='top'>
-                {this.renderTaskPoolRadio(true)}
-              </el-tooltip>
-            )
+          this.$scopedSlots.taskPool 
+          ? this.$scopedSlots.taskPool(this.renderTaskPoolRadio)
+          : this.renderTaskPoolRadio()
         }
         {
-          this.taskConfig?.autoDispatch
-            ? this.renderAutoDispatchRadio()
-            : (
-              <el-tooltip content='尚未启用自动分配功能，如需开启请到 系统管理-工单设置中开启「启用自动分配规则」设置'  placement='top'>
-                {this.renderAutoDispatchRadio(true)}
-              </el-tooltip>
-            )
+          this.$scopedSlots.autoDispatch 
+          ? this.$scopedSlots.autoDispatch(this.renderAutoDispatchRadio)
+          : this.renderAutoDispatchRadio()
         }
       </div>
     )

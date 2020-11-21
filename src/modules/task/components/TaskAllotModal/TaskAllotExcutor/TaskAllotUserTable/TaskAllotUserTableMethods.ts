@@ -572,9 +572,27 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
   }
   
   /** 
+   * @description 表格拖动事件
+  */
+  public handlerHeaderDragend(newWidth: number, oldWidth: number, tableColumn: any = {}) {
+    let field: string = tableColumn.property || ''
+    let column: Column | null = null
+    
+    for (let i = 0; i < this.columns.length; i++) {
+      column = this.columns[i]
+      if (column.field === field) {
+        column.width = newWidth
+      }
+    }
+    
+    const columns = this.simplifyTableColumsProperty(this.columns)
+    this.saveDataToStorage(StorageKeyEnum.TaskAllotTableColumns, columns)
+  }
+  
+  /** 
    * @description 排序变化
   */
-  public handlerTableSortChange(option: { prop?: any, order?: any } = {}) {
+  public handlerTableSortChanged(option: { prop?: any, order?: any } = {}) {
     const { prop, order } = option
     if (!order) {
       this.orderDetail = {}
@@ -701,10 +719,10 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
    * @description 获取用户列表
    * -- 支持外部调用的
   */
-  public outsideFetchUsers(): void {
+  public async outsideFetchUsers(): Promise<void> {
     Log.succ(Log.Start, this.outsideFetchUsers.name)
     
-    this.matchTags()
+    await this.matchTags()
     this.initialize()
   }
   
@@ -764,13 +782,20 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
       return column
     })
     
-    const showColumns = this.columns.map((column: Column) => ({
-      field: column.field,
-      show: column.show,
-      width: column.width
-    }))
+    const showColumns = this.simplifyTableColumsProperty(this.columns)
     
-    this.saveDataToStorage(StorageKeyEnum.TaskAllotTableColumns, showColumns);
+    this.saveDataToStorage(StorageKeyEnum.TaskAllotTableColumns, showColumns)
+  }
+  
+  /* 精简列属性 */
+  simplifyTableColumsProperty(columns: Column[]): Column[] {
+    return (
+      columns.map((column: Column) => ({
+        field: column.field,
+        show: column.show,
+        width: column.width
+      }))
+    )
   }
   
   /** 

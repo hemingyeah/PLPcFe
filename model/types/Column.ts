@@ -19,7 +19,7 @@ interface Column {
   // 最小宽度
   minWidth?: string | null
   // 宽
-  width?: string | null
+  width?: string | null | number
   // 是否显示，基本用于表格
   show?: boolean
   // 是否支持排序

@@ -6,6 +6,8 @@ import TaskAllotModalComponents from '@src/modules/task/components/TaskAllotModa
 import InitDataLoginUser from '@model/entity/InitDataLoginUser'
 
 class TaskAllotModalProps extends TaskAllotModalComponents {
+  /* 是否是转派状态 */
+  @Prop() readonly isReAllot: boolean | undefined
   /* 当前登录用户 */
   @Prop() readonly loginUser: InitDataLoginUser | undefined
   /* 工单信息 */

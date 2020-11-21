@@ -44,14 +44,11 @@ export default class TaskAllotModal extends TaskAllotModalRender {
         <div class='task-allot-nav'>
           <div class='task-allot-type'>
             <span class='task-allot-nav-title'>派单方式</span>
-            <task-allot-type 
-              type={this.allotType}
-              taskConfig={this.taskConfig}
-              onChange={(value: TaskAllotTypeEnum) => this.handlerAllotTypeChange(value)} 
-            />
+            {this.renderTaskAllotType()}
           </div>
           {this.renderExcutor()}
           {this.renderSynergy()}
+          {this.renderReAllotReason()}
         </div>
         
         <div class='task-allot-content'>
