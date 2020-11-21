@@ -256,13 +256,7 @@ class TaskAllotUserTableRender extends TaskAllotUserTableMethods {
    * @description 渲染表格列
   */
   renderTableColumnField(scope: any, column: Column) {
-    let value = null
-    
-    try {
-      value = JSON.parse(scope.row[column.field || ''])
-    } catch (error) {
-      value = column.field ? scope.row[column.field] : ''
-    }
+    let value = column.field ? scope.row[column.field] : ''
     
     // 负责人
     if (column.field === TaslAllotTableColumnFieldEnum.Excutor) return this.renderColumnWithExcutor(scope)
@@ -357,7 +351,7 @@ class TaskAllotUserTableRender extends TaskAllotUserTableMethods {
     return (
       <div class='task-allot-user-table-excutor-column'>
         <el-checkbox 
-          value={this.userPageCheckedMap[userId]} 
+          value={this.userPageCheckedMap[userId]}
           onInput={(value: boolean) => this.handlerExcutorCheckedChange(value, scope.row)}
         >
         </el-checkbox>

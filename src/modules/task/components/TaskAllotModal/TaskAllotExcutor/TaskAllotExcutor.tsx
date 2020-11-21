@@ -40,9 +40,23 @@ export default class TaskAllotExcutor extends Vue {
     return Boolean(this.TaskAllotModalComponent?.allowModifySynergyUser)
   }
   
+  /* 当前组件的负责人数据是否和父级的负责人数据一致 */
+  get isSameExcutorUser(): boolean {
+    return (
+      this.selectedExcutorUser 
+      && this.taskAllotModalExcutorUser 
+      && (this.selectedExcutorUser.userId == this.taskAllotModalExcutorUser.userId)
+    )
+  }
+  
   /* 工单派单组件 */
   get TaskAllotModalComponent() {
     return findComponentUpward(this, ComponentNameEnum.TaskAllotModal) || {}
+  }
+  
+  /* 工单派单组件 负责人信息 */
+  get taskAllotModalExcutorUser(): any {
+    return this.TaskAllotModalComponent?.executorUser
   }
   
   /** 
@@ -116,6 +130,7 @@ export default class TaskAllotExcutor extends Vue {
                   stateColorMap={this.stateColorMap}
                   userId={this.selectedExcutorUser?.userId}
                   showSynergyButton={this.allowModifySynergyUser}
+                  showExcutorIcon={this.isSameExcutorUser}
                   emitEventComponentName={ComponentNameEnum.TaskAllotExcutor}
                   onClose={() => this.closeUserCard()}
                 /> 

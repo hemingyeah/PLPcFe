@@ -192,7 +192,7 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
   public deleteExcutorUser(user: LoginUser) {
     this.executorUser = null
     /* 清除选择负责人表格列表 负责人信息 */
-    this.TaskAllotExcutorTableComponent?.outsideUpwardSetClearExcutorUser()
+    this.TaskAllotExcutorTableComponent?.outsideUpwardClearExcutorUser()
   }
   
   /** 

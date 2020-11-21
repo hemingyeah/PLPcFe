@@ -29,6 +29,8 @@ export default class TaskAllotUserTable extends TaskAllotUserTableRender {
     this.buildColumns()
     // 还原排序方式
     this.revertSort()
+    // 匹配服务团队
+    this.matchTags()
     // 绑定事件
     this.$nextTick(() => {
       this.bindTableScrollEvent()

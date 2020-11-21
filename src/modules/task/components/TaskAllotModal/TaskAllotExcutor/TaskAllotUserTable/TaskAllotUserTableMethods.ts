@@ -652,6 +652,13 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
   }
   
   /** 
+   * @description 匹配服务团队
+  */
+  public matchTags() {
+    
+  }
+  
+  /** 
    * @description 获取用户列表
    * -- 支持外部调用的
   */
@@ -665,7 +672,7 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
    * @description 清除负责人信息
    * -- 支持向上的外部调用的方法
   */
-  public outsideUpwardSetClearExcutorUser() {
+  public outsideUpwardClearExcutorUser() {
     this.handlerExcutorCheckedChange(false, this.selectExecutorUser)
   }
   
