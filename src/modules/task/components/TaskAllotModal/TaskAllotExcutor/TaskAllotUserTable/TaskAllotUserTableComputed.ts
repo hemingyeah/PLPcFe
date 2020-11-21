@@ -41,6 +41,11 @@ class TaskAllotUserTableComputed extends TaskAllotUserTableData {
     return this.TaskAllotModalComponent?.taskConfig?.allotByTag === true
   }
   
+  /* 是否是按服务团队派单 */
+  get allotByExclusiveTag() {
+    return this.TaskAllotModalComponent?.taskConfig?.allotByExclusiveTag === true
+  }
+  
   /* 用户状态 对象 */
   get userStateMap() {
     return this.TaskAllotModalComponent?.stateColorMap || {}

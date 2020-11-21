@@ -13,6 +13,8 @@ import StorageKeyEnum from '@model/enum/StorageKeyEnum'
 /* entity */
 import CustomerAddress from '@model/entity/CustomerAddress'
 import LoginUser from '@model/entity/LoginUser/LoginUser'
+import TaskAllotUserInfo from '@model/entity/TaskAllotUserInfo'
+import Tag from '@model/entity/Tag/Tag'
 /* image */
 // @ts-ignore
 import DefaultHead from '@src/assets/img/avatar.png'
@@ -32,7 +34,7 @@ import Log from '@src/util/log.ts'
 import { storageGet, storageSet } from '@src/util/storage.ts'
 import { isString, isObject, isArray } from '@src/util/type'
 import { openTabForTaskView, openTabForCustomerView } from '@src/util/business/openTab'
-import TaskAllotUserInfo from '@model/entity/TaskAllotUserInfo'
+import { objectArrayIntersection } from '@src/util/array'
 
 declare let AMap: any
 
@@ -254,6 +256,19 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
       column.width = columnMap[column.field || '']?.width || undefined
       return column
     })
+  }
+  
+  /** 
+   * @description 构建搜索团队列表参数
+  */
+  public buildSearchTagParams() {
+    return {
+      pageSize: 0,
+      pageNum: 1,
+      keyword: '',
+      onlyParent: true,
+      customerId: this.customer.id || ''
+    }
   }
   
   /** 
@@ -654,8 +669,32 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
   /** 
    * @description 匹配服务团队
   */
-  public matchTags() {
-    
+  public async matchTags(): Promise<void> {
+    try {
+      if (!this.isAllotByTag && !this.allotByExclusiveTag) return
+      
+      let searchTagParams = this.buildSearchTagParams()
+      let result: any = await this.fetchTagList(searchTagParams) || {}
+      // 团队列表
+      let tagList: Tag[] = result.list || []
+      // 客户团队列表
+      let customerTags: Tag[] = this.customer.tags || []
+      let tags: Tag[] = []
+      
+      // 按服务团队派单 取可见团队
+      if (this.allotByExclusiveTag) {
+        tags = tagList
+      }
+      // 按团队派单 取可见团队和客户团队的交集
+      else if (this.allotByExclusiveTag) {
+        tags = tagList
+      }
+      
+      this.selectTeams = tags
+      
+    } catch (error) {
+      console.log('TaskAllotUserTableMethods -> matchTags -> error', error)
+    }
   }
   
   /** 
@@ -665,6 +704,7 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
   public outsideFetchUsers(): void {
     Log.succ(Log.Start, this.outsideFetchUsers.name)
     
+    this.matchTags()
     this.initialize()
   }
   
