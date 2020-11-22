@@ -46,6 +46,8 @@ import AutoDispatchListItem from '@model/types/AutoDispatchListItem'
 /* util */
 import Log from '@src/util/log.ts'
 import Platform from '@src/util/Platform'
+import PlatformUtil from '@src/platform'
+import { openTabForTaskView } from '@src/util/business/openTab'
 /* vue */
 import { Emit } from 'vue-property-decorator'
 import ComponentNameEnum from '@model/enum/ComponentNameEnum'
@@ -65,9 +67,17 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
   
   /** 
    * @description 派单成功
+   * 默认实现。跳转到工单详情页面 如果有需要可以自定义
   */
   @Emit(TaskAllotModalEmitEventEnum.Success)
-  public allotSuccess() {}
+  public allotSuccess() {
+    // @ts-ignore
+    let id = window?.frameElement?.dataset?.id
+    // 关闭当前tab
+    PlatformUtil.closeTab(id)
+    // 打开新tab
+    openTabForTaskView(this.task.id)
+  }
   
   /** 
    * @description 构建自动派单审批参数
@@ -158,7 +168,17 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
     
     return params
   }
-
+  
+  /** 
+   * @description 构建转派参数
+  */
+  public buildReAllotParams(): AllotExcutorParams {
+    let reAllotParams = this.buildAllotExcutorParams()
+    reAllotParams.reason = this.reason
+    
+    return reAllotParams
+  }
+  
   /** 
    * @description 选择协同人
   */
@@ -672,7 +692,7 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
       }
       
       // 转派工单
-      const reAllotParams = this.buildAllotExcutorParams()
+      const reAllotParams = this.buildReAllotParams()
       this.fetchReAllotSubmit(reAllotParams)
       
     } catch(err) {

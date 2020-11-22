@@ -636,7 +636,6 @@ export default {
     }
   },
   methods: {
-    previousStep() { },
     nextStep() {
       this.nowGuideStep++;
     },
@@ -1143,7 +1142,12 @@ export default {
       } else {
         this.rightActiveTab = this.viewBalanceTab ? 'balance-tab' : this.viewFeedbackTab ? 'feedback-tab' : 'card-tab';
       }
-
+      
+      // 来自指派列表的指派操作
+      if (query.allot && this.allowAllotTask) {
+        this.allot()
+      }
+      
       this.loading = false;
       
       this.$nextTick(() => {

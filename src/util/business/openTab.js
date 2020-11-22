@@ -12,7 +12,7 @@ function getFromId() {
   } catch (error) {
     console.warn('getFromId -> error', error)
   }
-
+  
   return fromId
 }
 
@@ -24,7 +24,7 @@ function getFromId() {
 */
 export function openTabForTaskView(taskId = '', isNoHistory = true) {
   let fromId = getFromId();
-
+  
   platform.openTab({
     id: `task_view_${taskId}`,
     url:`/task/view/${taskId}${isNoHistory ? '?noHistory=1' : ''}`,
@@ -39,7 +39,7 @@ export function openTabForTaskView(taskId = '', isNoHistory = true) {
 */
 export function openTabForTaskCreate(defaultTypeId = '') {
   let fromId = getFromId();
-
+  
   platform.openTab({
     id: 'task_edit',
     title: '正在加载',
@@ -79,7 +79,7 @@ export function openTabForCustomerView(customerId = '', isNoHistory = true) {
 */
 export function openTabForProductView(productId = '', isNoHistory = true) {
   let fromId = getFromId();
-
+  
   platform.openTab({
     id: `product_view_${productId}`,
     title: '产品详情',
@@ -99,7 +99,7 @@ export function openTabForProductView(productId = '', isNoHistory = true) {
 */
 export function openTabForTeamtView(teamId = '', isNoHistory = true) {
   let fromId = getFromId();
-
+  
   platform.openTab({
     id: `team_view_${teamId}`,
     title: '团队详情',
@@ -116,7 +116,7 @@ export function openTabForTeamtView(teamId = '', isNoHistory = true) {
 */
 export function openTabForTeamCreate(isNoHistory = true) {
   let fromId = getFromId();
-
+  
   platform.openTab({
     id: 'team_create',
     title: '新建团队',
@@ -133,7 +133,7 @@ export function openTabForTeamCreate(isNoHistory = true) {
 */
 export function openTabForTeamChildCreate(parentData) {
   let fromId = getFromId();
-
+  
   platform.openTab({
     id: 'team_create',
     title: '新建子团队',
@@ -154,7 +154,7 @@ export function openTabForTeamChildCreate(parentData) {
 */
 export function openTabForUserView(userId, params = {}) {
   let fromId = getFromId();
-
+  
   platform.openTab({
     id: `tab_team_view_${userId}`,
     title: '成员详情',
@@ -174,7 +174,7 @@ export function openTabForUserView(userId, params = {}) {
 */
 export function openTabForPerformanceView(performanceId) {
   let fromId = getFromId();
-
+  
   platform.openTab({
     id: `performance_reposrt_${performanceId}`,
     title: '绩效报告详情',
@@ -193,7 +193,7 @@ export function openTabForPerformanceView(performanceId) {
 */
 export function openTabForWikiCreate() {
   let fromId = getFromId();
-
+  
   platform.openTab({
     id: 'wiki_create',
     title: '知识库新建',
@@ -210,7 +210,7 @@ export function openTabForWikiCreate() {
 */
 export function openTabForWikiEdit(wikiId = '') {
   let fromId = getFromId();
-
+  
   platform.openTab({
     id: `wiki_create_${wikiId}`,
     title: '知识库编辑',
@@ -227,7 +227,7 @@ export function openTabForWikiEdit(wikiId = '') {
 */
 export function openTabForWikiView(wikiId = '') {
   let fromId = getFromId();
-
+  
   platform.openTab({
     id: `document_detail_${wikiId}`,
     title: '知识库详情',
@@ -243,7 +243,7 @@ export function openTabForWikiView(wikiId = '') {
 */
 export function openTabForWikiList() {
   let fromId = getFromId();
-
+  
   platform.openTab({
     id: 'wiki',
     title: '知识库列表',
@@ -280,7 +280,7 @@ export function openTabForEventView(eventId) {
 */
 export function openTabCommon(tabParams = {}) {
   let fromId = getFromId();
-
+  
   platform.openTab({
     ...tabParams,
     fromId
