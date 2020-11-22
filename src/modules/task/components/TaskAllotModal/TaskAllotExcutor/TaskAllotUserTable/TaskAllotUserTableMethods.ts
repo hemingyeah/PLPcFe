@@ -607,6 +607,7 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
     }
     
     this.orderDetail = orderDetail
+    this.selectSortord = null
     this.initialize()
   }
   
@@ -616,9 +617,15 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
   public handlerSortordChange(value: number): void {
     Log.succ(Log.Start, this.handlerSortordChange.name)
     
+    // @ts-ignore
+    // 清空表格排序
+    this.$refs.TaskAllotUserTable?.clearSort()
     this.orderDetail = {}
+    // 赋值
     this.selectSortord = value
+    // 保存
     this.saveDataToStorage(StorageKeyEnum.TaskAllotTableSort, value)
+    // 初始化
     this.initialize()
   }
   

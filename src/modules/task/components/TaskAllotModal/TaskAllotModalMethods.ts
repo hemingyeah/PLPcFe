@@ -51,6 +51,7 @@ import { openTabForTaskView } from '@src/util/business/openTab'
 /* vue */
 import { Emit } from 'vue-property-decorator'
 import ComponentNameEnum from '@model/enum/ComponentNameEnum'
+import LeaderEnum from '@model/enum/LeaderEnum'
 
 /* 加载的组件 */
 const LoadComponentMap = {
@@ -609,9 +610,15 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
    * @description 显示弹窗
   */
   public show() {
+    // 初始化派单类型
+    this.allotType = TaskAllotTypeEnum.Person
+    // 显示弹窗
     this.showTaskAllotModal = true
+    // 匹配服务团队
     this.matchExcutorWithReAllot()
+    // 获取工单配置
     this.fetchTaskConfig()
+    // 初始化
     this.initialize()
   }
   
@@ -674,13 +681,13 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
       await this.fetchTaskType()
       
       let flowSetting: any = this.taskType?.flowSetting || {}
-      let isNotReAllot = flowSetting?.allot?.reallotAppr == 'none'
+      let isNotReAllot = flowSetting?.allot?.reallotAppr == LeaderEnum.None
       let approve = new TaskApprove()
       
       // 开启转派审批 且 工单类型数据存在
       if (!isNotReAllot && this.taskType) {
         approve = checkApprove(this.taskType, TaskActionEnum.ALLOT.value, this.task, this.customer)
-        approve.action = '转派'
+        approve.action = TaskActionEnum.REDEPLOY.name
         approve.reason = this.reason
       }
       // 是否需要审批

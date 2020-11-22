@@ -184,7 +184,7 @@ class TaskAllotUserTableRender extends TaskAllotUserTableMethods {
           <el-input
             autocomplete="off"
             class='location-max-input' 
-            placeholder='最大值' 
+            placeholder='最大值'
             type='number'
             value={this.locationOtherData.maxValue}
             onInput={HandlerMaxValueChanged} 
@@ -211,7 +211,13 @@ class TaskAllotUserTableRender extends TaskAllotUserTableMethods {
         {
           this.userStateList.map((userState: UserState) => {
             return (
-              <el-option key={userState.key} value={userState.value} label={userState.label} />
+              <el-option key={userState.key} value={userState.value} label={userState.label}>
+                <div class='task-allot-state-select-item'>
+                  <span class='user-state-round' style={{ backgroundColor: this.userStateMap && this.userStateMap[userState.label || ''] }}>
+                  </span>
+                  <span>{userState.label}</span>
+                </div>
+              </el-option>
             )
           })
         }

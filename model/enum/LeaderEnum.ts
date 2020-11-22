@@ -12,7 +12,9 @@ enum LeaderEnum {
   // 指定人员列表
   Users = 'Users',
   // 工单派单人
-  AllotUser = 'allotUser'
+  AllotUser = 'allotUser',
+  // 不需要审批
+  None = 'none'
 }
 
 export default LeaderEnum

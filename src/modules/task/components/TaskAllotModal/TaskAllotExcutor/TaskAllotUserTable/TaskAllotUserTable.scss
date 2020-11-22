@@ -43,6 +43,9 @@
       border-radius: 50%;
     }
   }
+  .biz-team-select-tag {
+    max-width: 135px;
+  }
 }
 
 .task-allot-user-table-block {
@@ -132,4 +135,19 @@
   .biz-team-select-tag {
     height: 20px;
   }
+}
+
+.el-select-dropdown {
+  .user-state-round {
+    display: inline-block;
+    border-radius: 50%;
+    width: 16px;
+    height: 16px;
+    margin-right: 10px;
+  }
+}
+
+.task-allot-state-select-item {
+  display: flex;
+  align-items: center;
 }
