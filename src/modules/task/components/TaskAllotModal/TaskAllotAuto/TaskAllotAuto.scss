@@ -3,6 +3,9 @@
   &-header {
     display: flex;
     justify-content: flex-end;
+    .el-button {
+      max-width: 88px !important;
+    }
   }
   &-match {
     color: $color-primary;
@@ -50,5 +53,8 @@
   }
   .base-timeline-item-before {
     border-color: $color-primary;
+  }
+  &-item-name {
+    cursor: pointer;
   }
 }

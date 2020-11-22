@@ -50,10 +50,14 @@ class AllotRuleModalData extends Vue {
       },
     }
   }
+  /* 禁用状态 */
+  public isDisabled: boolean = false
   /* 等待状态 */
   public pending: boolean = false
   /* 操作符选项列表 */
   public tagOpeartorOptions: ElSelectOption[] = ConditionOpeartorOptions
+  /* 标题 */
+  public title: string = ''
   /* 显示创建分配规则弹窗的状态 */
   public showAllotRuleModal: boolean = false
 }

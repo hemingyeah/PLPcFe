@@ -16,20 +16,21 @@ import ElSelectOption from '@model/types/ElSelectOption'
 /* util */
 import { uuid } from '@src/util/string'
 import LoginUser from '@model/entity/LoginUser/LoginUser'
+import { VNode } from 'vue'
 
 class AllotRuleModalRender extends AllotRuleModalMethods {
   
   /** 
    * @description 工单类型清除按钮
   */
-  public renderTaskTypeClear() {
+  public renderTaskTypeClear(): VNode | null {
     /* 是否为空 */
     let isTaskTypeEmpty = this.form.typeData[RuleTypeEnum.Select].taskType.length <= 0
-    if (isTaskTypeEmpty) return null
+    if (isTaskTypeEmpty || this.isDisabled) return null
     
     return (
-      <button 
-        type='button' 
+      <button
+        type='button'
         class='biz-user-select-clear task-type-select-clear' 
         key='task-type-clear'
         onClick={() => this.form.typeData[RuleTypeEnum.Select].taskType = []}
@@ -42,7 +43,7 @@ class AllotRuleModalRender extends AllotRuleModalMethods {
   /** 
    * @description 渲染 规则类型 对应的列表
   */
-  public renderAllotType() {    
+  public renderAllotType(): VNode | null {    
     // 按照工单类型
     if (this.form.type === RuleTypeEnum.Type) {
       return this.renderAllotTypeWithTaskType()
@@ -57,12 +58,14 @@ class AllotRuleModalRender extends AllotRuleModalMethods {
     if (this.form.type === RuleTypeEnum.Tag) {
       return this.renderAllotGroupWithTag()
     }
+    
+    return null
   }
   
   /** 
    * @description 渲染 规则类型 按照工单类型
   */
-  public renderAllotTypeWithTaskType() {
+  public renderAllotTypeWithTaskType(): VNode {
     let text = '当工单类型符合以下条件时：'
     let value = this.form.typeData[RuleTypeEnum.Type]
     let changedHandler = (value: TaskType[]) => this.handlerTaskTypeSelectChanged(value)
@@ -73,7 +76,7 @@ class AllotRuleModalRender extends AllotRuleModalMethods {
   /** 
    * @description 渲染 规则类型 按照特定条件
   */
-  public renderAllotTypeWithConditions() {
+  public renderAllotTypeWithConditions(): VNode {
     let text = '选择工单类型，当工单类型为：'
     let { taskType, field, operator, value } = this.form.typeData[RuleTypeEnum.Select]
     let changedHandler = (value: TaskType[]) => this.handlerCustomTaskTypeSelectChanged(value)
@@ -83,7 +86,8 @@ class AllotRuleModalRender extends AllotRuleModalMethods {
         {this.renderTaskTypesSelect(taskType, changedHandler, false, text)}
         <div class={`${this.className}-condition-field`}>
           <span>选择应用条件，当字段</span>
-          <el-select 
+          <el-select
+            disabled={this.isDisabled}
             value={field} 
             onInput={(value: string) => {
               this.form.typeData[RuleTypeEnum.Select].field = value
@@ -99,6 +103,7 @@ class AllotRuleModalRender extends AllotRuleModalMethods {
             }
           </el-select>
           <el-select
+            disabled={this.isDisabled}
             value={operator} 
             onInput={(value: AllotOperatorEnum) => {this.form.typeData[RuleTypeEnum.Select].operator = value}}
           >
@@ -111,6 +116,7 @@ class AllotRuleModalRender extends AllotRuleModalMethods {
             }
           </el-select>
           <el-select
+            disabled={this.isDisabled}
             value={value} 
             onInput={(value: string) => this.form.typeData[RuleTypeEnum.Select].value = value}
           >
@@ -132,7 +138,7 @@ class AllotRuleModalRender extends AllotRuleModalMethods {
     changedHandler: (value: TaskType[]) => void,
     multiple: boolean = true,
     text?: string
-  ) {
+  ): VNode {
     const ScopedSlots = {
       option: (props: { option: TaskType }) => {
         return (
@@ -147,6 +153,7 @@ class AllotRuleModalRender extends AllotRuleModalMethods {
       <div class={`${this.className}-task-type`}>
         <span>{text}</span>
         <biz-form-remote-select
+          disabled={this.isDisabled}
           multiple={multiple}
           value={value}
           onInput={changedHandler}
@@ -162,7 +169,7 @@ class AllotRuleModalRender extends AllotRuleModalMethods {
   /** 
    * @description 渲染 规则类型 按照客户所属团队
   */
-  public renderAllotGroupWithTag() {
+  public renderAllotGroupWithTag(): VNode {
     let tagData = this.form.typeData[RuleTypeEnum.Tag]
     let { tags, operator } = tagData
     
@@ -171,7 +178,7 @@ class AllotRuleModalRender extends AllotRuleModalMethods {
         <div class={`${this.className}-customer-tag-operator`}>
           当客户所属团队
           {
-            <el-select value={operator} onInput={(value: AllotOperatorEnum) => this.handlerOperatorSelectChanged(value)}>
+            <el-select disabled={this.isDisabled} value={operator} onInput={(value: AllotOperatorEnum) => this.handlerOperatorSelectChanged(value)}>
               {
                 this.tagOpeartorOptions.map((option: ElSelectOption) => {
                   return (
@@ -183,7 +190,8 @@ class AllotRuleModalRender extends AllotRuleModalMethods {
           }
           以下任意团队时
         </div>
-        <biz-team-select 
+        <biz-team-select
+          disabled={this.isDisabled}
           value={tags} 
           onInput={(value: Tag[]) => this.handlerCustomerTeamChanged(value)} 
           multiple 
@@ -195,7 +203,7 @@ class AllotRuleModalRender extends AllotRuleModalMethods {
   /** 
    * @description 渲染 分配对象
   */
-  public renderAllotGroup() {    
+  public renderAllotGroup(): VNode {    
     return (
       <div class={`${this.className}-group`}>
         {this.renderAllotGroupSelect()}
@@ -207,12 +215,12 @@ class AllotRuleModalRender extends AllotRuleModalMethods {
   /** 
    * @description 渲染 分配给 select选择
   */
-  public renderAllotGroupSelect() {
+  public renderAllotGroupSelect(): VNode {
     // 数据变化
     const HandlerGroupChange = (value: AllotGroupEnum) => this.form.groupType = value
     
     return (
-      <el-select value={this.form.groupType} onInput={HandlerGroupChange}>
+      <el-select disabled={this.isDisabled} value={this.form.groupType} onInput={HandlerGroupChange}>
         {
           this.allotGroupOptions.map((option: ElSelectOption) => {
             return (
@@ -227,7 +235,7 @@ class AllotRuleModalRender extends AllotRuleModalMethods {
   /** 
    * @description 渲染 分配给 select选择对应的表单
   */
-  public renderAllotGroupSelectForm() {
+  public renderAllotGroupSelectForm(): VNode | null {
     // 人员列表
     if (this.form.groupType === AllotGroupEnum.User) {
       return this.renderAllotGroupUserSelect()
@@ -247,16 +255,19 @@ class AllotRuleModalRender extends AllotRuleModalMethods {
     if (this.form.groupType === AllotGroupEnum.TagLeader) {
       return this.renderAllotGroupTeamSelect(true)
     }
+    
+    return null
   }
   
   /** 
    * @description 渲染 分配给 用户select
   */
-  public renderAllotGroupUserSelect() {
+  public renderAllotGroupUserSelect(): VNode {
     let value = this.form.groupData[AllotGroupEnum.User]
     
     return (
-      <biz-user-select 
+      <biz-user-select
+        disabled={this.isDisabled}
         value={value}
         onInput={(value: LoginUser[]) => this.handlerUserSelectChanged(value)}
         fetch={this.fetchUsers} 
@@ -268,7 +279,7 @@ class AllotRuleModalRender extends AllotRuleModalMethods {
   /** 
    * @description 渲染 分配给 角色权限select
   */
-  public renderAllotGroupRoleSelect() {
+  public renderAllotGroupRoleSelect(): VNode {
     const ScopedSlots = {
       option: (props: { option: Role }) => {
         return (
@@ -282,6 +293,7 @@ class AllotRuleModalRender extends AllotRuleModalMethods {
     
     return (
       <biz-form-remote-select
+        disabled={this.isDisabled}
         value={value}
         onInput={(value: Role[]) => this.handlerRoleSelectChanged(value)}
         placeholder='请选择角色'
@@ -294,14 +306,15 @@ class AllotRuleModalRender extends AllotRuleModalMethods {
   /** 
    * @description 渲染 分配给 团队select
   */
-  public renderAllotGroupTeamSelect(isLeader = false) {
+  public renderAllotGroupTeamSelect(isLeader = false): VNode {
     let value = (
       isLeader 
         ? this.form.groupData[AllotGroupEnum.TagLeader]
         : this.form.groupData[AllotGroupEnum.Tag]
     )
     return (
-      <biz-team-select 
+      <biz-team-select
+        disabled={this.isDisabled}
         value={value} 
         onInput={(value: Tag[]) => this.handlerTeamChanged(value, isLeader)}
       />
@@ -311,12 +324,12 @@ class AllotRuleModalRender extends AllotRuleModalMethods {
   /** 
    * @description 渲染 派单顺序 select
   */
-  public renderAllotOrder() {
+  public renderAllotOrder(): VNode {
     // 数据变化
     const HandlerOrderChange = (value: AllotOrderEnum) => this.form.order = value
     
     return (
-      <el-select class={`${this.className}-order`} value={this.form.order} onInput={HandlerOrderChange}>
+      <el-select disabled={this.isDisabled} class={`${this.className}-order`} value={this.form.order} onInput={HandlerOrderChange}>
         {
           this.allotOrderOptions.map((option: ElSelectOption) => {
             return (
@@ -325,6 +338,19 @@ class AllotRuleModalRender extends AllotRuleModalMethods {
           })
         }
       </el-select>
+    )
+  }
+  
+  /** 
+   * @description 渲染确定按钮
+  */
+  public renderConfirmButton(): VNode | null {
+    if (this.isDisabled) return null
+
+    return (
+      <el-button type='primary' disabled={this.pending} onClick={() => this.submit()}>
+        确 定
+      </el-button>
     )
   }
 }

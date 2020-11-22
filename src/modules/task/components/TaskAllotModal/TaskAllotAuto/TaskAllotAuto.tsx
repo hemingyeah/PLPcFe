@@ -143,7 +143,15 @@ export default class TaskAllotAuto extends Vue {
   */
   private openRuleDialog() {
     // @ts-ignore
-    this.$refs.AllotRuleModal && this.$refs.AllotRuleModal.show()
+    this.$refs.AllotRuleModal && this.$refs.AllotRuleModal.outsideShow()
+  }
+  
+  /** 
+   * @description 打开分配规则弹窗 查看信息
+  */
+  private openRuleDialogForDisplay(item: AutoDispatchListItem) {
+    // @ts-ignore
+    this.$refs.AllotRuleModal && this.$refs.AllotRuleModal.outsideShow(item, { isDisabled: true, title: '查看分配规则' })
   }
   
   /** 
@@ -194,7 +202,9 @@ export default class TaskAllotAuto extends Vue {
   private renderMathItem(item: AutoDispatchListItem) {
     return (
       <div class={`${this.className}-item`}>
-        <div class={[`${this.className}-item-name`, `${this.className}-match`]}>按「{item.finalRuleName || ''}」匹配</div>
+        <div class={[`${this.className}-item-name`, `${this.className}-match`]} onClick={() => this.openRuleDialogForDisplay(item)}>
+          按「{item.finalRuleName || ''}」匹配
+        </div>
         <div>
           { item.finalExecutorName && <span>预估匹配到合适人员【{item.finalExecutorName}】</span> }
           { item.candidateOneName && <span>, 当前备选人员 {item.candidateOneName}, {item.candidateTwoName}</span> }
@@ -215,7 +225,9 @@ export default class TaskAllotAuto extends Vue {
   private renderUnMathItem(item: AutoDispatchListItem) {
     return (
       <div class={`${this.className}-item`}>
-        <div class={`${this.className}-item-name`}>按「{item.name || ''}」匹配</div>
+        <div class={`${this.className}-item-name`} onClick={() => this.openRuleDialogForDisplay(item)}>
+          按「{item.name || ''}」匹配
+        </div>
         <div class={`${this.className}-nomatch`}>未匹配到合适人员</div>
       </div>
     )

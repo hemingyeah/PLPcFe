@@ -502,9 +502,10 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
   /**
    * @description 选择团队变化事件
   */
-  public handlerTeamChange(): void {
+  public handlerTeamChange(value: Tag[]): void {
     Log.succ(Log.Start, this.handlerTeamChange.name)
     
+    this.selectTeams = value
     this.initialize()
   }
   

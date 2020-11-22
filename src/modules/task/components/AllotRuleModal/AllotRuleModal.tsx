@@ -22,11 +22,12 @@ export default class AllotRuleModal extends AllotRuleModalRender {
     const attrs = this.getAttributes() 
     
     return (
-      <base-modal class={this.className} id={this.className} show={this.showAllotRuleModal} {...attrs}>
+      <base-modal class={[this.className, this.isDisabled && `${this.className}-disabled`]} id={this.className} show={this.showAllotRuleModal} {...attrs}>
         <el-form ref='form' model={this.form} label-width='200px' label-position='left'>
           
           <el-form-item label='名称：' required>
-            <el-input 
+            <el-input
+              disabled={this.isDisabled}
               placeholder='规则名称 [最多十个字] '
               value={this.form.name} 
               onInput={(value: string) => this.handlerNameChange(value)}  
@@ -35,7 +36,7 @@ export default class AllotRuleModal extends AllotRuleModalRender {
           </el-form-item>
           
           <el-form-item label='规则类型：' required>
-            <el-radio-group value={this.form.type} onInput={(value: RuleTypeEnum) => this.handlerTypeChange(value)}>
+            <el-radio-group disabled={this.isDisabled} value={this.form.type} onInput={(value: RuleTypeEnum) => this.handlerTypeChange(value)}>
               <el-radio label={RuleTypeEnum.Type}>按照工单类型</el-radio>
               <el-radio label={RuleTypeEnum.Select}>按照特定条件</el-radio>
               <el-radio label={RuleTypeEnum.Tag}>按照客户所属团队</el-radio>
@@ -61,9 +62,7 @@ export default class AllotRuleModal extends AllotRuleModalRender {
           <el-button onClick={() => this.close()}>
             取 消
           </el-button>
-          <el-button type='primary' disabled={this.pending} onClick={() => this.submit()}>
-            确 定
-          </el-button>
+          {this.renderConfirmButton()}
         </div>
         
       </base-modal>

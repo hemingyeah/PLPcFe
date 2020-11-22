@@ -5,11 +5,12 @@
   & > .base-modal {
     height: calc(100vh - 100px);
     width: calc(100% - 100px) !important;
-  }
-  
-  .base-modal-body {
-    display: flex;
-    padding: 0 !important;
+    
+    & > .base-modal-body {
+      display: flex;
+      padding: 0 !important;
+    }
+    
   }
   
   .task-allot-nav {

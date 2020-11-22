@@ -55,4 +55,14 @@
     }
   }
 }
+
+.allot-rule-modal-disabled {
+  .el-tag__close,
+  .el-icon-close,
+  .el-icon-error,
+  .icon-yemianshanchu {
+    display: none;
+  }
+
+}
 /* end 弹窗 */

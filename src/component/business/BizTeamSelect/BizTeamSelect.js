@@ -143,7 +143,7 @@ const BizTeamSelect = {
       if(!this.popperVisible) return;
       this.popperVisible = false;
     },
-   
+    
     choose(value){
       // 单选
       if(!this.multiple){
@@ -151,21 +151,23 @@ const BizTeamSelect = {
         this.close();
         return this.$emit('input', data);
       }
-
+      
       // 多选
       let index = this.value.findIndex(item => item.id === value.id);
       index >= 0 ? this.value.splice(index, 1) : this.value.push(value);
-
+      
       this.$emit('input', this.value);
       this.updatePopper();
     },
     /** 删除选中项 */
     remove(event, item){
-      event.stopPropagation();
-
-      let index = this.value.findIndex(i => item == i);
+      event.stopPropagation()
+      
+      let index = this.value.findIndex(i => item == i)
       if(index >= 0) this.value.splice(index, 1)
-      this.updatePopper();
+      
+      this.$emit('input', this.value)
+      this.updatePopper()
     },
     /** 清空选中项 */
     clear(event){
@@ -173,7 +175,7 @@ const BizTeamSelect = {
       this.$emit('input', []);
       this.close();
     },
-
+    
     /** 获取团队数据 */
     async fetchTeam(action){
       try {

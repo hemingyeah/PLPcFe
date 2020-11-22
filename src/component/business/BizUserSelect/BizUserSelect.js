@@ -27,6 +27,10 @@ const BizUserSelect = {
       type: String,
       default: '请选择人员'
     },
+    disabled: {
+      type: Boolean,
+      default: false
+    }
   },
   data() {
     return {
@@ -172,8 +176,10 @@ const BizUserSelect = {
     },
     /** 显示popper */
     showPopper(event) {
+      if (this.disabled) return
+      
       event.stopPropagation();
-
+      
       // 如果没创建popper，先创建
       if (this.$data.$popper == null) {
         document.body.appendChild(this.$refs.popper)
@@ -298,7 +304,7 @@ const BizUserSelect = {
   render(h) {
     let clazz = ['biz-user-select'];
     return (
-      <div class={ clazz } onClick={ e => this.showPopper(e) }>
+      <div class={ clazz } onClick={ e => !this.disabled && this.showPopper(e) }>
         <input id={ this.id } type="text" />
         { this.renderClear(h) }
         { this.multiple ? this.renderMultiple(h) : this.renderSingle(h) }

@@ -169,7 +169,7 @@ class AllotRuleModalMethods extends AllotRuleModalComputed {
   public getAttributes() {
     return {
       props: {
-        title: '新建分配规则'
+        title: this.title
       },
       on: {
         'update:show': (val: boolean) => {
@@ -229,7 +229,7 @@ class AllotRuleModalMethods extends AllotRuleModalComputed {
   /** 
    * @description 获取工单类型开启的系统字段列表
   */
-  public fetchEnabledFields(): void {
+  public fetchEnabledFields(): Promise<Field[] | void> {
     this.pending = true
     
     let params: { typeId: string, tableName: string } = {
@@ -237,18 +237,22 @@ class AllotRuleModalMethods extends AllotRuleModalComputed {
       tableName: 'task'
     }
     
-    SettingApi.getSettingTaskTypeEnabledFields(params)
-      .then((result: Field[]) => {
-        this.enabledFields = result || []
-        this.form.typeData[RuleTypeEnum.Select].field = this.enabledFieldsOptions?.[0].value
-        this.setFormTypeData()
-      })
-      .catch(error => {
-        console.warn(error)
-      })
-      .finally(() => {
-        this.pending = false
-      })
+    return (
+      SettingApi.getSettingTaskTypeEnabledFields(params)
+        .then((result: Field[]) => {
+          this.enabledFields = result || []
+          this.form.typeData[RuleTypeEnum.Select].field = this.enabledFieldsOptions?.[0].value
+          this.setFormTypeData()
+          
+          return result
+        })
+        .catch(error => {
+          console.warn(error)
+        })
+        .finally(() => {
+          this.pending = false
+        })
+    )
   }
   
   /**
@@ -349,18 +353,40 @@ class AllotRuleModalMethods extends AllotRuleModalComputed {
   
   /** 
    * @description 显示弹窗
+   * -- 支持外部调用的
   */
-  public show() {
+  public outsideShow(data: RuleParams, options: { isDisabled: boolean, title: string } = { isDisabled: false, title: '新建分配规则' }) {
+    // 是否为禁用状态
+    this.isDisabled = options.isDisabled
+    this.title = options.title
+    this.show(data)
+  }
+  
+  /** 
+   * @description 显示弹窗
+  */
+  public show(data?: RuleParams) {
+    // 初始化构建form
     this.form = this.buildForm()
-    this.fetchEnabledFields()
+    // 解析数据
+    data && this.unpack(data)
+    // 获取开启的字段列表
+    !this.isDisabled && this.fetchEnabledFields()
+    // 显示
     this.showAllotRuleModal = true
   }
   
+  /** 
+   * @description 设置表单字段数据
+  */
   public setFormTypeData() {
     this.form.typeData[RuleTypeEnum.Select].operator = this.taskTypeSelectedFieldOperatorOptions[0].value
     this.form.typeData[RuleTypeEnum.Select].value = this.taskTypeSelectedFieldValueOptions?.[0].value || ''
   }
   
+  /** 
+   * @description 提交
+  */
   public submit() {
     if (this.pending) return
     
@@ -380,6 +406,85 @@ class AllotRuleModalMethods extends AllotRuleModalComputed {
         Platform.alert(error)
         this.pending = false
       }) 
+  }
+  
+  /** 
+   * @description 将数据转换为组件数据
+  */
+  public unpack(data: RuleParams) {
+    let { according, condition, candidate, name } = data
+    // @ts-ignore
+    let { typeInfo = [], group, orderBy, tagInfo = [], templateId = '', templateName = '', fieldName = '', groupId = '', groupName = '' } = condition
+    let { info } = candidate
+    let { groupData, typeData } = this.form
+    
+    // 按工单类型
+    if (according === RuleAccordingMap[RuleTypeEnum.Type]) {
+      this.form.type = RuleTypeEnum.Type
+      typeData[RuleTypeEnum.Type] = typeInfo.map(taskType => {
+        return { id: taskType.id || '', name: taskType.name || '', value: taskType.id || '', label: taskType.name || '' }
+      })
+    }
+    
+    // 按特定条件
+    if (according === RuleAccordingMap[RuleTypeEnum.Select]) {
+      this.form.type = RuleTypeEnum.Select
+      // @ts-ignore
+      this.form.typeData[RuleTypeEnum.Select].taskType = [{ id: templateId, name: templateName, label: templateName, value: templateId }]
+      // 获取字段列表
+      this.fetchEnabledFields().then(() => {
+        this.form.typeData[RuleTypeEnum.Select].field = fieldName
+        this.form.typeData[RuleTypeEnum.Select].operator = condition.operator
+        this.form.typeData[RuleTypeEnum.Select].value = condition.value || ''
+      })
+    }
+    
+    // 按客户服务团队
+    if (according === RuleAccordingMap[RuleTypeEnum.Tag]) {
+      this.form.type = RuleTypeEnum.Tag
+      // 团队列表
+      typeData[RuleTypeEnum.Tag].tags = tagInfo.map(tag => {
+        return { id: tag.id || '', tagName: tag.name || '' }
+      })
+      // 操作符
+      typeData[RuleTypeEnum.Tag].operator = <AllotOperatorEnum>condition.operator
+    }
+    
+    // 指定人员用户
+    if (group === AllotGroupEnum.User) {
+      groupData[AllotGroupEnum.User] = (
+        info 
+          ? (
+            info.map(user => {
+              return { userId: user.userId || '', displayName: user.userName, times: user.times }
+            })
+          )
+          : []
+      )
+    }
+    
+    // 指定角色
+    if (group === AllotGroupEnum.Role) {
+      // @ts-ignore
+      groupData[AllotGroupEnum.Role] = [{ id: groupId, name: groupName, value: groupId, label: groupName }]
+    }
+    
+    // 指定服务团队
+    if (group === AllotGroupEnum.Tag) {
+      groupData[AllotGroupEnum.Tag] = [{ id: groupId, tagName: groupName }]
+    }
+    
+    // 指定服务团队主管
+    if (group === AllotGroupEnum.TagLeader) {
+      groupData[AllotGroupEnum.TagLeader] = [{ id: groupId, tagName: groupName }]
+    }
+    
+    // 分配给
+    this.form.groupType = group
+    // 排序方式
+    this.form.order = orderBy
+    // 名称
+    this.form.name = name
   }
 }
 

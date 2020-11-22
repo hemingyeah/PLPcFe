@@ -1,4 +1,5 @@
 /* entity */
+import Tag from '@model/entity/Tag/Tag'
 import LoginUser from '@model/entity/LoginUser/LoginUser'
 /* interface */
 import { ElSelectOption, UserState } from '@src/modules/task/components/TaskAllotModal/TaskAllotExcutor/TaskAllotUserTable/TaskAllotUserTableInterface'
@@ -104,10 +105,10 @@ class TaskAllotUserTableRender extends TaskAllotUserTableMethods {
   */
   public renderTeamSelect() {
     return (
-      <biz-team-select 
+      <biz-team-select
         value={this.selectTeams} 
         fetchFunc={(params: TaskTagListSearchModel) => this.fetchTagList(params)} 
-        onInput={() => this.handlerTeamChange()} 
+        onInput={(value: Tag[]) => this.handlerTeamChange(value)} 
         multiple 
         collapse 
       />
