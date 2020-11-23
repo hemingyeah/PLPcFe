@@ -67,7 +67,8 @@
         class="search-input"
         placeholder="输入关键词搜索" 
         v-model="params.keyword"
-        @keyup.enter.native="search">
+        @keyup.enter.native="search"
+        v-trim:blur>
         <i slot="suffix" class="el-input__icon el-icon-search"></i>
       </el-input>
 

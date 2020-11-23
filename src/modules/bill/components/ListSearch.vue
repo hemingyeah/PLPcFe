@@ -6,7 +6,7 @@
       <form class="base-search" onsubmit="return false;">
         <div class="list-left">
           <div class="list-base-search-group">
-            <el-input v-model="searchModel.keyword" :placeholder="placeholder">
+            <el-input v-model="searchModel.keyword" :placeholder="placeholder" v-trim:blur>
               <i slot="prefix" class="el-input__icon el-icon-search"></i>
             </el-input>
             <base-button type="primary" @event="search();trackEventHandler('search')" native-type="submit">搜索</base-button>

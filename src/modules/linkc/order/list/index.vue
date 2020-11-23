@@ -9,6 +9,7 @@
           placeholder="搜索订单编号商品名称"
           v-model="searchModel.keyWord"
           @keyup.enter.native="searchModel.pageNum=1,search()"
+          v-trim:blur
         >
           <el-button slot="append" @click="searchModel.pageNum=1,search()">
             <i class="iconfont icon-search"></i>
