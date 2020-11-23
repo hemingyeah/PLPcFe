@@ -139,7 +139,6 @@ export default {
       }
     },
     dialogConfirm(e) {
-      console.log(e, 'dialogConfirm');
       this.$refs.publicDialog.changeBtnLoading(true);
       switch (this.dialogType) {
       case 'addMenu':
@@ -189,7 +188,8 @@ export default {
         break;
       case 'cloneMenu':
         if (e.nowChooseArr && e.nowChooseArr.length > 0) {
-          this.$refs.workTreeData.reflashPage(e.nowChooseArr[0].id);
+          this.$refs.workTreeData.reflashPage(e.nowChooseArr[0]);
+          this.changeVisibleProp(false);
         }
         break;
       default:
@@ -237,13 +237,9 @@ export default {
                       fasterEditRoot_.indexArr,
                       0
                     );
-                    console.log(this.treeData, 'this.treeData');
                   }
-
-                  console.log(fasterEditRoot_, 'fasterFindRootById');
                 } catch (error) {}
               }
-              console.log(nowEditMenu, 'nowEditMenu');
               this.nowEditMenu = nowEditMenu;
             }
           } else {
@@ -294,7 +290,7 @@ export default {
                 0,
                 this.childData.indexArr.length - 2
               );
-              console.log(element, this.childData, 'renameMenu');
+              // console.log(element, this.childData, 'renameMenu');
               element[this.childData.nowIndex].name = res.result.name;
             }
             this.changeVisibleProp(false);
@@ -311,7 +307,7 @@ export default {
         });
     },
     changeTree(type, indexArr, data, des) {
-      console.log(type, indexArr, data);
+      // console.log(type, indexArr, data);
       try {
         let element = this.findRoot(
           this.treeData,
@@ -319,7 +315,6 @@ export default {
           0,
           indexArr.length - 1
         );
-        console.log(element);
         if (type == 'add') {
           element.push(data);
         } else if (type == 'delete') {
@@ -331,7 +326,6 @@ export default {
       } catch (error) {}
     },
     changeTreeDetail(key, val) {
-      console.log(this.nowEditMenu, 'nowEditMenu');
       try {
         let element = this.findRoot(
           this.treeData,
@@ -339,7 +333,6 @@ export default {
           0,
           this.nowEditMenu.indexArr.length - 2
         );
-        console.log(element, 'changeTreeDetail');
         element[this.nowEditMenu.nowIndex][key] = val;
       } catch (error) {
         console.warn(error);

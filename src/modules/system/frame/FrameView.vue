@@ -1212,7 +1212,7 @@ export default {
       try {
         for (let index = 0; index < this.frameTabs.length; index++) {
           if (this.frameTabs[index].id == obj.type) {
-            this.$platform.refreshTab('productV2_catalog_edit');
+            this.$platform.refreshTab(obj.type);
             break;
           }
         }

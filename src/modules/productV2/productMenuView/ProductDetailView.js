@@ -279,25 +279,25 @@ export default {
             window.parent.flashSomePage({
               type: 'productV2_catalog_edit'
             })
-            window.location.href = '/productV2/productMenu/list'
+            window.location.href = '/productV2/catalog/list'
           }
         }).catch()
       })
     },
     alterData() {
       this.$platform.openTab({
-        id: 'productV2_productMenu_edit',
+        id: 'productV2_catalog_edit',
         title: '产品目录编辑',
         close: true,
-        url: `/productV2/productMenu/edit?id=${this.dataInfo.id}`,
+        url: `/productV2/catalog/edit?id=${this.dataInfo.id}`,
       })
     },
     creatData() {
       this.$platform.openTab({
-        id: 'productV2_productMenu_edit',
+        id: 'productV2_catalog_edit',
         title: '产品目录编辑',
         close: true,
-        url: '/productV2/productMenu/edit',
+        url: '/productV2/catalog/edit',
       })
     }
 

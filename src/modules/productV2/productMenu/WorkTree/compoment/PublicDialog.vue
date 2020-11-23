@@ -56,7 +56,7 @@
               <el-option
                 v-for="item in options"
                 :key="item.id"
-                :label="dialogType == 'linkWiki' ? item.title : item.name"
+                :label="dialogType == 'linkWiki' ? item.title : dialogType== 'cloneMenu'? item.pathName : item.name"
                 :value="item.id"
               >
                 <div class="flex-x overHideCon-1">
@@ -67,7 +67,7 @@
                     <div>{{ item.title }}</div>
                   </template>
                   <template v-if="dialogType == 'cloneMenu'">
-                    <div>{{ item.name }}</div>
+                    <div>{{ item.pathName }}</div>
                   </template>
                 </div>
               </el-option>
@@ -224,10 +224,8 @@ export default {
       ) {
         this.$emit('confirm', { nowChooseArr: this.nowChooseArr });
       }
-      console.log(JSON.stringify(this.nowChooseArr), 321);
     },
     dataUpdate(e, key) {
-      console.log(e, key, 'get');
       this[key] = e;
     },
     calculateClass(e, t) {

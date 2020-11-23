@@ -26,7 +26,7 @@ export default {
   mounted() {},
   methods: {
     openTab() {
-      window.location.href = '/productV2/productMenu/settingField'
+      window.location.href = '/productV2/catalog/settingField'
       // this.$platform.openTab({
       //   id: 'productV2_productMenu_settingField',
       //   title: '产品目录表单',

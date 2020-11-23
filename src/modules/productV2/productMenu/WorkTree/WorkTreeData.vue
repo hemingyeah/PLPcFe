@@ -168,8 +168,8 @@
       </template>
     </div>
     <div class="bottom-btns" v-if="propData.conData == 1">
-      <el-button type="danger" @click="deletInfo">删除</el-button>
-      <el-button class="mar-l-8" type="primary" @click="submit">保存</el-button>
+      <el-button type="danger" :loading="btnLoading" @click="deletInfo">删除</el-button>
+      <el-button class="mar-l-8" type="primary" :loading="btnLoading" @click="submit">保存</el-button>
     </div>
   </div>
 </template>
@@ -219,6 +219,7 @@ export default {
       flashPartType: false,
       flashProductType: false,
       fieldIds: [],
+      btnLoading:false
     };
   },
   components: {
@@ -269,12 +270,10 @@ export default {
       this.$previewImg(file.url);
     },
     handlePreview(file) {
-      console.log(file, 'file');
       if (!file.url) return;
       this.$previewVideo(file.url);
     },
     onBeforeUploadImage(file) {
-      // console.log(file.raw, "file");
       const isJPG = file.type === 'image/jpeg' || file.type === 'image/png';
       const isLt2M = file.size / 1024 / 1024 < 2;
 
@@ -288,7 +287,6 @@ export default {
       return isJPG && isLt2M;
     },
     onBeforeUploadVideo(file) {
-      console.log(file, 'file');
       const isMP4 = file.type === 'video/mp4';
       const isLt10M = file.size / 1024 / 1024 < 10;
 
@@ -302,7 +300,6 @@ export default {
       return isMP4 && isLt10M;
     },
     UploadImage(param) {
-      console.log(param, 'param');
       Uploader.upload(param.file, '/files/upload')
         .then((result) => {
           if (result.status != 0) {
@@ -327,7 +324,6 @@ export default {
             ...this.productMenuValue.product_pic,
             item,
           ]);
-          // console.log(item, "uploadImg");
         })
         .catch((err) => {
           console.warn(err);
@@ -335,7 +331,6 @@ export default {
         .finally(() => {});
     },
     showDialog(e) {
-      console.log(this.productMenuValue, 'productMenuValue');
       if (this.$parent.changeDialog) {
         this.$parent.changeDialog(e);
       } else if (this.$parent.$parent.changeDialog) {
@@ -379,6 +374,7 @@ export default {
       if (!validateRes) return;
       this.rootDataChange('fullscreenLoading', true);
       let url_data = this.transferData();
+      this.btnLoading = true;
       setPageInfo(url_data)
         .then((res) => {
           if (res.code != 0) {
@@ -399,6 +395,7 @@ export default {
         })
         .finally(() => {
           this.rootDataChange('fullscreenLoading', false);
+          this.btnLoading = false;
         });
     },
     transferData(data) {
@@ -449,6 +446,7 @@ export default {
         type: 'warning',
       })
         .then(() => {
+          this.btnLoading = true;
           clearCatalogData({
             catalogId: this.propData.id,
           }).then((res) => {
@@ -472,6 +470,8 @@ export default {
                 duration: 2000,
               });
             }
+          }).finally(()=>{
+            this.btnLoading = false;
           });
         })
         .catch(() => {});

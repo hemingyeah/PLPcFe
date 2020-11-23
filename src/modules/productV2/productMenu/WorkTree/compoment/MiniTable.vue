@@ -12,7 +12,6 @@
       ref="multipleTable"
     >
       <template v-if="dataType == 'part'">
-        
         <el-table-column
           show-overflow-tooltip
           prop="serialNumber"
@@ -61,7 +60,6 @@
       </template>
       <template v-if="dataType == 'wiki'">
         <el-table-column
-          show-overflow-tooltip
           prop="title"
           label="标题"
           width="180"
@@ -79,7 +77,7 @@
                     class="view-detail-btn"
                     @click.stop.prevent="openProductMenuTab(scope.row.id)"
                   >
-                    {{scope.row.title }}
+                    {{ scope.row.title }}
                   </a>
                 </el-tooltip>
               </template>
@@ -247,6 +245,9 @@ export default {
           }).then((res) => {
             if (res.code == 0) {
               this.reflash();
+              window.parent.flashSomePage({
+                type: 'productV2_catalog_list',
+              });
             } else {
               this.$notify.close();
               this.$notify.error({
@@ -293,13 +294,20 @@ export default {
       try {
         fromId = window.frameElement.getAttribute('id');
       } catch (error) {}
-      
 
       this.$platform.openTab({
-        id: `${this.dataType == 'part' ? 'productV2_productMenu_view_' : 'document_detail_'}${id}`,
+        id: `${
+          this.dataType == 'part'
+            ? 'productV2_productMenu_view_'
+            : 'document_detail_'
+        }${id}`,
         title: '知识库列表',
         close: true,
-        url: `${this.dataType == 'part' ? '/productV2/productMenu/view?id=' : '/wiki/detail/page?wikiId='}${id}`,
+        url: `${
+          this.dataType == 'part'
+            ? '/productV2/catalog/view?id='
+            : '/wiki/detail/page?wikiId='
+        }${id}`,
         fromId,
       });
     },

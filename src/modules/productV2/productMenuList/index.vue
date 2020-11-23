@@ -156,7 +156,7 @@
             "
             :min-width="column.minWidth || '120px'"
             :sortable="column.sortable"
-            :show-overflow-tooltip="column.field !== 'name'"
+            :show-overflow-tooltip="column.fieldName !== 'pathName'"
             :align="column.align"
           >
             <template slot-scope="scope">
@@ -568,7 +568,6 @@ export default {
           isSystem: 1,
         },
       ];
-      console.log(this.dynamicFields, 'dynamicFields')
       return this.dynamicFields
         .concat(fixedFields)
         .filter(
@@ -813,10 +812,10 @@ export default {
       } catch (error) {}
 
       this.$platform.openTab({
-        id: `productV2_productMenu_view_${id}`,
+        id: `productV2_catalog_view_${id}`,
         title: '产品目录详情',
         close: true,
-        url: `/productV2/productMenu/view?id=${id}`,
+        url: `/productV2/catalog/view?id=${id}`,
         fromId,
       });
     },
@@ -832,7 +831,6 @@ export default {
             item['catalogName'] = '';
             return item;
           });
-          console.log(res.result);
           this.page = Page.as(Object.freeze(res.result));
           this.matchSelected();
         })
@@ -1106,7 +1104,6 @@ export default {
       let localColumns = columnStatus
         .map((i) => (typeof i == 'string' ? { field: i, show: true } : i))
         .reduce((acc, col) => (acc[col.field] = col) && acc, {});
-      console.log(this.productFields, 'productFields');
 
       this.columns = this.productFields
         .filter(
@@ -1245,9 +1242,9 @@ export default {
       let fromId = window.frameElement.getAttribute('id');
 
       this.$platform.openTab({
-        id: 'productV2_productMenu_edit',
+        id: 'productV2_catalog_edit',
         title: '新建产品目录',
-        url: '/productV2/productMenu/edit',
+        url: '/productV2/catalog/edit',
         reload: true,
         close: true,
         fromId,

@@ -134,7 +134,6 @@ export default {
       this.tasks[index].showList = 1 - this.tasks[index].showList;
     },
     checkRootList(index) {
-      console.log(this.nowEditMenu, this.tasks[index], this.rootData, 'checkRootList');
       if(this.nowEditMenu.id == this.tasks[index].id) return
       this.rootDataChange('nowEditMenu', {
         id: this.tasks[index].id,
@@ -147,7 +146,6 @@ export default {
     },
     addChildArr(index) {
       let nowMenu = this.tasks[index];
-      console.log(this.rootData, 'addChildArr');
       this.rootDataChange('childData', {
         id: nowMenu.id,
         pathName: nowMenu.pathName,
@@ -193,14 +191,6 @@ export default {
     },
     renameChildArr(index) {
       let nowMenu = this.tasks[index];
-      console.log({
-        id: nowMenu.id,
-        pathName: nowMenu.pathName,
-        indexArr: [...this.rootData.indexArr, index],
-        pathNameArr: this.rootData.pathNameArr,
-        name: nowMenu.name,
-        nowIndex: index,
-      });
       this.rootDataChange('childData', {
         id: nowMenu.id,
         pathName: nowMenu.pathName,
@@ -213,7 +203,6 @@ export default {
       this.tasks[index].popoverVisible = false;
     },
     arrUpdate(e) {
-      console.log(this.rootData, 'arrUpdate');
       let obj = {
         id: this.sortMenu.id,
         parentId: this.rootData.id,
@@ -238,7 +227,6 @@ export default {
           this.getTreeData();
         }
       });
-      console.log(obj, this.sortMenu, 'update');
     },
     addArr(e) {
       let obj = {
@@ -265,11 +253,9 @@ export default {
           this.getTreeData();
         }
       });
-      console.log(obj, this.sortMenu, 'add');
     },
     arrChoose(e) {
       this.rootDataChange('sortMenu', this.tasks[e.oldIndex]);
-      console.log(e, 'choose');
     },
     tasksItemMove(e) {
       this.rootDataChange('nowHoverMenu', { id: this.tasks[e].id });
