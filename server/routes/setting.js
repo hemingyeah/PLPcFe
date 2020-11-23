@@ -55,7 +55,7 @@ router.get('/system/mall/index', async ctx => {
   let script = ['/system.mall.index.js'];
   let modConfig = modules['system.mall.index'];
   let reqHeaders = ctx.request.headers;
-  let result = await HttpClient.request('/setting/serviceStation/markSpareGray', 'get', null, {headers: reqHeaders});
+  let result = await HttpClient.request('/setting/serviceStation/partShop', 'get', null, {headers: reqHeaders});
   let body = result.body;
 
   ctx.body = Template.renderWithHtml('商品列表', body, script, modConfig.template)
