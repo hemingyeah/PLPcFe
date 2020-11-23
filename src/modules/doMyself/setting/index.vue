@@ -727,7 +727,7 @@ export default {
     },
     goToShopCenter() {
       // window.location = '/setting/serviceStation/markSpareGray'
-      window.location.href = '/system/mall/index'
+      window.location.href = '/setting/serviceStation/partShop'
     },
     copyUrl() {
       if (!this.setData.protalUrl) return

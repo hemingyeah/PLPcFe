@@ -51,7 +51,7 @@ router.get('/setting/task/field/taskReceipt', async ctx => {
 });
 
 
-router.get('/system/mall/index', async ctx => {
+router.get('/setting/serviceStation/partShop', async ctx => {
   let script = ['/system.mall.index.js'];
   let modConfig = modules['system.mall.index'];
   let reqHeaders = ctx.request.headers;

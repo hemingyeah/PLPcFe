@@ -17,7 +17,7 @@ export default {
   methods: {
     goToShops() {
       // window.location.href = "/setting/serviceStation/markSpareGray";
-      window.location.href = '/system/mall/index'
+      window.location.href = '/setting/serviceStation/partShop'
     },
   },
 };
