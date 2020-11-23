@@ -69,7 +69,7 @@ import {
   setTreeList,
   setPagerelationPartOrWiki,
   renameTree,
-  cloneMenu
+  cloneMenu,
 } from '@src/api/ProductV2Api';
 
 let finded = false;
@@ -197,6 +197,9 @@ export default {
               this.$message({
                 message: '复制成功',
                 type: 'success',
+              });
+              window.parent.flashSomePage({
+                type: 'productV2_catalog_list',
               });
               this.changeVisibleProp(false);
             } else {
