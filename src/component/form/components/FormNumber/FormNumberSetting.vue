@@ -69,6 +69,7 @@
     <!-- start 默认值 -->
     <form-default-value-setting
       :field="field"
+      :max-length="maxLength"
       type="number"
       @input="update"
     ></form-default-value-setting>
@@ -94,6 +95,8 @@
 import SettingMixin from '@src/component/form/mixin/setting';
 import { settingProps } from '@src/component/form/components/props';
 
+import { FORM_FIELD_NUMBER_MAX_LENGTH } from '@src/model/const/Number.ts';
+
 const DECIMAL_MIN_LENGTH = 1;
 const DECIMAL_MAX_LENGTH = 5;
 
@@ -102,6 +105,9 @@ export default {
   mixins: [SettingMixin],
   props: settingProps,
   computed: {
+    maxLength() {
+      return FORM_FIELD_NUMBER_MAX_LENGTH;
+    },
     /** 
     * @description 小数位数配置项
     */
