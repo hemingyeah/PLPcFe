@@ -88,11 +88,6 @@ export default class FormField{
     if(isCascader(params)){
       this.setting = { maxDeep: 2, dataSource:[{value:'一级选项 1', children:[{ value : '二级选项 1'}]}]}
     }
-
-    // 计算公式设置默认不允许修改
-    if (this.formType == 'formula' && !this.setting.defaultValueConfig) {
-      this.setting.defaultValueConfig = { isNotModify: 1 };
-    }
   
     // 辅助字段
     this.dragging = false; // 当前字段时候正在被拖拽

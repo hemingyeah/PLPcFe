@@ -1,6 +1,7 @@
 <template>
   <div class="form-formula">
     <input 
+      :class="{'has-formula': formula.length}"
       autocomplete="off"
       ref="input" 
       type="number" 
@@ -62,16 +63,24 @@ export default {
       let parent = findComponentUpward(this, 'form-builder');
       let form = parent?.value || {};
 
-      // 处理计算公式，最多保留3位小数
-      let formulaStr = this.formula.map(item => {
-        let { isOperator, value } = item;
-        let fieldValue = form[value] || 0;
-        return isOperator ? value : (!isNaN(Number(fieldValue)) ? fieldValue : 0);
-      }).join('');
+      // 处理计算公式，取值并转成可计算的字符串
+      let formulaStr = this.formula.map(item => item.isOperator ? item.value : form[item.value]).join('');
+
+      let value = '';
+
+      try {
+        let formulaVal = MathUtil.evaluate(formulaStr);
+
+        // 判断是否是有限的数字，因为0是被除数的话计算结果可能是Infinity无穷
+        let isFinite = Number.isFinite(formulaVal);
+
+        value = isFinite ? formulaVal.toString() : '';
+
+      } catch (error) {
+        console.log(`[${this.field.displayName}]计算出错啦~`)
+      }
       
-      let formulaVal = MathUtil.evaluate(formulaStr);
-      let value = !isNaN(formulaVal) ? formulaVal.toString() : '';
-      
+      // 最多保留3位小数
       return value.replace(/([0-9]+.[0-9]{3})[0-9]*/, '$1');
     }
   },
@@ -151,7 +160,10 @@ export default {
   
   input {
     width: 100%;
-    padding-right: 26px;
+
+    &.has-formula {
+      padding-right: 26px;
+    }
     
     &:disabled {
       -webkit-text-fill-color: #b2b2b2;

@@ -68,6 +68,24 @@ function info (field) {
   return message;
 }
 
+function formula(fields, field) {
+  let message = [];
+  let formula = (field.setting && field.setting.formula) || [];
+  
+  // 验证是否存在已删除的无效字段
+  for(let i = 0; i < formula.length; i++) {
+    let index = fields.findIndex(field => field.fieldName == formula[i].value);
+    let isDelete = !formula[i].isOperator && index == -1;
+
+    if(isDelete){
+      message.push('存在已删除的无效字段');
+      break;
+    }
+  }
+
+  return message;
+}
+
 /**
  * 验证表单字段格式
  * @param {array} fields - 待验证字段
@@ -86,6 +104,10 @@ export function validate(fields){
 
     if(isInfo(field)) {
       message = message.concat(info(field));
+    }
+
+    if(field.formType == 'formula') {
+      message = message.concat(formula(fields, field));
     }
 
     return message.length > 0 ? {message, title: field.displayName} : null;

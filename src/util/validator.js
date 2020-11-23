@@ -319,11 +319,12 @@ function formula(value, field = {}) {
   let isNotModify = defaultValueConfig.isNotModify == 1 && formula.length > 0;
 
   return new Promise(resolve => {
-    // 不允许修改时 不做校验
-    if (isNotModify) return resolve(null);
+    // 空值
+    let isEmpty = !value || !value.toString().length;
 
     if (field.isNull === 1) return resolve(null);
-    if (!value || !value.toString().length) return resolve(`请输入${field.displayName}`);
+    if (isNotModify && isEmpty) return resolve(`${field.displayName}缺少计算对象或输入无效值，无法得出计算结果，请重新确认`);
+    if (isEmpty) return resolve(`请输入${field.displayName}`);
     if (typeof Number(value) !== 'number') return resolve('请输入数字');
     resolve(null);
   });
