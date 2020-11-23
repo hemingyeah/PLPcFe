@@ -686,6 +686,16 @@ export default {
           continue;
         }
 
+        if (tv.fieldName === "source") {
+          let condition = {
+            property: "source",
+            operator: tv.operatorValue,
+            inValue: form[fn],
+          };
+          params.systemConditions.push(condition);
+          continue;
+        }
+
         if (tv.formType == "date") {
           params.systemConditions.push({
             property: fn,

@@ -456,6 +456,7 @@ export default {
               "allotTypeStr",
               "state",
               "cascader",
+              "source"
             ];
             const personnel = [
               "createUser",
