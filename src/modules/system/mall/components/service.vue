@@ -169,7 +169,7 @@ export default {
       const {selectState, searchParts} = this
       this.params.pageNum = 1
       this.params.isShow = selectState ? selectState - 1 : ''
-      this.params.keyWord = searchParts
+      this.params.keyword = searchParts
       this.serviceList()
     },
     /** 初始化 */
