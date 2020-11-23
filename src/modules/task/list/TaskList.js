@@ -413,7 +413,11 @@ export default {
             columns,
           };
         }
-      });
+      }).filter(item => {
+          if (item) {
+            return item
+          }
+      })
       this.exportColumnList = [...this.exportColumns, ...list];
     },
     /**
