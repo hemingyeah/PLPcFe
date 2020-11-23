@@ -23,7 +23,7 @@ import AuthEnum from '@model/enum/AuthEnum'
 @Component({ 
   name: ComponentNameEnum.TaskAllotAuto,
   components: {
-    [AllotRuleModal.name]: AllotRuleModal
+    AllotRuleModal
   }
 })
 export default class TaskAllotAuto extends Vue {

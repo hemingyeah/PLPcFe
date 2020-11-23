@@ -20,8 +20,8 @@ import { CreateElement } from 'vue'
 @Component({ 
   name: ComponentNameEnum.TaskAllotExcutor,
   components: {
-    [TaskAllotUserTable.name]: TaskAllotUserTable,
-    [UserCard.name]: UserCard
+    TaskAllotUserTable,
+    UserCard
   }
 })
 export default class TaskAllotExcutor extends Vue {

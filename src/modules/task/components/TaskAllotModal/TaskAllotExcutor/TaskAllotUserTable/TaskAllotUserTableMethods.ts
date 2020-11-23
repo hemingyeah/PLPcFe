@@ -707,11 +707,11 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
       let customerTags: Tag[] = this.customer.tags || []
       let tags: Tag[] = []
       
-      // 按服务团队派单 取可见团队
+      // 按客户服务团队派单 取可见团队
       if (this.allotByExclusiveTag) {
         tags = tagList
       }
-      // 按团队派单 取可见团队和客户团队的交集
+      // 按服务团队派单 取可见团队和客户团队的交集
       else if (this.isAllotByTag) {
         tags = objectArrayIntersection<Tag, Tag>(customerTags, tagList)
       }

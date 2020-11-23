@@ -57,9 +57,9 @@ window.openCustomerViewFunc = function openCustomerViewFunc(customerId: string) 
 @Component({ 
   name: ComponentNameEnum.TaskAllotPool,
   components: {
-    [TaskAllotMap.name]: TaskAllotMap,
-    [TaskAllotPoolNotification.name]: TaskAllotPoolNotification,
-    [TaskAllotPoolInfo.name]: TaskAllotPoolInfo
+    TaskAllotMap,
+    TaskAllotPoolNotification,
+    TaskAllotPoolInfo
   }
 })
 export default class TaskAllotPool extends Vue {

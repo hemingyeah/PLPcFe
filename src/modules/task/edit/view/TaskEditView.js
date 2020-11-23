@@ -488,7 +488,7 @@ export default {
             try {
               isSameForm = (
                 JSON.stringify(params) === JSON.stringify(this.backParams)
-                || Object.keys(this.backParams).length > 0
+                && Object.keys(this.backParams).length > 0
               )
             } catch (error) {
               isSameForm = true

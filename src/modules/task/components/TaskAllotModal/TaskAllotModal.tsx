@@ -24,12 +24,12 @@ import AutoDispatchListItem from '@model/types/AutoDispatchListItem'
 @Component({
   name: ComponentNameEnum.TaskAllotModal,
   components: {
-    [TaskAllotExcutor.name]: TaskAllotExcutor,
-    [TaskAllotPool.name]: TaskAllotPool,
-    [TaskAllotAuto.name]: TaskAllotAuto,
-    [TaskAllotType.name]: TaskAllotType,
-    [UserButton.name]: UserButton,
-    [ProposeApproveDialog.name]: ProposeApproveDialog
+    TaskAllotExcutor,
+    TaskAllotPool,
+    TaskAllotAuto,
+    TaskAllotType,
+    UserButton,
+    ProposeApproveDialog
   }
 })
 

@@ -3,7 +3,7 @@
  * -- 临时写的，不是最优的方案
 */
 export function objectArrayIntersection<T, U>(arr1: T[], arr2: U[], key: string = 'id', perferedLeft: boolean = false): any[] {
-  if (arr1.length > arr2.length) return objectArrayIntersection(arr1, arr2, key)
+  if (arr1.length > arr2.length) return objectArrayIntersection(arr1, arr2, key, perferedLeft)
   
   let arr1Map: { [x: string]: T } = arr1.reduce((acc: any, item: any, index: number): any => {
     acc[item[key]] = item

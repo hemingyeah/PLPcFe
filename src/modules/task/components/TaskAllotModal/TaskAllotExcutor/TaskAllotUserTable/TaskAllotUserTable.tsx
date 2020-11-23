@@ -19,7 +19,7 @@ const TableColumnDefaultWidth = '120px'
 @Component({ 
   name: ComponentNameEnum.TaskAllotUserTable,
   components: {
-    [ContactUserItem.name]: ContactUserItem
+    ContactUserItem
   }
 })
 export default class TaskAllotUserTable extends TaskAllotUserTableRender {
