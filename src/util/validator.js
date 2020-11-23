@@ -148,7 +148,7 @@ function cascader(value, field = {}){
   return new Promise(resolve => {
     let setting = field.setting || {};
     let maxDeep = setting.maxDeep || 2;
-    if(((field.isNull == 1 && value.length > 0) || field.isNull == 0) && value.length < maxDeep) return resolve(`请补全${field.displayName}`);
+    // if(((field.isNull == 1 && value.length > 0) || field.isNull == 0) && value.length < maxDeep) return resolve(`请补全${field.displayName}`);
     if (field.isNull) return resolve(null);
     if(value == null || !value.toString().length) return resolve(`请选择${field.displayName}`);
     resolve(null);

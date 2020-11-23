@@ -70,7 +70,9 @@ export default {
     margin-block-end: 0em;
   }
   .form-item-msg-img{
-    width: 100%;
+    width: 90%;
+    display: flex;
+    flex: 1;
   }
 
 }

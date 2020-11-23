@@ -18,7 +18,7 @@
     
     <!-- start 配置选项区域 -->
     <div class="cascader-setting-modal-body">
-      <div class="cascader-setting-panel" :style="{width: `${100 / maxDeep}%`}" v-for="(option, index) in selectedOption" :key="option.id">
+      <div class="cascader-setting-panel" :style="{width: `${100 / maxDeep}%`}" v-for="(option, index) in selectedOption" :key="index">
         <h3>{{deepZhChar[index]}}级选项</h3>        
           <div class="cascader-setting-option-list" ref="list" @keyup.enter="addChildrenOption(option)">
             <draggable tag="div" :list="option.children" v-bind="{ animation:380, handle:'.handle' }">
@@ -35,7 +35,7 @@
               </draggable>
           </div>          
         <div class="cascader-setting-operation">
-          <a @click="addChildrenOption(option)" href="javascript:;" class="cascader-setting-btn">增加选项</a>
+          <a @click="addChildrenOption(option,index)" href="javascript:;" class="cascader-setting-btn">增加选项</a>
           <a @click="showMultiBatchModal(option,index)" href="javascript:;" class="cascader-setting-btn">批量编辑</a>
         </div>
       </div>  
@@ -83,7 +83,7 @@
         <div class="base-import-warn">
           <p style="margin: 0">
             在导入前，请先下载
-            <a href="/excels/multileve/menu/import/template">导入模板</a>，批量导入只做新增，请在编辑导入模板时确保数据不要重复。
+            <a :href="`/excels/multileve/menu/import/template?maxDeep=${maxDeep}`">导入模板</a>，批量导入只做新增，请在编辑导入模板时确保数据不要重复。
           </p>
         </div>
       </div>
@@ -93,6 +93,7 @@
 </template>
 
 <script>
+import * as FormUtil from '@src/component/form/util';
 import _ from 'lodash';
 import draggable from 'vuedraggable';
 import platform from '@src/platform';
@@ -265,32 +266,50 @@ export default {
       }
 
       let currOption = option;
+      let newParent = {};
       for(let i = option.deep; i <= this.maxDeep; i++){
-        selectedOption.push(currOption.parent());
-        currOption = currOption.children[0];
+        if(currOption){
+          selectedOption.push(currOption.parent());
+          if(!currOption.children[0]) {
+            newParent = currOption;
+          }
+          currOption = currOption.children[0];  
+        }else{  
+                      
+          //创建新的空节点
+          selectedOption.push(newParent);
+        }
+            
       }
-      
       this.selectedOption = selectedOption;
     },
     /** 删除选项 */
     removeOption(option){
-      platform.confirm('确定要删除该选项？').then(value => {
+      platform.confirm('确定要删除该选项以及对应子选项？').then(value => {
         if(!value) return Promise.reject('cancel')
       })
         .then(() => {
           let deep = option.deep;
           let parent = option.parent();
           let source = parent == null ? this.source : parent.children;
+          let selfIndex = source.indexOf(option);
+          if(parent.deep == 0 && source.length == 1 ) return this.$message.warning('至少需要保留一个选项！');
 
-          let index = source.indexOf(option);
-          source.splice(index, 1);
+          source.splice(selfIndex, 1);
+          if(source.length){
+            let activeIndex =  selfIndex == 0 ? selfIndex : selfIndex - 1;
 
-          this.chooseOption(source[index - 1])
+            this.chooseOption(source[activeIndex]);      
+          }else{      
+            this.chooseOption(parent)
+          }
         })
         .catch(err => console.log(err))
     },
     /** 添加选项 */
-    addChildrenOption(parent){
+    addChildrenOption(parent,index){
+      if(parent.children.length == 0 && index > parent.deep ) return this.$message.warning('请先补全上一级选项');
+
       // 根据当前最大级数，补全数据
       let value = `${this.deepZhChar[parent.deep]}级选项 ${parent.children.length + 1}`;
       let option = new Option(value, false, parent);
@@ -311,10 +330,36 @@ export default {
       inputEl.select();
     },
     submit(){
+      let repeat = this.checkTreeNodeRepeat(this.source);
+      if(repeat.length){
+        FormUtil.notification([{ message:repeat, title: '重复项'}], this.$createElement);
+        return;
+      }
+
       // TODO: 计算选项总数
       this.$emit('update:show', false);
       this.$emit('close');
       this.$emit('input', this.exportSetting(this.source));
+    },
+    //校验节点重复项
+    checkTreeNodeRepeat(tree){
+      let repeat = [];
+      const loopTree = (tree,path='') =>{
+        let map = new Map();
+        for(let i=0;i<tree.length;i++){
+            let node = tree[i];
+            let key = path ? `${path}/${node.value}`:node.value;
+            if(map.has(key)){
+              repeat.push(map.get(key),key);
+              map.delete(key);
+            }else {
+              map.set(key,key)
+            }
+            node.children&&node.children.length&&loopTree(node.children,key)
+        }
+      }
+      loopTree(tree.children)
+      return repeat;
     },
     close(){
       this.$emit('update:show', false);
@@ -374,10 +419,19 @@ export default {
     initselectedOption(){
       this.selectedOption = [];
       let option = this.source;
-      
+      let newParent = {};
+        
       for(let i = 1; i <= this.maxDeep; i++){
-        this.selectedOption.push(option);
-        option = option.children[0];
+        if(option){
+          this.selectedOption.push(option);
+          if(!option.children[0]) {
+            newParent = option;
+          }
+          option = option.children[0];
+        }else{
+          //创建新节点
+          this.selectedOption.push(newParent);
+        }
       }
     },
     initSource(value, isDefault, children, parent){
@@ -385,9 +439,9 @@ export default {
       if(source.deep >= this.maxDeep) return source;
 
       // 如果级数小于最大级数，且没有子选项，就添加一个默认值
-      if(source.deep < this.maxDeep && children.length == 0) {
-        children.push({value: `${this.deepZhChar[source.deep]}级选项 1`})
-      }
+      // if(source.deep < this.maxDeep && children.length == 0) {
+      //   children.push({value: `${this.deepZhChar[source.deep]}级选项 1`})
+      // }
       
       // 处理子选项
       for(let i = 0; i < children.length; i++){

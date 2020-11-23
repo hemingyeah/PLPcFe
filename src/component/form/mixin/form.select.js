@@ -42,7 +42,9 @@ const FORM_SELECT = {
       this.$emit('input', {value: option.value, prop: 'defaultValue'});
     },
     //下拉多级菜单
-    showMultiBatchModal(option,index){
+    showMultiBatchModal(option,index){   
+      if(option.children.length == 0 && index > option.deep ) return this.$message.warning('请先补全上一级选项');
+      
       this.optionText = option.children.map(item => item.value).join('\n');
       this.batchModalShow = true;
       this.errMessage = null;

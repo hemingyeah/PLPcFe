@@ -60,9 +60,9 @@ const LogicalFieldModal = {
 
       return Array.isArray(depValues) && depValues.indexOf(this.currValue) >= 0;
     },
-    renderValueItem(option){
+    renderValueItem(option){    
       const className = ['logical-field-value', option.value == this.currValue ? 'logical-field-selected' : null];
-
+      
       return <div class={className} key={option.value} onClick={() => this.choose(option)}>{option.value}</div>
     },
     renderTargetItem(field){

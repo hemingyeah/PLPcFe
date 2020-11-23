@@ -855,16 +855,18 @@ const FormDesign = {
             </div>
           </div>
         </div>
-        <div class="form-design-main">    
-          <div class="form-design-hidden">
-          { this.hiddenFields.length > 0 && (
-            <p onClick={this.onShowBaseModal }><i class="iconfont icon-fdn-hidden"></i>查看已隐藏字段</p> )} 
-          </div>
-          <div class="form-design-center">
-            <div class={['form-design-phone', this.silence ? 'form-design-silence' : null]}>
-              { this.renderPreviewList(h) }
+        <div class="form-design-main">  
+         <div class="form-design-box">
+            <div class="form-design-hidden">
+            { this.hiddenFields.length > 0 && (
+              <p onClick={this.onShowBaseModal }><i class="iconfont icon-fdn-hidden"></i>查看已隐藏字段</p> )} 
             </div>
-          </div>
+            <div class="form-design-center">
+              <div class={['form-design-phone', this.silence ? 'form-design-silence' : null]}>
+                { this.renderPreviewList(h) }
+              </div>
+            </div>
+          </div>  
         </div>
         { this.renderSettingPanel(h) }
         <div class="form-design-ghost" key="form-design-ghost" onWheel={this.scrollPreviewList}>

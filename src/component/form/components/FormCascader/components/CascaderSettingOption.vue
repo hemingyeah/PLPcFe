@@ -8,7 +8,7 @@
       <button type="button" class="cascader-setting-option-default-btn btn-text" tabindex="-1" title="默认选项" @click="changeDefault">
         <i class="iconfont icon-check-fill"></i>
       </button>
-      <button type="button" class="cascader-setting-option-remove-btn" tabindex="-1" title="删除选项" @click="remove" v-if="allowRemove">
+      <button type="button" class="cascader-setting-option-remove-btn" tabindex="-1" title="删除选项" @click="remove" >
         <i class="iconfont icon-minus-fill"></i>
       </button>
     </div>
@@ -105,6 +105,7 @@ export default {
     font-size: 14px;
     background-color: transparent;
     border-radius: 4px;
+    // border: 1px solid #e0e1e2 ;
 
     &:hover,
     &:focus{
@@ -163,7 +164,7 @@ export default {
 
 .cascader-setting-option-active{
  input[type='text']{
-  //  background-color: #F5F7FA;
+   background-color: #F5F7FA;
  } 
 }
 </style>
