@@ -22,6 +22,7 @@ import FormMixin from '@src/component/form/mixin/form';
 import { FORM_FIELD_TEXT_MAX_LENGTH } from '@src/model/const/Number.ts';
 import { findComponentUpward } from '@src/util/assist';
 import * as MathUtil from 'mathjs';
+import * as Lang from '@src/util/lang';
 
 export default {
   name: 'form-formula',
@@ -67,21 +68,21 @@ export default {
       let formulaStr = this.formula.map(item => item.isOperator ? item.value : form[item.value]).join('');
 
       let value = '';
-
       try {
         let formulaVal = MathUtil.evaluate(formulaStr);
 
-        // 判断是否是有限的数字，因为0是被除数的话计算结果可能是Infinity无穷
-        let isFinite = Number.isFinite(formulaVal);
-
-        value = isFinite ? formulaVal.toString() : '';
+        // 判断是否是安全数值
+        if (Lang.isSafeNumber(formulaVal)) {
+          // 保留3位小数并去掉多余0
+          let decimal = MathUtil.bignumber(formulaVal).toFixed(3);
+          value = decimal.toString().replace(/(?:\.0*|(\.\d+?)0+)$/, '$1');
+        }
 
       } catch (error) {
         console.log(`[${this.field.displayName}]计算出错啦~`)
       }
       
-      // 最多保留3位小数
-      return value.replace(/([0-9]+.[0-9]{3})[0-9]*/, '$1');
+      return value;
     }
   },
   watch: {
