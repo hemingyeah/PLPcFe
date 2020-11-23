@@ -189,7 +189,7 @@ export default {
       let value = event.target.value;
       let max = this.limitConig.max;
 
-      if (max && Number(value) > Number(max)) {
+      if (value && max && Number(value) > Number(max)) {
         value = '';
 
         this.$platform.notification({
@@ -209,7 +209,7 @@ export default {
       let value = event.target.value;
       let min = this.limitConig.min;
       
-      if (min && Number(value) < Number(min)) {
+      if (value && min && Number(value) < Number(min)) {
         value = '';
 
         this.$platform.notification({
