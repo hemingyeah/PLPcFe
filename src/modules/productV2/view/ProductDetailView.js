@@ -837,12 +837,12 @@ export default {
 
       this.loading = false;
 
-      this.$nextTick(() => {
-        setTimeout(() => {
-          if (!storageGet(TASK_GUIDE_DETAIL)) this.$tours['myTour'].start(), this.nowGuideStep = 1, storageSet(TASK_GUIDE_DETAIL, '4');
-        }, 1000)
+      // this.$nextTick(() => {
+      //   setTimeout(() => {
+      //     if (!storageGet(TASK_GUIDE_DETAIL)) this.$tours['myTour'].start(), this.nowGuideStep = 1, storageSet(TASK_GUIDE_DETAIL, '4');
+      //   }, 1000)
 
-      })
+      // })
 
     } catch (e) {
       console.error('error ', e)

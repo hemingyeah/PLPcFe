@@ -1,23 +1,23 @@
 <template>
-  <div id="doMyself-box">
+  <div id="normal-setting-box">
     <div class="flex-x al-start">
       <div class="left-menu">
-        <div class="menu-title">{{ '自助门户设置' }}</div>
+        <div class="menu-title">产品设置</div>
         <template v-for="(item, index) in menuList">
-           <nav
+          <nav
             :class="`menu-list ${nowMenu == index ? 'menu-checked' : ''}`"
             :key="index"
-          @click="changePage(index)"
+            @click="changePage(index)"
           >
-          <!-- <div class="left-border" v-if="nowMenu==index"></div> -->
-          <div class="icon-box">
+            <!-- <div class="left-border" v-if="nowMenu==index"></div> -->
+            <div class="icon-box">
               <i
                 :class="
                   `iconfont ${item.icon} ${
                     nowMenu == index ? 'font-16 font-w-600' : 'font-14'
-                }`
-            "
-            ></i>
+                  }`
+                "
+              ></i>
             </div>
             <span>{{ item.name }}</span>
           </nav>
@@ -33,11 +33,10 @@
   </div>
 </template>
 <script>
-import toastList from '../toastList/toastList'
-import wxSet from '../wxSet/wxSet'
-import doMyselfSet from '../setting/index'
+import ProductSet from '@src/modules/setting/productMenu/productSet';
+import ProductMenuSet from '@src/modules/setting/productMenu/productMenuSet';
 export default {
-  name: 'do-myself-view',
+  name: 'product-menu-setting',
   props: {
     initData: {
       type: Object,
@@ -47,72 +46,55 @@ export default {
   provide() {
     return {
       initData: this.initData,
-    }
+    };
   },
   data() {
     return {
       menuList: [
         {
-          name: '客户自助门户',
-          icon: 'icon-Gateway',
-          comName: 'do-myself-set',
+          name: '产品管理设置',
+          icon: 'icon-shezhi-chanpinguanlishezhi',
+          comName: 'product-set',
         },
         {
-          name: '公众号设置',
-          icon: 'icon-weixin2',
-          comName: 'wx-set',
-        },
-        {
-          name: '短信消息设置',
-          icon: 'icon-duanxin3',
-        },
-        {
-          name: '消息记录',
-          icon: 'icon-message',
-          comName: 'toast-list',
+          name: '产品目录设置',
+          icon: 'icon-shezhi-chanpinmulu',
+          comName: 'product-menu-set',
         },
       ],
       nowMenu: 1, // 0 客户自助门户 1 公众号设置 2 短信消息设置 3 消息记录
-    }
+    };
   },
   computed: {},
   created() {
-    let type = window.location.href.split('/')[
-      window.location.href.split('/').length - 1
-    ]
+    let type = this.$getUrlObj(window).type;
     let typeObj = {
-      wxSet: 1,
-      toastList: 3,
-      doMyselfSet: 0,
-    }
-    this.nowMenu = typeObj[type]
+      productSet: 0,
+      productMenuSet: 1,
+    };
+    this.nowMenu = typeObj[type];
   },
   methods: {
     changePage(index) {
       if (this.nowMenu === index) {
-        return
+        return;
       }
-      if (index === 2) {
-        window.location.href = '/setting/message/smsmessage'
-      } else if (index === 0) {
-        window.location.href = '/setting/doMyself/doMyselfSet'
+      if (index === 0) {
+        window.location.href = '/setting/doMyself/doMyselfSet';
       } else if (index === 1) {
-        window.location.href = '/setting/doMyself/wxSet'
-      } else if (index === 3) {
-        window.location.href = '/setting/doMyself/toastList'
+        window.location.href = '/setting/doMyself/wxSet';
       }
-      this.nowMenu === index
+      this.nowMenu === index;
     },
   },
   components: {
-    [toastList.name]: toastList,
-    [wxSet.name]: wxSet,
-    [doMyselfSet.name]: doMyselfSet,
+    [ProductSet.name]: ProductSet,
+    [ProductMenuSet.name]: ProductMenuSet,
   },
-}
+};
 </script>
 <style lang="scss">
-.al-start{
+.al-start {
   align-items: flex-start;
 }
 .flex-1 {
@@ -142,14 +124,14 @@ export default {
 label {
   margin-bottom: 0;
 }
-#doMyself-box {
+#normal-setting-box {
   padding: 10px;
   position: relative;
   box-sizing: border-box;
   min-height: 100vh;
   max-width: 100vw;
 }
-#doMyself-components-box {
+#normal-setting-components-box {
   margin-left: 10px;
   flex: 1;
   min-width: 920px;

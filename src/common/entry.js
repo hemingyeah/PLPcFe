@@ -55,9 +55,28 @@ function previewVideo(url) {
 
 }
 
+function getUrlObj(window_) {
+  let params = window_.location.href.split('?')[1];
+  let obj = {};
+  try {
+
+
+    if (params) {
+      params.split('&').forEach((item) => {
+        let item_ = item.split('=');
+        obj[item_[0]] = item_[1];
+      });
+    }
+  } catch (error) {
+    console.warn(error)
+  }
+  return obj
+}
+
 Vue.prototype.$appConfig = appConfig;
 Vue.prototype.$platform = platform;
 Vue.prototype.$previewImg = previewImg;
 Vue.prototype.$previewVideo = previewVideo;
+Vue.prototype.$getUrlObj = getUrlObj;
 
 export default Vue;

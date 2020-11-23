@@ -105,10 +105,10 @@ const FormBuilder = {
         // 判读是否隐藏该字段
         if(util.isHiddenField(field, this.value, this.fields)) return null;
 
-        //判断是否是已隐藏字段
+        // 判断是否是已隐藏字段
         if(field.isHidden == 1) return null;
 
-        //判断是否可见
+        // 判断是否可见
         if(field.isVisible == false) return null;
 
         let comp = FieldManager.findField(field.formType);

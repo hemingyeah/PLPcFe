@@ -1,53 +1,86 @@
 <template>
-  <div class="work-tree-box">
+  <div class="work-tree-box" v-loading.fullscreen.lock="fullscreenLoading">
     <base-collapse class="modal-box" :right-size="3">
       <template slot="left">
         <div class="draggable-box">
           <div class="flex-1 draggable-data">
-            <work-tree-draggable
-              ref="workTreeDraggable"
-              :tasks="treeData.tasks"
-              :root-data="{ id: treeData.id, deep: 0 }"
-              :now-edit-menu="nowEditMenu"
-              :now-hover-menu="nowHoverMenu"
-              :deep-count="0"
-            />
+            <template v-if="treeData[0].tasks">
+              <work-tree-draggable
+                ref="workTreeDraggable"
+                :com-index="-1"
+                :tasks="treeData[0].tasks"
+                :root-data="{
+                  id: treeData[0].id,
+                  banMoveIn: false,
+                  indexArr: [0],
+                  pathNameArr: [],
+                }"
+                :now-edit-menu="nowEditMenu"
+                :now-hover-menu="nowHoverMenu"
+                :deep-count="0"
+                :sort-menu="sortMenu"
+              />
+            </template>
           </div>
-          <div class="flex-x">
-            <el-button @click.stop="changeAll"
-            >全部{{ allType ? '折叠' : '展开' }}</el-button
+          <div class="flex-x draggable-data-btn">
+            <div
+              class="draggable-data-btn-item cur-point"
+              @click.stop="changeDialog('addMenu')"
             >
-            <el-button @click.stop="changeDialog('addMenu')"
-            >新建一级目录</el-button
+              <i class="iconfont icon-zhankai"></i>
+              新建一级目录
+            </div>
+            <div
+              class="draggable-data-btn-item cur-point"
+              @click.stop="changeAll"
             >
+              全部{{ allType ? '折叠' : '展开' }}
+            </div>
           </div>
         </div>
       </template>
       <template slot="right">
         <div class="data-box">
-          <work-tree-data />
+          <work-tree-data :prop-data="nowEditMenu" ref="workTreeData" />
       </div> </template
     ></base-collapse>
 
     <!--  -->
     <public-dialog
+      ref="publicDialog"
       :visible-prop="visibleProp"
       @changeVisibleProp="changeVisibleProp"
-      @confirm="addMenuDialogConfirm"
+      @confirm="dialogConfirm"
       :dialog-type="dialogType"
+      :init-data="childData"
     ></public-dialog>
     <!--  -->
   </div>
 </template>
 <script>
+import _ from 'lodash';
+
 import workTreeDraggable from '@src/modules/productV2/productMenu/WorkTree/workTreeDraggable';
 import WorkTreeData from '@src/modules/productV2/productMenu/WorkTree/WorkTreeData';
 import PublicDialog from '@src/modules/productV2/productMenu/WorkTree/compoment/PublicDialog';
+
+import {
+  getTreeList,
+  setTreeList,
+  setPagerelationPartOrWiki,
+  renameTree,
+  getTreeListNode,
+} from '@src/api/ProductV2Api';
+
+let finded = false;
 export default {
   provide() {
     return {
-      nowEditMenuChange: this.nowEditMenuChange,
-      nowHoverMenuChange: this.nowHoverMenuChange,
+      rootDataChange: this.rootDataChange,
+      changeDialog: this.changeDialog,
+      getTreeData: this.getTreeData,
+      changeTree: this.changeTree,
+      changeTreeDetail: this.changeTreeDetail,
     };
   },
   data() {
@@ -55,100 +88,21 @@ export default {
       allType: true,
       visibleProp: false,
       dialogType: 'addMenu',
-      treeData: {
-        id: 0,
-        deep: 0,
-        tasks: [
-          {
-            name: 1, // 目录名称
-            id: 1, // 目录id
-            routeName: '1/', // 路由名称
-            showList: true, // 是否是展开状态
-            conData: false, // 是否有内容
-            routerIndex: '0|1', // 后端拼接
-            deep: 1,
-            tasks: [
-              // 子目录
-              {
-                name: 1.1,
-                id: 1.1,
-                routeName: '1/1.1', // 路由名称
-                showList: true,
-                deep: 2,
-                tasks: [
-                  {
-                    name: 1.11,
-                    routeName: '1/1.1/1.11', // 路由名称
-                    id: 1.11,
-                    deep: 3,
-                    parentId: 1.1,
-                    showList: true,
-                    tasks: [
-                      {
-                        name: 1.111,
-                        routeName: '1/1.1/1.11/1.111', // 路由名称
-                        id: 1.111,
-                        deep: 4,
-                        parentId: 1.11,
-                        showList: true,
-                        tasks: [
-                          {
-                            name: 1.1111,
-                            routeName: '1/1.1/1.11/1.111', // 路由名称
-                            id: 1.1111,
-                            deep: 5,
-                            parentId: 1.111,
-                            showList: true,
-                            tasks: [
-                              {
-                                name: 1.11111,
-                                routeName: '1/1.1/1.11/1.111/1.1111', // 路由名称
-                                id: 1.11111,
-                                deep: 6,
-                                parentId: 1.1111,
-                                showList: true,
-                                tasks: [],
-                                conData: false,
-                              },
-                              {
-                                name: 1.11112,
-                                routeName: '1/1.1/1.11/1.111/1.1112', // 路由名称
-                                id: 1.11112,
-                                deep: 6,
-                                parentId: 1.1111,
-                                showList: true,
-                                tasks: [],
-                                conData: false,
-                              },
-                            ],
-                            conData: false,
-                          },
-                        ],
-                        conData: false,
-                      },
-                    ],
-                    conData: false,
-                  },
-                ],
-                conData: false,
-              },
-              {
-                name: 1.2,
-                routeName: '1/1.2', // 路由名称
-                id: 1.2,
-                deep: 2,
-                tasks: [],
-                showList: true,
-                conData: true,
-              },
-            ],
-          },
-        ],
-      },
+      treeData: [
+        {
+          id: '',
+          tasks: [],
+        },
+      ],
       httpPending: [],
       nowEditMenu: {},
       nowHoverMenu: {},
       popoverVisible: {},
+      fullscreenLoading: false,
+      childData: {},
+      sortMenu: {},
+      dialogInitData: {},
+      fasterFindId: '',
     };
   },
   components: {
@@ -156,14 +110,22 @@ export default {
     WorkTreeData,
     PublicDialog,
   },
+  created() {
+    let id = this.$getUrlObj(window).id;
+    if (id) {
+      this.fasterFindId = id;
+    }
+    this.getTreeData();
+  },
   methods: {
     changeVisibleProp(e) {
       this.visibleProp = e;
     },
     changeAll() {
       this.allType = !this.allType;
-      this.forAllArr(this.treeData.tasks, this.allType);
-      window.parent.changeLinkPage()
+      this.forAllArr(this.treeData[0].tasks, this.allType);
+
+      // window.parent.changeLinkPage();  快速刷页面
     },
     forAllArr(obj, val) {
       for (let index = 0; index < obj.length; index++) {
@@ -176,23 +138,277 @@ export default {
         } catch (error) {}
       }
     },
-    addMenuDialogConfirm(e) {
-      this.treeData.tasks.push({
-        name: e.name,
-        tasks: [],
-        conData: null,
-        showList: true,
-      });
+    dialogConfirm(e) {
+      console.log(e, 'dialogConfirm');
+      this.$refs.publicDialog.changeBtnLoading(true);
+      switch (this.dialogType) {
+      case 'addMenu':
+        e = {
+          ...e,
+          parentId: '',
+          pathName: `${e.catalogName}`,
+          orderId: this.treeData[0].tasks.length,
+          showList: 1,
+        };
+        this.addMenu(e);
+        break;
+      case 'addMenuChild':
+        e = {
+          ...e,
+          parentId: this.childData.id,
+          pathName: [
+            ..._.cloneDeep(this.childData.pathNameArr),
+            e.catalogName,
+          ].join('/'),
+          orderId: this.treeData[0].tasks.length,
+          showList: 1,
+        };
+        this.addMenu(e);
+        break;
+      case 'renameMenuChild':
+        e = {
+          ...e,
+          pathName: [...this.childData.pathNameArr, e.catalogName].join('/'),
+          id: this.childData.id,
+        };
+        this.renameMenu(e);
+        break;
+      case 'linkPart':
+        if (Object.keys(e).length) {
+          this.link('part', e.nowChooseArr);
+        } else {
+          this.changeVisibleProp(false);
+        }
+        break;
+      case 'linkWiki':
+        if (Object.keys(e).length) {
+          this.link('wiki', e.nowChooseArr);
+        } else {
+          this.changeVisibleProp(false);
+        }
+        break;
+      case 'cloneMenu':
+        if (e.nowChooseArr && e.nowChooseArr.length > 0) {
+          this.$refs.workTreeData.reflashPage(e.nowChooseArr[0].id);
+        }
+        break;
+      default:
+        break;
+      }
     },
     changeDialog(type) {
       this.dialogType = type;
       this.changeVisibleProp(true);
     },
-    nowEditMenuChange(e) {
-      this.$set(this, 'nowEditMenu', e);
+    rootDataChange(key, val) {
+      this.$set(this, key, val);
+      if (key == 'nowEditMenu') this.$refs.workTreeData.resetForm();
     },
-    nowHoverMenuChange(e) {
-      this.$set(this, 'nowHoverMenu', e);
+    getTreeData() {
+      this.fullscreenLoading = true;
+      getTreeList()
+        .then((res) => {
+          if (res.code == 0) {
+            this.treeData[0].tasks = res.result;
+
+            if (res.result.length > 0) {
+              let nowEditMenu = {
+                id: res.result[0].id,
+                canEditConData: !(res.result[0].tasks.length > 0),
+                conData: res.result[0].conData || 0,
+                name: res.result[0].name,
+                indexArr: [0, 0],
+                nowIndex: 0,
+              };
+              if (this.fasterFindId) {
+                try {
+                  let fasterEditRoot_ = this.fasterFindRootById(
+                    this.treeData[0].tasks,
+                    this.fasterFindId,
+                    [0]
+                  );
+                  fasterEditRoot_['canEditConData'] = !(
+                    fasterEditRoot_.tasks.length > 0
+                  );
+                  nowEditMenu = fasterEditRoot_;
+                  if (fasterEditRoot_.indexArr.length > 2) {
+                    this.fasterShowList(
+                      this.treeData,
+                      fasterEditRoot_.indexArr,
+                      0
+                    );
+                    console.log(this.treeData, 'this.treeData');
+                  }
+
+                  console.log(fasterEditRoot_, 'fasterFindRootById');
+                } catch (error) {}
+              }
+              console.log(nowEditMenu, 'nowEditMenu');
+              this.nowEditMenu = nowEditMenu;
+            }
+          } else {
+            this.$notify.error({
+              title: '网络错误',
+              message: res.message,
+              duration: 2000,
+            });
+          }
+        })
+        .finally(() => {
+          this.fullscreenLoading = false;
+        });
+    },
+    addMenu(e) {
+      setTreeList(e)
+        .then((res) => {
+          if (res.code == 0) {
+            if (res.result) {
+              res.result.tasks = [];
+              if (this.dialogType == 'addMenu') {
+                this.changeTree('add', [0], res.result);
+              } else {
+                this.changeTree('add', this.childData.indexArr, res.result);
+              }
+            }
+            this.changeVisibleProp(false);
+          } else {
+            this.$notify.error({
+              title: '网络错误',
+              message: res.message,
+              duration: 2000,
+            });
+          }
+        })
+        .finally(() => {
+          this.$refs.publicDialog.changeBtnLoading(false);
+        });
+    },
+    renameMenu(e) {
+      renameTree(e)
+        .then((res) => {
+          if (res.code == 0) {
+            if (res.result) {
+              let element = this.findRoot(
+                this.treeData,
+                this.childData.indexArr,
+                0,
+                this.childData.indexArr.length - 2
+              );
+              console.log(element, this.childData, 'renameMenu');
+              element[this.childData.nowIndex].name = res.result.name;
+            }
+            this.changeVisibleProp(false);
+          } else {
+            this.$notify.error({
+              title: '网络错误',
+              message: res.message,
+              duration: 2000,
+            });
+          }
+        })
+        .finally(() => {
+          this.$refs.publicDialog.changeBtnLoading(false);
+        });
+    },
+    changeTree(type, indexArr, data, des) {
+      console.log(type, indexArr, data);
+      try {
+        let element = this.findRoot(
+          this.treeData,
+          indexArr,
+          0,
+          indexArr.length - 1
+        );
+        console.log(element);
+        if (type == 'add') {
+          element.push(data);
+        } else if (type == 'delete') {
+          if (this.nowEditMenu && this.nowEditMenu.id == des.id) {
+            this.nowEditMenu = {};
+          }
+          element.splice(data, 1);
+        }
+      } catch (error) {}
+    },
+    changeTreeDetail(key, val) {
+      console.log(this.nowEditMenu, 'nowEditMenu');
+      try {
+        let element = this.findRoot(
+          this.treeData,
+          this.nowEditMenu.indexArr,
+          0,
+          this.nowEditMenu.indexArr.length - 2
+        );
+        console.log(element, 'changeTreeDetail');
+        element[this.nowEditMenu.nowIndex][key] = val;
+      } catch (error) {
+        console.warn(error);
+      }
+    },
+    findRoot(data, indexArr, index, max) {
+      let root = data[indexArr[index]].tasks;
+      if (index < max) {
+        index++;
+        return this.findRoot(root, indexArr, index, max);
+      }
+      return root;
+    },
+    fasterFindRootById(arr, id, indexArr) {
+      let item;
+      for (let index = 0; index < arr.length; index++) {
+        if (finded) {
+          break;
+        }
+        if (arr[index].id == id) {
+          finded = true;
+          item = arr[index];
+          indexArr.push(index);
+          item['indexArr'] = indexArr;
+          item['nowIndex'] = index;
+          break;
+        } else if (arr[index].tasks.length > 0) {
+          indexArr.push(index);
+          return this.fasterFindRootById(arr[index].tasks, id, indexArr);
+        }
+      }
+      if (finded) {
+        return item;
+      }
+    },
+    fasterShowList(data, indexArr, index) {
+      let root = data[indexArr[index]].tasks;
+      if (index < indexArr.length - 2) {
+        index++;
+        if (index > 0 && indexArr.length > 2) {
+          root[indexArr[index]]['showList'] = 1;
+        }
+        return this.fasterShowList(root, indexArr, index);
+      }
+    },
+    link(type, data) {
+      setPagerelationPartOrWiki({
+        catalogId: this.nowEditMenu.id,
+        relationIds: data,
+        type,
+      })
+        .then((res) => {
+          if (res.code == 0) {
+            this.changeVisibleProp(false);
+            this.$refs.workTreeData.reflashTable(type);
+            window.parent.flashSomePage({
+              type: 'productV2_catalog_list',
+            });
+          } else {
+            this.$notify.error({
+              title: '网络错误',
+              message: res.message,
+              duration: 2000,
+            });
+          }
+        })
+        .finally(() => {
+          this.$refs.publicDialog.changeBtnLoading(false);
+        });
     },
   },
 };
@@ -220,6 +436,18 @@ export default {
         }
         -ms-overflow-style: none;
         overflow: -moz-scrollbars-none;
+      }
+    }
+    .draggable-data-btn {
+      height: 48px;
+      justify-content: space-between;
+      background: #fafafa;
+      padding: 0 12px;
+      border-top: 1px solid $color-border-l1;
+      &-item {
+        .iconfont {
+          color: #999;
+        }
       }
     }
     .data-box {

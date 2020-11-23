@@ -108,9 +108,10 @@ export default {
     open() {
 
       if (!this.selectedIds.length) {
-        return this.$platform.alert('请选择需要批量编辑的产品');
+        return this.$platform.alert('请选择需要批量编辑的产品目录');
       }
 
+      this.reset();
       this.visible = true;
     },
     buildParams() {
@@ -204,7 +205,6 @@ export default {
         }
       },
       mounted() {
-        this.reset();
         this.buildForm();
       },
       methods: {
@@ -216,6 +216,9 @@ export default {
         },
         reset() {
           this.form = {};
+          if(this.fields.length == 0) {
+            return;
+          }
           this.selectField(this.fields[0].fieldName)
         },
         dispatch({type, bubbles = false, params = {}}) {

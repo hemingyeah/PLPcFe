@@ -19,9 +19,6 @@ import FormCascader from './FormCascader';
 import FormCustomer from './FormCustomer';
 import FormRelation from './FormRelation';
 import FormRelatedTask from './FormRelatedTask';
-// 产品目录特有表单组件
-import FormRelatedPart from './FormRelatedPart';
-import FormRelatedWiki from './FormRelatedWiki';
 
 import FormAutograph from './FormAutograph'
 import FormSparepart from './FormSparepart'
@@ -54,8 +51,6 @@ const ALL_FORM_FIELDS = [
   FormSparepart,
   FormServiceIterm,
   FormRelatedTask,
-  FormRelatedPart,
-  FormRelatedWiki,
   FormFormula
 ].reduce((acc, val) => (Array.isArray(val) ? acc = acc.concat(val) : acc.push(val)) && acc, []);
 
@@ -125,8 +120,6 @@ const COMMON_FIELDS = ['text', 'textarea', 'number', 'select', 'cascader', 'code
 // 工单字段列表，工单彻底改造完成后删除，用 COMMON_FIELDS 替代
 const TASK_FIELDS = ['text', 'textarea', 'number', 'select', 'code', 'attachment', 'user', 'date', 'datetime', 'phone'];
 
-const PRODUCT_MENU = ['related_wiki', 'related_part'];
-
 const MODE_MANAGER = {
   base: {
     include: [...COMMON_FIELDS]
@@ -138,7 +131,7 @@ const MODE_MANAGER = {
     include: [...COMMON_FIELDS]
   },
   product_menu: {
-    include: [...PRODUCT_MENU, ...COMMON_FIELDS]
+    include: [ ...COMMON_FIELDS]
   },
   task: {
     include: [

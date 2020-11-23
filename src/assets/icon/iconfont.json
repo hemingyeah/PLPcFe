@@ -6,6 +6,69 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "18381319",
+      "name": "菜单-产品",
+      "font_class": "caidan-chanpin",
+      "unicode": "e747",
+      "unicode_decimal": 59207
+    },
+    {
+      "icon_id": "18381910",
+      "name": "设置-产品管理设置",
+      "font_class": "shezhi-chanpinguanlishezhi",
+      "unicode": "e748",
+      "unicode_decimal": 59208
+    },
+    {
+      "icon_id": "18381911",
+      "name": "设置-产品二维码",
+      "font_class": "shezhi-chanpinerweima",
+      "unicode": "e749",
+      "unicode_decimal": 59209
+    },
+    {
+      "icon_id": "18381912",
+      "name": "设置-产品目录",
+      "font_class": "shezhi-chanpinmulu",
+      "unicode": "e74a",
+      "unicode_decimal": 59210
+    },
+    {
+      "icon_id": "18325727",
+      "name": "附加组件",
+      "font_class": "fujiazujian",
+      "unicode": "e73f",
+      "unicode_decimal": 59199
+    },
+    {
+      "icon_id": "18325728",
+      "name": "事件",
+      "font_class": "shijian1",
+      "unicode": "e742",
+      "unicode_decimal": 59202
+    },
+    {
+      "icon_id": "18326094",
+      "name": "工单",
+      "font_class": "gongdan",
+      "unicode": "e746",
+      "unicode_decimal": 59206
+    },
+    {
+      "icon_id": "11952315",
+      "name": "皇冠",
+      "font_class": "huangguan",
+      "unicode": "e6d1",
+      "unicode_decimal": 59089
+    },
+    {
+      "icon_id": "10885634",
+      "name": "暂停",
+      "font_class": "zanting",
+      "unicode": "e6d0",
+      "unicode_decimal": 59088
+    },
+    {
       "icon_id": "18192549",
       "name": "calculator",
       "font_class": "fdn-formula",

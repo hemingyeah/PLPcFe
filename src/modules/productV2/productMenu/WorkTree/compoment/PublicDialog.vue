@@ -9,7 +9,13 @@
       :close-on-click-modal="false"
     >
       <div class="add-menu-dialog-box">
-        <template v-if="dialogType == 'addMenu'">
+        <template
+          v-if="
+            dialogType == 'addMenu' ||
+              dialogType == 'addMenuChild' ||
+              dialogType == 'renameMenuChild'
+          "
+        >
           <el-form
             :model="ruleForm"
             :rules="rules"
@@ -25,12 +31,20 @@
         <template v-else>
           <div class="flex-x copy-el-form-item">
             <div class="lable-100">
-              {{ dialogType == 'linkPart' ? '备件' : '知识库' }}：
+              {{
+                dialogType == 'linkPart'
+                  ? '备件'
+                  : dialogType == 'linkWiki'
+                    ? '知识库'
+                    : '目录'
+              }}：
             </div>
             <el-select
-              class="flex-1"
+              class="flex-1 pos-r"
+              popper-class="max-w-488"
               v-model="nowChooseArr"
               multiple
+              :multiple-limit="dialogType == 'cloneMenu' ? 1 : 0"
               filterable
               remote
               collapse-tags
@@ -42,9 +56,20 @@
               <el-option
                 v-for="item in options"
                 :key="item.id"
-                :label="item.name"
-                :value="item.name"
+                :label="dialogType == 'linkWiki' ? item.title : item.name"
+                :value="item.id"
               >
+                <div class="flex-x overHideCon-1">
+                  <template v-if="dialogType == 'linkPart'">
+                    <div>{{ item.name }}</div>
+                  </template>
+                  <template v-if="dialogType == 'linkWiki'">
+                    <div>{{ item.title }}</div>
+                  </template>
+                  <template v-if="dialogType == 'cloneMenu'">
+                    <div>{{ item.name }}</div>
+                  </template>
+                </div>
               </el-option>
             </el-select>
             <!-- <com-lenovoselect
@@ -82,7 +107,9 @@
       </div>
       <div slot="footer">
         <el-button @click="visible = false">取 消</el-button>
-        <el-button type="primary" @click="confirm">确认</el-button>
+        <el-button type="primary" :loading="btnLoading" @click="confirm"
+        >确认</el-button
+        >
       </div>
     </el-dialog>
     <!--  -->
@@ -90,7 +117,12 @@
 </template>
 
 <script>
-import { getDocumentList } from '@src/api/Repository';
+import {
+  getPageCloneData,
+  getPagePart,
+  getPageWiki,
+} from '@src/api/ProductV2Api';
+import _ from 'lodash';
 export default {
   name: 'public-dialog',
   props: {
@@ -101,6 +133,9 @@ export default {
       type: String,
       default: 'addMenu',
     },
+    initData: {
+      type: Object,
+    },
   },
   data() {
     return {
@@ -108,11 +143,23 @@ export default {
         addMenu: {
           title: '添加目录',
         },
+        addMenuChild: {
+          title: '添加目录',
+        },
+        cloneMenu: {
+          title: '选择需要克隆的目录',
+          http: getPageCloneData,
+        },
+        renameMenuChild: {
+          title: '重命名',
+        },
         linkPart: {
           title: '关联备件',
+          http: getPagePart,
         },
         linkWiki: {
           title: '关联知识库',
+          http: getPageWiki,
         },
       },
       nowChooseArr: [],
@@ -123,11 +170,12 @@ export default {
       rules: {
         name: [
           { required: true, message: '请输入目录名称', trigger: 'blur' },
-          // { min: 3, max: 5, message: '长度在 3 到 5 个字符', trigger: 'blur' },
+          { min: 1, max: 30, message: '最多30个字符', trigger: 'change' },
         ],
       },
       selectLoading: false,
       options: [],
+      btnLoading: false,
     };
   },
   computed: {
@@ -143,18 +191,38 @@ export default {
   watch: {
     visible(newVal, oldVal) {
       if (newVal == false) {
-        if (this.dialogData == 'addMenu') this.$refs['ruleForm'].resetFields();
+        if (
+          this.dialogType == 'addMenu'
+          || this.dialogType == 'renameMenuChild'
+          || this.dialogType == 'addMenuChild'
+        )
+          this.$refs['ruleForm'].resetFields();
         this.nowChooseArr = [];
+        this.btnLoading = false;
         // this.$refs.comLenovoselect.resetSerchList();
       }
+    },
+    initData(newVal, oldVal) {
+      if (this.dialogType == 'renameMenuChild')
+        this.$set(this.ruleForm, 'name', newVal.name);
     },
   },
   methods: {
     confirm() {
-      if (this.dialogType == 'addMenu') {
+      if (
+        this.dialogType == 'addMenu'
+        || this.dialogType == 'addMenuChild'
+        || this.dialogType == 'renameMenuChild'
+      ) {
         this.$refs['ruleForm'].validate((valid) => {
-          if (valid) this.$emit('confirm', { name: this.ruleForm.name });
+          if (valid) this.$emit('confirm', { catalogName: this.ruleForm.name });
         });
+      } else if (
+        this.dialogType == 'linkPart'
+        || this.dialogType == 'linkWiki'
+        || this.dialogType == 'cloneMenu'
+      ) {
+        this.$emit('confirm', { nowChooseArr: this.nowChooseArr });
       }
       console.log(JSON.stringify(this.nowChooseArr), 321);
     },
@@ -177,41 +245,25 @@ export default {
     slotClick(e, ref) {
       this.$refs[ref].chooseItem(e);
     },
-    lenovoselectSearchData(data = {}) {
-      return new Promise((resolve, reject) => {
-        if (this.dialogType == 'linkPart') {
-          this.selectLoading = true;
-          this.$http
-            .get('/partV2/category/listData', {
-              ...data,
-            })
-            .then((res) => {
-              if (!res) {
-                return reject();
-              }
-              this.options = res.list;
-              resolve(res);
-            })
-            .catch((err) => {
-              reject();
-            })
-            .finally(() => {
-              this.selectLoading = false;
-            });
-        } else {
-          getDocumentList({ ...data })
-            .then((res) => {
-              if (res.code != 0) {
-                return reject();
-              }
-              resolve(res.result);
-            })
-            .catch((err) => {
-              reject();
-            });
-        }
-      });
-    },
+    lenovoselectSearchData: _.debounce(function(e) {
+      this.selectLoading = true;
+      this.dialogData[this.dialogType]
+        .http({
+          keyWord: e,
+          pageSize: 50,
+          pageNum: 1,
+        })
+        .then((res) => {
+          if (!res) {
+            return;
+          }
+          this.options = res.result.list;
+        })
+        .catch((err) => {})
+        .finally(() => {
+          this.selectLoading = false;
+        });
+    }, 800),
     /**
      * @description 搜索备件
      */
@@ -252,6 +304,9 @@ export default {
         }
       }
     },
+    changeBtnLoading(e){
+      this.btnLoading = e
+    }
   },
 };
 </script>
@@ -275,5 +330,9 @@ export default {
   border-top: 1px solid rgba(0, 0, 0, 0.09);
   border-bottom: 1px solid rgba(0, 0, 0, 0.09);
   padding: 0;
+}
+
+.el-select-dropdown__item {
+  height: auto;
 }
 </style>

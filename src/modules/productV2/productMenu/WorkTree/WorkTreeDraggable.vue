@@ -4,14 +4,16 @@
     tag="ul"
     :list="tasks"
     :group="{ name: 'g1' }"
-    @add="arrUpdate"
+    @add="addArr"
+    @update="arrUpdate"
+    @choose="arrChoose"
     handle=".handle"
-    :disabled="disable"
+    :disabled="rootData.banMoveIn"
   >
     <template v-if="tasks.length > 0">
       <li
         v-for="(el, index) in tasks"
-        :key="index"
+        :key="el.id"
         class="dragArea-root"
         :class="{ 'dragArea-root-show': el.showList }"
         @click.stop="checkRootList(index)"
@@ -24,7 +26,7 @@
           @mouseenter="tasksItemMove(index)"
           @mouseleave="tasksItemLeave"
         >
-          <div class="flex-1 flex-x" :style="`padding-left:${deepCount * 5}px`">
+          <div class="flex-1 flex-x" :style="`padding-left:${deepCount * 8}px`">
             <i
               v-if="el.tasks.length > 0"
               class="iconfont icon-icon_arrow arrow-right"
@@ -50,11 +52,11 @@
               v-model="el.popoverVisible"
             >
               <div class="item-menu-box">
-                <div @click.stop="addChildArr(index)">
+                <div @click.stop="addChildArr(index)" v-show="!el.conData">
                   添加子集目录
                 </div>
-                <div v-if="el.conData && el.tasks.length <= 0">
-                  编辑
+                <div @click.stop="renameChildArr(index)">
+                  重命名
                 </div>
                 <div @click.stop="deleteNowArr(index)">
                   删除
@@ -69,11 +71,16 @@
 
         <work-tree-draggable
           :tasks="el.tasks"
-          :disable="el.conData ? true : false"
-          :root-data="{ id: el.id, routeName: el.routeName, deep: el.deep }"
+          :root-data="{
+            id: el.id,
+            banMoveIn: el.tasks.conData == 1 ? true : false,
+            indexArr: [...rootData.indexArr, index],
+            pathNameArr: [...rootData.pathNameArr, el.name],
+          }"
           :now-edit-menu="nowEditMenu"
           :now-hover-menu="nowHoverMenu"
           :deep-count="deepCount * 1 + 1"
+          :sort-menu="sortMenu"
         />
       </li>
     </template>
@@ -82,15 +89,16 @@
 <script>
 import draggable from 'vuedraggable';
 import _ from 'lodash';
+import { sortTreeList, delTreeList } from '@src/api/ProductV2Api';
 const arrTemp = {
   name: '目录名称',
   tasks: [],
   conData: null,
-  showList: true,
+  showList: 1,
 };
 
 export default {
-  inject: ['nowEditMenuChange', 'nowHoverMenuChange'],
+  inject: ['rootDataChange', 'changeDialog', 'getTreeData', 'changeTree'],
   props: {
     tasks: {
       required: true,
@@ -98,10 +106,6 @@ export default {
     },
     rootData: {
       type: Object,
-    },
-    disable: {
-      type: Boolean,
-      default: false,
     },
     nowEditMenu: {
       type: Object,
@@ -112,50 +116,50 @@ export default {
     deepCount: {
       type: Number | String,
     },
+    sortMenu: {
+      type: Object,
+    },
   },
   components: {
     draggable,
   },
   computed: {},
-  watch: {
-    tasksItemCanMove(newVal, oldVal) {
-      if (this.popoverVisibleBool) return;
-      this.popoverVisibleChange({});
-    },
-  },
   data() {
-    return {
-      tasksItemCanMove: -1,
-    };
+    return {};
   },
   name: 'work-tree-draggable',
   methods: {
     showRootList(index) {
       if (this.tasks[index].tasks.length <= 0) return;
-      this.tasks[index].showList = !this.tasks[index].showList;
+      this.tasks[index].showList = 1 - this.tasks[index].showList;
     },
     checkRootList(index) {
-      console.log(this.nowEditMenu, this.tasks[index]);
-      this.nowEditMenuChange({ id: this.tasks[index].id });
-      console.log(this.rootData);
+      console.log(this.nowEditMenu, this.tasks[index], this.rootData, 'checkRootList');
+      if(this.nowEditMenu.id == this.tasks[index].id) return
+      this.rootDataChange('nowEditMenu', {
+        id: this.tasks[index].id,
+        canEditConData: !(this.tasks[index].tasks.length > 0),
+        conData: this.tasks[index].conData,
+        name: this.tasks[index].name,
+        indexArr:this.rootData.indexArr,
+        nowIndex:index
+      });
     },
     addChildArr(index) {
-      this.popoverVisibleChange({});
-      console.log(this.$parent, this.tasks);
+      let nowMenu = this.tasks[index];
+      console.log(this.rootData, 'addChildArr');
+      this.rootDataChange('childData', {
+        id: nowMenu.id,
+        pathName: nowMenu.pathName,
+        indexArr: [...this.rootData.indexArr, index],
+        pathNameArr: this.rootData.pathNameArr,
+      });
+      this.changeDialog('addMenuChild');
       this.tasks[index].popoverVisible = false;
-      this.tasks[index].tasks.push(
-        _.cloneDeep({
-          ...arrTemp,
-          deep: this.tasks[index].deep + 1,
-          ...(this.rootData.routeName
-            ? { routeName: `${this.rootData.routeName}/目录名称` }
-            : {}),
-        })
-      );
     },
     deleteNowArr(index) {
-      this.popoverVisibleChange({});
       this.tasks[index].popoverVisible = false;
+
       this.$confirm(
         '此操作将删该目录以及目录下的所有子目录, 是否继续?',
         '提示',
@@ -166,18 +170,112 @@ export default {
         }
       )
         .then(() => {
-          this.tasks[index].tasks.splice(0, this.tasks[index].tasks.length);
+          delTreeList({
+            ids: [this.tasks[index].id],
+          }).then((res) => {
+            if (res.code == 0) {
+              this.changeTree(
+                'delete',
+                [...this.rootData.indexArr],
+                index,
+                this.tasks[index]
+              );
+            } else {
+              this.$notify.error({
+                title: '网络错误',
+                message: res.message,
+                duration: 2000,
+              });
+            }
+          });
         })
         .catch(() => {});
     },
+    renameChildArr(index) {
+      let nowMenu = this.tasks[index];
+      console.log({
+        id: nowMenu.id,
+        pathName: nowMenu.pathName,
+        indexArr: [...this.rootData.indexArr, index],
+        pathNameArr: this.rootData.pathNameArr,
+        name: nowMenu.name,
+        nowIndex: index,
+      });
+      this.rootDataChange('childData', {
+        id: nowMenu.id,
+        pathName: nowMenu.pathName,
+        indexArr: [...this.rootData.indexArr, index],
+        pathNameArr: this.rootData.pathNameArr,
+        name: nowMenu.name,
+        nowIndex: index,
+      });
+      this.changeDialog('renameMenuChild');
+      this.tasks[index].popoverVisible = false;
+    },
     arrUpdate(e) {
-      console.log(this.deepCount);
+      console.log(this.rootData, 'arrUpdate');
+      let obj = {
+        id: this.sortMenu.id,
+        parentId: this.rootData.id,
+        pathName: [
+          ..._.cloneDeep(this.rootData.pathNameArr),
+          this.sortMenu.name,
+        ].join('/'),
+        orderId: e.newIndex,
+        showList: this.sortMenu.showList,
+      };
+      sortTreeList(obj).then((res) => {
+        if (res.code == 0) {
+          this.sortMenu.pathName = res.result.pathName;
+          this.sortMenu.parentId = res.result.parentId;
+          this.rootDataChange('sortMenu', this.sortMenu);
+        } else {
+          this.$notify.error({
+            title: '网络错误',
+            message: res.message,
+            duration: 2000,
+          });
+          this.getTreeData();
+        }
+      });
+      console.log(obj, this.sortMenu, 'update');
+    },
+    addArr(e) {
+      let obj = {
+        id: this.sortMenu.id,
+        parentId: this.rootData.id,
+        pathName: [
+          ..._.cloneDeep(this.rootData.pathNameArr),
+          this.sortMenu.name,
+        ].join('/'),
+        orderId: e.newIndex,
+        showList: this.sortMenu.showList,
+      };
+      sortTreeList(obj).then((res) => {
+        if (res.code == 0) {
+          this.sortMenu.pathName = res.result.pathName;
+          this.sortMenu.parentId = res.result.parentId;
+          this.rootDataChange('sortMenu', this.sortMenu);
+        } else {
+          this.$notify.error({
+            title: '网络错误',
+            message: res.message,
+            duration: 2000,
+          });
+          this.getTreeData();
+        }
+      });
+      console.log(obj, this.sortMenu, 'add');
+    },
+    arrChoose(e) {
+      this.rootDataChange('sortMenu', this.tasks[e.oldIndex]);
+      console.log(e, 'choose');
     },
     tasksItemMove(e) {
-      this.nowHoverMenuChange({ id: this.tasks[e].id });
+      this.rootDataChange('nowHoverMenu', { id: this.tasks[e].id });
     },
     tasksItemLeave(e) {
-      this.nowHoverMenuChange({});
+      this.rootDataChange('nowHoverMenu', {});
     },
     nowHoverMenuShow(e) {
       return e.popoverVisible
@@ -222,6 +320,7 @@ ul {
 
   .tasks-item {
     position: relative;
+    padding-left: 10px;
     &:active {
       background: #e6fffb;
     }

@@ -1,6 +1,6 @@
 import Vue from '@src/common/entry';
 import http from '@src/util/http';
-import productMenuSetting from './index.vue';
+import SettingProductFieldsView from './setting.product.fields.vue';
 
 Vue.prototype.$http = http;
 
@@ -13,7 +13,7 @@ try {
     console.error('no init data')
 }
 
-const PageComponent = Vue.extend(productMenuSetting);
+const PageComponent = Vue.extend(SettingProductFieldsView);
 const app = new PageComponent({
     propsData: {
         initData

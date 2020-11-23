@@ -198,27 +198,34 @@ router.use('/outside/pc/task/delete', (ctx) =>
     host: '30.40.59.137',
     port: 10012,
     headers: {
-      cookie: 'VIPPUBLINKJSESSIONID=25c91850-650b-49c9-8bc2-9f8da584992c',
+      cookie: 'VIPPUBLINKJSESSIONID=9bea2b8f-f9bb-4e43-9a22-a967588b9e92',
     },
   })
 );
 
 // 通知中心改造
-router.use('/outside/*', (ctx) =>
-  HttpClient.proxy(ctx, {
-    host: '30.40.59.106',
-    port: 10002,
-    headers: {
-      cookie:
-        'VIPPUBLINKJSESSIONID=f560fed5-4bc4-4ff0-8638-e6666c18a31a; JSESSIONID=5442CD36355252A20E2CC1DAB778E536; __wpkreporterwid_=a99f79d5-3645-407a-3bf8-d6774e411773',
-    },
-  })
-);
+// router.use('/outside/*', (ctx) =>
+//   HttpClient.proxy(ctx, {
+//     host: '30.40.59.106',
+//     port: 10002,
+//     headers: {
+//       cookie:
+//         'VIPPUBLINKJSESSIONID=f560fed5-4bc4-4ff0-8638-e6666c18a31a; JSESSIONID=5442CD36355252A20E2CC1DAB778E536; __wpkreporterwid_=a99f79d5-3645-407a-3bf8-d6774e411773',
+//     },
+//   })
+// );
 
 router.use('/approve/search', (ctx) =>
   HttpClient.proxy(ctx, {
     host: '47.98.255.79',
     port: 10002,
+  })
+);
+
+router.use('/outside/pc/catalog', (ctx) =>
+  HttpClient.proxy(ctx, {
+    host: '30.40.58.216',
+    port: 10013,
   })
 );
 

@@ -175,9 +175,14 @@
                   >新建工单呼叫中心</a
                   >
                   <a href="javascript:;" @click="goTaskList">工单列表</a>
-                  <a href="javascript:;" @click="goProductMenu">产品目录</a>
+                  <a href="javascript:;" @click="goProductMenu">产品目录管理</a>
+                  <a href="javascript:;" @click="goProductMenuList"
+                  >产品目录列表</a
+                  >
+                  <a href="javascript:;" @click="goProductMenuField"
+                  >产品目录设置</a
+                  >
                   <a href="javascript:;" @click="goProductList">产品列表</a>
-                  <a href="javascript:;" @click="goProductMenuField">产品目录表单</a>
                   <!-- <a href="javascript:;" @click="goCallCenterSetting">呼叫中心设置</a>
                   <a href="javascript:;" @click="goCallCenterWorkbench">呼叫工作台</a>
                   <a href="javascript:;" @click="goCallCenter">呼叫中心</a> -->
@@ -514,7 +519,7 @@ export default {
       showSystemPopup: false,
       systemData: [],
       shbEdition: 1,
-      taskListIds: ['M_TASK_ALL']
+      taskListIds: ['M_TASK_ALL'],
     };
   },
   computed: {
@@ -529,7 +534,11 @@ export default {
       if (currentProtocol === 'https:') {
         protocol = 'wss';
       }
-      return `${protocol}://${window.location.hostname}/api/callcenter/outside/websocket/asset/${this.loginUser.tenantId}_${this.loginUser.userId}`;
+      return `${protocol}://${
+        window.location.hostname
+      }/api/callcenter/outside/websocket/asset/${this.loginUser.tenantId}_${
+        this.loginUser.userId
+      }`;
     },
     /** 是否显示devtool */
     showDevTool() {
@@ -576,8 +585,8 @@ export default {
   methods: {
     openReason() {
       if (localStorage.getItem('reason_bool')) {
-        this.changeTaskVersion(false)
-        return
+        this.changeTaskVersion(false);
+        return;
       }
       this.$refs.reasonPanel.open();
     },
@@ -991,9 +1000,17 @@ export default {
     },
     goProductMenu() {
       platform.openTab({
-        id: 'my_shop_order_list',
-        title: '产品目录',
-        url: '/productV2/productMenu/edit',
+        id: 'productV2_catalog_edit',
+        title: '产品目录管理',
+        url: '/productV2/catalog/edit',
+        reload: true,
+      });
+    },
+    goProductMenuList() {
+      platform.openTab({
+        id: 'productV2_catalog_list',
+        title: '产品目录列表',
+        url: '/productV2/catalog/list',
         reload: true,
       });
     },
@@ -1008,8 +1025,8 @@ export default {
     goProductMenuField() {
       platform.openTab({
         id: 'productV2_set_field',
-        title: '产品目录表单',
-        url: '/productV2/productMenu/settingField',
+        title: '产品目录设置',
+        url: '/productV2/catalog/setting?type=productMenuSet',
         reload: true,
       });
     },
@@ -1020,7 +1037,13 @@ export default {
     openCallCenterWorkbench(data) {
       // console.info('data::', data);
       let url = data && data.id
-        ? `/setting/callcenter/workbench?id=${data.id}&dialCount=${data.dialCount}&linkmanName=${data.linkmanName}&callPhone=${data.callPhone}&callType=${data.callType}&callState=${data.callState}&ringTime=${data.ringTime}`
+        ? `/setting/callcenter/workbench?id=${data.id}&dialCount=${
+          data.dialCount
+        }&linkmanName=${data.linkmanName}&callPhone=${
+          data.callPhone
+        }&callType=${data.callType}&callState=${data.callState}&ringTime=${
+          data.ringTime
+        }`
         : '/setting/callcenter/workbench';
       platform.openTab({
         id: 'M_CALLCENTER_WORKBENCH_LIST',
@@ -1116,7 +1139,7 @@ export default {
     /**
      * @description 切换工单新旧版本
      */
-    changeTaskVersion: _.debounce(function (version) {
+    changeTaskVersion: _.debounce(function(version) {
       // 工单列表重定向
       this.currentTaskListTab.url = `/task?newVersion=${version}`;
       this.reloadFrameTab(this.currentTaskListTab, true);
@@ -1184,7 +1207,17 @@ export default {
     },
     pushTaskListIds(id) {
       this.taskListIds.push(id);
-    }
+    },
+    flashSomePage(obj = {}) {
+      try {
+        for (let index = 0; index < this.frameTabs.length; index++) {
+          if (this.frameTabs[index].id == obj.type) {
+            this.$platform.refreshTab('productV2_catalog_edit');
+            break;
+          }
+        }
+      } catch (error) {}
+    },
   },
   created() {
     // TODO: 迁移完成后删除
@@ -1194,9 +1227,11 @@ export default {
     window.pushTaskListIds = this.pushTaskListIds;
     window.loginUser = this.loginUser;
 
-    window.resizeFrame = function () {
+    window.resizeFrame = function() {
       console.warn('此方法只用于兼容旧页面，无实际效果，不推荐调用');
     };
+
+    window.flashSomePage = this.flashSomePage;
     this.clearCachedIds();
     sessionStorage.removeItem('shb_systemMsg');
     this.getSystemMsg();
