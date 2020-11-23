@@ -1,13 +1,26 @@
 <template>
   <div class="form-setting-panel form-select-setting">
-    <h3>{{ isSystem ? '系统' : '基础' }}字段 -- {{field.displayName}}</h3>
-    <div class="form-setting-group">
-      <textarea placeholder="请在此添加描述信息" rows="3" data-prop="placeHolder" :value="field.placeHolder" @input="updateForDom" :maxlength="placeholderMaxLength"></textarea>
+    <h3> {{field.displayName}}</h3>
+    <p class="form-design-warning">该字段为系统内置字段，暂不支持修改、删除。</p>
+    <!-- start 描述信息 -->
+    <form-describe-setting
+      :field="field"
+      @input="updateForDom"
+    ></form-describe-setting>
+    <!-- end 描述信息 -->
+    
+    <!-- start 校验 -->
+    <div class="form-setting-group form-setting-item">
+      <h4 class="form-item-title">校验</h4>
+      <div class="form-item-box">
+        <!-- 必填 -->
+        <form-required-setting :field="field" @input="update"></form-required-setting>
+      </div>
     </div>
-    <div class="form-setting-group">
-      <el-checkbox :value="field.isNull" @input="update($event, 'isNull')" :true-label="0" :false-label="1">必填</el-checkbox>
-    </div>
+    <!-- end 校验 -->
+
     <div class="form-select-setting-list">
+      <h4>选项</h4>
       <div v-for="(option, index) in options" :key="index" class="form-select-setting-option">
         <input type="text" :value="option.value" @input="updateOption($event, option)" maxlength="20">
         <button type="button" class="btn-text form-select-setting-delete" @click="delOption(option, index)"><i class="iconfont icon-minus-fill"></i></button>

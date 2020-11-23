@@ -60,10 +60,11 @@ const LogicalFieldModal = {
 
       return Array.isArray(depValues) && depValues.indexOf(this.currValue) >= 0;
     },
-    renderValueItem(option){    
+    renderValueItem(option,index){   
+      if(!option.value) return null;
       const className = ['logical-field-value', option.value == this.currValue ? 'logical-field-selected' : null];
       
-      return <div class={className} key={option.value} onClick={() => this.choose(option)}>{option.value}</div>
+      return <div class={className} key={index} onClick={() => this.choose(option)}>{option.value}</div>
     },
     renderTargetItem(field){
       const attrs = {
@@ -111,7 +112,7 @@ const LogicalFieldModal = {
         <h3 slot="title">配置显示逻辑 <i class="iconfont icon-question" {...tooltip}></i></h3>
         <div class="logical-field-panel">
           <h4 class="logical-field-panel-header">如果该字段值为：</h4>
-          <div class="logical-field-panel-body">{ this.options.map(o => this.renderValueItem(o)) }</div>
+          <div class="logical-field-panel-body">{ this.options.map((o,index) => this.renderValueItem(o,index)) }</div>
         </div>
         <div class="logical-field-panel">
           <h4 class="logical-field-panel-header">那么显示以下字段：</h4>
