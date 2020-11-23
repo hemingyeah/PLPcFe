@@ -42,12 +42,16 @@
             保存计划任务
           </button>
           <!-- end 编辑计划任务 -->
+          <!-- end 工单按钮组 -->
           
         </div>
-        <!-- end 工单按钮组 -->
         
       </div>
-
+      
+      <!-- start 工单流程步骤 -->
+      <!-- <TaskProcessSteps :template-id="task.templateId"></TaskProcessSteps> -->
+      <!-- end 工单流程步骤 -->
+      
       <task-edit-form :task="task" :fields.sync="fields" :state="state" :types="types" :url-params="urlParams" :value.sync="form" ref="form" @updatetemplateId="updateTaskTemplateId"></task-edit-form>
     </form>
       

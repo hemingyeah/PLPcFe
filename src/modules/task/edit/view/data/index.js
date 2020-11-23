@@ -8,6 +8,8 @@ export default {
   loadingPage: false,
   pending: false,
   submitting: false,
+  // 提交次数
+  submitCount: 0,
   submitModel: {
     url: ''
   },

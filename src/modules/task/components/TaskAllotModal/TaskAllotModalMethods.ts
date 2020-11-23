@@ -351,7 +351,7 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
           if (!isSuccess) return
           
           this.taskType = result.data || null
-
+          
         })
         .catch(err => {
           console.error(err)
@@ -476,10 +476,10 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
   public fetchTaskPoolSubmit(params: AllotTaskPoolParams) {
     return (
       taskAllotTaskPoll(params)
-      .then((data: getTaskAllotTaskPoolResult) => {
-        let isSuccess = data.succ
+      .then((result: getTaskAllotTaskPoolResult) => {
+        let isSuccess = result.success
         if (!isSuccess) {
-          return Platform.alert(data.message)
+          return Platform.alert(result.message)
         }
         
         this.allotSuccess()

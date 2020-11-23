@@ -739,7 +739,7 @@ export function deleteComponent(params: {} | undefined) {
  * @param {Object} params - 参数对象
  * @param {String} params.id - 工单id
  */
-export function getTaskType(params: {} | undefined): Promise<getTaskTypeResult> {
+export function getTaskType(params: { id: string } | undefined): Promise<getTaskTypeResult> {
   return http.get("/setting/taskType/getOne", params);
 }
 
@@ -1219,7 +1219,7 @@ export function taskReAllot(params: TaskAllotModel): Promise<getTaskAllotResult>
  * @description 工单指派-指派工单池
  */
 export function taskAllotTaskPoll(params: TaskAllotTaskPoolModel): Promise<getTaskAllotTaskPoolResult> {
-  return http.post('/task/allotTaskToPool', params)
+  return http.post(`${fixedPrefixTaskPath}/outside/pc/task/allotToPool`, params)
 }
 
 /**

@@ -27,7 +27,9 @@ enum ComponentNameEnum {
   // 工单指派人员卡片
   UserCard = 'user-card',
   // 工单指派人员按钮
-  UserButton = 'user-button'
+  UserButton = 'user-button',
+  // 工单流程步骤
+  TaskProcessSteps = 'task-process-steps',
 }
 
 export default ComponentNameEnum

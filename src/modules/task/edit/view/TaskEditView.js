@@ -4,6 +4,7 @@ import * as TaskApi from '@src/api/TaskApi.ts'
 import TaskEditForm from '@src/modules/task/edit/components/TaskEditForm/TaskEditForm.vue'
 import PlanTaskEditForm from '@src/modules/task/edit/components/PlanTaskEditForm/PlanTaskEditForm.vue'
 import TaskAllotModal from '@src/modules/task/components/TaskAllotModal/TaskAllotModal.tsx'
+import TaskProcessSteps from '@src/modules/task/components/TaskProcessSteps/TaskProcessSteps.tsx'
 /* utils */
 import {parse} from '@src/util/querystring';
 import * as FormUtil from '@src/component/form/util'
@@ -95,19 +96,6 @@ export default {
     */
     closeAndOpenTab(url, newTabId) {
       location.href = url;
-      // let id = window.frameElement.dataset.id;
-      // this.$platform.closeTab(id)
-      
-      // let fromId = window.frameElement.getAttribute('id')
-      
-      // this.$platform.openTab({
-      //   id: newTabId,
-      //   title: '',
-      //   url,
-      //   reload: true,
-      //   close: true,
-      //   fromId
-      // });
     },
     /** 
      * @description 呼叫中心与工单数据的处理 linkman/address/customer
@@ -153,7 +141,7 @@ export default {
           // 根据是否派单决定跳转地址
           let taskId = res.result;
           
-          if (this.isAllot) {
+          if (isAllot) {
             this.openAllotModel({ 
               ...params.task, 
               id: taskId,
@@ -479,6 +467,7 @@ export default {
           
           const params = this.buildParams()
           
+          ++this.submitCount
           this.togglePending(true)
           
           // 指派需要对比 现在的表单于上一次表单数据是否相同，不相同则更新工单数据
@@ -496,7 +485,9 @@ export default {
             // 表单数据不相同
             if (!isSameForm) {
               this.backParams = params
-              return this.updateTaskMethod(params, isAllot);
+              let isFirstCreate = this.submitCount <= 1 && this.isTaskCreate
+              let taskMethodFunc = isFirstCreate ? this.createTaskMethod : this.updateTaskMethod
+              return taskMethodFunc(params, isAllot)
             } 
             
             return this.openAllotModel(this.allotTask )
@@ -604,6 +595,7 @@ export default {
   components: {
     [TaskEditForm.name]: TaskEditForm,
     [PlanTaskEditForm.name]: PlanTaskEditForm,
-    TaskAllotModal
+    TaskAllotModal,
+    TaskProcessSteps
   }
 }
