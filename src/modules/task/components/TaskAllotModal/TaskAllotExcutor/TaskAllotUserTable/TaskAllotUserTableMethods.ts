@@ -429,7 +429,7 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
         // 解析数据
         data.result?.list ? data.result.list = parseObject(data.result.list) : null
         // 合并数据
-        this.userPage.merge(data.result)
+        this.userPage.merge(data.result || {})
         // key : userId(string) -> value: boolean
         this.userPageCheckedMap = (
           this.userPage.list
@@ -712,14 +712,14 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
         tags = tagList
       }
       // 按团队派单 取可见团队和客户团队的交集
-      else if (this.allotByExclusiveTag) {
-        tags = tagList
+      else if (this.isAllotByTag) {
+        tags = objectArrayIntersection<Tag, Tag>(customerTags, tagList)
       }
       
       this.selectTeams = tags
       
     } catch (error) {
-      console.log('TaskAllotUserTableMethods -> matchTags -> error', error)
+      console.warn('TaskAllotUserTableMethods -> matchTags -> error', error)
     }
   }
   

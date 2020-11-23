@@ -293,7 +293,7 @@ export default {
     openAllotModel(task = {}) {
       this.allotTask = task
       this.$nextTick(() => {
-        this.$refs.TaskAllotModal && this.$refs.TaskAllotModal.show()
+        this.$refs.TaskAllotModal && this.$refs.TaskAllotModal.outsideShow()
       })
       this.togglePending()
     },

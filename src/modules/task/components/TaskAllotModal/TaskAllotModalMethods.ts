@@ -305,20 +305,22 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
     
     Log.succ(Log.Start, `TaskAllotModalMethods -> ${this.fetchCustomer.name}`)
     
-    getCustomer(id).then((result: getCustomerDetailResult) => {
-      let isSuccess = result.status == 0
-      if (!isSuccess) return
-      
-      Log.succ(Log.End, `TaskAllotModalMethods -> ${this.fetchCustomer.name}`)
-      
-      this.customer = Object.freeze(result.data || {})
-      
-      // @ts-ignore
-      this.$refs.TaskAllotExcutorComponent.outsideFetchUsers()
-      
-    }).catch(err => {
-      console.error(err)
-    })
+    return (
+      getCustomer(id).then((result: getCustomerDetailResult) => {
+        let isSuccess = result.status == 0
+        if (!isSuccess) return
+        
+        Log.succ(Log.End, `TaskAllotModalMethods -> ${this.fetchCustomer.name}`)
+        
+        this.customer = Object.freeze(result.data || {})
+        
+        // @ts-ignore
+        this.$refs.TaskAllotExcutorComponent.outsideFetchUsers()
+        
+      }).catch(err => {
+        console.error(err)
+      })
+    )
   }
   
   /** 
@@ -364,13 +366,15 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
     let customerId = this.customerId
     if(!customerId) return console.warn('fetchExeinsynWithCustomerManager paramer not have customerId')
     
-    getCustomerExeinsyn({ id: customerId}).then(result => {
-      let exeInSynOfTaskOrEvent = result?.data?.exeInSynOfTaskOrEvent;
-      // 允许自动将客户负责人带入工单或事件协同人
-      if (exeInSynOfTaskOrEvent) {
-        result?.data?.userId && this.synergyUserList.push(result.data)
-      }
-    })
+    return (
+      getCustomerExeinsyn({ id: customerId}).then(result => {
+        let exeInSynOfTaskOrEvent = result?.data?.exeInSynOfTaskOrEvent;
+        // 允许自动将客户负责人带入工单或事件协同人
+        if (exeInSynOfTaskOrEvent) {
+          result?.data?.userId && this.synergyUserList.push(result.data)
+        }
+      })
+    )
     
   }
   
@@ -543,9 +547,15 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
    * @description 初始化
   */
   public async initialize() {
-    await this.fetchStateColor()
-    await this.fetchCustomer()
-    this.fetchSynergyUserWithCustomerManager()
+    try {
+      await this.fetchStateColor()
+      await this.fetchCustomer()
+      await this.fetchSynergyUserWithCustomerManager()
+    } catch (error) {
+      console.error('hbc: TaskAllotModalMethods -> initialize -> error', error)
+    } finally {
+      this.pending = false
+    }
   }
   
   /** 
@@ -591,6 +601,25 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
   }
   
   /** 
+   * @description 显示弹窗
+   * --支持外部调用的
+  */
+  public async outsideShow() {
+    // 等待状态
+    this.pending = true
+    // 初始化派单类型
+    this.allotType = TaskAllotTypeEnum.Person
+    // 匹配负责人显示
+    this.matchExcutorWithReAllot()
+    // 获取工单配置
+    await this.fetchTaskConfig()
+    // 初始化
+    this.initialize()
+    // 显示
+    this.show()
+  }
+  
+  /** 
    * @description 设为负责人
   */
   public setExecutorUser(user: LoginUser | TaskAllotUserInfo | null) {
@@ -610,16 +639,8 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
    * @description 显示弹窗
   */
   public show() {
-    // 初始化派单类型
-    this.allotType = TaskAllotTypeEnum.Person
     // 显示弹窗
     this.showTaskAllotModal = true
-    // 匹配服务团队
-    this.matchExcutorWithReAllot()
-    // 获取工单配置
-    this.fetchTaskConfig()
-    // 初始化
-    this.initialize()
   }
   
   /** 

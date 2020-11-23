@@ -36,6 +36,7 @@ class TaskAllotUserTableRender extends TaskAllotUserTableMethods {
       <biz-form-remote-select
         value={this.selectTeamUsers}
         onInput={(value: any[]) => this.handlerTeamUsersChange(value)}
+        collapsed
         multiple
         placeholder='请选择人员'
         remoteMethod={(params: any) => this.fetchTeamUsers(params)}

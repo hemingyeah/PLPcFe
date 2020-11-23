@@ -830,11 +830,11 @@ export default {
     },
     // 指派工单
     allot() {
-      this.$refs.TaskAllotModal.show()
+      this.$refs.TaskAllotModal.outsideShow()
     },
     // 转派工单
     redeploy() {
-      this.$refs.TaskAllotModal.show()
+      this.$refs.TaskAllotModal.outsideShow()
     },
     // 打印工单
     printTask() {
