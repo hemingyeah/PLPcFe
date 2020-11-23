@@ -32,14 +32,14 @@
 
 <script>
 /* api */
-import * as TaskApi from '@src/api/TaskApi.ts';
+import * as TaskApi from "@src/api/TaskApi.ts";
 
 export default {
-  name: 'cancel-task-dialog',
+  name: "cancel-task-dialog",
   props: {
     taskId: {
       type: String,
-      default: '',
+      default: "",
     }
   },
   data() {
@@ -53,7 +53,7 @@ export default {
     buildParams() {
       let { showWithPart, isGoBack, reason } = this.cancelModal;
 
-      let content = {updateType: 'tRecord', updateContent: reason};
+      let content = {updateType: "tRecord", updateContent: reason};
       let task = {id: this.taskId};
 
       if (showWithPart) content.isGoBack = isGoBack;
@@ -68,8 +68,8 @@ export default {
         showWithPart: false,
         errorWithPart: false,
         isRequired: false,
-        reason: '',
-        isGoback: ''
+        reason: "",
+        isGoback: ""
       }
     },
     async openDialog() {
@@ -92,7 +92,7 @@ export default {
         this.visible = true;
 
       } catch (e) {
-        console.error('cancelTask error', e);
+        console.error("cancelTask error", e);
       }
     },
     async submit() {
@@ -101,14 +101,14 @@ export default {
       // 工单如果使用了备件，则"是否做退回处理"必选
       if (showWithPart && !isGoBack) return this.cancelModal.isRequired = true;
 
-      if (!reason.trim()) return this.$platform.alert('请填写取消说明');
+      if (!reason.trim()) return this.$platform.alert("请填写取消说明");
 
       this.pending = true;
 
       // 取消是否需要审批
       const result = await TaskApi.offApproveCheck(this.buildParams());
-      if (!result.succ && result.message == '需要审批') {
-        this.$emit('proposeApprove', result.data);
+      if (!result.succ && result.message == "需要审批") {
+        this.$emit("proposeApprove", result.data);
         this.visible = false;
         this.pending = false;
         return;
@@ -119,7 +119,7 @@ export default {
 
       TaskApi.cancelTask(params).then(res => {
         if (res.success) {
-          let fromId = window.frameElement.getAttribute('fromid');
+          let fromId = window.frameElement.getAttribute("fromid");
           // this.$platform.refreshTab(fromId);
 
           window.location.reload();

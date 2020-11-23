@@ -8,17 +8,16 @@
       class="task-list-view common-list-container"
       ref="taskListPage"
       v-show="mapShow"
-      @click="allEvent"
       v-loading.fullscreen.lock="loading"
     >
       <div class="task-list-header">
         <!-- 搜索 -->
         <div class="task-list-header-seach">
           <form onsubmit="return false;">
-            <div class="seach task-span1 task-flex task-ai guide-box">
+            <div class="seach task-span1 guide-box">
               <div style="position: relative;" >
                 <div class="guide-disable-cover" v-if="nowGuideStep == 4"></div>
-                <div itemid="" @mouseenter="guideDropdownMenu_enter">  
+                <div itemid="" @mouseenter="guideDropdownMenu_enter" class="task-flex task-ai task-jend">  
                   <el-dropdown id="v-task-step-3" >
                     <div
                       :class="['task-list-customize', 'task-font14', 'task-c3', 'task-flex', 'task-ai', 'task-pointer', nowGuideStep == 4? 'guide-point bg-w':'']"
@@ -37,32 +36,26 @@
                           :key="index"
                           class="task-flex task-ai task-pointer"
                         >
-                          <span
-                            class="task-list-dropdown-item"
-                            @click="checkOther(item)"
-                          >
-                            {{ item.name }}</span
-                            >
+                          <span class="task-list-dropdown-item" @click="checkOther(item)">{{
+                            item.name
+                          }}</span>
                           <div class="task-list-dropdown-icon">
                             <el-tooltip content="查看筛选条件" placement="top">
+                              <i class="iconfont icon-yanjing task-font12" @click="creatViewPanel(item, 'view')"></i>
+                            </el-tooltip>
+                            <el-tooltip content="编辑视图" placement="top">
                               <i
-                                class="iconfont icon-yanjing task-font12"
-                                @click="$refs.taskView.open(item.id, item.name, 1)"
+                                class="iconfont icon-bianji1 task-ml12 task-font12"
+                                @click="creatViewPanel(item, 'edit')"
+                                v-if="item.authEdit"
                               ></i>
                             </el-tooltip>
-                            <!-- <el-tooltip content="编辑视图" placement="top">
-                            <i
-                              class="iconfont icon-bianji1 task-ml12 task-font12"
-                              @click.stop="editView(item)"
-                              v-if="item.authEdit"
-                            ></i>
-                          </el-tooltip> -->
                             <el-tooltip content="删除视图" placement="top">
                               <i
                                 class="iconfont icon-shanchu-copy task-ml12 task-font12"
-                                @click.stop="$refs.viewModel.deleteViewBtn(item.id)"
+                                @click.stop="delView(item)"
                                 v-if="item.authEdit"
-                              ></i>
+                              ></i>{{item.authEdit}}
                             </el-tooltip>
                           </div>
                         </div>
@@ -70,14 +63,14 @@
                       <el-dropdown-item>
                         <div
                           class="task-flex task-ai task-cfa task-pointer task-list-wd252"
-                          @click="panelSearchAdvancedToggle"
+                          @click="creatViewPanel"
                         >
                           <i class="iconfont icon-add task-mr4 task-font12"></i>
                           新建视图
                         </div>
                       </el-dropdown-item>
                     </el-dropdown-menu>
-              </el-dropdown></div></div>
+                  </el-dropdown>
 
               <el-input
                 v-model="params.keyword"
@@ -100,30 +93,30 @@
                 </el-select>
               </el-input>
 
-              <base-button
-                type="primary"
-                @event="searchBefore"
-                native-type="submit"
-                class="task-ml12"
-              >
-                搜索
-              </base-button>
-              <base-button type="ghost" @event="resetParams" class="task-ml12">
-                重置
-              </base-button>
-              <div class="guide-box">
-                <div class="guide-disable-cover" v-if="nowGuideStep == 3"></div>
-                <div
-                  id="v-task-step-2"
-                  :class="['advanced-search-visible-btn', 'task-ml12', nowGuideStep == 3? 'guide-point':'']"
-                  @click.self="panelSearchAdvancedToggle"
-                >
-                  <i class="iconfont icon-gaojisousuo task-font12 task-mr4"></i>
-                  高级搜索
+                  <base-button
+                    type="primary"
+                    @event="searchBefore"
+                    native-type="submit"
+                    class="task-ml12"
+                  >
+                    搜索
+                  </base-button>
+                  <base-button type="ghost" @event="resetParams" class="task-ml12">
+                    重置
+                  </base-button>
+                  <div class="guide-box">
+                    <div class="guide-disable-cover" v-if="nowGuideStep == 3"></div>
+                    <div
+                      id="v-task-step-2"
+                      :class="['advanced-search-visible-btn', 'task-ml12', nowGuideStep == 3? 'guide-point':'']"
+                      @click.self="panelSearchAdvancedToggle"
+                    >
+                      <i class="iconfont icon-gaojisousuo task-font12 task-mr4"></i>
+                      高级搜索
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-          </form>
+          </div></div></form>
         </div>
         <!-- 筛选 -->
         <div class="task-list-header-nav">
@@ -365,12 +358,12 @@
         ref="searchPanel"
         v-show="advanceds.length"
         @bj="showBj = false"
+        v-if="advanceds.length"
       >
         <div
           class="advanced-search-btn-group task-flex task-buttom"
           slot="footer"
         >
-          <base-button type="primary" @event="editView">存为视图</base-button>
           <div class="task-span1"></div>
           <base-button type="ghost" @event="resetParams">重置</base-button>
           <base-button
@@ -382,6 +375,31 @@
         </div>
       </task-search-panel>
       <!-- end 高级搜索 -->
+      
+      <!-- S 新建视图 -->
+      <task-view-panel
+        :init-data="initData"
+        :config="seoSetList"
+        :search-params="searchParams"
+        :task_view_list="task_view_list"
+        :region="region"
+        @bj="showBj = false"
+        :customize-list="[...taskFields, ...taskReceiptFields]"
+        ref="viewPanel"
+      >
+        <div class="advanced-search-btn-group task-flex task-buttom" slot="footer">
+          <div class="task-span1"></div>
+          <base-button type="ghost" @event="$refs.viewPanel.hide()">{{viewType === 'view' ? '关闭' : '取消'}}</base-button>
+          <base-button
+            v-if="viewType !== 'view'"
+            type="primary"
+            native-type="submit"
+            @event="saveView"
+          >保存视图</base-button
+          >
+        </div>
+      </task-view-panel>
+      <!-- E 新建视图 -->
       <div class="common-list-section">
         <!--operation bar start-->
         <div class="task-list-operation-bar-container task-flex task-ai">
@@ -789,12 +807,9 @@
                     }}
                   </template>
 
-                  <!-- 位置 -->
-                  <template v-else-if="column.formType === 'location'">
-                    {{
-                      scope.row.attribute[column.field] &&
-                        scope.row.attribute[column.field].address
-                    }}
+                  <!-- 时间 -->
+                  <template v-else-if="!column.isSystem">
+                    {{ scope.row.attribute && scope.row.attribute[column.field] }}
                   </template>
 
                   <!-- 时间 -->
@@ -1048,7 +1063,7 @@
 </template>
 
 <script>
-import TaskList from './TaskList';
+import TaskList from "./TaskList";
 export default TaskList;
 </script>
 <style lang="scss">

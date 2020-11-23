@@ -726,7 +726,8 @@ export default {
       this.$platform.openLink(e)
     },
     goToShopCenter() {
-      window.location = '/setting/serviceStation/markSpareGray'
+      // window.location = '/setting/serviceStation/markSpareGray'
+      window.location.href = '/system/mall/index'
     },
     copyUrl() {
       if (!this.setData.protalUrl) return

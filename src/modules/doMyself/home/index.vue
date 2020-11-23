@@ -2,7 +2,7 @@
   <div id="doMyself-box">
     <div class="flex-x al-start">
       <div class="left-menu">
-        <div class="menu-title">{{ '自助门户设置' }}</div>
+        <div class="menu-title">{{ "自助门户设置" }}</div>
         <template v-for="(item, index) in menuList">
           <nav
             :class="`menu-list ${nowMenu == index ? 'menu-checked' : ''}`"
@@ -12,11 +12,9 @@
             <!-- <div class="left-border" v-if="nowMenu==index"></div> -->
             <div class="icon-box">
               <i
-                :class="
-                  `iconfont ${item.icon} ${
-                    nowMenu == index ? 'font-16 font-w-600' : 'font-14'
-                  }`
-                "
+                :class="`iconfont ${item.icon} ${
+                  nowMenu == index ? 'font-16 font-w-600' : 'font-14'
+                }`"
               ></i>
             </div>
             <span>{{ item.name }}</span>
@@ -33,11 +31,11 @@
   </div>
 </template>
 <script>
-import toastList from '../toastList/toastList'
-import wxSet from '../wxSet/wxSet'
-import doMyselfSet from '../setting/index'
+import toastList from "../toastList/toastList";
+import wxSet from "../wxSet/wxSet";
+import doMyselfSet from "../setting/index";
 export default {
-  name: 'do-myself-view',
+  name: "do-myself-view",
   props: {
     initData: {
       type: Object,
@@ -47,61 +45,65 @@ export default {
   provide() {
     return {
       initData: this.initData,
-    }
+    };
   },
   data() {
     return {
       menuList: [
         {
-          name: '客户自助门户',
-          icon: 'icon-Gateway',
-          comName: 'do-myself-set',
+          name: "客户自助门户",
+          icon: "icon-Gateway",
+          comName: "do-myself-set",
         },
         {
-          name: '公众号设置',
-          icon: 'icon-weixin2',
-          comName: 'wx-set',
+          name: "公众号设置",
+          icon: "icon-weixin2",
+          comName: "wx-set",
         },
         {
-          name: '短信消息设置',
-          icon: 'icon-duanxin3',
+          name: "短信消息设置",
+          icon: "icon-duanxin3",
         },
         {
-          name: '消息记录',
-          icon: 'icon-message',
-          comName: 'toast-list',
+          name: "消息记录",
+          icon: "icon-message",
+          comName: "toast-list",
         },
       ],
       nowMenu: 1, // 0 客户自助门户 1 公众号设置 2 短信消息设置 3 消息记录
-    }
+    };
   },
-  computed: {},
+  computed: {
+    linkControl() {
+      return this.initData.openLinkC;
+    },
+  },
   created() {
-    let type = window.location.href.split('/')[
-      window.location.href.split('/').length - 1
-    ]
+    let type = window.location.href.split("/")[
+      window.location.href.split("/").length - 1
+    ];
     let typeObj = {
       wxSet: 1,
       toastList: 3,
       doMyselfSet: 0,
-    }
-    this.nowMenu = typeObj[type]
+    };
+    this.nowMenu = typeObj[type];
   },
   methods: {
     changePage(index) {
       if (this.nowMenu === index) {
-        return
+        return;
       }
       if (index === 2) {
-        window.location.href = '/setting/message/smsmessage'
+        window.location.href = "/setting/message/smsmessage";
       } else if (index === 0) {
-        window.location.href = '/setting/doMyself/doMyselfSet'
+        window.location.href = "setting/serviceStation/customerPortal";
       } else if (index === 1) {
-        window.location.href = '/setting/doMyself/wxSet'
+        window.location.href = "/setting/doMyself/wxSet";
       } else if (index === 3) {
-        window.location.href = '/setting/doMyself/toastList'
+        window.location.href = "/setting/doMyself/toastList";
       }
-      this.nowMenu === index
+      this.nowMenu === index;
     },
   },
   components: {
@@ -109,10 +111,10 @@ export default {
     [wxSet.name]: wxSet,
     [doMyselfSet.name]: doMyselfSet,
   },
-}
+};
 </script>
 <style lang="scss">
-.al-start{
+.al-start {
   align-items: flex-start;
 }
 .flex-1 {

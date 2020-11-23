@@ -120,7 +120,6 @@ export default {
     buildParams() {
       const form = this.$refs.searchForm.returnData();
       this.formBackup = Object.assign({}, form);
-      console.log(this.fields);
       console.log(this.formBackup);
 
       return this.formBackup;

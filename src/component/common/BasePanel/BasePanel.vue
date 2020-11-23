@@ -110,7 +110,6 @@ export default {
   overflow: hidden;
   padding-bottom: 100px;
 }
-
 .base-panel-title {
   display: flex;
   flex-flow: row nowrap;
