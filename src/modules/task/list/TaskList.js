@@ -2174,7 +2174,6 @@ export default {
         if (resetParamBool) {
           this.$refs.searchPanel.resetParams();
         }
-        this.params.keyword = '';
         searchModel['page'] = params.page;
         searchModel['pageSize'] = params.pageSize
 
