@@ -514,6 +514,7 @@ export default {
             this.selectedField = {};
             this.form = {};
           }
+          console.log(this.form)
         },
         returnDatas() {
           let data = Object.assign({}, this.form);
@@ -530,8 +531,7 @@ export default {
           // }
         },
         buildForm() {
-          localStorage.setItem("fields_length", this.fields.length);
-          if (Object.keys(this.form).length === this.fields.length) return;
+          if (Object.keys(this.form).length) return;
           this.fields.forEach((f) => {
             if (!this.form[f.fieldName] || !this.form[f.fieldName].length) {
               // 地址的默认值初始化为对象
