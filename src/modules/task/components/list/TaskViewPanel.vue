@@ -305,7 +305,7 @@ export default {
               value.fieldName === "synergyId") ||
             (item.property === "allotType" &&
               value.fieldName === "allotTypeStr") ||
-            (item.property === "flag" && value.fieldName === "onceException") ||
+            (item.property === "flags" && value.fieldName === "onceException") ||
             ((item.property === "province" ||
               item.property === "city" ||
               item.property === "dist") &&
@@ -325,7 +325,7 @@ export default {
                   fieldName: value.fieldName,
                   formType: value.formType,
                 });
-              } else if (item.property === "flag") {
+              } else if (item.property === "flags") {
                 this.searchModelCN.push({
                   key: value.displayName,
                   content: item.inValue
