@@ -246,6 +246,18 @@ function getTreeListNode(params) {
 }
 
 
+/**
+ * 克隆某个目录
+ * @param params
+ *   id : 目录id
+ * @returns {*}
+ */
+function cloneMenu(params) {
+  
+  return http.get(`${headUrl}/outside/pc/catalog/clone`, params)
+}
+
+
 
 export {
   getProductMenuField,
@@ -271,5 +283,6 @@ export {
   removePartOrWiki,
   clearCatalogData,
   getMenuRecord,
-  getTreeListNode
+  getTreeListNode,
+  cloneMenu
 }

@@ -130,6 +130,7 @@ const FormBuilder = {
         return (
           <form-item
             label={field.displayName} class={formItemClass}
+            hideform={field.hideform || false}
             key={field.fieldName} findRootEl={this.findRootEl} validation>
             {formField}
           </form-item>

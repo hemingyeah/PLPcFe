@@ -147,7 +147,7 @@ export default {
           title: '添加目录',
         },
         cloneMenu: {
-          title: '选择需要克隆的目录',
+          title: '选择需要复制的目录',
           http: getPageCloneData,
         },
         renameMenuChild: {

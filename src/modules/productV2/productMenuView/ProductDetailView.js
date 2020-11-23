@@ -314,10 +314,10 @@ export default {
       id: getUrlObj.id
     }).then(res => {
       if (res.code == 0) {
-        res.result.productVideo = res.result.productVideo || []
-        res.result.productExplain = res.result.productExplain || []
-        this.$set(this, 'dataInfo', res.result || {})
-        this.$refs.producMmenuInfoRecord.initRecord(res.result.id)
+        res.result.catalogInfo.productVideo = res.result.catalogInfo.productVideo || []
+        res.result.catalogInfo.productExplain = res.result.catalogInfo.productExplain || []
+        this.$set(this, 'dataInfo', res.result.catalogInfo || {})
+        this.$refs.producMmenuInfoRecord.initRecord(res.result.catalogInfo.id)
       } else {
         this.$notify.error({
           title: '网络错误',

@@ -69,7 +69,7 @@ import {
   setTreeList,
   setPagerelationPartOrWiki,
   renameTree,
-  getTreeListNode,
+  cloneMenu
 } from '@src/api/ProductV2Api';
 
 let finded = false;
@@ -189,7 +189,24 @@ export default {
       case 'cloneMenu':
         if (e.nowChooseArr && e.nowChooseArr.length > 0) {
           this.$refs.workTreeData.reflashPage(e.nowChooseArr[0]);
-          this.changeVisibleProp(false);
+          cloneMenu({
+            cloneId: e.nowChooseArr[0],
+            catalogId: this.nowEditMenu.id,
+          }).then((res) => {
+            if (res.code == 0) {
+              this.$message({
+                message: '复制成功',
+                type: 'success',
+              });
+              this.changeVisibleProp(false);
+            } else {
+              this.$notify.error({
+                title: '网络错误',
+                message: res.message,
+                duration: 2000,
+              });
+            }
+          });
         }
         break;
       default:

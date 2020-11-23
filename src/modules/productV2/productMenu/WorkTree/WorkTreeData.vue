@@ -17,7 +17,7 @@
         <div class="normal-title-1">
           <div class="flex-1">编辑目录详细信息</div>
           <el-button @click="showDialog('cloneMenu')"
-          >克隆其他产品目录</el-button
+          >复制其他产品目录</el-button
           >
         </div>
 
@@ -47,6 +47,7 @@
             <el-checkbox-group v-model="fieldIds">
               <template v-for="item in fields">
                 <el-checkbox
+                  :checked="item.hideform"
                   v-if="item.isSystem != 1"
                   :label="item.id"
                   :key="item.id"
@@ -82,7 +83,7 @@
           </template>
 
           <template slot="productPic" slot-scope="{ field }">
-            <form-item :label="field.displayName">
+            <form-item class="upload-img" :label="field.displayName">
               <el-upload
                 action="string"
                 list-type="picture-card"
@@ -168,8 +169,16 @@
       </template>
     </div>
     <div class="bottom-btns" v-if="propData.conData == 1">
-      <el-button type="danger" :loading="btnLoading" @click="deletInfo">删除</el-button>
-      <el-button class="mar-l-8" type="primary" :loading="btnLoading" @click="submit">保存</el-button>
+      <el-button type="danger" :loading="btnLoading" @click="deletInfo"
+      >删除</el-button
+      >
+      <el-button
+        class="mar-l-8"
+        type="primary"
+        :loading="btnLoading"
+        @click="submit"
+      >保存</el-button
+      >
     </div>
   </div>
 </template>
@@ -199,10 +208,7 @@ export default {
   props: {
     propData: {
       type: Object,
-      default: () => {
-        {
-        }
-      },
+      default: () => ({}),
     },
   },
   inject: ['rootDataChange', 'changeTreeDetail'],
@@ -219,7 +225,7 @@ export default {
       flashPartType: false,
       flashProductType: false,
       fieldIds: [],
-      btnLoading:false
+      btnLoading: false,
     };
   },
   components: {
@@ -237,6 +243,13 @@ export default {
         this.reflashPage(newVal.id);
       }
     },
+    fieldIds(newVal, oldVal) {
+      this.fields.map((item) => {
+        if (newVal.indexOf(item.id) > -1) item['hideform'] = true;
+        else item['hideform'] = false;
+        return item;
+      });
+    },
   },
   mounted() {
     getProductMenuField()
@@ -244,7 +257,11 @@ export default {
         const { code, result, message } = res;
         if (code == 0) {
           const fields = result || [];
+          let arr = [];
           const sortedFields = fields.sort((a, b) => a.orderId - b.orderId);
+          this.fielIdArr = sortedFields.map((item) => {
+            return item.id;
+          });
           this.fields = sortedFields;
         } else {
           this.$notify.error({
@@ -417,13 +434,14 @@ export default {
         id,
       }).then((res) => {
         if (res.code == 0) {
-          if (res.result.fieldIds) {
-            this.fieldIds = res.result.fieldIds;
+          if (res.result.catalogInfo.fieldIds) {
+            this.fieldIds = res.result.catalogInfo.fieldIds;
           }
-          res.result.productVideo = res.result.productVideo || [];
-          res.result.productPic = res.result.productPic || [];
-          res.result.productExplain = res.result.productExplain || [];
-          this.$set(this, 'productMenuValue', res.result);
+          res.result.catalogInfo.productVideo = res.result.catalogInfo.productVideo || [];
+          res.result.catalogInfo.productPic = res.result.catalogInfo.productPic || [];
+          res.result.catalogInfo.productExplain = res.result.catalogInfo.productExplain || [];
+          this.$set(this, 'productMenuValue', res.result.catalogInfo);
+          this.$set(this, 'fieldIds', res.result.selectField);
         } else {
           this.$notify.error({
             title: '网络错误',
@@ -449,30 +467,32 @@ export default {
           this.btnLoading = true;
           clearCatalogData({
             catalogId: this.propData.id,
-          }).then((res) => {
-            if (res.code == 0) {
-              this.rootDataChange('nowEditMenu', {
-                ...this.propData,
-                conData: 0,
-              });
-              this.changeTreeDetail('conData', 0);
-              this.$message({
-                message: '删除成功',
-                type: 'success',
-              });
-              window.parent.flashSomePage({
-                type: 'productV2_catalog_list',
-              });
-            } else {
-              this.$notify.error({
-                title: '网络错误',
-                message: res.message,
-                duration: 2000,
-              });
-            }
-          }).finally(()=>{
-            this.btnLoading = false;
-          });
+          })
+            .then((res) => {
+              if (res.code == 0) {
+                this.rootDataChange('nowEditMenu', {
+                  ...this.propData,
+                  conData: 0,
+                });
+                this.changeTreeDetail('conData', 0);
+                this.$message({
+                  message: '删除成功',
+                  type: 'success',
+                });
+                window.parent.flashSomePage({
+                  type: 'productV2_catalog_list',
+                });
+              } else {
+                this.$notify.error({
+                  title: '网络错误',
+                  message: res.message,
+                  duration: 2000,
+                });
+              }
+            })
+            .finally(() => {
+              this.btnLoading = false;
+            });
         })
         .catch(() => {});
     },
@@ -547,6 +567,14 @@ export default {
   margin: 0;
   flex-shrink: 0;
   text-align: start;
+}
+.upload-img {
+  .el-upload-list__item label {
+    padding: 0;
+  }
+  .el-upload--picture-card {
+    border-color: $color-primary;
+  }
 }
 .el-checkbox {
   margin-bottom: 15px;

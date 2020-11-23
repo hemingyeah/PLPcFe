@@ -1,5 +1,5 @@
 <template>
-  <div class="form-item" :class="{err: errMessage}">
+  <div class="form-item" :class="{err: errMessage}" v-show="!hideform">
     <label :for="forId">{{label}} <span class="form-item-required" v-if="showRequired">*</span></label>
     <div class="form-item-control">
       <slot></slot>
@@ -39,6 +39,10 @@ export default {
     isNotNull: {
       type: Boolean,
       default: undefined
+    },
+    hideform: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -73,8 +77,8 @@ export default {
     },
     disabled() {
       let field = this.field;
-      return field.disabled ||
-        (field.setting && field.setting.defaultValueConfig && !!field.setting.defaultValueConfig.isNotModify && !!field.defaultValue);
+      return field.disabled
+        || (field.setting && field.setting.defaultValueConfig && !!field.setting.defaultValueConfig.isNotModify && !!field.defaultValue);
     },
   },
   methods: {

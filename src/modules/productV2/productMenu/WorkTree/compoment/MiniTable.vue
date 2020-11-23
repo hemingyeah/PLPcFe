@@ -1,8 +1,9 @@
 <!--  -->
 <template>
-  <div v-loading.fullscreen.lock="fullscreenLoading">
+  <div>
     <el-table
       :data="page.list"
+      v-loading="fullscreenLoading"
       stripe
       style="width: 100%"
       :highlight-current-row="false"
