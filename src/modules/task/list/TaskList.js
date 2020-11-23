@@ -1301,7 +1301,7 @@ export default {
       this.searchParams = {...this.searchParams_spare, ...{templateId: taskType.id}}
       this.currentTaskType = taskType;
       this.selectId = 'all'
-      this.params = this.initParams(this.params.pageSize);
+      this.params = this.initParams(this.params.pageSize, this.params.keyword);
       this.initialize();
       // this.createPerspective({id: this.selectId}, true)
     },
@@ -1659,9 +1659,9 @@ export default {
      * @param {Number} pageSize 页大小
      * @returns {Object} params
      */
-    initParams(pageSize = 10) {
+    initParams(pageSize = 10, keyword) {
       return {
-        keyword: "",
+        keyword,
         pageNum: 1,
         pageSize,
         orderDetail: {},
@@ -2196,7 +2196,6 @@ export default {
         if (resetParamBool) {
           this.$refs.searchPanel.resetParams();
         }
-        this.params.keyword = '';
         searchModel['page'] = params.page;
         searchModel['pageSize'] = params.pageSize
 
