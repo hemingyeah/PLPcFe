@@ -1092,34 +1092,34 @@ export function revertReason(params: object) {
  * 获取负责人 协同人 派单人 创建人
  */
 export function getSimpleUserListByIds(params: object = []) {
-  return http.post(`/outside/user/getSimpleUserListByIds`, params)
+  return http.post(`${fixedPrefixTaskPath}/outside/user/getSimpleUserListByIds`, params)
 }
 /**
  * 获取联系人
  */
 
 export function getLinkmanListByIds(params: object = []) {
-  return http.post(`/outside/pc/customer/getLinkmanListByIds`, params)
+  return http.post(`${fixedPrefixTaskPath}/outside/pc/customer/getLinkmanListByIds`, params)
 }
 
 /**
 * 获取产品
 */
 export function getSimpleProductList(params: object = []) {
-  return http.post(`/outside/pc/getSimpleProductList`, params)
+  return http.post(`${fixedPrefixTaskPath}/outside/pc/getSimpleProductList`, params)
 }
 
 /**
  * 获取客户人
  */
 export function getSimpleCustomerList(params: object = []) {
-  return http.post(`/outside/pc/customer/getSimpleCustomerList`, params)
+  return http.post(`${fixedPrefixTaskPath}/outside/pc/customer/getSimpleCustomerList`, params)
 }
 /**
 * 获取团队服务
 */
 export function getSimpleTagListByIds(params: object = []) {
-  return http.post(`/outside/tag/getSimpleTagListByIds`, params)
+  return http.post(`${fixedPrefixTaskPath}/outside/tag/getSimpleTagListByIds`, params)
 }
 
 /* -------------  end  新工单api ---------------- */
