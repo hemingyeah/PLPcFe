@@ -9,7 +9,7 @@
     <div class="form-item-box">
       <!-- 后备插槽(默认渲染) -->
       <slot>
-        <input :type="type" placeholder="请输入默认值" v-model="field.defaultValue" @input="update(field.defaultValue, 'defaultValue')" />
+        <input :type="type" placeholder="请输入默认值" v-model="field.defaultValue" @input="handleInput" />
         <el-checkbox v-model="defaultValueConfig.isNotModify" @change="update(defaultValueConfig, 'defaultValueConfig', true)" :true-label="1" :false-label="0" :disabled="modifyDefaultValueDisabled">不允许修改</el-checkbox>
       </slot>
     </div>
@@ -19,6 +19,8 @@
 <script>
 /* props */
 import { settingProps } from '@src/component/form/components/props';
+
+import { FORM_FIELD_TEXT_MAX_LENGTH } from '@src/model/const/Number.ts';
 
 export default {
   name: 'form-default-value-setting',
@@ -35,6 +37,10 @@ export default {
     tooltipContent: {
       type: String,
       default: '设置后在输入框中可默认显示'
+    },
+    maxLength: {
+      type: Number,
+      default: FORM_FIELD_TEXT_MAX_LENGTH
     }
   },
   computed: {
@@ -50,6 +56,14 @@ export default {
     }
   },
   methods: {
+    handleInput(e) {
+      let value = e.target.value;
+      if(value.length > this.maxLength) {
+        value = value.slice(0, this.maxLength);
+      }
+
+      this.update(value, 'defaultValue');
+    },
     update(value, prop, isSetting = false) {
       this.$emit('input', value, prop, isSetting);
     }

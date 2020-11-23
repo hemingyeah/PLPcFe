@@ -30,6 +30,7 @@
     <!-- start 默认值 -->
     <form-default-value-setting
       :field="field"
+      :max-length="maxLength"
       @input="update"
     ></form-default-value-setting>
     <!-- end 默认值 -->
@@ -54,10 +55,19 @@
 import SettingMixin from '@src/component/form/mixin/setting';
 import { settingProps } from '@src/component/form/components/props';
 
+
+import { FORM_FIELD_TEXTAREA_MAX_LENGTH } from '@src/model/const/Number.ts';
+
+
 export default {
   name: 'form-textarea-setting',
   mixins: [SettingMixin],
   props: settingProps,
+  computed: {
+    maxLength() {
+      return FORM_FIELD_TEXTAREA_MAX_LENGTH;
+    }
+  },
   methods: {
     updateForDom(event){
       let el = event.target;
