@@ -45,7 +45,7 @@
       </div>
       <!-- E 视图名称 -->
       <!-- S 搜索 -->
-      <el-form class="advanced-search-form" onsubmit="return false;" v-show="type !== 'view'">
+      <el-form onsubmit="return false;" v-show="type !== 'view'">
         <div class="task-pointer task-flex task-ai">
           <span class="task-font16 task-mr4">添加查询条件</span>
           <span>
@@ -1114,7 +1114,7 @@ export default {
   }
 }
 .task-view-name {
-  padding: 15px 15px 20px 15px;
+  padding: 15px 15px 20px 0;
   > div {
     width: 225px;
   }
@@ -1124,9 +1124,12 @@ export default {
   }
 }
 .task-view-region {
-  position: absolute;
-  bottom: 70px;
-  left: 30px;
+    position: absolute;
+    bottom: 55px;
+    left: 15px;
+    height: 50px;
+    width: 100%;
+    background-color: white;
 }
 .task-view-view {
   padding: 15px 15px 0 15px;
