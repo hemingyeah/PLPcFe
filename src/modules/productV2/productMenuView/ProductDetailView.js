@@ -319,38 +319,36 @@ export default {
         this.$set(this, 'dataInfo', res.result.catalogInfo || {})
         this.fieldHideIdArr = res.result.selectField || [];
         this.$refs.producMmenuInfoRecord.initRecord(res.result.catalogInfo.id);
-        let subtask = [
-          getProductMenuField().then(res_ => {
-            if (res_.code == 0) {
+        getProductMenuField().then(res_ => {
+          if (res_.code == 0) {
 
-              let fields = res_.result || [];
-              fields = fields.filter(item => {
-                if (this.fieldHideIdArr.indexOf(item.id) < 0) {
+            let fields = res_.result || [];
+            fields = fields.filter(item => {
+              if (this.fieldHideIdArr.indexOf(item.id) < 0) {
 
-                  return item
+                return item
+              }
+            })
+            this.fields = [...fields];
+
+            this.fields.forEach(field => {
+
+              if (field.fieldName == 'attachment') {
+                let {
+                  isEncryptAttachment,
+                  attachment
+                } = this.task
+
+                // 系统附件加密
+                if (isEncryptAttachment) {
+                  this.task.attachment = ENCRYPT_FIELD_VALUE;
+                } else {
+                  this.task.attachment = attachment.filter(item => !item.receipt);
                 }
-              })
-              this.fields = [...fields];
-
-              this.fields.forEach(field => {
-
-                if (field.fieldName == 'attachment') {
-                  let {
-                    isEncryptAttachment,
-                    attachment
-                  } = this.task
-
-                  // 系统附件加密
-                  if (isEncryptAttachment) {
-                    this.task.attachment = ENCRYPT_FIELD_VALUE;
-                  } else {
-                    this.task.attachment = attachment.filter(item => !item.receipt);
-                  }
-                }
-              })
-            }
-          })
-        ];
+              }
+            })
+          }
+        })
       } else {
         this.$notify.error({
           title: '网络错误',
