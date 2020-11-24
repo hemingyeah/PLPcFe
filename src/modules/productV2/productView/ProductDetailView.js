@@ -19,7 +19,10 @@ import EditContactDialog from '@src/modules/product/components/EditContactDialog
 import ProductContactTable from '@src/modules/product/components/ProductContactTable.vue';
 import MiniTable from '@src/modules/productV2/productMenu/WorkTree/compoment/MiniTable';
 
-import { isShowCustomerRemind, isShowPlanTask } from '@src/util/version.ts'
+import {
+  isShowCustomerRemind,
+  isShowPlanTask
+} from '@src/util/version.ts'
 
 import qs from '@src/util/querystring';
 import AuthUtil from '@src/util/auth';
@@ -71,22 +74,22 @@ export default {
     }
   },
   computed: {
-    hasLinkman () {
+    hasLinkman() {
       let field = this.dynamicProductFields.filter(item => item.formType == 'customer')[0];
       return field && field.setting.customerOption?.linkman;
     },
-    hasAddress () {
+    hasAddress() {
       let field = this.dynamicProductFields.filter(item => item.formType == 'customer')[0];
       return field && field.setting.customerOption?.address;
     },
     product() {
       return this.newestProduct || this.initData.product || {};
     },
-    customer () {
+    customer() {
       return this.product.customer || {};
     },
     /** 客户是否被禁用 */
-    isDisable(){
+    isDisable() {
       return this.customer.status == null || this.customer.status === 0;
     },
     /** 
@@ -102,7 +105,7 @@ export default {
      * 在客户删除时不允许做任何操作，只能查询 
      * 所有操作的权限应该以此为基础
      */
-    isDelete(){
+    isDelete() {
       return this.customer.isDelete == null || this.customer.isDelete === 1;
     },
     /** 
@@ -112,7 +115,7 @@ export default {
      * 2. 编辑客户团队权限： 没有团队的客户都可编辑，有团队的按团队匹配。 包含个人权限
      * 3. 编辑客户个人权限： 自己创建的 或 客户负责人
      */
-    hasEditCustomerAuth(){
+    hasEditCustomerAuth() {
       let customer = this.customer;
       let loginUserId = this.loginUser.userId;
       return AuthUtil.hasAuthWithDataLevel(this.permission, 'CUSTOMER_EDIT',
@@ -120,11 +123,11 @@ export default {
         () => {
           let tags = Array.isArray(customer.tags) ? customer.tags : [];
           // 无团队则任何人都可编辑
-          if(tags.length == 0) return true;
+          if (tags.length == 0) return true;
 
           let loginUserTagIds = this.initData.loginUser.tagIdsWithChildTag || [];
           return tags.some(tag => loginUserTagIds.indexOf(tag.id) >= 0);
-        }, 
+        },
         // 个人权限判断
         () => {
           return customer.createUser == loginUserId || this.isCustomerManager
@@ -140,32 +143,31 @@ export default {
       return this.initData.taskTypeInfo.map(t => Object.freeze(t));
     },
     fields() {
-      let fixedFields = [
-        {
-          displayName: '',
-          formType: 'separator'
-        },
-        {
-          displayName: '创建人',
-          fieldName: 'createUser',
-          formType: 'user',
-          isSystem: 1,
-          orderId: 10001
-        },
-        {
-          displayName: '创建时间',
-          fieldName: 'createTime',
-          formType: 'datetime',
-          isSystem: 1,
-          orderId: 10002
-        },
-        {
-          displayName: '系统编号',
-          fieldName: 'id',
-          formType: 'text',
-          isSystem: 1,
-          orderId: 10003
-        },
+      let fixedFields = [{
+        displayName: '',
+        formType: 'separator'
+      },
+      {
+        displayName: '创建人',
+        fieldName: 'createUser',
+        formType: 'user',
+        isSystem: 1,
+        orderId: 10001
+      },
+      {
+        displayName: '创建时间',
+        fieldName: 'createTime',
+        formType: 'datetime',
+        isSystem: 1,
+        orderId: 10002
+      },
+      {
+        displayName: '系统编号',
+        fieldName: 'id',
+        formType: 'text',
+        isSystem: 1,
+        orderId: 10003
+      },
       ];
 
       if (this.initData.productConfig.qrcodeEnabled) {
@@ -240,7 +242,7 @@ export default {
       };
     },
     /** 当前登录的用户 */
-    loginUser(){
+    loginUser() {
       return this.initData.loginUser || {};
     },
     /** 当前用户的权限 */
@@ -248,11 +250,11 @@ export default {
       return this.initData.loginUser.authorities;
     },
     /** 是否显示返回按钮 */
-    allowBack(){
+    allowBack() {
       let allow = true;
       // 如果带入noHistory参数，则不显示
       let query = qs.parse(window.location.search);
-      if(query.noHistory) return false;
+      if (query.noHistory) return false;
 
       return allow;
     },
@@ -276,7 +278,7 @@ export default {
      * 3. 客户编辑权限
      * 4. 创建工单权限
      */
-    allowCreateTask(){
+    allowCreateTask() {
       return !this.isDelete && this.hasEditProductAuth && AuthUtil.hasAuth(this.permission, 'TASK_ADD');
     },
     /**
@@ -287,7 +289,7 @@ export default {
      * 3. 客户编辑权限
      * 4. 新建事件权限
      */
-    allowCreateEvent(){
+    allowCreateEvent() {
       return !this.isDelete && this.hasEditProductAuth && AuthUtil.hasAuth(this.permission, 'CASE_ADD');
     },
     /**
@@ -299,7 +301,7 @@ export default {
      * 4. 客户编辑权限
      * 5. 工单新建权限和工单指派权限
      */
-    allowCreatePlanTask(){
+    allowCreatePlanTask() {
       let planTaskEnabled = this.initData.planTaskEnabled;
       return !this.isDelete && this.hasEditProductAuth && planTaskEnabled && AuthUtil.hasEveryAuth(this.permission, ['TASK_ADD', 'TASK_DISPATCH'])
     },
@@ -317,7 +319,7 @@ export default {
      * 2. 编辑产品团队权限： 创建人没有团队的产品都可编辑，有团队的按团队匹配。 包含个人权限
      * 3. 编辑产品个人权限： 自己创建的产品 或 客户负责人的产品
      */
-    hasEditProductAuth(){
+    hasEditProductAuth() {
       let customer = this.product.customer;
       let loginUserId = this.loginUser.userId;
       return AuthUtil.hasAuthWithDataLevel(this.permission, 'PRODUCT_EDIT',
@@ -325,7 +327,7 @@ export default {
         () => {
           let tags = Array.isArray(customer.tags) ? customer.tags : [];
           // 无团队则任何人都可编辑
-          if(!tags.length) return true;
+          if (!tags.length) return true;
 
           let loginUserTagIds = this.initData.loginUser.tagIds || [];
           return tags.some(tag => loginUserTagIds.indexOf(tag.id) >= 0);
@@ -352,7 +354,7 @@ export default {
       return true;
     },
   },
-  async created(){
+  async created() {
     // 折叠面板缓存
     let collapse = sessionStorage.getItem(`product_collapse_${this.product.id}`);
     let collapseDirection = sessionStorage.getItem(`product_collapseDirection_${this.product.id}`);
@@ -362,7 +364,9 @@ export default {
   async mounted() {
     try {
       // 获取产品自定义字段
-      let res = await getProductFields({isFromSetting: false});
+      let res = await getProductFields({
+        isFromSetting: false
+      });
       this.dynamicProductFields = res.data || [];
     } catch (error) {
       console.error('product-view fetch product fields error', error);
@@ -387,7 +391,7 @@ export default {
   },
   methods: {
     getAddress(field) {
-      if(!field) return '';
+      if (!field) return '';
       return field.province + field.city + field.dist + field.address || ''
     },
     openBindCodeDialog() {
@@ -405,7 +409,9 @@ export default {
         .then(res => {
           if (res.status) return this.$platform.notification({
             title: '失败',
-            message: (h => (<div>{res.message || '发生未知错误'}</div>))(this.$createElement),
+            message: (h => ( < div > {
+              res.message || '发生未知错误'
+            } < /div>))(this.$createElement),
             type: 'error',
           });
 
@@ -425,9 +431,9 @@ export default {
 
     },
     createCode() {
-      if(!this.product.qrcodeId) return;
-      if(!this.$refs.qrcode) return 
-      
+      if (!this.product.qrcodeId) return;
+      if (!this.$refs.qrcode) return
+
       let url = `${window.location.origin}/qrcode/${this.initData.domain}?qrcodeId=${this.product.qrcodeId}`;
 
       this.$refs.qrcode.innerHTML = '';
@@ -444,7 +450,7 @@ export default {
     },
 
     // 更新客户名称的样式
-    updateProductNameStyle(){
+    updateProductNameStyle() {
       let cnEl = this.$refs.customerName;
       let width = cnEl.offsetWidth;
       let maxWidth = cnEl.closest('h3').offsetWidth;
@@ -466,8 +472,13 @@ export default {
         })
         .catch(e => console.error('e', e));
     },
-    editProduct() {
-      window.location.href = `/customer/product/edit/${this.productId}`
+    editProduct(id) {
+      window.location.href = `/productV2/edit?id=${this.product.id}`
+      // window.location.href = `/customer/product/edit/${this.productId}`
+    },
+    addProduct(id) {
+      window.location.href = '/productV2/edit'
+      // window.location.href = `/customer/product/edit/${this.productId}`
     },
     openRemindDialog(remind) {
       this.$refs.addRemindDialog.openDialog(remind);
@@ -491,7 +502,7 @@ export default {
       parent.frameHistoryBack(window);
     },
     /** 从客户创建工单 */
-    createTask(typeId){
+    createTask(typeId) {
       let fromId = window.frameElement.getAttribute('id');
 
       this.$platform.openTab({
@@ -503,7 +514,7 @@ export default {
       })
     },
     /** 从客户创建事件 */
-    createEvent(typeId){
+    createEvent(typeId) {
       let fromId = window.frameElement.getAttribute('id');
 
       this.$platform.openTab({
@@ -515,7 +526,7 @@ export default {
       })
     },
     /** 从客户创建计划工单 */
-    createPlanTask(typeId){
+    createPlanTask(typeId) {
       let fromId = window.frameElement.getAttribute('id');
 
       this.$platform.openTab({
@@ -528,7 +539,7 @@ export default {
     },
     // 打开客户新tab
     openCustomer() {
-      if(this.product.customer && !this.product.customer.id) return 
+      if (this.product.customer && !this.product.customer.id) return
 
       const customerId = this.product.customer.id;
 
@@ -545,7 +556,7 @@ export default {
         productId: this.product.id
       }
       productStatisticsInit(params).then(result => {
-        if(!result) return 
+        if (!result) return
         this.statisticalData = result;
         this.tabs = this.buildTabs();
       })
@@ -553,32 +564,38 @@ export default {
     },
     // 构建tab
     buildTabs() {
-      const {taskQuantity, eventQuantity, unfinishedTaskQuantity, unfinishedEventQuantity, recordQuantity, plantaskQuantity, remindQuantity} = this.statisticalData;
+      const {
+        taskQuantity,
+        eventQuantity,
+        unfinishedTaskQuantity,
+        unfinishedEventQuantity,
+        recordQuantity,
+        plantaskQuantity,
+        remindQuantity
+      } = this.statisticalData;
 
-      return [
-        {
-          displayName: `信息动态(${recordQuantity || 0})`,
-          component: InfoRecord.name,
-          slotName: 'record-tab',
-          show: true,
-        }, {
-          displayName: taskQuantity ? `工单(${unfinishedTaskQuantity || 0}/${taskQuantity >= 1000 ? '999+' : taskQuantity})` : '工单(0)',
-          component: TaskTable.name,
-          show: true,
-        }, {
-          displayName: eventQuantity ? `事件(${unfinishedEventQuantity || 0}/${eventQuantity >= 1000 ? '999+' : eventQuantity})` : '事件(0)',
-          component: EventTable.name,
-          show: true,
-        }, {
-          displayName: `计划任务(${plantaskQuantity || 0})`,
-          component: PlanTable.name,
-          show: this.allowCreatePlanTask && this.isShowPlanTask,
-        }, {
-          displayName: `产品提醒(${remindQuantity || 0})`,
-          component: RemindTable.name,
-          show: this.isShowCustomerRemind,
-        }
-      ].filter(tab => tab.show)
+      return [{
+        displayName: `信息动态(${recordQuantity || 0})`,
+        component: InfoRecord.name,
+        slotName: 'record-tab',
+        show: true,
+      }, {
+        displayName: taskQuantity ? `工单(${unfinishedTaskQuantity || 0}/${taskQuantity >= 1000 ? '999+' : taskQuantity})` : '工单(0)',
+        component: TaskTable.name,
+        show: true,
+      }, {
+        displayName: eventQuantity ? `事件(${unfinishedEventQuantity || 0}/${eventQuantity >= 1000 ? '999+' : eventQuantity})` : '事件(0)',
+        component: EventTable.name,
+        show: true,
+      }, {
+        displayName: `计划任务(${plantaskQuantity || 0})`,
+        component: PlanTable.name,
+        show: this.allowCreatePlanTask && this.isShowPlanTask,
+      }, {
+        displayName: `产品提醒(${remindQuantity || 0})`,
+        component: RemindTable.name,
+        show: this.isShowCustomerRemind,
+      }].filter(tab => tab.show)
     },
 
     selectTab(tab) {

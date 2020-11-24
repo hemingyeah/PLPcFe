@@ -7,6 +7,7 @@ import {
   getProductMenuField,
   getPageInfo,
   delTreeList,
+  productMenuStatistics
 } from '@src/api/ProductV2Api.js';
 
 /* util */
@@ -20,10 +21,6 @@ import {
   isShowCustomerRemind,
   isShowPlanTask
 } from '@src/util/version.ts'
-import {
-  storageGet,
-  storageSet
-} from '@src/util/storage';
 
 
 /* component */
@@ -65,6 +62,7 @@ export default {
       leftActiveTab: 'product-view',
       rightActiveTab: 'part',
       collapseDirection: '',
+      statistics:{},
       nowGuideStep: 5,
       guideSearchModelSave: false,
       guideDropdownMenu: false,
@@ -348,6 +346,16 @@ export default {
               }
             })
           }
+        })
+        productMenuStatistics({
+          id: getUrlObj.id
+        }).then(res_ => {
+          try {
+            this.statistics = res_.result
+          } catch (error) {
+
+          }
+
         })
       } else {
         this.$notify.error({

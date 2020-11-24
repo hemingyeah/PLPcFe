@@ -11,13 +11,13 @@
             </div>
           </div>
           <div class="flex-x">
-            <div class="mar-l-28 flex-x">
+            <div class="mar-l-28 flex-x cur-point" @click="deleteProduct">
               <i class="iconfont icon-shanchu1"></i>删除
             </div>
-            <div class="mar-l-28 flex-x">
+            <div class="mar-l-28 flex-x cur-point" @click="editProduct">
               <i class="iconfont icon-bianji1"></i>编辑
             </div>
-            <div class="mar-l-28 flex-x">
+            <div class="mar-l-28 flex-x" @click="addProduct">
               <el-button type="primary"
               ><i class="iconfont icon-add1"></i>新建</el-button
               >
@@ -182,28 +182,28 @@
             <el-tab-pane
               :label="`计划任务(${statisticalData.plantaskQuantity || 0})`"
               name="plan-table"
-              v-show="this.allowCreatePlanTask && this.isShowPlanTask"
+              v-if="this.allowCreatePlanTask && this.isShowPlanTask"
             >
               <plan-table :share-data="propsForSubComponents"></plan-table>
             </el-tab-pane>
             <el-tab-pane
               :label="`产品提醒(${statisticalData.remindQuantity || 0})`"
               name="remind-table"
-              v-show="this.isShowCustomerRemind"
+              v-if="this.isShowCustomerRemind"
             >
               <remind-table :share-data="propsForSubComponents"></remind-table>
             </el-tab-pane>
             <el-tab-pane
               :label="statisticalData.taskQuantity ? `工单(${statisticalData.unfinishedTaskQuantity || 0}/${statisticalData.taskQuantity >= 1000 ? '999+' : statisticalData.taskQuantity})` : '工单(0)'"
               name="task-table"
-              v-show="this.isShowCustomerRemind"
+              v-if="this.isShowCustomerRemind"
             >
               <task-table :share-data="propsForSubComponents"></task-table>
             </el-tab-pane>
             <el-tab-pane
               :label="statisticalData.eventQuantity ? `事件(${statisticalData.unfinishedEventQuantity || 0}/${statisticalData.eventQuantity >= 1000 ? '999+' : statisticalData.eventQuantity})` : '事件(0)'"
               name="event-table"
-              v-show="this.isShowCustomerRemind"
+              v-if="this.isShowCustomerRemind"
             >
               <event-table :share-data="propsForSubComponents"></event-table>
             </el-tab-pane>
@@ -235,6 +235,8 @@
       <!-- end 附加组件 -->
     </base-collapse>
     <!-- end 工单详情折叠面板 -->
+
+    <remind-dialog ref="addRemindDialog" :product="product"></remind-dialog>
 
     <!-- tour s -->
     <v-tour
@@ -298,6 +300,7 @@
       </template>
     </v-tour>
     <!-- tour e -->
+    
   </div>
 </template>
 
@@ -308,6 +311,18 @@ export default ProductDetailView;
 
 <style lang="scss">
 @import './ProductDetailView.scss';
+</style>
+<style lang="scss" scoped>
+.task-detail-header{
+  padding: 0;
+  .header-btns{
+    padding: 0 12px;
+    background: #fafafa;
+  }
+  .header-data{
+    padding: 0 12px;
+  }
+}
 </style>
 
 <style lang="scss">

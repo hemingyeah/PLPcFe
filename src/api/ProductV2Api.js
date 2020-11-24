@@ -258,6 +258,18 @@ function cloneMenu(params) {
 }
 
 
+/**
+ * 目录详情tab的数量
+ * @param params
+ *   id : 目录id
+ * @returns {*}
+ */
+function productMenuStatistics(params) {
+  
+  return http.get(`${headUrl}/outside/pc/catalog/relation/statistics`, params)
+}
+
+
 
 export {
   getProductMenuField,
@@ -284,5 +296,6 @@ export {
   clearCatalogData,
   getMenuRecord,
   getTreeListNode,
-  cloneMenu
+  cloneMenu,
+  productMenuStatistics
 }

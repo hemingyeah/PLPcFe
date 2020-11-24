@@ -100,4 +100,14 @@ router.get('/productV2/catalog/view/:id', async ctx => {
   ctx.body = Template.renderWithHtml('产品目录详情', body, script, modConfig.template)
 });
 
+router.get('/productV2/edit', async ctx => {
+  let modConfig = modules['productV2.edit'];
+  let script = ['/productV2.edit.js'];
+  let reqHeaders = ctx.request.headers;
+  let result = await HttpClient.request(`/productV2/edit/edit/${ctx.params.id}`, 'get', null, {headers: reqHeaders});
+  let body = result.body;
+
+  ctx.body = Template.renderWithHtml('编辑产品', body, script, modConfig.template)
+});
+
 module.exports = router;

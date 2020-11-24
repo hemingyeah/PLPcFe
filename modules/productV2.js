@@ -31,4 +31,8 @@ module.exports = {
     entry: './src/modules/productV2/productView/index.js',
     template: 'src/templates/map.html',
   },
+  'productV2.edit': {
+    entry: './src/modules/productV2/productEdit/index.js',
+    template: 'src/templates/map.html',
+  },
 };

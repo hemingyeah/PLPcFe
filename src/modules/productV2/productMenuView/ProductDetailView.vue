@@ -66,7 +66,7 @@
               ></product-menu-view>
             </el-tab-pane>
 
-            <el-tab-pane label="动态信息" name="record">
+            <el-tab-pane :label="`动态信息(${statistics.recordCount || 0})` " name="record">
               <product-menu-info-record
                 ref="producMmenuInfoRecord"
                 :prop-data="dataInfo"
@@ -100,6 +100,13 @@
                 data-type="wiki"
                 page-type="view"
               />
+            </el-tab-pane>
+            <el-tab-pane :label="`产品(${statistics.productCount || 0})` " name="product">
+              <!-- <mini-table
+                :id="dataInfo.id"
+                data-type="product"
+                page-type="view"
+              /> -->
             </el-tab-pane>
           </el-tabs>
         </div>

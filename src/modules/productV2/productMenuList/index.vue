@@ -1663,7 +1663,7 @@ body {
     }
   }
 }
-.el-table .cell.el-tooltip{
+.el-table .cell{
   line-height: 31px;
 }
 </style>
