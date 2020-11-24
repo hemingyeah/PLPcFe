@@ -26,6 +26,8 @@ class TaskAllotUserTableData extends TaskAllotUserTableComponents {
   public AMapInfoWindow: any = null
   /* 是否禁用加载更多 */
   public isDisableLoadmore: boolean = false
+  /* 最后一次点击的标记头像 */
+  public lastClickedUserMarker: { marker: any, data: TaskAllotUserInfo | null } = { marker: null, data: null }
   /* 表格排序数据 */
   public orderDetail: { order: boolean, code: number } | {} = {}
   /* 当前选择的负责人 */
@@ -42,6 +44,8 @@ class TaskAllotUserTableData extends TaskAllotUserTableComponents {
   public selectUserState: string[] = []
   /* 当前选择的排序方式 */
   public selectSortord: number | null = AllotSortedEnum.Distance
+  /* 当前选择的排序方式 备份数据 */
+  public backupSelectSorted: number | null = AllotSortedEnum.Distance
   /* 表格key 随机数 */
   public tableKey: number = Math.random() * 1000 >> 2
   /* 团队用户page */

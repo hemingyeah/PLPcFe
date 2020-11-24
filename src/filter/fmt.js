@@ -226,6 +226,13 @@ export function fmt_number_limit(value, limit) {
   
 }
 
+/** 
+ * @description 格式化显示文字
+*/
+export function fmt_display_text(value, text) {
+  return value ? `${value}${text || ''}` : '--'
+}
+
 const fmt = {
   fmt_date,
   fmt_datetime,
@@ -236,7 +243,8 @@ const fmt = {
   fmt_datehour,
   fmt_state,
   fmt_short_time,
-  fmt_h_m_s
+  fmt_h_m_s,
+  fmt_display_text
 }
 
 export default fmt;

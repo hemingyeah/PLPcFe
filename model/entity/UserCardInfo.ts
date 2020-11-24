@@ -1,7 +1,7 @@
 import LoginUser from '@model/entity/LoginUser/LoginUser'
 
 class UserCardInfo {
-  public static readonly Placeholder: string = '--'
+  public static readonly Placeholder: string = ''
   // 拒单率
   refuse: string = UserCardInfo.Placeholder
   // 转派率

@@ -551,7 +551,8 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
       await this.fetchCustomer()
       await this.fetchSynergyUserWithCustomerManager()
     } catch (error) {
-      console.error('hbc: TaskAllotModalMethods -> initialize -> error', error)
+      this.toggleTaskAllotExecutorComponentPending()
+      console.error('TaskAllotModalMethods -> initialize -> error', error)
     } finally {
       this.pending = false
     }
@@ -606,6 +607,7 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
   public async outsideShow() {
     // 等待状态
     this.pending = true
+    this.toggleTaskAllotExecutorComponentPending(true)
     // 初始化派单类型
     this.allotType = TaskAllotTypeEnum.Person
     // 匹配负责人显示
@@ -814,6 +816,14 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
       this.pending = false
       console.warn('TaskAllotModalMethods -> submitWithAutoDispatch -> error', error)
     }
+  }
+  
+  /** 
+   * @description 切换负责人组件状态
+  */
+  public toggleTaskAllotExecutorComponentPending(pending: boolean = false) {
+    // @ts-ignore
+    this.$refs.TaskAllotExcutorComponent?.outsideSetPending(pending)
   }
 }
 

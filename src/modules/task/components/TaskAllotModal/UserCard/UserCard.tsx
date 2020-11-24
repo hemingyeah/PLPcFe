@@ -24,6 +24,7 @@ import { dispatch } from '@src/util/emitter'
 import DateUtil from '@src/util/date'
 import Platform from '@src/util/Platform'
 import { openTabForUserView } from '@src/util/business/openTab'
+import { fmt_display_text } from '@src/filter/fmt'
 
 enum UserCardEmitEventEnum {
   // 关闭事件
@@ -165,13 +166,6 @@ export default class UserCard extends Vue {
   }
   
   /** 
-   * @description 格式化显示文字
-  */
-  private formatDisplayText(value: any, text?: string) {
-    return value ? `${value}${text || ''}` : (value || UserCardInfo.Placeholder)
-  }
-  
-  /** 
    * @description 选择时间变化
   */
   private handlerTimeChange(value: Date[]): void {
@@ -183,7 +177,7 @@ export default class UserCard extends Vue {
    * @description 打开用户详情tab
   */
   private openUserViewTab(): void {
-    openTabForUserView(this.userId)
+    openTabForUserView(this.userId, { from: 'task' })
   }
   
   mounted() {
@@ -255,31 +249,31 @@ export default class UserCard extends Vue {
           <div class='user-card-detail'>
             <div class='user-card-detail-row'>
               <div class='user-card-detail-row-item'>
-                未完成工单量: {this.formatDisplayText(this.userCardInfo.unfinished, '个')}
+                未完成工单量: {fmt_display_text(this.userCardInfo.unfinished, '个')}
               </div>
               <div class='user-card-detail-row-item'>
-                已完成工单量: {this.formatDisplayText(this.userCardInfo.finished, '个')}
-              </div>
-            </div>
-            <div class='user-card-detail-row'>
-              <div class='user-card-detail-row-item'>
-                平均响应用时: {this.userCardInfo.rangeAccept}
-              </div>
-              <div class='user-card-detail-row-item'>
-                平均工作用时: {this.userCardInfo.rangeWork}
+                已完成工单量: {fmt_display_text(this.userCardInfo.finished, '个')}
               </div>
             </div>
             <div class='user-card-detail-row'>
               <div class='user-card-detail-row-item'>
-                拒单率: {this.formatDisplayText(this.userCardInfo.refuse, '%')}
+                平均响应用时: {fmt_display_text(this.userCardInfo.rangeAccept, 'H')}
               </div>
               <div class='user-card-detail-row-item'>
-                转派率: {this.formatDisplayText(this.userCardInfo.allot, '%')}
+                平均工作用时: {fmt_display_text(this.userCardInfo.rangeWork, 'H')}
               </div>
             </div>
             <div class='user-card-detail-row'>
               <div class='user-card-detail-row-item'>
-                好评率: {this.formatDisplayText(this.userCardInfo.degree, '%')}
+                拒单率: {fmt_display_text(this.userCardInfo.refuse)}
+              </div>
+              <div class='user-card-detail-row-item'>
+                转派率: {fmt_display_text(this.userCardInfo.allot)}
+              </div>
+            </div>
+            <div class='user-card-detail-row'>
+              <div class='user-card-detail-row-item'>
+                好评率: {fmt_display_text(this.userCardInfo.degree)}
               </div>
             </div>
           </div>

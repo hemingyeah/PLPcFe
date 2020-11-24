@@ -13,6 +13,8 @@ import Column from '@model/types/Column'
 /* util */
 import { uuid } from '@src/util/string'
 import { isString } from '@src/util/type'
+import { fmt_display_text } from '@src/filter/fmt'
+import { isArray } from 'lodash'
 
 class TaskAllotUserTableRender extends TaskAllotUserTableMethods {
   /** 
@@ -290,7 +292,7 @@ class TaskAllotUserTableRender extends TaskAllotUserTableMethods {
    * @description 渲染通用表格列
   */
   renderColumnWithCommon(value: string) {
-    return value
+    return fmt_display_text(value)
   }
   
   /** 
@@ -300,7 +302,7 @@ class TaskAllotUserTableRender extends TaskAllotUserTableMethods {
     let distance = Number(value) 
     if (isNaN(distance)) return value
     
-    return `${(distance / 1000).toFixed(3)} KM`
+    return distance ? `${(distance / 1000).toFixed(3)} KM` : fmt_display_text(distance)
   }
 
   /** 
@@ -310,14 +312,14 @@ class TaskAllotUserTableRender extends TaskAllotUserTableMethods {
     let duration = Number(value) 
     if (isNaN(duration)) return value
     
-    return `${(duration / 3600).toFixed(3)}小时`
+    return duration ? `${(duration / 3600).toFixed(3)}小时` : fmt_display_text(duration)
   }
   
   /** 
    * @description 渲染数组表格列
   */
   renderColumnWithStringArray(value: string[]): string {
-    return value.join(', ')
+    return isArray(value) ? value.join(', ') : fmt_display_text(value)
   }
   
   /** 

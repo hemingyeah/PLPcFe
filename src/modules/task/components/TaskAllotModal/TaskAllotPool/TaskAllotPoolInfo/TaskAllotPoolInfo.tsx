@@ -81,7 +81,7 @@ export default class TaskAllotPoolInfo extends Vue {
     const user: LoginUser = info.user
     
     return (
-      <div class='task-pool-user-content' onClick={() => openTabForUserView(user.userId)}>
+      <div class='task-pool-user-content' onClick={() => openTabForUserView(user.userId, { from: 'task' })}>
         <div class={`${this.className}-user-head`}> <img src={user.head || DefaultHead} /></div>
         <div class="">
           <div class="task-pool-user-info">

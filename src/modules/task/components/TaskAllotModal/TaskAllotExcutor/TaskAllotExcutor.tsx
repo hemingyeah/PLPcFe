@@ -64,6 +64,7 @@ export default class TaskAllotExcutor extends Vue {
   */
   private closeUserCard() {
     this.isShowUserCard = false
+    this.restoreUserMarkerIcon()
   }
   
   /**
@@ -101,6 +102,14 @@ export default class TaskAllotExcutor extends Vue {
   */
   public outsideSetPending(pending: boolean): void {
     this.pending = pending
+  }
+  
+  /** 
+   * @description 还原地图标记
+  */
+  private restoreUserMarkerIcon() {
+    // @ts-ignore
+    this.$refs.TaskAllotUserTableComponent?.outsideRestoreUserMarkerIcon()
   }
   
   render(h: CreateElement) {

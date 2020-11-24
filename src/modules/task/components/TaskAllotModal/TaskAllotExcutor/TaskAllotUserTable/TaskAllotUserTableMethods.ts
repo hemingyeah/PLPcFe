@@ -79,7 +79,48 @@ function parseObject(value: any): any {
   return newValue
 }
 
+/* TODO: 拆分，之前放在一起了 */
 class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
+  /** 
+   * @description 添加用户标记点击事件
+  */
+  public bindUserMarkerClickEvent(userMarker: any) {
+    userMarker.on(EventNameEnum.Click, (event: any) => {
+      /* 如果存在之前标记点击数据 则还原标记 */
+      this.lastClickedUserMarker.marker && this.restoreUserMarkerIcon()
+      /* 获取用户信息 */
+      let user: TaskAllotUserInfo = event.target.getExtData()
+      /* 构建大号头像 */
+      event.target.setIcon(this.buildUserMarkerIcon(AMap, user, true))
+      /* 设置负责人信息 */
+      this.TaskAllotExcutorComponent.outsideSetSelectedExcutorUser(true, user)
+      /* 保存点击标记信息 */
+      this.lastClickedUserMarker = {
+        marker: event.target,
+        data: user
+      }
+    })
+  }
+  
+  /** 
+   * @description 添加用户标记鼠标悬浮事件
+  */
+  public bindUserMarkerMouseOverEvent(userMarker: any) {
+    userMarker.on(EventNameEnum.MouseOver, (event: any) => {
+      let user: TaskAllotUserInfo = event.target.getExtData()
+      if (user.userId !== this.TaskAllotModalComponent?.executorUser?.userId) return
+      
+      let infoWindow = new AMap.InfoWindow({
+        closeWhenClickMap: true,
+        isCustom: true,
+        offset: new AMap.Pixel(0, -34),
+        content: '<div class="task-allot-map-excutor-window">负责人</div>'
+      })
+      
+      infoWindow.open(this.AMap, event.target.getPosition())
+    })
+  }
+  
   /**
    * @deprecated 
    * @description 绑定位置select 点击事件
@@ -195,7 +236,7 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
   }
   
   /** 
-   * 构建人员标记
+   * @description 构建人员标记
   */
   public buildUserMarkers(): void {
     if (this.userPage.list.length <= 0) {
@@ -215,30 +256,33 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
         title: user.displayName,
         map: this.AMap,
         extData: user,
-        content: `<img class='staff-header' width='42' height='42' src='${user.head || DefaultHead}' />`
+        icon: this.buildUserMarkerIcon(AMap, user)
       })
       
-      userMarker.on(EventNameEnum.Click, (event: any) => {
-        let user: TaskAllotUserInfo = event.target.getExtData()
-        /* 设置负责人信息 */
-        this.TaskAllotExcutorComponent.outsideSetSelectedExcutorUser(true, user)
-      })
-      
-      userMarker.on(EventNameEnum.MouseOver, (event: any) => {
-        let user: TaskAllotUserInfo = event.target.getExtData()
-        if (user.userId !== this.TaskAllotModalComponent?.executorUser?.userId) return
-        
-        let infoWindow = new AMap.InfoWindow({
-          closeWhenClickMap: true,
-          isCustom: true,
-          offset: new AMap.Pixel(0, -34),
-          content: '<div class="task-allot-map-excutor-window">负责人</div>'
-        })
-        
-        infoWindow.open(this.AMap, event.target.getPosition())
-      })
+      // 绑定点击事件
+      this.bindUserMarkerClickEvent(userMarker)
+      // 绑定鼠标悬浮事件
+      this.bindUserMarkerMouseOverEvent(userMarker)
       
     })
+  }
+  
+  /** 
+   * @description 构建人员icon
+   * @param {*} aMap 高德地图对象
+   * @param {TaskAllotUserInfo} user 用户信息
+   * @param {Boolean} isLarge 是否是更大的标记
+  */
+  public buildUserMarkerIcon(aMap: any, user: TaskAllotUserInfo, isLarge: boolean = false) {
+    let size = isLarge ? new aMap.Size(52, 52) : new aMap.Size(42, 42)
+    
+    return (
+      new aMap.Icon({
+        image: user.head || DefaultHead,
+        size,
+        imageSize: size
+      })
+    )
   }
   
   /** 
@@ -620,7 +664,7 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
     const { prop, order } = option
     if (!order) {
       this.orderDetail = {}
-      this.selectSortord = AllotSortedEnum.Distance
+      this.selectSortord = this.backupSelectSorted
       return this.initialize()
     }
     
@@ -631,6 +675,10 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
       code: SortedMap[prop],
     }
     
+    if (!this.backupSelectSorted) {
+      this.backupSelectSorted = this.selectSortord
+    }
+
     this.orderDetail = orderDetail
     this.selectSortord = null
     this.initialize()
@@ -648,6 +696,7 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
     this.orderDetail = {}
     // 赋值
     this.selectSortord = value
+    this.backupSelectSorted = value
     // 保存
     this.saveDataToStorage(StorageKeyEnum.TaskAllotTableSort, value)
     // 初始化
@@ -759,6 +808,14 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
   }
   
   /** 
+   * @description 还原用户标记
+   * -- 支持外部调用的
+  */
+  public outsideRestoreUserMarkerIcon() {
+    this.restoreUserMarkerIcon()
+  }
+  
+  /** 
    * @description 清除负责人信息
    * -- 支持向上的外部调用的方法
   */
@@ -785,6 +842,16 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
   */
   public async revertSort() {
     this.selectSortord = await this.getDataToStorage(StorageKeyEnum.TaskAllotTableSort, AllotSortedEnum.Distance)
+  }
+  
+  /** 
+   *  @description 还原之前点击的用户标记
+  */
+  public restoreUserMarkerIcon() {
+    let { marker, data } = this.lastClickedUserMarker
+    if (!marker || !data) return
+    
+    marker.setIcon(this.buildUserMarkerIcon(AMap, data))
   }
   
   /**
@@ -820,7 +887,7 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
   }
   
   /* 精简列属性 */
-  simplifyTableColumsProperty(columns: Column[]): Column[] {
+  public simplifyTableColumsProperty(columns: Column[]): Column[] {
     return (
       columns.map((column: Column) => ({
         field: column.field,

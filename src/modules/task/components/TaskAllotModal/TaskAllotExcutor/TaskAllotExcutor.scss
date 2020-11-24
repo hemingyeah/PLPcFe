@@ -10,6 +10,12 @@
       box-sizing: content-box;
       overflow: hidden;
     }
+    .amap-icon {
+      border-radius: 50%;
+      img {
+        border-radius: 50%;
+      }
+    }
   }
   .user-card {
     border-left: 1px solid $border-color-base;
