@@ -145,7 +145,7 @@ export default class TaskProcessSteps extends Vue {
           {
             this.steps.map((step: TaskProcessStep) => {
               return (
-                <el-step title={step.name} scopedSlots={this.getScopedSlots(step.flow)}></el-step>
+                <el-step title={step.name} scopedSlots={this.getScopedSlots(step.flow, step.value)}></el-step>
               )
             })
           }
