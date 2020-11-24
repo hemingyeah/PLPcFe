@@ -56,6 +56,7 @@ export default {
       dataInfo: {
         id
       },
+      fieldHideIdArr: [],
       taskState: {
         value: this.initData?.task?.state || ''
       },
@@ -304,12 +305,11 @@ export default {
 
 
   },
-  created() {
-    // 折叠面板缓存
-    let collapse = sessionStorage.getItem(`product_customer_collapse_${this.task.id}`);
-    let collapseDirection = sessionStorage.getItem(`product_collapseDirection_${this.task.id}`);
+  async created() {
 
     let getUrlObj = this.$getUrlObj(window);
+
+    this.loading = true;
     getPageInfo({
       id: getUrlObj.id
     }).then(res => {
@@ -317,7 +317,40 @@ export default {
         res.result.catalogInfo.productVideo = res.result.catalogInfo.productVideo || []
         res.result.catalogInfo.productExplain = res.result.catalogInfo.productExplain || []
         this.$set(this, 'dataInfo', res.result.catalogInfo || {})
-        this.$refs.producMmenuInfoRecord.initRecord(res.result.catalogInfo.id)
+        this.fieldHideIdArr = res.result.selectField || [];
+        this.$refs.producMmenuInfoRecord.initRecord(res.result.catalogInfo.id);
+        let subtask = [
+          getProductMenuField().then(res_ => {
+            if (res_.code == 0) {
+
+              let fields = res_.result || [];
+              fields = fields.filter(item => {
+                if (this.fieldHideIdArr.indexOf(item.id) < 0) {
+
+                  return item
+                }
+              })
+              this.fields = [...fields];
+
+              this.fields.forEach(field => {
+
+                if (field.fieldName == 'attachment') {
+                  let {
+                    isEncryptAttachment,
+                    attachment
+                  } = this.task
+
+                  // 系统附件加密
+                  if (isEncryptAttachment) {
+                    this.task.attachment = ENCRYPT_FIELD_VALUE;
+                  } else {
+                    this.task.attachment = attachment.filter(item => !item.receipt);
+                  }
+                }
+              })
+            }
+          })
+        ];
       } else {
         this.$notify.error({
           title: '网络错误',
@@ -325,57 +358,27 @@ export default {
           duration: 2000,
         });
       }
+    }).finally(() => {
+
+      this.loading = false;
     })
+
+    // 折叠面板缓存
+    let collapse = sessionStorage.getItem(`product_menu_collapse_${getUrlObj.id}`);
+    let collapseDirection = sessionStorage.getItem(`product_collapseDirection_${getUrlObj.id}`);
     this.collapse = JSON.parse(collapse || 'true');
     this.collapseDirection = collapseDirection || '';
   },
   async mounted() {
-    try {
-      this.loading = true;
-
-      let {
-        templateId
-      } = this.task;
-      let subtask = [
-        getProductMenuField()
-      ];
 
 
-      const result = await Promise.all(subtask);
 
-      const fields = result[0].result || [];
-      this.fields = [...fields];
+    // this.$nextTick(() => {
+    //   setTimeout(() => {
+    //     if (!storageGet(TASK_GUIDE_DETAIL)) this.$tours['myTour'].start(), this.nowGuideStep = 1, storageSet(TASK_GUIDE_DETAIL, '4');
+    //   }, 1000)
 
-      this.fields.forEach(field => {
-        if (field.fieldName == 'attachment') {
-          let {
-            isEncryptAttachment,
-            attachment
-          } = this.task
-
-          // 系统附件加密
-          if (isEncryptAttachment) {
-            this.task.attachment = ENCRYPT_FIELD_VALUE;
-          } else {
-            this.task.attachment = attachment.filter(item => !item.receipt);
-          }
-        }
-      })
-
-      let query = parse(window.location.search) || {};
-
-      this.loading = false;
-
-      // this.$nextTick(() => {
-      //   setTimeout(() => {
-      //     if (!storageGet(TASK_GUIDE_DETAIL)) this.$tours['myTour'].start(), this.nowGuideStep = 1, storageSet(TASK_GUIDE_DETAIL, '4');
-      //   }, 1000)
-
-      // })
-
-    } catch (e) {
-      console.error('error ', e)
-    }
+    // })
 
   },
   beforeDestroy() {
@@ -383,10 +386,10 @@ export default {
   },
   watch: {
     collapse(newValue) {
-      sessionStorage.setItem(`product_customer_collapse_${this.task.id}`, newValue);
+      sessionStorage.setItem(`product_menu_collapse_${this.datainfo.id}`, newValue);
     },
     collapseDirection(newValue) {
-      sessionStorage.setItem(`product_collapseDirection_${this.task.id}`, newValue);
+      sessionStorage.setItem(`product_collapseDirection_${this.datainfo.id}`, newValue);
     }
   },
   components: {

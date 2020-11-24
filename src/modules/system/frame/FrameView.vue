@@ -1026,7 +1026,7 @@ export default {
       platform.openTab({
         id: 'productV2_set_field',
         title: '产品目录设置',
-        url: '/productV2/catalog/setting?type=productMenuSet',
+        url: '/setting/productV2/catalog/setting?type=productMenuSet',
         reload: true,
       });
     },

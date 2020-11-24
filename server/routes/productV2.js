@@ -57,21 +57,21 @@ router.get('/productV2/view/:id', async ctx => {
   
   ctx.body = Template.renderWithHtml('产品详情', body, script, modConfig.template)
 });
-router.get('/productV2/catalog/setting', async ctx => {
+router.get('/setting/productV2/catalog/setting', async ctx => {
   let script = ['/productV2.catalog.setting.js'];
   let modConfig = modules['productV2.catalog.setting'];
   let reqHeaders = ctx.request.headers;
-  let result = await HttpClient.request('/productV2/catalog/setting', 'get', null, {
+  let result = await HttpClient.request('/setting/productV2/catalog/setting', 'get', null, {
     headers: reqHeaders
   });
   let body = result.body;
   ctx.body = Template.renderWithHtml('产品目录设置', body, script, modConfig.template)
 });
-router.get('/productV2/catalog/settingField', async ctx => {
+router.get('/setting/productV2/catalog/settingField', async ctx => {
   let script = ['/productV2.catalog.settingField.js'];
   let modConfig = modules['productV2.catalog.settingField'];
   let reqHeaders = ctx.request.headers;
-  let result = await HttpClient.request('/productV2/catalog/settingField', 'get', null, {
+  let result = await HttpClient.request('/setting/productV2/catalog/settingField', 'get', null, {
     headers: reqHeaders
   });
   let body = result.body;

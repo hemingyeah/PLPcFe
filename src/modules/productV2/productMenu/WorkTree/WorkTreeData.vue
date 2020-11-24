@@ -434,14 +434,15 @@ export default {
         id,
       }).then((res) => {
         if (res.code == 0) {
-          if (res.result.catalogInfo.fieldIds) {
-            this.fieldIds = res.result.catalogInfo.fieldIds;
-          }
+         
           res.result.catalogInfo.productVideo = res.result.catalogInfo.productVideo || [];
           res.result.catalogInfo.productPic = res.result.catalogInfo.productPic || [];
           res.result.catalogInfo.productExplain = res.result.catalogInfo.productExplain || [];
           this.$set(this, 'productMenuValue', res.result.catalogInfo);
-          this.$set(this, 'fieldIds', res.result.selectField);
+          if (res.result.selectField) {
+            this.$set(this, 'fieldIds', res.result.selectField);
+          }
+          
         } else {
           this.$notify.error({
             title: '网络错误',

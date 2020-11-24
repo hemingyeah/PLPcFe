@@ -26,10 +26,10 @@ const FormView = {
   },
 
   methods: {
-    //TODO :预览图片
+    // TODO :预览图片
     previewImage(event){
       let element = event.target;
-      let imgSrc =  element.currentSrc;
+      let imgSrc = element.currentSrc;
 
       if (!/\.(png|bmp|gif|jpg|jpeg|tiff)$/i.test(imgSrc) || !element) return
 
@@ -186,8 +186,8 @@ const FormView = {
     buildRelatedTask({displayName, value}) {
       if(Array.isArray(value) && value.length > 0) {
         let _renderContent = value.map((item, index) => {
-          let taskId = item.taskId || "";
-          let taskNo = item.taskNo || "";
+          let taskId = item.taskId || '';
+          let taskNo = item.taskNo || '';
           
           return (
             <span>
@@ -382,7 +382,7 @@ const FormView = {
       if(formType === 'related_task') {
         params = {
           ...params,
-          value: value
+          value
         };
         return this.buildRelatedTask(params);
       }
@@ -426,7 +426,7 @@ const FormView = {
     let domGroups = groups.map(group => {
       let currentGroupId = 0;
       
-      let title = group.filter(f => f.formType === 'separator').map(item => {
+      let title = group.filter(f => f.formType === 'separator' && !f.hideform).map(item => {
         currentGroupId = item.id;
         if (this.sectionState[currentGroupId] === undefined) {
           this.$set(this.sectionState, currentGroupId, true);
@@ -435,7 +435,7 @@ const FormView = {
       });
 
       let items = group.filter(f => f.formType !== 'separator').map(item => this.mapFieldToDom(item, createElement));
-      
+      // hideform={group.hideform || false}
       return (
         <div class="view-group">
           {title}
