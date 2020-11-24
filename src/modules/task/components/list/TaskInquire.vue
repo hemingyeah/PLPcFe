@@ -465,7 +465,7 @@ export default {
               "synergyId",
               "user",
             ];
-            if (personnel.indexOf(fieldName) !== -1) {
+            if (personnel.indexOf(fieldName) !== -1 || personnel.indexOf(formType) !== -1) {
               this.form[fieldName] = ids;
               ids.forEach((item, i) => {
                 this.userList.push({
@@ -509,12 +509,10 @@ export default {
             } else {
               this.form[fieldName] = content;
             }
-            console.log(this.form);
           } else {
             this.selectedField = {};
             this.form = {};
           }
-          console.log(this.form)
         },
         returnDatas() {
           let data = Object.assign({}, this.form);

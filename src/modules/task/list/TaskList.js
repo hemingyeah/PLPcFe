@@ -610,7 +610,22 @@ export default {
       // }
       // // console.log(FormUtil.initialize(this.advanceds, searchModel))
       // // this.$refs.taskView.open(id)
-      this.search(searchModel);
+      if (searchModel.templateId) {
+        this.taskTypes.forEach(item => {
+          if (item.id === searchModel.templateId) {
+            this.currentTaskType = item
+          }
+        })
+      } else {
+        this.currentTaskType =  {
+          name: "全部",
+          id: "",
+        }
+      }
+
+        this.getTaskOpen(() => {
+          this.search(searchModel);
+        })
       // this.buildColumns();
 
       if (selectedCols) {
@@ -660,11 +675,32 @@ export default {
       }
       this.viewType = type
       this.$refs.viewPanel.mergeTaskFields(this.taskAllFields)
-      this.currentTaskType.id = searchModel ? searchModel.templateId : ''
-      this.getTaskOpen((taskFields, taskReceiptFields) => {
+
+      if (searchModel) {
+        if (searchModel.templateId) {
+          this.taskTypes.forEach(item => {
+            if (item.id === searchModel.templateId) {
+              this.currentTaskType = item
+            }
+          })
+        } else {
+          this.currentTaskType =  {
+            name: "全部",
+            id: "",
+          }
+        }
+
+        this.getTaskOpen((taskFields, taskReceiptFields) => {
+          this.$refs.viewPanel.open(type, searchModel && [...searchModel.systemConditions, ...searchModel.conditions], {taskFields, taskReceiptFields});
+          this.showBj = true
+        })
+      } else {
+        let taskFields= this.seoSetList
+        let taskReceiptFields = [...this.taskFields, ...this.taskReceiptFields]
         this.$refs.viewPanel.open(type, searchModel && [...searchModel.systemConditions, ...searchModel.conditions], {taskFields, taskReceiptFields});
         this.showBj = true
-      })
+      }
+      
     },
     /**
      * 请求 getTaskTemplateFields and fetchTaskFields 接口
@@ -672,7 +708,17 @@ export default {
     getTaskOpen(fn) {
       Promise.all([this.fetchTaskFields(), this.fetchTaskReceiptFields()])
       .then((res) => {
-        fn(this.seoSetList, res[1])
+        this.$set(this, "taskFields", res[0] || []);
+        this.$set(this, "taskReceiptFields", res[1] || []);
+
+        this.planTimeType = res[0].filter((item) => {
+          return item.displayName === "计划时间";
+        })[0].setting.dateType;
+
+        this.buildColumns();
+        this.seoSet()
+        this._exportColumns()
+        fn(this.seoSetList, [...res[0], ...res[1]])
       })
     },
     /**
