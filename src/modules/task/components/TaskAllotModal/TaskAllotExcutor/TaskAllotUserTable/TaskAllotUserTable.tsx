@@ -59,6 +59,7 @@ export default class TaskAllotUserTable extends TaskAllotUserTableRender {
             onHeader-dragend={(newWidth: number, oldWidth: number, column: any) => this.handlerHeaderDragend(newWidth, oldWidth, column)}
             onSort-change={(option: any) => this.handlerTableSortChanged(option)}
             stripe
+            scopedSlots={{ append: () => this.renderTableAppendSlot() }}
           >
             {
               this.columns.filter((column: Column) => column.show).map((column: Column) => {
@@ -78,6 +79,7 @@ export default class TaskAllotUserTable extends TaskAllotUserTableRender {
               })
               
             }
+            <div slot='append'></div>
           </el-table>
         </div>
         <base-table-advanced-setting onSave={(value: any) => this.saveTaskAllotTableColumn(value)} ref='BaseTableAdvancedSettingComponent' />

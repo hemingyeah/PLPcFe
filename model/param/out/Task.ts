@@ -55,7 +55,7 @@ export type getTaskAllotTaskPollApproveResult = MsgModel<TaskApprove>
 export type getTaskAllotResult = Result<{ state: string, stateDisplayName: string }>
 
 /* 工单指派-指派-工单池 */
-export type getTaskAllotTaskPoolResult = Result<null>
+export type getTaskAllotTaskPoolResult = Result<{ state: string, stateDisplayName: string }>
 
 /* 工单指派-指派-工单池 有权限接单 人员列表 */
 export type getTaskPoolAuthUsersResult = MsgModel<TaskPoolUser[]>

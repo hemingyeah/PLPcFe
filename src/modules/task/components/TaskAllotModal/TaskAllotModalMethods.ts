@@ -460,6 +460,14 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
           return Platform.alert(data.message)
         }
         
+        data?.result?.stateDisplayName 
+          && (
+            Platform.notification({
+            title: data?.result?.stateDisplayName || '',
+            type: 'success',
+          })
+        )
+        
         this.allotSuccess()
       })
       .catch((err: any) => {
@@ -475,11 +483,19 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
   public fetchTaskPoolSubmit(params: AllotTaskPoolParams) {
     return (
       taskAllotTaskPoll(params)
-      .then((result: getTaskAllotTaskPoolResult) => {
-        let isSuccess = result.success
+      .then((data: getTaskAllotTaskPoolResult) => {
+        let isSuccess = data.success
         if (!isSuccess) {
-          return Platform.alert(result.message)
+          return Platform.alert(data.message)
         }
+        
+        data?.result?.stateDisplayName 
+          && (
+            Platform.notification({
+            title: data?.result?.stateDisplayName || '',
+            type: 'success',
+          })
+        )
         
         this.allotSuccess()
       })
@@ -502,6 +518,14 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
           return Platform.alert(data.message)
         }
         
+        data?.result?.stateDisplayName 
+          && (
+            Platform.notification({
+            title: data?.result?.stateDisplayName || '',
+            type: 'success',
+          })
+        )
+        
         this.allotSuccess()
       })
       .catch((err: any) => {
@@ -522,6 +546,14 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
         if (!isSuccess) {
           return Platform.alert(data.message)
         }
+        
+        data?.result?.stateDisplayName 
+          && (
+            Platform.notification({
+            title: data?.result?.stateDisplayName || '',
+            type: 'success',
+          })
+        )
         
         this.allotSuccess()
       })

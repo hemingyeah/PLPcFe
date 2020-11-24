@@ -265,7 +265,7 @@ class TaskAllotUserTableRender extends TaskAllotUserTableMethods {
   /** 
    * @description 渲染表格列
   */
-  renderTableColumnField(scope: any, column: Column) {
+  public renderTableColumnField(scope: any, column: Column) {
     let value = column.field ? scope.row[column.field] : ''
     
     // 负责人
@@ -291,24 +291,24 @@ class TaskAllotUserTableRender extends TaskAllotUserTableMethods {
   /** 
    * @description 渲染通用表格列
   */
-  renderColumnWithCommon(value: string) {
+  public renderColumnWithCommon(value: string) {
     return fmt_display_text(value)
   }
   
   /** 
    * @description 渲染距离表格列
   */
-  renderColumnWithLineDistance(value: string) {
+  public renderColumnWithLineDistance(value: string) {
     let distance = Number(value) 
     if (isNaN(distance)) return value
     
     return distance ? `${(distance / 1000).toFixed(3)} KM` : fmt_display_text(distance)
   }
-
+  
   /** 
    * @description 渲染驾车时间表格列
   */
-  renderColumnWithLineDuration(value: string) {
+  public renderColumnWithLineDuration(value: string) {
     let duration = Number(value) 
     if (isNaN(duration)) return value
     
@@ -318,14 +318,14 @@ class TaskAllotUserTableRender extends TaskAllotUserTableMethods {
   /** 
    * @description 渲染数组表格列
   */
-  renderColumnWithStringArray(value: string[]): string {
+  public renderColumnWithStringArray(value: string[]): string {
     return isArray(value) ? value.join(', ') : fmt_display_text(value)
   }
   
   /** 
    * @description 渲染工作状态表格列
   */
-  renderColumnWithState(value: string) {
+  public renderColumnWithState(value: string) {
     return (
       <div class='user-card-header-content-state'>
         <span class='user-state-round' style={{
@@ -340,7 +340,7 @@ class TaskAllotUserTableRender extends TaskAllotUserTableMethods {
   /** 
    * @description 渲染人员名称表格列
   */
-  renderColumnWithDisplayName(scope: any) {
+  public renderColumnWithDisplayName(scope: any) {
     let { displayName = '', label = [] } = scope.row || {}
     return (
       <div class='task-allot-user-table-column-field'>
@@ -355,7 +355,7 @@ class TaskAllotUserTableRender extends TaskAllotUserTableMethods {
   /** 
    * @description 渲染负责人表格列
   */
-  renderColumnWithExcutor(scope: any) {
+  public renderColumnWithExcutor(scope: any) {
     let { userId = '' } = scope.row
     
     return (
@@ -366,6 +366,15 @@ class TaskAllotUserTableRender extends TaskAllotUserTableMethods {
         >
         </el-checkbox>
       </div>
+    )
+  }
+  
+  /** 
+   * @description 渲染表格插入 用于无限加载显示
+  */
+  public renderTableAppendSlot() {
+    return (
+      <div class='task-allot-user-table-append-block'>{ this.isDisableLoadmore ? '已加载全部结果' : '载入更多结果...' }</div>
     )
   }
 }
