@@ -6,7 +6,7 @@
         <el-input v-model="searchParts" placeholder="请输入服务项目信息" />
       </div>
       <div class="select-state">
-        <el-select v-model="selectState" placeholder="发布状态" @change="_state">
+        <el-select v-model="selectState" placeholder="发布状态">
           <el-option
             v-for="item in selectStateList"
             :key="item.value"
@@ -16,17 +16,10 @@
           </el-option>
         </el-select>
       </div>
-      <base-button
-        type="primary"
-        native-type="submit"
-        class="task-ml12"
-        @event="search"
-      >
+      <base-button type="primary" native-type="submit" class="task-ml12" @event="search">
         搜索
       </base-button>
-      <base-button type="ghost" class="task-ml12" @event="initialization">
-        重置
-      </base-button>
+      <base-button type="ghost" class="task-ml12" @event="initialization"> 重置 </base-button>
       <div class="task-span1" />
     </div>
     <!-- table -->
@@ -45,10 +38,7 @@
         >
           <template slot-scope="scope">
             <template v-if="item.fieldName === 'isShow'">
-              <el-checkbox
-                v-model="scope.row.isShow"
-                @change="marketItem(scope.row.isShow, scope.row.id)"
-              ></el-checkbox>
+              <el-checkbox v-model="scope.row.isShow" @change="marketItem(scope.row.isShow, scope.row.id)"></el-checkbox>
             </template>
             <template v-else>{{ scope.row[item.fieldName] }}</template>
           </template>
@@ -136,7 +126,7 @@ export default {
       }, // 列表请求参数
       pagination: {}, //分页
       searchParts: "", // 搜索备件信息
-      selectState: "", //状态
+      selectState: "全部", //状态
       selectStateList: STATELIST,
       tableNames: TABLENAME,
       tableData: [],
@@ -169,37 +159,32 @@ export default {
     /*是否发布 */
     async marketItem(value, id) {
       const params = {
-        type: "服务",
+        type: '服务',
         id,
-        isShow: value ? 1 : 0,
-      };
-      const {} = await SettingApi.marketItem(params);
-    },
-    _state(value) {
-      if (!value) {
-        this.search();
+        isShow: value ? 1 : 0
       }
+      const {} = await SettingApi.marketItem(params)
     },
     search() {
-      const { selectState, searchParts } = this;
-      this.params.pageNum = 1;
-      this.params.isShow = selectState ? selectState - 1 : "";
-      this.params.keyword = searchParts;
-      this.serviceList();
+      const {selectState, searchParts} = this
+      this.params.pageNum = 1
+      this.params.isShow = selectState ? selectState - 1 : ''
+      this.params.keyword = searchParts
+      this.serviceList()
     },
     /** 初始化 */
     initialization() {
       this.params = {
         pageNum: 1,
         pageSize: 10,
-      };
-      this.searchParts = "";
-      this.selectState = "";
-      this.serviceList();
+      }
+      this.searchParts =  ""
+      this.selectState = ""
+      this.serviceList()
     },
     /*分页条数切换 */
     handleSizeChange(value) {
-      this.params.pageNum = 1;
+      this.params.pageNum = 1
       this.params.pageSize = value;
       this.serviceList();
     },
