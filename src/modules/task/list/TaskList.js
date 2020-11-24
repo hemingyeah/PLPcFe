@@ -1351,6 +1351,7 @@ export default {
       this.searchParams = {...this.searchParams_spare, ...{templateId: taskType.id}}
       this.currentTaskType = taskType;
       this.selectId = 'all'
+      this.searchParams.keyword = this.params.keyword
       this.params = this.initParams(this.params.pageSize, this.params.keyword);
       this.initialize();
       // this.createPerspective({id: this.selectId}, true)
