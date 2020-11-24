@@ -153,7 +153,7 @@ class AllotRuleModalRender extends AllotRuleModalMethods {
       <div class={`${this.className}-task-type`}>
         <span>{text}</span>
         <biz-form-remote-select
-          disabled={this.isDisabled}
+          inputDisabled={this.isDisabled}
           multiple={multiple}
           value={value}
           onInput={changedHandler}
