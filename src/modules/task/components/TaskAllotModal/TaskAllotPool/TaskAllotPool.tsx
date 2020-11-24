@@ -33,13 +33,15 @@ import { CreateElement } from 'vue'
 import '@src/modules/task/components/TaskAllotModal/TaskAllotPool/TaskAllotPool.scss'
 /* types */
 import StateColorMap from '@model/types/StateColor'
+import TaskConfig from '@model/types/TaskConfig'
 /* util */
 import Log from '@src/util/log.ts'
 import { formatDate } from '@src/util/lang'
 import Platform from '@src/util/Platform'
 import { findComponentUpward } from '@src/util/assist'
 import { openTabForTaskView, openTabForCustomerView } from '@src/util/business/openTab'
-import { fmt_address } from '@src/filter/fmt'
+import { fmt_address, fmt_number } from '@src/filter/fmt'
+import { isBeforeTime } from '@src/util/time'
 
 declare let AMap: any
 
@@ -69,6 +71,8 @@ export default class TaskAllotPool extends Vue {
   @Prop() readonly stateColorMap: StateColorMap | undefined
   /* 工单信息 */
   @Prop() readonly task: any | undefined
+  /* 工单设置 */
+  @Prop() readonly taskConfig: TaskConfig | undefined
   
   /* 地图用户信息弹窗 */
   private AMapUserInfoWindow: any = null
@@ -111,6 +115,11 @@ export default class TaskAllotPool extends Vue {
   /* 客户地址 */
   get customerAddress(): CustomerAddress {
     return this.customer.customerAddress || new CustomerAddress()
+  }
+  
+  /* 是否开启 按服务团队划分工单池 */
+  get isPoolByTag(): boolean {
+    return this.taskConfig?.poolByTag === true
   }
   
   /** 
@@ -247,14 +256,15 @@ export default class TaskAllotPool extends Vue {
   }
   
     /**
-   * @description 构建人员信息弹窗
+   * @description 构建工单信息弹窗
   */
   private buildTaskMarkerInfo(event: any) : string {
     let task: any = event?.target?.getExtData() || {}
     let {
       customerId = '',
-      customerName = '',
+      customerEntity = {},
       taskId,
+      taskUUID,
       taskNo = '',
       linkMan = {}, 
       lmPhone = '', 
@@ -268,10 +278,10 @@ export default class TaskAllotPool extends Vue {
       `
       <div class="map-info-window-content map-task-content-window">
         <div class="map-task-content-window-header">
-          <div class="customer-name link-text" onclick="openCustomerViewFunc('${customerId}')">${ customerName }</div>
+          <div class="customer-name link-text" onclick="openCustomerViewFunc('${customerEntity?.id}')">${ customerEntity?.name || '' }</div>
           ${isTimeout ? '<div class="map-task-content-window-header-timeout">超时接单</div>' : ''}
         </div>
-        <p><label>工单编号：</label><span class="link-text" onclick="openTaskViewFunc('${taskId}')">${ taskNo }</span></p>
+        <p><label>工单编号：</label><span class="link-text" onclick="openTaskViewFunc('${taskId || taskUUID}')">${ taskNo }</span></p>
         <p><label>联系人：</label>${ linkMan.name || '' }</p>
         <p><label>电话：</label>${ linkMan.phone || '' }</p>
         <p><label>地址：</label>${ fmt_address(address) || '' }</p>
@@ -386,7 +396,7 @@ export default class TaskAllotPool extends Vue {
   */
   private fetchTaskPoolList() {
     return (
-      getTaskPoolList({ ids: [] }).then((data: getTaskSearchListResult) => {
+      getTaskPoolList({ ids: [], page: 1, pageSize: 1000 }).then((data: getTaskSearchListResult) => {
         let isSuccess = data.success
         if (!isSuccess) {
           return Platform.alert(data.message)
@@ -394,12 +404,12 @@ export default class TaskAllotPool extends Vue {
         
         // 工单池列表数据
         this.taskPoolList = data?.result?.content.map((task: any) => {
-          let isTimeout = task.overTime ? task.overTime < new Date().getTime() : false
+          let isTimeout = isBeforeTime(task.overTime)
           task.isTimeout = isTimeout
           return task
         }) || []
         // 工单池总量
-        this.taskPoolInfo.taskPoolAllCount = this.taskPoolList.length
+        this.taskPoolInfo.taskPoolAllCount = fmt_number(data.result?.totalElements, '')
         
       })
     )
@@ -455,7 +465,7 @@ export default class TaskAllotPool extends Vue {
     // 查询订阅工单池人员列表
     this.fetchSubscriptionUsers()
     // 查询客户团队统计工单池数量
-    this.fetchCustomerTagTaskPoolCount()
+    this.isPoolByTag && this.fetchCustomerTagTaskPoolCount()
   }
   
   /**
@@ -537,15 +547,16 @@ export default class TaskAllotPool extends Vue {
           idName={this.mapId} 
           handlerCustomFunc={(amap: any) => this.buildMarkers(amap)} 
         />
-        <task-allot-pool-notification 
+        <task-allot-pool-notification
           checked={this.notificationCheckd} 
           checkedChangeFunc={(value: TaskPoolNotificationTypeEnum[]) => this.onNotificationCheckedChanged(value)}
           slotDefault={this.renderNotificationAddUser}
         >
         </task-allot-pool-notification>
-        <task-allot-pool-info 
+        <task-allot-pool-info
+          hideCustomerTagInfo={!this.isPoolByTag}
           stateColorMap={this.stateColorMap}
-          info={this.taskPoolInfo} 
+          info={this.taskPoolInfo}
           checked={{ 
             subscription: this.isShowMapTaskPoolSubscriptionUsers,
             auth: this.isShowMapTaskPoolAuthUsers

@@ -23,7 +23,9 @@ function getFromId() {
  * @param {Boolean} isNoHistory 是否不显示历史参数
 */
 export function openTabForTaskView(taskId = '', isNoHistory = true) {
-  let fromId = getFromId();
+  if (!taskId) return
+  
+  let fromId = getFromId()
   
   platform.openTab({
     id: `task_view_${taskId}`,
@@ -58,6 +60,8 @@ export function openTabForTaskCreate(defaultTypeId = '') {
  * @param {Boolean} isNoHistory 是否不显示历史参数
 */
 export function openTabForCustomerView(customerId = '', isNoHistory = true) {
+  if (!customerId) return
+  
   let fromId = getFromId();
   
   platform.openTab({
@@ -78,6 +82,8 @@ export function openTabForCustomerView(customerId = '', isNoHistory = true) {
  * @param {Boolean} isNoHistory 是否不显示历史参数
 */
 export function openTabForProductView(productId = '', isNoHistory = true) {
+  if (!productId) return
+  
   let fromId = getFromId();
   
   platform.openTab({
@@ -98,6 +104,8 @@ export function openTabForProductView(productId = '', isNoHistory = true) {
  * @param {Boolean} isNoHistory 是否不显示历史参数
 */
 export function openTabForTeamtView(teamId = '', isNoHistory = true) {
+  if (!teamId) return
+
   let fromId = getFromId();
   
   platform.openTab({
@@ -153,6 +161,8 @@ export function openTabForTeamChildCreate(parentData) {
  * @param {Object} params 参数对象
 */
 export function openTabForUserView(userId, params = {}) {
+  if (!userId) return
+  
   let fromId = getFromId();
   
   platform.openTab({
@@ -173,6 +183,8 @@ export function openTabForUserView(userId, params = {}) {
  * @param {String} performanceId 绩效id
 */
 export function openTabForPerformanceView(performanceId) {
+  if (!performanceId) return
+
   let fromId = getFromId();
   
   platform.openTab({
@@ -209,6 +221,8 @@ export function openTabForWikiCreate() {
  * @param {String} wikiId 知识库id
 */
 export function openTabForWikiEdit(wikiId = '') {
+  if (!wikiId) return
+  
   let fromId = getFromId();
   
   platform.openTab({
@@ -226,6 +240,8 @@ export function openTabForWikiEdit(wikiId = '') {
  * @param {String} wikiId 知识库id
 */
 export function openTabForWikiView(wikiId = '') {
+  if (!wikiId) return
+  
   let fromId = getFromId();
   
   platform.openTab({
@@ -261,7 +277,10 @@ export function openTabForWikiList() {
  * @param {String} eventId 事件id
 */
 export function openTabForEventView(eventId) {
-  let fromId = getFromId();
+  if (!eventId) return
+  
+  let fromId = getFromId()
+
   platform.openTab({
     id: `event_view_${eventId}`,
     title: '事件详情',

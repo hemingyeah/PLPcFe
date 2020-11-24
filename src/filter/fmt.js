@@ -1,5 +1,5 @@
 import * as Lang from '@src/util/lang';
-
+import { isNumber } from '@src/util/type'
 
 /** 格式化日期，支持毫秒 */
 export function fmt_date(value){
@@ -215,6 +215,15 @@ export function fmt_number(value, defaultValue) {
   }
   
   return number
+}
+
+export function fmt_number_limit(value, limit) {
+  let isValueNumberType = isNumber(value)
+  let isLimitNumberType = isNumber(limit)
+  if (!isValueNumberType || !isLimitNumberType) return value
+  
+  return limit > value ? `${limit - 1}+` : value
+  
 }
 
 const fmt = {

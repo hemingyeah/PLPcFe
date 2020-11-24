@@ -1,6 +1,6 @@
 export interface TaskAllotPoolInfoData {
   // 工单池工单总量
-  taskPoolAllCount: number,
+  taskPoolAllCount: number | null,
   // 客户服务团队待接单量
   customerTeamUnAcceptCount: number,
   // 订阅工单池用户数量

@@ -73,6 +73,7 @@ export default class TaskAllotModal extends TaskAllotModalRender {
                     style={this.allotContentStyle[TaskAllotTypeEnum.Pool]}
                     stateColorMap={this.stateColorMap}
                     task={this.task}
+                    taskConfig={this.taskConfig}
                     loginUser={this.loginUser}
                   />
                 )

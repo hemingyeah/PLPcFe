@@ -18,15 +18,15 @@
               保存
             </button>
             
-            <button type="button" class="btn-text btn-back" :disabled="disabled" @click="submit(false)" v-if="isShowOnlySaveButton">
-              只保存
-            </button>
+            <base-button type="primary" class="btn-text btn-back" :disabled="disabled" @event="submit(false)" v-if="isShowOnlySaveButton">
+              提交
+            </base-button>
             
-            <span class="text" v-if="isShowSaveAndAllotButton">|</span>
+            <span class="text" v-if="isShowSaveAndAllotButton"></span>
             
-            <button type="button" class="btn btn-primary" :disabled="disabled" @click="submit(true)" v-if="isShowSaveAndAllotButton">
-              保存并派单
-            </button>
+            <base-button type="primary" class="btn btn-primary" :disabled="disabled" @event="submit(true)" v-if="isShowSaveAndAllotButton">
+              提交并派单
+            </base-button>
             
           </template>
           <!-- end 新建按钮组 -->

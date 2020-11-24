@@ -42,7 +42,7 @@ export default class TaskAllotType extends Vue {
       <div class={ComponentNameEnum.TaskAllotType}>
         <el-radio value={this.type} onInput={this.handlerTypeChange} label="checkTaskPerson">指派给工单负责人</el-radio>
         {
-          this.$scopedSlots.taskPool 
+          this.$scopedSlots.taskPool
           ? this.$scopedSlots.taskPool(this.renderTaskPoolRadio)
           : this.renderTaskPoolRadio()
         }

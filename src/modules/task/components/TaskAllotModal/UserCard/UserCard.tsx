@@ -60,6 +60,7 @@ export default class UserCard extends Vue {
   
   @Watch('userId')
   onUserIdChanged() {
+    this.computedStartAndEndTime()
     this.fetchUserTaskData()
   }
   

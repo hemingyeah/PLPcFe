@@ -42,6 +42,8 @@ const SortedMap: { [x: string]: number } = {
   [TaslAllotTableColumnFieldEnum.Ufinish]: AllotSortedEnum.UnfinishedTask,
   [TaslAllotTableColumnFieldEnum.Finish]: AllotSortedEnum.FinishTaskByToday,
   [TaslAllotTableColumnFieldEnum.Plan]: AllotSortedEnum.PlanTaskByToday,
+  [TaslAllotTableColumnFieldEnum.Degree]: AllotSortedEnum.TaskDegreePercentByMonth,
+  [TaslAllotTableColumnFieldEnum.LineDistance]: AllotSortedEnum.Distance
 }
 
 // @ts-ignore
@@ -597,6 +599,7 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
     const { prop, order } = option
     if (!order) {
       this.orderDetail = {}
+      this.selectSortord = AllotSortedEnum.Distance
       return this.initialize()
     }
     

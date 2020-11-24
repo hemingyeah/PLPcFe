@@ -20,7 +20,7 @@ class TaskAllotModalRender extends TaskAllotModalMethods {
     }
     
     // 未开启自动派单 或 转派
-    if (!(this.taskConfig.autoDispatch === true || this.isReAllot)) {
+    if (!(this.taskConfig.autoDispatch === true) || this.isReAllot) {
       scopedSlots.autoDispatch = this.renderTaskAllotAutoDispatch(this.isReAllot)
     }
     
@@ -131,7 +131,7 @@ class TaskAllotModalRender extends TaskAllotModalMethods {
     
     return (
       <div class='task-allot-reason'>
-        <span class='task-allot-nav-title'>选择工单协同人</span>
+        <span class='task-allot-nav-title'>转派说明</span>
         <el-input
           type='textarea'
           rows={5}

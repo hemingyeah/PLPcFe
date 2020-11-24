@@ -69,7 +69,7 @@ const TaskAllotUserTableStateColumn = {
   "field": "state",
   "show": true,
   "fixed": false,
-  "sortable": true,
+  "sortable": false,
   "width": "150px",
   "type": "column"
 }

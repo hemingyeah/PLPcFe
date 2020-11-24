@@ -9,7 +9,7 @@ import LoginUser from '@model/entity/LoginUser/LoginUser'
 import TaskPoolUser from '@model/entity/TaskPoolUser'
 import Tag from '@model/entity/Tag/Tag'
 /* filter */
-import { fmt_number } from '@src/filter/fmt'
+import { fmt_number, fmt_number_limit } from '@src/filter/fmt'
 /* interface */
 import { TaskAllotPoolInfoData } from '@src/modules/task/components/TaskAllotModal/TaskAllotPool/TaskAllotPoolInterface'
 /* image */
@@ -39,6 +39,8 @@ export default class TaskAllotPoolInfo extends Vue {
     subscription: boolean,
     auth: boolean
   } | undefined
+  /* 隐藏客户团队数据信息 */
+  @Prop() readonly hideCustomerTagInfo: boolean | undefined
   /* 工作状态颜色数组 */
   @Prop() readonly stateColorMap: StateColorMap | undefined
   /* 选中状态 */
@@ -61,7 +63,20 @@ export default class TaskAllotPoolInfo extends Vue {
   private handleAuthCheckedChange(value: boolean) {
     return value
   }
-
+  
+  /** 
+   * @description 渲染客户团队信息
+  */
+  private renderCusomterTagInfo() {
+    if (this.hideCustomerTagInfo) return null
+    
+    return (
+      <div class={[`${this.className}-row`, 'no-border']}>
+        {`客户服务团队待接单量: ${fmt_number(this.info?.customerTeamUnAcceptCount, '')}`}
+      </div>
+    )
+  }
+  
   private renderUserItem(info: TaskPoolUser) {
     const user: LoginUser = info.user
     
@@ -97,11 +112,9 @@ export default class TaskAllotPoolInfo extends Vue {
     return (
       <div class={this.className}>
         <div class={`${this.className}-row`}>
-          {`工单池工单总量: ${fmt_number(this.info?.taskPoolAllCount, '')}`}
+          {`工单池工单总量: ${fmt_number_limit((fmt_number(this.info?.taskPoolAllCount, '')))}`}
         </div>
-        <div class={[`${this.className}-row`, 'no-border']}>
-          {`客户服务团队待接单量: ${fmt_number(this.info?.customerTeamUnAcceptCount, '')}`}
-        </div>
+        {this.renderCusomterTagInfo()}
         <el-collapse>
           <el-collapse-item>
             <template slot="title">
