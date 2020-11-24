@@ -179,15 +179,34 @@
                   </template>
                 </sample-tooltip>
               </template>
-              <template v-else-if="column.field === 'customer'">
-                <a
-                  href=""
-                  class="view-detail-btn"
-                  @click.stop.prevent="createCustomerTab(scope.row.customer.id)"
-                >
-                  {{ scope.row.customerName }}
-                </a>
+
+              <template v-if="column.fieldName === 'productVideo'">
+                <template v-if="scope.row.productVideo.length">
+                  <sample-tooltip :row="scope.row">
+                    <template slot="content" slot-scope="{ isContentTooltip }">
+                      <el-tooltip
+                        :content="scope.row[column.field]"
+                        placement="top"
+                        :disabled="!isContentTooltip"
+                      >
+                        <a
+                          href=""
+                          class="view-detail-btn"
+                          @click.stop.prevent="
+                            previewVideo(scope.row.productVideo[0].url)
+                          "
+                        >
+                          {{
+                            scope.row.productVideo[0] &&
+                              scope.row.productVideo[0]
+                          }}
+                        </a>
+                      </el-tooltip>
+                    </template>
+                  </sample-tooltip>
+                </template>
               </template>
+
               <template v-else-if="column.field === 'tags'">
                 {{ scope.row | formatTags }}
               </template>
@@ -443,7 +462,6 @@
 
 <script>
 import _ from 'lodash';
-import { storageGet, storageSet } from '@src/util/storage';
 
 import Page from '@model/Page';
 import { formatDate } from '@src/util/lang';
@@ -452,9 +470,7 @@ import BatchRemindingDialog from '@src/modules/product/components/BatchReminding
 import BatchUpdateDialog from '@src/modules/product/components/BatchUpdateDialog.vue';
 import SearchPanel from '@src/modules/productV2/productMenuList/compoment/SearchPanel.vue';
 
-import {
-  getUpdateRecord,
-} from '@src/api/ProductApi';
+import { getUpdateRecord } from '@src/api/ProductApi';
 import {
   getPageList,
   getProductMenuField,
@@ -533,17 +549,19 @@ export default {
         {
           displayName: '产品视频',
           fieldName: 'productVideo',
-          formType: 'attachment',
+          formType: 'text',
           isExport: false,
           show: true,
+          orderId: -0.9,
           isSystem: 1,
         },
         {
           displayName: '产品图片',
           fieldName: 'productPic',
-          formType: 'attachment',
+          formType: 'text',
           isExport: false,
           show: true,
+          orderId: -0.8,
           isSystem: 1,
         },
         {
@@ -660,16 +678,8 @@ export default {
     // [tab_spec]标准化刷新方式
     window.__exports__refresh = this.search;
 
-    // this.$eventBus.$on(
-    //   'product_list.update_product_list_remind_count',
-    //   this.updateProductRemindCount
-    // );
   },
   beforeDestroy() {
-    // this.$eventBus.$off(
-    //   'product_list.update_product_list_remind_count',
-    //   this.updateProductRemindCount
-    // );
   },
   methods: {
     getAddress(field) {
@@ -920,7 +930,7 @@ export default {
 
         const ids = this.multipleSelection.map((p) => p.id);
         this.loading = true;
-        const res = await delTreeList({ids});
+        const res = await delTreeList({ ids });
         this.loading = false;
 
         if (!res || res.code != 0)
@@ -1324,6 +1334,9 @@ export default {
       window.parent.flashSomePage({
         type: 'productV2_catalog_edit',
       });
+    },
+    previewVideo(e) {
+      this.$previewVideo(e);
     },
   },
   components: {

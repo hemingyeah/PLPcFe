@@ -27,12 +27,6 @@ export default {
   methods: {
     openTab() {
       window.location.href = '/setting/productV2/catalog/settingField'
-      // this.$platform.openTab({
-      //   id: 'productV2_productMenu_settingField',
-      //   title: '产品目录表单',
-      //   url: '/productV2/productMenu/settingField',
-      //   close: true,
-      // });
     },
   },
 };

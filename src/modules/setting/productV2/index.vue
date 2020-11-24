@@ -34,7 +34,7 @@
 </template>
 <script>
 import ProductSet from '@src/modules/setting/productMenu/productSet';
-import ProductMenuSet from '@src/modules/setting/productMenu/productMenuSet';
+import ProductMenuSet from '@src/modules/setting/productV2ductMenuSet';
 export default {
   name: 'product-menu-setting',
   props: {
@@ -72,7 +72,7 @@ export default {
       productSet: 0,
       productMenuSet: 1,
     };
-    this.nowMenu = typeObj[type];
+    this.nowMenu = typeObj[type] || 1;
   },
   methods: {
     changePage(index) {
@@ -80,9 +80,9 @@ export default {
         return;
       }
       if (index === 0) {
-        window.location.href = '/setting/doMyself/doMyselfSet';
+        window.location.href = '/setting/product/productType';
       } else if (index === 1) {
-        window.location.href = '/setting/doMyself/wxSet';
+        window.location.href = '/setting/productV2/catalog/setting?type=productMenu';
       }
       this.nowMenu === index;
     },

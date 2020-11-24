@@ -8,11 +8,11 @@ module.exports = {
     template: 'src/templates/map.html'
   },
   'productV2.catalog.setting': {
-    entry: './src/modules/setting/productMenu/index.js',
+    entry: './src/modules/setting/productV2/index.js',
     template: 'src/templates/map.html'
   },
   'productV2.catalog.settingField': {
-    entry: './src/modules/setting/productMenu/productMenuField/index.js',
+    entry: './src/modules/setting/productV2/productMenuField/index.js',
     template: 'src/templates/map.html'
   },
   'productV2.catalog.view': {
