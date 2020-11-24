@@ -60,6 +60,7 @@
 .user-card-header-content {
   color: $text-color-regular;
   &-name {
+    cursor: pointer;
     font-size: $font-size-base;
     font-weight: 600;
     line-height: 20px;
@@ -111,7 +112,7 @@
     align-items: center;
     &-item {
       text-align: left;
-      width: 120px;
+      width: 130px;
     }
   }
 }

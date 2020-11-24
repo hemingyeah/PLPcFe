@@ -176,5 +176,7 @@ export enum AllotLocationEnum {
   // 50公里
   Fifty = 50,
   // 其他
-  Other = 0
+  Other = 0,
+  // 全部
+  All = -1
 }

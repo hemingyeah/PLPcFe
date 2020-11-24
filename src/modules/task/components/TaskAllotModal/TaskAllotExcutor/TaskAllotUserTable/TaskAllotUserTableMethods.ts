@@ -25,7 +25,7 @@ import Page from '@model/Page'
 import Column from '@model/types/Column'
 import { getTaskAllotUserInfoResult, getTaskTagListResult } from '@model/param/out/Task'
 import { MAX_GREATER_THAN__MIN_MESSAGE, REQUIRED_MIN_MESSAGE, REQUIRED_MAX_MESSAGE } from '@src/model/const/Alert'
-import { TaskTagListSearchModel } from '@model/param/in/Task'
+import { TaskAllotUserSearchModel, TaskTagListSearchModel } from '@model/param/in/Task'
 import { AllotSortedEnum, AllotLocationEnum, TaslAllotTableColumnFieldEnum } from './TaskAllotUserTableModel'
 /* util */
 import * as _ from 'lodash'
@@ -131,7 +131,7 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
     this.$once(HookEnum.Destroyed, () => {
       Loadmore.unbind(scrollEl)
     })
-
+    
   }
   
   /** 
@@ -273,6 +273,38 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
     }
   }
   
+  /**
+   * @description 构建搜索人员参数
+   */
+  public buildSearchUserParams(): TaskAllotUserSearchModel {
+    let distance: number[] | null = this.getParamDistance()
+    let users: LoginUser[] = this.isAllotByTag ? this.selectTeamUsers : this.selectDeptUsers
+    let orderDetail: any = (
+      Object.keys(this.orderDetail).length > 0 
+        ? this.orderDetail
+        : { code: this.selectSortord, order: true  }
+    )
+    let params: TaskAllotUserSearchModel = {
+      order: orderDetail.order,
+      code: orderDetail.code,
+      customerId: this.customer.id || '',
+      lat: Number(this.customerAddress.adLatitude),
+      lng: Number(this.customerAddress.adLongitude),
+      pageNum: ++this.userPage.pageNum,
+      pageSize: this.userPage.pageSize,
+      states: this.selectUserState,
+      tagIds: this.selectTeams.map(team => (team.id || '')),
+      userIds: users.map(user => user.userId)
+    }
+    
+    if (distance && isArray(distance)) {
+      params.startDistance = String(distance[0])
+      params.endDistance = String(distance[1])
+    }
+    
+    return params
+  }
+  
   /** 
    * @description 部门选择人员
   */
@@ -340,10 +372,14 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
   /** 
    * @description 获取位置参数
   */
-  public getParamDistance(): number[] {
+  public getParamDistance(): number[] | null {
     let m = 1000
     
     try {
+      // 全部
+      if (this.selectLocation === AllotLocationEnum.All) {
+        return null
+      }
       // 5公里以内
       if (this.selectLocation === AllotLocationEnum.Five) {
         return [0, AllotLocationEnum.Five * m]
@@ -400,27 +436,7 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
     
     Log.succ(Log.Start, this.fetchUsers.name)
     
-    let distance = this.getParamDistance()
-    let users: LoginUser[] = this.isAllotByTag ? this.selectTeamUsers : this.selectDeptUsers
-    let orderDetail: any = (
-      Object.keys(this.orderDetail).length > 0 
-        ? this.orderDetail
-        : { code: this.selectSortord, order: true  }
-    )
-    let params = {
-      order: orderDetail.order,
-      code: orderDetail.code,
-      customerId: this.customer.id || '',
-      lat: Number(this.customerAddress.adLatitude),
-      lng: Number(this.customerAddress.adLongitude),
-      pageNum: ++this.userPage.pageNum,
-      pageSize: this.userPage.pageSize,
-      startDistance: String(distance[0]),
-      endDistance: String(distance[1]),
-      states: this.selectUserState,
-      tagIds: this.selectTeams.map(team => (team.id || '')),
-      userIds: users.map(user => user.userId)
-    }
+    const params: TaskAllotUserSearchModel = this.buildSearchUserParams()
     
     return (
       getTaskAllotUserInfo(params).then((data: getTaskAllotUserInfoResult) => {
@@ -441,10 +457,15 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
               return acc
             }, {})
         )
-        
+        // 是否禁用加载更多
         this.isDisableLoadmore = !(data.result.hasNextPage)
-        // this.bindTableScrollEvent()
-
+        // 解绑滚动事件
+        this.unBindTableScrollEvent()
+        this.$nextTick(() => {
+          // 添加滚动事件
+          this.bindTableScrollEvent()
+        })
+        
         Log.succ(Log.End, this.fetchUsers.name)
       })
     )

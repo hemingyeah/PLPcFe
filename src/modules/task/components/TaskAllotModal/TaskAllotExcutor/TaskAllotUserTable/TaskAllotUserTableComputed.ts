@@ -7,8 +7,11 @@ import Customer from '@model/entity/Customer'
 import CustomerAddress from '@model/entity/CustomerAddress'
 /* interface */
 import { UserState } from '@src/modules/task/components/TaskAllotModal/TaskAllotExcutor/TaskAllotUserTable/TaskAllotUserTableInterface'
+/* types */
+import StateColorMap from '@model/types/StateColor'
 /* util */
 import { findComponentUpward, findComponentDownward } from '@src/util/assist'
+import { getRootWindow } from '@src/util/dom'
 
 class TaskAllotUserTableComputed extends TaskAllotUserTableData {
   /* 工单派单组件 */
@@ -51,11 +54,27 @@ class TaskAllotUserTableComputed extends TaskAllotUserTableData {
     return this.TaskAllotModalComponent?.stateColorMap || {}
   }
   
+  /* 根窗口 用户状态对象 */
+  get rootWindowUserStateMap(): StateColorMap {
+    let userStateMap: StateColorMap = {}
+    
+    try {
+      let rootWindow: any = getRootWindow(window)
+      let initData: any = JSON.parse(rootWindow?._init || '{}')
+      userStateMap = initData.userStateMap
+    } catch (error) {
+      userStateMap = {}
+      console.error('TaskAllotUserTableComputed ~ rootWindowUserStateMap ~ error', error)
+    }
+    
+    return userStateMap
+  }
+  
   /* 用户状态 列表 */
   get userStateList(): UserState[] {
     let list: UserState[] = []
     
-    for (let userStateKey in this.userStateMap) {
+    for (let userStateKey in this.rootWindowUserStateMap) {
       let userState: UserState = {
         key: userStateKey,
         value: userStateKey,

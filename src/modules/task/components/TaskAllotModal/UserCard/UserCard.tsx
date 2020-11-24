@@ -23,6 +23,7 @@ import StateColorMap from '@model/types/StateColor'
 import { dispatch } from '@src/util/emitter'
 import DateUtil from '@src/util/date'
 import Platform from '@src/util/Platform'
+import { openTabForUserView } from '@src/util/business/openTab'
 
 enum UserCardEmitEventEnum {
   // 关闭事件
@@ -178,6 +179,13 @@ export default class UserCard extends Vue {
     this.fetchUserTaskData()
   }
   
+  /** 
+   * @description 打开用户详情tab
+  */
+  private openUserViewTab(): void {
+    openTabForUserView(this.userId)
+  }
+  
   mounted() {
     this.computedStartAndEndTime()
     this.fetchUserTaskData()
@@ -199,7 +207,7 @@ export default class UserCard extends Vue {
               <div class='user-card-header-content-top'>
                 
                 <div class='user-card-header-content-top-left'>
-                  <div class='user-card-header-content-name'>
+                  <div class='user-card-header-content-name' onClick={() => this.openUserViewTab()}>
                     {this?.user?.displayName}
                     { this.showExcutorIcon && <i class='iconfont icon-huangguan'></i> }
                   </div>

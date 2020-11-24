@@ -146,7 +146,9 @@ export interface TaskAllotUserSearchModel {
   // 只能排序 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8
   code: number,
   lng?: number,
-  lat?: number
+  lat?: number,
+  pageNum: number,
+  pageSize: number
 }
 
 /* 工单指派-指派前验证是否审批 */

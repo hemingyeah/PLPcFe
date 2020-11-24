@@ -37,7 +37,7 @@ class TaskAllotUserTableData extends TaskAllotUserTableComponents {
   /* 当前选择的部门人员列表 */
   public selectDeptUsers: LoginUser[] = []
   /* 当前选择的距离 */
-  public selectLocation: number = AllotLocationEnum.Five
+  public selectLocation: number = AllotLocationEnum.All
   /* 当前选择的工作状态 */
   public selectUserState: string[] = []
   /* 当前选择的排序方式 */
@@ -52,6 +52,7 @@ class TaskAllotUserTableData extends TaskAllotUserTableComponents {
   public userPageCheckedMap: {[x: number]: boolean} = {}
   /* 距离选项列表 */
   public locationOptions: ElSelectOption[] = [
+    { label: '距离', value: AllotLocationEnum.All },
     { label: '5公里以内', value: AllotLocationEnum.Five },
     { label: '10公里以内', value: AllotLocationEnum.Ten },
     { label: '20公里以内', value: AllotLocationEnum.Twenty },
