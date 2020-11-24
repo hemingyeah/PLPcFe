@@ -10,7 +10,7 @@ const DEFAULT_OPIONS = {
   }
 };
 // https agent
-const AGENT = new https.Agent({
+const HTTPSAGENT = new https.Agent({
   keepAlive: true,
   maxSockets: 1024,
   maxFreeSockets: 256,
@@ -24,6 +24,6 @@ const HTTPAGENT = new http.Agent({
 
 module.exports = {
   DEFAULT_OPIONS,
-  AGENT,
+  HTTPSAGENT,
   HTTPAGENT
 };

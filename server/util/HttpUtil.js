@@ -3,19 +3,9 @@ const chalk = require('chalk');
 const chalkError = chalk.red;
 // model
 const MODEL_PATH = './../model';
-const {
-  proxyConfig,
-  isNotLocalEnv,
-  envMap
-} = require(`${MODEL_PATH}/proxyConfigModel`);
-const {
-  SHB_ENV
-} = require(`${MODEL_PATH}/userConfigModel`);
-const {
-  DEFAULT_OPIONS,
-  AGENT,
-  HTTPAGENT
-} = require(`${MODEL_PATH}/httpConfigModel`);
+const { proxyConfig, isNotLocalEnv, envMap } = require(`${MODEL_PATH}/proxyConfigModel`);
+const { SHB_ENV } = require(`${MODEL_PATH}/userConfigModel`);
+const { DEFAULT_OPIONS, HTTPSAGENT, HTTPAGENT } = require(`${MODEL_PATH}/httpConfigModel`);
 
 /** 如果解析失败返回原值 */
 function toJSON(data) {
@@ -110,30 +100,33 @@ function getRequestOptions(path, method, options = {}) {
  * @param {Object} ctx 上下文
  * @param {Object} options 配置项
  */
-function getProxyOptions(ctx, options = {}, isForce = false) {
+function getProxyOptions(ctx, options = {}) {
   let proxyOptions = {};
 
   let request = ctx.request;
   let path = request.originalUrl;
   let method = request.method;
-
+  
   proxyOptions.path = path;
   proxyOptions.method = method;
-
+  
   let originHeaders = Object.assign({}, request.header, options.headers);
   let localHeaders = Object.assign({}, request.header, DEFAULT_OPIONS.headers, options.headers);
   proxyOptions.headers = Object.assign({}, isNotLocalEnv ? originHeaders : localHeaders);
-
-  setBaseOptions(proxyOptions, options, isForce);
-
+  
+  setBaseOptions(proxyOptions, options)
+  
   return proxyOptions;
 }
 
-function setBaseOptions(originOptions = {}, options = {}, isForce = false) {
-  originOptions.host = getHostName(options, isForce);
-  originOptions.hostname = getHostName(options, isForce);
-  originOptions.port = getPort(options, isForce);
-  originOptions.agent = isForce ? HTTPAGENT : AGENT;
+function setBaseOptions(originOptions = {}, options = {}) {
+  let isForce = options.force === true
+  let isHttp = options.httpProtocol === 'http'
+
+  originOptions.host = getHostName(options, isForce)
+  originOptions.hostname = getHostName(options, isForce)
+  originOptions.port = getPort(options, isForce)
+  originOptions.agent = isHttp ? HTTPAGENT : HTTPSAGENT
 
   delete originOptions.headers.host;
 }

@@ -41,7 +41,7 @@ router.get('/', async (ctx) => {
   let result = await HttpClient.request('/', 'get', null, {
     headers: reqHeaders,
   });
-
+  
   // 请求失败,模拟登陆
   if (!result.status) {
     console.warn('请求失败');
@@ -50,7 +50,7 @@ router.get('/', async (ctx) => {
     if (null != mockUser) {
       userToken = `${mockUser.userId}_${mockUser.tenantId}`;
     }
-
+    
     let loginRes = await HttpClient.request(
       `/dd/mockLogin?code=dev_code&corpId=${userToken}`,
       'get',
@@ -60,7 +60,7 @@ router.get('/', async (ctx) => {
       let cookie = loginRes.headers['set-cookie'] || {};
       headers['set-cookie'] = cookie;
       reqHeaders['cookie'] = cookie[0];
-
+      
       // 再次请求
       result = await HttpClient.request('/', 'get', null, {
         headers: reqHeaders,
@@ -69,15 +69,15 @@ router.get('/', async (ctx) => {
       console.log(loginRes);
     }
   }
-
+  
   headers = Object.assign(headers, result.headers);
   body = result.body;
-
+  
   // 补全headers
   for (let name in headers) {
     ctx.response.set(name, headers[name]);
   }
-
+  
   // 返回html
   ctx.body = Template.renderWithHtml(
     '售后宝',
@@ -86,6 +86,19 @@ router.get('/', async (ctx) => {
     modConfig.template
   );
 })
+
+// 示例: 
+// router.use('/outside/es/*', (ctx) =>
+//   HttpClient.proxy(ctx, {
+//     force: true,
+//     httpProtocol: 'http',
+//     host: '127.0.0.1',
+//     port: 10006,
+//     headers: {
+//       cookie: 'VIPPUBLINKJSESSIONID=a644d918-3065-4760-b2a4-a47d50230230',
+//     },
+//   })
+// )
 
 router.use('', performanceRouter.routes());
 router.use('', customerRouter.routes(), customerRouter.allowedMethods());
