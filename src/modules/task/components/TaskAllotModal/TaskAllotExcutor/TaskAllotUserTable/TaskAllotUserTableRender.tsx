@@ -310,7 +310,7 @@ class TaskAllotUserTableRender extends TaskAllotUserTableMethods {
     let duration = Number(value) 
     if (isNaN(duration)) return value
     
-    return `${(duration * 3600)}小时`
+    return `${(duration / 3600).toFixed(3)}小时`
   }
   
   /** 

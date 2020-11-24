@@ -1,20 +1,26 @@
 import { getTaskType } from '@src/api/TaskApi'
 /* entity */
 import TaskType from '@model/entity/TaskType'
+import TaskApprove from '@model/entity/TaskApprove'
 /* enum */
 import ComponentNameEnum from '@model/enum/ComponentNameEnum'
 import TaskActionEnum from '@model/enum/TaskActionEnum'
 /* model */
 import { getTaskTypeResult } from '@model/param/out/Task'
+/* types */
+import FlowSetting from '@model/types/FlowSetting'
 /* vue */
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator'
 import { CreateElement } from 'vue'
+/* service */
+import { checkApprove } from '@service/TaskService'
 /* scss */
 import '@src/modules/task/components/TaskProcessSteps/TaskProcessSteps.scss'
 
 interface TaskProcessStep {
   name: string,
-  value: string
+  value: string,
+  flow?: any
 }
 
 /* 步骤条对象 */
@@ -28,7 +34,7 @@ const StepMap: { [x: string]: TaskProcessStep } = {
   // 开始
   [TaskActionEnum.START.value]: { name: TaskActionEnum.START.name, value: TaskActionEnum.START.value },
   // 完成
-  [TaskActionEnum.FINISH.value]: { name: TaskActionEnum.CREATE.name, value: TaskActionEnum.FINISH.value }
+  [TaskActionEnum.FINISH.value]: { name: TaskActionEnum.FINISH.name, value: TaskActionEnum.FINISH.value }
 }
 
 @Component({ 
@@ -76,11 +82,27 @@ export default class TaskProcessSteps extends Vue {
     )
   }
   
-  private getScopedSlots() {
+  private getScopedSlots(flow: any, action: string) {
+    // 判空
+    if (!flow) {
+      return console.warn('Caused: [TaskProcessSteps] getScopedSlots flow is empty')
+    }
+    // 审批信息
+    let taskApprove: TaskApprove | null = this.taskType ? checkApprove(this.taskType, action, { id: '' }, {}) : null
+    
     const scopedSlots = {
       description: (props: any) => {
         return (
-          <div>title</div>
+          <div class='task-step-flow'>
+            {
+              taskApprove
+              && taskApprove.needApprove
+              && <div class='task-step-flow-approve'>需审批</div>
+            }
+            {
+              <div class='task-step-flow-overtime'></div>
+            }
+          </div>
         )
       }
     }
@@ -96,7 +118,19 @@ export default class TaskProcessSteps extends Vue {
       return console.warn('Caused: [TaskProcessSteps] taskType is empty')
     }
     
-    let { flowSetting = {} } = this.taskType || {}
+    // 工单流程设置
+    let flowSetting: any = this.taskType.flowSetting
+    let currentFlow: FlowSetting = new FlowSetting()
+    // 遍历添加步骤信息
+    for (let flow in flowSetting) {
+      currentFlow = flowSetting[flow]
+      // 是否开启该流程
+      let isEnabled = currentFlow?.state === true
+      // 开启则 添加该流程
+      isEnabled
+      && StepMap[flow]
+      && this.steps.push({ ...StepMap[flow],  flow: currentFlow})
+    }
     
   }
   
@@ -108,11 +142,13 @@ export default class TaskProcessSteps extends Vue {
     return (
       <div class={ComponentNameEnum.TaskProcessSteps}>
         <el-steps active={this.active} finish-status='success'>
-          <el-step title='新建' scopedSlots={this.getScopedSlots()}></el-step>
-          <el-step title='指派'></el-step>
-          <el-step title='接受'></el-step>
-          <el-step title='开始'></el-step>
-          <el-step title='完成'></el-step>
+          {
+            this.steps.map((step: TaskProcessStep) => {
+              return (
+                <el-step title={step.name} scopedSlots={this.getScopedSlots(step.flow)}></el-step>
+              )
+            })
+          }
         </el-steps>
       </div>
     )

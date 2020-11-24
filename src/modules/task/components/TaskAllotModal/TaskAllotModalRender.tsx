@@ -71,7 +71,9 @@ class TaskAllotModalRender extends TaskAllotModalMethods {
   /** 
    * @description 渲染负责人
   */
-  public renderExcutor(): VNode {
+  public renderExcutor(): VNode | null {
+    if (this.allotType !== TaskAllotTypeEnum.Person) return null
+    
     return (
       <div class='task-allot-executor'>
         <span class='task-allot-nav-title'>负责人</span>

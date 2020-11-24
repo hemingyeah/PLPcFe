@@ -130,7 +130,6 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
     
     let params: AllotTaskPoolParams = {
       taskId: this.task?.id || '',
-      executorId: this.executorUser?.userId || '',
       noticeCusTag: taskPoolData.checked.includes(TaskPoolNotificationTypeEnum.SendToTeamUser),
       authTaskPoolUser: taskPoolData.checked.includes(TaskPoolNotificationTypeEnum.SendToAuthUser),
       otherNotifier: (
@@ -782,6 +781,7 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
       }
       
       // 派单到工单池提交
+      allotTaskPoolParams.executorId = 'task_pool'
       this.fetchTaskPoolSubmit(allotTaskPoolParams)
       
     } catch (error) {
