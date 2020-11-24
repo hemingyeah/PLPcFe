@@ -39,9 +39,9 @@
           <el-input
             placeholder="请输入视图名称"
             v-model="viewName"
+            :maxlength="20"
           >
         </el-input></div>
-        </el-input>
       </div>
       <!-- E 视图名称 -->
       <!-- S 搜索 -->
@@ -210,7 +210,9 @@ export default {
      */
     saveViewBtn(fn) {
       const { region } = this;
-      region.searchModel.systemConditions = this.buildTaskInquireParams().systemConditions;
+      const {systemConditions, conditions} = this.buildTaskInquireParams()
+      region.searchModel.systemConditions = systemConditions;
+      region.searchModel.conditions = conditions
       if (!this.viewName) {
         this.$platform.alert("请输入视图名称");
         return;
@@ -367,7 +369,7 @@ export default {
                     ids: item.inValue,
                   });
                 });
-              } else if (item.property === "executor") {
+              } else if (item.property === "executor" || item.operator === "user") {
                 this.getSimpleUserListByIds(item.inValue, (content) => {
                   this.searchModelCN.push({
                     key: value.displayName,
@@ -396,16 +398,6 @@ export default {
                         return item.tagName;
                       })
                       .join("，"),
-                    fieldName: value.fieldName,
-                    formType: value.formType,
-                    ids: item.inValue,
-                  });
-                });
-              } else if (item.property === "user") {
-                this.getSimpleUserListByIds(item.inValue, (content) => {
-                  this.searchModelCN.push({
-                    key: value.displayName,
-                    content,
                     fieldName: value.fieldName,
                     formType: value.formType,
                     ids: item.inValue,
@@ -876,7 +868,7 @@ export default {
           return item.isSystem == 0 && item.isSearch;
         }),
       ];
-      this.getOneView(systemConditions, [...taskFields, ...taskReceiptFields]);
+      this.getOneView(systemConditions, this.customizeViewList);
     },
     hide() {
       this.visible = false;
@@ -1026,9 +1018,9 @@ export default {
 <style lang="scss" scoped>
 .advanced-search-form {
   overflow: auto;
-  padding: 10px 15px 300px 15px;
+  padding: 10px 15px 0 15px;
 
-  height: calc(100%);
+  height: calc(100% - 200px);
   justify-content: space-between;
   overflow-x: hidden;
 

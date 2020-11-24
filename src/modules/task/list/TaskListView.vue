@@ -320,7 +320,7 @@
                   v-for="item in taskTypes"
                   :key="item.id"
                   class="task-nav-create"
-                  :class="{ 'task-c2': currentTaskType.name === item.name }"
+                  :class="{ 'task-c2': currentTaskType.id === item.id }"
                   @click="changeTaskType(item)"
                 >
                   {{ item.name }}
