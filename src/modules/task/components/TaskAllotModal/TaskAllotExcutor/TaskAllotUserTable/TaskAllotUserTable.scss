@@ -49,10 +49,10 @@
 }
 
 .task-allot-user-table-block {
-  max-height: 380px;
+  max-height: 300px;
   overflow-y: auto;
   .el-table__body-wrapper {
-    max-height: 330px;
+    max-height: 250px;
     overflow-y: scroll;
   }
 }
