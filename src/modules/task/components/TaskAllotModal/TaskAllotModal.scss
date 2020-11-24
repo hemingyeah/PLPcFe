@@ -25,6 +25,11 @@
     overflow-y: scroll;
   }
   
+  .dialog-footer {
+    display: flex;
+    justify-content: flex-end;
+  }
+  
 }
 /* end 弹窗 */
 
