@@ -26,10 +26,6 @@ const BizFormRemoteSelect = {
       type: Array,
       default: () => []
     },
-    disabled: {
-      type: Boolean,
-      default: false
-    },
     multiple: {
       type: Boolean,
       default: false
@@ -65,7 +61,7 @@ const BizFormRemoteSelect = {
           value={ this.value }
           scopedSlots={ this.$scopedSlots }
           multiple={ this.multiple }
-          disabled={ this.disabled }
+          disabled={ this.inputDisabled }
         >
         </base-select>
         { this.cleared && this.value.length > 0 && clearButton }
