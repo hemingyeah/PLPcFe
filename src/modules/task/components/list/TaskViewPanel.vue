@@ -1119,7 +1119,7 @@ export default {
     position: absolute;
     bottom: 55px;
     left: 15px;
-    height: 50px;
+    height: 20px;
     width: 100%;
     background-color: white;
 }
