@@ -15,16 +15,20 @@ module.exports = {
     entry: './src/modules/setting/productV2/productMenuField/index.js',
     template: 'src/templates/map.html'
   },
+  'productV2.settingField': {
+    entry: './src/modules/setting/productV2/productField/index.js',
+    template: 'src/templates/map.html'
+  },
   'productV2.catalog.view': {
     entry: './src/modules/productV2/productMenuView/index.js',
     template: 'src/templates/map.html'
   },
   'productV2.list': {
-    entry: './src/modules/productV2/list/index.js',
+    entry: './src/modules/productV2/productList/index.js',
     template: 'src/templates/map.html',
   },
   'productV2.view': {
-    entry: './src/modules/productV2/view/index.js',
+    entry: './src/modules/productV2/productView/index.js',
     template: 'src/templates/map.html',
   },
 };

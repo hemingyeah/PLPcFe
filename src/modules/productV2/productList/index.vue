@@ -5,7 +5,7 @@
         <div class="product-list-base-search-group">
           <el-input
             v-model="searchModel.keyword"
-            placeholder="根据产品目录信息搜索"
+            placeholder="根据产品信息搜索"
           >
             <i slot="prefix" class="el-input__icon el-icon-search"></i>
           </el-input>
@@ -34,7 +34,7 @@
     <div class="product-list-section">
       <!--operation bar start-->
       <div class="operation-bar-container">
-        <div class="top-btn-group">
+        <div class="top-btn-group flex-x">
           <base-button
             type="primary"
             icon="icon-add"
@@ -42,25 +42,68 @@
             v-if="createdPermission"
           >新建</base-button
           >
-          <base-button
+          <div
+            class="task-ai task-flex task-font14 task-c6 task-pointer mar-l-20"
+            @click="deleteProducts"
+            v-if="deletePermission"
+          >
+            <i class="iconfont icon-qingkongshanchu task-icon"></i>
+            <span class="task-mr4 task-ml4">删除</span>
+          </div>
+          
+          <div
+            class="task-ai task-flex task-font14 task-c6 task-pointer mar-l-24"
+            @click="openDialog('edit')"
+            v-if="editedPermission === 3"
+          >
+            <i class="iconfont icon-edit task-icon"></i>
+            <span class="task-mr4 task-ml4">批量编辑</span>
+          </div>
+          <div
+            class="task-ai task-flex task-font14 task-c6 task-pointer mar-l-24"
+            @click="openDialog('remind')"
+            v-if="editedPermission === 3 && isShowCustomerRemind"
+          >
+            <i class="iconfont icon-notification task-icon"></i>
+            <span class="task-mr4 task-ml4">批量提醒</span>
+          </div>
+          <div
+            class="task-ai task-flex task-font14 task-c6 task-pointer mar-l-24"
+            @click="openDialog('sendMessage')"
+            v-if="editedPermission === 3"
+          >
+            <i class="iconfont icon-duanxin3 task-icon"></i>
+            <span class="task-mr4 task-ml4">发送短信</span>
+          </div>
+          <!-- <base-button
             type="ghost"
             icon="icon-qingkongshanchu"
             @event="deleteProducts"
             v-if="deletePermission"
-          >删除</base-button
+            >删除</base-button
           >
-        </div>
-
-        <div class="action-button-grou flex-x">
-          <!-- <base-button type="plain" @event="openDialog('sendMessage')" v-if="editedPermission === 3">发送短信</base-button> -->
-          <!-- <base-button
+          <base-button
+            type="plain"
+            @event="openDialog('sendMessage')"
+            v-if="editedPermission === 3"
+            >发送短信</base-button
+          >
+          <base-button
             type="plain"
             @event="openDialog('edit')"
             v-if="editedPermission === 3"
-          >批量编辑</base-button
+            >批量编辑</base-button
+          >
+          <base-button
+            type="plain"
+            @event="openDialog('remind')"
+            v-if="editedPermission === 3 && isShowCustomerRemind"
+            >批量提醒</base-button
           > -->
-          <!-- <base-button type="plain" @event="openDialog('remind')" v-if="editedPermission === 3 && isShowCustomerRemind">批量提醒</base-button> -->
-          <el-dropdown v-if="exportPermission || exportPermissionTaskEdit">
+        </div>
+
+        <div class="action-button-group flex-x">
+          <el-dropdown trigger="click" v-if="exportPermission">
             <div
               class="task-ai task-flex task-font14 task-c6 task-pointer"
               @click="trackEventHandler('moreAction')"
@@ -70,7 +113,7 @@
             </div>
             <el-dropdown-menu slot="dropdown">
               <el-dropdown-item>
-                <div @click="openDialog('importProduct')">导入产品目录</div>
+                <div @click="openDialog('importProduct')">导入产品</div>
               </el-dropdown-item>
               <el-dropdown-item>
                 <div @click="exportProduct(false)">导出</div>
@@ -78,9 +121,11 @@
               <el-dropdown-item>
                 <div @click="exportProduct(true)">导出全部</div>
               </el-dropdown-item>
+              <el-dropdown-item>
+                <div @click="openDialog('update')">批量更新</div>
+              </el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
-
           <!-- 选择列 -->
           <div class="guide-box mar-l-25">
             <!-- <div class="guide-disable-cover" v-if="nowGuideStep == 2"></div> -->
@@ -112,23 +157,11 @@
         />
       </div>
 
-      <!-- <el-table
-        :data="page.list"
-        :key="tableKey"
-        stripe
-        @select="handleSelection"
-        @select-all="handleSelection"
-        @sort-change="sortChange"
-        :highlight-current-row="false"
-        header-row-class-name="product-table-header"
-        ref="multipleTable"
-        class="product-table"
-      > -->
       <el-table
         stripe
         :data="page.list"
         :highlight-current-row="false"
-        :key="tableKey"
+        :row-key="getRowKey"
         :border="true"
         @select="handleSelection"
         @select-all="handleSelection"
@@ -156,11 +189,11 @@
             "
             :min-width="column.minWidth || '120px'"
             :sortable="column.sortable"
-            :show-overflow-tooltip="column.fieldName !== 'pathName'"
+            :show-overflow-tooltip="column.field !== 'name'"
             :align="column.align"
           >
             <template slot-scope="scope">
-              <template v-if="column.fieldName === 'pathName'">
+              <template v-if="column.field === 'name'">
                 <sample-tooltip :row="scope.row">
                   <template slot="content" slot-scope="{ isContentTooltip }">
                     <el-tooltip
@@ -171,7 +204,7 @@
                       <a
                         href=""
                         class="view-detail-btn"
-                        @click.stop.prevent="openProductMenuTab(scope.row.id)"
+                        @click.stop.prevent="openProductTab(scope.row.id)"
                       >
                         {{ scope.row[column.field] }}
                       </a>
@@ -179,34 +212,24 @@
                   </template>
                 </sample-tooltip>
               </template>
-
-              <template v-if="column.fieldName === 'productVideo'">
-                <template v-if="scope.row.productVideo.length">
-                  <sample-tooltip :row="scope.row">
-                    <template slot="content" slot-scope="{ isContentTooltip }">
-                      <el-tooltip
-                        :content="scope.row[column.field]"
-                        placement="top"
-                        :disabled="!isContentTooltip"
-                      >
-                        <a
-                          href=""
-                          class="view-detail-btn"
-                          @click.stop.prevent="
-                            previewVideo(scope.row.productVideo[0].url)
-                          "
-                        >
-                          {{
-                            scope.row.productVideo[0] &&
-                              scope.row.productVideo[0]
-                          }}
-                        </a>
-                      </el-tooltip>
-                    </template>
-                  </sample-tooltip>
-                </template>
+              <template v-else-if="column.field === 'customer'">
+                <a
+                  href=""
+                  class="view-detail-btn"
+                  @click.stop.prevent="createCustomerTab(scope.row.customer.id)"
+                >
+                  {{ scope.row.customerName }}
+                </a>
               </template>
-
+              <template v-else-if="column.field === 'productTemplate'">
+                <a
+                  href=""
+                  class="view-detail-btn"
+                  @click.stop.prevent="createTemplateTab(scope.row.templateId)"
+                >
+                  {{ scope.row.templateName }}
+                </a>
+              </template>
               <template v-else-if="column.field === 'tags'">
                 {{ scope.row | formatTags }}
               </template>
@@ -255,6 +278,9 @@
                     scope.row.attribute[column.field].address
                 }}
               </template>
+              <template v-else-if="column.formType == 'related_task'">
+                {{ getRelatedTask(scope.row.attribute[column.field]) }}
+              </template>
               <template v-else-if="column.field === 'createUser'">
                 {{ scope.row.createUser && scope.row.createUser.displayName }}
               </template>
@@ -262,9 +288,7 @@
                 {{ scope.row.createTime | formatDate }}
               </template>
               <div
-                v-else-if="
-                  column.formType === 'textarea' && column.isSystem != 1
-                "
+                v-else-if="column.formType === 'textarea'"
                 v-html="buildTextarea(scope.row.attribute[column.field])"
                 @click="openOutsideLink"
               ></div>
@@ -282,35 +306,11 @@
               </template>
 
               <template v-else-if="!column.isSystem">
-                {{ scope.row.attribute && scope.row.attribute[column.field] }}
+                {{ scope.row.attribute[column.field] }}
               </template>
-              <template v-else-if="column.fieldName === 'productPic'">
-                <div class="flex-x">
-                  <div class="flex-x goods-img-list flex-1">
-                    <template v-for="(item, index) in scope.row[column.field]">
-                      <img
-                        :key="index"
-                        v-if="index <= 4"
-                        :src="
-                          item
-                            ? `${item}?x-oss-process=image/resize,m_fill,h_32,w_32`
-                            : defaultImg
-                        "
-                        @click.stop="previewImg(item)"
-                      />
-                    </template>
-                    <div>
-                      {{
-                        scope.row[column.field].length > 5
-                          ? `+${scope.row[column.field].length - 5}`
-                          : ''
-                      }}
-                    </div>
-                  </div>
-                </div>
-              </template>
+
               <template v-else>
-                {{ scope.row[column.field] || '' }}
+                {{ scope.row[column.field] }}
               </template>
             </template>
           </el-table-column>
@@ -350,7 +350,7 @@
       width="420px"
     >
       <h3 slot="title">
-        <span>已选中目录({{ multipleSelection.length }})</span>
+        <span>已选中产品({{ multipleSelection.length }})</span>
         <i
           v-if="multipleSelection.length"
           class="iconfont icon-qingkongshanchu product-panel-btn"
@@ -369,16 +369,16 @@
         <template v-else>
           <div class="product-selected-list">
             <div class="product-selected-row product-selected-head">
-              <span class="product-selected-sn">产品目录</span>
+              <span class="product-selected-sn">编号</span>
+              <span class="product-selected-name">产品</span>
             </div>
             <div
               class="product-selected-row"
               v-for="c in multipleSelection"
               :key="c.id"
             >
-              <span class="product-selected-sn overHideCon-1">{{
-                c.pathName
-              }}</span>
+              <span class="product-selected-sn">{{ c.serialNumber }}</span>
+              <span class="product-selected-name">{{ c.name }}</span>
               <button
                 type="button"
                 class="product-selected-delete"
@@ -391,6 +391,12 @@
         </template>
       </div>
     </base-panel>
+
+    <send-message-dialog
+      ref="messageDialog"
+      :selected-ids="selectedIds"
+      :sms-rest="smsRest"
+    ></send-message-dialog>
 
     <batch-editing-dialog
       ref="batchEditingDialog"
@@ -407,13 +413,13 @@
     <base-import
       title="导入产品"
       ref="importProductModal"
-      @success="baseImportSuccess(), search()"
-      action="/excels/catalog/import"
+      @success="search"
+      action="/excels/customer/customerProductImport"
     >
       <div slot="tip">
         <div class="base-import-warn">
           <p>
-            请先下载<a href="/catalog/import/template">导入模版 </a
+            请先下载<a href="/product/import/template">导入模版 </a
             >，填写完成后再上传导入。
           </p>
           <!--<p>导入产品前，请确保产品所属客户已存在。您可以 <a href="/customer/import/getAllCustomerId">点这里</a>导出包含所有已存在客户的模板</p>-->
@@ -427,21 +433,19 @@
       :build-params="buildExportParams"
       :validate="checkExportCount"
       method="post"
-      action="/excels/catalog/export"
+      action="/excels/customer/customerProduct"
     />
 
-    <!-- <batch-update-dialog
+    <batch-update-dialog
       ref="batchUpdateDialog"
       :selected-ids="selectedIds"
       :total-items="page.total"
       :build-download-params="buildParams"
       @success="search"
       action="/excels/customer/customerProductUpdateBatch"
-    ></batch-update-dialog> -->
-
-    <!-- start 选择列设置 -->
+    ></batch-update-dialog>
     <biz-select-column ref="advanced" @save="saveColumnStatus" />
-    <!-- <base-table-advanced-setting ref="advanced" @save="modifyColumnStatus" /> -->
+    <!-- <base-table-advanced-setting ref="advanced" @save="modifyColumnStatus"/> -->
 
     <search-panel
       :init-data="initData"
@@ -465,17 +469,18 @@ import _ from 'lodash';
 
 import Page from '@model/Page';
 import { formatDate } from '@src/util/lang';
-import BatchEditingDialog from '@src/modules/productV2/productMenuList/compoment/BatchEditingDialog.vue';
+import SendMessageDialog from '@src/modules/product/components/SendMessageDialog.vue';
+import BatchEditingDialog from '@src/modules/product/components/BatchEditingDialog.vue';
 import BatchRemindingDialog from '@src/modules/product/components/BatchRemindingDialog.vue';
 import BatchUpdateDialog from '@src/modules/product/components/BatchUpdateDialog.vue';
-import SearchPanel from '@src/modules/productV2/productMenuList/compoment/SearchPanel.vue';
+import SearchPanel from '@src/modules/product/components/SearchPanel.vue';
 
-import { getUpdateRecord } from '@src/api/ProductApi';
 import {
-  getPageList,
-  getProductMenuField,
-  delTreeList,
-} from '@src/api/ProductV2Api';
+  getProductFields,
+  getProduct,
+  deleteProductByIds,
+  getUpdateRecord,
+} from '@src/api/ProductApi';
 import TeamMixin from '@src/mixins/teamMixin';
 import { isShowCustomerRemind } from '@src/util/version.ts';
 
@@ -539,53 +544,87 @@ export default {
     productFields() {
       let fixedFields = [
         {
-          displayName: '产品目录',
-          fieldName: 'pathName',
+          displayName: '最近更新',
+          fieldName: 'updateTime',
+          formType: 'date',
           isExport: false,
-          show: true,
-          orderId: -1,
           isSystem: 1,
         },
         {
-          displayName: '产品视频',
-          fieldName: 'productVideo',
+          displayName: '产品模板',
+          fieldName: 'productTemplate',
           formType: 'text',
           isExport: false,
-          show: true,
-          orderId: -0.9,
-          isSystem: 1,
+          isSystem: 0,
         },
         {
-          displayName: '产品图片',
-          fieldName: 'productPic',
-          formType: 'text',
-          isExport: false,
-          show: true,
-          orderId: -0.8,
-          isSystem: 1,
-        },
-        {
-          displayName: '产品数量',
-          fieldName: 'productNum',
+          displayName: '服务团队',
+          fieldName: 'tags',
           isExport: true,
-          show: true,
-          isSystem: 1,
+          isSystem: 0,
+          exportAlias: 'customerTags',
+        },
+        {
+          displayName: '提醒数量',
+          fieldName: 'remindCount',
+          isExport: false,
+          isSystem: 0,
         },
         {
           displayName: '创建人',
-          fieldName: 'createUserName',
+          fieldName: 'createUser',
           isExport: true,
-          show: true,
-          isSystem: 1,
+          isSystem: 0,
         },
         {
           displayName: '创建时间',
           fieldName: 'createTime',
           isExport: true,
-          show: true,
-          isSystem: 1,
+          isSystem: 0,
         },
       ];
+
+      if (this.initData.productConfig.qrcodeEnabled) {
+        fixedFields.push({
+          displayName: '二维码编号',
+          fieldName: 'qrcodeId',
+          formType: 'text',
+          isExport: false,
+          isSystem: 1,
+          placeholder: '请输入产品二维码',
+          orderId: 10001,
+        });
+      }
+      let field = this.dynamicFields.filter(
+        (item) => item.formType == 'customer'
+      )[0];
+      if (field && field.setting.customerOption?.linkman) {
+        fixedFields.push({
+          displayName: '联系人',
+          fieldName: 'linkmanName',
+          formType: 'text',
+          isExport: true,
+          isSystem: 0,
+        });
+
+        fixedFields.push({
+          displayName: '电话',
+          fieldName: 'phone',
+          isExport: true,
+          isSystem: 0,
+        });
+      }
+
+      if (field && field.setting.customerOption?.address) {
+        fixedFields.push({
+          displayName: '地址',
+          fieldName: 'address',
+          isExport: true,
+          formType: 'text',
+          isSystem: 0,
+        });
+      }
+
       return this.dynamicFields
         .concat(fixedFields)
         .filter(
@@ -593,13 +632,70 @@ export default {
             f.formType !== 'separator'
             && f.formType !== 'info'
             && f.formType !== 'autograph'
-            && f.formType !== 'attachment'
-            && f.fieldName !== 'catalogName'
         )
         .map((f) => {
-          if (f.isSystem == 1) {
+          // 调整字段顺序
+          if (f.fieldName === 'name') {
+            f.orderId = -13;
             f.show = true;
           }
+
+          if (f.fieldName === 'customer') {
+            f.orderId = -12;
+            f.show = true;
+          }
+
+          if (f.fieldName === 'linkmanName') {
+            f.orderId = -11;
+            f.show = true;
+          }
+
+          if (f.fieldName === 'phone') {
+            f.orderId = -10;
+            f.show = true;
+          }
+
+          if (f.fieldName === 'address') {
+            f.orderId = -9;
+            f.show = true;
+          }
+
+          if (f.fieldName === 'serialNumber') {
+            f.orderId = -6;
+            f.show = true;
+          }
+
+          if (f.fieldName === 'type') {
+            f.orderId = -5;
+            f.show = true;
+          }
+
+          if (f.fieldName === 'tags') {
+            f.orderId = -8;
+          }
+
+          if (f.fieldName === 'productTemplate') {
+            f.orderId = -7;
+          }
+
+          if (f.fieldName === 'remindCount') {
+            f.orderId = -3;
+          }
+
+          if (f.fieldName === 'updateTime') {
+            f.orderId = -2;
+          }
+
+          if (f.fieldName === 'createUser') {
+            f.orderId = -1;
+            f.show = true;
+          }
+
+          if (f.fieldName === 'createTime') {
+            f.orderId = 0;
+            f.show = true;
+          }
+
           return f;
         })
         .sort((a, b) => a.orderId - b.orderId);
@@ -614,7 +710,24 @@ export default {
       return this.multipleSelection.map((p) => p.id);
     },
     exportColumns() {
-      return [...this.columns].map((field) => {
+      return [
+        {
+          label: '产品系统编号',
+          field: 'productId',
+          export: true,
+        },
+        {
+          label: '客户姓名',
+          field: 'customerName',
+          export: true,
+        },
+        {
+          label: '客户编号',
+          field: 'customerSN',
+          export: true,
+        },
+        ...this.columns,
+      ].map((field) => {
         if (
           ['customer', 'productTemplate', 'remindCount'].some(
             (key) => key === field.fieldName
@@ -624,6 +737,14 @@ export default {
           field.export = false;
         } else {
           field.export = true;
+        }
+
+        if ('qrcodeId' == field.fieldName) {
+          field.export = Boolean(this.initData.productConfig.qrcodeEnabled);
+        }
+
+        if ('qrcodeId' == field.fieldName) {
+          field.export = Boolean(this.initData.productConfig.qrcodeEnabled);
         }
 
         return field;
@@ -662,8 +783,8 @@ export default {
 
     // 获取产品动态字段
     try {
-      let res = await getProductMenuField({ isFromSetting: false });
-      this.dynamicFields = res.result || [];
+      let res = await getProductFields({ isFromSetting: false });
+      this.dynamicFields = res.data || [];
       this.buildColumns();
     } catch (error) {
       console.error('product-list fetch product fields error', error);
@@ -678,8 +799,16 @@ export default {
     // [tab_spec]标准化刷新方式
     window.__exports__refresh = this.search;
 
+    this.$eventBus.$on(
+      'product_list.update_product_list_remind_count',
+      this.updateProductRemindCount
+    );
   },
   beforeDestroy() {
+    this.$eventBus.$off(
+      'product_list.update_product_list_remind_count',
+      this.updateProductRemindCount
+    );
   },
   methods: {
     getAddress(field) {
@@ -726,106 +855,15 @@ export default {
       const { province, city, dist, address } = ad;
       return [province, city, dist, address].filter((d) => !!d).join('-');
     },
-    // 选择列 s
 
-    /**
-     * @description 表头更改
-     */
-    headerDragend(newWidth, oldWidth, column, event) {
-      let data = this.columns
-        .map((item) => {
-          if (item.displayName === column.label) {
-            item.width = column.width;
-          }
-          return item;
-        })
-        .map((item) => {
-          return {
-            field: item.field,
-            show: item.show,
-            width: item.width,
-          };
-        });
-      this.modifyColumnStatus({ type: 'column', data });
-    },
-
-    /**
-     * @description 修改选择列设置
-     * @param {Object} event 事件对象
-     */
-    modifyColumnStatus(event) {
-      let columns = event.data || [],
-        colMap = columns.reduce(
-          (acc, col) => (acc[col.field] = col) && acc,
-          {}
-        );
-      this.columns.forEach((col) => {
-        let newCol = colMap[col.field];
-        if (null != newCol) {
-          this.$set(col, 'show', newCol.show);
-          this.$set(col, 'width', newCol.width);
-        }
-      });
-
-      this.saveColumnStatusToStorage();
-    },
-    showAdvancedSetting() {
-      window.TDAPP.onEvent('pc：产品目录管理-选择列事件');
-      this.$refs.advanced.open(this.columns);
-    },
-    /**
-     * @description 修改选择列设置
-     * @param {Object} event 事件对象
-     */
-    saveColumnStatus(event) {
-      let columns = event.data || [];
-
-      this.columns = [];
-
-      this.$nextTick(() => {
-        this.$set(this, 'columns', columns.slice());
-        this.saveColumnStatusToStorage();
-      });
-    },
-
-    saveColumnStatusToStorage() {
-      const localStorageData = this.getLocalStorageData();
-      let columnsStatus = null;
-
-      // 判断是否存储选择列
-      const columnsList = this.columns.map((c) => ({
-        field: c.field,
-        show: c.show,
-        width: c.width,
-      }));
-
-      if (localStorageData.columnStatus) {
-        localStorageData.columnStatus[
-          `${this.selectColumnState}`
-        ] = columnsList;
-        columnsStatus = localStorageData.columnStatus;
-      } else {
-        columnsStatus = {
-          [`${this.selectColumnState}`]: columnsList,
-        };
-      }
-
-      this.saveDataToStorage('columnStatus', columnsStatus);
-    },
-
-    // 选择列 e
-
-    openProductMenuTab(id) {
-      let fromId = '';
-      try {
-        fromId = window.frameElement.getAttribute('id');
-      } catch (error) {}
+    openProductTab(productId) {
+      let fromId = window.frameElement.getAttribute('id');
 
       this.$platform.openTab({
-        id: `productV2_catalog_view_${id}`,
-        title: '产品目录详情',
+        id: `product_view_${productId}`,
+        title: '产品详情',
         close: true,
-        url: `/productV2/catalog/view?id=${id}`,
+        url: `/productV2/view/${productId}?noHistory=1`,
         fromId,
       });
     },
@@ -833,15 +871,10 @@ export default {
       const params = this.buildParams();
       this.loading = true;
 
-      return getPageList(params)
+      return getProduct(params)
         .then((res) => {
           this.loading = false;
-          res.result.list = res.result.list.map((item) => {
-            item.productDesc = item.productDesc || '';
-            item['catalogName'] = '';
-            return item;
-          });
-          this.page = Page.as(Object.freeze(res.result));
+          this.page = Page.as(Object.freeze(res));
           this.matchSelected();
         })
         .catch((e) => console.error('fetch product catch an error', e));
@@ -891,20 +924,20 @@ export default {
       this.search();
     },
     openDialog(action) {
-      // if (action === 'sendMessage') {
-      //   window.TDAPP.onEvent('pc：产品管理-发送短信事件');
-      //   this.$refs.messageDialog.openSendMessageDialog();
-      // }
+      if (action === 'sendMessage') {
+        window.TDAPP.onEvent('pc：产品管理-发送短信事件');
+        this.$refs.messageDialog.openSendMessageDialog();
+      }
 
-      // if (action === 'edit') {
-      //   window.TDAPP.onEvent('批量编辑	pc：产品目录管理-批量编辑事件');
-      //   this.$refs.batchEditingDialog.open();
-      // }
+      if (action === 'edit') {
+        window.TDAPP.onEvent('批量编辑	pc：产品管理-批量编辑事件');
+        this.$refs.batchEditingDialog.open();
+      }
 
-      // if (action === 'remind') {
-      //   window.TDAPP.onEvent('批量提醒	pc：产品目录管理-批量提醒事件');
-      //   this.$refs.batchRemindingDialog.openBatchRemindingDialog();
-      // }
+      if (action === 'remind') {
+        window.TDAPP.onEvent('批量提醒	pc：产品管理-批量提醒事件');
+        this.$refs.batchRemindingDialog.openBatchRemindingDialog();
+      }
 
       if (action === 'importProduct') {
         this.$refs.importProductModal.open();
@@ -919,21 +952,20 @@ export default {
     },
     // operation
     async deleteProducts() {
-      window.TDAPP.onEvent('pc：产品目录管理-删除事件');
+      window.TDAPP.onEvent('pc：产品管理-删除事件');
       if (!this.multipleSelection.length) {
-        return this.$platform.alert('请选择需要删除的产品目录');
+        return this.$platform.alert('请选择需要删除的产品');
       }
 
       try {
-        if (!(await this.$platform.confirm('确定要删除选择的产品目录？')))
-          return;
+        if (!(await this.$platform.confirm('确定要删除选择的产品？'))) return;
 
-        const ids = this.multipleSelection.map((p) => p.id);
+        const ids = this.multipleSelection.map((p) => p.id).join(',');
         this.loading = true;
-        const res = await delTreeList({ ids });
+        const res = await deleteProductByIds(ids);
         this.loading = false;
 
-        if (!res || res.code != 0)
+        if (!res || res.status)
           return this.$platform.notification({
             title: '失败',
             type: 'error',
@@ -942,9 +974,6 @@ export default {
         this.$platform.notification({
           title: '删除成功',
           type: 'success',
-        });
-        window.parent.flashSomePage({
-          type: 'productV2_catalog_edit',
         });
         this.multipleSelection = [];
         this.search();
@@ -1085,28 +1114,96 @@ export default {
         ? this.toggleSelection()
         : this.toggleSelection([c]);
     },
-    // modifyColumnStatus(event) {
-    //   let columns = event.data || [];
-    //   let colMap = columns.reduce(
-    //     (acc, col) => (acc[col.field] = col) && acc,
-    //     {}
-    //   );
 
-    //   this.columns.forEach((col) => {
-    //     let newCol = colMap[col.field];
-    //     if (null != newCol) {
-    //       this.$set(col, 'show', newCol.show);
-    //       this.$set(col, 'width', newCol.width);
-    //     }
-    //   });
+    // 选择列 s
 
-    //   const columnsStatus = this.columns.map((c) => ({
-    //     field: c.field,
-    //     show: c.show,
-    //     width: c.width,
-    //   }));
-    //   this.saveDataToStorage('columnStatus', columnsStatus);
-    // },
+    /**
+     * @description 表头更改
+     */
+    headerDragend(newWidth, oldWidth, column, event) {
+      let data = this.columns
+        .map((item) => {
+          if (item.displayName === column.label) {
+            item.width = column.width;
+          }
+          return item;
+        })
+        .map((item) => {
+          return {
+            field: item.field,
+            show: item.show,
+            width: item.width,
+          };
+        });
+      this.modifyColumnStatus({ type: 'column', data });
+    },
+
+    /**
+     * @description 修改选择列设置
+     * @param {Object} event 事件对象
+     */
+    modifyColumnStatus(event) {
+      let columns = event.data || [],
+        colMap = columns.reduce(
+          (acc, col) => (acc[col.field] = col) && acc,
+          {}
+        );
+      this.columns.forEach((col) => {
+        let newCol = colMap[col.field];
+        if (null != newCol) {
+          this.$set(col, 'show', newCol.show);
+          this.$set(col, 'width', newCol.width);
+        }
+      });
+
+      this.saveColumnStatusToStorage();
+    },
+    showAdvancedSetting() {
+      window.TDAPP.onEvent('pc：产品管理-选择列事件');
+      this.$refs.advanced.open(this.columns);
+    },
+    /**
+     * @description 修改选择列设置
+     * @param {Object} event 事件对象
+     */
+    saveColumnStatus(event) {
+      let columns = event.data || [];
+
+      this.columns = [];
+
+      this.$nextTick(() => {
+        this.$set(this, 'columns', columns.slice());
+        this.saveColumnStatusToStorage();
+      });
+    },
+
+    saveColumnStatusToStorage() {
+      const localStorageData = this.getLocalStorageData();
+      let columnsStatus = null;
+
+      // 判断是否存储选择列
+      const columnsList = this.columns.map((c) => ({
+        field: c.field,
+        show: c.show,
+        width: c.width,
+      }));
+
+      if (localStorageData.columnStatus) {
+        localStorageData.columnStatus[
+          `${this.selectColumnState}`
+        ] = columnsList;
+        columnsStatus = localStorageData.columnStatus;
+      } else {
+        columnsStatus = {
+          [`${this.selectColumnState}`]: columnsList,
+        };
+      }
+
+      this.saveDataToStorage('columnStatus', columnsStatus);
+    },
+
+    // 选择列 e
+
     buildColumns() {
       const localStorageData = this.getLocalStorageData();
 
@@ -1207,7 +1304,7 @@ export default {
 
     exportProduct(exportAll) {
       let ids = [];
-      let fileName = `${formatDate(new Date(), 'YYYY-MM-DD')}产品目录数据.xlsx`;
+      let fileName = `${formatDate(new Date(), 'YYYY-MM-DD')}产品数据.xlsx`;
       if (!exportAll) {
         if (!this.multipleSelection.length)
           return this.$platform.alert('请选择要导出的数据');
@@ -1247,27 +1344,42 @@ export default {
       });
     },
 
-    goToCreate() {
-      window.TDAPP.onEvent('pc：产品目录管理-新建事件');
+    createTemplateTab(templateId) {
       let fromId = window.frameElement.getAttribute('id');
 
       this.$platform.openTab({
-        id: 'productV2_catalog_edit',
-        title: '新建产品目录',
-        url: '/productV2/catalog/edit',
+        id: `product_template_view_${templateId}`,
+        title: '产品模板',
+        close: true,
+        url: `/product/detail/${templateId}?noHistory=1`,
+        fromId,
+      });
+    },
+    goToCreate() {
+      window.TDAPP.onEvent('pc：产品管理-新建事件');
+      // window.location = '/customer/product/create';
+      let fromId = window.frameElement.getAttribute('id');
+
+      this.$platform.openTab({
+        id: 'customer_product_create',
+        title: '新建产品',
+        url: '/customer/product/create',
         reload: true,
         close: true,
         fromId,
       });
     },
     getLocalStorageData() {
-      const dataStr = localStorage.getItem('productV2_product_menu_list') || '[]';
+      const dataStr = localStorage.getItem('product_list_localStorage_19_4_24') || '{}';
       return JSON.parse(dataStr);
     },
     saveDataToStorage(key, value) {
       const data = this.getLocalStorageData();
       data[key] = value;
-      localStorage.setItem('productV2_product_menu_list', JSON.stringify(data));
+      localStorage.setItem(
+        'product_list_localStorage_19_4_24',
+        JSON.stringify(data)
+      );
     },
     revertStorage() {
       const { pageSize, column_number } = this.getLocalStorageData();
@@ -1303,7 +1415,7 @@ export default {
       );
     },
     panelSearchAdvancedToggle() {
-      window.TDAPP.onEvent('pc：产品目录管理-高级搜索事件');
+      window.TDAPP.onEvent('pc：产品管理-高级搜索事件');
       this.$refs.searchPanel.open();
       this.$nextTick(() => {
         let forms = document.getElementsByClassName('advanced-search-form');
@@ -1316,31 +1428,21 @@ export default {
     // TalkingData事件埋点
     trackEventHandler(type) {
       if (type === 'search') {
-        window.TDAPP.onEvent('pc：产品目录管理-搜索事件');
+        window.TDAPP.onEvent('pc：产品管理-搜索事件');
         return;
       }
       if (type === 'moreAction') {
-        window.TDAPP.onEvent('pc：产品目录管理-更多操作事件');
+        window.TDAPP.onEvent('pc：产品管理-更多操作事件');
         return;
       }
     },
     getRowKey(row) {
       return row.id || '';
     },
-    previewImg(url) {
-      this.$previewImg(url);
-    },
-    baseImportSuccess() {
-      window.parent.flashSomePage({
-        type: 'productV2_catalog_edit',
-      });
-    },
-    previewVideo(e) {
-      this.$previewVideo(e);
-    },
   },
   components: {
     SearchPanel,
+    [SendMessageDialog.name]: SendMessageDialog,
     [BatchEditingDialog.name]: BatchEditingDialog,
     [BatchRemindingDialog.name]: BatchRemindingDialog,
     [BatchUpdateDialog.name]: BatchUpdateDialog,
@@ -1663,7 +1765,7 @@ body {
     }
   }
 }
-.el-table .cell.el-tooltip{
+.el-table .cell.el-tooltip {
   line-height: 31px;
 }
 </style>

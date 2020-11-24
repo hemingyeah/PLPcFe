@@ -33,8 +33,8 @@
   </div>
 </template>
 <script>
-import ProductSet from '@src/modules/setting/productMenu/productSet';
-import ProductMenuSet from '@src/modules/setting/productV2ductMenuSet';
+import ProductSet from '@src/modules/setting/productV2/productSet';
+import ProductMenuSet from '@src/modules/setting/productV2/productMenuSet';
 export default {
   name: 'product-menu-setting',
   props: {

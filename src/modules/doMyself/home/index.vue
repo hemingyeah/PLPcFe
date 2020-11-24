@@ -4,20 +4,20 @@
       <div class="left-menu">
         <div class="menu-title">{{ '自助门户设置' }}</div>
         <template v-for="(item, index) in menuList">
-           <nav
+          <nav
             :class="`menu-list ${nowMenu == index ? 'menu-checked' : ''}`"
             :key="index"
-          @click="changePage(index)"
+            @click="changePage(index)"
           >
-          <!-- <div class="left-border" v-if="nowMenu==index"></div> -->
-          <div class="icon-box">
+            <!-- <div class="left-border" v-if="nowMenu==index"></div> -->
+            <div class="icon-box">
               <i
                 :class="
                   `iconfont ${item.icon} ${
                     nowMenu == index ? 'font-16 font-w-600' : 'font-14'
-                }`
-            "
-            ></i>
+                  }`
+                "
+              ></i>
             </div>
             <span>{{ item.name }}</span>
           </nav>
@@ -132,9 +132,6 @@ export default {
 }
 .font-16 {
   font-size: 16px;
-}
-.font-w-600 {
-  font-weight: 500;
 }
 .al-c {
   align-items: center !important;
