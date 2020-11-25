@@ -168,7 +168,7 @@ export default {
     search() {
       const {selectState, searchParts} = this
       this.params.pageNum = 1
-      this.params.isShow = selectState ? selectState - 1 : ''
+      this.params.isShow = selectState !== "全部" ? selectState - 1 : ''
       this.params.keyword = searchParts
       this.serviceList()
     },
@@ -179,7 +179,7 @@ export default {
         pageSize: 10,
       }
       this.searchParts =  ""
-      this.selectState = ""
+      this.selectState = "全部"
       this.serviceList()
     },
     /*分页条数切换 */
