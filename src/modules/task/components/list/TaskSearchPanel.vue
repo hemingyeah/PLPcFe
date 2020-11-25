@@ -456,6 +456,17 @@ export default {
       }
       this.buildTaskInquireParams(params);
       // 返回接口数据
+      if (params.conditions) {
+        params.conditions = [...new Set(
+          params.conditions.map((item) => {
+            item = JSON.stringify(item);
+            return item;
+          })
+        )].map((item) => {
+          item = JSON.parse(item);
+          return item;
+        });
+      }
       return { params: this.clearParams(params), repeatBool };
     },
     buildTaskInquireParams(params) {
@@ -614,7 +625,7 @@ export default {
           params.systemConditions.push(condition);
           continue;
         }
-        
+
         // if (tv.fieldName === "source") {
         //   let condition = {
         //     property: "source",
