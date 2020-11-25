@@ -30,12 +30,12 @@
             @change="change($event, 'loginValidate')"
           >
             <div class="mar-b-12">
-              <el-radio class="mar-r-16" :label="false"
+              <el-radio class="mar-r-16" :label="true"
               >仅允许客户列表下手机号码访问</el-radio
               >
             </div>
             <div>
-              <el-radio :label="true">所有用户均可访问</el-radio>
+              <el-radio :label="false">所有用户均可访问</el-radio>
             </div>
           </el-radio-group>
         </div>
