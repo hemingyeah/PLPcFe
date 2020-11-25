@@ -5,8 +5,8 @@
       <div class="search-parts">
         <el-input v-model="searchParts" placeholder="请输入备件信息" />
       </div>
-      <div class="select-state">
-        <el-select v-model="selectState" placeholder="发布状态">
+      <div class="select-state"> 
+        <el-select v-model="selectState" placeholder="发布状态" clearable @clear="search">
           <el-option
             v-for="item in selectStateList"
             :key="item.value"
@@ -17,7 +17,7 @@
         </el-select>
       </div>
       <div class="select-stock">
-        <el-select v-model="selectStock" placeholder="有无库存">
+        <el-select v-model="selectStock" placeholder="有无库存" clearable @clear="search">
           <el-option
             v-for="item in selectStockList"
             :key="item.value"
@@ -198,10 +198,6 @@ import * as SettingApi from "@src/api/SettingApi";
 // 发布状态
 const STATELIST = [
   {
-    value: 0,
-    label: "全部",
-  },
-  {
     value: 1,
     label: "未发布",
   },
@@ -212,10 +208,6 @@ const STATELIST = [
 ];
 // 库存
 const STOCK = [
-  {
-    value: 0,
-    label: "全部",
-  },
   {
     value: 2,
     label: "有库存",
@@ -281,8 +273,8 @@ export default {
       }, // 列表请求参数
       pagination: {}, //分页
       searchParts: "", // 搜索备件信息
-      selectState: "全部", //状态
-      selectStock: "全部", //库存
+      selectState: "", //状态
+      selectStock: '', //库存
       outstockBatchDialog: false, //出库
       instockBatchDialog: false, //入库
       sparepartConfig: {}, // 出库数据
@@ -557,9 +549,9 @@ export default {
     search() {
       const { selectState, searchParts, selectStock } = this;
       this.params.pageNum = 1;
-      this.params.isShow = selectState !== '全部' ? selectState - 1 : "";
+      this.params.isShow = selectState ? selectState - 1 : "";
       this.params.keyWord = searchParts;
-      this.params.haveStock = selectStock !== '全部' ? selectStock - 1 : "";
+      this.params.haveStock = selectStock ? selectStock - 1 : "";
       this.getShopSparepartRepertory();
     },
     /** 初始化 */
@@ -569,8 +561,8 @@ export default {
         pageSize: 10,
       };
       this.searchParts = "";
-      this.selectState = '全部';
-      this.selectStock = "全部";
+      this.selectState = '';
+      this.selectStock = "";
       this.getShopSparepartRepertory();
     },
     /*分页条数切换 */
