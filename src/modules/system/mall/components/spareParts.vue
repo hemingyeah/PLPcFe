@@ -557,9 +557,9 @@ export default {
     search() {
       const { selectState, searchParts, selectStock } = this;
       this.params.pageNum = 1;
-      this.params.isShow = selectState ? selectState - 1 : "";
+      this.params.isShow = selectState !== '全部' ? selectState - 1 : "";
       this.params.keyWord = searchParts;
-      this.params.haveStock = selectStock ? selectStock - 1 : "";
+      this.params.haveStock = selectStock !== '全部' ? selectStock - 1 : "";
       this.getShopSparepartRepertory();
     },
     /** 初始化 */
