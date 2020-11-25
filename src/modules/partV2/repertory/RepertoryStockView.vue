@@ -1113,7 +1113,7 @@ export default {
       try {
         let result = await this.$http.post('/partV2/approve/transfer/initiate', allocation);
         if(result.status == 0){
-          this.$platform.toast(`${result.data ? '调拨成功，请等待备件库管理员处理' : '调拨成功'}`).then(() => location.reload());
+          this.$platform.toast(`${result.data ? '调拨成功，请等待备件库管理员处理' : '调拨成功'}`).then(() => this.initialize());
           this.allocationDialog = false;
         }else{
           this.$platform.alert(result.message);
@@ -1139,7 +1139,7 @@ export default {
       try {
         let result = await this.$http.post('/partV2/approve/apply', apply);
         if(result.status == 0){
-          this.$platform.toast('申领成功，请等待备件库管理员处理').then(() => location.reload());
+          this.$platform.toast('申领成功，请等待备件库管理员处理').then(() => this.initialize());
           this.applyDialog = false;
         }else{
           this.$platform.alert(result.message);
@@ -1160,7 +1160,7 @@ export default {
       try {
         let result = await this.$http.post('/partV2/repertory/stockInOut', outstock);
         if(result.status == 0){
-          this.$platform.toast('出库成功').then(() => location.reload());
+          this.$platform.toast('出库成功').then(() => this.initialize());
           this.outstockDialog = false;
         }else{
           this.$platform.alert(result.message);
@@ -1225,11 +1225,11 @@ export default {
 
         try {
           if(!await this.$platform.confirm(`确定从仓库列表中移除备件${ remove }吗?`)) return;
-
           this.pending = true;
           let result = await this.$http.post('/partV2/repertory/batchRemove', ids)
           if(result.status == 0){
-            this.$platform.toast('移除成功').then(() => location.reload());
+            this.$platform.toast('移除成功').then(() => this.initialize());
+            this.toggleSelection();
           }else{
             this.$platform.alert(result.message);
           }
@@ -1256,12 +1256,12 @@ export default {
       try {
         let result = await this.$http.post('/partV2/repertory/stockInOutBach', outstock);
         if(result.status == 0){
-          this.$platform.toast('批量出库成功').then(() => location.reload());
+          this.$platform.toast('批量出库成功').then(() => this.initialize());
           this.outstockBatchDialog = false;
         } else{
           this.$platform.alert(result.message);
-          this.pending = false;
         }
+        this.pending = false;
       } catch (error) {
         this.pending = false;
         console.log(error)
@@ -1278,7 +1278,7 @@ export default {
       try {
         let result = await this.$http.post('/partV2/repertory/stockInOut', instock);
         if(result.status == 0){
-          this.$platform.toast('入库成功').then(() => location.reload());
+          this.$platform.toast('入库成功').then(() => this.initialize());
           this.instockDialog = false;
         }else{
           this.$platform.alert(result.message);
@@ -1342,14 +1342,13 @@ export default {
 
         if(result.status == 0){
           this.$platform.toast('批量调拨成功').then(() => {
-            location.reload();
+            this.initialize()
           });
           this.transferBatchDialog = false;
         } else{
           this.$platform.alert(result.message);
-          this.pending = false;
         }
-
+        this.pending = false;
       } catch (error) {
         this.pending = false;
         console.log(error)
@@ -1370,7 +1369,6 @@ export default {
       if(!isSucc) {
         return this.$platform.alert(message);
       }
-
       let data = this.selected.filter(item => this.allowInOutStore(item));
       this.instockBatchDialog = true;
       this.$nextTick(() => {
@@ -1392,13 +1390,12 @@ export default {
         let result = await this.$http.post('/partV2/repertory/stockInOutBach', instock);
 
         if (result.status == 0){
-          this.$platform.toast('批量入库成功').then(() => location.reload());
+          this.$platform.toast('批量入库成功').then(() => this.initialize());
           this.instockBatchDialog = false;
         } else{
           this.$platform.alert(result.message);
-          this.pending = false;
         }
-
+        this.pending = false;
       } catch (error) {
         this.pending = false;
         console.log(error)
@@ -1435,7 +1432,7 @@ export default {
   
         if((result && result.status === 0)){
 
-          this.$platform.toast('分配成功').then(() => location.reload());
+          this.$platform.toast('分配成功').then(() => this.initialize());
           this.isPartSparesDialog = false;
 
         }else{
@@ -1453,7 +1450,7 @@ export default {
         this.$platform.alert('对不起，您没有该操作权限');
         return
       }
-
+      return;
       let { status, message } = this.judgeSelectManager();
       let isSucc = (status == 0);
 
@@ -1493,18 +1490,18 @@ export default {
         if((result && result.status === 0)){
           
           this.$platform.toast('批量分配成功').then(() => {
-            location.reload();
+            this.initialize()
             this.isPartSparesDialog = false;
           });
 
         } else{
           this.$platform.alert(result.message);
-          this.pending = false;
         }
+        this.pending = false;
       } catch (e) {
         console.warn(e);
         this.pending = false;
-      }
+      } 
 
     }, 1000),
     buildParams(pageNum, pageSize){
