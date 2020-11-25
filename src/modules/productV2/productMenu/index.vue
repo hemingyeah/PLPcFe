@@ -199,7 +199,7 @@ export default {
                 type: 'success',
               });
               window.parent.flashSomePage({
-                type: 'productV2_catalog_list',
+                type: 'M_PRODUCT_CATALOG',
               });
               this.changeVisibleProp(false);
             } else {
@@ -409,7 +409,7 @@ export default {
             this.changeVisibleProp(false);
             this.$refs.workTreeData.reflashTable(type);
             window.parent.flashSomePage({
-              type: 'productV2_catalog_list',
+              type: 'M_PRODUCT_CATALOG',
             });
           } else {
             this.$notify.error({

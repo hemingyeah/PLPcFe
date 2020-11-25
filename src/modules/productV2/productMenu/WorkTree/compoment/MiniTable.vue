@@ -302,7 +302,7 @@ export default {
             if (res.code == 0) {
               this.reflash();
               window.parent.flashSomePage({
-                type: 'productV2_catalog_list',
+                type: 'M_PRODUCT_CATALOG',
               });
             } else {
               this.$notify.close();

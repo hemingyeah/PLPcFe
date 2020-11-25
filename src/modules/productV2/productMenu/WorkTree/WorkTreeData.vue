@@ -319,6 +319,7 @@ export default {
     UploadImage(param) {
       Uploader.upload(param.file, '/files/upload')
         .then((result) => {
+          console.log(result, 'result')
           if (result.status != 0) {
             this.$message({
               message: `${result.message}`,
@@ -336,11 +337,12 @@ export default {
             url: file.ossUrl || file.url || `/files/get?fileId=${file.id}`,
             fileSize: file.fileSizeStr,
           };
-          param.file['ossUrl'] = item.url;
-          this.$set(this, 'productMenuValue.product_pic', [
-            ...this.productMenuValue.product_pic,
+          // param.file['ossUrl'] = item.url;
+          this.$set(this.productMenuValue, 'productPic', [
+            ...this.productMenuValue.productPic,
             item,
           ]);
+          console.log(this.productMenuValue, 'productMenuValue.productPic')
         })
         .catch((err) => {
           console.warn(err);
@@ -406,7 +408,7 @@ export default {
               type: 'success',
             });
             window.parent.flashSomePage({
-              type: 'productV2_catalog_list',
+              type: 'M_PRODUCT_CATALOG',
             });
           }
         })
@@ -481,7 +483,7 @@ export default {
                   type: 'success',
                 });
                 window.parent.flashSomePage({
-                  type: 'productV2_catalog_list',
+                  type: 'M_PRODUCT_CATALOG',
                 });
               } else {
                 this.$notify.error({

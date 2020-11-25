@@ -117,25 +117,6 @@ export default {
           orderId: -9,
         },
         {
-          displayName: '产品简介',
-          fieldName: 'productDesc',
-          formType: 'text',
-          isExport: false,
-          isNull: 1,
-          isSystem: 1,
-          orderId: -9,
-        },
-        {
-          displayName: '产品数量',
-          fieldName: 'productNum',
-          formType: 'text',
-          isExport: false,
-          isNull: 1,
-          isSystem: 1,
-          orderId: -9,
-        },
-
-        {
           displayName: '创建人',
           fieldName: 'createUserId',
           formType: 'user',

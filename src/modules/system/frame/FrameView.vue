@@ -1008,7 +1008,7 @@ export default {
     },
     goProductMenuList() {
       platform.openTab({
-        id: 'productV2_catalog_list',
+        id: 'M_PRODUCT_CATALOG',
         title: '产品目录列表',
         url: '/productV2/catalog/list',
         reload: true,

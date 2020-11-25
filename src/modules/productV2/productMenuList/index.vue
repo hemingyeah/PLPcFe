@@ -156,7 +156,7 @@
             "
             :min-width="column.minWidth || '120px'"
             :sortable="column.sortable"
-            :show-overflow-tooltip="column.fieldName !== 'pathName'"
+            :show-overflow-tooltip="column.fieldName !== 'pathName' && column.fieldName !== 'productVideo' && column.fieldName !== 'productPic'"
             :align="column.align"
           >
             <template slot-scope="scope">
@@ -185,7 +185,7 @@
                   <sample-tooltip :row="scope.row">
                     <template slot="content" slot-scope="{ isContentTooltip }">
                       <el-tooltip
-                        :content="scope.row[column.field]"
+                        :content="scope.row.productVideo[0].filename"
                         placement="top"
                         :disabled="!isContentTooltip"
                       >
@@ -198,7 +198,7 @@
                         >
                           {{
                             scope.row.productVideo[0] &&
-                              scope.row.productVideo[0].name
+                              scope.row.productVideo[0].filename
                           }}
                         </a>
                       </el-tooltip>
@@ -287,16 +287,17 @@
               <template v-else-if="column.fieldName === 'productPic'">
                 <div class="flex-x">
                   <div class="flex-x goods-img-list flex-1">
-                    <template v-for="(item, index) in scope.row[column.field]">
+                    <template v-for="(item, index) in scope.row.productPic">
                       <img
                         :key="index"
                         v-if="index <= 4"
+                        class="curs-point"
                         :src="
-                          item
-                            ? `${item}?x-oss-process=image/resize,m_fill,h_32,w_32`
+                          item.url
+                            ? `${item.url}?x-oss-process=image/resize,m_fill,h_32,w_32`
                             : defaultImg
                         "
-                        @click.stop="previewImg(item)"
+                        @click.stop="previewImg(item.url)"
                       />
                     </template>
                     <div>
@@ -549,7 +550,7 @@ export default {
         {
           displayName: '产品视频',
           fieldName: 'productVideo',
-          formType: 'text',
+          formType: 'attchment',
           isExport: false,
           show: true,
           orderId: -0.9,
@@ -558,7 +559,7 @@ export default {
         {
           displayName: '产品图片',
           fieldName: 'productPic',
-          formType: 'text',
+          formType: 'attchment',
           isExport: false,
           show: true,
           orderId: -0.8,
@@ -567,6 +568,7 @@ export default {
         {
           displayName: '产品数量',
           fieldName: 'productNum',
+          formType: 'text',
           isExport: true,
           show: true,
           isSystem: 1,
