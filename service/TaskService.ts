@@ -152,7 +152,7 @@ function getProductFieldValue2string(data: any, fieldName: string, formType: str
 /** 
  * @description 检查审批
 */
-export function checkApprove(taskType: TaskType, action: string, task: Task, customer: Customer): TaskApprove {
+export function checkApprove(taskType: TaskType, action: string, task: Task | null, customer: Customer | null): TaskApprove {
 	let needApprove: boolean = false
 	let flowSetting: any = taskType.flowSetting
 	let result: TaskApprove = { needApprove }
@@ -166,7 +166,7 @@ export function checkApprove(taskType: TaskType, action: string, task: Task, cus
   
 	result.needApprove = checkIsNeedApprove(currentFlowSetting, task, customer, result)
 	result.approversName = getApproversName(currentFlowSetting, task, result)
-	result.taskId = task.id
+	result.taskId = task?.id || ''
   
 	return result
 }
@@ -174,7 +174,7 @@ export function checkApprove(taskType: TaskType, action: string, task: Task, cus
 /** 
  * @description 是否需要审批
 */
-function checkIsNeedApprove(flowSetting: FlowSetting, task: Task, customer: Customer, result: any = {}): boolean {
+function checkIsNeedApprove(flowSetting: FlowSetting, task: Task | null, customer: Customer | null, result: any = {}): boolean {
 	let { leader = '', approvers } = flowSetting
 	// 审批人列表是否是空的
 	let isEmptyApprovers = isArray(approvers) ? approvers.length <= 0 : false
@@ -189,6 +189,7 @@ function checkIsNeedApprove(flowSetting: FlowSetting, task: Task, customer: Cust
 		(!isEmptyApprovers && (leader == LeaderEnum.Users || isFormUser))
 		|| leader === LeaderEnum.Leader
 		|| leader ===  LeaderEnum.CreateUser
+		|| leader ===  LeaderEnum.AllotUser
 		|| isPromoter
 		|| isCustomerManager
 		|| (!leader && !isEmptyApprovers)
@@ -200,13 +201,13 @@ function checkIsNeedApprove(flowSetting: FlowSetting, task: Task, customer: Cust
 	}
 	
 	// 客户负责人
-	if (isCustomerManager) {
+	if (isCustomerManager && customer) {
 		let { customerManager } = customer
 		return Boolean(customerManager)
 	}
   
 	// 工单表单 人员字段
-	if (isFormUser) {
+	if (isFormUser && task) {
 		let { attribute = {} } = task
 		let formUserValue = attribute[leader]
 		return Boolean(formUserValue)
@@ -223,7 +224,7 @@ function checkIsNeedApprove(flowSetting: FlowSetting, task: Task, customer: Cust
 /** 
  * @description 获取审批人名称
 */
-function getApproversName(flowSetting: FlowSetting, task: Task, result: any = {}): string {
+function getApproversName(flowSetting: FlowSetting, task: Task | null, result: any = {}): string {
 	let { leader = '', approvers = [], taskTemplateId } = flowSetting
 	let approversName = ''
 	
@@ -266,7 +267,7 @@ function getApproversName(flowSetting: FlowSetting, task: Task, result: any = {}
 	}
   
 	// 表单字段 人员字段
-	if (leader.indexOf(LeaderEnum.FormUser) > -1 && taskTemplateId) {
+	if (leader.indexOf(LeaderEnum.FormUser) > -1 && taskTemplateId && task) {
 		let { attribute = {} } = task
 		let formUserValue = attribute[leader]
 		approversName = formUserValue

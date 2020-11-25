@@ -5,6 +5,8 @@ import TaskEditForm from '@src/modules/task/edit/components/TaskEditForm/TaskEdi
 import PlanTaskEditForm from '@src/modules/task/edit/components/PlanTaskEditForm/PlanTaskEditForm.vue'
 import TaskAllotModal from '@src/modules/task/components/TaskAllotModal/TaskAllotModal.tsx'
 import TaskProcessSteps from '@src/modules/task/components/TaskProcessSteps/TaskProcessSteps.tsx'
+/* enum */
+import TaskStateEnum from '@model/enum/TaskStateEnum.ts'
 /* utils */
 import {parse} from '@src/util/querystring';
 import * as FormUtil from '@src/component/form/util'
@@ -31,6 +33,7 @@ export default {
   name: 'task-edit-view',
   inject: ['initData'],
   data() {
+    data.template = taskTemplate
     return data
   },
   computed,
@@ -160,7 +163,7 @@ export default {
             let id = `task_view${taskId}`
             this.closeAndOpenTab(url, id)
           }
-
+          
           this.togglePending()
           
         })
@@ -286,6 +289,7 @@ export default {
     // 打开新建工单弹窗
     openAllotModel(task = {}) {
       this.allotTask = task
+      this.allotTask.state = TaskStateEnum.CREATED.value
       this.$nextTick(() => {
         this.$refs.TaskAllotModal && this.$refs.TaskAllotModal.outsideShow()
       })
@@ -596,6 +600,7 @@ export default {
     */
     updateTaskTemplateId(template = {}) {
       taskTemplate = template || {};
+      this.template = template
     },
   },
   components: {

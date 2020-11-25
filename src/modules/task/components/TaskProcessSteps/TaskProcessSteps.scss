@@ -2,4 +2,43 @@
   .el-step__description {
     position: relative;
   }
+  .el-step {
+    i {
+      font-size: $font-size-base;
+    }
+  }
+  .el-step__icon {
+    height: 32px !important;
+    width: 32px !important;
+  }
+  .el-step.is-horizontal .el-step__line {
+    top: 16px !important;
+  }
+  .el-steps {
+    .el-step:nth-last-of-type(1) {
+      .task-step-flow-approve,
+      .task-step-flow-overtime {
+        right: -100px;
+      }
+    }
+  }
+}
+.task-step-flow {
+  position: relative;
+  & > div {
+    width: 90px;
+    @include text-ellipsis();
+    text-align: center;
+  }
+  &-approve {
+    position: absolute;
+    right: 0;
+    top: -45px;
+  }
+  &-overtime {
+    position: absolute;
+    right: 0px;
+    top: -68px;
+    width: 90px;
+  }
 }
