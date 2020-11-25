@@ -6,7 +6,7 @@
         <el-input v-model="searchParts" placeholder="请输入服务项目信息" />
       </div>
       <div class="select-state">
-        <el-select v-model="selectState" clearable placeholder="发布状态" @clear="search">
+        <el-select v-model="selectState" clearable placeholder="发布状态" @change="search">
           <el-option
             v-for="item in selectStateList"
             :key="item.value"
