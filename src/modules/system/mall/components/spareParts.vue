@@ -6,7 +6,7 @@
         <el-input v-model="searchParts" placeholder="请输入备件信息" />
       </div>
       <div class="select-state"> 
-        <el-select v-model="selectState" placeholder="发布状态" clearable @clear="search">
+        <el-select v-model="selectState" placeholder="发布状态" clearable @change="search">
           <el-option
             v-for="item in selectStateList"
             :key="item.value"
@@ -17,7 +17,7 @@
         </el-select>
       </div>
       <div class="select-stock">
-        <el-select v-model="selectStock" placeholder="有无库存" clearable @clear="search">
+        <el-select v-model="selectStock" placeholder="有无库存" clearable @change="search">
           <el-option
             v-for="item in selectStockList"
             :key="item.value"
