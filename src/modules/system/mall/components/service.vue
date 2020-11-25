@@ -6,7 +6,7 @@
         <el-input v-model="searchParts" placeholder="请输入服务项目信息" />
       </div>
       <div class="select-state">
-        <el-select v-model="selectState" placeholder="发布状态">
+        <el-select v-model="selectState" clearable placeholder="发布状态" @clear="search">
           <el-option
             v-for="item in selectStateList"
             :key="item.value"
@@ -71,10 +71,6 @@ import * as SettingApi from "@src/api/SettingApi";
 // 发布状态
 const STATELIST = [
   {
-    value: 0,
-    label: "全部",
-  },
-  {
     value: 1,
     label: "未发布",
   },
@@ -126,7 +122,7 @@ export default {
       }, // 列表请求参数
       pagination: {}, //分页
       searchParts: "", // 搜索备件信息
-      selectState: "全部", //状态
+      selectState: "", //状态
       selectStateList: STATELIST,
       tableNames: TABLENAME,
       tableData: [],
@@ -168,7 +164,7 @@ export default {
     search() {
       const {selectState, searchParts} = this
       this.params.pageNum = 1
-      this.params.isShow = selectState !== "全部" ? selectState - 1 : ''
+      this.params.isShow = selectState ? selectState - 1 : ''
       this.params.keyword = searchParts
       this.serviceList()
     },
@@ -179,7 +175,7 @@ export default {
         pageSize: 10,
       }
       this.searchParts =  ""
-      this.selectState = "全部"
+      this.selectState = ""
       this.serviceList()
     },
     /*分页条数切换 */
