@@ -277,7 +277,7 @@ function productMenuStatistics(params) {
  */
 function getPageLinkProduct(params) {
   
-  return http.get(`${headUrl}/outside/pc/catalog/relation/product`, params)
+  return http.get(`${headUrl}/outside/pc/catalog/product`, params)
 }
 
 
