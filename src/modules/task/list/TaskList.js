@@ -2033,7 +2033,7 @@ export default {
           }
         })
         // 自定义
-        const conditions = params.conditions || [];
+        const conditions = (this.searchParams.conditions && this.searchParams.conditions.length) ? [...params.conditions, ...this.searchParams.conditions] : params.conditions || [];
         // 创建时间
         const createTimeStart = this._time(params.createTime, 0);
         const createTimeEnd = this._time(params.createTime, 1);
@@ -2232,7 +2232,7 @@ export default {
           allotUserIds: this.getUserIdsWithSubmit(null, params, "allotUser"),
           payTypes: params.paymentMethods,
           searchTagIds: params.tags && params.tags.map(({ id }) => id),
-          systemConditions,
+          systemConditions: (this.searchParams.systemConditions && this.searchParams.systemConditions.length) ? [...systemConditions, ...this.searchParams.systemConditions] : systemConditions,
           // eventNo: params.eventNo,
         };
         // 工单搜索分类型
