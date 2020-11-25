@@ -447,12 +447,14 @@ export default {
             }
           })
         } else {
-          result.forEach(item => {
-            if (item.id === this.selectIds.allId) {
-              this.searchParams = item.searchModel
-              this.searchParams_spare = item.searchModel
-            }
-          })
+          if (!type) {
+            result.forEach(item => {
+              if (item.id === this.selectIds.allId) {
+                this.searchParams = item.searchModel
+                this.searchParams_spare = item.searchModel
+              }
+            })
+          }
         }
         if (!type) {
           this.initialize();
