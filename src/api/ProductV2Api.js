@@ -1,5 +1,5 @@
 import http from '@src/util/http';
-const headUrl = ''
+const headUrl = '/api/customer'
 
 /** ------------ start 产品 ----------------------- */
 /**
@@ -269,6 +269,17 @@ function productMenuStatistics(params) {
   return http.get(`${headUrl}/outside/pc/catalog/relation/statistics`, params)
 }
 
+/**
+ * 目录详情tab的数量
+ * @param params
+ *   id : 目录id
+ * @returns {*}
+ */
+function getPageLinkProduct(params) {
+  
+  return http.get(`${headUrl}/outside/pc/catalog/relation/product`, params)
+}
+
 
 
 export {
@@ -285,6 +296,7 @@ export {
   getPageProduct,
   getPageLinkPart,
   getPageLinkWiki,
+  getPageLinkProduct,
   setPageRelationProduct,
   setPagerelationPartOrWiki,
   getPageWiki,

@@ -18,15 +18,15 @@
 
 <script>
 import * as TaskApi from '@src/api/TaskApi';
-import FormMixin from '@src/component/form/mixin/form';
+import FormMixin from "@src/component/form/mixin/form";
 
 export default {
-  name: 'part-search',
+  name: "task-search",
   mixins: [FormMixin],
   props: {
     value: {
       type: String,
-      default: ''
+      default: ""
     }
   },
   data() {
@@ -38,12 +38,12 @@ export default {
   created() {
     let options = sessionStorage.getItem(`${this.field.fieldName}_options`);
 
-    this.options = JSON.parse(options || '[]');
+    this.options = JSON.parse(options || "[]");
   },
   methods: {
     choose(newValue) {
       let oldValue = null;
-      this.$emit('update', { newValue, oldValue, field: this.field });
+      this.$emit("update", { newValue, oldValue, field: this.field });
     },
     searchTask(keyword) {
       this.loading = true;
@@ -57,7 +57,7 @@ export default {
           );
         })
         .catch(err =>
-          console.error('searchTaskManager function catch err', err)
+          console.error("searchTaskManager function catch err", err)
         );
     }
   }

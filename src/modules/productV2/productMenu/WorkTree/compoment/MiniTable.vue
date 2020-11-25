@@ -99,6 +99,59 @@
         >
         </el-table-column>
       </template>
+      <template v-if="dataType == 'product'">
+        <el-table-column
+          prop="productName"
+          label="产品名称"
+          width="180"
+        >
+          <template slot-scope="scope">
+            <sample-tooltip :row="scope.row">
+              <template slot="content" slot-scope="{ isContentTooltip }">
+                <el-tooltip
+                  :content="scope.row.productName"
+                  placement="top"
+                  :disabled="!isContentTooltip"
+                >
+                  <a
+                    href=""
+                    class="view-detail-btn"
+                    @click.stop.prevent="openProductMenuTab(scope.row.id)"
+                  >
+                    {{ scope.row.productName }}
+                  </a>
+                </el-tooltip>
+              </template>
+            </sample-tooltip>
+          </template>
+        </el-table-column>
+        <el-table-column
+          show-overflow-tooltip
+          prop="serialNumber"
+          label="产品编号"
+          width="180"
+        >
+        </el-table-column>
+        <el-table-column
+          show-overflow-tooltip
+          prop="type"
+          label="类型"
+          width="180"
+        >
+        </el-table-column>
+        <el-table-column
+          show-overflow-tooltip
+          prop="customerName"
+          label="客户"
+        >
+        </el-table-column>
+        <el-table-column
+          show-overflow-tooltip
+          prop="createUserName"
+          label="创建人"
+        >
+        </el-table-column>
+      </template>
 
       <el-table-column show-overflow-tooltip prop="createTime" label="创建时间">
         <template slot-scope="scope">
@@ -161,6 +214,7 @@ import { formatDate } from '@src/util/lang';
 import {
   getPageLinkPart,
   getPageLinkWiki,
+  getPageLinkProduct,
   removePartOrWiki,
 } from '@src/api/ProductV2Api';
 
@@ -196,6 +250,7 @@ export default {
       httpObj: {
         part: getPageLinkPart,
         wiki: getPageLinkWiki,
+        product: getPageLinkProduct
       },
     };
   },
@@ -299,15 +354,15 @@ export default {
       this.$platform.openTab({
         id: `${
           this.dataType == 'part'
-            ? 'productV2_productMenu_view_'
-            : 'document_detail_'
+            ? 'productV2_productMenu_view_' : this.dataType == 'wiki'
+              ? 'document_detail_' : 'product_detail_'
         }${id}`,
         title: '知识库列表',
         close: true,
         url: `${
           this.dataType == 'part'
-            ? '/productV2/catalog/view?id='
-            : '/wiki/detail/page?wikiId='
+            ? '/productV2/catalog/view?id=' : this.dataType == 'wiki'
+              ? '/wiki/detail/page?wikiId=' : '/customer/product/view/'
         }${id}`,
         fromId,
       });

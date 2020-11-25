@@ -102,11 +102,11 @@
               />
             </el-tab-pane>
             <el-tab-pane :label="`产品(${statistics.productCount || 0})` " name="product">
-              <!-- <mini-table
+              <mini-table
                 :id="dataInfo.id"
                 data-type="product"
                 page-type="view"
-              /> -->
+              />
             </el-tab-pane>
           </el-tabs>
         </div>

@@ -54,7 +54,7 @@ import SettingMixin from '@src/component/form/mixin/setting';
 import { settingProps } from '@src/component/form/components/props';
 
 export default {
-  name: 'form-related-wiki-setting',
+  name: 'form-related-catalog-setting',
   mixins: [SettingMixin],
   props: settingProps,
   computed: {

@@ -222,7 +222,7 @@ router.use('/approve/search', (ctx) =>
   })
 );
 
-router.use('/outside/pc/catalog', (ctx) =>
+router.use('/api/customer/outside/pc/catalog', (ctx) =>
   HttpClient.proxy(ctx, {
     host: '30.40.58.216',
     port: 10013,

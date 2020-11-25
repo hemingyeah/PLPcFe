@@ -61,7 +61,7 @@ import FormMixin from '@src/component/form/mixin/form';
 import _ from 'lodash'
 
 export default {
-  name: 'form-related-part',
+  name: 'form-related-catalog',
   mixins: [FormMixin],
   props: {
     value: {
@@ -78,18 +78,26 @@ export default {
       page: 1,
       pageSize: 20
     }
-	},
+  },
+  watch: {
+    value(val) {
+      this.init(val);
+    }
+  },
 	mounted() {
-		if(this.value && this.value.length > 0) {
-      let taskValue = _.cloneDeep(this.value);
-      this.taskValue = taskValue.map(item => {
-        item.value = item.taskNo;
-        return item;
-      });
-      this.options = taskValue;
-		}
+    this.init(this.value);
 	},
   methods: {
+    init(val) {
+      if(val && val.length > 0) {
+        let taskValue = _.cloneDeep(val);
+        this.taskValue = taskValue.map(item => {
+          item.value = item.taskNo;
+          return item;
+        });
+        this.options = taskValue;
+      }
+    },
 		searchTask(keyword = '') {
 			let params = {
         page: this.page,

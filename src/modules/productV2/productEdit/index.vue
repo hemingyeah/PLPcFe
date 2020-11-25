@@ -9,6 +9,8 @@
         </div>
       </div>
 
+
+
       <product-edit-form :fields="productFields" v-model="form" :product-id="productId" ref="productEditForm">
         
       </product-edit-form>
@@ -25,12 +27,12 @@ import {
   updateProduct
 } from '@src/api/ProductApi';
 import * as FormUtil from '@src/component/form/util';
-import ProductEditForm from '@src/modules/product/components/ProductEditForm.vue';
+import ProductEditForm from '@src/modules/product/components/ProductEditFormV2.vue';
 
 import * as util from '@src/modules/product/utils/ProductMapping';
 
 
-import initData from '@src/modules/productV2/productView/initData.js'
+import initData from '@src/modules/productV2/productEdit/initData.js'
 
 
 

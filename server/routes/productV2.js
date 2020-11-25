@@ -34,28 +34,111 @@ router.get('/productV2/catalog/view', async ctx => {
   let body = result.body;
   ctx.body = Template.renderWithHtml('产品目录详情', body, script, modConfig.template)
 });
-
-router.get('/productV2/list', async ctx => {
+/** start 产品 */
+router.get('/customer/productV2', async ctx => {
   let script = ['/productV2.list.js'];
   let modConfig = modules['productV2.list'];
   let reqHeaders = ctx.request.headers;
-  let result = await HttpClient.request('/productV2/list', 'get', null, {
-    headers: reqHeaders
-  });
+  let result = await HttpClient.request('/customer/product', 'get', null, {headers: reqHeaders});
   let body = result.body;
-  ctx.body = Template.renderWithHtml('产品列表', body, script, modConfig.template)
+
+  ctx.body = Template.renderWithHtml('产品管理', body, script, modConfig.template)
 });
 
-router.get('/productV2/view/:id', async ctx => {
+router.get('/customer/productV2/view/:id', async ctx => {
+  let script = ['/productV2.view.js'];
   let modConfig = modules['productV2.view'];
   let reqHeaders = ctx.request.headers;
-  let script = ['/productV2.view.js'];
   
   let result = await HttpClient.request(`/customer/product/view/${ctx.params.id}`, 'get', null, {headers: reqHeaders});
   let body = result.body;
   
   ctx.body = Template.renderWithHtml('产品详情', body, script, modConfig.template)
 });
+
+router.get('/customer/productV2/create', async ctx => {
+  
+
+  let modConfig = modules['productV2.edit'];
+  let script = ['/productV2.edit.js'];
+
+  
+  let reqHeaders = ctx.request.headers;
+  
+  const customerId = ctx.request.query.customerId;
+  
+  let result = await HttpClient.request(`/customer/product/create?customerId=${customerId}`, 'get', null, {headers: reqHeaders});
+  let body = result.body;
+
+  ctx.body = Template.renderWithHtml('新建产品', body, script, modConfig.template)
+});
+
+router.get('/customer/productV2/edit/:id', async ctx => {
+
+  let modConfig = modules['productV2.edit'];
+  let script = ['/productV2.edit.js'];
+  let reqHeaders = ctx.request.headers;
+  let result = await HttpClient.request(`/customer/product/edit/${ctx.params.id}`, 'get', null, {headers: reqHeaders});
+  let body = result.body;
+
+  ctx.body = Template.renderWithHtml('编辑产品', body, script, modConfig.template)
+});
+
+router.get('/productV2/createOnTask', async ctx => {
+
+  let modConfig = modules['productV2.edit'];
+  let script = ['/productV2.edit.js'];
+  let reqHeaders = ctx.request.headers;
+  // let result = await HttpClient.request(`/customer/product/edit/${ctx.params.id}`, 'get', null, {headers: reqHeaders});
+  let result = await HttpClient.request('/product/createOnTask', 'get', null, {headers: reqHeaders});
+  let body = result.body;
+
+  ctx.body = Template.renderWithHtml('编辑产品', body, script, modConfig.template)
+});
+
+router.get('/productV2/createOnEvent', async ctx => {
+  let modConfig = modules['productV2.edit.modal'];
+  let script = ['/productV2.edit.modal.js'];
+  
+  let reqHeaders = ctx.request.headers;
+  // let result = await HttpClient.request(`/customer/product/edit/${ctx.params.id}`, 'get', null, {headers: reqHeaders});
+  let result = await HttpClient.request('/product/createOnTask', 'get', null, {headers: reqHeaders});
+  let body = result.body;
+
+  ctx.body = Template.renderWithHtml('编辑产品', body, script, modConfig.template)
+});
+
+/** end 产品 */
+// router.get('/productV2/list', async ctx => {
+//   let script = ['/productV2.list.js'];
+//   let modConfig = modules['productV2.list'];
+//   let reqHeaders = ctx.request.headers;
+//   let result = await HttpClient.request('/productV2/list', 'get', null, {
+//     headers: reqHeaders
+//   });
+//   let body = result.body;
+//   ctx.body = Template.renderWithHtml('产品列表', body, script, modConfig.template)
+// });
+
+// router.get('/productV2/view/:id', async ctx => {
+//   let modConfig = modules['productV2.view'];
+//   let reqHeaders = ctx.request.headers;
+//   let script = ['/productV2.view.js'];
+  
+//   let result = await HttpClient.request(`/customer/product/view/${ctx.params.id}`, 'get', null, {headers: reqHeaders});
+//   let body = result.body;
+  
+//   ctx.body = Template.renderWithHtml('产品详情', body, script, modConfig.template)
+// });
+// router.get('/productV2/edit/:id', async ctx => {
+//   let modConfig = modules['productV2.edit'];
+//   let script = ['/productV2.edit.js'];
+//   let reqHeaders = ctx.request.headers;
+//   let result = await HttpClient.request(`/customer/product/edit/${ctx.params.id}`, 'get', null, {headers: reqHeaders});
+//   let body = result.body;
+
+//   ctx.body = Template.renderWithHtml('编辑产品', body, script, modConfig.template)
+// });
 router.get('/setting/productV2/catalog/setting', async ctx => {
   let script = ['/productV2.catalog.setting.js'];
   let modConfig = modules['productV2.catalog.setting'];
@@ -100,14 +183,6 @@ router.get('/productV2/catalog/view/:id', async ctx => {
   ctx.body = Template.renderWithHtml('产品目录详情', body, script, modConfig.template)
 });
 
-router.get('/productV2/edit', async ctx => {
-  let modConfig = modules['productV2.edit'];
-  let script = ['/productV2.edit.js'];
-  let reqHeaders = ctx.request.headers;
-  let result = await HttpClient.request(`/productV2/edit/edit/${ctx.params.id}`, 'get', null, {headers: reqHeaders});
-  let body = result.body;
 
-  ctx.body = Template.renderWithHtml('编辑产品', body, script, modConfig.template)
-});
 
 module.exports = router;

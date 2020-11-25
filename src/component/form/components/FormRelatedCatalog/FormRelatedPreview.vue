@@ -17,7 +17,7 @@
 import { previewProps } from '@src/component/form/components/props';
 
 export default {
-  name: 'form-related-wiki-preview',
+  name: 'form-related-catalog-preview',
   props: previewProps,
 }
 </script>

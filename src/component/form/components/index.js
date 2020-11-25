@@ -26,6 +26,9 @@ import FormServiceIterm from './FormServiceIterm'
 
 import FormFormula from './FormFormula/index.ts';
 
+
+import FormRelatedCatalog from './FormRelatedCatalog';
+
 // 所有字段
 const ALL_FORM_FIELDS = [
   FormText,
@@ -51,7 +54,8 @@ const ALL_FORM_FIELDS = [
   FormSparepart,
   FormServiceIterm,
   FormRelatedTask,
-  FormFormula
+  FormFormula,
+  FormRelatedCatalog
 ].reduce((acc, val) => (Array.isArray(val) ? acc = acc.concat(val) : acc.push(val)) && acc, []);
 
 const FormFieldMap = {};

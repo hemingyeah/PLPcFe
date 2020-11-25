@@ -473,11 +473,11 @@ export default {
         .catch(e => console.error('e', e));
     },
     editProduct(id) {
-      window.location.href = `/productV2/edit?id=${this.product.id}`
+      window.location.href = `/product/edit/${this.product.id}`
       // window.location.href = `/customer/product/edit/${this.productId}`
     },
     addProduct(id) {
-      window.location.href = '/productV2/edit'
+      window.location.href = '/product/create'
       // window.location.href = `/customer/product/edit/${this.productId}`
     },
     openRemindDialog(remind) {

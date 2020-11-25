@@ -198,7 +198,7 @@
                         >
                           {{
                             scope.row.productVideo[0] &&
-                              scope.row.productVideo[0]
+                              scope.row.productVideo[0].name
                           }}
                         </a>
                       </el-tooltip>

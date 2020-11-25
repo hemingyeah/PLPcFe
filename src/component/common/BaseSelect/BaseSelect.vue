@@ -37,7 +37,8 @@
         </div>
 
         <ul class="option-list" v-loadmore="loadmoreOptions" ref="list">
-
+         
+      
           <li v-for="op in optionList" :key="getValueKey(op)" @click="selectTag(op)" :class="{'selected': value.some(user => user[valueKey] ===op[valueKey])}">
             <slot name="option" :option="op" v-if="optionSlot"> </slot>
             <template v-else>{{op.label}}</template>
@@ -54,6 +55,7 @@
 <script>
 import Clickoutside from '@src/util/clickoutside';
 import Page from '@model/Page';
+import _ from 'lodash'
 
 /**
  * Todo
@@ -211,7 +213,7 @@ export default {
         })
         .catch(err => console.error(err))
     },
-    searchByKeyword(e) {
+    searchByKeyword:_.debounce(function(e) {
       this.resetStatus(e.target.value);
       this.pending = true;
       this.search()
@@ -223,7 +225,7 @@ export default {
         .catch(e => {
           console.log('searchByKeyword catch e', e)
         });
-    },
+    }, 800),
     initList() {
       this.pending = true;
       this.showList = true;

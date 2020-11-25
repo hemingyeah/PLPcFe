@@ -518,6 +518,7 @@ export default {
       dynamicFields: [],
       filterTeams: [],
       tableKey: (Math.random() * 1000) >> 2,
+      selectColumnState:'product_list_select'
     };
   },
   computed: {
@@ -863,7 +864,7 @@ export default {
         id: `product_view_${productId}`,
         title: '产品详情',
         close: true,
-        url: `/productV2/view/${productId}?noHistory=1`,
+        url: `/product/view/${productId}?noHistory=1`,
         fromId,
       });
     },
@@ -1207,7 +1208,7 @@ export default {
     buildColumns() {
       const localStorageData = this.getLocalStorageData();
 
-      let columnStatus = localStorageData.columnStatus || [];
+      let columnStatus = localStorageData.columnStatus[this.selectColumnState] || [];
       let localColumns = columnStatus
         .map((i) => (typeof i == 'string' ? { field: i, show: true } : i))
         .reduce((acc, col) => (acc[col.field] = col) && acc, {});
@@ -1370,14 +1371,14 @@ export default {
       });
     },
     getLocalStorageData() {
-      const dataStr = localStorage.getItem('product_list_localStorage_19_4_24') || '{}';
+      const dataStr = localStorage.getItem('product_list_localStorage_20_11_25') || '{}';
       return JSON.parse(dataStr);
     },
     saveDataToStorage(key, value) {
       const data = this.getLocalStorageData();
       data[key] = value;
       localStorage.setItem(
-        'product_list_localStorage_19_4_24',
+        'product_list_localStorage_20_11_25',
         JSON.stringify(data)
       );
     },
