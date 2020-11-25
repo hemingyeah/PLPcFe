@@ -389,16 +389,17 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
   }
   
   /* 派单审批 */
-  public fetchApproveWithTaskAllot(params: TaskAllotApproveParams): Promise<TaskApprove | null> {
+  public fetchApproveWithTaskAllot(params: TaskAllotApproveParams): Promise<any | null> {
     return (
       getTaskAllotApprove(params)
-      .then((data: getTaskAllotApproveResult) => {
-        let isSuccess = data.success
-        if (!isSuccess) {
-          return Platform.alert(data.message)
-        }
+      .then((result: getTaskAllotApproveResult) => {
+        let isSuccess = result.succ
+        let isNeedApprove = !isSuccess && result.message === Approve.message
         
-        return data.result || {}
+        return {
+          isNeedApprove,
+          data: result.data || {}
+        }
         
       }).catch((err) => {
         this.pending = false
@@ -776,14 +777,14 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
       
       // 验证审批
       const params = { taskId: this.task.id }
-      let approve: TaskApprove | null = await this.fetchApproveWithTaskAllot(params)
+      let approve: any | null = await this.fetchApproveWithTaskAllot(params)
       if (!approve) return
       
-      let isNeedApprove = approve.needApprove === true
+      let isNeedApprove = approve.isNeedApprove === true
       // 有审批
       if (isNeedApprove) {
         this.pending = false
-        return this.showApproveDialog(approve)
+        return this.showApproveDialog(approve.data)
       }
       
       // 派单到负责人提交

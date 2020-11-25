@@ -46,7 +46,7 @@ export type getTaskUserCardInfoResult = Result<UserCardInfo>
 export type getTaskAllotUserInfoResult = Result<PageInfo<TaskAllotUserInfo>>
 
 /* 工单指派-指派审批信息 */
-export type getTaskAllotApproveResult = Result<TaskApprove>
+export type getTaskAllotApproveResult = MsgModel<TaskApprove>
 
 /* 工单指派-指派工单池-审批信息 */
 export type getTaskAllotTaskPollApproveResult = MsgModel<TaskApprove>
