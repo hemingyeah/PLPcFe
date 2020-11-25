@@ -9,6 +9,14 @@ const TaskAllotUserTableCommonColumns = [
     "type": "column"
   },
   {
+    "label": "所在团队",
+    "field": "tags",
+    "show": true,
+    "fixed": false,
+    "width": "150px",
+    "type": "column",
+  },
+  {
     "label": "员工",
     "field": "displayName",
     "show": true,
@@ -120,6 +128,8 @@ export const TaskAllotUserTableStandEditionColumns = [
 export enum TaslAllotTableColumnFieldEnum {
   // 负责人
   Excutor = 'excutor',
+  // 所在团队
+  Tags = 'tags',
   // 名称
   DisplayName = 'displayName',
   // 权限

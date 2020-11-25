@@ -98,7 +98,7 @@ export default class TaskAllotModal extends TaskAllotModalRender {
         
         <div slot='footer' class='dialog-footer'>
             <el-button onClick={() => this.close()}>取 消</el-button>
-            <el-button type='primary' disabled={this.pending} onClick={() => this.submit()}>确 定</el-button>
+            <el-button type='primary' disabled={this.pending} onClick={() => this.submit()}>提 交</el-button>
         </div>
         
       </base-modal>

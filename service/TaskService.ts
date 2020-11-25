@@ -175,7 +175,7 @@ export function checkApprove(taskType: TaskType, action: string, task: Task, cus
  * @description 是否需要审批
 */
 function checkIsNeedApprove(flowSetting: FlowSetting, task: Task, customer: Customer, result: any = {}): boolean {
-	let { leader, approvers, taskTemplateId } = flowSetting
+	let { leader = '', approvers } = flowSetting
 	// 审批人列表是否是空的
 	let isEmptyApprovers = isArray(approvers) ? approvers.length <= 0 : false
 	// 表单字段 人员字段
@@ -224,7 +224,7 @@ function checkIsNeedApprove(flowSetting: FlowSetting, task: Task, customer: Cust
  * @description 获取审批人名称
 */
 function getApproversName(flowSetting: FlowSetting, task: Task, result: any = {}): string {
-	let { leader, approvers = [], taskTemplateId } = flowSetting
+	let { leader = '', approvers = [], taskTemplateId } = flowSetting
 	let approversName = ''
 	
 	// 按指定人员

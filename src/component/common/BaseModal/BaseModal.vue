@@ -202,7 +202,7 @@ export default {
     height: 24px;
     line-height: 24px;
     font-size: 16px;
-    font-weight: 400;
+    font-weight: 600;
     font-size: 18px;
 
     @include text-ellipsis()

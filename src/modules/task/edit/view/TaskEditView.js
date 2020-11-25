@@ -74,11 +74,17 @@ export default {
   methods: {
     ...methods,
     buildParams() {
-      const task = util.packToTask(this.fields, this.form);
-      task.templateId = taskTemplate.value;
-      task.templateName = taskTemplate.text;
+      const task = util.packToTask(this.fields, this.form)
+      this.form.templateId = taskTemplate.value
+      this.form.templateName = taskTemplate.text
+      task.templateId = taskTemplate.value
+      task.templateName = taskTemplate.text
       
-      const { address, customer, tick, linkman } = task;
+      if (this.allotTask.id) {
+        task.id = this.allotTask.id
+      }
+      
+      const { address, customer, tick, linkman } = task
       const params = {
         address,
         customer,

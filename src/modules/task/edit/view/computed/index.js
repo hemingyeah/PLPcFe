@@ -122,6 +122,7 @@ export default {
       isPlanTaskEdit: this.isPlanTaskEdit,
       isFromCustomer: this.isFromCustomer,
       isFromProduct: this.isFromProduct,
+      isDisabledTaskType: Object.keys(this.allotTask).length > 0
     }
   },
   task() {
