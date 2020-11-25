@@ -500,7 +500,7 @@ export default {
               return taskMethodFunc(params, isAllot)
             } 
             
-            return this.openAllotModel(this.allotTask )
+            return this.openAllotModel(this.allotTask)
           }
           
           if (this.isTaskCreate) {
@@ -569,7 +569,7 @@ export default {
             return this.togglePending();
           }
           // 根据是否派单决定跳转地址
-          let taskId = this.editId;
+          let taskId = this.editId || this.allotTask.id;
           
           if (isAllot) {
             this.openAllotModel({ 
