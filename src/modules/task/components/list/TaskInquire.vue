@@ -76,7 +76,6 @@ const MultiFieldNames = [
   "synergyId",
   "createUser",
   "executor",
-  "source",
 ];
 
 function setFieldOperateHandler(field = {}) {
