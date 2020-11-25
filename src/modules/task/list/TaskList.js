@@ -666,7 +666,7 @@ export default {
       });
       this.region = {
         viewName: name || "",
-        searchModel: this.searchParams,
+        searchModel: {...this.searchParams_spare, ...this.params},
         selectedCols: selectCols.join(","),
         viewRegion: region
       }
@@ -674,6 +674,8 @@ export default {
         this.region["viewId"] = id;
         this.region["searchModel"] = searchModel
         this.isViewModel = region;
+      } else {
+        this.region.searchModel.moreConditions = []
       }
       this.viewType = type
       this.$refs.viewPanel.mergeTaskFields(this.taskAllFields)
@@ -1949,27 +1951,33 @@ export default {
       this.loading = true;
       this.selectId = item.id;
       const {initData} = this
+
+      this.searchParams.createUser = "";
+      this.searchParams.executor = "";
+      this.searchParams.synergyId = "";
+
+      this.searchParams_spare.createUser = "";
+      this.searchParams_spare.executor = "";
+      this.searchParams_spare.synergyId = "";
+
       switch (item.id) {
-      case "all":
-        this.searchParams.createUser = "";
-        this.searchParams.executor = "";
-        this.searchParams.synergyId = "";
-        break;
       case "create":
         this.searchParams.createUser = initData.currentUserId;
-        this.searchParams.executor = "";
-        this.searchParams.synergyId = "";
+
+        this.searchParams_spare.createUser = initData.currentUserId;
         break;
       case "execute":
-        this.searchParams.createUser = "";
         this.searchParams.executor = initData.currentUserId;
-        this.searchParams.synergyId = "";
+
+        this.searchParams_spare.executor = initData.currentUserId;
         break;
-      default:
-        this.searchParams.createUser = "";
-        this.searchParams.executor = "";
+      case "synergy":
         this.searchParams.synergyId = initData.currentUserId;
-        break;
+
+        this.searchParams_spare.synergyId = initData.currentUserId;
+      break;
+      default:
+        break
       }
       this.search(this.searchParams, bool);
     },
