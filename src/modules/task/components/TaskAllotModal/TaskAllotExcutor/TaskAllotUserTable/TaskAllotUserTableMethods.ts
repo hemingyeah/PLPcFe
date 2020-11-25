@@ -509,6 +509,8 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
           // 添加滚动事件
           this.bindTableScrollEvent()
         })
+        // 地图加载
+        this.mapInit()
         
         Log.succ(Log.End, this.fetchUsers.name)
       })
@@ -734,7 +736,7 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
     
     this.fetchUsers()
       .then(() => {
-        this.mapInit()
+        // this.mapInit()
       })
       .catch((err: any) => {
         console.error(err)
