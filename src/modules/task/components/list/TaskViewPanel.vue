@@ -19,7 +19,7 @@
       </el-dropdown>
     </h3>
     <!-- S 搜索条件 -->
-    <el-form class="advanced-search-form" onsubmit="return false;">
+    <el-form class="advanced-search-form" :class="{'advanced-search-form-active': type === 'view'}" onsubmit="return false;">
       <!-- 查看视图 -->
       <div class="task-flex task-ai">
         <div class="task-view-name task-view-view task-flex" v-show="type === 'view'" v-for="(item, index) in searchModelCN" :key="index">
@@ -1020,7 +1020,7 @@ export default {
   overflow: auto;
   padding: 10px 15px 0 15px;
 
-  height: calc(100% - 200px);
+  height: calc(100% - 140px);
   justify-content: space-between;
   overflow-x: hidden;
 
@@ -1057,6 +1057,9 @@ export default {
       margin: 0 10px;
     }
   }
+}
+.advanced-search-form-active {
+ height: calc(100% - 30px);
 }
 .hide {
   overflow: hidden;
