@@ -664,6 +664,7 @@ export default {
       }).map(item => {
         return item.fieldName
       });
+      this.searchParams_spare.templateId = this.currentTaskType.id
       this.region = {
         viewName: name || "",
         searchModel: {...this.searchParams_spare, ...this.params},
@@ -2033,7 +2034,7 @@ export default {
           }
         })
         // 自定义
-        const conditions = (this.searchParams.conditions && this.searchParams.conditions.length) ? [...params.conditions, ...this.searchParams.conditions] : params.conditions || [];
+        const conditions = (this.searchParams_spare.conditions && this.searchParams_spare.conditions.length) ? [...params.conditions, ...this.searchParams_spare.conditions] : params.conditions || [];
         // 创建时间
         const createTimeStart = this._time(params.createTime, 0);
         const createTimeEnd = this._time(params.createTime, 1);
@@ -2232,7 +2233,7 @@ export default {
           allotUserIds: this.getUserIdsWithSubmit(null, params, "allotUser"),
           payTypes: params.paymentMethods,
           searchTagIds: params.tags && params.tags.map(({ id }) => id),
-          systemConditions: (this.searchParams.systemConditions && this.searchParams.systemConditions.length) ? [...systemConditions, ...this.searchParams.systemConditions] : systemConditions,
+          systemConditions: (this.searchParams_spare.systemConditions && this.searchParams_spare.systemConditions.length) ? [...systemConditions, ...this.searchParams_spare.systemConditions] : systemConditions,
           // eventNo: params.eventNo,
         };
         // 工单搜索分类型
