@@ -741,8 +741,12 @@ export default {
      */
     saveView() {
       const {conditions,systemConditions} = this.$refs.viewPanel.buildTaskInquireParams()
-      this.searchParams.systemConditions = systemConditions
-      this.searchParams.conditions = conditions
+
+      let param = {...this.searchParams_spare, ...this.params}
+      param.systemConditions = systemConditions
+      param.conditions = conditions
+
+      this.searchParams = param
       if (!systemConditions.length && !conditions.length) {
         this.$platform.alert("请您先设置查询条件");
         return
@@ -753,7 +757,7 @@ export default {
         this.taskPage.list = [];
         this.$refs.viewPanel.hide();
         this.getUserViews("saveView")
-        this.search(this.searchParams);
+        this.search(param);
       })
     },
     /*
