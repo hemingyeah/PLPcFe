@@ -34,7 +34,7 @@ import {
   User
 } from '@src/modules/task/components/TaskAllotModal/TaskAllotModalInterface'
 /* model */
-import { TASK_NO_EXECUTOR_MESSAGE, TASK_NO_REALLOT_REASON_MESSAGE, TASK_REALLOT_NOT_SAME_USER_MESSAGE } from '@src/model/const/Alert'
+import { TASK_NOT_AUTO_DISPATCH_RULE, TASK_NO_EXECUTOR_MESSAGE, TASK_NO_REALLOT_REASON_MESSAGE, TASK_REALLOT_NOT_SAME_USER_MESSAGE } from '@src/model/const/Alert'
 import { getCustomerDetailResult } from '@model/param/out/Customer'
 import { getTaskAllotApproveResult, getTaskAllotResult, getTaskAllotTaskPollApproveResult, getTaskAllotTaskPoolResult, getTaskConfigResult, getTaskTypeResult } from '@model/param/out/Task'
 import { TaskPoolNotificationTypeEnum } from '@src/modules/task/components/TaskAllotModal/TaskAllotPool/TaskAllotPoolModel'
@@ -829,6 +829,12 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
   */
   public async submitWithAutoDispatch() {
     try {
+      // 验证
+      if (!this.matchRule) {
+        this.pending = false
+        return Platform.alert(TASK_NOT_AUTO_DISPATCH_RULE)
+      }
+      
       const autoDispatchApproveParams: AutoDispatchApproveParams = this.buildAutoDispatchApproveParams()
       let approve = await this.fetchApproveWithAutoDispatch(autoDispatchApproveParams) || null
       if (!approve) return

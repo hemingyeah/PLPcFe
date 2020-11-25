@@ -49,7 +49,7 @@
       </div>
       
       <!-- start 工单流程步骤 -->
-      <!-- <TaskProcessSteps :template-id="form.templateId"></TaskProcessSteps> -->
+      <!-- <TaskProcessSteps :template-id="task.templateId"></TaskProcessSteps> -->
       <!-- end 工单流程步骤 -->
       
       <task-edit-form :task="task" :fields.sync="fields" :state="state" :types="types" :url-params="urlParams" :value.sync="form" ref="form" @updatetemplateId="updateTaskTemplateId"></task-edit-form>
