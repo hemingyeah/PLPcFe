@@ -15,6 +15,7 @@ import { uuid } from '@src/util/string'
 import { isString } from '@src/util/type'
 import { fmt_display_text } from '@src/filter/fmt'
 import { isArray } from 'lodash'
+import { convertSecondsToHourMinuteText } from '@src/util/time'
 
 class TaskAllotUserTableRender extends TaskAllotUserTableMethods {
   /** 
@@ -312,7 +313,7 @@ class TaskAllotUserTableRender extends TaskAllotUserTableMethods {
     let duration = Number(value) 
     if (isNaN(duration)) return value
     
-    return duration ? `${(duration / 3600).toFixed(3)}小时` : fmt_display_text(duration)
+    return duration ? convertSecondsToHourMinuteText(duration) : fmt_display_text(duration)
   }
   
   /** 
@@ -373,6 +374,8 @@ class TaskAllotUserTableRender extends TaskAllotUserTableMethods {
    * @description 渲染表格插入 用于无限加载显示
   */
   public renderTableAppendSlot() {
+    if (this.userPage.list.length <= 0) return null
+    
     return (
       <div class='task-allot-user-table-append-block'>{ this.isDisableLoadmore ? '已加载全部结果' : '载入更多结果...' }</div>
     )

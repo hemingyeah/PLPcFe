@@ -645,6 +645,8 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
     this.allotType = TaskAllotTypeEnum.Person
     // 匹配负责人显示
     this.matchExcutorWithReAllot()
+    // 初始化协同人显示
+    this.synergyUserList = this.task?.synergies || []
     // 获取工单配置
     await this.fetchTaskConfig()
     // 初始化

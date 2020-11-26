@@ -30,6 +30,8 @@ class TaskAllotUserTableData extends TaskAllotUserTableComponents {
   public lastClickedUserMarker: { marker: any, data: TaskAllotUserInfo | null } = { marker: null, data: null }
   /* 表格排序数据 */
   public orderDetail: { order: boolean, code: number } | {} = {}
+  /* 等待状态 */
+  public pending: boolean = false
   /* 当前选择的负责人 */
   public selectExecutorUser: TaskAllotUserInfo = new TaskAllotUserInfo()
   /* 当前选择的团队 */

@@ -23,7 +23,7 @@ interface Column {
   // 是否显示，基本用于表格
   show?: boolean
   // 是否支持排序
-  sortable?: boolean
+  sortable?: boolean | string
 }
 
 export default Column

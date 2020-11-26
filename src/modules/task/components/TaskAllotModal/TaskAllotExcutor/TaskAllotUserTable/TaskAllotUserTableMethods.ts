@@ -499,10 +499,11 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
    * -- 内部调用的
   */
   public fetchUsers(): Promise<any> {
-    if (this.isDisableLoadmore) return Promise.resolve()
+    if (this.isDisableLoadmore || this.pending) return Promise.resolve()
     
     Log.succ(Log.Start, this.fetchUsers.name)
     
+    this.pending = true
     const params: TaskAllotUserSearchModel = this.buildSearchUserParams()
     
     return (
@@ -537,6 +538,8 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
         
         Log.succ(Log.End, this.fetchUsers.name)
       })
+      .catch(err => console.error(err))
+      .finally(() => this.pending = false)
     )
   }
   

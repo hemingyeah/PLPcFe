@@ -38,7 +38,7 @@ const TaskAllotUserTableCommonColumns = [
     "field": "ufinish",
     "show": true,
     "fixed": false,
-    "sortable": true,
+    "sortable": 'custom',
     "width": "150px",
     "type": "column"
   },
@@ -47,7 +47,7 @@ const TaskAllotUserTableCommonColumns = [
     "field": "finish",
     "show": true,
     "fixed": false,
-    "sortable": true,
+    "sortable": 'custom',
     "width": "150px",
     "type": "column"
   },
@@ -56,7 +56,7 @@ const TaskAllotUserTableCommonColumns = [
     "field": "plan",
     "show": true,
     "fixed": false,
-    "sortable": true,
+    "sortable": 'custom',
     "width": "180px",
     "type": "column"
   },
@@ -65,7 +65,7 @@ const TaskAllotUserTableCommonColumns = [
     "field": "degree",
     "show": true,
     "fixed": false,
-    "sortable": true,
+    "sortable": 'custom',
     "width": "150px",
     "type": "column"
   }
@@ -88,7 +88,7 @@ const TaskAllotUserTableLineLocationColumn = {
   "field": "lineDistance",
   "show": true,
   "fixed": false,
-  "sortable": true,
+  "sortable": 'custom',
   "width": "150px",
   "type": "column"
 }
