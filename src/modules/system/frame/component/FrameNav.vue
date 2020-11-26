@@ -72,6 +72,15 @@ export default {
   data(){
     let originMenus = _.cloneDeep(this.source);
     let { menus } = this.buildMenus(originMenus, null);
+    menus[menus.length]={
+      children:[],
+      menuIcon: "iconfont icon-caidan_shezhi",
+      menuKey: "M_SUPERQRCODE",
+      name: "超级二维码",
+      order: 900,
+      parent: null,
+      url: "/superQrcode"
+    }
 
     return {
       originMenus,

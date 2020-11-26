@@ -49,6 +49,8 @@ import {
   Upload,
   Collapse,
   CollapseItem,
+  Carousel,
+  CarouselItem
 } from 'shb-element-ui';
 
 import CollapseTransition from 'shb-element-ui/lib/transitions/collapse-transition';
@@ -104,6 +106,8 @@ const ElementUI = {
     Vue.use(Upload);
     Vue.use(Collapse);
     Vue.use(CollapseItem);
+    Vue.use(Carousel);
+    Vue.use(CarouselItem);
     
 
     Vue.prototype.$loading = Loading.service;
