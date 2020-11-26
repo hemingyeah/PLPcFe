@@ -56,6 +56,8 @@ class TaskAllotUserTableData extends TaskAllotUserTableComponents {
   public userPage: Page =  new Page({ pageNum: 0 })
   /* 用户选择状态 */
   public userPageCheckedMap: {[x: number]: boolean} = {}
+  /* 用户标记列表 */
+  public userMarkers: any[] = []
   /* 距离选项列表 */
   public locationOptions: ElSelectOption[] = [
     { label: '距离', value: AllotLocationEnum.All },

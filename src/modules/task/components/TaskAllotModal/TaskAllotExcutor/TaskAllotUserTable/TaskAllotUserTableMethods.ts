@@ -252,6 +252,7 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
       return Log.warn('userPage.list is empty', this.buildUserMarkers.name)
     }
     
+    this.userMarkers = []
     this.userPage.list.forEach((user: TaskAllotUserInfo) => {
       let { lat, lng } = user
       // 无经纬度
@@ -267,6 +268,8 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
         extData: user,
         icon: this.buildUserMarkerIcon(AMap, user)
       })
+      
+      this.userMarkers.push(userMarker)
       
       // 绑定点击事件
       this.bindUserMarkerClickEvent(userMarker)
@@ -526,7 +529,7 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
             }, {})
         )
         // 是否禁用加载更多
-        this.isDisableLoadmore = !(data.result.hasNextPage)
+        this.isDisableLoadmore = !(data?.result?.hasNextPage === true)
         // 解绑滚动事件
         this.unBindTableScrollEvent()
         this.$nextTick(() => {
@@ -534,7 +537,8 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
           this.bindTableScrollEvent()
         })
         // 地图加载
-        this.mapInit()
+        let isUsersEmpty: boolean = this.userPage.list.length === 0
+        isUsersEmpty ? this.AMap.remove(this.userMarkers) : this.mapInit()
         
         Log.succ(Log.End, this.fetchUsers.name)
       })
