@@ -159,27 +159,24 @@ export default {
           type: 'error'
         });
       }
-
       let row = this.add(null);
-      if(this.repertory.length){
+      if(!this.repertory.length){
         this.$platform.toast('暂无权限，请联系管理员！', "warning");
         return;
-      }
+      } 
       this.form.push(row);
       if(this.form.length == 1) {
         this.getFetchUsers();
       }
     },
     add(event, row = {}){
-      
-      console.log(event,row);
+
       let repertories = this.repertory || [];
-      
+
       let repertory = row.repertory || {};
       let sparepart = row.sparepart || {};
-      // console.log(repertory,sparepart);
+
       let id = `${repertory.id }_${ sparepart.id}`;
-      
       return {
         _id: id,
         sparepart: sparepart.id || '',
