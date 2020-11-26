@@ -225,7 +225,7 @@ export default {
       // 编辑
       if (region.viewId) {
         TaskApi.editView(params).then((res) => {
-          fn();
+          fn(this.viewName);
         });
         return;
       }
@@ -235,7 +235,7 @@ export default {
         ...region,
         viewName: this.viewName,
       }).then((res) => {
-        fn();
+        fn(this.viewName);
       });
     },
     /**
