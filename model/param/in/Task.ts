@@ -154,7 +154,20 @@ export interface TaskAllotUserSearchModel {
 /* 工单指派-指派前验证是否审批 */
 export interface TaskAllotApproveGetModel {
   // 工单id
-  taskId: string
+  taskId: string,
+  // 负责人用户id
+  executorId: string,
+  // 协同人
+  synergies?: {
+    // 名字
+    displayName?: string,
+    // 头像
+    head?: string,
+    // 钉钉人员id
+    staffId?: string,
+    // 用户id
+    userId: string
+  }[]
 }
 
 /* 工单指派-指派到负责人 */

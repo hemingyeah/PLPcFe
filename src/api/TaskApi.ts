@@ -1191,7 +1191,7 @@ export function getTaskAllotUserInfo(params: TaskAllotUserSearchModel): Promise<
  * @description 工单指派-指派前验证是否审批接口
  */
 export function getTaskAllotApprove(params: TaskAllotApproveGetModel): Promise<getTaskAllotApproveResult> {
-  return http.get('/task/confirmAllotTo', params)
+  return http.post('/task/confirmAllotTo', params)
 }
 
 /**

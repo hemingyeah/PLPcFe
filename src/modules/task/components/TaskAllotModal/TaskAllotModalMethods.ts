@@ -389,7 +389,7 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
   }
   
   /* 派单审批 */
-  public fetchApproveWithTaskAllot(params: TaskAllotApproveParams): Promise<any | null> {
+  public fetchApproveWithTaskAllot(params: AllotExcutorParams): Promise<any | null> {
     return (
       getTaskAllotApprove(params)
       .then((result: getTaskAllotApproveResult) => {
@@ -776,8 +776,8 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
       }
       
       // 验证审批
-      const params = { taskId: this.task.id }
-      let approve: any | null = await this.fetchApproveWithTaskAllot(params)
+      const allotExcutorParams = this.buildAllotExcutorParams()
+      let approve: any | null = await this.fetchApproveWithTaskAllot(allotExcutorParams)
       if (!approve) return
       
       let isNeedApprove = approve.isNeedApprove === true
@@ -788,7 +788,6 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
       }
       
       // 派单到负责人提交
-      const allotExcutorParams = this.buildAllotExcutorParams()
       this.fetchExcutorSubmit(allotExcutorParams)
       
     } catch (error) {
