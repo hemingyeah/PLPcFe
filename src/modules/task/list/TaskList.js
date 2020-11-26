@@ -430,7 +430,7 @@ export default {
       } = await TaskApi.getUserViews();
       if (success) {
         this.taskView = result;
-        this.otherLists(result);
+        this.otherLists(result, type);
         const {mySearch, viewId} = this.intercept()
 
         if (this.intercept()) {
@@ -497,7 +497,7 @@ export default {
      * @description 头部筛选
      */
     /* 其他,列表 */
-    otherLists(result) {
+    otherLists(result, type) {
       this.otherList = []
       result.map((item, index) => {
         if (
@@ -510,6 +510,13 @@ export default {
           this.otherList.push(item);
         }
       });
+      if (type) {
+        this.otherList.forEach(item => {
+          if (item.id === this.region.viewId || (item.name === type)) {
+            this.checkOther(item)
+          }
+        })
+      }
     },
     /**
      * @description 新建视图
@@ -599,8 +606,18 @@ export default {
       this.selectColumnState = title;
       this.searchParams = searchModel
       this.searchParams_spare = searchModel
-      this.selectId = 'all'
-      this.params = this.initParams(this.params.pageSize);
+
+      this.params = this.initParams(searchModel.pageSize, searchModel.keyword);
+
+      if (searchModel.createUser) {
+        this.selectId = 'create'
+      } else if (searchModel.executor) {
+        this.selectId = 'execute'
+      } else if (searchModel.synergyId) {
+        this.selectId = 'synergy'
+      } else {
+        this.selectId = 'all'
+      }
 
       // this.taskTypes.forEach((item) => {
       //   if (item.id === searchModel.templateId) {
@@ -742,23 +759,14 @@ export default {
      */
     saveView() {
       const {conditions,systemConditions} = this.$refs.viewPanel.buildTaskInquireParams()
-
-      let param = {...this.searchParams_spare, ...this.params}
-      param.systemConditions = systemConditions
-      param.conditions = conditions
-
-      this.searchParams = param
       if (!systemConditions.length && !conditions.length) {
         this.$platform.alert("请您先设置查询条件");
         return
       }
 
-      this.$refs.viewPanel.saveViewBtn(async () => {
-        this.params.pageNum = 1;
-        this.taskPage.list = [];
+      this.$refs.viewPanel.saveViewBtn(async (viewName) => {
         this.$refs.viewPanel.hide();
-        this.getUserViews("saveView")
-        this.search(param);
+        this.getUserViews(viewName)
       })
     },
     /*
@@ -2034,7 +2042,21 @@ export default {
           }
         })
         // 自定义
-        const conditions = (this.searchParams_spare.conditions && this.searchParams_spare.conditions.length) ? [...params.conditions, ...this.searchParams_spare.conditions] : params.conditions || [];
+        let conditions;
+
+        if (this.searchParams_spare.conditions && this.searchParams_spare.conditions.length) {
+          conditions = [...this.searchParams_spare.conditions.filter(item => {
+            let bool = params.conditions.some(value => {
+              return item.property === value.property
+            })
+            if (!bool) {
+              return item
+            }
+          }), ...params.conditions]
+        } else {
+          conditions = params.conditions
+        }
+
         // 创建时间
         const createTimeStart = this._time(params.createTime, 0);
         const createTimeEnd = this._time(params.createTime, 1);
@@ -2171,6 +2193,21 @@ export default {
           }
         }
 
+        // 自定义视图去重
+        let customizeSys;
+        if (this.searchParams_spare.systemConditions && this.searchParams_spare.systemConditions.length) {
+          customizeSys = [...this.searchParams_spare.systemConditions.filter(item => {
+            let bool = systemConditions.some(value => {
+              return item.property === value.property
+            })
+            if (!bool) {
+              return item
+            }
+          }), ...systemConditions]
+        } else {
+          customizeSys = systemConditions
+        }
+
         const par = {
           ...citys,
           conditions: [...conditions], // 支付方式
@@ -2233,7 +2270,7 @@ export default {
           allotUserIds: this.getUserIdsWithSubmit(null, params, "allotUser"),
           payTypes: params.paymentMethods,
           searchTagIds: params.tags && params.tags.map(({ id }) => id),
-          systemConditions: (this.searchParams_spare.systemConditions && this.searchParams_spare.systemConditions.length) ? [...systemConditions, ...this.searchParams_spare.systemConditions] : systemConditions,
+          systemConditions: customizeSys,
           // eventNo: params.eventNo,
         };
         // 工单搜索分类型
