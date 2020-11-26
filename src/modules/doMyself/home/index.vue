@@ -97,7 +97,7 @@ export default {
       if (index === 2) {
         window.location.href = "/setting/message/smsmessage";
       } else if (index === 0) {
-        window.location.href = "setting/serviceStation/customerPortal";
+        window.location.href = "/setting/serviceStation/customerPortal";
       } else if (index === 1) {
         window.location.href = "/setting/doMyself/wxSet";
       } else if (index === 3) {
