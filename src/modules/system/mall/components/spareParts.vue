@@ -76,6 +76,7 @@
           v-for="(item, index) in tableNames"
           :key="index"
           :label="item.displayName"
+          :width="item.width || 'auto'"
         >
           <template slot-scope="scope">
             <template v-if="item.fieldName === 'isShopWindow'">
@@ -88,15 +89,16 @@
                   )
                 "
               />
-              <span>{{ scope.row.isShopWindow ? "禁用" : "启用" }}</span>
+              <span>{{ scope.row.isShopWindow ? "启用" : "禁用" }}</span>
             </template>
             <template v-else-if="item.fieldName === 'isShow'">
-              <el-checkbox
+              <el-switch
                 v-model="scope.row.isShow"
                 @change="
                   updateIsShowOrIsShopWindows(scope.row.isShow, scope.row.id, 0)
                 "
-              ></el-checkbox>
+              />
+              <span>{{ scope.row.isShow ? "发布" : "取消" }}</span>
             </template>
             <template v-else-if="item.fieldName === 'images'">
               <img
@@ -255,10 +257,12 @@ const TABLENAME = [
   {
     displayName: "启用橱窗",
     fieldName: "isShopWindow",
+    width: 100
   },
   {
     displayName: "发布/取消",
     fieldName: "isShow",
+    width: 100
   },
 ];
 
@@ -332,6 +336,7 @@ export default {
           id,
         } = item.baseSparepart;
         let images = imageList ? JSON.parse(imageList)[0] : image;
+        
         return {
           images,
           serialNumber,
@@ -348,6 +353,7 @@ export default {
           baseRepertory: item.baseRepertory,
           repertoryCount: item.repertoryCount,
           safetyStock: item.safetyStock,
+          
         };
       });
 
