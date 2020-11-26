@@ -167,6 +167,9 @@ const BizTeamSelect = {
       let index = this.value.findIndex(i => item == i);
       if(index >= 0) this.value.splice(index, 1)
       this.updatePopper();
+      this.$emit('input', this.value.filter(value => {
+        return value.id !== item.id
+      }));
     },
     /** 清空选中项 */
     clear(event){
