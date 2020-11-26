@@ -434,7 +434,7 @@ export default {
         const {mySearch, viewId} = this.intercept()
 
         if (this.intercept()) {
-          this.selectId = mySearch
+          this.selectId = mySearch || 'all'
           this.filterId = viewId
           result.forEach(item => {
             if (item.id === viewId) {
@@ -676,6 +676,11 @@ export default {
      * 新建视图展示
      */
     creatViewPanel({ region, id, name, searchModel }, type) {
+      if (name === "已关闭工单" || name === '已取消工单') {
+        this.$refs.viewPanel.open(type, name);
+        this.showBj = true
+        return 
+      }
       const selectCols = this.columns.filter((item) => {
         return item.show
       }).map(item => {
@@ -1367,7 +1372,7 @@ export default {
     changeTaskType(taskType) {
       this.searchParams = {...this.searchParams_spare, ...{templateId: taskType.id}}
       this.currentTaskType = taskType;
-      this.selectId = 'all'
+      // this.selectId = 'all'
       this.searchParams.keyword = this.params.keyword
       this.params = this.initParams(this.params.pageSize, this.params.keyword);
       this.initialize();
@@ -2054,7 +2059,7 @@ export default {
             }
           }), ...params.conditions]
         } else {
-          conditions = params.conditions
+          conditions = params.conditions || []
         }
 
         // 创建时间
@@ -2205,7 +2210,7 @@ export default {
             }
           }), ...systemConditions]
         } else {
-          customizeSys = systemConditions
+          customizeSys = systemConditions || []
         }
 
         const par = {

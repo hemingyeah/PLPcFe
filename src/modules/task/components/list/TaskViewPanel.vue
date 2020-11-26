@@ -859,9 +859,19 @@ export default {
       }
       return operator;
     },
-    open(type = "", systemConditions = "", { taskFields, taskReceiptFields }) {
+    open(type = "", systemConditions = "", { taskFields, taskReceiptFields } = '') {
       this.visible = true;
       this.type = type;
+
+      // 已取消 and 已关闭
+      if (systemConditions === "已关闭工单" || systemConditions === '已取消工单') {
+        this.searchModelCN = [{
+          key: '工单状态',
+          content: systemConditions
+        }]
+        return
+      }
+      
       this.customizeViewList = [
         ...taskFields,
         ...taskReceiptFields.filter((item) => {
