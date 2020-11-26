@@ -664,6 +664,7 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
   */
   public handlerTableSortChanged(option: { prop?: any, order?: any } = {}) {
     const { prop, order } = option
+
     if (!order) {
       this.orderDetail = {}
       this.selectSortord = this.backupSelectSorted
@@ -677,10 +678,10 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
       code: SortedMap[prop],
     }
     
-    if (!this.backupSelectSorted) {
+    if (this.backupSelectSorted == null) {
       this.backupSelectSorted = this.selectSortord
     }
-
+    
     this.orderDetail = orderDetail
     this.selectSortord = null
     this.initialize()
