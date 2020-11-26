@@ -282,6 +282,7 @@ export default {
      */
     getOneView(systemConditions, customizeViewList) {
       const taskList = customizeViewList;
+      let ids = []
       this.searchModelCN = [
         {
           key: "",
@@ -351,6 +352,7 @@ export default {
                 });
               } else if (item.property === "createUser") {
                 this.getSimpleUserListByIds(item.inValue, (content) => {
+                  console.log(content)
                   this.searchModelCN.push({
                     key: value.displayName,
                     content,
@@ -361,6 +363,7 @@ export default {
                 });
               } else if (item.property === "allotUser") {
                 this.getSimpleUserListByIds(item.inValue, (content) => {
+                  console.log(content)
                   this.searchModelCN.push({
                     key: value.displayName,
                     content,
@@ -371,6 +374,7 @@ export default {
                 });
               } else if (item.property === "executor" || item.operator === "user") {
                 this.getSimpleUserListByIds(item.inValue, (content) => {
+                  console.log(content)
                   this.searchModelCN.push({
                     key: value.displayName,
                     content,
@@ -381,6 +385,7 @@ export default {
                 });
               } else if (item.property === "synergies") {
                 this.getSimpleUserListByIds(item.inValue, (content) => {
+                  console.log(content)
                   this.searchModelCN.push({
                     key: value.displayName,
                     content,
