@@ -374,7 +374,6 @@ import BaseGallery from 'packages/BaseGallery'
 
 
 import settingMixin from './settingShowCmp/index'
-import userImg from '@src/assets/img/myShop/logo.png'
 import headPhone from '@src/assets/img/myShop/headPhone.png'
 import {
   getRules,
@@ -457,7 +456,7 @@ export default {
           type: 'company-card',
           id: 1,
           data: {
-            logoUrl: userImg,
+            logoUrl: '',
             name: '',
             mobile: '',
             address: '',
