@@ -35,10 +35,12 @@
           v-for="(item, index) in tableNames"
           :key="index"
           :label="item.displayName"
+          :width="item.width || 'auto'"
         >
           <template slot-scope="scope">
             <template v-if="item.fieldName === 'isShow'">
-              <el-checkbox v-model="scope.row.isShow" @change="marketItem(scope.row.isShow, scope.row.id)"></el-checkbox>
+              <el-switch v-model="scope.row.isShow" @change="marketItem(scope.row.isShow, scope.row.id)" />
+              <span>{{ scope.row.isShow ? "发布" : "取消" }}</span>
             </template>
             <template v-else>{{ scope.row[item.fieldName] }}</template>
           </template>
@@ -109,6 +111,7 @@ const TABLENAME = [
   {
     displayName: "发布/取消",
     fieldName: "isShow",
+    width: 100
   },
 ];
 
