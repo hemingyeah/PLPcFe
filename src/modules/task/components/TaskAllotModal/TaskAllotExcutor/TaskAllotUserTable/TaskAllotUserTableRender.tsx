@@ -159,15 +159,18 @@ class TaskAllotUserTableRender extends TaskAllotUserTableMethods {
    * @description 渲染选择位置 其他选项
   */
   renderLocationOtherOption() {
-    const numberReg = /^\d+[.]?\d{1,3}$/
+    const numberLengthReg = /^\d{0,5}$/
+    const numberReg = /^\d+$/
     const numberHandler = (value: string): number | null => {
       let number = Number(value)
       return (
-        value === '' 
+        value === ''
           ? null
           : numberReg.test(value)
-            ? number
-            : Number(number.toFixed(3))
+            ? numberLengthReg.test(value)
+              ? number
+              : Number(value.substr(0, 5))
+            : null
       )
     }
     const HandlerMinValueChanged = (value: string) => { this.locationOtherData.minValue = numberHandler(value) }
@@ -180,7 +183,9 @@ class TaskAllotUserTableRender extends TaskAllotUserTableMethods {
           <el-input
             autocomplete="off"
             class='location-min-input' 
-            placeholder='最小值' 
+            placeholder='最小值'
+            min={0}
+            max={99999}
             type='number'
             value={this.locationOtherData.minValue}
             onInput={HandlerMinValueChanged}
@@ -191,6 +196,8 @@ class TaskAllotUserTableRender extends TaskAllotUserTableMethods {
             class='location-max-input' 
             placeholder='最大值'
             type='number'
+            min={0}
+            max={99999}
             value={this.locationOtherData.maxValue}
             onInput={HandlerMaxValueChanged} 
           />

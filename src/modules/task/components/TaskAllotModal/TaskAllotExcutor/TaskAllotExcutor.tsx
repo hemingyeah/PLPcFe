@@ -5,7 +5,7 @@ import UserCard from '@src/modules/task/components/TaskAllotModal/UserCard/UserC
 import ComponentNameEnum from '@model/enum/ComponentNameEnum'
 /* entity */
 import TaskAllotUserInfo from '@model/entity/TaskAllotUserInfo'
-import LoginUser from '@model/entity/LoginUser/LoginUser'
+import Customer from '@model/entity/Customer'
 /* scss */
 import '@src/modules/task/components/TaskAllotModal/TaskAllotExcutor/TaskAllotExcutor.scss'
 /* types */
@@ -25,6 +25,8 @@ import { CreateElement } from 'vue'
   }
 })
 export default class TaskAllotExcutor extends Vue {
+  /* 客户信息 */
+  @Prop() readonly customer: Customer | undefined
   /* 工作状态颜色数组 */
   @Prop() readonly stateColorMap: StateColorMap | undefined
   
@@ -40,12 +42,12 @@ export default class TaskAllotExcutor extends Vue {
     return Boolean(this.TaskAllotModalComponent?.allowModifySynergyUser)
   }
   
-  /* 当前组件的负责人数据是否和父级的负责人数据一致 */
-  get isSameExcutorUser(): boolean {
-    return (
-      this.selectedExcutorUser 
-      && this.taskAllotModalExcutorUser 
-      && (this.selectedExcutorUser.userId == this.taskAllotModalExcutorUser.userId)
+  /* 当前选中的用户是客户的客户负责人，则显示专属标签（鼠标移动标签上提示“客户负责人”） */
+  get isCustomerManager(): boolean {
+    return Boolean(
+      this.selectedExcutorUser
+      && this.customer
+      && this.selectedExcutorUser.userId === this.customer.customerManager
     )
   }
   
@@ -139,7 +141,7 @@ export default class TaskAllotExcutor extends Vue {
                   stateColorMap={this.stateColorMap}
                   userId={this.selectedExcutorUser?.userId}
                   showSynergyButton={this.allowModifySynergyUser}
-                  showExcutorIcon={this.isSameExcutorUser}
+                  showCustomerManagerIcon={this.isCustomerManager}
                   emitEventComponentName={ComponentNameEnum.TaskAllotExcutor}
                   onClose={() => this.closeUserCard()}
                 /> 

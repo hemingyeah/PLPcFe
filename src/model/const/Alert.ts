@@ -27,9 +27,9 @@ export const REQUIRE_OTHER_NOTIFICATION_USER_MEESSAGE: string = '请先选择其
 // 工单指派地理位置 最大值不能小于最小值
 export const MAX_GREATER_THAN__MIN_MESSAGE: string = '最大值不能小于最小值';
 // 工单指派地理位置 最大值不能小于最小值
-export const REQUIRED_MIN_MESSAGE: string = '请输入最小值';
+export const REQUIRED_MIN_MESSAGE: string = '请输入正确的最小值';
 // 工单指派地理位置 最大值不能小于最小值
-export const REQUIRED_MAX_MESSAGE: string = '请输入最大值';
+export const REQUIRED_MAX_MESSAGE: string = '请输入正确的最大值';
 // 转派说明必填提示
 export const TASK_NO_REALLOT_REASON_MESSAGE: string = '请填写转派说明';
 // 不能将工单转派给原负责人

@@ -57,6 +57,7 @@ export default class TaskAllotModal extends TaskAllotModalRender {
               <div class='task-allot-excutor-container' style={this.allotContentStyle[TaskAllotTypeEnum.Person]}>
                 <task-allot-excutor
                   ref='TaskAllotExcutorComponent'
+                  customer={this.customer}
                   task={this.task}
                   loginUser={this.loginUser}
                   stateColorMap={this.stateColorMap}
@@ -71,10 +72,10 @@ export default class TaskAllotModal extends TaskAllotModalRender {
                     ref='TaskAllotPoolComponent'
                     show={this.allotType === TaskAllotTypeEnum.Pool}
                     style={this.allotContentStyle[TaskAllotTypeEnum.Pool]}
-                    stateColorMap={this.stateColorMap}
-                    task={this.task}
-                    taskConfig={this.taskConfig}
                     loginUser={this.loginUser}
+                    task={this.task}
+                    stateColorMap={this.stateColorMap}
+                    taskConfig={this.taskConfig}
                   />
                 )
               }
@@ -82,9 +83,9 @@ export default class TaskAllotModal extends TaskAllotModalRender {
                 this.isShowTaskAutoDispatchComponent
                 && (
                   <task-allot-auto
-                    show={this.allotType === TaskAllotTypeEnum.Auto} 
-                    task={this.task}
                     loginUser={this.loginUser}
+                    task={this.task}
+                    show={this.allotType === TaskAllotTypeEnum.Auto} 
                     style={this.allotContentStyle[TaskAllotTypeEnum.Auto]}
                     changeMatchRule={(rule: AutoDispatchListItem | null) => this.outsideSetMatchRule(rule)}
                   />

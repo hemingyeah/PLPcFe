@@ -39,8 +39,8 @@ enum UserCardEmitEventEnum {
 export default class UserCard extends Vue {
   // 向外发布事件的 组件名字
   @Prop() readonly emitEventComponentName: string | undefined
-  // 负责人图标
-  @Prop() readonly showExcutorIcon: boolean | undefined
+  // 客户负责人图标
+  @Prop() readonly showCustomerManagerIcon: boolean | undefined
   // 工作状态颜色数组
   @Prop() readonly stateColorMap: StateColorMap | undefined
   // 是否显示 协同人按钮
@@ -203,7 +203,11 @@ export default class UserCard extends Vue {
                 <div class='user-card-header-content-top-left'>
                   <div class='user-card-header-content-name' onClick={() => this.openUserViewTab()}>
                     {this?.user?.displayName}
-                    { this.showExcutorIcon && <i class='iconfont icon-huangguan'></i> }
+                    { this.showCustomerManagerIcon && (
+                      <el-tooltip content='客户负责人' placement='top'>
+                        <i class='iconfont icon-huangguan'></i>
+                      </el-tooltip>
+                    )}
                   </div>
                   
                   <div class='user-card-header-content-state'>
