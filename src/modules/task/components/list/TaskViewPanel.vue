@@ -874,6 +874,7 @@ export default {
           key: '工单状态',
           content: systemConditions
         }]
+        this.region.viewName = systemConditions
         return
       }
       
