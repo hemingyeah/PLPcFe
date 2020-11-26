@@ -46,6 +46,15 @@ const SortedMap: { [x: string]: number } = {
   [TaslAllotTableColumnFieldEnum.LineDistance]: AllotSortedEnum.Distance
 }
 
+const OrderMap = {
+  [AllotSortedEnum.Distance]: true,
+  [AllotSortedEnum.TaskDegreePercentByMonth]: false,
+  [AllotSortedEnum.TaskWorkUsedTimeByMonth]: true,
+  [AllotSortedEnum.ExecutorTaskByMonth]: false,
+  [AllotSortedEnum.TaskAcceptTimeByMonth]: true,
+  [AllotSortedEnum.FinishTaskByMonth]: false
+}
+
 // @ts-ignore
 window.openCustomerViewFunc = function openCustomerViewFunc(customerId: string) {
   openTabForCustomerView(customerId)
@@ -323,11 +332,8 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
   public buildSearchUserParams(): TaskAllotUserSearchModel {
     let distance: number[] | null = this.getParamDistance()
     let users: LoginUser[] = this.isAllotByTag ? this.selectTeamUsers : this.selectDeptUsers
-    let orderDetail: any = (
-      Object.keys(this.orderDetail).length > 0 
-        ? this.orderDetail
-        : { code: this.selectSortord, order: true  }
-    )
+    let orderDetail: { order: boolean, code: number} = this.getParamOrderDetail()
+    
     let params: TaskAllotUserSearchModel = {
       order: orderDetail.order,
       code: orderDetail.code,
@@ -411,6 +417,23 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
   */
   public getScrollTableEl(): Element | null {
     return document.querySelector('.task-allot-user-table-block .el-table__body-wrapper')
+  }
+  
+    /** 
+   * @description 获取排序参数
+  */
+  public getParamOrderDetail(): { order: boolean, code: number } {
+    let orderDetail: any = (
+      Object.keys(this.orderDetail).length > 0 
+        ? this.orderDetail
+        : {
+          code: this.selectSortord, 
+          // @ts-ignore
+          order: OrderMap[this.selectSortord] === undefined ? true : OrderMap[this.selectSortord]
+        }
+    )
+    
+    return orderDetail
   }
   
   /** 
@@ -664,7 +687,7 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
   */
   public handlerTableSortChanged(option: { prop?: any, order?: any } = {}) {
     const { prop, order } = option
-
+    
     if (!order) {
       this.orderDetail = {}
       this.selectSortord = this.backupSelectSorted

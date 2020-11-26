@@ -51,7 +51,7 @@ export default class TaskAllotAuto extends Vue {
   
   @Watch('isUsedResult')
   onIsUsedResultChanged(newVal: string) {
-    this.changeMatchRule && this.changeMatchRule(newVal ? this.matchRule : null)
+    this.changeUpwardMatchRule(newVal ? this.matchRule : null)
   }
   
   /* 自动派单根据是否显示未匹配的筛选列表 匹配结果用于显示的列表 */
@@ -74,6 +74,7 @@ export default class TaskAllotAuto extends Vue {
       if (matchSuccessfully) {
         this.matchRule = item
         this.matchRuleIndex = i
+        this.changeUpwardMatchRule(this.matchRule)
         break
       }
     }
@@ -97,6 +98,10 @@ export default class TaskAllotAuto extends Vue {
       taskId: this.task?.id || '',
       executorId: 'auto_dispatch'
     }
+  }
+  
+  private changeUpwardMatchRule(data: AutoDispatchListItem | null) {
+    this.changeMatchRule && this.changeMatchRule(data)
   }
   
   /** 
@@ -202,8 +207,10 @@ export default class TaskAllotAuto extends Vue {
   private renderMathItem(item: AutoDispatchListItem) {
     return (
       <div class={`${this.className}-item`}>
-        <div class={[`${this.className}-item-name`, `${this.className}-match`]} onClick={() => this.openRuleDialogForDisplay(item)}>
-          按「{item.finalRuleName || ''}」匹配
+        <div class={[`${this.className}-match`]}>
+          按「
+          <span class={`${this.className}-item-name`} onClick={() => this.openRuleDialogForDisplay(item)}>{item.finalRuleName || ''}</span>
+          」匹配
         </div>
         <div>
           { item.finalExecutorName && <span>预估匹配到合适人员【{item.finalExecutorName}】</span> }
@@ -225,8 +232,10 @@ export default class TaskAllotAuto extends Vue {
   private renderUnMathItem(item: AutoDispatchListItem) {
     return (
       <div class={`${this.className}-item`}>
-        <div class={`${this.className}-item-name`} onClick={() => this.openRuleDialogForDisplay(item)}>
-          按「{item.name || ''}」匹配
+        <div>
+          按「
+          <span class={`${this.className}-item-name`} onClick={() => this.openRuleDialogForDisplay(item)}>{item.name || ''}</span>
+          」匹配
         </div>
         <div class={`${this.className}-nomatch`}>未匹配到合适人员</div>
       </div>
