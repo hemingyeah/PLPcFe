@@ -1450,7 +1450,6 @@ export default {
         this.$platform.alert('对不起，您没有该操作权限');
         return
       }
-      return;
       let { status, message } = this.judgeSelectManager();
       let isSucc = (status == 0);
 
