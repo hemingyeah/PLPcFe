@@ -1,7 +1,12 @@
 <template>
-  <base-panel :show.sync="visible" :width="panelWidth" @close="hide()" :re="true">
+  <base-panel
+    :show.sync="visible"
+    :width="panelWidth"
+    @close="hide()"
+    :re="true"
+  >
     <h3 slot="title">
-      <span>{{region.viewName || '新建视图'}}</span>
+      <span>{{ region.viewName || "新建视图" }}</span>
       <el-dropdown
         class="pull-right"
         trigger="click"
@@ -19,17 +24,24 @@
       </el-dropdown>
     </h3>
     <!-- S 搜索条件 -->
-    <el-form class="advanced-search-form" :class="{'advanced-search-form-active': type === 'view'}" onsubmit="return false;">
+    <el-form
+      class="advanced-search-form"
+      :class="{ 'advanced-search-form-active': type === 'view' }"
+      onsubmit="return false;"
+    >
       <!-- 查看视图 -->
       <div class="task-flex task-ai">
-        <div class="task-view-name task-view-view task-flex" v-show="type === 'view'" v-for="(item, index) in searchModelCN" :key="index">
-          <span class="task-f14">{{item.key}} :</span>
+        <div
+          class="task-view-name task-view-view task-flex"
+          v-show="type === 'view'"
+          v-for="(item, index) in searchModelCN"
+          :key="index"
+        >
+          <span class="task-f14">{{ item.key }} :</span>
           <div v-if="item.fieldName !== 'area'">
-            {{item.content}}
+            {{ item.content }}
           </div>
-          <div v-else>
-            {{item.province}}{{item.city}}{{item.dist}}
-          </div>
+          <div v-else>{{ item.province }}{{ item.city }}{{ item.dist }}</div>
         </div>
       </div>
       <!-- S 视图名称 -->
@@ -41,7 +53,8 @@
             v-model="viewName"
             :maxlength="20"
           >
-        </el-input></div>
+          </el-input>
+        </div>
       </div>
       <!-- E 视图名称 -->
       <!-- S 搜索 -->
@@ -71,7 +84,12 @@
       </el-form>
       <!-- E 搜索 -->
       <!-- 全员可见 -->
-      <el-checkbox v-model="viewRegion" class="task-view-region" v-show="type !== 'view'">设为全员可见</el-checkbox>
+      <el-checkbox
+        v-model="viewRegion"
+        class="task-view-region"
+        v-show="type !== 'view'"
+        >设为全员可见</el-checkbox
+      >
       <!-- 搜索操作按钮 -->
       <slot name="footer"></slot>
     </el-form>
@@ -210,9 +228,9 @@ export default {
      */
     saveViewBtn(fn) {
       const { region } = this;
-      const {systemConditions, conditions} = this.buildTaskInquireParams()
+      const { systemConditions, conditions } = this.buildTaskInquireParams();
       region.searchModel.systemConditions = systemConditions;
-      region.searchModel.conditions = conditions
+      region.searchModel.conditions = conditions;
       if (!this.viewName) {
         this.$platform.alert("请输入视图名称");
         return;
@@ -282,7 +300,7 @@ export default {
      */
     getOneView(systemConditions, customizeViewList) {
       const taskList = customizeViewList;
-      let ids = []
+      let ids = [];
       this.searchModelCN = [
         {
           key: "",
@@ -308,7 +326,8 @@ export default {
               value.fieldName === "synergyId") ||
             (item.property === "allotType" &&
               value.fieldName === "allotTypeStr") ||
-            (item.property === "flags" && value.fieldName === "onceException") ||
+            (item.property === "flags" &&
+              value.fieldName === "onceException") ||
             ((item.property === "province" ||
               item.property === "city" ||
               item.property === "dist") &&
@@ -352,7 +371,7 @@ export default {
                 });
               } else if (item.property === "createUser") {
                 this.getSimpleUserListByIds(item.inValue, (content) => {
-                  console.log(content)
+                  console.log(content);
                   this.searchModelCN.push({
                     key: value.displayName,
                     content,
@@ -363,7 +382,7 @@ export default {
                 });
               } else if (item.property === "allotUser") {
                 this.getSimpleUserListByIds(item.inValue, (content) => {
-                  console.log(content)
+                  console.log(content);
                   this.searchModelCN.push({
                     key: value.displayName,
                     content,
@@ -372,9 +391,12 @@ export default {
                     ids: item.inValue,
                   });
                 });
-              } else if (item.property === "executor" || item.operator === "user") {
+              } else if (
+                item.property === "executor" ||
+                item.operator === "user"
+              ) {
                 this.getSimpleUserListByIds(item.inValue, (content) => {
-                  console.log(content)
+                  console.log(content);
                   this.searchModelCN.push({
                     key: value.displayName,
                     content,
@@ -385,7 +407,7 @@ export default {
                 });
               } else if (item.property === "synergies") {
                 this.getSimpleUserListByIds(item.inValue, (content) => {
-                  console.log(content)
+                  console.log(content);
                   this.searchModelCN.push({
                     key: value.displayName,
                     content,
@@ -526,294 +548,317 @@ export default {
     },
 
     buildTaskInquireParams() {
-      let params = {
-        systemConditions: [],
-        conditions: [],
-      };
-      const taskInquireList = this.$refs.taskInquireParams.returnInquireFields();
-      const form = { ...this.$refs.taskInquireParams.returnData() };
-      this.formBackup = Object.assign(this.formBackup, {
-        ...this.$refs.taskInquireParams.returnData(),
-      });
+      if (this.viewName) {
+        let params = {
+          systemConditions: [],
+          conditions: [],
+        };
+        const taskInquireList = this.$refs.taskInquireParams.returnInquireFields();
+        const form = { ...this.$refs.taskInquireParams.returnData() };
+        this.formBackup = Object.assign(this.formBackup, {
+          ...this.$refs.taskInquireParams.returnData(),
+        });
 
-      const isSystemFields = taskInquireList.filter((f) => f.isSystem);
-      const notSystemFields = taskInquireList.filter((f) => !f.isSystem);
+        const isSystemFields = taskInquireList.filter((f) => f.isSystem);
+        const notSystemFields = taskInquireList.filter((f) => !f.isSystem);
 
-      let tv = null;
-      let fn = "";
-      // 固定条件
-      for (let i = 0; i < isSystemFields.length; i++) {
-        tv = isSystemFields[i];
-        fn = tv.fieldName;
+        let tv = null;
+        let fn = "";
+        // 固定条件
+        for (let i = 0; i < isSystemFields.length; i++) {
+          tv = isSystemFields[i];
+          fn = tv.fieldName;
 
-        if (!form[fn] || (Array.isArray(form[fn]) && !form[fn].length)) {
-          continue;
-        }
-
-        // 空对象
-        if (
-          typeof form[fn] === "object" &&
-          !Array.isArray(form[fn]) &&
-          !Object.keys(form[fn]).length
-        ) {
-          continue;
-        }
-
-        if (tv.formType === "address") {
-          let address = [];
-          let isEmpty = isEmptyStringObject(form[fn]);
-
-          if (!isEmpty) {
-            if (form[fn].province) {
-              address.push({
-                property: "province",
-                operator: tv.operatorValue,
-                value: form[fn].province,
-              });
-            }
-            if (form[fn].city) {
-              address.push({
-                property: "city",
-                operator: tv.operatorValue,
-                value: form[fn].city,
-              });
-            }
-            if (form[fn].dist) {
-              address.push({
-                property: "dist",
-                operator: tv.operatorValue,
-                value: form[fn].dist,
-              });
-            }
+          if (!form[fn] || (Array.isArray(form[fn]) && !form[fn].length)) {
+            continue;
           }
-          params.systemConditions = [...params.systemConditions, ...address];
-          continue;
-        }
 
-        if (tv.fieldName == "tags") {
-          let condition = {
-            property: "tagIds",
-            operator: tv.operatorValue,
-            inValue: form[fn].map((tag) => {
-              return tag.id;
-            }),
-          };
-          params.systemConditions.push(condition);
-          continue;
-        }
+          // 空对象
+          if (
+            typeof form[fn] === "object" &&
+            !Array.isArray(form[fn]) &&
+            !Object.keys(form[fn]).length
+          ) {
+            continue;
+          }
 
-        if (tv.fieldName == "state") {
-          let condition = {
+          if (tv.formType === "address") {
+            let address = [];
+            let isEmpty = isEmptyStringObject(form[fn]);
+
+            if (!isEmpty) {
+              if (form[fn].province) {
+                address.push({
+                  property: "province",
+                  operator: tv.operatorValue,
+                  value: form[fn].province,
+                });
+              }
+              if (form[fn].city) {
+                address.push({
+                  property: "city",
+                  operator: tv.operatorValue,
+                  value: form[fn].city,
+                });
+              }
+              if (form[fn].dist) {
+                address.push({
+                  property: "dist",
+                  operator: tv.operatorValue,
+                  value: form[fn].dist,
+                });
+              }
+            }
+            params.systemConditions = [...params.systemConditions, ...address];
+            continue;
+          }
+
+          if (tv.fieldName == "tags") {
+            let condition = {
+              property: "tagIds",
+              operator: tv.operatorValue,
+              inValue: form[fn].map((tag) => {
+                return tag.id;
+              }),
+            };
+            params.systemConditions.push(condition);
+            continue;
+          }
+
+          if (tv.fieldName == "state") {
+            let condition = {
+              property: fn,
+              operator: tv.operatorValue,
+              inValue: form[fn].map((stateName) =>
+                TaskStateEnum.getValue(stateName)
+              ),
+            };
+            params.systemConditions.push(condition);
+            continue;
+          }
+
+          if (tv.fieldName === "exceptionType") {
+            let exceptionType;
+            switch (form[fn]) {
+              case "暂停":
+                exceptionType = 1;
+                break;
+              case "超时":
+                exceptionType = 2;
+                break;
+              default:
+                exceptionType = 0;
+                break;
+            }
+            params.systemConditions.push({
+              property: "exceptionType",
+              operator: tv.operatorValue,
+              value: exceptionType,
+            });
+            continue;
+          }
+
+          if (tv.fieldName == "product") {
+            params.systemConditions.push({
+              property: "productId",
+              operator: tv.operatorValue,
+              value: form[fn],
+            });
+            continue;
+          }
+
+          if (tv.fieldName === "paymentMethod") {
+            params.conditions.push({
+              property: fn,
+              operator: tv.operatorValue,
+              inValue: form[fn],
+            });
+            continue;
+          }
+
+          if (tv.fieldName == "allotTypeStr") {
+            params.systemConditions.push({
+              property: "allotType",
+              operator: tv.operatorValue,
+              inValue: form[fn].map((type) => AllotTypeConvertMap[type]),
+            });
+            continue;
+          }
+
+          if (tv.fieldName == "onceException") {
+            params.systemConditions.push({
+              property: "flags",
+              operator: tv.operatorValue,
+              inValue: form[fn].map(
+                (exception) => FlagConvertMap[exception] || ""
+              ),
+            });
+            continue;
+          }
+
+          if (tv.fieldName === "synergyId") {
+            let condition = {
+              property: "synergies",
+              operator: tv.operatorValue,
+              inValue: form[fn],
+            };
+            params.systemConditions.push(condition);
+            continue;
+          }
+
+          // if (tv.fieldName === "source") {
+          //   let condition = {
+          //     property: "source",
+          //     operator: tv.operatorValue,
+          //     inValue: form[fn],
+          //   };
+          //   params.systemConditions.push(condition);
+          //   continue;
+          // }
+
+          if (tv.formType == "date") {
+            params.systemConditions.push({
+              property: fn,
+              operator: tv.operatorValue,
+              betweenValue1: `${formatDate(
+                form[fn][0],
+                "YYYY-MM-DD"
+              )} 00:00:00`,
+              betweenValue2: `${formatDate(
+                form[fn][1],
+                "YYYY-MM-DD"
+              )} 23:59:59`,
+            });
+            continue;
+          }
+
+          if (tv.formType === "datetime") {
+            params.systemConditions.push({
+              property: fn,
+              operator: tv.operatorValue,
+              betweenValue1: `${formatDate(
+                form[fn][0],
+                "YYYY-MM-DD"
+              )} 00:00:00`,
+              betweenValue2: `${formatDate(
+                form[fn][1],
+                "YYYY-MM-DD"
+              )} 23:59:59`,
+            });
+            continue;
+          }
+
+          if (
+            MultiFieldNames.indexOf(tv.formType) !== -1 ||
+            tv.formType === "user"
+          ) {
+            params.systemConditions.push({
+              property: fn,
+              operator: tv.operatorValue,
+              inValue: form[fn],
+            });
+            continue;
+          }
+
+          if (TaskInquireConvertFieldNamesToConditionsMap[fn]) {
+            params.systemConditions.push({
+              property: TaskInquireConvertFieldNamesToConditionsMap[fn],
+              operator: tv.operatorValue,
+              value: form[fn],
+            });
+            continue;
+          }
+
+          let value =
+            TaskOnceConvertMap[form[fn]] != undefined
+              ? TaskOnceConvertMap[form[fn]]
+              : form[fn];
+          value =
+            TaskApproveConvertMap[value] != undefined
+              ? TaskApproveConvertMap[value]
+              : value;
+
+          params.systemConditions.push({
             property: fn,
             operator: tv.operatorValue,
-            inValue: form[fn].map((stateName) =>
-              TaskStateEnum.getValue(stateName)
-            ),
-          };
-          params.systemConditions.push(condition);
-          continue;
-        }
-
-        if (tv.fieldName === "exceptionType") {
-          let exceptionType;
-          switch (form[fn]) {
-            case "暂停":
-              exceptionType = 1;
-              break;
-            case "超时":
-              exceptionType = 2;
-              break;
-            default:
-              exceptionType = 0;
-              break;
-          }
-          params.systemConditions.push({
-            property: "exceptionType",
-            operator: tv.operatorValue,
-            value: exceptionType,
+            value,
           });
-          continue;
         }
 
-        if (tv.fieldName == "product") {
-          params.systemConditions.push({
-            property: "productId",
-            operator: tv.operatorValue,
+        // 自定义条件
+        for (let i = 0; i < notSystemFields.length; i++) {
+          tv = notSystemFields[i];
+          fn = tv.fieldName;
+          !tv.operator ? (tv["operator"] = this.matchOperator(tv)) : "";
+          if (!form[fn] || (Array.isArray(form[fn]) && !form[fn].length)) {
+            continue;
+          }
+
+          // 空对象
+          if (
+            typeof form[fn] === "object" &&
+            !Array.isArray(form[fn]) &&
+            !Object.keys(form[fn]).length
+          ) {
+            continue;
+          }
+
+          // FIXME: 同下面 datetime
+          if (tv.formType === "date") {
+            params.conditions.push({
+              property: fn,
+              operator: tv.operator,
+              betweenValue1: formatDate(form[fn][0], "YYYY-MM-DD HH:mm:ss"),
+              betweenValue2: `${formatDate(
+                form[fn][1],
+                "YYYY-MM-DD"
+              )} 23:59:59`,
+            });
+            continue;
+          }
+
+          if (tv.formType === "cascader") {
+            params.conditions.push({
+              property: fn,
+              operator: tv.operator,
+              inValue: form[fn],
+            });
+            continue;
+          }
+          if (tv.formType === "user" && Array.isArray(form[fn])) {
+            params.conditions.push({
+              property: fn,
+              operator: "user",
+              inValue: form[fn],
+            });
+            continue;
+          }
+
+          // FIXME: 这里 form[fn] 为 字 符串的时候 error
+          if (tv.formType === "datetime") {
+            params.conditions.push({
+              property: fn,
+              operator: tv.operator,
+              betweenValue1: formatDate(form[fn][0], "YYYY-MM-DD HH:mm:ss"),
+              betweenValue2: `${formatDate(
+                form[fn][1],
+                "YYYY-MM-DD"
+              )} 23:59:59`,
+            });
+            continue;
+          }
+          params.conditions.push({
+            property: fn,
+            operator: tv.operator,
             value: form[fn],
           });
-          continue;
         }
 
-        if (tv.fieldName === "paymentMethod") {
-          params.conditions.push({
-            property: fn,
-            operator: tv.operatorValue,
-            inValue: form[fn],
-          });
-          continue;
-        }
-
-        if (tv.fieldName == "allotTypeStr") {
-          params.systemConditions.push({
-            property: "allotType",
-            operator: tv.operatorValue,
-            inValue: form[fn].map((type) => AllotTypeConvertMap[type]),
-          });
-          continue;
-        }
-
-        if (tv.fieldName == "onceException") {
-          params.systemConditions.push({
-            property: "flags",
-            operator: tv.operatorValue,
-            inValue: form[fn].map(
-              (exception) => FlagConvertMap[exception] || ""
-            ),
-          });
-          continue;
-        }
-
-        if (tv.fieldName === "synergyId") {
-          let condition = {
-            property: "synergies",
-            operator: tv.operatorValue,
-            inValue: form[fn],
-          };
-          params.systemConditions.push(condition);
-          continue;
-        }
-
-        // if (tv.fieldName === "source") {
-        //   let condition = {
-        //     property: "source",
-        //     operator: tv.operatorValue,
-        //     inValue: form[fn],
-        //   };
-        //   params.systemConditions.push(condition);
-        //   continue;
-        // }
-
-        if (tv.formType == "date") {
-          params.systemConditions.push({
-            property: fn,
-            operator: tv.operatorValue,
-            betweenValue1: `${formatDate(form[fn][0], "YYYY-MM-DD")} 00:00:00`,
-            betweenValue2: `${formatDate(form[fn][1], "YYYY-MM-DD")} 23:59:59`,
-          });
-          continue;
-        }
-
-        if (tv.formType === "datetime") {
-          params.systemConditions.push({
-            property: fn,
-            operator: tv.operatorValue,
-            betweenValue1: `${formatDate(form[fn][0], "YYYY-MM-DD")} 00:00:00`,
-            betweenValue2: `${formatDate(form[fn][1], "YYYY-MM-DD")} 23:59:59`,
-          });
-          continue;
-        }
-
-        if (
-          MultiFieldNames.indexOf(tv.formType) !== -1 ||
-          tv.formType === "user"
-        ) {
-          params.systemConditions.push({
-            property: fn,
-            operator: tv.operatorValue,
-            inValue: form[fn],
-          });
-          continue;
-        }
-
-        if (TaskInquireConvertFieldNamesToConditionsMap[fn]) {
-          params.systemConditions.push({
-            property: TaskInquireConvertFieldNamesToConditionsMap[fn],
-            operator: tv.operatorValue,
-            value: form[fn],
-          });
-          continue;
-        }
-
-        let value =
-          TaskOnceConvertMap[form[fn]] != undefined
-            ? TaskOnceConvertMap[form[fn]]
-            : form[fn];
-        value =
-          TaskApproveConvertMap[value] != undefined
-            ? TaskApproveConvertMap[value]
-            : value;
-
-        params.systemConditions.push({
-          property: fn,
-          operator: tv.operatorValue,
-          value,
-        });
+        this.searchModelCN = [];
+        return params;
+      } else {
+        this.$platform.alert("请输入视图名称");
       }
-
-      // 自定义条件
-      for (let i = 0; i < notSystemFields.length; i++) {
-        tv = notSystemFields[i];
-        fn = tv.fieldName;
-        !tv.operator ? (tv["operator"] = this.matchOperator(tv)) : "";
-        if (!form[fn] || (Array.isArray(form[fn]) && !form[fn].length)) {
-          continue;
-        }
-
-        // 空对象
-        if (
-          typeof form[fn] === "object" &&
-          !Array.isArray(form[fn]) &&
-          !Object.keys(form[fn]).length
-        ) {
-          continue;
-        }
-
-        // FIXME: 同下面 datetime
-        if (tv.formType === "date") {
-          params.conditions.push({
-            property: fn,
-            operator: tv.operator,
-            betweenValue1: formatDate(form[fn][0], "YYYY-MM-DD HH:mm:ss"),
-            betweenValue2: `${formatDate(form[fn][1], "YYYY-MM-DD")} 23:59:59`,
-          });
-          continue;
-        }
-
-        if (tv.formType === "cascader") {
-          params.conditions.push({
-            property: fn,
-            operator: tv.operator,
-            inValue: form[fn],
-          });
-          continue;
-        }
-        if (tv.formType === "user" && Array.isArray(form[fn])) {
-          params.conditions.push({
-            property: fn,
-            operator: "user",
-            inValue: form[fn],
-          });
-          continue;
-        }
-
-        // FIXME: 这里 form[fn] 为 字 符串的时候 error
-        if (tv.formType === "datetime") {
-          params.conditions.push({
-            property: fn,
-            operator: tv.operator,
-            betweenValue1: formatDate(form[fn][0], "YYYY-MM-DD HH:mm:ss"),
-            betweenValue2: `${formatDate(form[fn][1], "YYYY-MM-DD")} 23:59:59`,
-          });
-          continue;
-        }
-        params.conditions.push({
-          property: fn,
-          operator: tv.operator,
-          value: form[fn],
-        });
-      }
-
-      return params;
     },
 
     getLocalStorageData() {
@@ -864,20 +909,29 @@ export default {
       }
       return operator;
     },
-    open(type = "", systemConditions = "", { taskFields, taskReceiptFields } = '') {
+    open(
+      type = "",
+      systemConditions = "",
+      { taskFields, taskReceiptFields } = ""
+    ) {
       this.visible = true;
       this.type = type;
 
       // 已取消 and 已关闭
-      if (systemConditions === "已关闭工单" || systemConditions === '已取消工单') {
-        this.searchModelCN = [{
-          key: '工单状态',
-          content: systemConditions
-        }]
-        this.region.viewName = systemConditions
-        return
+      if (
+        systemConditions === "已关闭工单" ||
+        systemConditions === "已取消工单"
+      ) {
+        this.searchModelCN = [
+          {
+            key: "工单状态",
+            content: systemConditions,
+          },
+        ];
+        this.region.viewName = systemConditions;
+        return;
       }
-      
+
       this.customizeViewList = [
         ...taskFields,
         ...taskReceiptFields.filter((item) => {
@@ -1075,7 +1129,7 @@ export default {
   }
 }
 .advanced-search-form-active {
- height: calc(100% - 30px);
+  height: calc(100% - 130px);
 }
 .hide {
   overflow: hidden;
@@ -1135,12 +1189,12 @@ export default {
   }
 }
 .task-view-region {
-    position: absolute;
-    bottom: 55px;
-    left: 15px;
-    height: 20px;
-    width: 100%;
-    background-color: white;
+  position: absolute;
+  bottom: 55px;
+  left: 15px;
+  height: 20px;
+  width: 100%;
+  background-color: white;
 }
 .task-view-view {
   padding: 15px 15px 0 15px;
