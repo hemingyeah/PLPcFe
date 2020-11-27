@@ -788,12 +788,11 @@ export default {
       this.otherText = "自定义筛选视图";
       this.selectColumnState = title;
       this.searchParams = searchModel
-      this.selectId = "all"
       this.searchParams_spare = searchModel
       this.getTaskCountByState(searchModel);
       this.params = this.initParams(this.params.pageSize);
-      this.search(searchModel);
       this.buildColumns();
+      this.createPerspective({id: this.selectId})
       // 埋点
       window.TDAPP.onEvent(`pc：工单列表-${name}`);
     },

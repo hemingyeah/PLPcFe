@@ -219,6 +219,25 @@
                 >
                   {{ `进行中(${filterData.processing || 0})` }}
                 </div>
+                <!-- 已完成工单 -->
+                <div
+                  v-for="item in taskView"
+                  :key="`${item.createTime}${Math.random() * 1000}`"
+                  @click="
+                    checkFilter({
+                      id: item.id,
+                      name: '已完成工单',
+                      searchModel: item.searchModel,
+                      title: 'finished',
+                    })
+                  "
+                  v-show="item.id === selectIds.finished"
+                  :class="{
+                    'task-c2': item.id === filterId,
+                  }"
+                >
+                  {{ `已完成(${filterData.finished || 0})` }}
+                </div>
                 <!-- 异常工单 -->
                 <div
                   v-for="item in taskView"
@@ -258,25 +277,7 @@
                 >
                   {{ `未完成(${filterData.unfinished || 0})` }}
                 </div>
-                <!-- 已完成工单 -->
-                <div
-                  v-for="item in taskView"
-                  :key="`${item.createTime}${Math.random() * 1000}`"
-                  @click="
-                    checkFilter({
-                      id: item.id,
-                      name: '已完成工单',
-                      searchModel: item.searchModel,
-                      title: 'finished',
-                    })
-                  "
-                  v-show="item.id === selectIds.finished"
-                  :class="{
-                    'task-c2': item.id === filterId,
-                  }"
-                >
-                  {{ `已完成(${filterData.finished || 0})` }}
-                </div>
+
               </div>
             </div>
             <div

@@ -642,6 +642,13 @@ export default {
     stopStep() {
       this.nowGuideStep = this.detailSteps.length + 1;
     },
+    /**
+     * 滚动的距离
+     */
+    getScroll(e) {
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop
+      this.collapse = scrollTop ? false : true
+    },
     // 是否含有某一指定权限
     hasAuth(keys) {
       return AuthUtil.hasAuth(this.permission, keys);
@@ -1059,6 +1066,8 @@ export default {
 
     this.collapse = JSON.parse(collapse || "true");
     this.collapseDirection = collapseDirection || "";
+
+    window.addEventListener('scroll', this.getScroll)
   },
   async mounted() {
     try {
@@ -1165,6 +1174,9 @@ export default {
     collapseDirection(newValue) {
       sessionStorage.setItem(`task_collapseDirection_${this.task.id}`, newValue);
     }
+  },
+  destroyed(){
+    window.removeEventListener('scroll', this.getScroll);
   },
   components: {
     [CancelTaskDialog.name]: CancelTaskDialog,
