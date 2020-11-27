@@ -22,14 +22,17 @@
       <el-table-column label="类别" prop="sparepartType"></el-table-column>
       <el-table-column label="备件规格" prop="standard" width="100px"></el-table-column>
       <el-table-column label="仓库">
-        <el-select v-model="scope.row.repertory" filterable slot-scope="scope" value-key="id">
-          <el-option
-            v-for="option in repertory"
-            :key="option.id"
-            :label="option.name"
-            :value="option"
-          ></el-option>
-        </el-select>
+        <template slot-scope="scope">
+          <span v-if="type">{{scope.row.sparepartName ? scope.row.repertory.name : ''}}</span>
+          <el-select v-model="scope.row.repertory" filterable value-key="id" v-else>
+            <el-option
+              v-for="option in repertory"
+              :key="option.id"
+              :label="option.name"
+              :value="option"
+            ></el-option>
+          </el-select>
+        </template>
       </el-table-column>
       <el-table-column label="类型">
         <el-select v-model="scope.row.type" slot-scope="scope">
@@ -67,18 +70,24 @@
 
 <script>
 import MathUtil from "@src/util/math";
+import { stringify } from '@src/util/querystring';
 
 export default {
   name: "part-instockBatch-form",
   inject: ["initData"],
   props: {
     sparepartConfig: Object,
-    repertory: Array
+    repertory: Array,
+    type: String,
+    repertoryName: {
+      type: Object,
+      default: () => ({})
+    },
   },
   data() {
     return {
       form: [],
-      remark: ""
+      remark: "",
     };
   },
   computed: {
@@ -116,10 +125,27 @@ export default {
 
       let repertories = this.repertory || [];
 
-      let repertory = row.repertory || {};
+      let repertory = row.repertory || this.repertoryName;
       let sparepart = row.sparepart || {};
 
       let id = repertory.id + "_" + sparepart.id;
+
+      if (this.form.length) {
+        this.form.push({
+          _id: id,
+          sparepart: sparepart.id || "",
+          sparepartName: sparepart.name || "",
+          serialNumber: sparepart.serialNumber || "",
+          sparepartType: sparepart.type || "",
+          standard: sparepart.standard || "",
+          type: this.form[this.form.length - 1].type,
+          repertory:
+            JSON.stringify(repertory) == "{}" ? repertories[0] : repertory,
+          variation: 1,
+        });
+        return
+      }
+
       this.form.push({
         _id: id,
         sparepart: sparepart.id || "",
@@ -130,7 +156,7 @@ export default {
         type: types[0],
         repertory:
           JSON.stringify(repertory) == "{}" ? repertories[0] : repertory,
-        variation: 1
+        variation: 1,
       });
     },
     fetchSparepart(keyword, cb) {

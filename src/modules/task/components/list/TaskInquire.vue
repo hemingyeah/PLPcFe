@@ -13,10 +13,13 @@
         :item="item"
         :inquire-form-backup="inquireFormBackup"
         :search-model="searchModel"
-        :search-model-cn="searchModelCN"
       />
     </div>
-    <div class="task-font14 task-c2 task-mt15 task-pointer" @click="create">
+    <div
+      class="task-font14 task-c2 task-mt15 task-pointer"
+      @click="create"
+      v-if="!type"
+    >
       设为常用搜索字段
     </div>
   </div>
@@ -52,6 +55,7 @@ const OperatorSelectOptionsMap = {
     { label: "包含", value: "like" },
     { label: "等于", value: "eq" },
   ],
+  multiple: [{ label: "介于", value: "in" }],
   description: [{ label: "包含", value: "like" }],
   date: [{ label: "介于", value: "between" }],
   select: [{ label: "等于", value: "eq" }],
@@ -59,11 +63,28 @@ const OperatorSelectOptionsMap = {
   many: [{ label: "包含", value: "contain" }],
 };
 
+const MultiFieldNames = [
+  "serviceType",
+  "serviceContent",
+  "level",
+  "paymentMethod",
+  "state",
+  "allotTypeStr",
+  "onceException",
+  "allotUser",
+  "tags",
+  "synergyId",
+  "createUser",
+  "executor",
+];
+
 function setFieldOperateHandler(field = {}) {
   let { fieldName, formType, setting } = field;
 
   if (formType == "number") {
     field.operatorOptions = OperatorSelectOptionsMap.input.slice();
+  } else if (MultiFieldNames.indexOf(fieldName) > -1) {
+    field.operatorOptions = OperatorSelectOptionsMap.multiple.slice();
   } else if (fieldName == "customer" || fieldName == "product") {
     field.operatorOptions = OperatorSelectOptionsMap.select.slice();
   } else if (formType === "description" || fieldName === "eventNo") {
@@ -94,6 +115,10 @@ function setFieldOperateHandler(field = {}) {
 export default {
   name: "task-inquire",
   props: {
+    taskNums: {
+      type: Array || null,
+      default: () => [], //已经存储的视图参数索引
+    },
     inquireFormBackup: {
       type: Object,
       default: () => ({}),
@@ -101,10 +126,6 @@ export default {
     searchModel: {
       type: Object,
       default: () => ({}),
-    },
-    searchModelCN: {
-      type: Array,
-      default: () => [],
     },
     config: {
       type: Array,
@@ -130,6 +151,9 @@ export default {
     };
   },
   watch: {
+    taskNums(v) {
+      this.list = v;
+    },
     config() {
       this.fields;
     },
@@ -184,7 +208,12 @@ export default {
       if (!this.$refs.batchForm) return {};
       this.$refs.batchForm.forEach((item) => {
         for (let key in item.returnDatas()) {
-          if (item.returnDatas()[key]) {
+          const value = item.returnDatas()[key];
+          if (
+            value &&
+            JSON.stringify(value) !== "{}" &&
+            JSON.stringify(value) !== "[]"
+          ) {
             data[key] = item.returnDatas()[key];
           } else if (key === "tags" && item.returnDatas()[key].length) {
             data[key] = item.returnDatas()[key];
@@ -205,7 +234,6 @@ export default {
 
       return inquireFields;
     },
-    // 设置为常用
     create() {
       const { check_system_list, check_customize_list, check_list } = this;
       this.$emit("setting", {
@@ -294,8 +322,8 @@ export default {
         }
         return v;
       });
+      console.log(this.list);
     },
-    // 获取选中的类型
     setting({ item, index }) {
       // type 0 = 初始化 1筛选
       if (item.isSystem) {
@@ -347,10 +375,6 @@ export default {
           type: Object,
           default: () => ({}),
         },
-        searchModelCN: {
-          type: Array,
-          default: () => [],
-        },
         fields: {
           type: Array,
           default: () => [],
@@ -368,7 +392,7 @@ export default {
           default: 1,
         },
         item: {
-          type: Number | String,
+          type: Number | String | Object,
           default: "",
         },
       },
@@ -378,19 +402,20 @@ export default {
           customer: {},
           form: {},
           product: {},
+          userList: []
         };
       },
       watch: {
-        item(v) {
-          this.buildForm();
-          if (!v) {
-            this.reset();
-          }
-        },
         inquireFormBackup(v) {
           if (JSON.stringify(v) === "{}") {
             this.reset();
             this.buildForm();
+          }
+        },
+        item(v) {
+          this.customizeParams();
+          if (!v) {
+            this.reset();
           }
         },
         fields(v) {
@@ -400,12 +425,93 @@ export default {
           }
         },
       },
-
       mounted() {
+        this.customizeParams();
         this.reset();
         this.buildForm();
       },
       methods: {
+        /*自定义视图参数 */
+        customizeParams() {
+          this.form["backUp"] = { customer: {}, product: {} };
+          if (this.item && this.item.fieldName) {
+            const {
+              fieldName,
+              content,
+              formType,
+              province,
+              city,
+              dist,
+              id,
+              ids,
+            } = this.item;
+            this.selectField(fieldName);
+            const types = [
+              "level",
+              "serviceContent",
+              "serviceType",
+              "paymentMethod",
+              "onceException",
+              "allotTypeStr",
+              "state",
+              "cascader",
+            ];
+            const personnel = [
+              "createUser",
+              "allotUser",
+              "executor",
+              "synergyId",
+              "user",
+            ];
+            if (personnel.indexOf(fieldName) !== -1 || personnel.indexOf(formType) !== -1) {
+              this.form[fieldName] = ids;
+              ids.forEach((item, i) => {
+                this.userList.push({
+                  id: item,
+                  name: content.split("，")[i]
+                })
+              })
+            } else if (
+              types.indexOf(fieldName) !== -1 ||
+              types.indexOf(formType) !== -1
+            ) {
+              this.form[fieldName] = content.split("，");
+            } else if (fieldName === "tlmName") {
+              this.form[fieldName] = id;
+              this.userList = [{id, name: content}]
+            } else if (formType === "datetime" || formType === "date") {
+              this.form[fieldName] = content.split("-");
+            } else if (fieldName === "customer") {
+              this.form[fieldName] = id;
+              this.form["backUp"].customer = { name: content, value: id };
+              this.customer = { name: content, value: id };
+            } else if (fieldName === "product") {
+              this.form[fieldName] = id;
+              this.form["backUp"].product = { name: content, value: id };
+              this.product = { name: content, value: id };
+            } else if (fieldName === "tags") {
+              this.form[fieldName] = [];
+              ids.forEach((item, i) => {
+                this.form[fieldName].push({
+                  id: item,
+                  tagName: content.split("，")[i],
+                });
+              });
+            } else if (fieldName === "area") {
+              this.form[fieldName] = {
+                addressType: 0,
+                province,
+                city,
+                dist,
+              };
+            } else {
+              this.form[fieldName] = content;
+            }
+          } else {
+            this.selectedField = {};
+            this.form = {};
+          }
+        },
         returnDatas() {
           let data = Object.assign({}, this.form);
           data.backUp = {
@@ -415,18 +521,37 @@ export default {
           return data;
         },
         reset() {
-          this.form = {};
+          // this.form = {};
           // if (this.fields.length) {
           //   this.selectField(this.fields[0].fieldName);
           // }
         },
         buildForm() {
-          localStorage.setItem("fields_length", this.fields.length);
-          if (Object.keys(this.form).length === this.fields.length) return;
-
+          if (Object.keys(this.form).length) return;
           this.fields.forEach((f) => {
-            if (f.fieldName === "tags" && f.formType === "select") {
-              this.form[f.fieldName] = [];
+            if (!this.form[f.fieldName] || !this.form[f.fieldName].length) {
+              // 地址的默认值初始化为对象
+              let tv = "";
+              if (f.formType == "customerAddress" || f.formType == "address")
+                tv = {};
+              if (f.formType == "date" || f.formType == "datetime") tv = [];
+              if (f.formType === "link") {
+                tv = {};
+              }
+              if (f.fieldName === "tags") {
+                tv = [];
+              }
+              if (f.formType === "area" || f.formType === "cascader") {
+                tv = [];
+              }
+
+              if (f.formType === "user") {
+                tv = [];
+              }
+              if (MultiFieldNames.indexOf(f.fieldName) > -1) {
+                this.form[f.fieldName] = [];
+              }
+              this.form[f.fieldName] = tv;
             }
           });
         },
@@ -488,6 +613,9 @@ export default {
             index: this.index,
           });
           this.form[val] = val == "tags" ? [] : "";
+          if (MultiFieldNames.indexOf(this.selectedField.fieldName) > -1) {
+            this.form[val] = [];
+          }
         },
         renderSelector() {
           if (!this.fields) return null;
@@ -513,11 +641,6 @@ export default {
 
           return (
             <el-select
-              class={
-                this.columnNum === 2
-                  ? "task-inquire-operator-select"
-                  : "task-mt12"
-              }
               value={this.selectedField.operatorValue}
               onInput={(value) => (this.selectedField.operatorValue = value)}
             >
@@ -537,8 +660,9 @@ export default {
           if (!comp || f.formType === "area") {
             return null;
           }
-          if (f.formType === "select") {
-            f.setting.isMulti = false;
+
+          if (MultiFieldNames.indexOf(this.selectedField.fieldName) > -1) {
+            f.setting.isMulti = true;
           }
 
           let childComp = null;
@@ -582,9 +706,11 @@ export default {
           } else if (f.formType === "user") {
             childComp = h("user-search", {
               props: {
+                multiple: true,
                 field: f,
                 value: this.form[f.fieldName],
                 disableMap: true,
+                userList: this.userList
               },
               on: {
                 update: (event) => this.update(event),
@@ -600,6 +726,7 @@ export default {
             let value = this.form[f.fieldName];
             childComp = h("biz-team-select", {
               props: {
+                multiple: true,
                 value: value ? value : [],
               },
               on: {
@@ -612,6 +739,7 @@ export default {
                 field: f,
                 value: this.form[f.fieldName],
                 disableMap: true,
+                userList: this.userList
               },
               on: {
                 update: (event) => this.update(event),
@@ -660,8 +788,22 @@ export default {
                     : "task-mt12"
                 }
               >
-                <div class="task-type">
+                <div
+                  class={
+                    this.columnNum === 2
+                      ? "task-inquire-operator-select task-type"
+                      : "task-mt12 task-type"
+                  }
+                >
                   {this.renderSelector()}
+                </div>
+                <div
+                  class={
+                    this.columnNum === 2
+                      ? "task-inquire-operator-select task-type"
+                      : "task-mt12 task-type"
+                  }
+                >
                   {this.renderOperateSelect()}
                 </div>
                 <div
@@ -713,11 +855,12 @@ export default {
 </script>
 
 <style lang="scss">
-.task-type > div {
+.task-type {
   width: 210px !important;
+  .el-select {
+    width: 100%;
+  }
 }
-</style>
-<style lang="scss">
 .task-inquire,
 .task-inquire-two {
   margin-top: 12px;

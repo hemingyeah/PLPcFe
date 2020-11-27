@@ -15,13 +15,13 @@
 
 <script>
 /* api */
-import * as TaskApi from '@src/api/TaskApi.ts';
+import * as TaskApi from "@src/api/TaskApi.ts";
 
 /* util */
-import DateUtil from '@src/util/date';
+import DateUtil from "@src/util/date";
 
 export default {
-  name: 'plantime-dialog',
+  name: "plantime-dialog",
   props: {
     task: {
       type: Object,
@@ -40,8 +40,8 @@ export default {
     return {
       visible: false,
       pending: false,
-      action: '',
-      planTime: '',
+      action: "",
+      planTime: "",
       sendSMS: false,
       planTimeDatePickeroptions: {
         disabledDate(time) {
@@ -60,7 +60,7 @@ export default {
     * @description 更新计划时间
     */
     update({ field, newValue, oldValue }) {
-      this.$set(this, 'planTime', newValue);
+      this.$set(this, "planTime", newValue);
     },
     /**
     * @description 打开计划时间弹窗
@@ -68,10 +68,10 @@ export default {
     async openDialog(action) {
       this.action = action;
 
-      let planTime = this.task.planTime || '';
+      let planTime = this.task.planTime || "";
 
       // 计划时间格式为日期时需格式化
-      if (this.dateType == 'date' && planTime) {
+      if (this.dateType == "date" && planTime) {
         planTime = planTime.slice(0, 10);
       }
       this.planTime = planTime;
@@ -80,7 +80,7 @@ export default {
       if (!this.modifiable && planTime) {
 
         // 上边已经对格式为日期时格式化了，现禁止修改计划时间，所以初始化为原始值
-        if (this.dateType == 'date') this.planTime = this.task.planTime;
+        if (this.dateType == "date") this.planTime = this.task.planTime;
 
         this.submit();
         return;
@@ -90,23 +90,23 @@ export default {
       this.visible = true;
     },
     submit() {
-      if (!this.planTime) return this.$platform.alert('请填写计划时间');
+      if (!this.planTime) return this.$platform.alert("请填写计划时间");
 
       // 校验计划时间是否早于当前时间
-      if (this.dateType == 'dateTime') {
+      if (this.dateType == "dateTime") {
         let planTime = DateUtil.parseDateTime(this.planTime).getTime();
         let nowTime = new Date().getTime();
         
-        if (planTime < nowTime) return this.$platform.alert('计划时间不能早于现在');
+        if (planTime < nowTime) return this.$platform.alert("计划时间不能早于现在");
       }
 
       let newPlanTime = this.planTime;
-      if(this.dateType == 'date') newPlanTime += ' 00:00:00';
+      if(this.dateType == "date") newPlanTime += " 00:00:00";
 
       let params = { taskId: this.task.id, newPlanTime };
 
       // 修改计划时间时参数
-      if (this.action == 'modifyPlanTime') {
+      if (this.action == "modifyPlanTime") {
         params.planTime = newPlanTime;
         params.sendSMS = this.sendSMS;
         delete params.newPlanTime;
@@ -117,7 +117,7 @@ export default {
 
       TaskApi[this.action](params).then(res => {
         if (res.success) {
-          let fromId = window.frameElement.getAttribute('fromid');
+          let fromId = window.frameElement.getAttribute("fromid");
           // this.$platform.refreshTab(fromId);
 
           window.location.href = `/task/view/${this.task.id}`;

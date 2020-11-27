@@ -164,7 +164,7 @@ export default {
 
     label {
       display: block;
-      width: 110px;
+      width: 85px;
       padding: 4px 0 0 10px;
       line-height: 24px;
       margin: 0;
@@ -197,6 +197,10 @@ export default {
     flex: 1;
     /*max-width: calc(100% - 110px);*/
     width: calc(100% - 110px);
+    
+    input {
+      width: 100%;
+    }
 
     .err-msg-wrap {
       min-height: 10px;

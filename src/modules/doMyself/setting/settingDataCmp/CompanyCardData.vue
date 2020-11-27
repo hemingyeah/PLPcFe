@@ -36,8 +36,7 @@
               <img
                 :src="
                   dataInfo.logoUrl
-                    ? `${dataInfo.logoUrl}?x-oss-process=image/resize,m_fill,h_96,w_96
-`
+                    ? `${dataInfo.logoUrl}?x-oss-process=image/resize,m_fill,h_96,w_96`
                     : ''
                 "
                 class="avatar"
@@ -119,14 +118,14 @@ export default {
         name: '',
         mobile: '',
         address: '',
-        logoUrl: userImg,
+        logoUrl: '',
         companyName: '',
       },
       dataInforReturn: {
         name: '',
         mobile: '',
         address: '',
-        logoUrl: userImg,
+        logoUrl: '',
         companyName: '',
       },
       rules: {
