@@ -589,7 +589,7 @@ export default {
             if (success) {
               $platform.alert('删除成功');
               this.multipleSelection = []
-              this.getTaskCountByState(this.searchParams)
+              this.getTaskCountByState()
               this.initialize();
             }
           }
@@ -790,7 +790,6 @@ export default {
       this.searchParams = searchModel
       this.selectId = "all"
       this.searchParams_spare = searchModel
-      this.getTaskCountByState(searchModel);
       this.params = this.initParams(this.params.pageSize);
       this.search(searchModel);
       this.buildColumns();
