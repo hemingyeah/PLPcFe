@@ -159,22 +159,8 @@ class TaskAllotUserTableRender extends TaskAllotUserTableMethods {
    * @description 渲染选择位置 其他选项
   */
   renderLocationOtherOption() {
-    const numberLengthReg = /^\d{0,5}$/
-    const numberReg = /^\d+$/
-    const numberHandler = (value: string): number | null => {
-      let number = Number(value)
-      return (
-        value === ''
-          ? null
-          : numberReg.test(value)
-            ? numberLengthReg.test(value)
-              ? number
-              : Number(value.substr(0, 5))
-            : null
-      )
-    }
-    const HandlerMinValueChanged = (value: string) => { this.locationOtherData.minValue = numberHandler(value) }
-    const HandlerMaxValueChanged = (value: string) => { this.locationOtherData.maxValue = numberHandler(value) }
+    const HandlerMinValueChanged = (value: string) => { this.locationOtherData.minValue = this.handlerNumberFormat(value) }
+    const HandlerMaxValueChanged = (value: string) => { this.locationOtherData.maxValue = this.handlerNumberFormat(value) }
     
     return (
       <div>
@@ -202,7 +188,7 @@ class TaskAllotUserTableRender extends TaskAllotUserTableMethods {
             onInput={HandlerMaxValueChanged} 
           />
           KM
-          <el-button class='location-confirm-button' onClick={() => this.handlerLocationOtherChange()}>确定</el-button>
+          <el-button type='primary' class='location-confirm-button' onClick={() => this.handlerLocationOtherChange()}>确定</el-button>
         </div>
       </div>
     )

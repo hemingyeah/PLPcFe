@@ -74,10 +74,12 @@ export default class TaskAllotAuto extends Vue {
       if (matchSuccessfully) {
         this.matchRule = item
         this.matchRuleIndex = i
-        this.changeUpwardMatchRule(this.matchRule)
         break
       }
     }
+    
+    this.matchRule = matchSuccessfully ? this.matchRule : null
+    this.changeUpwardMatchRule(this.matchRule)
     
     return matchResultBeforeList
   }

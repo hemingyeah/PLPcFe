@@ -646,7 +646,7 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
     // 匹配负责人显示
     this.matchExcutorWithReAllot()
     // 初始化协同人显示
-    this.synergyUserList = this.task?.synergies || []
+    this.synergyUserList = this.task?.synergies.slice() || []
     // 获取工单配置
     await this.fetchTaskConfig()
     // 初始化
