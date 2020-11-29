@@ -15,17 +15,17 @@ import { getRootWindow } from '@src/util/dom'
 
 class TaskAllotUserTableComputed extends TaskAllotUserTableData {
   /* 工单派单组件 */
-  get TaskAllotModalComponent() {
+  get TaskAllotModalComponent(): any {
     return findComponentUpward(this, ComponentNameEnum.TaskAllotModal) || {}
   }
   
   /* 工单派单负责人组件 */
-  get TaskAllotExcutorComponent() {
+  get TaskAllotExcutorComponent(): any {
     return findComponentUpward(this, ComponentNameEnum.TaskAllotExcutor) || {}
   }
   
   /* 选择列 组件 */
-  get BaseTableAdvancedSettingComponent() { 
+  get BaseTableAdvancedSettingComponent(): any { 
     return findComponentDownward(this, ComponentNameEnum.BaseTableAdvancedSetting)
   }
   

@@ -41,7 +41,7 @@ class TaskAllotUserTableRender extends TaskAllotUserTableMethods {
         onInput={(value: any[]) => this.handlerTeamUsersChange(value)}
         collapsed
         multiple
-        placeholder='请选择人员'
+        placeholder='员工'
         remoteMethod={(params: any) => this.fetchTeamUsers(params)}
         scopedSlots={scopedSlots}
       >
@@ -60,7 +60,7 @@ class TaskAllotUserTableRender extends TaskAllotUserTableMethods {
         <div class='task-allot-table-user-input' onClick={() => this.chooseDepartmentUsers()}>
         {
           isUsersEmpty 
-          ? <span class='task-allot-table-user-input-placeholder'>请选择人员</span>
+          ? <span class='task-allot-table-user-input-placeholder'>员工</span>
           : this.renderDeptUsers()
         }
       </div>
@@ -110,6 +110,7 @@ class TaskAllotUserTableRender extends TaskAllotUserTableMethods {
   public renderTeamSelect() {
     return (
       <biz-team-select
+        placeholder='服务团队'
         value={this.selectTeams} 
         fetchFunc={(params: TaskTagListSearchModel) => this.fetchTagList(params)} 
         onInput={(value: Tag[]) => this.handlerTeamChange(value)} 
@@ -202,7 +203,7 @@ class TaskAllotUserTableRender extends TaskAllotUserTableMethods {
       <el-select
         collapse-tags
         multiple
-        placeholder="请选择工作状态"
+        placeholder="工作状态"
         value={this.selectUserState}
         onInput={(value: string[]) => this.handlerUserStateChange(value)}
       > 
@@ -229,7 +230,7 @@ class TaskAllotUserTableRender extends TaskAllotUserTableMethods {
   public renderSortordSelect() {
     return (
       <el-select
-        placeholder="请选择排序方式"
+        placeholder="智能排序"
         value={this.selectSortord}
         onInput={(value: number) => this.handlerSortordChange(value)}
       > 

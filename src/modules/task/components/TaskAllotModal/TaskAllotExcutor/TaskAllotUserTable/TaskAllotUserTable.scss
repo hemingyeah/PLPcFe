@@ -1,6 +1,11 @@
 // 工单指派人员筛选
 .task-allot-user-filter {
+  background: linear-gradient(180deg, #FAFAFA 0%, #F2F2F2 100%);
   display: flex;
+  border: 1px solid #ebebeb;
+  border-radius: 3px;
+  padding: 8px 0;
+  transition: .2s;
   
   .task-allot-table-user,
   .biz-team-select,
@@ -17,9 +22,33 @@
   .contact-user-avatar-margin {
     margin-top: 0;
   }
-  .option-list li {
+  .contact-user-item {
     &:hover {
-      background-color: transparent;
+      background-color: transparent !important;
+    }
+  }
+  & > .el-select,
+  .biz-form-remote-select,
+  .task-allot-table-user,
+  .task-allot-user-table-column {
+    border: 0;
+    margin-left: 8px;
+  }
+  .el-input,
+  .el-input__inner {
+    border: 0;
+    background: linear-gradient(180deg, #FAFAFA 0%, #F2F2F2 100%);
+  }
+  .task-allot-table-user-input,
+  .el-input__suffix .el-input__suffix-inner i {
+    color: $text-color-secondary;
+    font-family: "iconfont" !important;
+  }
+  .el-icon-arrow-up,
+  .task-allot-table-user-input {
+    &:before {
+      // icon-up
+      content: "\e74d";
     }
   }
 }
@@ -30,8 +59,8 @@
     cursor: pointer;
     display: flex;
     align-items: center;
-    justify-content: center;
-    width: 100px;
+    justify-content: space-around;
+    width: 120px;
   }
   &-excutor-column {
     display: flex;
@@ -44,7 +73,7 @@
     }
   }
   .biz-team-select-tag {
-    max-width: 135px;
+    max-width: 100px;
   }
 }
 
@@ -156,4 +185,42 @@
   height: 30px;
   line-height: 30px;
   text-align: center;
+}
+
+.task-allot-user-filter  {
+  & > .el-select,
+  & > .biz-form-remote-select,
+  .task-allot-table-user {
+    position: relative;
+    &:after {
+      background-color: #D9D9D9;
+      content: "";
+      position: absolute;
+      right: 0;
+      top: -4px;
+      width: 1px;
+      height: 40px;
+    }
+  }
+  .biz-team-select-placeholder,
+  .placeholder-text,
+  .task-allot-table-user-input-placeholder,
+  .el-input__inner::placeholder {
+    color: $text-color-primary !important;
+  }
+  .task-allot-table-user-input {
+    border: none;
+    position: relative;
+    &:before {
+      position: absolute;
+      right: 10px;
+      top: 0;
+      transform: rotate(180deg);
+    }
+  }
+  .biz-team-select-tag {
+    background-color: rgba(144, 147, 153, 0.1);
+    border-color: rgba(144, 147, 153, 0.2);
+    color:  #909399;
+  }
 }

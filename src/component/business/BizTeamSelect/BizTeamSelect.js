@@ -4,6 +4,7 @@ import _ from 'lodash'
 import Popper from 'popper.js';
 import Page from '@model/Page';
 import * as TeamApi from '@src/api/TeamApi'
+import Clickoutside from '@src/util/clickoutside'
 
 /**
  * TODO: item option render(jsx、template)
@@ -77,7 +78,7 @@ const BizTeamSelect = {
     return {
       $parentEl: util.getParentEl(this.parent),
       $popper: null,
-
+      
       // 是否显示popper
       popperVisible: false,   
       popperWidth: 0,
@@ -90,19 +91,10 @@ const BizTeamSelect = {
         // 是否只查主团队，true时只查出主团队来，子团队附带在主团队的children里，同时搜索条件支持子团队查询；不传或false时主团队和子团队会在同一级返回
         onlyParent: true
       },
-  
+      
       loadmoreOptions: {
         disabled: false,
         callback: this.loadmore
-      },
-      
-      // 组件关闭
-      onClose: event => {
-        let target = event.target;
-        let data = this.$data;
-        if(target == data.$referenceEl || this.$refs.popper.contains(target)) return;
-        
-        this.close()
       }
     }
   },
@@ -114,10 +106,11 @@ const BizTeamSelect = {
       return this.serializer(this.value)
     }
   },
+  directives: { Clickoutside },
   methods: {
     getValue(isArray = false){
       if(!isArray) return this.value;
-
+      
       return Array.isArray(this.value) 
         ? this.value 
         : null != this.value ? [this.value] : [];
@@ -190,11 +183,13 @@ const BizTeamSelect = {
         console.error(err)
       }
     },
-
+    
     /** 显示popper */
     showPopper(event){
-      if(this.popperVisible || this.disabled) return;
-
+      if (this.disabled) return
+      // 已显示 则需要关闭
+      if (this.popperVisible) return this.close()
+      
       // 如果没创建popper，先创建
       if(this.$data.$popper == null){
         let options = {
@@ -202,22 +197,22 @@ const BizTeamSelect = {
           removeOnDestroy: true,
           onUpdate: this.updatePopperWidth
         }
-
+        
         this.$data.$parentEl.appendChild(this.$refs.popper)
         this.$data.$popper = new Popper(this.$el, this.$refs.popper, {...options, ...this.popperOptions});
       }
-
+      
       // 更新宽度
-      this.popperWidth = this.$el.offsetWidth;
-      this.popperVisible = true;
-      this.$data.$popper.scheduleUpdate();
+      this.popperWidth = this.$el.offsetWidth
+      this.popperVisible = true
+      this.$data.$popper.scheduleUpdate()
       this.$nextTick(() => {
-        this.$refs.search.focus();
-        if(this.$refs.selectPanel) this.$refs.selectPanel.scrollTop = 0;
+        this.$refs.search.focus()
+        if(this.$refs.selectPanel) this.$refs.selectPanel.scrollTop = 0
       })
-
+      
       if(this.page.hasNextPage && !this.page.list.length ) {
-        this.fetchTeam('merge');
+        this.fetchTeam('merge')
       }
     },
     /** 更新popper定位 */
@@ -248,12 +243,14 @@ const BizTeamSelect = {
     },
     renderItem(h, item){
       let clazz = ['biz-team-select-item']
-      if(this.getValue(true).findIndex(i => i.id == item.id) >= 0) clazz.push('biz-team-select-selected');
-
+      let checked = this.getValue(true).findIndex(i => i.id == item.id) >= 0
+      if(checked) clazz.push('biz-team-select-selected');
+      
       return (
         <div class={clazz} onClick={e => this.choose(item)} key={item.id}>
           { this.renderPrefix(item) }
           <div class="biz-team-select-name">{ item.tagName || item.name}</div>
+          { checked && <div class="checked"></div> }
         </div>
       )
     },
@@ -263,9 +260,9 @@ const BizTeamSelect = {
         if(!index && index !== items.length - 1) clazz.push('biz-team-select-subItem-start');
         if(index && index === items.length - 1) clazz.push('biz-team-select-subItem-end');
         if(items.length === 1) clazz.push('biz-team-select-subItem-only');
-  
+        
         if(this.getValue(true).findIndex(i => i.id == item.id) >= 0) clazz.push('biz-team-select-selected');
-
+        
         return (
           <div class={clazz} onClick={e => this.choose(item)} key={item.id}>
             <div class="biz-team-select-line"></div>
@@ -279,18 +276,18 @@ const BizTeamSelect = {
       if(!this.loading && items.length == 0){
         return <div class="biz-team-select-empty">暂无可用团队</div>
       }
-
+      
       let teamItems = [];
-
+      
       for(let i = 0; i < items.length; i++){
         let item = items[i];
         teamItems.push(this.renderItem(h, item));
-
+        
         if(item.children && item.children.length && item.expand !== false){
           teamItems = teamItems.concat(this.renderSubItem(h, item.children))
         }
       }
-
+      
       return teamItems;
     },
     /** 渲染popper */
@@ -301,13 +298,13 @@ const BizTeamSelect = {
         display: this.popperVisible ? 'block' : 'none',
         width: `${this.popperWidth}px`
       }
-
+      
       let content = (
         this.loading 
           ? <div class="biz-team-select-loading">正在加载...</div>
           : null
       )
-  
+      
       let panelAttrs = {
         directives: [
           {
@@ -316,7 +313,7 @@ const BizTeamSelect = {
           }
         ]
       }
-  
+      
       return (
         <div class={clazz}
           style={style} ref="popper"
@@ -336,7 +333,7 @@ const BizTeamSelect = {
     /** 清除按钮 */
     renderClear(){
       if(this.isEmpty) return null;
-
+      
       return (
         <button type="button" class="biz-team-select-clear" onClick={e => this.clear(e)} key="clear">
           <i class="el-icon-error" style="color:rgba(211, 214, 217, 0.69);"></i>
@@ -381,33 +378,52 @@ const BizTeamSelect = {
       let inner = this.isEmpty 
         ? <p class="biz-team-select-placeholder">{ this.placeholder }</p>
         : <p>{ value ? value.tagName : '' }</p>;
-
+        
       return <div class="biz-team-select-input-inner">{ inner }</div>
+    },
+    /* 渲染箭头 */
+    renderArrow(h) {
+      return (
+        <span class="el-input__suffix">
+          <span class="el-input__suffix-inner">
+            <i class={['el-select__caret', 'el-input__icon', 'el-icon-arrow-up', this.popperVisible ? 'is-reverse' : '']}></i>
+          </span>
+        </span>
+      )
     }
   },
   render(h){
-    let clazz = ['biz-team-select'];
+    const attrs = {
+      directives: [
+        {
+          name: 'clickoutside',
+          value: this.close
+        }
+      ]
+    }
+    let clazz = ['biz-team-select', 'el-input', 'el-input__inner']
     
     if (this.disabled) {
-      clazz.push('biz-team-select-disabled');
+      clazz.push('biz-team-select-disabled')
     }
     
     if(Array.isArray(this.className) && this.className.length > 0){
       clazz = clazz.concat(this.className)
     }
-
-    if(this.popperVisible) clazz.push('biz-team-select-open');
+    
+    if(this.popperVisible) clazz.push('biz-team-select-open')
+    
     return (
-      <div class={clazz} onClick={e => this.showPopper(e)}>
-        <input id={this.id} name={this.name} type="text" value={this.formValue}/>
-        { this.renderClear(h) }
-        { this.multiple ? this.renderMultiple(h) : this.renderSingle(h) }
-        { this.renderPopper(h) }
+      <div class='el-select el-input--small el-input--suffix' {...attrs}>
+        <div class={clazz} onClick={e => this.showPopper(e)}>
+          <input id={this.id} name={this.name} type="text" value={this.formValue}/>
+          {/* { this.renderClear(h) } */}
+          { this.multiple ? this.renderMultiple(h) : this.renderSingle(h) }
+          { this.renderPopper(h) }
+          { this.renderArrow(h) }
+        </div>
       </div>
     )
-  },
-  mounted(){
-    document.addEventListener('click', this.onClose, true);
   },
   beforeDestroy(){
     // 销毁popper
@@ -417,9 +433,6 @@ const BizTeamSelect = {
         this.$data.$parentEl.removeChild(this.$refs.popper);
       }
     }
-  },
-  destroyed(){
-    document.removeEventListener('click', this.onClose, true);
   }
 }
 

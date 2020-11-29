@@ -850,6 +850,7 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
       }
       
       this.selectTeams = tags
+      this.TaskAllotExcutorComponent.outsideSetCustomerTags(tags.slice())
       
     } catch (error) {
       console.warn('TaskAllotUserTableMethods -> matchTags -> error', error)

@@ -6,6 +6,7 @@ import ComponentNameEnum from '@model/enum/ComponentNameEnum'
 /* entity */
 import TaskAllotUserInfo from '@model/entity/TaskAllotUserInfo'
 import Customer from '@model/entity/Customer'
+import Tag from '@model/entity/Tag/Tag'
 /* scss */
 import '@src/modules/task/components/TaskAllotModal/TaskAllotExcutor/TaskAllotExcutor.scss'
 /* types */
@@ -30,6 +31,8 @@ export default class TaskAllotExcutor extends Vue {
   /* 工作状态颜色数组 */
   @Prop() readonly stateColorMap: StateColorMap | undefined
   
+  /* 客户团队信息 */
+  private customerTags: Tag[] = []
   /* 是否显示人员卡片信息 */
   private isShowUserCard: boolean = false
   /* 等待状态 */
@@ -40,6 +43,11 @@ export default class TaskAllotExcutor extends Vue {
   /* 是否允许修改协同人 */
   get allowModifySynergyUser(): boolean {
     return Boolean(this.TaskAllotModalComponent?.allowModifySynergyUser)
+  }
+  
+  /* 客户团队名称列表 */
+  get customerTagNames(): string[] {
+    return this.customerTags.map(tag => tag.tagName || '')
   }
   
   /* 当前选中的用户是客户的客户负责人，则显示专属标签（鼠标移动标签上提示“客户负责人”） */
@@ -87,6 +95,14 @@ export default class TaskAllotExcutor extends Vue {
     let excutorUser = isSelected ? user : null
     this.isShowUserCard = isSelected
     this.selectedExcutorUser = excutorUser
+  }
+  
+  /**
+   * @description 获取团队用户
+   * -- 支持外部调用的
+  */
+  public outsideSetCustomerTags(tags: Tag[]) {
+    this.customerTags = tags
   }
   
   /**
@@ -138,11 +154,12 @@ export default class TaskAllotExcutor extends Vue {
             { this.isShowUserCard 
               && (
                 <user-card
+                  customerTagNames={this.customerTagNames}
+                  emitEventComponentName={ComponentNameEnum.TaskAllotExcutor}
                   stateColorMap={this.stateColorMap}
-                  userId={this.selectedExcutorUser?.userId}
                   showSynergyButton={this.allowModifySynergyUser}
                   showCustomerManagerIcon={this.isCustomerManager}
-                  emitEventComponentName={ComponentNameEnum.TaskAllotExcutor}
+                  userId={this.selectedExcutorUser?.userId}
                   onClose={() => this.closeUserCard()}
                 /> 
               )

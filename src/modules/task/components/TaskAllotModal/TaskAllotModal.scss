@@ -11,6 +11,10 @@
       padding: 0 !important;
     }
     
+    & > .base-modal-header {
+      background-color: #fff;
+    }
+    
   }
   
   .task-allot-nav {
@@ -126,5 +130,8 @@
   .task-allot-map{
     flex: 1;
     min-height: 380px;
+  }
+  .task-allot-user-filter {
+    border-bottom: 0;
   }
 }

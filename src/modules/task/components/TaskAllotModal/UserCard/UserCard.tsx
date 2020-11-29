@@ -25,6 +25,8 @@ import DateUtil from '@src/util/date'
 import Platform from '@src/util/Platform'
 import { openTabForUserView } from '@src/util/business/openTab'
 import { fmt_display_text } from '@src/filter/fmt'
+import { isArray } from '@src/util/type'
+import { stringArrayIntersection } from '@src/util/array'
 
 enum UserCardEmitEventEnum {
   // 关闭事件
@@ -37,6 +39,8 @@ enum UserCardEmitEventEnum {
 
 @Component({ name: ComponentNameEnum.UserCard })
 export default class UserCard extends Vue {
+  // 客户团队名称列表
+  @Prop() readonly customerTagNames: string[] | undefined
   // 向外发布事件的 组件名字
   @Prop() readonly emitEventComponentName: string | undefined
   // 客户负责人图标
@@ -48,6 +52,8 @@ export default class UserCard extends Vue {
   // 用户id
   @Prop() readonly userId: string | undefined
   
+  // 用户是否在客户团队内
+  private isUserInCustomerTag: boolean = false
   // 等待状态
   private pending: boolean = false
   // 时间
@@ -156,6 +162,7 @@ export default class UserCard extends Vue {
         }
         
         this.userCardInfo = data.result
+        this.matchUserInCustomerTags()
       })
       .catch((error) => {
         console.error(error)
@@ -171,6 +178,17 @@ export default class UserCard extends Vue {
   private handlerTimeChange(value: Date[]): void {
     this.timeRange = value
     this.fetchUserTaskData()
+  }
+  
+  /** 
+   * @description 匹配用户是否在客户团队里
+  */
+  private matchUserInCustomerTags() {
+    if (!isArray(this.customerTagNames)) return
+    // 交集团队列表
+    let intersectionTags: string[] = stringArrayIntersection(this.customerTagNames || [], this.userCardInfo.department)
+    // 是否在客户团队内
+    this.isUserInCustomerTag = intersectionTags.length > 0
   }
   
   /** 
@@ -208,6 +226,13 @@ export default class UserCard extends Vue {
                         <i class='iconfont icon-huangguan'></i>
                       </el-tooltip>
                     )}
+                    {
+                      this.isUserInCustomerTag && (
+                        <el-tooltip content='客户的服务团队' placement='top'>
+                          <i class='iconfont icon-beipinbeijian-5'></i>
+                        </el-tooltip>
+                      )
+                    }
                   </div>
                   
                   <div class='user-card-header-content-state'>

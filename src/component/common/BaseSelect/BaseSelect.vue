@@ -1,8 +1,8 @@
 <template>
   <div class="base-select-container">
-    <div class="content" v-clickoutside="closeList">
+    <div class="content el-select el-input el-input--small el-input--suffix" v-clickoutside="closeList">
       <div 
-        class="base-select-main-content multiple-layout el-select" 
+        class="base-select-main-content multiple-layout el-input el-input__inner" 
         @click.stop="focusInput" 
         v-if="multiple"
         :class="{'error': error, 'wrapper-is-focus': isFocus, 'clearable-layout': clearable}"
@@ -18,6 +18,13 @@
         <span v-if="value.length <= 0" class="placeholder-text">
           {{ placeholder }}
         </span>
+        
+        <span class="el-input__suffix">
+          <span class="el-input__suffix-inner">
+            <i class="el-select__caret el-input__icon el-icon-arrow-up" :class="showList && 'is-reverse'"></i>
+          </span>
+        </span>
+        
       </div>
       
       <div 
@@ -155,10 +162,11 @@ export default {
   },
   methods: {
     focusInput() {
-      if (!this.disabled) {
-        this.isFocus = true;
-        this.initList();
-      }
+      if (this.disabled) return
+      if (this.showList) return this.close()
+      
+      this.isFocus = true
+      this.initList()
     },
     closeList(e) {
       this.showList = false;
@@ -417,6 +425,7 @@ export default {
       }
 
       li.selected {
+        background-color: #eef8f7;
         color: $color-primary;
         /*font-weight: 700;*/
 
@@ -442,4 +451,18 @@ export default {
     flex-flow: row nowrap;
     align-items: center;
   }
+</style>
+
+<style lang="scss">
+.base-select-container {
+  .el-select {
+    width: 100%;
+  }
+  .el-select .el-input .el-select__caret.is-reverse {
+    transform: rotateZ(0deg);
+  }
+}
+.base-select-main-content {
+
+}
 </style>
