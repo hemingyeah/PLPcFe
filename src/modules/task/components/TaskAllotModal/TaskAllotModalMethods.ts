@@ -727,7 +727,7 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
         return Platform.alert(TASK_NO_EXECUTOR_MESSAGE)
       }
       // 验证负责人是否相同
-      if (executor === this.task?.executor.userId) {
+      if (executor === this.task?.executor.userId && this.allotType === TaskAllotTypeEnum.Person) {
         this.pending = false
         return Platform.alert(TASK_REALLOT_NOT_SAME_USER_MESSAGE)
       }
