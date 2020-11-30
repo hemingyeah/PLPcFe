@@ -14,7 +14,7 @@ import { PickerOptions } from '@src/modules/task/components/TaskAllotModal/UserC
 import { getTaskUserCardInfoResult } from '@model/param/out/Task'
 /* vue */
 import { Vue, Component, Prop, Emit, Watch } from 'vue-property-decorator'
-import { CreateElement } from 'vue'
+import { CreateElement, VNode } from 'vue'
 /* scss */
 import '@src/modules/task/components/TaskAllotModal/UserCard/UserCard.scss'
 /* types */
@@ -24,7 +24,7 @@ import { dispatch } from '@src/util/emitter'
 import DateUtil from '@src/util/date'
 import Platform from '@src/util/Platform'
 import { openTabForUserView } from '@src/util/business/openTab'
-import { fmt_display_text } from '@src/filter/fmt'
+import { fmt_display_text, fmt_number_to_fixed } from '@src/filter/fmt'
 import { isArray } from '@src/util/type'
 import { stringArrayIntersection } from '@src/util/array'
 
@@ -172,6 +172,24 @@ export default class UserCard extends Vue {
       })
   }
   
+  private getUserInfoData(value: string | null, suffix: string): string | number {
+    let newValue: string | number | null = null
+    if (value !== null) {
+      newValue = fmt_number_to_fixed(Number(value), 2)
+    }
+    
+    return fmt_display_text(newValue, suffix)
+  }
+  
+  private getUserInfoUsedTime(value: string | null): string | number {
+    return this.getUserInfoData(value, 'H')
+  }
+  
+  private getUserInfoTashRate(value: string | null): string | number {
+    if (value !== null) { value = value.substr(0, value.length - 1) }
+    return this.getUserInfoData(value, '%')
+  }
+  
   /** 
    * @description 选择时间变化
   */
@@ -196,6 +214,65 @@ export default class UserCard extends Vue {
   */
   private openUserViewTab(): void {
     openTabForUserView(this.userId, { from: 'task' })
+  }
+  
+  /** 
+   * @description 渲染用户卡片时间
+  */
+  private renderUserCardTime(): VNode {
+    return (
+      <div class='user-card-time'>
+        <el-date-picker
+          type='daterange'
+          unlink-panels
+          start-placeholder='开始日期'
+          end-placeholder='结束日期'
+          clearable={false}
+          picker-options={PickerOptions}
+          value={this.timeRange}
+          onInput={this.handlerTimeChange}
+        />
+      </div>
+    )
+  }
+  
+  /** 
+   * @description 渲染用户信息详情
+  */
+  private renderUserCardDetail(): VNode {
+    return (
+      <div class='user-card-detail'>
+        <div class='user-card-detail-row'>
+          <div class='user-card-detail-row-item'>
+            未完成工单量: {fmt_display_text(this.userCardInfo.unfinished, '个')}
+          </div>
+          <div class='user-card-detail-row-item'>
+            已完成工单量: {fmt_display_text(this.userCardInfo.finished, '个')}
+          </div>
+        </div>
+        <div class='user-card-detail-row'>
+          <div class='user-card-detail-row-item'>
+            平均响应用时: {this.getUserInfoUsedTime(this.userCardInfo.rangeAccept)}
+          </div>
+          <div class='user-card-detail-row-item'>
+            平均工作用时: {this.getUserInfoUsedTime(this.userCardInfo.rangeWork)}
+          </div>
+        </div>
+        <div class='user-card-detail-row'>
+          <div class='user-card-detail-row-item'>
+            拒单率: {this.getUserInfoTashRate(this.userCardInfo.refuse)}
+          </div>
+          <div class='user-card-detail-row-item'>
+            转派率: {this.getUserInfoTashRate(this.userCardInfo.allot)}
+          </div>
+        </div>
+        <div class='user-card-detail-row'>
+          <div class='user-card-detail-row-item'>
+            好评率: {fmt_display_text(this.userCardInfo.degree)}
+          </div>
+        </div>
+      </div>
+    )
   }
   
   mounted() {
@@ -261,51 +338,8 @@ export default class UserCard extends Vue {
               
             </div>
           </div>
-          
-          <div class='user-card-time'>
-            <el-date-picker
-              type='daterange'
-              unlink-panels
-              start-placeholder='开始日期'
-              end-placeholder='结束日期'
-              clearable={false}
-              picker-options={PickerOptions}
-              value={this.timeRange}
-              onInput={this.handlerTimeChange}
-            />
-          </div>
-          
-          <div class='user-card-detail'>
-            <div class='user-card-detail-row'>
-              <div class='user-card-detail-row-item'>
-                未完成工单量: {fmt_display_text(this.userCardInfo.unfinished, '个')}
-              </div>
-              <div class='user-card-detail-row-item'>
-                已完成工单量: {fmt_display_text(this.userCardInfo.finished, '个')}
-              </div>
-            </div>
-            <div class='user-card-detail-row'>
-              <div class='user-card-detail-row-item'>
-                平均响应用时: {fmt_display_text(this.userCardInfo.rangeAccept, 'H')}
-              </div>
-              <div class='user-card-detail-row-item'>
-                平均工作用时: {fmt_display_text(this.userCardInfo.rangeWork, 'H')}
-              </div>
-            </div>
-            <div class='user-card-detail-row'>
-              <div class='user-card-detail-row-item'>
-                拒单率: {fmt_display_text(this.userCardInfo.refuse)}
-              </div>
-              <div class='user-card-detail-row-item'>
-                转派率: {fmt_display_text(this.userCardInfo.allot)}
-              </div>
-            </div>
-            <div class='user-card-detail-row'>
-              <div class='user-card-detail-row-item'>
-                好评率: {fmt_display_text(this.userCardInfo.degree)}
-              </div>
-            </div>
-          </div>
+          {this.renderUserCardTime()}
+          {this.renderUserCardDetail()}
           
       </div>
     )

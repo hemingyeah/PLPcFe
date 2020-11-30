@@ -109,7 +109,7 @@ export default class TaskAllotAuto extends Vue {
   /** 
    * @description 获取自动派单预估列表结果
   */
-  private fetchAutoDispatchResultList() {
+  private fetchAutoDispatchResultList(event?: MouseEvent) {
     if (this.pending) return
     
     this.pending = true
@@ -134,6 +134,8 @@ export default class TaskAllotAuto extends Vue {
       })
       .finally(() => {
         this.pending = false
+        // @ts-ignore 取消按钮的焦点
+        event?.target?.parentNode?.blur()
       })
   }
   
@@ -261,7 +263,7 @@ export default class TaskAllotAuto extends Vue {
     return (
       <div class={this.className} {...attrs}>
         <div class={`${this.className}-header`}>
-          <el-button type='primary' plain onClick={this.fetchAutoDispatchResultList}>重新匹配</el-button>
+          <el-button type='primary' ref='MatchButton' plain onClick={(event: MouseEvent) => this.fetchAutoDispatchResultList(event)}>重新匹配</el-button>
           {
             this.isHaveSystemSettingAuth
             && <el-button type='ghost' onClick={this.openRuleDialog}>添加新规则</el-button>
@@ -285,7 +287,7 @@ export default class TaskAllotAuto extends Vue {
             )
         }
         </div>
-        <allot-rule-modal onSuccess={this.fetchAutoDispatchResultList} ref='AllotRuleModal'></allot-rule-modal>
+        <allot-rule-modal onSuccess={() => this.fetchAutoDispatchResultList()} ref='AllotRuleModal'></allot-rule-modal>
       </div>
     )
   }

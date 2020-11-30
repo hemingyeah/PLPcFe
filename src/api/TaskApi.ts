@@ -1213,7 +1213,7 @@ export function taskAllotExcutor(params: TaskAllotModel): Promise<getTaskAllotRe
  * @description 工单转派
  */
 export function taskReAllot(params: TaskAllotModel): Promise<getTaskAllotResult> {
-  return http.post(`${fixedPrefixTaskPath}/outside/dd/task/reallot`, params)
+  return http.post(`${fixedPrefixTaskPath}/outside/pc/task/reallot`, params)
 }
 
 /**
