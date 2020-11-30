@@ -84,6 +84,9 @@
     max-height: 250px;
     overflow-y: scroll;
   }
+  th .cell {
+    @include text-ellipsis();
+  }
 }
 
 .task-allot-map{

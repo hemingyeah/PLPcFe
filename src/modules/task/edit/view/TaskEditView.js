@@ -78,10 +78,14 @@ export default {
     ...methods,
     buildParams() {
       const task = util.packToTask(this.fields, this.form)
-      this.form.templateId = taskTemplate.value
-      this.form.templateName = taskTemplate.text
+      
       task.templateId = taskTemplate.value
       task.templateName = taskTemplate.text
+      
+      if (this.isTaskCreate) {
+        this.form.templateId = taskTemplate.value
+        this.form.templateName = taskTemplate.text
+      }
       
       if (this.allotTask.id) {
         task.id = this.allotTask.id
