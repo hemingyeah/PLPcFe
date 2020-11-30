@@ -294,6 +294,7 @@ export default {
         this.$refs.TaskAllotModal && this.$refs.TaskAllotModal.outsideShow()
       })
       this.togglePending()
+      this.backParams.task.id = task.id
     },
     /** 
      * @description 新建计划任务弹窗

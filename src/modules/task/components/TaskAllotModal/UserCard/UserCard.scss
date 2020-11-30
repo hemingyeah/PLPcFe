@@ -83,6 +83,13 @@
   &-name, &-state, &-team {
     line-height: 20px;
   }
+  .user-card-header-content-team {
+    i {
+      cursor: pointer;
+      color: #FFB302;
+      margin-right: 10px;
+    }
+  }
 }
 
 .user-card-header-content {

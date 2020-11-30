@@ -233,6 +233,17 @@ export function fmt_display_text(value, text) {
   return value ? `${value}${text || ''}` : '--'
 }
 
+/** 
+ * @description 格式化显示数组
+ * @param {Number} value 值
+ * @param {Number} num 规定小数的位数，是 0 ~ 20 之间的值，包括 0 和 20，有些实现可以支持更大的数值范围
+*/
+export function fmt_number_to_fixed(value, num) {
+  if (!isNumber(value)) return value
+  
+  return value.toFixed(num)
+}
+
 const fmt = {
   fmt_date,
   fmt_datetime,

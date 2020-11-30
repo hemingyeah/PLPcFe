@@ -620,7 +620,8 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
     try {
       await this.fetchStateColor()
       await this.fetchCustomer()
-      await this.fetchSynergyUserWithCustomerManager()
+      // 非转派时获取客户负责人带入协同人
+      !this.isReAllot && await this.fetchSynergyUserWithCustomerManager()
     } catch (error) {
       this.toggleTaskAllotExecutorComponentPending()
       console.error('TaskAllotModalMethods -> initialize -> error', error)

@@ -226,13 +226,6 @@ export default class UserCard extends Vue {
                         <i class='iconfont icon-huangguan'></i>
                       </el-tooltip>
                     )}
-                    {
-                      this.isUserInCustomerTag && (
-                        <el-tooltip content='客户的服务团队' placement='top'>
-                          <i class='iconfont icon-beipinbeijian-5'></i>
-                        </el-tooltip>
-                      )
-                    }
                   </div>
                   
                   <div class='user-card-header-content-state'>
@@ -256,6 +249,13 @@ export default class UserCard extends Vue {
               </div>
               
               <div class='user-card-header-content-team'>
+                {
+                  this.isUserInCustomerTag && (
+                    <el-tooltip content='客户的服务团队' placement='top'>
+                      <i class='iconfont icon-favorfill'></i>
+                    </el-tooltip>
+                  )
+                }
                 { this.userCardInfo.department.join(', ') }
               </div>
               
