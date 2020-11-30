@@ -1,13 +1,13 @@
 <template>
-  <div class="task-detail-container" v-loading="loading">
+  <div class="task-detail-container" v-loading="loading" @scroll="getScroll" ref="container">
     <div class="guide-model-box" v-if="nowGuideStep < 5">
 
     </div>
     <!-- start 顶部操作区 -->
-    <div class="task-detail-header">
+    <div class="task-detail-header" ref="header">
       <div class="task-detail-header-top" :class="{'active': !collapse}">
         <!-- start 折叠按钮 -->
-        <div class="collapse-btn" @click="collapse = !collapse">
+        <div class="collapse-btn" @click="collapseBtn">
           <el-tooltip :content="collapse?'收起':'展开'" placement="top">
             <i class="iconfont icon-more"></i>
           </el-tooltip>
@@ -195,7 +195,7 @@
     <!-- end 顶部操作区 -->
 
     <!-- start 工单详情折叠面板 -->
-    <base-collapse class="task-detail-main-content" :show-collapse="showCollapse" :direction.sync="collapseDirection">
+    <base-collapse class="task-detail-main-content" :show-collapse="showCollapse" :direction.sync="collapseDirection" :style="`margin-top: ${collapse ? marTop : 67}px`">
 
       <!-- start 工单详情 -->
       <template slot="left">
@@ -230,9 +230,6 @@
             <el-tab-pane :label="finishedState?'回执信息':'完成回执'" name="receipt-view" v-if="viewReceiptTab">
               <task-receipt-detail-view :share-data="propsForSubComponents" />
             </el-tab-pane>
-            <el-tab-pane label="动态信息" name="record">
-              <task-info-record :share-data="propsForSubComponents" :show-template="showTaskRecordTemplate" />
-            </el-tab-pane>
           </el-tabs>
         </div>
 
@@ -244,6 +241,9 @@
       <template slot="right">
         <div class="task-detail-main-content-right" v-show="collapseDirection != 'right'">
           <el-tabs v-model="rightActiveTab">
+            <el-tab-pane label="动态信息" name="record">
+              <task-info-record :share-data="propsForSubComponents" :show-template="showTaskRecordTemplate" />
+            </el-tab-pane>
             <el-tab-pane label="审核结算" name="balance-tab" v-if="viewBalanceTab">
               <task-account ref="taskAccount" :share-data="propsForSubComponents" @back="openDialog('back')" @proposeApprove="proposeApprove" />
             </el-tab-pane>

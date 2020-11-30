@@ -1017,14 +1017,15 @@ export default {
         paymentConfig
       } = this.initData;
 
-      let columnStatus = [];
-      if (localStorageData.columnStatus) {
-        for (let key in localStorageData.columnStatus) {
-          if (key === this.selectColumnState) {
-            columnStatus = localStorageData.columnStatus[key];
-          }
-        }
-      }
+      let columnStatus = localStorageData.columnStatus || [];
+
+      // if (localStorageData.columnStatus) {
+      //   for (let key in localStorageData.columnStatus) {
+      //     if (key === this.selectColumnState) {
+      //       columnStatus = localStorageData.columnStatus[key];
+      //     }
+      //   }
+      // }
       let localColumns = columnStatus
         .map((i) => (typeof i == "string" ? { field: i, show: true } : i))
         .reduce((acc, col, currentIndex) => {
@@ -2780,14 +2781,10 @@ export default {
       }));
 
       if (localStorageData.columnStatus) {
-        localStorageData.columnStatus[
-          `${this.selectColumnState}`
-        ] = columnsList;
+        localStorageData.columnStatus =  columnsList;
         columnsStatus = localStorageData.columnStatus;
       } else {
-        columnsStatus = {
-          [`${this.selectColumnState}`]: columnsList,
-        };
+        columnsStatus = columnsList;
       }
 
       this.saveDataToStorage("columnStatus", columnsStatus);
