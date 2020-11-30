@@ -432,6 +432,7 @@ import {
   isShowPlanTask,
   isShowLinkC,
   isShowMoreSperaParts,
+  isStandardEdition
 } from "@src/util/version.ts";
 
 /* util */
@@ -1134,6 +1135,7 @@ export default {
         M_CALLCENTER_WORKBENCH_LIST: this.has_call_center_module,
         M_CALLCENTER_STATISTICS: this.has_call_center_module,
         M_CALLCENTER_STAGE: this.has_call_center_module,
+        M_VIP_SPAREPART_APPLY: !isStandardEdition()
       };
       let isFilter = false;
       let filterMenuKeys = [];
