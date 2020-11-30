@@ -565,14 +565,6 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
           return Platform.alert(data.message)
         }
         
-        data?.result?.stateDisplayName 
-          && (
-            Platform.notification({
-            title: data?.result?.stateDisplayName || '',
-            type: 'success',
-          })
-        )
-        
         this.allotSuccess()
       })
       .catch((err: any) => {
@@ -763,59 +755,81 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
    * @description 转派提交
   */
   public async submitWithReAllot() {
-    try {
-      // 是否是派单到负责人
-      let isReAllotToPerson = this.allotType === TaskAllotTypeEnum.Person
-      // 验证负责人是否存在
-      let executor = this.executorUser?.userId
-      if (!executor && isReAllotToPerson) {
-        this.pending = false
-        return Platform.alert(TASK_NO_EXECUTOR_MESSAGE)
-      }
-      // 验证负责人是否相同
-      if (executor === this.task?.executor.userId && isReAllotToPerson) {
-        this.pending = false
-        return Platform.alert(TASK_REALLOT_NOT_SAME_USER_MESSAGE)
-      }
-      // 验证转派说明
+    try {      
+      // 效验
       if (this.reallotRemarkNotNull && !this.reason) {
         this.pending = false
         return Platform.alert(TASK_NO_REALLOT_REASON_MESSAGE)
       }
       
-      await this.fetchTaskType()
-      
-      let flowSetting: any = this.taskType?.flowSetting || {}
-      let isNotReAllot = flowSetting?.allot?.reallotAppr == LeaderEnum.None
-      let approve = new TaskApprove()
-      
-      // 开启转派审批 且 工单类型数据存在
-      if (!isNotReAllot && this.taskType) {
-        approve = checkApprove(this.taskType, TaskActionEnum.ALLOT.value, this.task, this.customer)
-        approve.action = TaskActionEnum.REDEPLOY.name
-        approve.reason = this.reason
-      }
-      // 是否需要审批
-      let isNeedApprove = approve.needApprove === true
-      // 有审批
-      if (isNeedApprove) {
-        this.pending = false
-        return this.showApproveDialog(approve)
+      // 按工单负责人
+      if (this.allotType === TaskAllotTypeEnum.Person) {
+        return this.submitReAllotWithExecutor()
       }
       
-      // 转派工单
-      if (isReAllotToPerson) {
-        const reAllotParams = this.buildReAllotParams()
-        this.fetchReAllotSubmit(reAllotParams)
-      } else {
-        const reAllotTaskPoolParams = this.buildReAllotTaskPoolParams()
-        this.fetchReAllotTaskPoolSubmit(reAllotTaskPoolParams)
+      // 派单到工单池
+      if (this.allotType === TaskAllotTypeEnum.Pool) {
+        return this.submitReAllotWithTaskPool()
       }
       
     } catch(err) {
       this.pending = false
       console.error(err)
     }
+  }
+  
+  /** 
+   * @description 转派提交到负责人
+  */
+  public async submitReAllotWithExecutor() {
+    // 验证负责人是否存在
+    let executor = this.executorUser?.userId
+    if (!executor) {
+      this.pending = false
+      return Platform.alert(TASK_NO_EXECUTOR_MESSAGE)
+    }
+    // 验证负责人是否相同
+    if (executor === this.task?.executor.userId) {
+      this.pending = false
+      return Platform.alert(TASK_REALLOT_NOT_SAME_USER_MESSAGE)
+    }
+    
+    // 验证审批
+    const allotExcutorParams = this.buildAllotExcutorParams()
+    let approve: any | null = await this.fetchApproveWithTaskAllot(allotExcutorParams)
+    if (!approve) return
+    
+    let isNeedApprove = approve.isNeedApprove === true
+    // 有审批
+    if (isNeedApprove) {
+      this.pending = false
+      return this.showApproveDialog(approve.data)
+    }
+    // 提交
+    const reAllotParams = this.buildReAllotParams()
+    this.fetchReAllotSubmit(reAllotParams)
+  }
+  
+  /** 
+   * @description 转派提交到工单池
+  */
+  public async submitReAllotWithTaskPool() {
+    // 构建参数
+    const allotTaskPoolParams = this.buildAllotTaskPoolParams()
+    // 验证审批
+    let approve: { isNeedApprove: boolean, data: TaskApprove } | null = await this.fetchTaskAllotTaskPoolApprove(allotTaskPoolParams)
+    if (!approve) return
+    
+    let isNeedApprove = approve.isNeedApprove === true
+    // 有审批
+    if (isNeedApprove) {
+      this.pending = false
+      return this.showApproveDialog(approve.data)
+    }
+    
+    // 提交
+    const reAllotTaskPoolParams = this.buildReAllotTaskPoolParams()
+    this.fetchReAllotTaskPoolSubmit(reAllotTaskPoolParams)
   }
   
   /** 
