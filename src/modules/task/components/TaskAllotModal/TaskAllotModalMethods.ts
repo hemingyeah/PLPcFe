@@ -722,7 +722,7 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
     try {
       // 验证负责人是否存在
       let executor = this.executorUser?.userId
-      if (!executor) {
+      if (!executor && this.allotType === TaskAllotTypeEnum.Person) {
         this.pending = false
         return Platform.alert(TASK_NO_EXECUTOR_MESSAGE)
       }
