@@ -277,7 +277,7 @@ export default class TaskAllotAuto extends Vue {
           />
         { 
           this.isMatchResultEmpty 
-            ? <div class={`${this.className}-empty`}>未匹配到任何规则，请使用「重新匹配」功能刷新结果或更换派单方式</div>
+            ? <div class={`${this.className}-empty`}>未匹配到任何规则，请使用「重新匹配」功能刷新结果或更换派单方式。</div>
             : (
               <el-button onClick={() => this.isShowUnMatchResult = !this.isShowUnMatchResult}>
                 { this.isShowUnMatchResult ? '收起' : '查看更多' }

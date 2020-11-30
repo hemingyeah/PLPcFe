@@ -16,7 +16,8 @@ import {
   TaskPoolAuthUsersGetModel,
   TaskPoolSubscriptionUsersGetModel,
   CustomerTahTaskPoolCountGetModel,
-  TaskPoolSearchModel
+  TaskPoolSearchModel,
+  TaskReAllotTaskPoolModel
 } from "@model/param/in/Task"
 
 import { 
@@ -1213,6 +1214,13 @@ export function taskAllotExcutor(params: TaskAllotModel): Promise<getTaskAllotRe
  */
 export function taskReAllot(params: TaskAllotModel): Promise<getTaskAllotResult> {
   return http.post(`${fixedPrefixTaskPath}/outside/dd/task/reallot`, params)
+}
+
+/**
+ * @description 工单转派到工单池
+ */
+export function taskReAllotTaskPool(params: TaskReAllotTaskPoolModel): Promise<getTaskAllotResult> {
+  return http.post(`${fixedPrefixTaskPath}/outside/dd/task/allotToPool`, params)
 }
 
 /**

@@ -188,7 +188,7 @@ export interface TaskAllotModel {
     staffId?: string,
     // 用户id
     userId: string
-  }[]
+  }[],
 }
 
 /* 工单指派-指派到工单池 */
@@ -224,6 +224,31 @@ export interface TaskAllotTaskPoolModel {
     // 用户id
     userId: string
   }[]
+}
+
+/* 工单转派-工单池 */
+export interface TaskReAllotTaskPoolModel {
+  // 工单id
+  taskId: string
+  // 负责人用户id  task_pool
+  executorId: string,
+  // 工单状态
+  state: string,
+  // 转派原因
+  reason?: string,
+  // 到工单池
+  toPool: boolean,
+  // 协同人
+  synergies?: {
+    // 名字
+    displayName?: string,
+    // 头像
+    head?: string,
+    // 钉钉人员id
+    staffId?: string,
+    // 用户id
+    userId: string
+  }[],
 }
 
 /* 工单指派转派 团队列表 */

@@ -9,7 +9,8 @@ import {
   taskAllotTaskPoll, 
   getTaskAllotTaskPoolApprove, 
   getTaskType,
-  taskReAllot
+  taskReAllot,
+  taskReAllotTaskPool
 } from '@src/api/TaskApi'
 import { getStateColorMap } from '@src/api/SettingApi'
 /* computed */
@@ -33,7 +34,8 @@ import {
   TaskAllotApproveParams, 
   AllotExcutorParams,
   AllotTaskPoolParams,
-  User
+  User,
+  ReAllotTaskPoolParams
 } from '@src/modules/task/components/TaskAllotModal/TaskAllotModalInterface'
 /* model */
 import { TASK_NOT_AUTO_DISPATCH_RULE, TASK_NO_EXECUTOR_MESSAGE, TASK_NO_REALLOT_REASON_MESSAGE, TASK_REALLOT_NOT_SAME_USER_MESSAGE } from '@src/model/const/Alert'
@@ -172,13 +174,26 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
   }
   
   /** 
-   * @description 构建转派参数
+   * @description 构建转派到负责人参数
   */
   public buildReAllotParams(): AllotExcutorParams {
     let reAllotParams = this.buildAllotExcutorParams()
     reAllotParams.reason = this.reason
     
     return reAllotParams
+  }
+  
+  /** 
+   * @description 构建转派到工单池参数
+  */
+  public buildReAllotTaskPoolParams(): ReAllotTaskPoolParams {
+    let reAllotTaskPoolParams: any = this.buildAllotExcutorParams()
+    reAllotTaskPoolParams.reason = this.reason
+    reAllotTaskPoolParams.executorId = 'task_pool'
+    reAllotTaskPoolParams.toPool = true
+    reAllotTaskPoolParams.state = this.task?.state
+    
+    return reAllotTaskPoolParams
   }
   
   /** 
@@ -540,10 +555,39 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
     )
   }
   
-  /* 转派工单提交 */
+  /* 转派工单到负责人提交 */
   public fetchReAllotSubmit(params: AllotExcutorParams) {
     return (
       taskReAllot(params)
+      .then((data: getTaskAllotResult) => {
+        let isSuccess = data.success
+        if (!isSuccess) {
+          return Platform.alert(data.message)
+        }
+        
+        data?.result?.stateDisplayName 
+          && (
+            Platform.notification({
+            title: data?.result?.stateDisplayName || '',
+            type: 'success',
+          })
+        )
+        
+        this.allotSuccess()
+      })
+      .catch((err: any) => {
+        console.error(err)
+      })
+      .finally(() => {
+        this.pending = false
+      })
+    )
+  }
+  
+  /* 转派工单到工单池提交 */
+  public fetchReAllotTaskPoolSubmit(params: ReAllotTaskPoolParams) {
+    return (
+      taskReAllotTaskPool(params)
       .then((data: getTaskAllotResult) => {
         let isSuccess = data.success
         if (!isSuccess) {
@@ -720,14 +764,16 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
   */
   public async submitWithReAllot() {
     try {
+      // 是否是派单到负责人
+      let isReAllotToPerson = this.allotType === TaskAllotTypeEnum.Person
       // 验证负责人是否存在
       let executor = this.executorUser?.userId
-      if (!executor && this.allotType === TaskAllotTypeEnum.Person) {
+      if (!executor && isReAllotToPerson) {
         this.pending = false
         return Platform.alert(TASK_NO_EXECUTOR_MESSAGE)
       }
       // 验证负责人是否相同
-      if (executor === this.task?.executor.userId && this.allotType === TaskAllotTypeEnum.Person) {
+      if (executor === this.task?.executor.userId && isReAllotToPerson) {
         this.pending = false
         return Platform.alert(TASK_REALLOT_NOT_SAME_USER_MESSAGE)
       }
@@ -758,8 +804,13 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
       }
       
       // 转派工单
-      const reAllotParams = this.buildReAllotParams()
-      this.fetchReAllotSubmit(reAllotParams)
+      if (isReAllotToPerson) {
+        const reAllotParams = this.buildReAllotParams()
+        this.fetchReAllotSubmit(reAllotParams)
+      } else {
+        const reAllotTaskPoolParams = this.buildReAllotTaskPoolParams()
+        this.fetchReAllotTaskPoolSubmit(reAllotTaskPoolParams)
+      }
       
     } catch(err) {
       this.pending = false

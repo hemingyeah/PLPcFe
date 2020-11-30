@@ -88,3 +88,19 @@ export interface AllotTaskPoolParams {
   // 协同人
   synergies?: User[],
 }
+
+/* 转派到工单池参数 */
+export interface ReAllotTaskPoolParams {
+  // 工单id
+  taskId: string
+  // 负责人用户id  task_pool
+  executorId: string,
+  // 工单状态
+  state: string,
+  // 转派原因
+  reason?: string,
+  // 到工单池
+  toPool: boolean,
+  // 协同人
+  synergies?: User[]
+}
