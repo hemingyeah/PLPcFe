@@ -17,6 +17,8 @@ import TaskAllotModalComputed from '@src/modules/task/components/TaskAllotModal/
 /* enum */
 import TaskAllotTypeEnum from '@model/enum/TaskAllotTypeEnum'
 import TaskActionEnum from '@model/enum/TaskActionEnum'
+import ComponentNameEnum from '@model/enum/ComponentNameEnum'
+import LeaderEnum from '@model/enum/LeaderEnum'
 /* entity */
 import Approve from '@model/entity/Approve'
 import LoginUser from '@model/entity/LoginUser/LoginUser'
@@ -50,8 +52,8 @@ import PlatformUtil from '@src/platform'
 import { openTabForTaskView } from '@src/util/business/openTab'
 /* vue */
 import { Emit } from 'vue-property-decorator'
-import ComponentNameEnum from '@model/enum/ComponentNameEnum'
-import LeaderEnum from '@model/enum/LeaderEnum'
+/* util */
+import { isArray } from '@src/util/type'
 
 /* 加载的组件 */
 const LoadComponentMap = {
@@ -646,7 +648,7 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
     // 匹配负责人显示
     this.matchExcutorWithReAllot()
     // 初始化协同人显示
-    this.synergyUserList = this.task?.synergies.slice() || []
+    this.synergyUserList = isArray(this.task?.synergies) ? this.task.synergies.slice() : []
     // 获取工单配置
     await this.fetchTaskConfig()
     // 初始化
