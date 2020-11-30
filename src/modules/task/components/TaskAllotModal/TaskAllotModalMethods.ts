@@ -769,7 +769,7 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
       
       // 派单到工单池
       if (this.allotType === TaskAllotTypeEnum.Pool) {
-        return this.submitReAllotWithTaskPool()
+        return this.submitWithTaskPool()
       }
       
     } catch(err) {
@@ -808,28 +808,6 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
     // 提交
     const reAllotParams = this.buildReAllotParams()
     this.fetchReAllotSubmit(reAllotParams)
-  }
-  
-  /** 
-   * @description 转派提交到工单池
-  */
-  public async submitReAllotWithTaskPool() {
-    // 构建参数
-    const allotTaskPoolParams = this.buildAllotTaskPoolParams()
-    // 验证审批
-    let approve: { isNeedApprove: boolean, data: TaskApprove } | null = await this.fetchTaskAllotTaskPoolApprove(allotTaskPoolParams)
-    if (!approve) return
-    
-    let isNeedApprove = approve.isNeedApprove === true
-    // 有审批
-    if (isNeedApprove) {
-      this.pending = false
-      return this.showApproveDialog(approve.data)
-    }
-    
-    // 提交
-    const reAllotTaskPoolParams = this.buildReAllotTaskPoolParams()
-    this.fetchReAllotTaskPoolSubmit(reAllotTaskPoolParams)
   }
   
   /** 
