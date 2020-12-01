@@ -173,7 +173,7 @@
         :repertory="manageRepertories"
         :sparepart-config="sparepartConfig"
         type="mall"
-        :repertoryName="tableData[0].baseRepertory"
+        :repertoryName="baseRepertory"
       ></part-instockBatch-form>
       <div slot="footer" class="dialog-footer">
         <base-button type="ghost" @event="instockBatchDialog = false"
@@ -197,6 +197,7 @@ import PartInStockBatchForm from "../../../partV2/repertory/form/PartInStockBatc
 
 // api
 import * as SettingApi from "@src/api/SettingApi";
+import { isArray } from '@src/util/type';
 // 发布状态
 const STATELIST = [
   {
@@ -286,6 +287,7 @@ export default {
       userId: "", //用户id
       auths: {}, //权限
       selected: [],
+      baseRepertory: {}, //仓库
       selectStateList: STATELIST,
       selectStockList: STOCK,
       tableNames: TABLENAME,
@@ -373,6 +375,13 @@ export default {
     async sparepartConfigs() {
       const result = await SettingApi.sparepartConfig();
       this.sparepartConfig = result;
+      result.forEach((item) => {
+        if (item.isSystem && item.classify) {
+          if (Number(item.isSystem) === 1 && Number(item.classify) === 2) {
+            this.baseRepertory = item
+          }
+        }
+      })
     },
     /*获取仓库列表 */
     async allRepertory() {
@@ -422,10 +431,11 @@ export default {
      * 判断是否是管理员
      */
     judgeSelectManager() {
-      const { manager } = this.tableData[0].baseRepertory;
+      const { manager } = this.baseRepertory;
       let isManage;
       if (manager) {
-        isManage = JSON.parse(manager).some((item) => {
+       isManage = isArray(manager) ? manager : JSON.parse(manager)
+       .some((item) => {
           return item.userId == this.userId;
         });
       }
@@ -462,7 +472,7 @@ export default {
       }
       if (!this.judgeSelectManager()) {
         this.$platform.alert(
-          `尚未给您分配"${this.tableData[0].baseRepertory.name}"的管理员权限，请联系管理员或到备件库管理中设置`
+          `尚未给您分配"${this.baseRepertory.name}"的管理员权限，请联系管理员或到备件库管理中设置`
         );
         return;
       }
@@ -483,7 +493,7 @@ export default {
       }
       if (!this.judgeSelectManager()) {
         this.$platform.alert(
-          `尚未给您分配"${this.tableData[0].baseRepertory.name}"的管理员权限，请联系管理员或到备件库管理中设置`
+          `尚未给您分配"${this.baseRepertory.name}"的管理员权限，请联系管理员或到备件库管理中设置`
         );
         return;
       }
