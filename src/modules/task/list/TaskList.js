@@ -986,9 +986,10 @@ export default {
      * @description 表头更改
      */
     headerDragend(newWidth, oldWidth, column, event) {
+      console.log(column)
       let data = this.columns
         .map((item) => {
-          if (item.displayName === column.label) {
+          if (item.fieldName === column.property) {
             item.width = column.width;
           }
           return item;
