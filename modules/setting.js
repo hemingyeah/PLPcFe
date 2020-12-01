@@ -13,5 +13,8 @@ module.exports = {
   },
   'setting.task.receipt_fields': {
     entry: './src/modules/setting/task/receipt_fields.js',
+  },
+  'system.mall.index' : {
+    entry: "./src/modules/system/mall/index.js"
   }
 }

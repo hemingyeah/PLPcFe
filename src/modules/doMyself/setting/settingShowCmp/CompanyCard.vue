@@ -7,7 +7,7 @@
           :src="
             infoData.logoUrl
               ? `${infoData.logoUrl}?x-oss-process=image/resize,m_fill,h_24,w_24`
-              : ''
+              : defaultLogoImg
           "
         />
         <div class="flex-x font-12 font-w-500 flex-1">
@@ -39,12 +39,17 @@ export default {
           name: "",
           mobile: "",
           address: "",
-          logoUrl: userImg,
+          logoUrl: "",
           companyName: "",
         };
       }, // primary、plain、only-text、ghost、danger
     },
   },
+  computed: {
+    defaultLogoImg() {
+      return userImg;
+    }
+  }
 };
 </script>
 

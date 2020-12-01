@@ -6,8 +6,8 @@
     filterable
     remote
     reserve-keyword
-    :placeholder="field.placeHolder?field.placeHolder:'请输入关键词搜索'"
-    :clearable="field.clearable?field.clearable:false"
+    :placeholder="field.placeHolder ? field.placeHolder : '请输入关键词搜索'"
+    :clearable="field.clearable ? field.clearable : false"
     :loading="loading"
     :remote-method="searchLinkman"
   >
@@ -15,7 +15,7 @@
       v-for="item in options"
       :key="item.id"
       :label="item.name"
-      :value="field.returnData?item[field.returnData]:item.id"
+      :value="field.returnData ? item[field.returnData] : item.id"
     ></el-option>
   </el-select>
 </template>
@@ -30,58 +30,73 @@ export default {
   props: {
     value: {
       type: String,
-      default: ""
-    }
+      default: "",
+    },
+    userList: {
+      type: Array,
+      default: () => [],
+    },
+  },
+  watch: {
+    /*判断是否自定义视图进来的 */
+    userList(v) {
+      if (Array.isArray(v) && v.length) {
+        this.options = v;
+      }
+    },
   },
   data() {
     return {
       loading: false,
-      options: []
+      options: [],
     };
   },
   created() {
     let options = sessionStorage.getItem(`${this.field.fieldName}_options`);
 
-    this.options = JSON.parse(options || "[]");
+    if (Array.isArray(this.userList) && this.userList.length) {
+      this.options = this.userList;
+    } else {
+      this.options = JSON.parse(options || "[]");
+    }
   },
   methods: {
     choose(newValue) {
       let oldValue = null;
       this.$emit("update", { newValue, oldValue, field: this.field });
     },
-    searchLinkman: _.debounce(function(keyword) {
+    searchLinkman: _.debounce(function (keyword) {
       this.loading = true;
       this.$emit("input", { keyword, field: this.field });
       this.$http
         .get("/api/elasticsearch/outside/es/linkman/list", {
           keyword,
-          pageNum: 1
+          pageNum: 1,
         })
-        .then(res => {
+        .then((res) => {
           let result = res.result || {};
           // 创建人字段
-          if(this.field.fieldName === 'createUser' && res.list.length > 0) {
+          if (this.field.fieldName === "createUser" && res.list.length > 0) {
             result = res;
-            result.list.map(res=>{
-              res['id'] = res.userId;
-              res['name'] = res.displayName; 
-              return res
-            })
-
+            result.list.map((res) => {
+              res["id"] = res.userId;
+              res["name"] = res.displayName;
+              return res;
+            });
           }
           this.options = result.list || [];
-          
+
           this.loading = false;
           sessionStorage.setItem(
             `${this.field.fieldName}_options`,
             JSON.stringify(this.options)
           );
         })
-        .catch(err =>
+        .catch((err) =>
           console.error("searchLinkmanManager function catch err", err)
         );
-    }, 1000)
-  }
+    }, 1000),
+  },
 };
 </script>
 

@@ -129,6 +129,9 @@ textarea {
   &-mt12 {
     margin-top: 12px;
   }
+  &-mr12 {
+    margin-right: 12px;
+  }
   &-ml15 {
     margin-left: 15px;
   }
@@ -206,7 +209,6 @@ textarea {
     border-bottom-color: #999!important;
     top: 7px!important;
   }
-
   .el-table .sort-caret.descending {
     border-top-color: #999!important;
     bottom: 9px!important;

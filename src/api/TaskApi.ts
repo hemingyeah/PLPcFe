@@ -3,15 +3,17 @@ import {
   TaskCreateAndEditModel,
   PlanTaskCreateAndEditModel,
 } from "@model/param/in/Task";
-import GrayUtil from '@src/util/gray';
+import GrayUtil from "@src/util/gray";
 
-const fixedPrefixTaskPath = '/api/task';
-const ElASTICSEARCH = '/api/elasticsearch';
-const fixedPrefixPaymentPath = '/api/payment';
+const fixedPrefixTaskPath = "/api/task";
+const ElASTICSEARCH = "/api/elasticsearch";
+const fixedPrefixPaymentPath = "/api/payment";
+const CUSTOMER = 'api/customer'
+const APPS = 'api/app'
 
-// const fixedPrefixTaskPath = '';
-// const ElASTICSEARCH = '';
-// const fixedPrefixPaymentPath = '';
+// const fixedPrefixTaskPath = "";
+// const ElASTICSEARCH = "";
+// const fixedPrefixPaymentPath = "";
 
 /* ------------- start 旧工单api ---------------- */
 
@@ -1055,7 +1057,7 @@ export function taskRecordDelete(params: any) {
  * @description 拨打电话
  */
 export function dialout(params: object) {
-  return http.post(`/api/callcenter/outside/callcenter/api/dialout`, params, false);
+  return http.post("/api/callcenter/outside/callcenter/api/dialout", params, false);
 }
 
 /**
@@ -1072,7 +1074,7 @@ export function getUserViews(params: object) {
  * @description 获取附件
  */
 export function getCardDetailList(params: object) {
-  return http.get(`/task/getCardDetailList`, params);
+  return http.get("/task/getCardDetailList", params);
 }
 
 /**
@@ -1087,6 +1089,39 @@ export function getOneView(params: string) {
  */
 export function revertReason(params: object) {
   return http.post(`/task/revertReason`, params)
+}
+/**
+ * 获取负责人 协同人 派单人 创建人
+ */
+export function getSimpleUserListByIds(params: object = []) {
+  return http.post(`${APPS}/outside/user/getSimpleUserListByIds`, params)
+}
+/**
+ * 获取联系人
+ */
+
+export function getLinkmanListByIds(params: object = []) {
+  return http.post(`${CUSTOMER}/outside/pc/customer/getLinkmanListByIds`, params)
+}
+
+/**
+* 获取产品
+*/
+export function getSimpleProductList(params: object = []) {
+  return http.post(`${CUSTOMER}/outside/pc/getSimpleProductList`, params)
+}
+
+/**
+ * 获取客户人
+ */
+export function getSimpleCustomerList(params: object = []) {
+  return http.post(`${CUSTOMER}/outside/pc/customer/getSimpleCustomerList`, params)
+}
+/**
+* 获取团队服务
+*/
+export function getSimpleTagListByIds(params: object = []) {
+  return http.post(`${APPS}/outside/tag/getSimpleTagListByIds`, params)
 }
 
 /* -------------  end  新工单api ---------------- */

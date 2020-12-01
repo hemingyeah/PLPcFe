@@ -1,9 +1,12 @@
 import Vue from '@src/common/entry';
 import Stage from './views/Stage.vue';
 import http from '@src/util/http';
+import mtracker from '@src/util/mtracker';
 
 Vue.prototype.$http = http;
 Vue.prototype.$eventBus = new Vue();
+
+mtracker();
 // 处理注入的参数
 let initData = {};
 
