@@ -204,7 +204,7 @@ export default class BaseCalculationFormula extends Vue {
     return (
       <div class='calculation-formula-fields'>
         <el-tooltip placement="top">
-          <div slot="content">表单中已配置的【数字】和【下拉菜单】类型的字段可以作为<br />运算的对象，其中下拉菜单的选项必须是数值才可以支持计算</div>
+          <div slot="content">表单中已配置的【数字】类型的字段可以作为运算的对象</div>
           <i class="iconfont icon-question"></i>
         </el-tooltip>
         运算对象:
