@@ -30,7 +30,7 @@ const BizFormRemoteSelect = {
       type: Boolean,
       default: false
     },
-    inputDisabled: {
+    inputDisabled: { // 与混入FormMixin的computed中disabled做区分
       type: Boolean,
       default: false
     }
@@ -64,7 +64,7 @@ const BizFormRemoteSelect = {
           disabled={ this.inputDisabled }
         >
         </base-select>
-        { this.cleared && this.value.length > 0 && clearButton }
+        { this.cleared && this.value.length > 0 && !this.inputDisabled && clearButton }
       </div>
     )
 
