@@ -3,6 +3,10 @@ import * as TaskApi from '@src/api/TaskApi.ts'
 /* component */
 import TaskEditForm from '@src/modules/task/edit/components/TaskEditForm/TaskEditForm.vue'
 import PlanTaskEditForm from '@src/modules/task/edit/components/PlanTaskEditForm/PlanTaskEditForm.vue'
+import TaskAllotModal from '@src/modules/task/components/TaskAllotModal/TaskAllotModal.tsx'
+import TaskProcessSteps from '@src/modules/task/components/TaskProcessSteps/TaskProcessSteps.tsx'
+/* enum */
+import TaskStateEnum from '@model/enum/TaskStateEnum.ts'
 /* utils */
 import {parse} from '@src/util/querystring';
 import * as FormUtil from '@src/component/form/util'
@@ -29,24 +33,25 @@ export default {
   name: 'task-edit-view',
   inject: ['initData'],
   data() {
+    data.template = taskTemplate
     return data
   },
   computed,
   async mounted() {
     try {
       this.initialize();
-
+      
       // 初始化默认值
       let form = this.workTask;
-
+      
       this.fields = await TaskApi.getTaskTemplateFields({ templateId: this.genTemplateId(), tableName: 'task' });
-
+      
       form = util.packToForm(this.fields, form);
       this.form = FormUtil.initialize(this.fields, form);
-
+      
       // 呼叫中心需求处理
       this.callCenterWithTaskDataHandler();
-
+      
       this.init = true;
       
       this.$nextTick(() => {
@@ -57,7 +62,7 @@ export default {
       })
       // 关联项查询处理
       this.relationFieldHandler();
-
+      
       // 是否打开派单设置弹窗
       this.$nextTick(async () => {
         let query = parse(window.location.search) || {}
@@ -71,24 +76,39 @@ export default {
   },
   methods: {
     ...methods,
+    buildParams() {
+      const task = util.packToTask(this.fields, this.form)
+      
+      task.templateId = taskTemplate.value
+      task.templateName = taskTemplate.text
+      
+      if (this.isTaskCreate) {
+        this.form.templateId = taskTemplate.value
+        this.form.templateName = taskTemplate.text
+      }
+      
+      if (this.allotTask.id) {
+        task.id = this.allotTask.id
+      }
+      
+      const { address, customer, tick, linkman } = task
+      const params = {
+        address,
+        customer,
+        eventId: this.isFromEvent ? this.eventId : '',
+        flow: this.isFromEvent ? this.urlParams.flow : '',
+        linkman,
+        task,
+        tick,
+      }
+      
+      return params
+    },
     /** 
      * 关闭并打开新的Tab
     */
     closeAndOpenTab(url, newTabId) {
       location.href = url;
-      // let id = window.frameElement.dataset.id;
-      // this.$platform.closeTab(id)
-      
-      // let fromId = window.frameElement.getAttribute('id')
-      
-      // this.$platform.openTab({
-      //   id: newTabId,
-      //   title: '',
-      //   url,
-      //   reload: true,
-      //   close: true,
-      //   fromId
-      // });
     },
     /** 
      * @description 呼叫中心与工单数据的处理 linkman/address/customer
@@ -99,7 +119,7 @@ export default {
       if(!callRecordId) {
         return console.warn(`Caused: current is not have callRecordId, The value is ${callRecordId}`);
       }
-
+      
       // 联系人 地址
       let { linkman, address } = callCenterMap;
       // 更新联系人/客户数据
@@ -120,27 +140,36 @@ export default {
       TaskApi.createTask(params)
         .then(res => {
           let isSucc = res.success;
-
+          
           platform.notification({
             type: isSucc ? 'success' : 'error',
             title: `创建工单${isSucc ? '成功' : '失败'}`,
             message: !isSucc && res.message
           })
-
+          
           if (!isSucc) {
             return this.togglePending();
           }
           
           // 根据是否派单决定跳转地址
           let taskId = res.result;
-          let taskDetailPath = `/task/view/${taskId}`;
-          let taskAllotPath = `/task/allotTask?id=${taskId}`;
-          let url = isAllot ? taskAllotPath : taskDetailPath;
-          let id = isAllot ? `task_allot_${taskId}` : `task_view${taskId}`
-
-          this.closeAndOpenTab(url, id)
+          
+          if (isAllot) {
+            this.openAllotModel({ 
+              ...params.task, 
+              id: taskId,
+              createUser: this.initData.loginUser || {},
+              excutor: {}
+            })
+          } else {
+            let taskDetailPath = `/task/view/${taskId}`;
+            let url = taskDetailPath
+            let id = `task_view${taskId}`
+            this.closeAndOpenTab(url, id)
+          }
+          
           this.togglePending()
-
+          
         })
         .catch(err => {
           this.togglePending();
@@ -152,10 +181,10 @@ export default {
     */
     customerCreateTaskHandler() {
       if(!this.isFromCustomer && !this.isFromPlan) return
-
+      
       let form = this.$refs.form;
       if(!form) return;
-
+      
       form.updateCustomer(this.form.customer, { isForceUpdateCustomer: true });
       form.relationFieldSelectHandler(TaskFieldNameMappingEnum.Product);
     },
@@ -194,9 +223,9 @@ export default {
         
         return this.$platform.closeTab(id)
       }
-
+      
       parent.frameHistoryBack(window)
-
+      
     },
     /** 
      * @description 查询工单配置
@@ -218,13 +247,13 @@ export default {
       let url = '';
       let createUrl = '/task/create';
       let updateAndEditUrl = '/task/update';
-
+      
       if(this.isTaskEdit) {
         url = this.isFromEvent ? createUrl : updateAndEditUrl;
       } else {
         url = createUrl;
       }
-
+      
       this.submitModel.url = url;
     },
     /** 
@@ -232,7 +261,7 @@ export default {
     */
     initTitle() {
       let title = '';
-
+      
       if(this.isPlanTaskEdit) {
         title = '编辑计划任务';
       } else if(this.isFromPlan) {
@@ -242,13 +271,13 @@ export default {
       } else {
         title = '新建工单';
       }
-
+      
       document.title = title;
     },
     jumpWithPlanTask() {
       try {
         let isFromId = window?.frameElement?.getAttribute('fromid');
-
+        
         if(isFromId) {
           let closeId = window.frameElement.dataset.id;
           this.$platform.refreshTab(isFromId);
@@ -261,22 +290,32 @@ export default {
         console.warn('jumpWithPlanTask -> error', error)
       }
     },
+    // 打开新建工单弹窗
+    openAllotModel(task = {}) {
+      this.allotTask = task
+      this.allotTask.state = TaskStateEnum.CREATED.value
+      this.$nextTick(() => {
+        this.$refs.TaskAllotModal && this.$refs.TaskAllotModal.outsideShow()
+      })
+      this.togglePending()
+      this.backParams.task.id = task.id
+    },
     /** 
      * @description 新建计划任务弹窗
     */
     async planTaskCreateDialogOpen() {
       let planTime = this.form?.[TaskFieldNameMappingEnum.PlanTime]
       if(!planTime) return this.$platform.alert(PLATN_TASK_PLAN_TIME_REQUIRES_MESSAGE)
-
+      
       this.submitting = true;
-
+      
       this.$refs.form
         .validate()
         .then(async (valid) => {
           this.submitting = false;
           
           if (!valid) return Promise.reject('validate fail.');
-
+          
           // 获取工单配置
           let result = await this.fetchTaskConfig();
           let taskConfig = result?.taskConfig || {};
@@ -288,7 +327,7 @@ export default {
             planTaskEditFormEl.toggle();
             planTaskEditFormEl.fetchExeinsyn(this.form?.customer?.[0]?.id);
           }
-
+          
           this.submitting = false;
         })
     },
@@ -298,16 +337,16 @@ export default {
     async planTaskEditDialogOpen() {
       let planTime = this.form?.[TaskFieldNameMappingEnum.PlanTime]
       if(!planTime) return this.$platform.alert(PLATN_TASK_PLAN_TIME_REQUIRES_MESSAGE)
-
+      
       this.submitting = true;
-
+      
       this.$refs.form
         .validate()
         .then(async (valid) => {
           this.submitting = false;
           
           if (!valid) return Promise.reject('validate fail.');
-
+          
           // 获取工单配置
           let result = await this.fetchTaskConfig();
           let taskConfig = result?.taskConfig || {};
@@ -317,7 +356,7 @@ export default {
           let planTaskEditFormEl = this.planTaskEditFormEl;
           let planTask = this.initData?.planTask || {};
           planTaskEditFormEl && planTaskEditFormEl.toggle(true, planTask);
-
+          
           this.submitting = false;
         })
     },
@@ -328,27 +367,27 @@ export default {
       TaskApi.createPlanTask(params)
         .then(res => {
           let isSucc = res.success;
-
+          
           platform.notification({
             type: isSucc ? 'success' : 'error',
             title: `创建计划任务${isSucc ? '成功' : '失败'}`,
             message: !isSucc && res.message
           })
-
+          
           if (!isSucc) {
             return this.togglePending();
           }
           
           this.jumpWithPlanTask();
           this.togglePending();
-
+          
         })
         .catch(err => console.error('err', err))
         .finally(() => {
           // 计划任务元素
           let planTaskEditFormEl = this.planTaskEditFormEl;
           planTaskEditFormEl && planTaskEditFormEl.togglePending();
-
+          
           this.togglePending();
         })
     },
@@ -359,20 +398,20 @@ export default {
       TaskApi.editPlanTask(params)
         .then(res => {
           let isSucc = res.success;
-
+          
           platform.notification({
             type: isSucc ? 'success' : 'error',
             title: `编辑计划任务${isSucc ? '成功' : '失败'}`,
             message: !isSucc && res.message
           })
-
+          
           if (!isSucc) {
             return this.togglePending();
           }
           
           this.jumpWithPlanTask();
           this.togglePending();
-
+          
         })
         .catch(err => console.error('err', err))
         .finally(() => {
@@ -387,10 +426,10 @@ export default {
     */
     productCreateTaskHandler() {
       if(!this.isFromProduct && !this.isFromPlan) return
-
+      
       let form = this.$refs.form;
       if(!form) return;
-
+      
       // 更新产品数据
       form.updateProduct(
         this.form.product,
@@ -402,7 +441,7 @@ export default {
     */
     reloadTab() {
       let fromId = window.frameElement.getAttribute('fromid');
-
+      
       this.$platform.refreshTab(fromId);
     },
     /** 
@@ -413,7 +452,7 @@ export default {
       if(!this.isFromEvent && !this.isCopyTask) return
       // 从客户新建工单
       if(this.isFromCustomer) return;
-
+      
       // 子组件form
       this.$nextTick(() => {
         let form = this.$refs.form;
@@ -423,7 +462,7 @@ export default {
         form.relationFieldSelectHandler(TaskFieldNameMappingEnum.Customer);
         form.relationFieldSelectHandler(TaskFieldNameMappingEnum.Product);
       })
-
+      
     },
     /** 
      * @description 提交
@@ -431,40 +470,52 @@ export default {
     */
     submit: _.debounce(function (isAllot = false) {
       if(this.submitting) return
-
+      
       this.submitting = true;
-
+      
       this.$refs.form
         .validate()
         .then(valid => {
-          this.submitting = false;
-
-          if (!valid) return Promise.reject('validate fail.');
-        
-          const task = util.packToTask(this.fields, this.form);
-          task.templateId = taskTemplate.value;
-          task.templateName = taskTemplate.text;
+          this.submitting = false
           
-          const { address, customer, tick, linkman } = task;
-          const params = {
-            address,
-            customer,
-            eventId: this.isFromEvent ? this.eventId : '',
-            flow: this.isFromEvent ? this.urlParams.flow : '',
-            linkman,
-            task,
-            tick,
-          };
-        
-          this.togglePending(true);
-
+          if (!valid) return Promise.reject('validate fail.')
+          
+          const params = this.buildParams()
+          
+          ++this.submitCount
+          this.togglePending(true)
+          
+          // 指派需要对比 现在的表单于上一次表单数据是否相同，不相同则更新工单数据
+          if (isAllot) {
+            // 是否是相同的工单数据
+            let isSameForm = true
+            try {
+              isSameForm = (
+                JSON.stringify(params) === JSON.stringify(this.backParams)
+                && Object.keys(this.backParams).length > 0
+              )
+            } catch (error) {
+              isSameForm = true
+            }
+            // 表单数据不相同
+            if (!isSameForm) {
+              this.backParams = params
+              let isFirstCreate = this.submitCount <= 1 && this.isTaskCreate
+              let taskMethodFunc = isFirstCreate ? this.createTaskMethod : this.updateTaskMethod
+              return taskMethodFunc(params, isAllot)
+            } 
+            
+            return this.openAllotModel(this.allotTask)
+          }
+          
+          if (this.isTaskCreate) {
+            return this.createTaskMethod(params, isAllot)
+          }
+          
           if (this.isTaskEdit) {
             return this.updateTaskMethod(params, isAllot);
           }
-          if (this.isTaskCreate) {
-            return this.createTaskMethod(params, isAllot);
-          }
-
+          
         })
         .catch(err => {
           this.togglePending();
@@ -478,7 +529,7 @@ export default {
       if (this.pending) {
         return console.warn('Caused: can not submitWithPlanTask action, because this.pending is true');
       }
-
+      
       this.togglePending(true);
       // 计划任务元素
       let planTaskEditFormEl = this.$refs.planTaskEditForm;
@@ -499,7 +550,7 @@ export default {
       if (this.isPlanTaskEdit) {
         return this.planTaskEditSubmit(params);
       }
-
+      
     }, 250),
     togglePending(pending = false) {
       this.pending = pending;
@@ -512,26 +563,37 @@ export default {
       TaskApi.editTask(params)
         .then(res => {
           let isSucc = res.success;
-
+          
           platform.notification({
             type: isSucc ? 'success' : 'error',
             title: `更新工单${isSucc ? '成功' : '失败'}`,
             message: !isSucc && res.message
           })
-
+          
           if (!isSucc) {
             return this.togglePending();
           }
           // 根据是否派单决定跳转地址
-          let taskId = this.editId;
-          let taskDetailPath = `/task/view/${taskId}`;
-          let taskAllotPath = `/task/allotTask?id=${taskId}`;
-          let url = isAllot ? taskAllotPath : taskDetailPath;
-          let id = isAllot ? `task_allot_${taskId}` : `task_view${taskId}`
-
-          this.closeAndOpenTab(url, id)
+          let taskId = this.editId || this.allotTask.id;
+          
+          if (isAllot) {
+            this.openAllotModel({ 
+              ...params.task, 
+              templateId: this.task.templateId, 
+              id: taskId,
+              createUser: this.task.createUser,
+              excutor: this.task.excutor
+            })
+          } else {
+            let taskDetailPath = `/task/view/${taskId}`
+            let url = taskDetailPath;
+            let id = `task_view${taskId}`
+            
+            this.closeAndOpenTab(url, id)
+          }
+          
           this.togglePending()
-
+          
         })
         .catch(err => {
           this.togglePending();
@@ -543,10 +605,13 @@ export default {
     */
     updateTaskTemplateId(template = {}) {
       taskTemplate = template || {};
+      this.template = template
     },
   },
   components: {
     [TaskEditForm.name]: TaskEditForm,
-    [PlanTaskEditForm.name]: PlanTaskEditForm
+    [PlanTaskEditForm.name]: PlanTaskEditForm,
+    TaskAllotModal,
+    TaskProcessSteps
   }
 }

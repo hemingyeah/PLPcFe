@@ -1,4 +1,4 @@
-import { getCustomerExeinsyn } from '@src/api/CustomerApi';
+import { getCustomerExeinsyn } from '@src/api/CustomerApi.ts';
 
 const TaskAllowSelect = {
   name: 'task-allot-select',

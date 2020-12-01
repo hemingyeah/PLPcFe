@@ -15,7 +15,7 @@
 import {formatDate} from '@src/util/lang';
 import { FormFieldMap,  } from '@src/component/form/components';
 import * as Utils from '@src/component/form/util';
-import * as CustomerApi from '@src/api/CustomerApi';
+import * as CustomerApi from '@src/api/CustomerApi.ts';
 import FormItem from '@src/component/form/FormItem.vue';
 
 export default {

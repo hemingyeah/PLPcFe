@@ -8,6 +8,14 @@ export default {
   auth() {
     return this.initData?.auth || [];
   },
+  /* 当前工单状态 */
+  currentTaskState() {
+    return this.isTaskCreate ? this.allotTask.state : this.task.state
+  },
+  /* 当前工单类型id */
+  currentTaskTemplateId() {
+    return this.isTaskCreate ? this.template.value : this.task.templateId
+  },
   /* 禁用状态 */
   disabled() {
     return this.submitting || this.pending;
@@ -122,12 +130,13 @@ export default {
       isPlanTaskEdit: this.isPlanTaskEdit,
       isFromCustomer: this.isFromCustomer,
       isFromProduct: this.isFromProduct,
+      isDisabledTaskType: Object.keys(this.allotTask).length > 0
     }
   },
   task() {
     let task = null;
     let isTaskJson = typeof this.initData.task === 'string';
-
+    
     try {
       task = (isTaskJson ? JSON.parse(this.initData?.task) : this.initData?.task) || {};
     } catch (error) {

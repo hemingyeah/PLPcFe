@@ -15,19 +15,20 @@ import {
 } from "@src/util/storage";
 
 /* component */
-import CancelTaskDialog from "./components/CancelTaskDialog.vue";
-import PlanTimeDialog from "./components/PlanTimeDialog.vue";
-import ApproveTaskDialog from "./components/ApproveTaskDialog.vue";
-import ProposeApproveDialog from "./components/ProposeApproveDialog.vue";
+import CancelTaskDialog from './components/CancelTaskDialog.vue';
+import PlanTimeDialog from './components/PlanTimeDialog.vue';
+import ApproveTaskDialog from './components/ApproveTaskDialog.vue';
+import ProposeApproveDialog from './components/ProposeApproveDialog.vue';
 
-import TaskInfoRecord from "./components/TaskInfoRecord.vue";
-import TaskReceiptView from "./components/TaskReceipt/View/TaskReceiptView.vue";
-import TaskReceiptEditView from "./components/TaskReceipt/Edit/TaskReceiptEditView.vue";
-import TaskAccount from "./components/TaskAccount.vue";
-import TaskFeedback from "./components/TaskFeedback";
-import TaskCard from "./components/TaskCard";
-import TaskView from "./components/TaskView.vue";
-import TaskTimeDialog from "./components/TaskTimeDialog.vue";
+import TaskInfoRecord from './components/TaskInfoRecord.vue';
+import TaskReceiptView from './components/TaskReceipt/View/TaskReceiptView.vue';
+import TaskReceiptEditView from './components/TaskReceipt/Edit/TaskReceiptEditView.vue';
+import TaskAccount from './components/TaskAccount.vue';
+import TaskFeedback from './components/TaskFeedback';
+import TaskCard from './components/TaskCard';
+import TaskView from './components/TaskView.vue';
+import TaskTimeDialog from './components/TaskTimeDialog.vue';
+import TaskAllotModal from '@src/modules/task/components/TaskAllotModal/TaskAllotModal.tsx'
 
 /* enum */
 import { TaskEventNameMappingEnum } from "@model/enum/EventNameMappingEnum.ts";
@@ -635,7 +636,6 @@ export default {
     }
   },
   methods: {
-    previousStep() {},
     nextStep() {
       this.nowGuideStep++;
     },
@@ -830,13 +830,11 @@ export default {
     },
     // 指派工单
     allot() {
-      this.pending = true;
-      location.href = `/task/allotTask?id=${this.task.id}`;
+      this.$refs.TaskAllotModal.outsideShow()
     },
     // 转派工单
     redeploy() {
-      this.pending = true;
-      location.href = `/task/redeploy?id=${this.task.id}`;
+      this.$refs.TaskAllotModal.outsideShow()
     },
     // 打印工单
     printTask() {
@@ -1144,7 +1142,12 @@ export default {
       } else {
         this.rightActiveTab = this.viewBalanceTab ? "balance-tab" : this.viewFeedbackTab ? "feedback-tab" : "card-tab";
       }
-
+      
+      // 来自指派列表的指派操作
+      if (query.allot && this.allowAllotTask) {
+        this.allot()
+      }
+      
       this.loading = false;
       
       this.$nextTick(() => {
@@ -1178,6 +1181,7 @@ export default {
     [TaskFeedback.name]: TaskFeedback,
     [TaskCard.name]: TaskCard,
     [TaskView.name]: TaskView,
-    [TaskTimeDialog.name]: TaskTimeDialog
+    [TaskTimeDialog.name]: TaskTimeDialog,
+    TaskAllotModal
   }
 }

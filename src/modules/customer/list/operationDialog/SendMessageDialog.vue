@@ -43,7 +43,7 @@
 
 <script>
 import { formatDate, } from '@src/util/lang';
-import * as CustomerApi from '@src/api/CustomerApi';
+import * as CustomerApi from '@src/api/CustomerApi.ts';
 
 export default {
   name: "send-message-dialog",

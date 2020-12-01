@@ -331,21 +331,10 @@ export default {
      * @description 初始化
     */
     init() {
-      // this.loading = true;
-
-      // // 获取客户、产品数据
-      // Promise.all([
-      //   this.fetchCustomerData(),
-      //   this.fetchProductData()
-      // ])
-      //   .then(res => {
-      //     this.loading = false;
-      //   })
-      //   .catch(err => console.error('error', err));
-
+      // 
     },
     judegeSelectTaskType(value) {
-      return !value || this.state.isFromEvent;
+      return (!value || this.state.isFromEvent) && !this.state.isDisabledTaskType
     },
     /** 
      * @description 同时通知客户 checkbox变化

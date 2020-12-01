@@ -20,7 +20,7 @@ import {trimAll} from '@src/util/lang';
 import Page from '@model/Page';
 import platform from '@src/platform';
 import { getRecordOfProduct, commentProduct } from '@src/api/ProductApi';
-import * as CustomerApi from '@src/api/CustomerApi';
+import * as CustomerApi from '@src/api/CustomerApi.ts';
 
 function createAttachmentDom(h, attachments){
   return attachments && attachments.length
