@@ -54,6 +54,9 @@
       margin: 0 10px;
     }
   }
+  & > div {
+    width: 100%;
+  }
 }
 
 .allot-rule-modal-disabled {
@@ -64,5 +67,15 @@
     display: none;
   }
 
+}
+
+.allot-rule-modal-role-select,
+.allot-rule-modal-type-select {
+  .list-wrapper {
+    padding-top: 4px;
+  }
+  .input-container {
+    display: none;
+  }
 }
 /* end 弹窗 */
