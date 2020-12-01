@@ -2,7 +2,7 @@
   <div class="cascader-setting-option" :class="{'cascader-setting-option-default': option.isDefault, 'cascader-setting-option-active': active}" :data-option-id="option.id">
     <div class="cascader-setting-left">
       <button type="button" class="btn-text handle" v-show="option.deep == 1"> <i class="iconfont icon-tuozhuaipaixu"></i></button>
-      <input type="text" :value="option.value" @input="input" @click="choose" maxlength="30" @blur="validate">
+      <el-input type="textarea" rows="1" v-model="option.value" @input="input" @focus="choose" :maxlength="optionMaxLength" @blur="validate"/>
     </div>
     <div class="cascader-setting-right">
       <button type="button" class="cascader-setting-option-default-btn btn-text" tabindex="-1" title="默认选项" @click="changeDefault">
@@ -16,6 +16,8 @@
 </template>
 
 <script>
+import { SELECT_OPTION_LENGTH_MAX } from '../../../config'
+
 export default {
   name: 'cascader-setting-option',
   props: {
@@ -36,6 +38,12 @@ export default {
       deepZhChar: ['一', '二', '三', '四','五']
     }
   },
+  computed: {
+    //字段长度
+    optionMaxLength(){
+      return SELECT_OPTION_LENGTH_MAX
+    }
+  },
   methods: {
     validate(event){
       let le = event.target;
@@ -49,20 +57,20 @@ export default {
         this.$emit('input', value);
       }
     },
-    input(event){
-      let value = event.target.value;
+    input(eventValue){
+      let value = eventValue;
 
       // 过滤
       if(value.indexOf('/') >= 0){
         value = value.replace(/\//g, '');
-        event.target.value = value;
+        eventValue = value;
       }
 
       // 长度限制在30字以内
-      if(value.length > 30) {
-        value = value.substring(0, 30)
-        event.target.value = value;
-      }
+      // if(value.length > 30) {
+      //   value = value.substring(0, 30)
+      //   eventValue = value;
+      // }
 
       this.$emit('input', value);
     },
@@ -94,22 +102,22 @@ export default {
     width: 58px;
     margin-left: 8px;
   }
-  input[type='text']{
+  .el-textarea__inner{
     width: 100%;
     margin: 0;
     // padding: 0 50px 0px 8px;
-    line-height: 24px;
+    // line-height: 24px;
     border: none;
     outline: none;
     border: 1px solid transparent;
     font-size: 14px;
     background-color: transparent;
     border-radius: 4px;
-    // border: 1px solid #e0e1e2 ;
+    border: 1px solid #e0e1e2 ;
 
     &:hover,
     &:focus{
-      border-color:  $color-primary;
+      border: 1px solid $color-primary;
     }
   }
 
@@ -163,7 +171,7 @@ export default {
 }
 
 .cascader-setting-option-active{
- input[type='text']{
+ .el-textarea__inner{
    background-color: #F5F7FA;
  } 
 }

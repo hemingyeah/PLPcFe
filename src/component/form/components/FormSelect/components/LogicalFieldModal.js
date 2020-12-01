@@ -67,6 +67,7 @@ const LogicalFieldModal = {
       return <div class={className} key={index} onClick={() => this.choose(option)}>{option.value}</div>
     },
     renderTargetItem(field){
+      if(field.isHidden == 1) return null
       const attrs = {
         nativeOn: {
           click: e => e.stopPropagation()

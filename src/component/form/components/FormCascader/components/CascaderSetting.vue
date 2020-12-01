@@ -324,7 +324,7 @@ export default {
       let optionEl = this.$el.querySelector(`[data-option-id="${id}"]`)
       if(optionEl == null) return;
 
-      let inputEl = optionEl.querySelector('input[type="text"]');
+      let inputEl = optionEl.querySelector('.el-textarea__inner');
       if(inputEl == null) return;
 
       inputEl.focus();

@@ -182,11 +182,6 @@ export default {
       errMessage: null
     }
   },
-  created() {
-    console.log("options")
-    console.log(this.field)
-    console.log(this.options);
-  },
   methods: {
     updateDependencies(val){
       this.$emit('input', {prop: 'dependencies', value: val, operate: 'update'})

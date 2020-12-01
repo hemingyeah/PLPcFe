@@ -11,6 +11,8 @@ import CustomerTagsExtendSetting from './extend/CustomerTagsExtendSetting.vue';
 import CustomerExtend from './extend/CustomerExtend.vue'
 // 工单优先级
 import TaskExtendSetting from './extend/TaskExtendSetting.vue';
+//下拉高级搜索
+import FormSelectSearch from './extend/FormSelectSearch.vue';
 
 let FormSelectField = {
   formType: 'select', // 字段类型
@@ -23,7 +25,8 @@ let FormSelectField = {
     extend: {
       'product_type_setting': ProductTypeExtendSetting,
       'customer_tags_setting': CustomerTagsExtendSetting,
-      'customer_extend': CustomerExtend
+      'customer_extend': CustomerExtend,
+      'select_search': FormSelectSearch
     }
   }
 };
