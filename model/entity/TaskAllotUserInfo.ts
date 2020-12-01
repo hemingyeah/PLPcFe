@@ -31,6 +31,8 @@ class TaskAllotUserInfo {
   lng: string = ''
   // 纬度
   lat: string = ''
+  // 最后登录时间
+  lastLoginTime: string | null = null
   // 自定义属性
   attribute: { lastLocateTime: string } | null = null
 }
