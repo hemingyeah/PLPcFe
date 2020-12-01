@@ -231,10 +231,6 @@ export default {
       const { systemConditions, conditions } = this.buildTaskInquireParams();
       region.searchModel.systemConditions = systemConditions;
       region.searchModel.conditions = conditions;
-      if (!this.viewName) {
-        this.$platform.alert("请输入视图名称");
-        return;
-      }
       region.viewRegion = this.viewRegion ? "所有用户" : "只有我";
       const params = {
         ...region,
@@ -853,7 +849,11 @@ export default {
             value: form[fn],
           });
         }
-
+        const {systemConditions, conditions} = params
+        if (!systemConditions.length && !conditions.length) {
+          this.$platform.alert("请您先设置查询条件");
+          return
+        }
         this.searchModelCN = [];
         return params;
       } else {

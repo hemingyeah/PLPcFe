@@ -763,12 +763,6 @@ export default {
      * 保存视图
      */
     saveView() {
-      const {conditions,systemConditions} = this.$refs.viewPanel.buildTaskInquireParams()
-      if (!systemConditions.length && !conditions.length) {
-        this.$platform.alert("请您先设置查询条件");
-        return
-      }
-
       this.$refs.viewPanel.saveViewBtn(async (viewName) => {
         this.$refs.viewPanel.hide();
         this.getUserViews(viewName)
