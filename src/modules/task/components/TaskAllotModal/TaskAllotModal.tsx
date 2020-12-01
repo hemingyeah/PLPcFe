@@ -88,6 +88,7 @@ export default class TaskAllotModal extends TaskAllotModalRender {
                     show={this.allotType === TaskAllotTypeEnum.Auto} 
                     style={this.allotContentStyle[TaskAllotTypeEnum.Auto]}
                     changeMatchRule={(rule: AutoDispatchListItem | null) => this.outsideSetMatchRule(rule)}
+                    onUsedChange={(used: boolean) => this.onIsUsedResultChanged(used)}
                   />
                 )
               }

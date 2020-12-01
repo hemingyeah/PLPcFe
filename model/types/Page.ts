@@ -33,7 +33,7 @@ class Page<T> {
     unpaged: false
   }
   public offset?: number = 0
-  public pageNumber?: number = 11
+  public pageNumber?: number = 1
   public pageSize?: number = 10
   public paged?: boolean = false
   public sort?: Sort = { sorted: false, unsorted: false, empty: false}

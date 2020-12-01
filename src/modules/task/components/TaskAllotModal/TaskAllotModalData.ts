@@ -23,6 +23,8 @@ class TaskAllotModalData extends TaskAllotModalProps {
   public executorUser: LoginUser | TaskAllotUserInfo | null = null
   /* 是否是按团队派单 */
   public isAllotByTag: boolean = true
+  /* 是否使用匹配出的预估结果 */
+  public isUsedResult: boolean = false
   /* 已经加载的组件列表 TODO: 实现 keep-alive component 功能 */
   public loadedComponents: string[] = [ComponentNameEnum.TaskAllotExcutor]
   /* 匹配的规则结果 */
