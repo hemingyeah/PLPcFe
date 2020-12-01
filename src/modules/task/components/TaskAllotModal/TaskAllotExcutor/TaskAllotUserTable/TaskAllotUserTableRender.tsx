@@ -16,6 +16,7 @@ import { isString } from '@src/util/type'
 import { fmt_display_text } from '@src/filter/fmt'
 import { isArray } from 'lodash'
 import { convertSecondsToHourMinuteText } from '@src/util/time'
+import DateUtil from '@src/util/date'
 
 class TaskAllotUserTableRender extends TaskAllotUserTableMethods {
   /** 
@@ -269,11 +270,10 @@ class TaskAllotUserTableRender extends TaskAllotUserTableMethods {
     if (column.field === TaslAllotTableColumnFieldEnum.DisplayName) return this.renderColumnWithDisplayName(scope)
     // 工作状态
     if (column.field === TaslAllotTableColumnFieldEnum.State) return this.renderColumnWithState(value)
-    // 距离或驾车距离
-    if (
-      column.field === TaslAllotTableColumnFieldEnum.LineDistance
-      || column.field === TaslAllotTableColumnFieldEnum.Distance
-    ) return this.renderColumnWithLineDistance(value)
+    // 距离
+    if (column.field === TaslAllotTableColumnFieldEnum.LineDistance) return this.renderColumnWithLineDistance(value)
+    // 驾车距离
+    if (column.field === TaslAllotTableColumnFieldEnum.Distance) return this.renderColumnWithDistance(value, scope.row)
     // 驾车时间
     if (column.field === TaslAllotTableColumnFieldEnum.Duration) return this.renderColumnWithLineDuration(value)
     // 数组类型
@@ -297,7 +297,19 @@ class TaskAllotUserTableRender extends TaskAllotUserTableMethods {
     let distance = Number(value) 
     if (isNaN(distance)) return value
     
-    return distance ? `${(distance / 1000).toFixed(3)} KM` : fmt_display_text(distance)
+    return distance ? `${(distance / 1000).toFixed(2)} KM` : fmt_display_text(distance)
+  }
+  
+  /** 
+   * @description 渲染距客户距离表格列
+  */
+  public renderColumnWithDistance(value: string, row: any = {}) {
+    let distance = Number(value) 
+    if (isNaN(distance)) return value
+    
+    // 最后登录时间
+    let lastLoginTime = DateUtil.getTimeDiffStr(row?.attribute?.lastLocateTime)
+    return distance ? `${(distance / 1000).toFixed(2)} KM ${lastLoginTime && `(${lastLoginTime}前)` }` : fmt_display_text(distance)
   }
   
   /** 

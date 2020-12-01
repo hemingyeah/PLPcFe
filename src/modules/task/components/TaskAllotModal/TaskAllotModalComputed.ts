@@ -79,6 +79,13 @@ class TaskAllotModalComputed extends TaskAllotModalData {
   }
   
   /** 
+   * @description 当前工单是否在工单池中
+  */
+  get isTaskInTaskPool(): boolean {
+    return this.task?.state === TaskStateEnum.TASK_POOL.value
+  }
+  
+  /** 
    * @description 转派说明是否必填
   */
   get reallotRemarkNotNull(): boolean {
