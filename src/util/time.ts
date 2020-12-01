@@ -30,5 +30,5 @@ export function convertSecondsToHourMinuteText(minutes: number): string {
   let hour = parseInt(String(minutes / (minute * second)))
   let surplus = parseInt(String(minutes % (minute * second) / minute))
   
-  return `${hour}H${ surplus ? `${surplus}M` : ''}`
+  return `${hour}h${ surplus ? `${surplus}m` : ''}`
 }

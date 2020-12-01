@@ -309,7 +309,7 @@ class TaskAllotUserTableRender extends TaskAllotUserTableMethods {
     
     // 最后登录时间
     let lastLoginTime = DateUtil.getTimeDiffStr(row?.lastLoginTime || row?.attribute?.lastLocateTime)
-    return distance ? `${(distance / 1000).toFixed(2)} KM ${lastLoginTime && `(${lastLoginTime}前)` }` : fmt_display_text(distance)
+    return distance ? `${(distance / 1000).toFixed(2)} ${lastLoginTime && `(${lastLoginTime}前)` }` : fmt_display_text(distance)
   }
   
   /** 

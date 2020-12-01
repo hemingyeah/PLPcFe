@@ -38,7 +38,7 @@ class TaskAllotModalRender extends TaskAllotModalMethods {
    * @description 渲染工单派单类型 工单池
   */
   public renderTaskAllotTypeTaskPool(isTaskInTaskPool: boolean = false): (x: Function) => VNode {
-    let content = isTaskInTaskPool ? '该工单已在工单池中发布，无法再次发布' : '尚未启用工单池派单功能，如需开启请到 系统管理-工单功能设置中配置' 
+    let content = isTaskInTaskPool ? '该工单已在工单池中，无法再次发布' : '尚未启用工单池派单功能，如需开启请到 系统管理-工单功能设置中配置' 
     
     const taskPoolSlot = (props: Function): VNode => {
       return (
