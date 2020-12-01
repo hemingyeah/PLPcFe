@@ -268,7 +268,7 @@ export default class UserCard extends Vue {
         </div>
         <div class='user-card-detail-row'>
           <div class='user-card-detail-row-item'>
-            好评率: {fmt_display_text(this.userCardInfo.degree)}
+            好评率: {this.getUserInfoTashRate(this.userCardInfo.degree)}
           </div>
         </div>
       </div>
