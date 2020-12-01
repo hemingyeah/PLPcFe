@@ -285,7 +285,8 @@ export default {
     },
     /** 删除选项 */
     removeOption(option){
-      platform.confirm('确定要删除该选项以及对应子选项？').then(value => {
+      let msg = option.children.length > 0 ?'确定要删除该选项以及对应子选项？':'确定要删除该选项吗？';
+      platform.confirm(msg).then(value => {
         if(!value) return Promise.reject('cancel')
       })
         .then(() => {

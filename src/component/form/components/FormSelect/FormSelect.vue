@@ -144,11 +144,15 @@ export default {
   }
   .el-radio-group,.el-checkbox-group{
     width: 100%;
-    display: flex;
-    justify-content: flex-start;
-    flex-wrap: wrap;
     label{
       padding: 0;
+      min-width: 110px;
+      width: auto;
+    }
+    .el-checkbox__label,.el-radio__label{
+      overflow-wrap: break-word;
+      text-overflow: ellipsis; 
+      white-space: normal;
     }
   }
 }
