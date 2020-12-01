@@ -50,9 +50,6 @@ export default {
       default: 'normal',
     }
   },
-  mounted(){
-    console.log(this.file);
-  },
   computed:{
     icon(){
       let file = this.file;
