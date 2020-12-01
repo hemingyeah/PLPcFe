@@ -87,7 +87,7 @@
               :remote-method="searchLinkmanOuterHandler"
               @input="updateLinkman(value.linkman[0])"
               placeholder="请输入关键字搜索联系人"
-              :input-disabled="true"
+              :input-disabled="isCreateCustomer"
               :cleared="true"
             >
             </biz-form-remote-select>
