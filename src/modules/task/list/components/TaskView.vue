@@ -18,16 +18,16 @@
 </template>
 <script>
 /* Api */
-import * as TaskApi from '@src/api/TaskApi.ts';
+import * as TaskApi from "@src/api/TaskApi.ts";
 
 export default {
-  name: 'task-view',
+  name: "task-view",
   data() {
     return {
-      info: '',
+      info: "",
       visible: false,
       searchModelCN: [],
-      name: ''
+      name: ""
     }
   },
   methods: {
@@ -42,7 +42,7 @@ export default {
         for(let key in result.searchModelCN) {
           searchModel.push({displayNmae: key, value: `${result.searchModelCN[key]}`})
         }
-        this.$emit('_searchModel', searchModel)
+        this.$emit("_searchModel", searchModel)
       }
       if (success) {
         for(let key in result.searchModelCN) {

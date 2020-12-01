@@ -59,7 +59,7 @@ export default {
   name: 'part-outstock-batch-form',
   inject: ['initData'],
   props: {
-    sparepartConfig: Object
+    sparepartConfig: Object,
   },
   data(){
     return {
@@ -116,6 +116,23 @@ export default {
       let repertory = row.repertory || {};
       let sparepart = row.sparepart || {};
 
+      if (this.form.length) {
+      this.form.push({
+        id: row.id,
+        sparepart: sparepart.id || '',
+        sparepartName: sparepart.name || '',
+        serialNumber: sparepart.serialNumber || '',
+        sparepartType: sparepart.type || '',
+        standard: sparepart.standard || '',
+        repertory: repertory.name || '',
+        repertoryId: repertory.id || '',
+        type: this.form[this.form.length - 1].type,
+        repertoryCount: row.repertoryCount,
+        safetyStock: row.safetyStock || null,
+        variation: 1
+      })
+        return
+      }
       this.form.push({
         id: row.id,
         sparepart: sparepart.id || '',

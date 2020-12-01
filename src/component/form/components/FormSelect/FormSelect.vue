@@ -1,47 +1,75 @@
 <template>
   <div class="form-select">
     <!-- start 下拉模式 -->
-    <el-select
-      v-if="selectType==1"
-      :id="`form_${field.fieldName}`"
-      :placeholder="placeholder"
-      :clearable="clearable"
-      :multiple="isMulti"
-      ref="elSelect"
-      filterable
-      :value="value" @change="input">
-      <el-option
-        v-for="item in options"
-        :key="item.value"
-        :label="item.text"
-        :value="item.value">
-      </el-option>
-    </el-select>
+    <template v-if="selectType==1">
+      <!-- 多选 -->
+      <el-select
+        v-if="isMulti"
+        :id="`form_${field.fieldName}`"
+        :placeholder="placeholder"
+        :clearable="clearable"
+        :multiple="isMulti"
+        ref="elSelect"
+        filterable
+        :value="value"
+        @change="input"
+      >
+        <el-option
+          v-for="item in options"
+          :key="item.value"
+          :label="item.text"
+          :value="item.value"
+        >
+        </el-option>
+      </el-select>
+      <!-- 单选 -->
+      <el-select
+        v-show="!isMulti"
+        :id="`form_${field.fieldName}`"
+        :placeholder="placeholder"
+        :clearable="clearable"
+        ref="elSelect"
+        filterable
+        :value="Array.isArray(value) ? '' : value"
+        @change="input"
+      >
+        <el-option
+          v-for="item in options"
+          :key="item.value"
+          :label="item.text"
+          :value="item.value"
+        >
+        </el-option>
+      </el-select>
+    </template>
     <!-- end 下拉模式 -->
 
-    <!-- start 单选平铺模式 -->
-    <el-radio-group v-model="newValue" @change="input"  v-if="!isMulti&&selectType==2">
-      <el-radio
-        v-for="item in options"
-        :label="item.text" 
-        :key="item.value"
-        :value="item.value">
-        {{item.text}}
-      </el-radio>
-    </el-radio-group>
-    <!-- end 单选平铺模式 -->
+    <!-- start 平铺模式 -->
+    <template v-else-if="selectType==2">
+      <!-- start 单选 -->
+      <el-radio-group v-model="newValue" @change="input" v-if="!isMulti">
+        <el-radio
+          v-for="item in options"
+          :label="item.text" 
+          :key="item.value"
+          :value="item.value">
+          {{item.text}}
+        </el-radio>
+      </el-radio-group>
+      <!-- end 单选 -->
 
-    <!-- start 多选平铺模式 -->
-    <el-checkbox-group v-model="newValue" @change="input" v-if="isMulti&&selectType==2">
-      <el-checkbox  
-        v-for="item in options" 
-        :label="item.text" 
-        :key="item.id">
-        {{item.text}}
-      </el-checkbox>
-    </el-checkbox-group>
-    <!-- end 多选平铺模式 -->
-
+      <!-- start 多选 -->
+      <el-checkbox-group v-model="newValue" @change="input" v-if="isMulti">
+        <el-checkbox  
+          v-for="item in options" 
+          :label="item.text" 
+          :key="item.id">
+          {{item.text}}
+        </el-checkbox>
+      </el-checkbox-group>
+      <!-- end 多选 -->
+    </template>
+    <!-- end 平铺模式 -->
   </div>
 </template>
 

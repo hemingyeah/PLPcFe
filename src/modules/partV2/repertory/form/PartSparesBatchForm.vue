@@ -160,6 +160,10 @@ export default {
         });
       }
       let row = this.add(null);
+      if(!this.repertory.length){
+        this.$platform.toast('暂无权限，请联系管理员！', "warning");
+        return;
+      } 
       this.form.push(row);
       if(this.form.length == 1) {
         this.getFetchUsers();

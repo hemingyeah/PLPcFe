@@ -8,7 +8,7 @@
     <div class="customer-list-search-group-container">
       <form class="base-search" onsubmit="return false;">
         <div class="customer-list-base-search-group">
-          <el-input v-model="params.keyword" placeholder="根据客户信息搜索">
+          <el-input v-model="params.keyword" placeholder="根据客户信息搜索" v-trim:blur>
             <i slot="prefix" class="el-input__icon el-icon-search"></i>
           </el-input>
           <base-button

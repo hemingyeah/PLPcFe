@@ -30,12 +30,12 @@
             @change="change($event, 'loginValidate')"
           >
             <div class="mar-b-12">
-              <el-radio class="mar-r-16" :label="false"
+              <el-radio class="mar-r-16" :label="true"
               >仅允许客户列表下手机号码访问</el-radio
               >
             </div>
             <div>
-              <el-radio :label="true">所有用户均可访问</el-radio>
+              <el-radio :label="false">所有用户均可访问</el-radio>
             </div>
           </el-radio-group>
         </div>
@@ -374,7 +374,6 @@ import BaseGallery from 'packages/BaseGallery'
 
 
 import settingMixin from './settingShowCmp/index'
-import userImg from '@src/assets/img/myShop/logo.png'
 import headPhone from '@src/assets/img/myShop/headPhone.png'
 import {
   getRules,
@@ -457,7 +456,7 @@ export default {
           type: 'company-card',
           id: 1,
           data: {
-            logoUrl: userImg,
+            logoUrl: '',
             name: '',
             mobile: '',
             address: '',
@@ -726,7 +725,8 @@ export default {
       this.$platform.openLink(e)
     },
     goToShopCenter() {
-      window.location = '/setting/serviceStation/markSpareGray'
+      // window.location = '/setting/serviceStation/markSpareGray'
+      window.location.href = '/setting/serviceStation/partShop'
     },
     copyUrl() {
       if (!this.setData.protalUrl) return

@@ -52,7 +52,7 @@ import { storageGet, storageSet } from '@src/util/storage';
 
 const { TASK_GUIDE_SEARCH_PUPAL } = require('@src/component/guide/taskV2Store');
 export default {
-  name: 'task-search-pupal',
+  name: "task-search-pupal",
   props: {
     taskTypeFilterFields: { // 自定义
       type: Array,
@@ -93,7 +93,7 @@ export default {
       visible: false,
       isIndeterminateSys: false,
       isIndeterminateCus: false,
-      seoText: '',
+      seoText: "",
       checkSystemList: [], // 选中系统字段
       checkCustomizeList: [], // 选中自定义字段
       systemList: [], // 系统字段
@@ -113,7 +113,7 @@ export default {
     },
     open() {
       if (storageGet(TASK_GUIDE_SEARCH_PUPAL) && storageGet(TASK_GUIDE_SEARCH_PUPAL) > 0) this.guideSearchPupal = false;
-      else this.guideSearchPupal = true, storageSet(TASK_GUIDE_SEARCH_PUPAL, '1');
+      else this.guideSearchPupal = true, storageSet(TASK_GUIDE_SEARCH_PUPAL, "1");
       this.visible = true;
       const searchField = localStorage.getItem('task-search-field')
       if (searchField) {
@@ -131,7 +131,7 @@ export default {
       this.checkCustomizeList = v ? this.customizeList.map(item => {return item.displayName}) : []
     },
     loc() {
-      const searchField = localStorage.getItem('task-search-field')
+      const searchField = localStorage.getItem("task-search-field")
       if (searchField) {
         this.checkSystemList = [...new Set(JSON.parse(searchField).checkSystemList)]
         this.checkCustomizeList = [...new Set(JSON.parse(searchField).checkCustomizeList)]
@@ -182,7 +182,7 @@ export default {
     reset() {
       this.systemList = this.config
       this.customizeList = this.taskTypeFilterFields
-      this.seoText = ''
+      this.seoText = ""
     },
     onSubmit() {
       const {checkSystemList, checkCustomizeList, config, taskTypeFilterFields} = this
@@ -202,12 +202,12 @@ export default {
         list
       }
       this.visible = false
-      this.$emit('taskPupal', params)
+      this.$emit("taskPupal", params)
       if (!list.length) {
-        localStorage.removeItem('task-search-field')
+        localStorage.removeItem("task-search-field")
         return
       }
-      localStorage.setItem('task-search-field', JSON.stringify(params))
+      localStorage.setItem("task-search-field", JSON.stringify(params))
     }
   }
 }

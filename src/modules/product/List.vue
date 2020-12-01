@@ -4,7 +4,7 @@
     <div class="product-list-search-group-container">
       <form class="base-search" onsubmit="return false;">
         <div class="product-list-base-search-group">
-          <el-input v-model="searchModel.keyword" placeholder="根据产品信息搜索">
+          <el-input v-model="searchModel.keyword" placeholder="根据产品信息搜索" v-trim:blur>
             <i slot="prefix" class="el-input__icon el-icon-search"></i>
           </el-input>
           <base-button type="primary" @event="searchModel.pageNum=1;search();trackEventHandler('search')" native-type="submit">搜索</base-button>
@@ -701,7 +701,7 @@ export default {
     buildParams() {
       const sm = Object.assign({}, this.searchModel);
       let params = {
-        keyword: sm.keyword,
+        keyword: sm.keyword.trim(),
         pageSize: sm.pageSize,
         pageNum: sm.pageNum,
       };

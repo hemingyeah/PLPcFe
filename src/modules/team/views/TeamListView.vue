@@ -2,7 +2,7 @@
   <div class="full-page" v-loading.fullscreen.lock="loadingPage">
     <header class="team-list-header">
       <form class="base-search team-list-header-search" @submit.prevent="search">
-        <el-input placeholder="输入团队信息进行搜索" v-model="model.keyword" class="input-with-select">
+        <el-input placeholder="输入团队信息进行搜索" v-model="model.keyword" class="input-with-select" v-trim:blur>
           <i slot="prefix" class="el-input__icon el-icon-search"></i>
         </el-input>
         <button type="submit" class="btn btn-primary">搜索</button>
