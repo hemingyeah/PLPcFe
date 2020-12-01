@@ -787,6 +787,7 @@ export default {
       this.params = this.initParams(this.params.pageSize);
       this.search(searchModel);
       this.buildColumns();
+      this._exportColumns()
       // 埋点
       window.TDAPP.onEvent(`pc：工单列表-${name}`);
     },
@@ -1032,9 +1033,9 @@ export default {
       let taskListFields = this.filterTaskListFields();
       let fields = taskListFields.concat(this.taskTypeFilterFields);
 
-      // if (this.selectColumnState === 'exception') {
-      //   fields = fields.concat(AbnormalList)
-      // }
+      if (this.selectColumnState === 'exception') {
+        fields = fields.concat(AbnormalList)
+      }
 
       if (Array.isArray(columnStatus) && columnStatus.length > 0) {
         fields = this.buildSortFields(fields, localColumns)
@@ -2560,7 +2561,7 @@ export default {
         item.export = true
         return item
       })
-
+      
 
       // 回执信息逻辑
       taskReceiptSystemFields = [
@@ -2572,6 +2573,10 @@ export default {
         field.export = true;
         return field;
       });
+
+      // 系统信息
+      let sysList = this.selectColumnState === 'exception' ? [...allExport, ...AbnormalList] : allExport
+
       this.exportColumns = [
         {
           label: "工单信息",
@@ -2586,7 +2591,7 @@ export default {
         {
           label: "系统信息",
           value: "systemChecked",
-          columns: allExport.map(item => {
+          columns: sysList.map(item => {
             item.export = true
             item.label = item.displayName
             return item
