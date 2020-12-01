@@ -151,6 +151,7 @@
         v-if="outstockBatchDialog"
         ref="outstockBatchForm"
         :sparepart-config="sparepartConfig"
+        :repertoryId="baseRepertory.id"
       ></part-outstock-batch-form>
       <div slot="footer" class="dialog-footer">
         <base-button type="ghost" @event="outstockBatchDialog = false"
@@ -375,13 +376,6 @@ export default {
     async sparepartConfigs() {
       const result = await SettingApi.sparepartConfig();
       this.sparepartConfig = result;
-      result.forEach((item) => {
-        if (item.isSystem && item.classify) {
-          if (Number(item.isSystem) === 1 && Number(item.classify) === 2) {
-            this.baseRepertory = item
-          }
-        }
-      })
     },
     /*获取仓库列表 */
     async allRepertory() {
@@ -394,6 +388,15 @@ export default {
           item.manager.some((item) => item.userId == this.userId)
         );
       });
+
+      arr.forEach((item) => {
+        console.log(item.classify, item)
+        if (item.isSystem && item.classify) {
+          if (Number(item.isSystem) === 1 && Number(item.classify) === 2) {
+            this.baseRepertory = item
+          }
+        }
+      })
     },
 
     handleSelection(selection) {
