@@ -79,4 +79,12 @@
     display: none;
   }
 }
+
+.allot-rule-modal {
+  .base-select-container {
+    .option-list {
+      max-height: 200px;
+    }
+  }
+}
 /* end 弹窗 */

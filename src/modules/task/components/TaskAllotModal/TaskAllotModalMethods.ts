@@ -387,7 +387,11 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
         let exeInSynOfTaskOrEvent = result?.data?.exeInSynOfTaskOrEvent;
         // 允许自动将客户负责人带入工单或事件协同人
         if (exeInSynOfTaskOrEvent) {
-          result?.data?.userId && this.synergyUserList.push(result.data)
+          // 判断用户id是否存在 且 目前的协同人列表中是否已存在
+          let userId: string = result?.data?.userId
+          let isHaveUserId = Boolean(userId)
+          let isRepeatUser = isHaveUserId ? this.synergyUserList.some(user => user.userId == userId) : false
+          isHaveUserId && !isRepeatUser && this.synergyUserList.push(result.data)
         }
       })
     )
