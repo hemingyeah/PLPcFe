@@ -92,8 +92,8 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
       taskId: this?.task?.id || ''
     }
     
-    // 有使用匹配的规则
-    if (this.matchRule) {
+    // 有使用匹配的规则并且使用预估结果
+    if (this.matchRule && this.isUsedResult) {
       params.estimatedMatches = this.getParamsMatchRule()
     }
     
@@ -154,7 +154,7 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
   /** 
    * @description 构建自动派单参数
   */
-  public buildAutpDispatchParams(): AutoDispatchParams {
+  public buildAutoDispatchParams(): AutoDispatchParams {
     let params: AutoDispatchParams = {
       taskId: this?.task?.id || '',
       executorId: 'auto_dispatch'
@@ -653,6 +653,13 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
   }
   
   /** 
+   * @description 是否使用自动匹配预估结果
+  */
+  public onIsUsedResultChanged(used: boolean) {
+    this.isUsedResult = used
+  }
+  
+  /** 
    * @deprecated
    * @description 工单池通知人员信息变动
   */
@@ -899,7 +906,7 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
       }
       
       // 自动派单提交
-      const autoDispatchParams = this.buildAutpDispatchParams()
+      const autoDispatchParams = this.buildAutoDispatchParams()
       this.fetchAutoDispatchSubmit(autoDispatchParams)
       
     } catch (error) {

@@ -16,7 +16,7 @@ import AutoDispatchListItem from '@model/types/AutoDispatchListItem'
 /* util */
 import Platform from '@src/util/Platform'
 /* vue */
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator'
+import { Vue, Component, Prop, Watch, Emit } from 'vue-property-decorator'
 import { CreateElement } from 'vue'
 import AuthEnum from '@model/enum/AuthEnum'
 
@@ -29,6 +29,8 @@ import AuthEnum from '@model/enum/AuthEnum'
 export default class TaskAllotAuto extends Vue {
   /* 改变匹配的规则 */
   @Prop() readonly changeMatchRule: Function | undefined
+  /* 是否使用匹配出的预估结果 */
+  @Prop() readonly isUsedResult: boolean | undefined
   /* 当前登录用户 */
   @Prop() readonly loginUser: InitDataLoginUser | undefined
   /* 工单信息 */
@@ -40,8 +42,6 @@ export default class TaskAllotAuto extends Vue {
   private className: string = ComponentNameEnum.TaskAllotAuto
   /* 是否显示未匹配成功的结果 */
   private isShowUnMatchResult: boolean = false
-  /* 是否使用匹配出的预估结果 */
-  private isUsedResult: boolean = false
   /* 匹配的规则 */
   private matchRule: AutoDispatchListItem | null = null
   /* 匹配成功的索引 */
@@ -52,6 +52,11 @@ export default class TaskAllotAuto extends Vue {
   @Watch('isUsedResult')
   onIsUsedResultChanged(newVal: string) {
     this.changeUpwardMatchRule(newVal ? this.matchRule : null)
+  }
+  
+  @Emit('usedChange')
+  private emitUsedChange(used: boolean) {
+    return used
   }
   
   /* 自动派单根据是否显示未匹配的筛选列表 匹配结果用于显示的列表 */
@@ -113,7 +118,7 @@ export default class TaskAllotAuto extends Vue {
     if (this.pending) return
     
     this.pending = true
-    this.isUsedResult = false
+    this.emitUsedChange(false)
     this.isShowUnMatchResult = false
     
     let params: TaskAutoDispatchResultListModel = this.buildParams()
@@ -222,7 +227,7 @@ export default class TaskAllotAuto extends Vue {
         </div>
         <div>
           提交后，系统会按分配规则重新匹配，可能会出现与预估的负责人不一致的情况。您可以
-          <el-checkbox value={this.isUsedResult} onInput={(value: boolean) => { this.isUsedResult = value }}>
+          <el-checkbox value={this.isUsedResult} onInput={(value: boolean) => { this.emitUsedChange(value); }}>
             使用预估结果
           </el-checkbox>
         </div>
