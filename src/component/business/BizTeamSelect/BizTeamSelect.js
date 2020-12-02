@@ -135,6 +135,7 @@ const BizTeamSelect = {
     close(){
       if(!this.popperVisible) return;
       this.popperVisible = false;
+      this.$emit('close')
     },
     
     choose(value){
@@ -189,6 +190,8 @@ const BizTeamSelect = {
       if (this.disabled) return
       // 已显示 则需要关闭
       if (this.popperVisible) return this.close()
+      
+      this.$emit('open')
       
       // 如果没创建popper，先创建
       if(this.$data.$popper == null){
