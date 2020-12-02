@@ -167,6 +167,10 @@
   .biz-team-select-tag {
     height: 20px;
   }
+  .el-tag {
+    max-width: 100px;
+    @include text-ellipsis()
+  }
 }
 
 .el-select-dropdown {
@@ -225,5 +229,11 @@
     background-color: rgba(144, 147, 153, 0.1);
     border-color: rgba(144, 147, 153, 0.2);
     color:  #909399;
+  }
+}
+
+.task-allot-user-table-column {
+  i.iconfont {
+    font-size: $font-size-larger !important;
   }
 }

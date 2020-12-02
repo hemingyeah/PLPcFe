@@ -346,8 +346,11 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
       pageNum: ++this.userPage.pageNum,
       pageSize: this.userPage.pageSize,
       states: this.selectUserState,
-      tagIds: this.selectTeams.map(team => (team.id || '')),
       userIds: users.map(user => user.userId)
+    }
+    
+    if (this.selectTeams.length > 0) {
+      params.tagIds = this.selectTeams.map(team => (team.id || ''))
     }
     
     if (distance && isArray(distance)) {
