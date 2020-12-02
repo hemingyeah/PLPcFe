@@ -13,7 +13,7 @@
         </el-tag>
         
         <div v-if="collapsed && value.length > 1" class='base-user-select-tag'>
-          +{{value.length - 1}}
+          + {{value.length - 1}}
         </div>
         <span v-if="value.length <= 0" class="placeholder-text">
           {{ placeholder }}
@@ -318,7 +318,7 @@ export default {
       }
 
       .el-tag {
-        margin: 5px 2px 0px;
+        margin: 5px 3px 0px;
       }
     }
 
