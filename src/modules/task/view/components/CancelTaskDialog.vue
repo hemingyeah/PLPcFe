@@ -21,7 +21,27 @@
         <p>获取工单的结算单失败，无法判断工单是否添加了备件，确定取消工单？</p>
       </template>
 
-      <textarea v-model="cancelModal.reason" placeholder="请输入取消说明[最多500字][必填]" rows="3" maxlength="500" />
+        <div class="task-detail-view-panel">
+          <div class="task-flex task-ai">
+            <span class="task-cef task-font16 task-detail-view-panel-icon">*</span><span>取消原因：</span>
+            <el-select v-model="checkBack" placeholder="请选择" class="task-w70">
+              <el-option
+                v-for="item in backList"
+                :key="item"
+                :label="item"
+                :value="item"
+              >
+              </el-option>
+            </el-select>
+            <span class="task-font12 task-c13 task-ml12">去配置原因</span>
+          </div>
+          <!--  -->
+          <div class="task-flex task-mt12">
+             <div class="task-font14">详细原因：</div>
+             <textarea v-model="cancelModal.reason" placeholder="请输入取消说明[最多500字][必填]" rows="3" maxlength="500" />
+          </div>
+        </div>
+
     </div>
     <div slot="footer" class="dialog-footer">
       <el-button @click="visible = false">取 消</el-button>

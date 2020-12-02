@@ -39,7 +39,7 @@ body {
   
       .base-modal-content {
         textarea {
-          width: 100%;
+          width: 70%;
         }
         
         p {
@@ -581,5 +581,12 @@ body {
     
     position: relative;
     left: 10px;
+  }
+}
+
+.task-detail-view-panel {
+  &-icon {
+    position: absolute;
+    margin-left: -6px;
   }
 }

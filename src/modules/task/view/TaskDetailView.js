@@ -38,6 +38,15 @@ const ENCRYPT_FIELD_VALUE = "***";
 
 const { TASK_GUIDE_DETAIL } = require("@src/component/guide/taskV2Store");
 
+/*回退原因 */
+const backList = [
+  "操作不习惯",
+  "不怎么会用，还是喜欢用老版本",
+  "新增功能用不上",
+  "新版本有BUG，影响业务开展了",
+  "其他",
+]
+
 export default {
   name: "task-detail-view",
   inject: ["initData"],
@@ -69,6 +78,8 @@ export default {
       timeDialog: {
         visible: false
       },
+      // 转派弹框
+      transfer: false,
       receiptFields: [], // 自定义回执字段
       customerRelationTaskCountData: {}, // 客户关联工单数量
       hasCallCenterModule: localStorage.getItem("call_center_module") == 1,
@@ -84,6 +95,8 @@ export default {
       guideSearchModelSave: false,
       guideDropdownMenu: false,
       isGuide: false,
+      backList,
+      checkBack: ''
     }
   },
   computed: {
