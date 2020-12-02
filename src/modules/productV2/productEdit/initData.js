@@ -1,197 +1,36 @@
 let obj = {
-  'customerConfig': {
-    'customerNameDuplicate': false,
-    'customerSearchOnMobile': true,
-    'divideByTag': true,
-    'showInfoInTask': true,
-    'autoSerialNumber': true,
-    'phoneUnique': true,
-    'addressAllowNull': true,
-    'errorAddressAllowImport': false,
-    'exeInSynOfTaskOrEvent': true,
-    'customerGetUrl': false
-  },
-  'teamsWithChildTag': [{
-    'id': '08e1d3bb-ed84-11ea-a442-00163e304a25',
-    'tenantId': '7416b42a-25cc-11e7-a500-00163e12f748',
-    'tagName': '测试子子',
-    'tagColor': null,
-    'createTime': 1599096193000,
-    'teamLeaders': [{
-      'head': 'https://static-legacy.dingtalk.com/media/lADPDgQ9rShVsl7NAlvNAek_489_603.jpg',
-      'userId': 'e66ab80f-1588-11ea-bfc9-00163e304a25',
-      'staffId': '0702311433487377',
-      'displayName': '蔡大海'
-    }],
-    'parent': {
-      'id': 'fc637ab7-e76d-11ea-9929-00163e304a25',
-      'tenantId': null,
-      'tagName': null,
-      'tagColor': null,
-      'createTime': null,
-      'teamLeaders': [],
-      'parent': null,
-      'children': [],
-      'description': null,
-      'phone': null,
-      'tagAddress': null,
-      'tagPlaceList': []
-    },
-    'children': [],
-    'description': null,
-    'phone': null,
-    'tagAddress': {
-      'province': null,
-      'city': null,
-      'dist': null,
-      'address': null,
-      'longitude': null,
-      'latitude': null,
-      'addressType': 1
-    },
-    'tagPlaceList': []
-  }, {
-    'id': 'a3dda245-e5df-11ea-9929-00163e304a25',
-    'tenantId': '7416b42a-25cc-11e7-a500-00163e12f748',
-    'tagName': '大树团队',
-    'tagColor': null,
-    'createTime': 1598255927000,
-    'teamLeaders': [{
-      'head': '',
-      'userId': '448d8f19-e5d9-11ea-9929-00163e304a25',
-      'staffId': null,
-      'displayName': '大树'
-    }],
-    'parent': null,
-    'children': [],
-    'description': '大树团队',
-    'phone': '',
-    'tagAddress': {
-      'province': null,
-      'city': null,
-      'dist': null,
-      'address': null,
-      'longitude': null,
-      'latitude': null,
-      'addressType': 1
-    },
-    'tagPlaceList': []
-  }, {
-    'id': 'fc637ab7-e76d-11ea-9929-00163e304a25',
-    'tenantId': '7416b42a-25cc-11e7-a500-00163e12f748',
-    'tagName': '我是来测试的',
-    'tagColor': null,
-    'createTime': 1598427016000,
-    'teamLeaders': [{
-      'head': 'https://static-legacy.dingtalk.com/media/lADPD3lGo1ZeoWfNBDjNBDg_1080_1080.jpg',
-      'userId': '6839d043-683e-11ea-bfc9-00163e304a25',
-      'staffId': '146424121533631117',
-      'displayName': '薄德忠'
-    }],
-    'parent': {
-      'id': 'c8901bc3-7619-11e9-bfc9-00163e304a25',
-      'tenantId': null,
-      'tagName': '附件测试团队勿动',
-      'tagColor': null,
-      'createTime': null,
-      'teamLeaders': [{
-        'head': 'https://static.dingtalk.com/media/lADPBbCc1erqpD7NAWzNAWw_364_364.jpg',
-        'userId': '5b679c65-411e-11e7-a318-00163e304a25',
-        'staffId': 'manager6951',
-        'displayName': '杨昌洋'
-      }],
-      'parent': null,
-      'children': [],
-      'description': null,
-      'phone': null,
-      'tagAddress': null,
-      'tagPlaceList': []
-    },
-    'children': [{
-      'id': '08e1d3bb-ed84-11ea-a442-00163e304a25',
-      'tenantId': '7416b42a-25cc-11e7-a500-00163e12f748',
-      'tagName': '测试子子',
-      'tagColor': null,
-      'createTime': 1599096193000,
-      'teamLeaders': [{
-        'head': 'https://static-legacy.dingtalk.com/media/lADPDgQ9rShVsl7NAlvNAek_489_603.jpg',
-        'userId': 'e66ab80f-1588-11ea-bfc9-00163e304a25',
-        'staffId': '0702311433487377',
-        'displayName': '蔡大海'
-      }],
-      'parent': {
-        'id': 'fc637ab7-e76d-11ea-9929-00163e304a25',
-        'tenantId': null,
-        'tagName': null,
-        'tagColor': null,
-        'createTime': null,
-        'teamLeaders': [],
-        'parent': null,
-        'children': [],
-        'description': null,
-        'phone': null,
-        'tagAddress': null,
-        'tagPlaceList': []
-      },
-      'children': [],
-      'description': null,
-      'phone': null,
-      'tagAddress': {
-        'province': null,
-        'city': null,
-        'dist': null,
-        'address': null,
-        'longitude': null,
-        'latitude': null,
-        'addressType': 1
-      },
-      'tagPlaceList': []
-    }],
-    'description': null,
-    'phone': null,
-    'tagAddress': {
-      'province': null,
-      'city': null,
-      'dist': null,
-      'address': null,
-      'longitude': null,
-      'latitude': null,
-      'addressType': 1
-    },
-    'tagPlaceList': []
-  }],
+  'isSelfHelpEnabled': true,
   'loginUser': {
     'displayName': '薄德忠',
     'roles': ['1'],
-    'tagIds': ['a3dda245-e5df-11ea-9929-00163e304a25', 'fc637ab7-e76d-11ea-9929-00163e304a25'],
-    'userId': '6839d043-683e-11ea-bfc9-00163e304a25',
+    'tagIds': ['7adffd1c-8a10-11ea-9ddd-00163e0f1a1b'],
+    'userId': '679e6312-683e-11ea-9ddd-00163e0f1a1b',
     'authorities': {
       'TASK_ADD': 3,
-      'CALENDAR_VIEW': 3,
       'PRODUCT_CREATE': 3,
       'CUSTOMER_CREATE': 3,
       'VIP_PAYMENT_ONLINE': 3,
       'TASK_BATCH_DISPATCH': 3,
       'CASE_ADD': 3,
       'SERVICE_CREATE': 3,
+      'CALLCENTER_EDIT': 3,
       'CASE_VIEW': 3,
+      'CALLCENTER_VIEW': 3,
       'TASK_EDIT': 3,
       'TASK_FEEDBACK': 3,
       'VIP_INFO_NOTICE_SELECT': 3,
       'LOGIN_PC': 3,
-      'PRODUCT_CATALOG_VIEW': 3,
-      'SMS_CONFIG': 3,
       'VIP_INFO_NOTICE_CREATE': 3,
       'SERVICE_EDIT': 3,
       'PORTAL_ORDER': 3,
       'PRODUCT_EDIT': 3,
       'VIP_SPAREPART_BACK': 3,
       'TASK_DISPATCH': 3,
+      'REPORT_VIEW': 3,
       'TASK_POOL': 3,
       'VIP_REPORT_VIEW': 3,
       'TASK_VIEW': 3,
       'AUTH_STAFF': 3,
-      'PRODUCT_CATALOG_DELETE': 3,
       'AUTH_ROLE': 3,
       'TASK_CLOSE': 3,
       'TASK_BATCH_CLOSE': 3,
@@ -213,8 +52,8 @@ let obj = {
       'CUSTOMER_PQRCODE': 3,
       'TASK_DELETE': 3,
       'VIP_TASK_PLAN': 3,
+      'CALLCENTER_STATISTICS': 3,
       'PRODUCT_DELETE': 3,
-      'PRODUCT_CATALOG_CREATE': 3,
       'CASE_EDIT': 3,
       'VIP_INFO_CREATE': 3,
       'SYSTEM_SEETING': 3,
@@ -223,251 +62,322 @@ let obj = {
       'PART_VIEW': 3,
       'AUTH_TAG': 3,
       'VIP_SPAREPART_STOCK': 3,
-      'PRODUCT_CATALOG_EDIT': 3,
       'TASK_BATCH_AUDIT': 3,
       'CUSTOMER_EDIT': 3
     },
-    'tagIdsWithChildTag': ['08e1d3bb-ed84-11ea-a442-00163e304a25', 'a3dda245-e5df-11ea-9929-00163e304a25', 'fc637ab7-e76d-11ea-9929-00163e304a25']
+    'tagIdsWithChildTag': ['7adffd1c-8a10-11ea-9ddd-00163e0f1a1b']
   },
-  'smsRest': -1,
-  'auth': {
-    'TASK_ADD': 3,
-    'CALENDAR_VIEW': 3,
-    'PRODUCT_CREATE': 3,
-    'CUSTOMER_CREATE': 3,
-    'VIP_PAYMENT_ONLINE': 3,
-    'TASK_BATCH_DISPATCH': 3,
-    'CASE_ADD': 3,
-    'SERVICE_CREATE': 3,
-    'CASE_VIEW': 3,
-    'TASK_EDIT': 3,
-    'TASK_FEEDBACK': 3,
-    'VIP_INFO_NOTICE_SELECT': 3,
-    'LOGIN_PC': 3,
-    'PRODUCT_CATALOG_VIEW': 3,
-    'SMS_CONFIG': 3,
-    'VIP_INFO_NOTICE_CREATE': 3,
-    'SERVICE_EDIT': 3,
-    'PORTAL_ORDER': 3,
-    'PRODUCT_EDIT': 3,
-    'VIP_SPAREPART_BACK': 3,
-    'TASK_DISPATCH': 3,
-    'TASK_POOL': 3,
-    'VIP_REPORT_VIEW': 3,
-    'TASK_VIEW': 3,
-    'AUTH_STAFF': 3,
-    'PRODUCT_CATALOG_DELETE': 3,
-    'AUTH_ROLE': 3,
-    'TASK_CLOSE': 3,
-    'TASK_BATCH_CLOSE': 3,
-    'VIP_SPAREPART_PERSION': 3,
-    'INFO_EDIT': 3,
-    'VIP_SPAREPART_INOUT': 3,
-    'TASK_AUDIT': 3,
-    'PRODUCT_VIEW': 3,
-    'CUSTOMER_DELETE': 3,
-    'CASE_DELETE': 3,
-    'INFO_VIEW': 3,
-    'EXPORT_IN': 3,
-    'VIP_APPROVE': 3,
-    'PART_EDIT': 3,
-    'SERVICE_VIEW': 3,
-    'CUSTOMER_VIEW': 3,
-    'VIP_SPAREPART_CREATE': 3,
-    'VIP_SPAREPART_VIEW': 3,
-    'CUSTOMER_PQRCODE': 3,
-    'TASK_DELETE': 3,
-    'VIP_TASK_PLAN': 3,
-    'PRODUCT_DELETE': 3,
-    'PRODUCT_CATALOG_CREATE': 3,
-    'CASE_EDIT': 3,
-    'VIP_INFO_CREATE': 3,
-    'SYSTEM_SEETING': 3,
-    'LOGIN_YD': 3,
-    'VIP_SPAREPART_EDIT': 3,
-    'PART_VIEW': 3,
-    'AUTH_TAG': 3,
-    'VIP_SPAREPART_STOCK': 3,
-    'PRODUCT_CATALOG_EDIT': 3,
-    'TASK_BATCH_AUDIT': 3,
-    'CUSTOMER_EDIT': 3
+  'product': {
+    'id': '13580459-2fac-11eb-9baf-00163e0d174e',
+    'name': '流星测试1234',
+    'serialNumber': '1355114',
+    'type': '电脑办公',
+    'isDelete': 0,
+    'createTime': 1606370167000,
+    'createUserId': '38a458ee-eb64-11ea-879a-00163e0f1a1b',
+    'createUser': {
+      'userId': '38a458ee-eb64-11ea-879a-00163e0f1a1b',
+      'loginName': null,
+      'displayName': '（流星）',
+      'email': null,
+      'cellPhone': null,
+      'lastLoginTime': null,
+      'enabled': 1,
+      'weixinid': null,
+      'powercode': null,
+      'head': null,
+      'sex': null,
+      'firstLogin': 0,
+      'tagList': [],
+      'departments': null,
+      'roles': null,
+      'attribute': {},
+      'openid': null,
+      'longitude': null,
+      'latitude': null,
+      'isDelete': null,
+      'synOpenid': null,
+      'staffId': null,
+      'tenantId': null,
+      'mainTeamId': null,
+      'unfinishedTask': null,
+      'todayFinishedTask': null,
+      'state': null,
+      'cusDistance': null,
+      'superAdmin': null,
+      'isTeamLeader': 0
+    },
+    'customerId': '860226a5-2e23-11eb-9baf-00163e0d174e',
+    'customerName': '浩克裤衩',
+    'customerSN': 'CUSEG283817',
+    'templateId': null,
+    'templateName': null,
+    'customer': {
+      'createUser': '6abf7d8d-9e68-11ea-9ddd-00163e0f1a1b',
+      'updateUser': null,
+      'createTime': null,
+      'updateTime': null,
+      'id': '860226a5-2e23-11eb-9baf-00163e0d174e',
+      'name': null,
+      'enName': null,
+      'serialNumber': null,
+      'status': null,
+      'level': null,
+      'superior': null,
+      'teamId': null,
+      'customerManager': '',
+      'customerManagerName': null,
+      'remark': null,
+      'industry': null,
+      'type': null,
+      'taskCount': null,
+      'productCount': null,
+      'isDelete': 0,
+      'attribute': {},
+      'companyNature': null,
+      'tagIds': null,
+      'tags': [],
+      'createUserId': null,
+      'createLoginUser': null,
+      'lmName': null,
+      'lmPhone': null,
+      'lmEmail': null,
+      'customerAddress': null,
+      'source': null,
+      'guideProfessions': [],
+      'isGuideData': false,
+      'products': [],
+      'guideData': false,
+      'focus': false
+    },
+    'customerNumber': null,
+    'qrcodeId': null,
+    'source': null,
+    'guideProfessions': [],
+    'isGuideData': false,
+    'address': {
+      'createUser': null,
+      'updateUser': '6abf7d8d-9e68-11ea-9ddd-00163e0f1a1b',
+      'createTime': '2020-11-24 15:06:07',
+      'updateTime': '2020-11-24 15:21:39',
+      'id': '860850dd-2e23-11eb-9baf-00163e0d174e',
+      'country': '',
+      'province': '山东省',
+      'city': '青岛市',
+      'dist': '',
+      'address': 'i建瓯日军弄此',
+      'longitude': 120.38263900,
+      'latitude': 36.06708200,
+      'isMain': 1,
+      'attribute': null,
+      'addressType': 0,
+      'customerId': '860226a5-2e23-11eb-9baf-00163e0d174e',
+      'guideProfessions': [],
+      'isGuideData': false,
+      'guideData': false
+    },
+    'linkman': {
+      'createUser': '6abf7d8d-9e68-11ea-9ddd-00163e0f1a1b',
+      'updateUser': '6abf7d8d-9e68-11ea-9ddd-00163e0f1a1b',
+      'createTime': '2020-11-24 15:06:07',
+      'updateTime': '2020-11-24 15:21:39',
+      'id': '860c1202-2e23-11eb-9baf-00163e0d174e',
+      'customerId': null,
+      'customer': {
+        'createUser': null,
+        'updateUser': null,
+        'createTime': null,
+        'updateTime': null,
+        'id': '860226a5-2e23-11eb-9baf-00163e0d174e',
+        'name': '浩克裤衩',
+        'enName': null,
+        'serialNumber': null,
+        'status': null,
+        'level': null,
+        'superior': null,
+        'teamId': null,
+        'customerManager': null,
+        'customerManagerName': null,
+        'remark': null,
+        'industry': null,
+        'type': null,
+        'taskCount': null,
+        'productCount': null,
+        'isDelete': null,
+        'attribute': {},
+        'companyNature': null,
+        'tagIds': null,
+        'tags': [],
+        'createUserId': null,
+        'createLoginUser': null,
+        'lmName': null,
+        'lmPhone': null,
+        'lmEmail': null,
+        'customerAddress': null,
+        'source': null,
+        'guideProfessions': [],
+        'isGuideData': false,
+        'products': [],
+        'guideData': false,
+        'focus': false
+      },
+      'name': '浩克家族',
+      'sex': null,
+      'position': null,
+      'department': null,
+      'isMain': 1,
+      'remark': null,
+      'phone': '18072725367',
+      'email': null,
+      'weixin': null,
+      'attribute': null,
+      'postcode': null,
+      'head': null,
+      'fax': null,
+      'enabled': null,
+      'address': null,
+      'guideProfessions': [],
+      'isGuideData': false,
+      'productId': null,
+      'tenantId': null,
+      'guideData': false
+    },
+    'updateUserId': '38a458ee-eb64-11ea-879a-00163e0f1a1b',
+    'updateTime': 1606370466000,
+    'updateUser': {
+      'userId': '38a458ee-eb64-11ea-879a-00163e0f1a1b',
+      'loginName': null,
+      'displayName': '（流星）',
+      'email': null,
+      'cellPhone': null,
+      'lastLoginTime': null,
+      'enabled': 1,
+      'weixinid': null,
+      'powercode': null,
+      'head': null,
+      'sex': null,
+      'firstLogin': 0,
+      'tagList': [],
+      'departments': null,
+      'roles': null,
+      'attribute': {},
+      'openid': null,
+      'longitude': null,
+      'latitude': null,
+      'isDelete': null,
+      'synOpenid': null,
+      'staffId': null,
+      'tenantId': null,
+      'mainTeamId': null,
+      'unfinishedTask': null,
+      'todayFinishedTask': null,
+      'state': null,
+      'cusDistance': null,
+      'superAdmin': null,
+      'isTeamLeader': 0
+    },
+    'attribute': {
+      'field_XOO1pSuUFR9iO8s7': '',
+      'field_uy6ppVKKr92J9fEa': ''
+    },
+    'guideData': false
   },
+  'tenantName': '众联成业测试用例企业',
+  'eventTypeInfo': [{
+    'name': '返件维修',
+    'id': 'da6f09fb-23f0-11eb-9baf-00163e0d174e'
+  }, {
+    'name': '家电维修',
+    'id': '90506446-248a-11eb-9baf-00163e0d174e'
+  }, {
+    'name': '安装单',
+    'id': '306e60b1-28ac-11eb-9baf-00163e0d174e'
+  }, {
+    'name': 'ccee',
+    'id': '3459fc0e-2d54-11eb-9baf-00163e0d174e'
+  }, {
+    'name': '浩克测试',
+    'id': '3eaa0646-2300-11eb-9baf-00163e0d174e'
+  }, {
+    'name': '麻将机型号报修',
+    'id': 'abfaeddf-23c8-11eb-9baf-00163e0d174e'
+  }, {
+    'name': 'chendhTest',
+    'id': '3c816ead-231d-11eb-9baf-00163e0d174e'
+  }, {
+    'name': '事件类型-沐籽',
+    'id': '99fbf28a-0e9c-11e8-9787-00163e109c09'
+  }, {
+    'name': '客户报修设备',
+    'id': '50f44e45-1435-11eb-9baf-00163e0d174e'
+  }, {
+    'name': '事件类型',
+    'id': '4203602d-22ff-11eb-9baf-00163e0d174e'
+  }, {
+    'name': '客户报修',
+    'id': '2018e154-7ed2-4c6b-9e2f-d67fd24e6d16'
+  }, {
+    'name': '示例服务请求',
+    'id': '0a918b72-cd2e-46ff-9270-25bff26d6fc8'
+  }, {
+    'name': '示例服务请求',
+    'id': 'b69a1ce9-47e9-470c-b8c0-f549741df54b'
+  }, {
+    'name': '测试暂停',
+    'id': '4a8bf043-5a31-11ea-9ddd-00163e0f1a1b'
+  }, {
+    'name': '维修申请',
+    'id': '56708bf6-51f6-11ea-9ddd-00163e0f1a1b'
+  }, {
+    'name': '推销手机卡',
+    'id': '298b0e7c-f3a4-11e8-af91-7cd30abca02e'
+  }, {
+    'name': '服务请求',
+    'id': '14020ca5-0e8a-11e8-9787-00163e109c09'
+  }],
+  'nickName': 'dasd ',
+  'domain': 102308,
   'productFields': [{
-    'id': 7192,
-    'tenantId': '7416b42a-25cc-11e7-a500-00163e12f748',
-    'tableName': 'product',
-    'isSystem': 0,
-    'fieldName': 'field_mSY257nkwN48swHL',
-    'displayName': '数字1',
-    'formType': 'number',
-    'defaultValue': '1',
-    'isNull': 1,
-    'isSearch': 0,
-    'placeHolder': null,
-    'setting': {
-      'defaultValueConfig': {
-        'isNotModify': 0
-      }
-    },
-    'orderId': 0,
-    'isDelete': 0,
-    'guideProfessions': [],
-    'isGuideData': false,
-    'isVisible': true,
-    'isHidden': 0,
-    'guideData': false
-  }, {
-    'id': 7193,
-    'tenantId': '7416b42a-25cc-11e7-a500-00163e12f748',
-    'tableName': 'product',
-    'isSystem': 0,
-    'fieldName': 'field_VpAg3J4I9EltaGiK',
-    'displayName': '数字2',
-    'formType': 'number',
-    'defaultValue': null,
-    'isNull': 1,
-    'isSearch': 1,
-    'placeHolder': null,
-    'setting': {},
-    'orderId': 1,
-    'isDelete': 0,
-    'guideProfessions': [],
-    'isGuideData': false,
-    'isVisible': true,
-    'isHidden': 0,
-    'guideData': false
-  }, {
-    'id': 7183,
-    'tenantId': '7416b42a-25cc-11e7-a500-00163e12f748',
-    'tableName': 'product',
-    'isSystem': 0,
-    'fieldName': 'field_GdP690myfHlLgsW1',
-    'displayName': '计算公式',
-    'formType': 'formula',
-    'defaultValue': null,
-    'isNull': 1,
-    'isSearch': 1,
-    'placeHolder': null,
-    'setting': {
-      'formula': [{
-        'name': '数字1',
-        'value': 'field_mSY257nkwN48swHL',
-        'isError': false,
-        'isDelete': false,
-        'isOperator': false
-      }, {
-        'name': '/',
-        'value': '/',
-        'isError': false,
-        'isDelete': false,
-        'isOperator': true
-      }, {
-        'name': '数字2',
-        'value': 'field_VpAg3J4I9EltaGiK',
-        'isError': false,
-        'isDelete': false,
-        'isOperator': false
-      }],
-      'defaultValueConfig': {
-        'isNotModify': 0
-      }
-    },
-    'orderId': 2,
-    'isDelete': 0,
-    'guideProfessions': [],
-    'isGuideData': false,
-    'isVisible': true,
-    'isHidden': 0,
-    'guideData': false
-  }, {
-    'id': 1149,
-    'tenantId': '7416b42a-25cc-11e7-a500-00163e12f748',
-    'tableName': 'product',
-    'isSystem': 1,
-    'fieldName': 'serialNumber',
-    'displayName': '产品编号',
-    'formType': 'text',
-    'defaultValue': null,
-    'isNull': 1,
-    'isSearch': 0,
-    'placeHolder': '请输入产品编号test',
-    'setting': {
-      'serialNumberUnique': false
-    },
-    'orderId': 3,
-    'isDelete': 0,
-    'guideProfessions': [],
-    'isGuideData': false,
-    'isVisible': true,
-    'isHidden': 0,
-    'guideData': false
-  }, {
-    'id': 1150,
-    'tenantId': '7416b42a-25cc-11e7-a500-00163e12f748',
-    'tableName': 'product',
-    'isSystem': 1,
-    'fieldName': 'name',
-    'displayName': '产品名称',
-    'formType': 'text',
-    'defaultValue': null,
-    'isNull': 0,
-    'isSearch': 0,
-    'placeHolder': '请输入产品名称test',
-    'setting': {},
-    'orderId': 4,
-    'isDelete': 0,
-    'guideProfessions': [],
-    'isGuideData': false,
-    'isVisible': true,
-    'isHidden': 0,
-    'guideData': false
-  }, {
-    'id': 1151,
+    'id': 21320,
     'tenantId': '7416b42a-25cc-11e7-a500-00163e12f748',
     'tableName': 'product',
     'isSystem': 1,
     'fieldName': 'type',
     'displayName': '产品类型',
     'formType': 'select',
-    'defaultValue': null,
+    'defaultValue': '电脑办公',
     'isNull': 1,
     'isSearch': 0,
-    'placeHolder': '请选择产品类型',
+    'placeHolder': '请选择',
     'setting': {
       'isMulti': false,
-      'dataSource': ['电器', '厨具', '空调']
+      'dataSource': ['书籍报刊', '手机数码', '电脑办公', '机械类', '家用电器', '保洁用品', '机械设备']
     },
-    'orderId': 5,
+    'orderId': 0,
     'isDelete': 0,
     'guideProfessions': [],
     'isGuideData': false,
-    'isVisible': true,
-    'isHidden': 0,
     'guideData': false
   }, {
-    'id': 7165,
+    'id': 85080,
     'tenantId': '7416b42a-25cc-11e7-a500-00163e12f748',
     'tableName': 'product',
     'isSystem': 0,
-    'fieldName': 'field_OYTI5VFqkybKvjYT',
-    'displayName': '日期 （年月）',
-    'formType': 'date',
+    'fieldName': 'field_XOO1pSuUFR9iO8s7',
+    'displayName': '关联工单',
+    'formType': 'related_task',
     'defaultValue': null,
     'isNull': 1,
-    'isSearch': 0,
-    'placeHolder': null,
-    'setting': {
-      'dateType': 'yyyy-MM'
-    },
-    'orderId': 6,
+    'isSearch': 1,
+    'placeHolder': '1211111',
+    'setting': {},
+    'orderId': 1,
     'isDelete': 0,
     'guideProfessions': [],
     'isGuideData': false,
-    'isVisible': true,
-    'isHidden': 0,
     'guideData': false
   }, {
-    'id': 1148,
+    'id': 21317,
     'tenantId': '7416b42a-25cc-11e7-a500-00163e12f748',
     'tableName': 'product',
     'isSystem': 1,
@@ -486,234 +396,89 @@ let obj = {
         'linkmanNotNull': false
       }
     },
-    'orderId': 7,
+    'orderId': 2,
     'isDelete': 0,
     'guideProfessions': [],
     'isGuideData': false,
-    'isVisible': true,
-    'isHidden': 0,
     'guideData': false
   }, {
-    'id': 7166,
+    'id': 85079,
     'tenantId': '7416b42a-25cc-11e7-a500-00163e12f748',
     'tableName': 'product',
     'isSystem': 0,
-    'fieldName': 'field_vphcYoBV7ZhqG4d3',
-    'displayName': '多级菜单',
-    'formType': 'cascader',
-    'defaultValue': '',
-    'isNull': 1,
+    'fieldName': 'field_uy6ppVKKr92J9fEa',
+    'displayName': '关联工单',
+    'formType': 'related_task',
+    'defaultValue': null,
+    'isNull': 0,
+    'isSearch': 1,
+    'placeHolder': '我是关联工单的描述 ',
+    'setting': {},
+    'orderId': 3,
+    'isDelete': 0,
+    'guideProfessions': [],
+    'isGuideData': false,
+    'guideData': false
+  }, {
+    'id': 21319,
+    'tenantId': '7416b42a-25cc-11e7-a500-00163e12f748',
+    'tableName': 'product',
+    'isSystem': 1,
+    'fieldName': 'name',
+    'displayName': '产品名称',
+    'formType': 'text',
+    'defaultValue': null,
+    'isNull': 0,
     'isSearch': 0,
-    'placeHolder': null,
-    'setting': {
-      'maxDeep': 5,
-      'dataSource': [{
-        'value': '一级选项 1',
-        'children': [{
-          'value': '二级选项 1',
-          'children': [{
-            'value': '三级选项 1',
-            'children': [{
-              'value': '四级选项 1',
-              'children': [{
-                'value': '五级选项 1'
-              }]
-            }]
-          }]
-        }]
-      }, {
-        'value': '电器',
-        'children': [{
-          'value': '电视',
-          'children': [{
-            'value': '三级选项 1',
-            'children': [{
-              'value': '四级选项 1',
-              'children': [{
-                'value': '五级选项 1'
-              }]
-            }]
-          }]
-        }, {
-          'value': '冰箱',
-          'children': [{
-            'value': '三级选项 1',
-            'children': [{
-              'value': '四级选项 1',
-              'children': [{
-                'value': '五级选项 1'
-              }]
-            }]
-          }]
-        }]
-      }, {
-        'value': '一级选项 2',
-        'children': [{
-          'value': '二级选项 1',
-          'children': [{
-            'value': '三级选项 1',
-            'children': [{
-              'value': '四级选项 1',
-              'children': [{
-                'value': '五级选项 1'
-              }]
-            }]
-          }]
-        }, {
-          'value': '二级选项 2',
-          'children': [{
-            'value': '三级选项 1',
-            'children': [{
-              'value': '四级选项 1',
-              'children': [{
-                'value': '五级选项 1'
-              }]
-            }]
-          }]
-        }]
-      }]
-    },
-    'orderId': 8,
+    'placeHolder': '请输入产品名称',
+    'setting': {},
+    'orderId': 4,
     'isDelete': 0,
     'guideProfessions': [],
     'isGuideData': false,
-    'isVisible': true,
-    'isHidden': 0,
     'guideData': false
   }, {
-    'id': 7167,
+    'id': 21318,
     'tenantId': '7416b42a-25cc-11e7-a500-00163e12f748',
     'tableName': 'product',
-    'isSystem': 0,
-    'fieldName': 'field_G3ItKj4znE01DuXL',
-    'displayName': '单行文本',
+    'isSystem': 1,
+    'fieldName': 'serialNumber',
+    'displayName': '产品编号',
     'formType': 'text',
     'defaultValue': null,
     'isNull': 1,
     'isSearch': 0,
-    'placeHolder': null,
-    'setting': {},
-    'orderId': 9,
-    'isDelete': 0,
-    'guideProfessions': [],
-    'isGuideData': false,
-    'isVisible': true,
-    'isHidden': 0,
-    'guideData': false
-  }, {
-    'id': 7168,
-    'tenantId': '7416b42a-25cc-11e7-a500-00163e12f748',
-    'tableName': 'product',
-    'isSystem': 0,
-    'fieldName': 'field_VKjhSSsQdtVyKhcO',
-    'displayName': '数字',
-    'formType': 'number',
-    'defaultValue': null,
-    'isNull': 1,
-    'isSearch': 0,
-    'placeHolder': null,
-    'setting': {},
-    'orderId': 10,
-    'isDelete': 0,
-    'guideProfessions': [],
-    'isGuideData': false,
-    'isVisible': true,
-    'isHidden': 0,
-    'guideData': false
-  }, {
-    'id': 7169,
-    'tenantId': '7416b42a-25cc-11e7-a500-00163e12f748',
-    'tableName': 'product',
-    'isSystem': 0,
-    'fieldName': 'field_4Ok1ifcAPBI1lJ4e',
-    'displayName': '人员',
-    'formType': 'user',
-    'defaultValue': null,
-    'isNull': 1,
-    'isSearch': 0,
-    'placeHolder': null,
-    'setting': {},
-    'orderId': 11,
-    'isDelete': 0,
-    'guideProfessions': [],
-    'isGuideData': false,
-    'isVisible': true,
-    'isHidden': 0,
-    'guideData': false
-  }, {
-    'id': 7172,
-    'tenantId': '7416b42a-25cc-11e7-a500-00163e12f748',
-    'tableName': 'product',
-    'isSystem': 0,
-    'fieldName': 'field_fgEJptLsBlS3lsod',
-    'displayName': '地址',
-    'formType': 'address',
-    'defaultValue': null,
-    'isNull': 1,
-    'isSearch': 0,
-    'placeHolder': null,
-    'setting': {},
-    'orderId': 12,
-    'isDelete': 0,
-    'guideProfessions': [],
-    'isGuideData': false,
-    'isVisible': true,
-    'isHidden': 0,
-    'guideData': false
-  }, {
-    'id': 7239,
-    'tenantId': '7416b42a-25cc-11e7-a500-00163e12f748',
-    'tableName': 'product',
-    'isSystem': 0,
-    'fieldName': 'field_kLpVVPFvQdiSjWmF',
-    'displayName': '附件',
-    'formType': 'attachment',
-    'defaultValue': null,
-    'isNull': 1,
-    'isSearch': 0,
-    'placeHolder': null,
-    'setting': {},
-    'orderId': 13,
-    'isDelete': 0,
-    'guideProfessions': [],
-    'isGuideData': false,
-    'isVisible': true,
-    'isHidden': 0,
-    'guideData': false
-  }, {
-    'id': 7299,
-    'tenantId': '7416b42a-25cc-11e7-a500-00163e12f748',
-    'tableName': 'product',
-    'isSystem': 0,
-    'fieldName': 'field_Q3tkenLSjcCoNM6p',
-    'displayName': '电话',
-    'formType': 'phone',
-    'defaultValue': null,
-    'isNull': 1,
-    'isSearch': 0,
-    'placeHolder': null,
+    'placeHolder': '请输入产品编号',
     'setting': {
-      'defaultValueConfig': {
-        'isCurrentPhone': 1
-      }
+      'isNull': 0,
+      'serialNumberUnique': true
     },
-    'orderId': 14,
+    'orderId': 5,
     'isDelete': 0,
     'guideProfessions': [],
     'isGuideData': false,
-    'isVisible': true,
-    'isHidden': 0,
     'guideData': false
   }],
+  'taskTypeInfo': [{
+    'name': '浩克工单',
+    'id': '43468312-fa44-40fc-801a-0960f1f7e6fe'
+  }, {
+    'name': '设备维修',
+    'id': 'b8532f57-4522-47b6-840c-8f0fbf7866d1'
+  }, {
+    'name': '万万万万万',
+    'id': 'a2b4d152-ff9b-46b1-9418-b61962f0bf08'
+  }],
   'productConfig': {
-    'productType': ['电器', '厨具', '空调'],
+    'productType': ['书籍报刊', '手机数码', '电脑办公', '机械类', '家用电器', '保洁用品', '机械设备'],
     'productSearchOnMobile': true,
-    'serialNumberUnique': false,
+    'serialNumberUnique': true,
     'qrcodeEnabled': true,
     'productTypeIsNull': false,
-    'fieldNameList': ['type', 'name', 'serialNumber'],
-    'hideDefaultLinkman': true
-  }
+    'fieldNameList': ['name', 'serialNumber'],
+    'hideDefaultLinkman': false
+  },
+  'planTaskEnabled': true
 }
 
 export default obj

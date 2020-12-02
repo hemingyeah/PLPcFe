@@ -546,6 +546,7 @@ export default {
           show: true,
           orderId: -1,
           isSystem: 1,
+          tableName:'catalog',
         },
         {
           displayName: '产品视频',
@@ -555,6 +556,7 @@ export default {
           show: true,
           orderId: -0.9,
           isSystem: 1,
+          tableName:'catalog',
         },
         {
           displayName: '产品图片',
@@ -564,6 +566,7 @@ export default {
           show: true,
           orderId: -0.8,
           isSystem: 1,
+          tableName:'catalog',
         },
         {
           displayName: '产品数量',
@@ -572,6 +575,7 @@ export default {
           isExport: true,
           show: true,
           isSystem: 1,
+          tableName:'catalog',
         },
         {
           displayName: '创建人',
@@ -579,6 +583,7 @@ export default {
           isExport: true,
           show: true,
           isSystem: 1,
+          tableName:'catalog',
         },
         {
           displayName: '创建时间',
@@ -586,6 +591,7 @@ export default {
           isExport: true,
           show: true,
           isSystem: 1,
+          tableName:'catalog',
         },
       ];
       return this.dynamicFields

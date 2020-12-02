@@ -114,14 +114,14 @@ export default {
       tableKey: (Math.random() * 1000) >> 2,
       taskStateEnum: TaskStateEnum,
       taskStatusFields: [
-        "onceOverTime",
-        "onceRefused",
-        "oncePaused",
-        "onceRollback",
-        "onceReallot",
-        "oncePrinted",
-        "positionException",
-        "source"
+        'onceOverTime',
+        'onceRefused',
+        'oncePaused',
+        'onceRollback',
+        'onceReallot',
+        'oncePrinted',
+        'positionException',
+        'source'
       ],
       taskTypes: [
         {
@@ -2023,11 +2023,11 @@ export default {
           break;
         }
         let source = params.source && params.source instanceof Array && params.source.length && params.source.map((item)=>{
-                if(item=='API创建'){
-                  item='开放API'
-                }
-                return item
-              }) || [];
+          if(item == 'API创建'){
+            item = '开放API'
+          }
+          return item
+        }) || [];
         // 是否审批中
         let inApprove;
         switch (params.inApprove) {
@@ -2132,7 +2132,7 @@ export default {
           page: params.page,
           pageSize: params.pageSize,
           templateId: this.currentTaskType.id,
-          state: state,
+          state,
           source,
           eventNo: params.eventNo,
           serviceTypes: params.serviceTypes,

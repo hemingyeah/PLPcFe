@@ -4,27 +4,110 @@
     <div class="task-detail-header">
       <div class="header-btns">
         <div class="flex-x box-12-t-b">
-          <div class="flex-1 flex-x">
-            <img src="" class="product-img" alt="" />
-            <div class="product-name">
-              产品名称产品名称产品名称产品名称产品名称产品名称产品名称产品名称产品名称产品名称产品名称产品名称产品名称产品名称产品名称产品名称产品名称产品名称
+          <div class="flex-1 over-x-h">
+            <div class="product-name overHideCon-1">
+              {{ product.name }}
+            </div>
+            <div class="flex-x mar-t-8">
+              产品目录:
+              <div v-if="1==1" class="flex-1 over-x-s color-primary cur-point" style="white-space: nowrap;">
+                产品目录:产品目录:产品目录:产品目录:产品目录:产品目录:产品目录:产品目录:产品目录:产品目录:产品目录:产品目录:产品目录:产品目录:产品目录:产品目录:产品目录:产品目录:产品目录:产品目录:产品目录:产品目录:产品目录:产品目录:
+              </div>
             </div>
           </div>
-          <div class="flex-x">
-            <div class="mar-l-28 flex-x cur-point" @click="deleteProduct">
-              <i class="iconfont icon-shanchu1"></i>删除
+          <div class="flex-x ">
+            <div class="flex-x" v-if="!isDelete ">
+              <div class="mar-l-30 flex-x" v-if="allowCreateTask">
+                <el-dropdown trigger="click" >
+                  <el-button type="primary"
+                  ><i class="iconfont icon-add1"></i>工单</el-button
+                  >
+
+                  <el-dropdown-menu slot="dropdown">
+                    <el-dropdown-item v-for="type in taskTypes" :key="type.id">
+                      <a class="link-of-dropdown" href="javascript:;" @click.prevent="createTask(type.id)">{{type.name}}</a>
+                    </el-dropdown-item>
+                  </el-dropdown-menu>
+                </el-dropdown>
+                
+              </div>
+              <div class="mar-l-8 flex-x" v-if="allowCreateEvent">
+                <el-dropdown trigger="click" >
+                  <el-button type="primary"
+                  ><i class="iconfont icon-add1"></i>事件</el-button
+                  >
+                  <el-dropdown-menu slot="dropdown">
+                    <el-dropdown-item v-for="event in eventTypes" :key="event.id">
+                      <a class="link-of-dropdown" href="javascript:;" @click.prevent="createEvent(event.id)">{{event.name}}</a>
+                    </el-dropdown-item>
+                  </el-dropdown-menu>
+                </el-dropdown>
+               
+              </div>
+              <div class="mar-l-8 flex-x" v-if="allowCreatePlanTask && isShowPlanTask">
+                <el-dropdown
+                  trigger="click"
+                  v-if="allowCreatePlanTask && isShowPlanTask"
+                >
+                  <el-button type="primary"
+                  ><i class="iconfont icon-add1"></i>计划任务</el-button
+                  >
+
+                  <el-dropdown-menu slot="dropdown">
+                    <el-dropdown-item v-for="task in taskTypes" :key="task.id">
+                      <a
+                        class="link-of-dropdown"
+                        href="javascript:;"
+                        @click.prevent="createPlanTask(task.id)"
+                      >
+                        {{ task.name }}
+                      </a>
+                    </el-dropdown-item>
+                  </el-dropdown-menu>
+                </el-dropdown>
+              </div>
+              <div class="mar-l-8 flex-x" @click="openBindCodeDialog">
+                <el-button type="primary"
+                ><i class="iconfont icon-add1"></i>关联二维码</el-button
+                >
+              </div>
             </div>
-            <div class="mar-l-28 flex-x cur-point" @click="editProduct">
-              <i class="iconfont icon-bianji1"></i>编辑
-            </div>
-            <div class="mar-l-28 flex-x" @click="addProduct">
-              <el-button type="primary"
-              ><i class="iconfont icon-add1"></i>新建</el-button
+            <div class="fle-x mar-l-20">
+              <el-tooltip
+                :popper-options="popperOptions"
+                content="加提醒"
+                placement="top"
               >
+                <i
+                  class="iconfont icon-bell cur-point"
+                  @click="openRemindDialog('remind')"
+                ></i>
+              </el-tooltip>
+
+              <el-tooltip
+                :popper-options="popperOptions"
+                content="删除产品"
+                placement="top"
+              >
+                <i
+                  class="iconfont icon-delete cur-point"
+                  @click="deleteProduct"
+                ></i>
+              </el-tooltip>
+              <el-tooltip
+                :popper-options="popperOptions"
+                content="编辑产品"
+                placement="top"
+              >
+                <i
+                  class="iconfont icon-edit-square cur-point"
+                  @click="editProduct"
+                ></i>
+              </el-tooltip>
             </div>
           </div>
         </div>
-        <div class="btn-box flex-x flex-1 box-12-t-b">
+        <!-- <div class="btn-box flex-x flex-1 box-12-t-b">
           <div class="btn-item">
             <el-button
               icon="iconfont icon-notification"
@@ -62,7 +145,7 @@
           <div class="btn-item" size="medium">
             <el-button>查看二维码</el-button>
           </div>
-        </div>
+        </div> -->
       </div>
       <div class="header-data"></div>
     </div>
@@ -172,41 +255,13 @@
                 </template>
               </form-view>
             </el-tab-pane>
+            <el-tab-pane label="产品目录" name="catalog-view">
+            </el-tab-pane>
+            <el-tab-pane label="产品二维码" name="qrcode-view">
+            </el-tab-pane>
 
-            <el-tab-pane :label="`信息动态(${statisticalData.recordQuantity || 0})`" name="info-record">
-              <info-record
-                ref="producMmenuInfoRecord"
-                :share-data="propsForSubComponents"
-              />
-            </el-tab-pane>
-            <el-tab-pane
-              :label="`计划任务(${statisticalData.plantaskQuantity || 0})`"
-              name="plan-table"
-              v-if="this.allowCreatePlanTask && this.isShowPlanTask"
-            >
-              <plan-table :share-data="propsForSubComponents"></plan-table>
-            </el-tab-pane>
-            <el-tab-pane
-              :label="`产品提醒(${statisticalData.remindQuantity || 0})`"
-              name="remind-table"
-              v-if="this.isShowCustomerRemind"
-            >
-              <remind-table :share-data="propsForSubComponents"></remind-table>
-            </el-tab-pane>
-            <el-tab-pane
-              :label="statisticalData.taskQuantity ? `工单(${statisticalData.unfinishedTaskQuantity || 0}/${statisticalData.taskQuantity >= 1000 ? '999+' : statisticalData.taskQuantity})` : '工单(0)'"
-              name="task-table"
-              v-if="this.isShowCustomerRemind"
-            >
-              <task-table :share-data="propsForSubComponents"></task-table>
-            </el-tab-pane>
-            <el-tab-pane
-              :label="statisticalData.eventQuantity ? `事件(${statisticalData.unfinishedEventQuantity || 0}/${statisticalData.eventQuantity >= 1000 ? '999+' : statisticalData.eventQuantity})` : '事件(0)'"
-              name="event-table"
-              v-if="this.isShowCustomerRemind"
-            >
-              <event-table :share-data="propsForSubComponents"></event-table>
-            </el-tab-pane>
+            
+            
           </el-tabs>
         </div>
 
@@ -223,11 +278,64 @@
           v-show="collapseDirection != 'right'"
         >
           <el-tabs v-model="rightActiveTab">
+            <el-tab-pane
+              :label="`信息动态(${statisticalData.recordQuantity || 0})`"
+              name="info-record"
+            >
+              <info-record
+                ref="producMmenuInfoRecord"
+                :share-data="propsForSubComponents"
+              />
+            </el-tab-pane>
+            <el-tab-pane
+              :label="
+                statisticalData.taskQuantity
+                  ? `工单(${statisticalData.unfinishedTaskQuantity || 0}/${
+                    statisticalData.taskQuantity >= 1000
+                      ? '999+'
+                      : statisticalData.taskQuantity
+                  })`
+                  : '工单(0)'
+              "
+              name="task-table"
+              v-if="this.isShowCustomerRemind"
+            >
+              <task-table :share-data="propsForSubComponents"></task-table>
+            </el-tab-pane>
+            <el-tab-pane
+              :label="
+                statisticalData.eventQuantity
+                  ? `事件(${statisticalData.unfinishedEventQuantity || 0}/${
+                    statisticalData.eventQuantity >= 1000
+                      ? '999+'
+                      : statisticalData.eventQuantity
+                  })`
+                  : '事件(0)'
+              "
+              name="event-table"
+              v-if="this.isShowCustomerRemind"
+            >
+              <event-table :share-data="propsForSubComponents"></event-table>
+            </el-tab-pane>
+            <el-tab-pane
+              :label="`计划任务(${statisticalData.plantaskQuantity || 0})`"
+              name="plan-table"
+              v-if="this.allowCreatePlanTask && this.isShowPlanTask"
+            >
+              <plan-table :share-data="propsForSubComponents"></plan-table>
+            </el-tab-pane>
+            <el-tab-pane
+              :label="`产品提醒(${statisticalData.remindQuantity || 0})`"
+              name="remind-table"
+              v-if="this.isShowCustomerRemind"
+            >
+              <remind-table :share-data="propsForSubComponents"></remind-table>
+            </el-tab-pane>
             <el-tab-pane label="备件" name="part">
-              <mini-table :id="product.id" data-type="part" page-type="view" />
+              <!-- <mini-table :id="product.id" data-type="part" page-type="view" /> -->
             </el-tab-pane>
             <el-tab-pane label="知识库" name="wiki">
-              <mini-table :id="product.id" data-type="wiki" page-type="view" />
+              <!-- <mini-table :id="product.id" data-type="wiki" page-type="view" /> -->
             </el-tab-pane>
           </el-tabs>
         </div>
@@ -237,6 +345,7 @@
     <!-- end 工单详情折叠面板 -->
 
     <remind-dialog ref="addRemindDialog" :product="product"></remind-dialog>
+    <bind-code :product-id="product.id" ref="bindCodeDialog"></bind-code>
 
     <!-- tour s -->
     <v-tour
@@ -300,7 +409,6 @@
       </template>
     </v-tour>
     <!-- tour e -->
-    
   </div>
 </template>
 
@@ -313,15 +421,42 @@ export default ProductDetailView;
 @import './ProductDetailView.scss';
 </style>
 <style lang="scss" scoped>
-.task-detail-header{
+.task-detail-header {
   padding: 0;
-  .header-btns{
+  .header-btns {
     padding: 0 12px;
     background: #fafafa;
   }
-  .header-data{
+  .header-data {
     padding: 0 12px;
   }
+}
+.task-detail-btn-group {
+  position: absolute;
+  right: 12px;
+  top: 8px;
+
+  font-size: 0;
+  z-index: 995;
+
+  .iconfont {
+    margin-left: 16px;
+    color: $text-color-secondary;
+    cursor: pointer;
+
+    &.icon-bianji1 {
+      color: $color-primary;
+    }
+
+    &.icon-shanchu-copy {
+      margin-left: 13px;
+    }
+  }
+}
+
+.task-detail-btn-group-point {
+  z-index: 997;
+  background: #fff;
 }
 </style>
 

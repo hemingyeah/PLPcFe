@@ -272,12 +272,57 @@ function productMenuStatistics(params) {
 /**
  * 目录详情tab的数量
  * @param params
- *   id : 目录id
  * @returns {*}
  */
 function getPageLinkProduct(params) {
   
   return http.get(`${headUrl}/outside/pc/catalog/product`, params)
+}
+
+
+
+/**
+ * 搜索产品列表轻量
+ * @param params
+ *   id : 产品id
+ * @returns {*}
+ */
+function searchProduct(params) {
+  
+  return http.get(`${headUrl}/outside/pc/product/info`, params)
+}
+
+/**
+ * 搜索未绑定的二维码
+ * @param params
+ *   id : 产品id
+ * @returns {*}
+ */
+function searchQrcode(params) {
+  
+  return http.get(`${headUrl}/outside/pc/product/qrcode`, params)
+}
+
+/**
+ * 搜索所有的产品目录
+ * @param params
+ *   id : 产品id
+ * @returns {*}
+ */
+function searchAllcatalog(params) {
+  
+  return http.get(`${headUrl}/outside/pc/catalog/catalogList`, params)
+}
+
+/**
+ * 获取产品列表所需表单
+ * @param params
+ *   id : 产品id
+ * @returns {*}
+ */
+function getListProductFields(params) {
+  
+  return http.get(`${headUrl}/outside/pc/product/getProductAndCatalogTemplate`, params)
 }
 
 
@@ -309,5 +354,9 @@ export {
   getMenuRecord,
   getTreeListNode,
   cloneMenu,
-  productMenuStatistics
+  productMenuStatistics,
+  searchProduct,
+  searchQrcode,
+  searchAllcatalog,
+  getListProductFields
 }

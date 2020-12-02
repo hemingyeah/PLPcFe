@@ -23,7 +23,7 @@
 
 <script>
 /** api */
-import { getPageCloneData } from '@src/api/ProductV2Api';
+import { searchAllcatalog } from '@src/api/ProductV2Api';
 
 /** mixin */
 import FormMixin from '@src/component/form/mixin/form';
@@ -73,7 +73,7 @@ export default {
         keyWord: keyword,
       };
 
-      return getPageCloneData(params)
+      return searchAllcatalog(params)
         .then((res) => {
           if (!res || !res.result || !res.result.list) return;
           res.list = res.result.list.map((item) =>
@@ -89,10 +89,12 @@ export default {
     },
     update(newValue) {
       console.log('newValue', newValue);
-      this.inputForValue(newValue);
+      this.inputForValue(newValue[0].id);
     },
     previewCatalog(){
       if(!this.comValue.length) return
+
+      console.log(this.comValue, this.value)
       this.$platform.openTab({
         id: `productV2_catalog_view_${this.comValue[0].id}`,
         title: '产品目录详情',

@@ -18,15 +18,45 @@
         </el-dropdown-menu>
       </el-dropdown>
     </h3>
+    <div
+      class="task-search-panel-title task-pointer task-flex task-ai"
+      @click="show = !show"
+    >
+      <span class="task-font16">常用查询条件</span>
+      <span
+        slot="reference"
+        class="task-font14 task-c2 task-ml12 task-mr4"
+        @click.stop="$refs.searchSetModal.open()"
+      >设置</span
+      >
+      <span class="task-span1">
+        <el-tooltip
+          content="常用查询条件可以通过“设置”功能，进行添加和修改"
+          placement="top"
+        >
+          <i class="iconfont icon-question task-icon"></i>
+        </el-tooltip>
+      </span>
+      <i class="iconfont icon-triangle-down task-f12 task-c9" v-if="!show"></i>
+      <i class="iconfont icon-up task-icon" v-else></i>
+    </div>
     <el-form class="advanced-search-form" onsubmit="return false;">
       <search-form
-        :fields="fields"
+        v-show="show"
+        :fields="diyFields"
         ref="searchForm"
         :form-backup="formBackup"
         :column-num="columnNum"
       ></search-form>
       <slot name="footer"></slot>
     </el-form>
+
+    <!-- 设置弹框 -->
+    <search-set-modal
+      ref="searchSetModal"
+      :fields="fields"
+      @changeDiyFields="changeDiyFields"
+    />
   </base-panel>
 </template>
 
@@ -37,8 +67,11 @@ import {
 } from '@src/component/form/components';
 import * as Utils from '@src/component/form/util';
 import { formatDate } from '@src/util/lang';
+import { storageGet, storageSet } from '@src/util/storage';
 import _ from 'lodash';
 import { isEmptyStringObject } from '@src/util/function';
+
+import SearchSetModal from './SearchSetModal';
 
 export default {
   name: 'search-panel',
@@ -58,13 +91,15 @@ export default {
       formBackup: {},
       columnNum: 1,
       selfFields: this.buildSelfFields(),
+      show: true,
+      diyFields: [],
     };
   },
   computed: {
     fields() {
       let f = {};
       let fields = [...this.config.fields, ...this.selfFields]
-        .filter((f) => f.isSearch || f.isSystem)
+        .filter((f) => f.isSearch || f.isSystem )
         .map((field) => {
           f = _.cloneDeep(field);
 
@@ -91,6 +126,15 @@ export default {
           });
         })
         .sort((a, b) => a.orderId - b.orderId);
+      let obj_ = storageGet('product_search_modal_com_data');
+      if (obj_) {
+        obj_ = JSON.parse(obj_);
+        if (obj_.allCheckList.length) {
+          this.diyFields = fields.filter(
+            (item) => obj_.allCheckList.indexOf(item.fieldName) > -1
+          );
+        }
+      }
 
       return fields;
     },
@@ -103,42 +147,102 @@ export default {
     if (column_number) this.columnNum = Number(column_number);
 
     this.computedWhetherAddQrcodeField();
+
+    this.diyFields = storageGet('product_list_search_modal') || [];
   },
   methods: {
     buildSelfFields() {
       let fields = [
         {
-          displayName: '产品目录',
-          fieldName: 'catalogName',
-          formType: 'text',
+          displayName: '创建时间',
+          fieldName: 'createTime',
+          formType: 'date',
           isExport: false,
           isNull: 1,
           isSystem: 1,
-          orderId: -9,
+          operator: 'between',
+          orderId: -2,
         },
         {
-          displayName: '产品简介',
-          fieldName: 'productDesc',
-          formType: 'text',
+          displayName: '有无提醒',
+          fieldName: 'hasRemind',
+          formType: 'select',
           isExport: false,
           isNull: 1,
           isSystem: 1,
-          orderId: -9,
+          operator: 'between',
+          orderId: -3,
+          setting: {
+            isMulti: false,
+            dataSource: [
+              {
+                text: '全部',
+                value: '',
+              },
+              {
+                text: '有',
+                value: 1,
+              },
+              {
+                text: '无',
+                value: 2,
+              },
+            ],
+          },
         },
-        {
-          displayName: '产品数量',
-          fieldName: 'productNum',
-          formType: 'text',
-          isExport: false,
-          isNull: 1,
-          isSystem: 1,
-          orderId: -9,
-        },
+      ];
 
+      let hasLinkman = this.config.fields.filter(
+        (item) => item.fieldName == 'linkmanName'
+      )[0];
+      let hasAddress = this.config.fields.filter(
+        (item) => item.fieldName == 'address'
+      )[0];
+
+      if (hasLinkman) {
+        fields.push({
+          displayName: '联系人',
+          fieldName: 'linkmanId',
+          formType: 'linkman',
+          isExport: false,
+          isNull: 1,
+          isSystem: 1,
+          orderId: -11,
+          placeholder: '请输入关键字搜索联系人',
+        });
+      }
+
+      if (hasAddress) {
+        fields.push({
+          displayName: '区域',
+          fieldName: 'area',
+          formType: 'area',
+          isExport: false,
+          isNull: 1,
+          isSystem: 1,
+          orderId: -10,
+        });
+        fields.push({
+          displayName: '详细地址',
+          fieldName: 'addressDetail',
+          formType: 'text',
+          isExport: false,
+          isNull: 1,
+          isSystem: 1,
+          orderId: -9,
+        });
+      }
+
+      return fields;
+    },
+    computedWhetherAddQrcodeField() {
+      this.selfFields = [
+        ...this.selfFields,
         {
           displayName: '创建人',
-          fieldName: 'createUserId',
+          fieldName: 'createUser',
           formType: 'user',
+          returnData: 'name',
           noClearable: true,
           isExport: false,
           isNull: 1,
@@ -146,66 +250,47 @@ export default {
           orderId: -3.5,
           placeHolder: '请输入创建人',
         },
-
-        {
-          displayName: '创建时间',
-          fieldName: 'createTime',
-          formType: 'date',
-          returnData: (result) => {
-            let obj = {
-              createTimeStart: formatDate(result[0], 'YYYY-MM-DD HH:mm:ss'),
-              createTimeEnd: formatDate(result[1], 'YYYY-MM-DD HH:mm:ss'),
-            };
-            return obj;
-          },
-          isExport: false,
-          isSystem: 1,
-          orderId: -2,
-        },
-        // {
-        //   displayName: '有无提醒',
-        //   fieldName: 'hasRemind',
-        //   formType: 'select',
-        //   isExport: false,
-        //   isNull: 1,
-        //   isSystem: 1,
-        //   operator: 'between',
-        //   orderId: -3,
-        //   setting: {
-        //     isMulti: false,
-        //     dataSource: [
-        //       {
-        //         text: '全部',
-        //         value: ''
-        //       },
-        //       {
-        //         text: '有',
-        //         value: 1
-        //       },
-        //       {
-        //         text: '无',
-        //         value: 2
-        //       }
-        //     ]
-        //   }
-        // }
+        this.initData?.productConfig?.qrcodeEnabled
+          ? {
+            displayName: '是否绑定二维码',
+            fieldName: 'qrcodeState',
+            formType: 'select',
+            isExport: false,
+            isNull: 1,
+            isSystem: 1,
+            operator: 'between',
+            orderId: 1000,
+            setting: {
+              isMulti: false,
+              dataSource: [
+                {
+                  text: '全部',
+                  value: '',
+                },
+                {
+                  text: '是',
+                  value: 1,
+                },
+                {
+                  text: '否',
+                  value: 2,
+                },
+              ],
+            },
+          }
+          : {},
       ];
-
-      return fields;
-    },
-    computedWhetherAddQrcodeField() {
-      this.selfFields = [...this.selfFields];
     },
     saveDataToStorage(key, value) {
       const data = this.getLocalStorageData();
       data[key] = value;
       localStorage.setItem(
-        'product_menu_list_localStorage_19_4_24',
+        'product_list_localStorage_19_4_24',
         JSON.stringify(data)
       );
     },
     getLocalStorageData() {
-      const dataStr = localStorage.getItem('product_menu_list_localStorage_19_4_24') || '{}';
+      const dataStr = localStorage.getItem('product_list_localStorage_19_4_24') || '{}';
       return JSON.parse(dataStr);
     },
     matchOperator(field) {
@@ -315,16 +400,11 @@ export default {
         if (!form[fn] || (Array.isArray(form[fn]) && !form[fn].length)) {
           continue;
         }
-        
+
         if (tv.formType === 'date' || tv.formType === 'datetime') {
-          if (tv.returnData) {
-            params = {
-              ...tv.returnData(form[fn]),
-              [fn]: form[fn].map(t => formatDate(t, 'YYYY/MM/DD')).join('-')
-            };
-            continue;
-          }
-          params[fn] = form[fn].map(t => formatDate(t, 'YYYY/MM/DD')).join('-');
+          params[fn] = form[fn]
+            .map((t) => formatDate(t, 'YYYY/MM/DD'))
+            .join('-');
           continue;
         }
 
@@ -334,6 +414,11 @@ export default {
 
         if (typeof form[fn] === 'string') {
           params[fn === 'customer' ? 'customerId' : fn] = form[fn];
+          continue;
+        }
+
+        if (typeof form[fn] === 'number') {
+          params[fn] = form[fn];
           continue;
         }
       }
@@ -423,8 +508,12 @@ export default {
     open() {
       this.visible = true;
     },
+    changeDiyFields(e) {
+      if (e.length) this.diyFields = e, this.show = true;
+    },
   },
   components: {
+    [SearchSetModal.name]: SearchSetModal,
     SearchForm: {
       name: 'search-form',
       props: {
@@ -445,6 +534,7 @@ export default {
         return {
           form: {},
           tableName: 'product',
+          show: true,
         };
       },
       mounted() {
@@ -663,6 +753,105 @@ export default {
   },
 };
 </script>
+<style lang="scss">
+.task-search-forms {
+  transition: height 0.5s;
+  .form-item {
+    width: 340px !important;
+  }
+}
+</style>
+<style lang="scss" scoped>
+.advanced-search-form {
+  overflow: auto;
+  padding: 10px 15px 150px 15px;
+
+  height: calc(100%);
+  justify-content: space-between;
+  overflow-x: hidden;
+
+  .two-columns {
+    display: flex;
+    flex-wrap: wrap;
+    .el-form-item {
+      width: 50%;
+    }
+  }
+
+  .form-item-container {
+    justify-content: space-between;
+  }
+
+  .form-item {
+    label {
+      padding-left: 0;
+    }
+
+    width: 390px;
+  }
+
+  .advanced-search-btn-group {
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+    position: absolute;
+    bottom: 0px;
+    background: #fff;
+    padding: 15px 20px;
+
+    .base-button {
+      margin: 0 10px;
+    }
+  }
+}
+.hide {
+  overflow: hidden;
+  padding: 0;
+  height: 0;
+  width: 0;
+}
+.task-search-panel-title {
+  height: 54px;
+  line-height: 54px;
+  padding: 0 15px;
+}
+.task-search-guide {
+  position: relative;
+  left: 120px;
+  margin-bottom: 20px;
+  > div {
+    &:first-child {
+      width: 0;
+      height: 0;
+      border-left: 4px solid transparent;
+      border-right: 4px solid transparent;
+      border-bottom: 6px solid #13c2c2;
+      margin-left: 15px;
+    }
+    &:last-child {
+      position: relative;
+      width: 267px;
+      height: 50px;
+      font-size: 14px;
+      color: #fff;
+      line-height: 50px;
+      background-color: #13c2c2;
+      box-shadow: 0px 6px 16px 0px rgba(0, 0, 0, 0.08),
+        0px 3px 6px -4px rgba(0, 0, 0, 0.12);
+      text-align: center;
+      border-radius: 4px;
+      > span {
+        font-size: 12px;
+        font-family: fantasy;
+        position: absolute;
+        top: 8px;
+        right: 9px;
+        line-height: 10px;
+      }
+    }
+  }
+}
+</style>
 
 <style lang="scss">
 .advanced-search-form {

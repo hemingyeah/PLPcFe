@@ -13,7 +13,7 @@
           <el-button @click="setMenuInfo">新建目录信息</el-button>
         </div>
       </template>
-      <template v-else>
+      <div v-show="propData.canEditConData && propData.conData">
         <div class="normal-title-1">
           <div class="flex-1">编辑目录详细信息</div>
           <el-button @click="showDialog('cloneMenu')"
@@ -166,7 +166,7 @@
         </el-form-item>
     </el-form> -->
         </form-builder>
-      </template>
+      </div>
     </div>
     <div class="bottom-btns" v-if="propData.conData == 1">
       <el-button type="danger" :loading="btnLoading" @click="deletInfo"
@@ -258,10 +258,16 @@ export default {
         if (code == 0) {
           const fields = result || [];
           let arr = [];
-          const sortedFields = fields.sort((a, b) => a.orderId - b.orderId);
+          const sortedFields = fields
+            .sort((a, b) => a.orderId - b.orderId)
+            .map((item) => {
+              if (item.fieldName == 'catalogNum') item['disabled'] = true;
+              return item;
+            });
           this.fielIdArr = sortedFields.map((item) => {
             return item.id;
           });
+          console.log(sortedFields)
           this.fields = sortedFields;
         } else {
           this.$notify.error({
@@ -319,7 +325,7 @@ export default {
     UploadImage(param) {
       Uploader.upload(param.file, '/files/upload')
         .then((result) => {
-          console.log(result, 'result')
+          console.log(result, 'result');
           if (result.status != 0) {
             this.$message({
               message: `${result.message}`,
@@ -332,7 +338,7 @@ export default {
           let file = result.data;
           let item = {
             id: file.id,
-            name: file.fileName,
+            filename: file.fileName,
             // 如果后端返回url,必须使用。如果后端不返回，需要拼接
             url: file.ossUrl || file.url || `/files/get?fileId=${file.id}`,
             fileSize: file.fileSizeStr,
@@ -342,7 +348,7 @@ export default {
             ...this.productMenuValue.productPic,
             item,
           ]);
-          console.log(this.productMenuValue, 'productMenuValue.productPic')
+          console.log(this.productMenuValue, 'productMenuValue.productPic');
         })
         .catch((err) => {
           console.warn(err);
@@ -436,7 +442,6 @@ export default {
         id,
       }).then((res) => {
         if (res.code == 0) {
-         
           res.result.catalogInfo.productVideo = res.result.catalogInfo.productVideo || [];
           res.result.catalogInfo.productPic = res.result.catalogInfo.productPic || [];
           res.result.catalogInfo.productExplain = res.result.catalogInfo.productExplain || [];
@@ -444,7 +449,6 @@ export default {
           if (res.result.selectField) {
             this.$set(this, 'fieldIds', res.result.selectField);
           }
-          
         } else {
           this.$notify.error({
             title: '网络错误',
@@ -453,8 +457,8 @@ export default {
           });
         }
       });
-      this.$set(this, 'flashPartType', false);
-      this.$set(this, 'flashProductType', false);
+      // this.$set(this, 'flashPartType', false);
+      // this.$set(this, 'flashProductType', false);
       this.$nextTick(() => {
         this.$set(this, 'flashPartType', true);
         this.$set(this, 'flashProductType', true);
@@ -501,15 +505,17 @@ export default {
     },
     reflashTable(type) {
       if (type == 'part') {
-        this.$set(this, 'flashPartType', false);
-        this.$nextTick(() => {
-          this.$set(this, 'flashPartType', true);
-        });
+        this.$refs.form.$slots.product_menu_part[2].child.reflash();
+        // this.$set(this, 'flashPartType', false);
+        // this.$nextTick(() => {
+        //   this.$set(this, 'flashPartType', true);
+        // });
       } else {
-        this.$set(this, 'flashProductType', false);
-        this.$nextTick(() => {
-          this.$set(this, 'flashProductType', true);
-        });
+        this.$refs.form.$slots.product_menu_wiki[2].child.reflash();
+        // this.$set(this, 'flashProductType', false);
+        // this.$nextTick(() => {
+        //   this.$set(this, 'flashProductType', true);
+        // });
       }
     },
   },

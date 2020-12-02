@@ -1,7 +1,7 @@
 <template>
   <div class="product-list-container" v-loading.fullscreen.lock="loading">
-    <div class="product-list-search-group-container">
-      <form class="base-search" onsubmit="return false;">
+    <div class="product-list-search-group-container bg-w">
+      <!-- <form class="base-search" onsubmit="return false;">
         <div class="product-list-base-search-group">
           <el-input
             v-model="searchModel.keyword"
@@ -28,8 +28,70 @@
           <i class="iconfont icon-add"></i>
           高级搜索
         </span>
-      </form>
+      </form> -->
+      <!-- 搜索 -->
+      <div class="task-list-header-seach ">
+        <form onsubmit="return false;">
+          <div class="seach task-span1 task-flex task-ai guide-box">
+            <div style="position: relative;" ></div>
+
+            <el-input
+              v-model="searchModel.keyword"
+              placeholder="请输入产品编号或产品信息"
+              class="task-with-input task-ml12"
+            >
+            </el-input>
+
+            <base-button
+              type="primary"
+              @event="searchModel.pageNum = 1;
+                      search();
+                      trackEventHandler('search');"
+              native-type="submit"
+              class="task-ml12"
+            >
+              搜索
+            </base-button>
+            <base-button type="ghost" @event="resetParams" class="task-ml12">
+              重置
+            </base-button>
+            <div class="guide-box">
+              <div
+                id="v-task-step-2"
+                :class="['advanced-search-visible-btn', 'task-ml12']"
+                @click.self="panelSearchAdvancedToggle"
+              >
+                <i class="iconfont icon-gaojisousuo task-font12 task-mr4"></i>
+                高级搜索
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <!-- 筛选 -->
+      <div class="task-list-header-nav bg-w">
+        <div class="task-flex">
+          <div class="task-font14 task-c6 state">产品目录：</div>
+          <div class="list list-crate" :style="`width: ${navWidth}px`">
+            <div class="list-item task-flex task-ai">
+              <div
+                v-for="(item, index) in selectList"
+                :key="index"
+                class="task-nav-create"
+                :class="{ 'task-c2': selectId === item.value }"
+                @click.stop="
+                  createPerspective(item)
+                "
+              >
+                {{ item.name }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
+
+    
 
     <div class="product-list-section">
       <!--operation bar start-->
@@ -75,31 +137,6 @@
             <i class="iconfont icon-duanxin3 task-icon"></i>
             <span class="task-mr4 task-ml4">发送短信</span>
           </div>
-          <!-- <base-button
-            type="ghost"
-            icon="icon-qingkongshanchu"
-            @event="deleteProducts"
-            v-if="deletePermission"
-            >删除</base-button
-          >
-          <base-button
-            type="plain"
-            @event="openDialog('sendMessage')"
-            v-if="editedPermission === 3"
-            >发送短信</base-button
-          >
-          <base-button
-            type="plain"
-            @event="openDialog('edit')"
-            v-if="editedPermission === 3"
-            >批量编辑</base-button
-          >
-          <base-button
-            type="plain"
-            @event="openDialog('remind')"
-            v-if="editedPermission === 3 && isShowCustomerRemind"
-            >批量提醒</base-button
-          > -->
         </div>
 
         <div class="action-button-group flex-x">
@@ -175,7 +212,7 @@
           type="selection"
           width="48"
           align="center"
-          class-name="select-column"
+          class-name="flex-x jus-center"
         ></el-table-column>
         <template v-for="(column, index) in columns">
           <el-table-column
@@ -369,7 +406,6 @@
         <template v-else>
           <div class="product-selected-list">
             <div class="product-selected-row product-selected-head">
-              <span class="product-selected-sn">编号</span>
               <span class="product-selected-name">产品</span>
             </div>
             <div
@@ -377,8 +413,7 @@
               v-for="c in multipleSelection"
               :key="c.id"
             >
-              <span class="product-selected-sn">{{ c.serialNumber }}</span>
-              <span class="product-selected-name">{{ c.name }}</span>
+              <span class="product-selected-sn">{{ c.name }}</span>
               <button
                 type="button"
                 class="product-selected-delete"
@@ -400,7 +435,7 @@
 
     <batch-editing-dialog
       ref="batchEditingDialog"
-      :config="{ fields: productFields, productTypes: productTypes }"
+      :config="{ fields: onlyProductFields, productTypes: productTypes }"
       :callback="search"
       :selected-ids="selectedIds"
     ></batch-editing-dialog>
@@ -426,15 +461,18 @@
         </div>
       </div>
     </base-import>
-
-    <base-export
+    <!-- start 导出工单 -->
+    <base-export-group
       ref="exportPanel"
+      :alert="exportAlert"
       :columns="exportColumns"
       :build-params="buildExportParams"
+      :group="true"
       :validate="checkExportCount"
       method="post"
       action="/excels/customer/customerProduct"
     />
+    <!-- end 导出工单 -->
 
     <batch-update-dialog
       ref="batchUpdateDialog"
@@ -450,7 +488,7 @@
     <search-panel
       :init-data="initData"
       :config="{
-        fields: this.productFields,
+        fields: onlyProductFields,
       }"
       ref="searchPanel"
     >
@@ -461,6 +499,8 @@
         >
       </div>
     </search-panel>
+
+
   </div>
 </template>
 
@@ -469,18 +509,21 @@ import _ from 'lodash';
 
 import Page from '@model/Page';
 import { formatDate } from '@src/util/lang';
+import { getRootWindow } from '@src/util/dom';
 import SendMessageDialog from '@src/modules/product/components/SendMessageDialog.vue';
 import BatchEditingDialog from '@src/modules/product/components/BatchEditingDialog.vue';
 import BatchRemindingDialog from '@src/modules/product/components/BatchRemindingDialog.vue';
 import BatchUpdateDialog from '@src/modules/product/components/BatchUpdateDialog.vue';
-import SearchPanel from '@src/modules/product/components/SearchPanel.vue';
+import SearchPanel from '@src/modules/productV2/productList/compoment/SearchPanel.vue';
+import { storageGet, storageSet } from '@src/util/storage';
 
 import {
-  getProductFields,
   getProduct,
   deleteProductByIds,
   getUpdateRecord,
 } from '@src/api/ProductApi';
+
+import {getListProductFields} from '@src/api/ProductV2Api'
 import TeamMixin from '@src/mixins/teamMixin';
 import { isShowCustomerRemind } from '@src/util/version.ts';
 
@@ -510,6 +553,7 @@ export default {
         pageSize: 10,
         pageNum: 1,
         orderDetail: {},
+        catalogState:'',
         moreConditions: {
           conditions: [],
         },
@@ -518,7 +562,16 @@ export default {
       dynamicFields: [],
       filterTeams: [],
       tableKey: (Math.random() * 1000) >> 2,
-      selectColumnState:'product_list_select'
+      selectColumnState:'product_list_select',
+      // 头部筛选列表 s
+      selectList: [
+        { name: '全部目录', key:'catalogState', value:'' },
+        { name: '有目录', key:'catalogState', value:1 },
+        { name: '无目录', key:'catalogState', value:0 }
+      ], 
+      navWidth: window.innerWidth - 120,
+      selectId: '',
+      // 头部筛选列表 e
     };
   },
   computed: {
@@ -550,6 +603,8 @@ export default {
           formType: 'date',
           isExport: false,
           isSystem: 1,
+          tableName:'product',
+
         },
         {
           displayName: '产品模板',
@@ -557,6 +612,7 @@ export default {
           formType: 'text',
           isExport: false,
           isSystem: 0,
+          tableName:'product',
         },
         {
           displayName: '服务团队',
@@ -564,24 +620,28 @@ export default {
           isExport: true,
           isSystem: 0,
           exportAlias: 'customerTags',
+          tableName:'product',
         },
         {
           displayName: '提醒数量',
           fieldName: 'remindCount',
           isExport: false,
           isSystem: 0,
+          tableName:'product',
         },
         {
           displayName: '创建人',
           fieldName: 'createUser',
           isExport: true,
           isSystem: 0,
+          tableName:'product',
         },
         {
           displayName: '创建时间',
           fieldName: 'createTime',
           isExport: true,
           isSystem: 0,
+          tableName:'product',
         },
       ];
 
@@ -594,8 +654,10 @@ export default {
           isSystem: 1,
           placeholder: '请输入产品二维码',
           orderId: 10001,
+          tableName:'product',
         });
       }
+      console.log(this.dynamicFields, 'dynamicFields');
       let field = this.dynamicFields.filter(
         (item) => item.formType == 'customer'
       )[0];
@@ -606,6 +668,7 @@ export default {
           formType: 'text',
           isExport: true,
           isSystem: 0,
+          tableName:'product',
         });
 
         fixedFields.push({
@@ -613,6 +676,7 @@ export default {
           fieldName: 'phone',
           isExport: true,
           isSystem: 0,
+          tableName:'product',
         });
       }
 
@@ -623,6 +687,7 @@ export default {
           isExport: true,
           formType: 'text',
           isSystem: 0,
+          tableName:'product',
         });
       }
 
@@ -701,6 +766,9 @@ export default {
         })
         .sort((a, b) => a.orderId - b.orderId);
     },
+    onlyProductFields(){
+      return this.productFields.filter(item=>item.tableName == 'product')
+    },
     productTypes() {
       return this.initData.productConfig.productType || [];
     },
@@ -711,7 +779,9 @@ export default {
       return this.multipleSelection.map((p) => p.id);
     },
     exportColumns() {
-      return [
+      console.log(this.columns, 'this.columns')
+      console.log(this.productFields, 'this.productFields')
+      let arr = [
         {
           label: '产品系统编号',
           field: 'productId',
@@ -750,6 +820,21 @@ export default {
 
         return field;
       });
+      console.log(arr, 'arr_')
+
+      let arr_ = [
+        {
+          label: '产品信息',
+          value: 'productExport',
+          columns: arr.filter(item=>item.tableName == 'product'),
+        },
+        {
+          label: '产品目录信息',
+          value: 'catalogExport',
+          columns: arr.filter(item=>item.tableName == 'catalog'),
+        },
+      ];
+      return arr_
     },
     smsRest() {
       return this.initData.smsRest || 0;
@@ -784,8 +869,8 @@ export default {
 
     // 获取产品动态字段
     try {
-      let res = await getProductFields({ isFromSetting: false });
-      this.dynamicFields = res.data || [];
+      let res = await getListProductFields();
+      this.dynamicFields = res.result || [];
       this.buildColumns();
     } catch (error) {
       console.error('product-list fetch product fields error', error);
@@ -864,7 +949,7 @@ export default {
         id: `product_view_${productId}`,
         title: '产品详情',
         close: true,
-        url: `/product/view/${productId}?noHistory=1`,
+        url: `/customer/product/view/${productId}?noHistory=1`,
         fromId,
       });
     },
@@ -875,7 +960,20 @@ export default {
       return getProduct(params)
         .then((res) => {
           this.loading = false;
-          this.page = Page.as(Object.freeze(res));
+          // this.page = Page.as(Object.freeze(res.result));
+          let { number, content, totalPages, totalElements, size } = res.result;
+          if(content.length) content.map((item)=> {if(item.catalog){
+            item = {...item, ...item.catalog};
+            if(item.catalog.catalogAttribute){
+              item.attribute = {...item.attribute, ...item.catalog.catalogAttribute}
+            }}
+          return item
+          })
+
+          this.page['list'] = content;
+          this.page['total'] = totalPages;
+          this.page['pageNum'] = number;
+          this.page['pageSize'] = size
           this.matchSelected();
         })
         .catch((e) => console.error('fetch product catch an error', e));
@@ -886,6 +984,7 @@ export default {
         keyword: sm.keyword,
         pageSize: sm.pageSize,
         pageNum: sm.pageNum,
+        catalogState:sm.catalogState
       };
 
       if (Object.keys(sm.orderDetail || {}).length) {
@@ -916,6 +1015,7 @@ export default {
         pageNum: 1,
         pageSize: this.page.pageSize,
         orderDetail: {},
+        catalogState:'',
         moreConditions: {
           conditions: [],
         },
@@ -1056,7 +1156,7 @@ export default {
         let sortModel = {
           isSystem,
           sequence: order === 'ascending' ? 'ASC' : 'DESC',
-          column: isSystem ? `product.${prop}` : prop,
+          column: isSystem ? `${prop}` : prop,
         };
 
         if (
@@ -1122,9 +1222,10 @@ export default {
      * @description 表头更改
      */
     headerDragend(newWidth, oldWidth, column, event) {
+      console.log(newWidth, oldWidth, column, event, 12312312)
       let data = this.columns
         .map((item) => {
-          if (item.displayName === column.label) {
+          if (item.fieldName === column.property) {
             item.width = column.width;
           }
           return item;
@@ -1161,6 +1262,7 @@ export default {
     },
     showAdvancedSetting() {
       window.TDAPP.onEvent('pc：产品管理-选择列事件');
+      console.log(this.columns)
       this.$refs.advanced.open(this.columns);
     },
     /**
@@ -1208,7 +1310,8 @@ export default {
     buildColumns() {
       const localStorageData = this.getLocalStorageData();
 
-      let columnStatus = localStorageData.columnStatus[this.selectColumnState] || [];
+      let columnStatus = localStorageData.columnStatus && localStorageData.columnStatus[this.selectColumnState];
+      columnStatus = columnStatus || [];
       let localColumns = columnStatus
         .map((i) => (typeof i == 'string' ? { field: i, show: true } : i))
         .reduce((acc, col) => (acc[col.field] = col) && acc, {});
@@ -1271,8 +1374,12 @@ export default {
               : '';
             show = localField.show !== false;
           }
+          
 
           col.show = show;
+          if(col.formType == 'related_catalog'){
+            col.show = true;
+          }
           col.width = width;
           col.type = 'column';
 
@@ -1280,20 +1387,118 @@ export default {
         });
     },
 
-    buildExportParams(checkedArr, ids) {
-      let exportAll = !ids || !ids.length;
-      let exportSearchModel = exportAll
-        ? {
-          ...this.buildParams(),
-          exportTotal: this.page.total,
-        }
-        : { exportTotal: ids.length };
+    // buildExportParams(checkedArr, ids) {
+    //   let exportAll = !ids || !ids.length;
+    //   let exportSearchModel = exportAll
+    //     ? {
+    //       ...this.buildParams(),
+    //       exportTotal: this.page.total,
+    //     }
+    //     : { exportTotal: ids.length };
 
-      return {
-        productChecked: checkedArr.join(','),
-        data: exportAll ? '' : ids.join(','),
-        exportSearchModel: JSON.stringify(exportSearchModel),
+    //   return {
+    //     productChecked: checkedArr.join(','),
+    //     data: exportAll ? '' : ids.join(','),
+    //     exportSearchModel: JSON.stringify(exportSearchModel),
+    //   };
+    // },
+    /**
+     * @description 构建导出参数
+     * @return {Object} 导出参数
+     */
+    buildExportParams(checkedMap, ids, exportOneRow) {
+      const {
+        productExport,
+        catalogExport
+      } = checkedMap
+      const Params = Object.assign({}, this.params);
+      const rootWindow = getRootWindow(window);
+      const {
+        loginUser
+      } = this.initData;
+
+      let exportAll = !ids || !ids.length;
+      const all = exportAll ? {
+        ...this.buildParams(),
+        productIds: this.selectedIds,
+        tagIds: loginUser.tagIds,
+        tenantId: JSON.parse(rootWindow._init).user.tenantId,
+      } : {
+        productIds: this.selectedIds,
+        tagIds: loginUser.tagIds,
+        tenantId: JSON.parse(rootWindow._init).user.tenantId,
+      } ;
+
+      let exportSearchModel = {
+
       };
+      let params = {
+        exportSearchModel: JSON.stringify({
+          ...all,
+          ...{
+            exportTotal: exportAll
+              ? this.page.total : this.selectedIds.length,
+          },
+        }),
+      };
+      /** ********************* *********************/
+      // 产品信息
+      let export_product = this.exportData(0, productExport)
+      
+      // 产品目录信息
+      let export_catalog = this.exportData(1, catalogExport)
+
+      params['exportOneRow'] = exportOneRow
+      params['data'] = exportAll ? '' : this.selectedIds.join(',');
+      params['catalogExport'] = export_catalog.join(',');
+      params['productExport'] = export_product.join(',');
+      
+      return params;
+    },
+    /**
+     * 导出数据
+     */
+    exportData(number, list = []) {
+      const export_list = this.exportColumns
+      if (number === 3) {
+        let cardField = []
+        export_list.filter((item, index) => {
+          return index > 2
+        }).forEach(v => {
+          v.columns.forEach(item => {
+            cardField.push(item)
+          })
+        })
+        return cardField.map(v => {
+          let bool = list.some(item => {
+            if (v.exportAlias) {
+              return v.exportAlias === item
+            } 
+            return v.fieldName === item
+            
+          })
+          if (bool) {
+            return v.exportAlias ? v.exportAlias : v.fieldName
+          }
+        }).filter(item => {
+          return item
+        })
+      }
+
+      return export_list[number].columns.map(v => {
+        let bool = list.some(item => {
+          if (v.exportAlias) {
+            return v.exportAlias === item
+          } 
+          return v.fieldName === item
+          
+        })
+        if (bool) {
+          return v.exportAlias ? v.exportAlias : v.fieldName
+        }
+      }).filter(item => {
+        return item
+      })
     },
     /** 检测导出条数 */
     checkExportCount(ids, max) {
@@ -1440,6 +1645,31 @@ export default {
     getRowKey(row) {
       return row.id || '';
     },
+    /**
+     * 创建视角
+     */
+    createPerspective(item, bool = false){
+      this.searchModel[item.key] = item.value;
+      this.selectId = item.value;
+      this.searchModel.pageNum = 1;
+      this.search();
+    },
+    /**
+     * @description 导出提示
+     */
+    exportAlert(result, params = {}) {
+      // let taskQueryInputString = params?.taskQueryInput || "{}";
+      // let taskQueryInput = JSON.parse(taskQueryInputString);
+      // let ids = taskQueryInput.ids || [];
+      // let idsArr = ids;
+      // let exportNum =
+      //   idsArr.length > 0 && ids.length > 0
+      //     ? idsArr.length
+      //     : this.taskPage.totalElements;
+      // let message = `您已选择${exportNum}条数据进行导出，导出进行中，导出完成后，您可以到右上角后台任务中查看导出数据，关闭本窗口不影响数据导出。`;
+
+      this.$platform.alert(result.message);
+    },
   },
   components: {
     SearchPanel,
@@ -1451,6 +1681,79 @@ export default {
   },
 };
 </script>
+<style lang="scss" scoped>
+.task-list {
+  &-header {
+    background: #ffffff;
+    box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, 0.06);
+    border-radius: 4px;
+    margin-bottom: 12px;
+    border-top: none;
+
+    &-seach {
+      padding: 6px 0;
+
+      .seach {
+        justify-content: flex-end;
+        padding-right: 16px;
+
+        .advanced-search-visible-btn {
+          width: 98px;
+          height: 32px;
+          background: #e9f9f9;
+          border-radius: 4px;
+          border: 1px solid #d0f3f4;
+          font-size: 14px;
+          color: #13c2c2;
+          line-height: 32px;
+          text-align: center;
+          cursor: pointer;
+        }
+      }
+    }
+
+    &-nav {
+      > div {
+        position: relative;
+        cursor: pointer;
+        border-top: 1px solid #F5F5F5;
+        .state {
+          padding-top: 4px;
+          padding-left: 11px;
+          width: 90px;
+          font-weight: 500;
+          background-color: #FAFAFA;
+        }
+        .element-icon i {
+          position: absolute;
+          right: 12px;
+          top: 6px;
+        }
+        .list {
+          width: 90%;
+          overflow: hidden;
+          // height: 30px;
+          .list-item {
+            > div {
+              padding-left: 11px;
+              font-size: 13px;
+              width: 130px;
+              height: 30px;
+              overflow-y: hidden;
+              color: #808080;
+              line-height: 30px;
+              &:hover {
+                color: #333;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+</style>
 
 <style lang="scss">
 $color-primary-light-9: mix(#fff, $color-primary, 90%) !default;

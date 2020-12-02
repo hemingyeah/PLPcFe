@@ -45,6 +45,9 @@
         <!-- end 按钮 -->
         <!-- start 服务电话 -->
         <div class="team-service-btn">
+          <base-button type="success" @event="openWxDialog">
+            维护服务微信
+          </base-button>
           <base-button type="primary" @event="openTelDialog">
             维护服务电话
           </base-button>
@@ -86,7 +89,7 @@
 
     <!-- start 导入服务电话 -->
     <base-import
-      title="维护服务电话"
+      title="维护服务微信"
       ref="serviceTelModal"
       :is-import-now="isImportNow"
       @success="importServiceSuccess"
@@ -105,6 +108,27 @@
       </div>
     </base-import>
     <!-- end 导入服务电话 -->
+
+    <!-- start 导入服务微信 -->
+    <base-import
+      title="维护服务电话"
+      ref="serviceWxModal"
+      :is-import-now="isImportNow"
+      @success="importServiceSuccess"
+      action="/security/user/import/importWeChat">
+      <div slot="tip">
+        <div class="base-import-warn">
+          请先下载<a :href="`/security/user/import/weChatTemplate?tag=${serviceTelItemId}`">导入模版 </a>，填写完成后再上传导入。<br>
+          这里维护微信号仅用于客户联系服务人员；<br>
+          如果没有微信号，将不向客户提供微信这种联系方式；<br>
+          次数据为非必填项。<br>
+          如果没有维护服务人员电话将会发送短信设置中统一服务电话；<br>
+          此数据为非必填项。  <br>
+          微信号应用示例（需开启超级二维码）<br>
+        </div>
+      </div>
+    </base-import>
+    <!-- end 导入服务微信 -->
 
     <!-- start 右侧选择团队弹窗 -->
     <base-panel :show.sync="multipleSelectionPanelShow" width="420px">
@@ -334,6 +358,15 @@ export default {
 
       this.serviceTelItemId = item.id;
       this.$refs.serviceTelModal.open();
+    },
+    openWxDialog(){
+      if(this.multipleSelection.length != 1) {
+        return this.$platform.alert('请您先选择一个团队');
+      }
+      let item = this.multipleSelection[0];
+
+      this.serviceTelItemId = item.id;
+      this.$refs.serviceWxModal.open();
     },
     /** 复原搜索参数 */
     revertSearchParams() {

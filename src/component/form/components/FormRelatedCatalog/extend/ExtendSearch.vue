@@ -1,66 +1,71 @@
 <template>
   <el-select
     class="task-search"
-    :value="value"
+    :value="field.returnData?value[field.returnData]:value"
     @input="choose"
     filterable
     remote
     reserve-keyword
-    :placeholder="field.placeHolder?field.placeHolder:'请输入关键词搜索'"
-    :disabled="field.disabled?field.disabled:false"
+    :placeholder="field.placeHolder ? field.placeHolder : '请输入关键词搜索'"
+    :disabled="field.disabled ? field.disabled : false"
     clearable
     :loading="loading"
-    :remote-method="searchTask"
+    :remote-method="search"
   >
-    <el-option v-for="item in options" :key="item.taskNo" :label="item.taskNo" :value="item.taskNo"></el-option>
+    <el-option
+      v-for="item in options"
+      :key="item.id"
+      :label="item.pathName"
+      :value="item.id"
+    ></el-option>
   </el-select>
 </template>
 
 <script>
-import * as TaskApi from '@src/api/TaskApi';
-import FormMixin from "@src/component/form/mixin/form";
+import { searchAllcatalog } from '@src/api/ProductV2Api';
+import FormMixin from '@src/component/form/mixin/form';
 
 export default {
-  name: "task-search",
+  name: 'catalog-search',
   mixins: [FormMixin],
   props: {
     value: {
-      type: String,
-      default: ""
-    }
+      type: String | Number | Object,
+      default: '',
+    },
   },
   data() {
     return {
       loading: false,
-      options: []
+      options: [],
     };
   },
   created() {
     let options = sessionStorage.getItem(`${this.field.fieldName}_options`);
 
-    this.options = JSON.parse(options || "[]");
+    this.options = JSON.parse(options || '[]');
   },
   methods: {
     choose(newValue) {
       let oldValue = null;
-      this.$emit("update", { newValue, oldValue, field: this.field });
+      this.$emit('update', { newValue, oldValue, field: this.field });
     },
-    searchTask(keyword) {
+    search(keyword) {
       this.loading = true;
-      TaskApi.search({ keyword, pageNum: 1 })
-        .then(res => {
-          this.options = res.result.content;
+      searchAllcatalog({ keyWord:keyword, pageNum: 1 })
+        .then((res) => {
+          this.options = res.result.list;
           this.loading = false;
           sessionStorage.setItem(
             `${this.field.fieldName}_options`,
             JSON.stringify(this.options)
           );
         })
-        .catch(err =>
-          console.error("searchTaskManager function catch err", err)
+        .catch((err) =>
+          console.error('searchTaskManager function catch err', err)
         );
-    }
-  }
+    },
+  },
 };
 </script>
 

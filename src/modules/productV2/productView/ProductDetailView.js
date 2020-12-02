@@ -12,7 +12,7 @@ import PlanTable from '@src/modules/product/components/PlanTable.vue';
 import RemindTable from '@src/modules/product/components/RemindTable.vue';
 import InfoRecord from '@src/modules/product/components/InfoRecord.vue';
 import RemindDialog from '@src/modules/product/components/RemindDialog.vue';
-import BindCodeDialog from '@src/modules/product/components/BindCodeDialog.vue';
+import BindCodeDialog from '@src/modules/productV2/productView/components/BindCodeDialog.vue';
 import DownloadCodeDialog from '@src/modules/product/components/DownloadCodeDialog.vue';
 
 import EditContactDialog from '@src/modules/product/components/EditContactDialog.vue';
@@ -56,12 +56,16 @@ export default {
 
       dynamicProductFields: [], // 产品自定义字段
       leftActiveTab: 'product-view',
-      rightActiveTab: 'part',
+      rightActiveTab: 'info-record',
       collapseDirection: '',
       nowGuideStep: 5,
       guideSearchModelSave: false,
       guideDropdownMenu: false,
       isGuide: false,
+      popperOptions: {
+        boundariesElement: 'viewport',
+        removeOnDestroy: true
+      },
     }
   },
 
@@ -170,7 +174,7 @@ export default {
       },
       ];
 
-      if (this.initData.productConfig.qrcodeEnabled) {
+      if (this.initData?.productConfig?.qrcodeEnabled) {
         fixedFields.push({
           displayName: '二维码编号',
           fieldName: 'qrcodeId',
@@ -183,36 +187,36 @@ export default {
       return this.dynamicProductFields
         .concat(fixedFields)
         .map(f => {
-          // if (f.fieldName === 'name') {
-          //   f.orderId = -11;
-          // }
+          if (f.fieldName === 'name') {
+            f.orderId = -11;
+          }
 
-          // if (f.fieldName === 'serialNumber') {
-          //   f.orderId = -10;
-          // }
+          if (f.fieldName === 'serialNumber') {
+            f.orderId = -10;
+          }
 
-          // if (f.fieldName === 'type') {
-          //   f.orderId = -9;
-          // }
+          if (f.fieldName === 'type') {
+            f.orderId = -9;
+          }
 
-          // if (f.fieldName === 'customer') {
-          //   f.orderId = -8;
-          // }
+          if (f.fieldName === 'customer') {
+            f.orderId = -8;
+          }
 
-          // if (f.fieldName === 'linkman') {
-          //   f.orderId = -7;
-          //   f.show = true
-          // }
+          if (f.fieldName === 'linkman') {
+            f.orderId = -7;
+            f.show = true
+          }
 
-          // if (f.fieldName === 'linkmanPhone') {
-          //   f.orderId = -6;
-          //   f.show = true
-          // }
+          if (f.fieldName === 'linkmanPhone') {
+            f.orderId = -6;
+            f.show = true
+          }
 
-          // if (f.fieldName === 'address') {
-          //   f.orderId = -5;
-          //   f.show = true
-          // }
+          if (f.fieldName === 'address') {
+            f.orderId = -5;
+            f.show = true
+          }
 
           return f;
         })
@@ -409,9 +413,9 @@ export default {
         .then(res => {
           if (res.status) return this.$platform.notification({
             title: '失败',
-            message: (h => ( < div > {
+            message: (h => ( <div> {
               res.message || '发生未知错误'
-            } < /div>))(this.$createElement),
+            } </div>))(this.$createElement),
             type: 'error',
           });
 
@@ -473,12 +477,16 @@ export default {
         .catch(e => console.error('e', e));
     },
     editProduct(id) {
-      window.location.href = `/product/edit/${this.product.id}`
-      // window.location.href = `/customer/product/edit/${this.productId}`
+      window.location.href = `/customer/product/edit/${this.product.id}`
     },
     addProduct(id) {
-      window.location.href = '/product/create'
-      // window.location.href = `/customer/product/edit/${this.productId}`
+      this.$platform.openTab({
+        id: 'customer_product_create',
+        title: '新建产品',
+        url: '/customer/product/create',
+        reload: true,
+        close: true,
+      });
     },
     openRemindDialog(remind) {
       this.$refs.addRemindDialog.openDialog(remind);

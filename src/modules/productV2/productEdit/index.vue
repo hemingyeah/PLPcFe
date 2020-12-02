@@ -3,16 +3,22 @@
     <form @submit.prevent="submit" class="base-form" v-if="init" novalidate>
       <div class="page-title">
         <div class="title">
-          <button type="button" class="btn-text btn-back" @click="goBack"><i class="iconfont icon-arrow-left"></i> 返回</button>
+          <button type="button" class="btn-text btn-back" @click="goBack">
+            <i class="iconfont icon-arrow-left"></i> 返回
+          </button>
           <span class="text">|</span>
-          <button type="submit" :disabled="pending" class="btn btn-primary">提交</button>
+          <button type="submit" :disabled="pending" class="btn btn-primary">
+            提交
+          </button>
         </div>
       </div>
 
-
-
-      <product-edit-form :fields="productFields" v-model="form" :product-id="productId" ref="productEditForm">
-        
+      <product-edit-form
+        :fields="productFields"
+        v-model="form"
+        :product-id="productId"
+        ref="productEditForm"
+      >
       </product-edit-form>
     </form>
   </div>
@@ -38,9 +44,10 @@ import initData from '@src/modules/productV2/productEdit/initData.js'
 
 export default {
   name: 'product-edit',
-  provide:{
-    return(){
-      initData:initData
+  provide(){
+    return{
+      // initData
+      cloneProduct:this.cloneProduct
     }
   },
   // inject: ['initData'],
@@ -118,7 +125,7 @@ export default {
      * @param {*} origin 原始值
      * @param {*} target 待合并的值
      */
-    
+
     this.form = FormUtil.initialize(this.productFields, form)
 
     this.init = true;
@@ -138,7 +145,7 @@ export default {
                 params.address = {}
               } else if (!field.setting.customerOption.linkman){
                 params.linkman = {}
-              }  
+              }
             }
           });
           this.pending = true;
@@ -200,6 +207,34 @@ export default {
 
       this.$platform.refreshTab(fromId);
     },
+    async cloneProduct(id){
+      let form = {};
+      // 处理编辑时数据
+      this.loadingPage = true;
+      let res = await getProductDetail({id});
+
+      this.loadingPage = false;
+      if(res.id) form = res;
+      form = util.packToForm(this.productFields, form);
+
+      // 客户详情新建产品，会带的客户信息
+      if (this.customer) {
+        form.customer = [{
+          label: this.customer.name,
+          value: this.customer.id,
+          ...this.customer
+        }];
+      }
+
+      /**
+     * 初始化所有字段的初始值
+     * @param {*} fields 字段
+     * @param {*} origin 原始值
+     * @param {*} target 待合并的值
+     */
+
+      this.form = FormUtil.initialize(this.productFields, form)
+    }
   },
   components: {
     [ProductEditForm.name]: ProductEditForm,
@@ -239,27 +274,28 @@ body {
   }
 }
 
-.form-builder{
+.form-builder {
   width: 700px;
   padding: 10px 0 0 10px;
 
-  .input-and-btn{
+  .input-and-btn {
     display: flex !important;
     flex-flow: row nowrap;
 
-    .form-item, .form-text, .form-select, .biz-team-select {
+    .form-item,
+    .form-text,
+    .form-select,
+    .biz-team-select {
       flex: 1;
     }
 
-    .base-dist-picker{
+    .base-dist-picker {
       padding-right: 0;
     }
 
-    button{
+    button {
       margin-left: 10px;
     }
   }
 }
-
-
 </style>

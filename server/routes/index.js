@@ -222,12 +222,20 @@ router.use('/approve/search', (ctx) =>
   })
 );
 
-router.use('/api/customer/outside/pc/catalog', (ctx) =>
+router.use('/api/customer/outside/pc', (ctx) =>
   HttpClient.proxy(ctx, {
     host: '30.40.58.216',
     port: 10013,
   })
 );
+
+router.use('/api/customer/outside/es', (ctx) =>
+  HttpClient.proxy(ctx, {
+    host: '30.40.58.216',
+    port: 10006,
+  })
+);
+
 
 router.use('', performanceRouter.routes());
 router.use('', customerRouter.routes(), customerRouter.allowedMethods());

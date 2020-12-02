@@ -1,64 +1,50 @@
 <template>
   <div class="form-related-task">
-		<el-select
-			v-model="taskValue"
-			style="width: 100%"
-			multiple
-			filterable
-			remote
-			reserve-keyword
+    <el-select
+      v-model="comValue"
+      style="width: 100%"
+      multiple
+      filterable
+      remote
+      reserve-keyword
       default-first-option
-			popper-append-to-body
-			popper-class="option-item"
-			loading-text="载入更多结果......"
-			no-data-text="未找到结果"
+      popper-append-to-body
+      popper-class="option-item"
+      loading-text="载入更多结果......"
+      no-data-text="未找到结果"
       autocomplete="on"
-      value-key="taskId"
-			@change="updateTask"
-			:placeholder="placeholder"
-			:remote-method="searchTask"
-			:loading="loading">
-				<el-option
-					v-for="option in options"
-					:key="option.value"
-					:label="option.taskNo"
-					:value="option">
-						<h3 class="option-item-font">{{option.taskNo}}</h3>
-						<p class="option-item-font">
-							<span v-if="option.customer">
-								<label>客户姓名：</label>
-								<span>{{option.customer && option.customer.name}}</span>
-							</span>
-							<span v-if="option.linkMan">
-								<label>联系人：</label>
-								<span>{{option.linkMan && option.linkMan.name}}</span>
-							</span>
-							<span v-if="option.linkMan">
-								<label>电话：</label>
-								<span>{{option.linkMan && option.linkMan.phone}}</span>
-							</span>
-						</p>
-						<p v-if="option.products && option.products.length > 0" class="option-item-font">
-							<span>
-								<label>产品：</label>
-								<span v-for="(product, idx) in option.products" :key="idx">
-									{{option.products[idx].name}}{{(idx <option.products.length - 1) && ','}}
-								</span>
-							</span>
-						</p>
-				</el-option>
-		</el-select>
+      value-key="id"
+      @change="update"
+      :placeholder="placeholder"
+      :remote-method="search"
+      :loading="loading"
+    >
+      <el-option
+        v-for="option in options"
+        :key="option.value"
+        :label="option.taskNo"
+        :value="option"
+      >
+        <div class="related-task-option" slot="option" slot-scope="{ option }">
+          <div class="related-task-option-desc">
+            <p>
+              <span>{{ option.pathName }}</span>
+            </p>
+          </div>
+        </div>
+      </el-option>
+    </el-select>
   </div>
 </template>
 
 <script>
 /** api */
-import { search } from '@src/api/TaskApi.ts';
+import { searchAllcatalog } from '@src/api/ProductV2Api';
 
 /** mixin */
 import FormMixin from '@src/component/form/mixin/form';
 
-import _ from 'lodash'
+import _ from 'lodash';
 
 export default {
   name: 'form-related-catalog',
@@ -66,83 +52,90 @@ export default {
   props: {
     value: {
       type: Array,
-      default: () => []
-    }
+      default: () => [],
+    },
   },
   data() {
     return {
-      taskValue: [],
-			options: [],
+      comValue: [],
+      options: [],
       loading: false,
-      
+
       page: 1,
-      pageSize: 20
-    }
+      pageSize: 20,
+    };
   },
   watch: {
     value(val) {
       this.init(val);
-    }
+    },
   },
-	mounted() {
+  mounted() {
     this.init(this.value);
-	},
+  },
   methods: {
     init(val) {
-      if(val && val.length > 0) {
-        let taskValue = _.cloneDeep(val);
-        this.taskValue = taskValue.map(item => {
-          item.value = item.taskNo;
+      if (val && val.length > 0) {
+        let value = _.cloneDeep(val);
+        this.comValue = value.map((item) => {
+          item.value = item.id;
           return item;
         });
-        this.options = taskValue;
+        this.options = value;
       }
     },
-		searchTask(keyword = '') {
-			let params = {
+    search(keyword = '') {
+      let params = {
         page: this.page,
         pageSize: this.pageSize,
-				keyword
+        keyWord: keyword,
       };
-			this.loading = true;
-			search(params).then(res => {
-				if (!res || !res.result || !res.result.content) return;
-				if (res.result.content) {
-					this.options = res.result.content.map(task => Object.freeze({
-            value: task.id,
-            taskNo: task.taskNo,
-						taskId: task.id,
-						templateId: task.templateId,
-						linkMan: task.linkMan || {},
-						customer: task.customerEntity || {},
-						products: task.products || []
-          }));
-				}
-			})
-			.catch(e => console.error(e))
-			.finally(() => {
-				this.loading = false;
-			});
-		},
-		updateTask(newValue) {
-      this.inputForValue(newValue.map(item => {
-        return {
-          taskId: item.taskId,
-          taskNo: item.taskNo,
-          templateId: item.templateId
-        }
-      }));
-		}
+      this.loading = true;
+
+      searchAllcatalog(params)
+        .then((res) => {
+          if (!res || !res.result || !res.result.list) return;
+          this.options = res.result.list.map((item) =>
+            Object.freeze({
+              label: item.pathName,
+              ...item,
+            })
+          );
+
+          return res;
+        })
+        .catch((e) => console.error(e))
+        .finally(() => {
+          this.loading = false;
+        });
+      //   .then(res => {
+      // 	if (!res || !res.result || !res.result.content) return;
+      // 	if (res.result.content) {
+      // 		this.options = res.result.content.map(task => Object.freeze({
+      //       value: task.id,
+      //       taskNo: task.taskNo,
+      // 			taskId: task.id,
+      // 			templateId: task.templateId,
+      // 			linkMan: task.linkMan || {},
+      // 			customer: task.customerEntity || {},
+      // 			products: task.products || []
+      //     }));
+      // 	}
+      // })
+    },
+    update(newValue) {
+      this.inputForValue(newValue[0].id);
+    },
   },
-}
+};
 </script>
 
 <style lang="scss" scoped>
-.form-related-task{
+.form-related-task {
   width: 100%;
 }
 
-.el-select-dropdown__item{
+.el-select-dropdown__item {
   * {
     margin: 0;
   }
@@ -178,5 +171,4 @@ export default {
     }
   }
 }
-
 </style>
