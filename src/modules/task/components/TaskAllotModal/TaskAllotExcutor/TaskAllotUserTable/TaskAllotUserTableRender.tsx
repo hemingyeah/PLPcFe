@@ -108,13 +108,31 @@ class TaskAllotUserTableRender extends TaskAllotUserTableMethods {
   /**
    * @description 渲染选择团队
   */
-  public renderTeamSelect() {
+  public renderTeamSelect() {    
+    if (this.openTeamSelectCount < 1) {
+      return this.renderPlaceHolderTeamSelect()
+    }
+    
     return (
       <biz-team-select
         placeholder='服务团队'
         value={this.selectTeams} 
         fetchFunc={(params: TaskTagListSearchModel) => this.fetchTagList(params)} 
         onInput={(value: Tag[]) => this.handlerTeamChange(value)} 
+        multiple 
+        collapse 
+      />
+    )
+  }
+  
+  public renderPlaceHolderTeamSelect() {
+    return (
+      <biz-team-select
+        placeholder='服务团队'
+        value={[]} 
+        fetchFunc={(params: TaskTagListSearchModel) => this.fetchTagList(params)} 
+        onInput={(value: Tag[]) => this.handlerTeamChange(value)}
+        onOpen={() => ++this.openTeamSelectCount}
         multiple 
         collapse 
       />
