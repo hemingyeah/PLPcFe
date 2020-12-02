@@ -437,8 +437,9 @@ export default {
       const { manager } = this.baseRepertory;
       let isManage;
       if (manager) {
-       isManage = isArray(manager) ? manager : JSON.parse(manager)
-       .some((item) => {
+       isManage = Array.isArray(manager) ? manager : JSON.parse(manager)
+
+       isManage.some((item) => {
           return item.userId == this.userId;
         });
       }
