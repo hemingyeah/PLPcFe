@@ -77,6 +77,7 @@
       ref="bulkImport"
       :is-import-now="isImportNow"
       @success="importSucc"
+      @fail="importFail"
       :action="`/excels/multileve/menu/import?maxDeep=${maxDeep}`"
     >
       <div slot="tip">
@@ -145,6 +146,9 @@ export default {
       data.forEach(item=>{
         this.mergeTreeOption(this.source,item);
       })
+    },
+    importFail(error) {
+      this.$message.error(error);
     },
     mergeTreeOption(parent,item){
       // 递归合并树节点

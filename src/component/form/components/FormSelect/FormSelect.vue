@@ -22,25 +22,6 @@
         >
         </el-option>
       </el-select>
-      <!-- 单选 -->
-      <el-select
-        v-show="!isMulti"
-        :id="`form_${field.fieldName}`"
-        :placeholder="placeholder"
-        :clearable="clearable"
-        ref="elSelect"
-        filterable
-        :value="Array.isArray(value) ? '' : value"
-        @change="input"
-      >
-        <el-option
-          v-for="item in options"
-          :key="item.value"
-          :label="item.text"
-          :value="item.value"
-        >
-        </el-option>
-      </el-select>
     </template>
     <!-- end 下拉模式 -->
 

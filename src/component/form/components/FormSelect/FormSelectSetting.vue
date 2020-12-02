@@ -125,19 +125,19 @@ export default {
     allowLogical(){
       if(this.field.isMulti) return false;
 
-      let context = this.getContext();
-      let fields = context.value;
+      // let context = this.getContext();
+      // let fields = context.value;
 
-      let currIndex = fields.findIndex(f => f.fieldName == this.field.fieldName);
+      // let currIndex = fields.findIndex(f => f.fieldName == this.field.fieldName);
 
-      for(let i = fields.length - 1; i > currIndex; i--){
-        let field = fields[i];
-        if(field.isSystem == 0 && FORM_FIELD_LOGICAL_DISABLE.indexOf(field.formType) < 0){
-          return true;
-        }
-      }
+      // for(let i = fields.length - 1; i > currIndex; i--){
+      //   let field = fields[i];
+      //   if(field.isSystem == 0 && FORM_FIELD_LOGICAL_DISABLE.indexOf(field.formType) < 0){
+      //     return true;
+      //   }
+      // }
 
-      return false;
+      return true;
     },
     /** 该字段配置的逻辑显示项 */
     logical(){
