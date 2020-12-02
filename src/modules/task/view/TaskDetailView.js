@@ -78,8 +78,6 @@ export default {
       timeDialog: {
         visible: false
       },
-      // 转派弹框
-      transfer: false,
       receiptFields: [], // 自定义回执字段
       customerRelationTaskCountData: {}, // 客户关联工单数量
       hasCallCenterModule: localStorage.getItem("call_center_module") == 1,

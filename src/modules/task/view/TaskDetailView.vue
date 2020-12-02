@@ -68,7 +68,7 @@
             <el-button @click="openDialog('cancel')" :disabled="pending" size="mini" v-if="allowCancelTask">取消
             </el-button>
 
-            <el-button @click="transfer = true" :disabled="pending" size="mini" v-if="allowRedeployTask">转派</el-button>
+            <el-button @click="redeploy" :disabled="pending" size="mini" v-if="allowRedeployTask">转派</el-button>
             <el-button :class="{'once-printed': task.oncePrinted == 1}" @click="printTask" :disabled="pending" size="mini" v-if="allowPrintTask">打印</el-button>
 
             <!-- start 服务报告 -->
@@ -359,37 +359,6 @@
       </div>
     </base-modal>
     <!-- end 拒绝工单弹窗 -->
-
-    <!-- S 转派弹框 -->
-    <base-modal title="转派工单" :show.sync="transfer" width="700px">
-      <div class="base-modal-content">
-        <div class="task-detail-view-panel">
-          <div class="task-flex task-ai">
-            <span class="task-cef task-font16 task-detail-view-panel-icon">*</span><span>转派原因：</span>
-            <el-select v-model="checkBack" placeholder="请选择" class="task-w70">
-              <el-option
-                v-for="item in backList"
-                :key="item"
-                :label="item"
-                :value="item"
-              >
-              </el-option>
-            </el-select>
-            <span class="task-font12 task-c13 task-ml12">去配置原因</span>
-          </div>
-          <!--  -->
-          <div class="task-flex task-mt12">
-             <div class="task-font14">详细原因：</div>
-            <textarea v-model="refuseDialog.reason" placeholder="请输入转派说明[最多500字][必填]" rows="3" maxlength="500" />
-          </div>
-        </div>
-      </div>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="transfer = false">取 消</el-button>
-        <el-button type="primary" @click="redeploy" :disabled="pending">确 定</el-button>
-      </div>
-    </base-modal>
-    <!-- E 转派弹框 -->
 
     <!-- start 取消工单弹窗 -->
     <cancel-task-dialog ref="cancelTaskDialog" :task-id="task.id" @proposeApprove="proposeApprove" />
