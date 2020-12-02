@@ -349,9 +349,9 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
       userIds: users.map(user => user.userId)
     }
     
-    if (this.selectTeams.length > 0) {
-      params.tagIds = this.selectTeams.map(team => (team.id || ''))
-    }
+    // 团队数据
+    let teams: Tag[] = this.selectTeams.length > 0 ? this.selectTeams : this.visibleTeams
+    params.tagIds = teams.map(team => (team.id || ''))
     
     if (distance && isArray(distance)) {
       params.startDistance = String(distance[0])
@@ -852,7 +852,7 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
         tags = objectArrayIntersection<Tag, Tag>(customerTags, tagList)
       }
       
-      this.selectTeams = tags
+      this.visibleTeams = tags
       this.TaskAllotExcutorComponent.outsideSetCustomerTags(tags.slice())
       
     } catch (error) {

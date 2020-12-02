@@ -30,8 +30,6 @@ class TaskAllotUserTableData extends TaskAllotUserTableComponents {
   public lastClickedUserMarker: { marker: any, data: TaskAllotUserInfo | null } = { marker: null, data: null }
   /* 表格排序数据 */
   public orderDetail: { order: boolean, code: number } | {} = {}
-  /* 打开团队select的次数 */
-  public openTeamSelectCount: number = 0
   /* 等待状态 */
   public pending: boolean = false
   /* 当前选择的负责人 */
@@ -60,6 +58,8 @@ class TaskAllotUserTableData extends TaskAllotUserTableComponents {
   public userPageCheckedMap: {[x: number]: boolean} = {}
   /* 用户标记列表 */
   public userMarkers: any[] = []
+  /* 可见的团队列表 */
+  public visibleTeams: Tag[] = []
   /* 距离选项列表 */
   public locationOptions: ElSelectOption[] = [
     { label: '距离', value: AllotLocationEnum.All },
