@@ -66,7 +66,7 @@ function findBrothersComponents(context, componentName, exceptMe = true) {
 
 /* 判断类型 */
 function typeOf(obj) {
-  const toString = Object.prototype.toString;
+  const toString = Object.prototype.toString
   const map = {
     '[object Boolean]': 'boolean',
     '[object Number]': 'number',

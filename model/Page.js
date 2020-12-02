@@ -15,7 +15,7 @@
 export default class Page{
   constructor(data = {}){
     this.list = Array.isArray(data.list) ? data.list : [];// 结果集
-
+    
     this.hasPreviousPage = !!data.hasPreviousPage; // 是否有前一页
     this.hasNextPage = data.hasNextPage !== false;// 是否有下一页
 
@@ -59,7 +59,7 @@ export default class Page{
       this[name] = otherPage[name];
     }
   }
-
+  
   /**
    * 根据给定对象创建一个Page实例，该T实例包含原对象的值。
    * 原对象保持不变。
