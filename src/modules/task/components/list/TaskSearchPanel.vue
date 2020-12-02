@@ -886,7 +886,7 @@ export default {
             ...JSON.parse(searchField).checkSystemList,
             ...JSON.parse(searchField).checkCustomizeList,
           ].some((v) => {
-            return v === item.displayName;
+            return v === item.fieldName;
           });
           if (!bool) {
             return item;

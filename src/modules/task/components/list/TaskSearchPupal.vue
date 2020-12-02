@@ -21,7 +21,7 @@
       <!-- 系统字段 -->
       <el-checkbox :indeterminate="isIndeterminateSys" v-model="sysCheckAll" @change="handleCheckAllSysChange"><h3 class="task-mtb13">系统字段</h3></el-checkbox>
       <el-checkbox-group v-model="checkSystemList">
-        <el-checkbox :label="item.displayName" v-for="(item, index) in systemList" :key="index" class="wh150"></el-checkbox>
+        <el-checkbox :label="item.fieldName" v-for="(item, index) in systemList" :key="index" class="wh150">{{item.displayName}}</el-checkbox>
       </el-checkbox-group>
       <template v-if="guideSearchPupal">
         <guide-compoment
@@ -37,7 +37,7 @@
       <!-- 自定义字段 -->
       <el-checkbox :indeterminate="isIndeterminateCus" v-model="cusCheckAll" @change="handleCheckAllCusChange" v-if="customizeList.length"><h3 class="task-mtb13">自定义字段</h3></el-checkbox>
       <el-checkbox-group v-model="checkCustomizeList">
-        <el-checkbox :label="item.displayName" v-for="(item, index) in customizeList" :key="index" class="wh150" v-if="item.isSearch"></el-checkbox>
+        <el-checkbox :label="item.fieldName" v-for="(item, index) in customizeList" :key="index" class="wh150" v-if="item.isSearch">{{item.displayName}}</el-checkbox>
       </el-checkbox-group>
     </div>
     <div slot="footer" class="dialog-footer">
@@ -125,10 +125,10 @@ export default {
       }
     },
     handleCheckAllSysChange(v) {
-      this.checkSystemList = v ? this.systemList.map(item => {return item.displayName}) : []
+      this.checkSystemList = v ? this.systemList.map(item => {return item.fieldName}) : []
     },
     handleCheckAllCusChange(v) {
-      this.checkCustomizeList = v ? this.customizeList.map(item => {return item.displayName}) : []
+      this.checkCustomizeList = v ? this.customizeList.map(item => {return item.fieldName}) : []
     },
     loc() {
       const searchField = localStorage.getItem("task-search-field")
@@ -191,7 +191,7 @@ export default {
       let list = [];
       [...config, ...taskTypeFilterFields].forEach(item => {
         [...sySet, ...CuSet].forEach(v => {
-          if (v === item.displayName) {
+          if (v === item.fieldName) {
             list.push(item)
           } 
         })

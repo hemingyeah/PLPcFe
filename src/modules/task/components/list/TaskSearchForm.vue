@@ -81,7 +81,7 @@ export default {
         if (field.fieldName === "tags") {
           tv = [];
         }
-        if (field.formType === "area") {
+        if (field.formType === "area" || field.formType === "cascader") {
           tv = [];
         }
 

@@ -589,7 +589,7 @@ export default {
             if (success) {
               $platform.alert('删除成功');
               this.multipleSelection = []
-              this.getTaskCountByState(this.searchParams)
+              this.getTaskCountByState()
               this.initialize();
             }
           }
@@ -763,12 +763,6 @@ export default {
      * 保存视图
      */
     saveView() {
-      const {conditions,systemConditions} = this.$refs.viewPanel.buildTaskInquireParams()
-      if (!systemConditions.length && !conditions.length) {
-        this.$platform.alert("请您先设置查询条件");
-        return
-      }
-
       this.$refs.viewPanel.saveViewBtn(async (viewName) => {
         this.$refs.viewPanel.hide();
         this.getUserViews(viewName)
@@ -790,7 +784,6 @@ export default {
       this.searchParams = searchModel
       this.selectId = "all"
       this.searchParams_spare = searchModel
-      this.getTaskCountByState(searchModel);
       this.params = this.initParams(this.params.pageSize);
       this.search(searchModel);
       this.buildColumns();
@@ -993,9 +986,10 @@ export default {
      * @description 表头更改
      */
     headerDragend(newWidth, oldWidth, column, event) {
+      console.log(column)
       let data = this.columns
         .map((item) => {
-          if (item.displayName === column.label) {
+          if (item.fieldName === column.property) {
             item.width = column.width;
           }
           return item;
