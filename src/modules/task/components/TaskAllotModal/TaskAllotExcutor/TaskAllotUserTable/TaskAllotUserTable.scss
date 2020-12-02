@@ -232,6 +232,21 @@
   }
 }
 
+.task-allot-user-filter {
+  .base-user-select-tag,
+  .biz-team-select-tag,
+  .el-tag {
+    background-color: transparent;
+    color: $text-color-primary;
+  }
+  .base-user-select-tag {
+    margin-top: 4px;
+  }
+  .el-select__tags-text {
+    font-size: 13px;
+  }
+}
+
 .task-allot-user-table-column {
   i.iconfont {
     font-size: $font-size-larger !important;

@@ -341,7 +341,7 @@ const BizTeamSelect = {
       
       return (
         <button type="button" class="biz-team-select-clear" onClick={e => this.clear(e)} key="clear">
-          <i class="el-icon-error" style="color:rgba(211, 214, 217, 0.69);"></i>
+          <i class="el-tag__close el-icon-close"></i>
         </button>
       )
     },
@@ -350,7 +350,7 @@ const BizTeamSelect = {
       return (
         <div class="biz-team-select-tag" key={item.id}>
           <span class="biz-team-select-tag-text">{item.tagName || item.name}</span>
-          <i class="el-icon-error" style="color:rgba(211, 214, 217, 0.69);" onClick={e => this.remove(e, item)}></i>
+          <i class="el-tag__close el-icon-close" onClick={e => this.remove(e, item)}></i>
         </div>
       );
     },
@@ -366,7 +366,7 @@ const BizTeamSelect = {
       
       let collapseTags = (
         this.value.length > 1 && this.collapse
-          ? <div class="biz-team-select-tag">+{this.value.length - 1}</div>
+          ? <div class="biz-team-select-tag">+ {this.value.length - 1}</div>
           : null
       );
       
