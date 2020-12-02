@@ -1,6 +1,7 @@
 import http from '@src/util/http';
 import GrayUtil from '@src/util/gray';  
 
+
 /** 
  * 获取客户信息，用于客户编辑
  * @param {string} id - 客户id
@@ -178,4 +179,13 @@ export function getCustomerExeinsyn(params) {
 export function getCustomerList(params) {
   let customerPreFixedPath = GrayUtil.getCustomerApiPath();
   return http.post(`${customerPreFixedPath}/customer/list`, params);
+}
+
+/**
+* 客户表单字段列表
+* @param {Object} params - 参数
+* @param {String} params.isFromSetting - 是否用于设置页，是：true 否：false
+*/
+export function getCustomerFields(params) {
+  return http.get('/customer/getCustomerFields', params);
 }

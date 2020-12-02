@@ -24,6 +24,7 @@ import BaseCascader from './common/BaseCascader';
 import BaseSelectionBar from './common/BaseSelectionBar';
 import BaseServiceStar from './common/BaseServiceStar';
 import BaseCollapse from './common/BaseCollapse';
+import BaseCalculationFormula from './common/BaseCalculationFormula'
 
 
 // 可快速调用的组件
@@ -51,6 +52,8 @@ import BaseEditor from './common/BaseEditor'
 // 自定义组件
 import GuideCompoment from './guide'
 
+import LenovoSelect from './compomentV2/LenovoSelect'
+
 import Form from './form';
 
 const components = [
@@ -75,7 +78,7 @@ const components = [
   BaseButton,
   BaseSelect,
   BaseSteps,
-
+  
   BaseContextMenu,
   BaseTable,
   
@@ -98,8 +101,9 @@ const components = [
   BaseEditor,
   BaseServiceStar,
   BaseCollapse,
-
-  GuideCompoment
+  BaseCalculationFormula,
+  GuideCompoment,
+  LenovoSelect
 ];
 
 export default {

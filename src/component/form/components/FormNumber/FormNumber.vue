@@ -8,6 +8,7 @@
       :placeholder="placeholder" 
       :value="value"
       @input="input"
+      :disabled="disabled"
     >
   </div>
 </template>
@@ -29,7 +30,7 @@ export default {
     },
     nativeInputValue() {
       return this.value === null || this.value === undefined ? '' : String(this.value);
-    },
+    }
   },
   watch: {
     // native input value is set explicitly
@@ -95,6 +96,9 @@ export default {
   width: 100%;
   input{
     width: 100%;
+    &:disabled{
+      -webkit-text-fill-color: #b2b2b2;
+    }
   }
 }
 </style>

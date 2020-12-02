@@ -141,6 +141,11 @@ export default {
     departShow: {
       type: Boolean,
       default: true
+    },
+    // 是否显示离职人员
+    showDeleteUser: {
+      type: Boolean,
+      default: false
     }
   },
   data(){
@@ -339,6 +344,9 @@ export default {
           this.params.lng = this.lng;
         }
         this.params.seeAllOrg = this.isSeeAllOrg;
+
+        // 可显示离职人员
+        this.params.showDeleteUser = this.showDeleteUser ? 2 : 0;
         
         let userPage = await this.fetchUser(this.params);
         this.userPage.merge(Page.as(userPage));
@@ -368,6 +376,9 @@ export default {
           this.params.lng = this.lng;
         }
         this.params.seeAllOrg = this.isSeeAllOrg;
+
+        // 离职人员
+        this.params.showDeleteUser = (dept.id == 'root' && dept.name == '离职人员') ? 1 : 0;
 
         let userPage = await this.fetchUser(this.params);
 
@@ -455,6 +466,8 @@ export default {
     fetchDept(){
       let params = {};
       params.seeAllOrg = this.isSeeAllOrg;
+      params.showDeleteUser = this.showDeleteUser ? 1 : 0;
+
       return http.get('/security/department/tree', params).then(result => {
         if(result.status == 1) return [];
 

@@ -8,11 +8,16 @@
 }
 
 .form-design-panel {
-  width: 310px;
+  width: 335px;
   height: 100%;
-  padding: 0 10px;
   user-select: none;
   background-color: #fff;
+  border-radius: 4px;
+  .form-design-left{
+    padding: 0 12px;
+    overflow: auto;
+    height: 98%;
+  }
 }
 
 .form-design-tabs {
@@ -25,9 +30,12 @@
 }
 
 .form-design-tab {
-  padding: 10px;
+  padding: 12px 0 6px 0;
   flex: 1;
-  border-bottom: 1px solid #ddd;
+  font-size: 16px;
+  font-weight: 500;
+  color: #333333;
+  font-family: PingFangSC-Medium;
 }
 
 .form-design-tab-active{
@@ -47,52 +55,56 @@
 }
 
 .form-design-field {
-  position: relative;
-  width: 140px;
+  width: 148px;
   height: 32px;
   line-height: 24px;
-  padding: 3px 24px 3px 10px;
+  padding: 3px 24px 3px 12px;
   text-align: left;
-  border: 1px solid #ddd;
+  border: 1px solid #D8D8D8;
   font-size: 12px;
   transition: background-color ease .15s;
+  border-radius: 3px;
+  .anticon{
+    margin-right: 10px;
+
+  }
+
 
   &:hover {
-    background-color: #f0f0f0;
+    background-color:#F5F7FA;
   }
 
   i.iconfont {
-    position: absolute;
-    font-size: 18px;
-    top: 3px;
-    right: 0;
+    // position: absolute;
+    font-size: 16px;
+    margin-top: 3px;
     width: 24px;
     height: 24px;
-    text-align: center;
-    color: #666;
+    // text-align: center;
+    color: #666666;
   }
 }
 
 .form-design-main {
-  width: calc(100% - 630px);
+  width: calc(100% - 700px);
   min-width: 500px;
-  //height: 100%;
-  height: calc(100% - 53px);
-  padding: 10px 15px;
+  height: calc(100% - 20px);
+  margin: 0px 10px;
   border-top: none;
   border-bottom: none;
   user-select: none;
+  background: #fff;
+  border-radius: 4px;
   // overflow: auto;
 
   // 手机边框
   .form-design-center {
-    background: url('./../../assets/img/iphoneX.png') no-repeat center 0;
+    background: url('./../../assets/img/phone_icon.png') no-repeat center 0;
     background-size: 100% 100%;
   
     position: relative;
-    height: 560px;
-    width: 328px;
-  
+    height: 568px;
+    width: 320px;
     margin: 0 auto;
   
     .form-design-phone {
@@ -101,29 +113,51 @@
       left: 15px;
       right: 23px;
       bottom: 22px;
-  
       height: calc(100% - 80px);
       width: calc(100% - 31px);
-  
       border: 1px solid #edf0f4;
       border-top: none;
-      background-color: #fff;
+      background-color: #F2F2F2;
       box-shadow: none;
+      padding-bottom: 12px;
   
       &::-webkit-scrollbar-thumb {
         border-radius: 3px;
       }
   
     }
-  
+  }
+  .form-design-hidden{
+    font-size: 12px;
+    color: #13C2C2;
+    height: 40px;
+    text-align: right;
+    margin: 12px 12px 0 0;
+    cursor: pointer;
+    font-family: PingFangSC-Medium; 
+    display: flex;
+    justify-content: flex-end;
+    .iconfont{
+      font-size: 12px;
+      margin-right: 5px;
+    }
   }
 
 }
 
 .form-design-setting {
-  width: 320px;
+  min-width: 345px;
+  width: 345px;
   height: 100%;
   background-color: #fff;
+  // overflow: auto;
+  border-radius: 4px;
+}
+
+.form-setting-panel-title{
+  line-height: 27px;
+  font-size: 14px;
+  font-weight: bold
 }
 
 .form-design-notification-content{
@@ -146,20 +180,31 @@
 .form-setting-panel {
   height: 100%;
   overflow: auto;
-  padding: 8px 10px;
+  padding: 23px 12px;
 
   & > h3 {
     line-height: 24px;
     padding: 3px 0;
-    font-size: 16px;
-
-    border-bottom: 1px solid #ddd;
+    font-size: 14px;
     margin: 0 0 8px 0;
+  }
+
+  .icon-question {
+    font-size: $font-size-small;
+    color: $text-color-secondary;
+    font-weight: normal;
+  }
+  .form-date-type{
+    margin-top: 8px;
   }
 }
 
 .form-setting-group {
-  margin-bottom: 10px;
+  margin-bottom: 24px;
+
+  &-small {
+    margin-bottom: 12px;
+  }
 
   input[type='text'],
   textarea {
@@ -167,7 +212,7 @@
   }
 
   label {
-    margin: 5px 5px 0 0;
+    margin: 8px 5px 0 0;
     vertical-align: middle;
     cursor: pointer;
   }
@@ -179,6 +224,42 @@
   textarea {
     display: block;
   }
+
+  &.form-setting-item {
+    .form-item-title {
+      margin-bottom: 0px;
+      font-family: PingFangSC-Medium;
+    }
+  
+    label.el-checkbox {
+      margin-top: 8px;
+    }
+  }
+}
+ 
+.form-common-setting {
+  &-panel {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  &-title {
+    &-name {
+      margin-right: 4px;
+      font-family: PingFangSC-Medium;
+    }
+
+    &-remind,
+    .iconfont {
+      font-size: $font-size-small;
+      color: $text-color-secondary;
+      font-weight: normal;
+    }
+
+    .iconfont {
+      margin-right: 4px;
+    }
+  } 
 }
 
 // ------------ preview ------------
@@ -186,13 +267,14 @@
   display: flex;
   flex-flow: row nowrap;
   overflow: hidden;
-  padding: 10px;
+  padding: 14px 10px;
+  background-color: #fff;
 
   label {
     display: block;
     margin: 0;
     width: 110px;
-    line-height: 32px;
+    line-height: 20px;
 
     @include text-ellipsis();
   }
@@ -202,16 +284,17 @@
   flex: 1;
   overflow: hidden;
   pointer-events: none;
+  text-align: right;
 }
 
 .form-preview-control {
   width: 100%;
   border-radius: 4px;
   padding: 0 5px;
-  border: 1px solid #ddd;
-  line-height: 30px;
-  height: 32px;
+  line-height: 20px;
+  height: 20px;
   color: #9a9a9a;
+  text-align: right;
   margin: 0;
   @include text-ellipsis();
 }
@@ -225,8 +308,8 @@
     right: 0;
     top: 0;
     width: 20px;
-    height: 32px;
-    line-height: 30px;
+    height: 20px;
+    line-height: 20px;
     font-size: 18px;
   }
 }
@@ -236,7 +319,7 @@
 }
 
 // ------------ design ------------
-.form-design-list {
+.form-design-phone {
   position: relative;
   box-shadow: 0 0 8px rgba(0, 0, 0, .15);
   width: 100%;
@@ -247,7 +330,7 @@
   margin: 0 auto;
   overflow: auto;
   border-radius: 1px;
-  background-color: #fff;
+  background-color: #F2F2F2;;
 }
 
 .form-design-tip {
@@ -273,7 +356,7 @@
     border-color: transparent !important;
   }
 
-  .form-design-preview-delete {
+  .form-design-operation {
     display: none !important;
   }
 }
@@ -295,17 +378,19 @@
 .form-design-preview {
   position: relative;
   border: 1px dashed transparent;
+  margin-top: 8px;
 
   &.form-design-selected {
     border-style: solid;
     border-color: $color-primary;
+    box-sizing: border-box;
   }
 
   &:hover {
     border-color: $color-primary;
 
-    .form-design-preview-delete {
-      display: block;
+    .form-design-operation {
+      visibility: initial;
     }
   }
 }
@@ -315,27 +400,56 @@
   border-style: solid !important;
   opacity: .65;
 }
-
-.form-design-preview-delete {
+.form-design-operation{
+  display: flex;
+  justify-content: flex-start;
   position: absolute;
-  display: none;
-  top: -1px;
+  padding: 0px 8px;
+  top: -9px;
   right: -1px;
+  height: 22px;
+  line-height: 22px;
+  background: #E5E5E5;
+  border-radius: 9px;
+  visibility: hidden;
+}
+.form-design-divider-separator{
+  width: 1px;
+  height: .9em;
+  margin: 5px 6px 0 6px;
+  vertical-align: middle;
+  background-color: #D9D9D9;
+}
+
+.form-design-preview-btn {
+  text-align: center;
   border: none;
-  background-color: $color-primary;
-  color: #fff;
+  color: #999999;
   outline: none;
-  width: 26px;
-  height: 26px;
+  height: 22px;
   padding: 0;
   margin: 0;
   z-index: 9;
   cursor: pointer;
+  &:hover {
+   color: $color-danger;
+  }
 
   i {
     font-size: 14px;
   }
 }
+.form-design-preview-delete{
+  &:hover {
+    color: $color-danger;
+  }
+}
+.form-design-preview-hidden{
+  &:hover {
+    color: $color-primary;
+  }
+}
+
 
 .form-design-cover {
   position: absolute;
@@ -410,8 +524,8 @@
     right: 10px;
     height: 30px;
     line-height: 30px;
-    font-size: 12px;
-    color: $text-color-regular;
+    font-size: 14px;
+    color: $color-primary;
     
     &:hover {
       color: $color-primary;
@@ -447,7 +561,7 @@
 
 // 电子签名、客户签名
 .form-view-autograph-content {
-  width: 300px;
+  max-width: 300px;
   height: 100px;
   border: 1px dashed #aaa;
 
@@ -477,7 +591,6 @@
   background-color: #fdf6ec;
   color: #e6a23c;
   padding: 10px;
-  margin-bottom: 5px;
 }
 
 .form-item__text{
@@ -488,7 +601,14 @@
 
 // 手机壳样式调整
 .form-design {
-  background-color: #fff;
+  // background-color: #fff;
   min-height: 600px;
   min-width: 800px;
+}
+.base-hidden-modal{
+  .base-modal-body {
+    margin: 23px auto;
+    width: 350px;
+  
+  }
 }

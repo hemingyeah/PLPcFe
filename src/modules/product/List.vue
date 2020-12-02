@@ -114,8 +114,11 @@
               {{scope.row | formatTags}}
             </template>
             <!-- 自定义的选择类型字段显示， 与type 区别-->
+            <template v-else-if="column.formType === 'cascader'">
+              {{ scope.row[column.field] | displaySelect }}
+            </template>
             <template v-else-if="column.formType === 'select' && !column.isSystem">
-              {{scope.row.attribute[column.field] | displaySelect}}
+              {{scope.row.attribute[column.field] | displaySelect}} 
             </template>
             <template v-else-if="column.field === 'updateTime'">
               <template v-if="scope.row.latesetUpdateRecord">
@@ -135,10 +138,13 @@
               {{formatCustomizeAddress(scope.row.attribute[column.field])}}
             </template>
             <template v-else-if="column.formType === 'user' && scope.row.attribute[column.field]">
-              {{scope.row.attribute[column.field].displayName || scope.row.attribute[column.field].name}}
+              {{ getUserName(column, scope.row.attribute[column.field]) }}
             </template>
             <template v-else-if="column.formType === 'location'">
               {{ scope.row.attribute[column.field] && scope.row.attribute[column.field].address}}
+            </template>
+            <template v-else-if="column.formType == 'related_task'">
+              {{ getRelatedTask(scope.row.attribute[column.field]) }}
             </template>
             <template v-else-if="column.field === 'createUser'">
               {{ scope.row.createUser && scope.row.createUser.displayName }}
@@ -295,6 +301,7 @@ import BatchUpdateDialog from './components/BatchUpdateDialog.vue';
 import SearchPanel from './components/SearchPanel.vue';
 
 import {
+  getProductFields,
   getProduct,
   deleteProductByIds,
   getUpdateRecord,
@@ -333,6 +340,7 @@ export default {
         },
       },
 
+      dynamicFields: [],
       filterTeams: [],
       tableKey: Math.random() * 1000 >> 2,
     }
@@ -412,7 +420,7 @@ export default {
           orderId: 10001
         })
       }
-      let field = this.initData.productFields.filter(item => item.formType == 'customer')[0]
+      let field = this.dynamicFields.filter(item => item.formType == 'customer')[0]
       if(field && field.setting.customerOption?.linkman) {
         fixedFields.push({
           displayName: '联系人',
@@ -440,9 +448,8 @@ export default {
         })
       }
 
-      return (this.initData.productFields || [])
-        .concat(fixedFields)
-        .filter(f => f.formType !== 'separator' && f.formType !== 'info')
+      return this.dynamicFields.concat(fixedFields)
+        .filter(f => f.formType !== 'separator' && f.formType !== 'info' && f.formType !== 'autograph')
         .map(f => {
 
           // 调整字段顺序
@@ -582,9 +589,18 @@ export default {
     },
 
   },
-  mounted() {
-    this.revertStorage();
+  async mounted() {
     this.buildColumns();
+
+    // 获取产品动态字段
+    try {
+      let res = await getProductFields({isFromSetting:false});
+      this.dynamicFields = res.data || [];
+      this.buildColumns();
+    } catch (error) {
+      console.error('product-list fetch product fields error',error);
+    }
+    this.revertStorage();
     this.search();
 
     if(!this.viewedPermission) {
@@ -594,7 +610,7 @@ export default {
     // [tab_spec]标准化刷新方式
     window.__exports__refresh = this.search;
 
-    this.$eventBus.$on('product_list.update_product_list_remind_count', this.updateProductRemindCount)
+    this.$eventBus.$on('product_list.update_product_list_remind_count', this.updateProductRemindCount) 
   },
   beforeDestroy() {
     this.$eventBus.$off('product_list.update_product_list_remind_count', this.updateProductRemindCount)
@@ -602,6 +618,19 @@ export default {
   methods: {
     getAddress(field) {
       return field.province + field.city + field.dist + field.address || ''
+    },
+    getRelatedTask(field) {
+      return Array.isArray(field) ? field.map(item => item.taskNo).join(',') : '';
+    },
+    // 处理人员显示
+    getUserName(field, value) {
+      // 多选
+      if(Array.isArray(value)) {
+        return value.map(i => i.displayName || i.name).join(',');
+      }
+      
+      let user = value || {};
+      return user.displayName || user.name;
     },
     openOutsideLink(e) {
       let url = e.target.getAttribute('url');
@@ -910,7 +939,7 @@ export default {
         .reduce((acc, col) => (acc[col.field] = col) && acc, {});
 
       this.columns = this.productFields
-        .filter(f => f.formType !== 'attachment' && f.formType !== 'separator' && f.formType !== 'info')
+        .filter(f => f.formType !== 'attachment' && f.formType !== 'separator' && f.formType !== 'info' && f.formType !== 'autograph')
         .map(field => {
           let sortable = false;
           let minWidth = null;

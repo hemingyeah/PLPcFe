@@ -1,0 +1,117 @@
+.calculation-formula-modal {
+  
+  .base-modal-body {    
+    padding: 20px;
+  }
+  
+  .calculation-formula-operators,
+  .calculation-formula-content,
+  .calculation-formula-fields {
+    margin-top: 20px;
+    color: $text-color-regular;
+    
+    span {
+      border: 1px solid $color-border-l2;
+      border-radius: $border-radius-base;
+      cursor: pointer;
+      
+      display: inline-block;
+      margin-left: 10px;
+      padding: 1px 8px;
+      
+      text-align: center;
+      font-size: $font-size-small;
+      user-select: none;
+
+      &:not(.operator) {
+        min-width: 30px;
+      }
+    }
+  }
+
+  .calculation-formula-operators,
+  .calculation-formula-fields {
+    span:hover {
+      background-color: $bg-color-l3;
+    }
+
+    .icon-question {
+      margin-right: 4px;
+    }
+  }
+
+  .calculation-formula-operators {
+    padding-left: 16px;
+  }
+  
+  .calculation-formula-block {
+    border: 1px solid $color-border-l2;
+    border-radius: $button-radius-base;
+    
+    padding: 12px;
+    margin-top: 10px;
+
+    .calculation-formula-content {
+      display: flex;
+      align-items: flex-start;
+      margin-top: 0px;
+
+      .calculation-formula-title {
+        min-width: 58px;
+      }
+
+      span {
+        margin: 0 0 6px 6px;
+
+        &.operator {
+          border-color: #fff;
+          padding: 0px;
+        }
+
+        &:not(.operator) {
+          background-color: $bg-color-l3;
+        }
+      }
+    }
+
+    .calculation-formula-action {
+      padding-top: 12px;
+      text-align: right;
+
+      .formula-clear-btn {
+        font-size: $font-size-small;
+        color: $color-danger;
+        margin-left: 6px;
+      }
+
+      .iconfont {
+        font-size: $font-size-large;
+        color: $text-color-regular;
+        
+        position: relative;
+        top: 1px;
+      }
+
+      .formula-clear-btn,
+      .formula-remove-btn {
+        cursor: pointer;
+        user-select: none;
+      }
+    }
+    
+    .error {
+      border: 1px solid $color-danger;
+    }
+  }
+
+  .calculation-formula-error {
+    margin-top: 8px;
+    color: $color-danger;
+    font-size: $font-size-small;
+  }
+
+  .base-modal-footer {
+    text-align: right;
+  }
+
+}

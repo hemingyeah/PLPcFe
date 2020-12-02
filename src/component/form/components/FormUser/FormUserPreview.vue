@@ -8,7 +8,7 @@
     <div class="form-preview-mock">
       <p class="form-preview-control form-preview-withIcon">
         {{field.placeHolder}}
-        <i class="iconfont icon-fd-user"></i>
+        <i class="iconfont icon-fdn-user"></i>
       </p>
     </div>
   </div>

@@ -1,5 +1,5 @@
 <template>
-  <transition name="slide-left" @after-leave="$emit('closed')">
+  <transition-group tag="div" name="slide-left" @after-leave="$emit('closed')">
     <template v-if="diyTransfer">
       <slot name="diyTransferCon" v-if="show">
       
@@ -7,7 +7,7 @@
     </template>
     <template v-else>
       <!-- <div v-show="show" class="base-panel-mask" @click.self="close"> -->
-      <aside v-if="show && !re" class="base-panel" :style="{width: width}" @click.stop>
+      <aside v-if="show && !re" key="aside1" class="base-panel" :style="{width: width}" @click.stop>
         <slot name="header">
           <header class="base-panel-title">
             <slot name="title">
@@ -23,7 +23,7 @@
 
         <slot name="footer"></slot>
       </aside>
-      <aside v-show="show && re" class="base-panel" :style="{width: width}" @click.stop>
+      <aside v-show="show && re" key="aside2" class="base-panel" :style="{width: width}" @click.stop>
         <slot name="header">
           <header class="base-panel-title">
             <slot name="title">
@@ -42,7 +42,7 @@
     </template>
 
     <!-- </div> -->
-  </transition>
+  </transition-group>
 </template>
 
 <script>

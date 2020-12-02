@@ -19,6 +19,7 @@
 <script>
 
 import {
+  getProductFields,
   getProductDetail,
   createProduct,
   updateProduct
@@ -39,6 +40,8 @@ export default {
       init: false,
       submitting: false,
       form: {},
+
+      dynamicProductFields: []
     }
   },
   computed: {
@@ -50,7 +53,7 @@ export default {
           formType: 'select',
           isSystem: 1
         },
-        ...this.initData.productFields
+        ...this.dynamicProductFields
       ]
     },
     auth() {
@@ -70,40 +73,44 @@ export default {
   },
   async mounted() {
     try {
-      // 初始化默认值
-      let form = {};
-      if (this.action === 'edit') {
-        // 处理编辑时数据
-        this.loadingPage = true;
-        let res = await getProductDetail({id: this.productId});
-
-        this.loadingPage = false;
-        if(res.id) form = res;
-      }
-      form = util.packToForm(this.productFields, form);
-
-      // 客户详情新建产品，会带的客户信息
-      if (this.customer) {
-        form.customer = [{
-          label: this.customer.name,
-          value: this.customer.id,
-          ...this.customer
-        }];
-      }
-
-      /**
-       * 初始化所有字段的初始值
-       * @param {*} fields 字段
-       * @param {*} origin 原始值
-       * @param {*} target 待合并的值
-       */
-      
-      this.form = FormUtil.initialize(this.productFields, form)
-
-      this.init = true;
+      // 获取产品自定义字段
+      let res = await getProductFields({isFromSetting: true});
+      this.dynamicProductFields = res.data || [];
     } catch (e) {
-      console.error('CustomerEditView caught an error ', e);
+      console.error('product-add_edit fetch product fields error', e);
     }
+
+    // 初始化默认值
+    let form = {};
+    if (this.action === 'edit') {
+      // 处理编辑时数据
+      this.loadingPage = true;
+      let res = await getProductDetail({id: this.productId});
+
+      this.loadingPage = false;
+      if(res.id) form = res;
+    }
+    form = util.packToForm(this.productFields, form);
+
+    // 客户详情新建产品，会带的客户信息
+    if (this.customer) {
+      form.customer = [{
+        label: this.customer.name,
+        value: this.customer.id,
+        ...this.customer
+      }];
+    }
+
+    /**
+     * 初始化所有字段的初始值
+     * @param {*} fields 字段
+     * @param {*} origin 原始值
+     * @param {*} target 待合并的值
+     */
+    
+    this.form = FormUtil.initialize(this.productFields, form)
+
+    this.init = true;
   },
 
   methods: {

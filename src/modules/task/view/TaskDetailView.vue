@@ -247,9 +247,6 @@
             <el-tab-pane label="审核结算" name="balance-tab" v-if="viewBalanceTab">
               <task-account ref="taskAccount" :share-data="propsForSubComponents" @back="openDialog('back')" @proposeApprove="proposeApprove" />
             </el-tab-pane>
-            <el-tab-pane label="客户评价" name="feedback-tab" v-if="viewFeedbackTab">
-              <task-feedback ref="taskFeedback" :share-data="propsForSubComponents" @proposeApprove="proposeApprove" />
-            </el-tab-pane>
             <el-tab-pane label="附加组件" name="card-tab" v-if="viewTaskCardTab">
               <task-detail-card :share-data="propsForSubComponents" />
             </el-tab-pane>

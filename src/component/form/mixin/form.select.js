@@ -41,12 +41,19 @@ const FORM_SELECT = {
       this.$emit('input', {value: this.options, prop: 'options'})
       this.$emit('input', {value: option.value, prop: 'defaultValue'});
     },
+    //下拉多级菜单
+    showMultiBatchModal(option,index){
+      this.optionText = option.children.map(item => item.value).join('\n');
+      this.batchModalShow = true;
+      this.errMessage = null;
+      this.currentLevel = index;
+    },
     showBatchModal(){
       this.optionText = this.field.options.map(item => item.value).join('\n');
       this.batchModalShow = true;
       this.errMessage = null;
     },
-    update(value, prop){
+    update(value, prop, isSetting = false){
       if(prop == 'isMulti') {
         // 如果是多选，清空默认值
         this.options.forEach(item => item.isDefault = false);
@@ -54,7 +61,7 @@ const FORM_SELECT = {
         this.$emit('input', {value: null, prop: 'defaultValue'});
       }
 
-      this.$emit('input', {value, prop})
+      this.$emit('input', {value, prop, isSetting})
     },
     updateForDom(event){
       let el = event.target;

@@ -141,6 +141,7 @@
 <script>
 
 import {
+  getProductFields,
   getProductDetail,
   deleteProductByIds,
   unbindQrcode,
@@ -189,15 +190,17 @@ export default {
       newestProduct: null,
       tabs: [],
       statisticalData: {}, // tab统计数据
+
+      dynamicProductFields: [] // 产品自定义字段
     }
   },
   computed: {
     hasLinkman () {
-      let field = this.initData.productFields.filter(item => item.formType == 'customer')[0];
+      let field = this.dynamicProductFields.filter(item => item.formType == 'customer')[0];
       return field && field.setting.customerOption?.linkman;
     },
     hasAddress () {
-      let field = this.initData.productFields.filter(item => item.formType == 'customer')[0];
+      let field = this.dynamicProductFields.filter(item => item.formType == 'customer')[0];
       return field && field.setting.customerOption?.address;
     },
     product() {
@@ -299,7 +302,7 @@ export default {
         })
       }
 
-      return this.initData.productFields
+      return this.dynamicProductFields
         .concat(fixedFields)
         .map(f => {
           // if (f.fieldName === 'name') {
@@ -466,7 +469,14 @@ export default {
       return isShowPlanTask()
     }
   },
-  mounted() {
+  async mounted() {
+    try {
+      // 获取产品自定义字段
+      let res = await getProductFields({isFromSetting: false});
+      this.dynamicProductFields = res.data || [];
+    } catch (error) {
+      console.error('product-view fetch product fields error', error);
+    }
     this.updateProductNameStyle();
     this.createCode();
     this.fetchStatisticalData();

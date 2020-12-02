@@ -135,9 +135,6 @@ export default {
 .font-16 {
   font-size: 16px;
 }
-.font-w-600 {
-  font-weight: 500;
-}
 .al-c {
   align-items: center !important;
 }

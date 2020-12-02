@@ -63,39 +63,78 @@ const BizSelectColumn = {
      * 目前是按照 templateId 工单类型id 分组的
     */
     columnsDataGrouped(columns = []) {
+      
+
       // 系统字段组
       let systemFieldsGroup = []
       // 自定义字段组
       let attributeFieldsGroup = {}
+      // 产品系统字段组
+      let productSystemFieldsGroup = []
+      // 产品自定义字段组
+      let productAttributeFieldsGroup = []
+      // 产品目录系统字段组
+      let catalogSystemFieldsGroup = []
+      // 产品目录自定义字段组
+      let catalogAttributeFieldsGroup = []
       // 字段树🌲
       let columnsTree = {
         system: { name: '系统字段', columns: systemFieldsGroup, checked: false, root: true, toggle: true },
-        attribute: { name: '自定义字段', columns: attributeFieldsGroup, checked: false, root: true, toggle: true}
+        attribute: { name: '自定义字段', columns: attributeFieldsGroup, checked: false, root: true, toggle: true},
+        productSystem: { name: '产品系统字段', columns: productSystemFieldsGroup, checked: false, root: true, toggle: true },
+        productAttribute: { name: '产品自定义字段', columns: productAttributeFieldsGroup, checked: false, root: true, toggle: true},
+        catalogSystem: { name: '产品目录系统字段', columns: catalogSystemFieldsGroup, checked: false, root: true, toggle: true },
+        catalogAttribute: { name: '产品目录自定义字段', columns: catalogAttributeFieldsGroup, checked: false, root: true, toggle: true},
+        
       }
       
-
+     
       columns.forEach(column => {
         if (!column) return false
         
         // 是否是系统字段
         let isSystemFiled = !(column?.templateId)
+        let isProductTable = column && column.tableName == 'product';
+        let isCatalogTable = column && column.tableName == 'catalog';
+        let productObj = {
 
-        if (isSystemFiled) {
-          systemFieldsGroup.push(column)
-        } else {
-          // 按工单类型分组 ( 工单类型是不可以重名的，所以可以用 工单类型名字 为 key )
-          let { templateName, templateId } = column
-          templateName = this.getTemplateName(templateId) || templateName
-          // 判断是否 自定义字段组存在 此类型数据
-          if (!attributeFieldsGroup[templateId]) {
-            attributeFieldsGroup[templateId] = { name: templateName, columns: [] }
-          }
+        }
+        let catalogObj = {
           
-          column.templateName = templateName
-          attributeFieldsGroup[templateId].columns.push(column)
+        }
+        if(isProductTable || isCatalogTable){
+          isSystemFiled = column?.isSystem
+          let system = isProductTable ? productSystemFieldsGroup : catalogSystemFieldsGroup;
+          let attribute = isProductTable ? productAttributeFieldsGroup : catalogAttributeFieldsGroup;
+          if (isSystemFiled) {
+            system.push(column)
+          } else {
+
+            attribute.push(column)
+          }
+        }else{
+          console.log('erro', column)
+          if (isSystemFiled) {
+            systemFieldsGroup.push(column)
+          } else {
+            // 按工单类型分组 ( 工单类型是不可以重名的，所以可以用 工单类型名字 为 key )
+            let { templateName, templateId } = column
+            templateName = this.getTemplateName(templateId) || templateName
+            // 判断是否 自定义字段组存在 此类型数据
+            if (!attributeFieldsGroup[templateId]) {
+              attributeFieldsGroup[templateId] = { name: templateName, columns: [] }
+            }
+            
+            column.templateName = templateName
+            attributeFieldsGroup[templateId].columns.push(column)
+          }
         }
 
+        
+
       })
+
+      
 
       if (Object.keys(columnsTree.attribute.columns).length == 0) {
         delete columnsTree.attribute
@@ -103,6 +142,10 @@ const BizSelectColumn = {
 
       // 初始化选中
       for(let key in columnsTree) {
+        if(Object.keys(columnsTree[key].columns).length == 0){
+          delete columnsTree[key]
+          continue
+        }
         this.toggleTreeChecked(columnsTree[key])
       }
       

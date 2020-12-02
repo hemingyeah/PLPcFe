@@ -1,6 +1,8 @@
 <template>
   <div class="form-setting-panel">
-    <h3>系统字段 -- {{field.displayName}}</h3>
+    <!-- start 标题 -->
+    <h3 class="form-setting-panel-title">{{field.displayName}}</h3>   
+    <!-- end 标题 -->
     <p class="form-design-warning">该字段为系统内置字段，暂不支持修改、删除。</p>
     <div class="form-setting-group">
       <el-checkbox :value="field.setting.autoSerialNumber" @input="update($event, 'autoSerialNumber', true)">启用客户自动编号</el-checkbox>

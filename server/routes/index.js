@@ -31,6 +31,7 @@ const taskRouter = require("./task");
 const sparePartRouter = require("./sparePart");
 
 const linkcRouter = require("./linkc")
+const productV2Router = require("./productV2")
 
 router.get("/", async (ctx) => {
   let modConfig = modules["system.frame"];
@@ -228,6 +229,19 @@ router.use("/approve/search", (ctx) =>
   HttpClient.proxy(ctx, {
     host: "47.98.255.79",
     port: 10002,
+  })
+);
+router.use("/api/customer/outside/pc", (ctx) =>
+  HttpClient.proxy(ctx, {
+    host: "30.40.58.216",
+    port: 10013,
+  })
+);
+
+router.use("/api/customer/outside/es", (ctx) =>
+  HttpClient.proxy(ctx, {
+    host: "30.40.58.216",
+    port: 10006,
   })
 );
 

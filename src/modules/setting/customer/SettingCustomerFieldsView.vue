@@ -1,12 +1,12 @@
 <template>
-  <div class="setting-customer">
+  <div class="setting-customer" v-loading="loading">
     <div class="setting-customer-header">
       <div>
         <button type="button" class="btn btn-text setting-back-btn" @click="back"><i class="iconfont icon-arrow-left"></i> 返回</button>
         <span class="setting-header-text">|</span>
-        <button type="button" class="btn btn-primary" @click="submit" :disabled="pending">保存</button>
+        <span>配置自定义字段</span>
       </div>
-
+      <base-button type="primary" native-type="submit" :disabled="pending"  @event="submit">保存</base-button>
     </div>
     <div class="setting-customer-design">
       <form-design v-model="fields" :max="maxField" mode="customer"></form-design>
@@ -18,6 +18,7 @@
 import * as FormUtil from '@src/component/form/util';
 import http from '@src/util/http';
 import platform from '@src/platform';
+import { getCustomerFields } from '@src/api/CustomerApi';
 /* mixin */
 import fieldMixin from '@src/mixins/fieldMixin';
 import FormDesignMixin from '@src/mixins/formDesign';
@@ -32,11 +33,9 @@ export default {
     }
   },
   data(){
-    let fields = this.initData.fields || [];
-    let sortedFields = fields.sort((a, b) => a.orderId - b.orderId);
-
     return {
-      fields: FormUtil.toFormField(sortedFields),
+      loading: true,
+      fields: [],
       pending: false,
       maxField: this.initData.fieldNum
     }
@@ -46,6 +45,7 @@ export default {
 
     // this.computedFormWidthAndHeight('setting-customer');
     // window.addEventListener('resize', this.resizeHandler);
+    this.getFieldsInfoReq();
   },
   beforeDestroy() {
     window.removeEventListener('resize', this.resizeHandler);
@@ -67,7 +67,7 @@ export default {
 
         let message = FormUtil.validate(fields);
         if(!FormUtil.notification(message, this.$createElement)) return;
-
+        
         this.pending = true;
         let result = await http.post('/setting/customer/saveFields', fields);
         if(result.status == 0){
@@ -89,6 +89,21 @@ export default {
       }
       
       this.pending = false;
+    },
+    //获取客户表单属性列表
+    getFieldsInfoReq() {
+      getCustomerFields({isFromSetting:true}).then((res)=>{
+        const { status, data, message } = res;
+        if(status == 0){
+          const fields = data || [];
+          const sortedFields = fields.sort((a, b) => a.orderId - b.orderId);
+          this.fields = FormUtil.toFormField(sortedFields);
+        }
+      
+        this.loading = false;
+      }).catch(error=>{
+        this.loading = false;
+      });
     }
   }
 }
@@ -99,13 +114,10 @@ html,body{
   height: 100%;
 }
 
-body{
-  padding: 10px;
-}
-
 .setting-customer{
   height: 100%;
-  background-color: #fff;
+  overflow-y: hidden;
+  background: #F5F5F5;
 }
 
 .setting-header-text{
@@ -123,6 +135,7 @@ body{
 }
 
 .setting-customer-design{
+  margin: 10px;
   height: calc(100% - 53px);
 }
 

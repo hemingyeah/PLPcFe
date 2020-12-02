@@ -1,6 +1,6 @@
 <template>
-  <div class="form-item" :class="{err: errMessage}">
-    <label :for="forId">{{label}} <span class="form-item-required" v-if="isRequired">*</span></label>
+  <div class="form-item" :class="{err: errMessage}" v-show="!hideform">
+    <label :for="forId">{{label}} <span class="form-item-required" v-if="showRequired">*</span></label>
     <div class="form-item-control">
       <slot></slot>
       <div class="err-msg-wrap">
@@ -13,6 +13,7 @@
 
 <script>
 import Validator from '@src/util/validator';
+import { findComponentUpward } from '@src/util/assist'
 import _ from 'lodash'
 
 export default {
@@ -38,6 +39,10 @@ export default {
     isNotNull: {
       type: Boolean,
       default: undefined
+    },
+    hideform: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -55,26 +60,42 @@ export default {
       if(this.isNotNull !== undefined) return this.isNotNull;
       return this.field.isNull == 0;
     },
+    showRequired() {
+      return this.isRequired && !this.disabled;
+    },
     forId(){
       if(!this.field.fieldName) return '';
       return `form_${this.field.fieldName}`;
+    },
+    formBuilderComponent() {
+      return findComponentUpward(this, 'form-builder')
     },
     /** 是否需要验证 */
     needValidation(){
       let validation = this.validation;
       return (typeof validation == 'boolean' && validation) || typeof validation == 'function'
-    }
+    },
+    disabled() {
+      let field = this.field;
+      return field.disabled
+        || (field.setting && field.setting.defaultValueConfig && !!field.setting.defaultValueConfig.isNotModify && !!field.defaultValue);
+    },
   },
   methods: {
-    /** 默认返回true, 确保不影响表单提交 */
-    validate() {
+    /** 
+     * @description 默认返回true, 确保不影响表单提交 
+     * @param {Boolean} isSample 是否是简单模式 (简单模式的概念是单个字段的单个验证)
+    */
+    validate(isSample = true) {
       if (typeof this.valueFn != 'function' || !this.needValidate) return true;
-
+      
       this.errMessage = '';
       this.status = false;
-
+      
       let value = this.valueFn();
-      return Validator.validate(value, this.field)
+      let formBuilderComponent = this.formBuilderComponent || {}
+      
+      return Validator.validate(value, this.field, formBuilderComponent.value, formBuilderComponent.mode, this.changeStatus, isSample, formBuilderComponent)
         .then(res => {
           let validator = this.getValidator();
           return res == null && typeof validator == 'function' 

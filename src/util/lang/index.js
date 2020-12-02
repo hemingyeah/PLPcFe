@@ -31,7 +31,37 @@ export function formatDate(originDate, tmp){
 
   return DateUtil.format(date, tmp);
 }
+/**  
+ * @description 格式化日期时间
+ * 支持小写yyyy格式
+ */
+export function fmt_data_time(date, tpl = "yyyy-MM-dd HH:mm:ss", isUTC = false) {
+  var utc = isUTC ? 'UTC' : '';
+  var y = date['get' + utc + 'FullYear']();
+  var M = date['get' + utc + 'Month']() + 1;
+  var d = date['get' + utc + 'Date']();
+  var h = date['get' + utc + 'Hours']();
+  var m = date['get' + utc + 'Minutes']();
+  var s = date['get' + utc + 'Seconds']();
 
+  tpl = tpl.replace('MM', s2d(M))
+    .replace('M', M)
+    .replace('yyyy', y)
+    .replace('yy', y % 100)
+    .replace('dd', s2d(d))
+    .replace('d', d)
+    .replace('HH', s2d(h))
+    .replace('h', h)
+    .replace('mm', s2d(m))
+    .replace('m', m)
+    .replace('ss', s2d(s))
+    .replace('s', s);
+
+  return tpl;
+}
+export function s2d(str) {
+  return str < 10 ? "0" + str : str;
+}
 /** 解析时间 */
 export function parseDate(str, tmp) {
   return DateUtil.parse(str, tmp);

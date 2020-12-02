@@ -73,7 +73,7 @@ export default {
     }
   },
   methods: {
-    batchEdit(){
+   batchEdit(){
       let newValues = this.optionText.split('\n').filter(option => option);
       if(!newValues.length) {
         Platform.alert("至少要有一个选项");

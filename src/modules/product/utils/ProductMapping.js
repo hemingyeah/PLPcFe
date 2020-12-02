@@ -7,7 +7,7 @@ export function packToProduct(fields, form){
     address: {}
   };
   let attribute = {};
-  const {customer, template, type, serialNumber, name, id, linkman, customerAddress} = form;
+  const {customer, template, type, serialNumber, name, id, linkman, customerAddress, catalogId } = form;
   let tv = null;
   fields.forEach(f => {
     if (!f.isSystem) {
@@ -39,6 +39,11 @@ export function packToProduct(fields, form){
   if (Array.isArray(template) && template.length) {
     product.templateId = template[0].value;
     product.templateName = template[0].label;
+  }
+
+
+  if(catalogId){
+    product['catalogId'] = catalogId
   }
   
   if (id) {

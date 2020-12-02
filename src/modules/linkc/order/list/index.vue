@@ -11,7 +11,7 @@
           @keyup.enter.native="searchModel.pageNum=1,search()"
           v-trim:blur
         >
-          <el-button slot="append" @click="searchModel.pageNum=1,search()">
+          <el-button slot="append" @click="(searchModel.pageNum = 1), search()">
             <i class="iconfont icon-search"></i>
           </el-button>
         </el-input>
@@ -37,7 +37,8 @@
                 <span style="float: left">{{ item.label }}</span>
                 <span
                   style="float: left; color: #8492a6; font-size: 13px; margin-left:12px;"
-                >{{ stateNumObj[stateObj[item.value].key]}}</span>
+                >{{ stateNumObj[stateObj[item.value].key] }}</span
+                >
               </el-option>
             </el-select>
           </div>
@@ -56,7 +57,12 @@
                 value-format="yyyy-MM-dd"
               ></el-date-picker>
             </div>
-            <el-button class="mar-l-10" type="primary" @click="searchModel.pageNum=1,search()">搜索</el-button>
+            <el-button
+              class="mar-l-10"
+              type="primary"
+              @click="(searchModel.pageNum = 1), search()"
+            >搜索</el-button
+            >
             <el-button @click="resetParams">重置</el-button>
           </div>
         </div>
@@ -64,8 +70,13 @@
     </div>
     <!-- search-modal-box end -->
 
+    
+
     <!-- start 产品模板列表 -->
-    <div class="product-template-list-view mar-t-12" ref="productTemplateListPage">
+    <div
+      class="product-template-list-view mar-t-12"
+      ref="productTemplateListPage"
+    >
       <!-- start 搜索 -->
       <div class="product-template-list-search-group">
         <!-- start  搜索header -->
@@ -174,21 +185,37 @@
                   <template v-if="column.conType === 'goods'">
                     <div class="flex-x">
                       <div class="flex-x goods-img-list flex-1">
-                        <template v-for="(item, index) in scope.row[column.field]">
+                        <template
+                          v-for="(item, index) in scope.row[column.field]"
+                        >
                           <img
                             :key="index"
                             v-if="index <= 4"
-                            :src="item.thumbnailUrl ? `${item.thumbnailUrl}?x-oss-process=image/resize,m_fill,h_32,w_32` : defaultImg"
+                            :src="
+                              item.thumbnailUrl
+                                ? `${
+                                  item.thumbnailUrl
+                                }?x-oss-process=image/resize,m_fill,h_32,w_32`
+                                : defaultImg
+                            "
                             @click.stop="previewImg(item.thumbnailUrl)"
                           />
                         </template>
                         <div
                           class="flex-1 overHideCon-1"
-                          v-if="scope.row[column.field].length==1"
-                        >{{scope.row[column.field][0].name}}</div>
-                        <div>{{scope.row[column.field].length>5?`+${scope.row[column.field].length-5}`:''}}</div>
+                          v-if="scope.row[column.field].length == 1"
+                        >
+                          {{ scope.row[column.field][0].name }}
+                        </div>
+                        <div>
+                          {{
+                            scope.row[column.field].length > 5
+                              ? `+${scope.row[column.field].length - 5}`
+                              : ''
+                          }}
+                        </div>
                       </div>
-                      <div>共{{scope.row.goodsCount}}件</div>
+                      <div>共{{ scope.row.goodsCount }}件</div>
                     </div>
                   </template>
                   <template v-else-if="column.conType === 'btnArray'">
@@ -197,10 +224,13 @@
                         v-for="(item, index) in column.btnArr"
                         :key="index"
                         href
-                        :class="`view-detail-btn ${index>0?'mar-l-10':''}`"
+                        :class="
+                          `view-detail-btn ${index > 0 ? 'mar-l-10' : ''}`
+                        "
                         :style="item.styleType(scope.row)"
                         @click.stop.prevent="item.click(scope.row)"
-                      >{{item.name}}</a>
+                      >{{ item.name }}</a
+                      >
                     </div>
                   </template>
                   <template v-else-if="column.conType === 'click'">
@@ -210,21 +240,31 @@
                       :style="`color:${item.color}`"
                       @click.stop.prevent="column.click(scope.row)"
                       v-if="hasViewCustomerAuth(scope.row)"
-                    >{{scope.row[column.field]}}</a>
-                    <p v-else>{{scope.row[column.field]}}</p>
+                    >{{ scope.row[column.field] }}</a
+                    >
+                    <p v-else>{{ scope.row[column.field] }}</p>
                   </template>
-                  <template
-                    v-else-if="column.field === 'createTime'"
-                  >{{ scope.row.createTime | formatDate }}</template>
+                  <template v-else-if="column.field === 'createTime'">{{
+                    scope.row.createTime | formatDate
+                  }}</template>
                   <template v-else-if="column.field === 'logisticsState'">
                     <div class="flex-x">
                       <div
-                        :class="[`status-tips-${scope.row.logisticsState}`,'status-tips-box']"
-                      >{{scope.row.logisticsState ? stateObj[scope.row.logisticsState].name : ''}}</div>
+                        :class="[
+                          `status-tips-${scope.row.logisticsState}`,
+                          'status-tips-box',
+                        ]"
+                      >
+                        {{
+                          scope.row.logisticsState
+                            ? stateObj[scope.row.logisticsState].name
+                            : ''
+                        }}
+                      </div>
                     </div>
                   </template>
 
-                  <template v-else>{{scope.row[column.field]}}</template>
+                  <template v-else>{{ scope.row[column.field] }}</template>
                 </template>
               </el-table-column>
             </template>
@@ -236,7 +276,8 @@
         <div class="table-footer">
           <div class="list-info">
             共
-            <span class="level-padding">{{ page.total || 0 }}</span>记录
+            <span class="level-padding">{{ page.total || 0 }}</span
+            >记录
             <!-- ，已选中
           <span
             class="product-template-selected-count"
@@ -284,13 +325,18 @@
           </h3>
 
           <div class="product-template-selected-panel">
-            <div class="product-template-selected-tip" v-if="multipleSelection.length <= 0">
+            <div
+              class="product-template-selected-tip"
+              v-if="multipleSelection.length <= 0"
+            >
               <img src="@src/assets/img/no-data.png" />
               <p>暂无选中的数据，请从列表中选择。</p>
             </div>
             <template v-else>
               <div class="product-template-selected-list">
-                <div class="product-template-selected-row product-template-selected-head">
+                <div
+                  class="product-template-selected-row product-template-selected-head"
+                >
                   <span class="product-template-selected-name">名称</span>
                   <span class="product-template-selected-sn">电话</span>
                 </div>
@@ -299,8 +345,12 @@
                   v-for="item in multipleSelection"
                   :key="item.id"
                 >
-                  <span class="product-template-selected-name">{{ item.name }}</span>
-                  <span class="product-template-selected-sn">{{ item.phone }}</span>
+                  <span class="product-template-selected-name">{{
+                    item.name
+                  }}</span>
+                  <span class="product-template-selected-sn">{{
+                    item.phone
+                  }}</span>
                   <button
                     type="button"
                     class="product-template-selected-delete"
@@ -321,8 +371,17 @@
     </div>
     <!-- end 产品模板列表 -->
 
-    <goods-dialog ref="goodsDialog" :info-data="goodsInfo" @confirm="goodsConfirm"></goods-dialog>
-    <out-stock-dialog ref="outStockDialog" :info-data="outStockInfo" @confirm="outStockConfirm"></out-stock-dialog>
+    <goods-dialog
+      ref="goodsDialog"
+      :info-data="goodsInfo"
+      @confirm="goodsConfirm"
+    ></goods-dialog>
+    <out-stock-dialog
+      ref="outStockDialog"
+      :info-data="outStockInfo"
+      @confirm="outStockConfirm"
+    ></out-stock-dialog>
+
   </div>
 </template>
 <script>
@@ -340,11 +399,9 @@ import AuthUtil from "@src/util/auth";
 import defaultImg from "@src/assets/img/myShop/default.png";
 
 /* 高级搜索面板 列数 */
-const PRODUCT_TEMPLATE_LIST_ADVANCE_SEARCH_COLUMN_NUMBER =
-  "customer_contact_search_column_number";
+const PRODUCT_TEMPLATE_LIST_ADVANCE_SEARCH_COLUMN_NUMBER = "customer_contact_search_column_number";
 /* 高级搜索 搜索数据 */
-const STORE_USER_FOR_SEARCH_PRODUCT_TEMPLATE =
-  "store_user_for_search_product_template";
+const STORE_USER_FOR_SEARCH_PRODUCT_TEMPLATE = "store_user_for_search_product_template";
 // 产品模板列表数据
 const MYSHOP_ORDER_LIST_TEMPLATE_DATA = "myshop_order_list_template_data";
 // 产品模板列表选择
@@ -424,7 +481,7 @@ export default {
         orderDetail: {},
         moreConditions: {
           stateList: [],
-          orderTime: '',
+          orderTime: "",
         },
       },
       selectedContact: {}, // 编辑联系人弹窗参数,
@@ -517,12 +574,15 @@ export default {
       }
 
       if (Object.keys(sm.moreConditions).length > 0) {
-        if (sm.moreConditions.orderTime && sm.moreConditions.orderTime.length > 0) {
+        if (
+          sm.moreConditions.orderTime
+          && sm.moreConditions.orderTime.length > 0
+        ) {
           sm.moreConditions["startTime"] = sm.moreConditions.orderTime[0];
           sm.moreConditions["endTime"] = sm.moreConditions.orderTime[1];
-        }else{
-          sm.moreConditions["startTime"] = '';
-          sm.moreConditions["endTime"] = '';
+        } else {
+          sm.moreConditions["startTime"] = "";
+          sm.moreConditions["endTime"] = "";
         }
         delete sm.moreConditions.orderTime;
         params = {
@@ -638,8 +698,7 @@ export default {
         let localField = localColumns[col.field];
 
         if (null != localField) {
-          width =
-            typeof localField.width == "number" ? `${localField.width}px` : "";
+          width = typeof localField.width == "number" ? `${localField.width}px` : "";
           show = localField.show !== false;
         }
         col.show = show;
@@ -726,8 +785,8 @@ export default {
         this.$nextTick(() => {
           original.length > 0
             ? unSelected.forEach((row) => {
-                this.$refs.productTemplateTable.toggleRowSelection(row, false);
-              })
+              this.$refs.productTemplateTable.toggleRowSelection(row, false);
+            })
             : this.$refs.productTemplateTable.clearSelection();
         });
         return this.$platform.alert(`最多只能选择${this.selectedLimit}条数据`);
@@ -838,6 +897,7 @@ export default {
     },
     // 搜索
     search() {
+      console.log(this.data1);
       const params = this.buildParams();
       // console.log(params, "searchP");
       this.fullscreenLoading = true;
@@ -886,16 +946,15 @@ export default {
               : prop,
         };
 
-        const sortedField =
-          this.productTemplateConfig.productFields.filter(
-            (sf) => sf.fieldName === prop
-          )[0] || {};
+        const sortedField = this.productTemplateConfig.productFields.filter(
+          (sf) => sf.fieldName === prop
+        )[0] || {};
 
         if (
-          prop === "createTime" ||
-          prop === "updateTime" ||
-          sortedField.formType === "date" ||
-          sortedField.formType === "datetime"
+          prop === "createTime"
+          || prop === "updateTime"
+          || sortedField.formType === "date"
+          || sortedField.formType === "datetime"
         ) {
           sortModel.type = "date";
         } else {
@@ -939,7 +998,7 @@ export default {
         orderDetail: {},
         moreConditions: {
           stateList: [],
-          orderTime: '',
+          orderTime: "",
         },
       };
 
@@ -956,8 +1015,8 @@ export default {
     buildTextarea(value) {
       return value
         ? value.replace(link_reg, (match) => {
-            return `<a href="javascript:;" target="_blank" url="${match}">${match}</a>`;
-          })
+          return `<a href="javascript:;" target="_blank" url="${match}">${match}</a>`;
+        })
         : "";
     },
     getRowKey(row) {
@@ -987,15 +1046,14 @@ export default {
           // 无团队则任何人都可编辑
           if (tags.length == 0) return true;
 
-          let loginUserTagIds =
-            this.initData.loginUser.tagIdsWithChildTag || [];
+          let loginUserTagIds = this.initData.loginUser.tagIdsWithChildTag || [];
           return tags.some((tag) => loginUserTagIds.indexOf(tag.id) >= 0);
         },
         // 个人权限判断
         () => {
           return (
-            customer.createUser == loginUserId ||
-            this.isCustomerManager(customer)
+            customer.createUser == loginUserId
+            || this.isCustomerManager(customer)
           );
         }
       );
@@ -1025,8 +1083,7 @@ export default {
           // 无团队则任何人都可编辑
           if (tags.length == 0) return true;
 
-          let loginUserTagIds =
-            this.initData.loginUser.tagIdsWithChildTag || [];
+          let loginUserTagIds = this.initData.loginUser.tagIdsWithChildTag || [];
           return tags.some((tag) => loginUserTagIds.indexOf(tag.id) >= 0);
         },
         // 个人权限判断
@@ -1103,9 +1160,9 @@ export default {
     exportColumns() {
       return this.columns.map((c) => {
         if (
-          c.field !== "customerAddress" &&
-          c.field !== "remindCount" &&
-          c.field !== "updateTime"
+          c.field !== "customerAddress"
+          && c.field !== "remindCount"
+          && c.field !== "updateTime"
         ) {
           c.export = true;
         }
@@ -1118,9 +1175,9 @@ export default {
       let exportAll = !ids || ids.length == 0;
       let exportSearchModel = exportAll
         ? {
-            ...this.buildParams(),
-            exportTotal: this.page.total,
-          }
+          ...this.buildParams(),
+          exportTotal: this.page.total,
+        }
         : { exportTotal: ids.length };
 
       return {
@@ -1152,16 +1209,15 @@ export default {
     // match data
     matchSelected() {
       if (!this.multipleSelection.length) return;
-      const selected =
-        this.page.list.filter((c) => {
-          if (this.multipleSelection.some((sc) => sc.id === c.id)) {
-            this.multipleSelection = this.multipleSelection.filter(
-              (sc) => sc.id !== c.id
-            );
-            this.multipleSelection.push(c);
-            return c;
-          }
-        }) || [];
+      const selected = this.page.list.filter((c) => {
+        if (this.multipleSelection.some((sc) => sc.id === c.id)) {
+          this.multipleSelection = this.multipleSelection.filter(
+            (sc) => sc.id !== c.id
+          );
+          this.multipleSelection.push(c);
+          return c;
+        }
+      }) || [];
 
       this.$nextTick(() => {
         this.toggleSelection(selected);
@@ -1195,7 +1251,7 @@ export default {
 };
 </script>
 <style lang="scss">
-@import url("../../assets/public.scss");
+@import url('../../assets/public.scss');
 label {
   margin-bottom: 0;
 }
@@ -1259,7 +1315,7 @@ label {
       .search-date {
         height: 32px;
         width: 340px;
-        .el-range-separator{
+        .el-range-separator {
           padding: 0;
         }
       }

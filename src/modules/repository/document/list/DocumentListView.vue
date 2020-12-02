@@ -88,6 +88,7 @@ export default {
         },
         view: "all",
         type: [],
+        fasterFindId: '',
       },
       tag: {
         name: "",

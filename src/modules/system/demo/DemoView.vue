@@ -1,14 +1,11 @@
 <template>
   <div style="padding: 10px;">
-
-    <biz-select-column ref="bizSelectColumn"></biz-select-column>
-    <base-button type="primary" @event="openS">
-      选择列
-    </base-button>
+    <base-calculation-formula ref="BaseCalculationFormula" />
   </div>
 </template>
 
 <script>
+import BaseCalculationFormula from '@src/component/common/BaseCalculationFormula/BaseCalculationFormula.tsx'
 
 export default {
   name: 'demo-view',
@@ -18,12 +15,13 @@ export default {
     }
   },
   methods: {
-    openS() {
-      this.$refs.bizSelectColumn.open();
-    },
+
   },
   mounted() {
-    this.openS();
+    this.$refs.BaseCalculationFormula.open()
+  },
+  components: {
+    [BaseCalculationFormula.name]: BaseCalculationFormula
   }
 };
 </script>

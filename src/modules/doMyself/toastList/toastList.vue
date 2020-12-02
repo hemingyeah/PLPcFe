@@ -9,13 +9,13 @@
   </div>
 </template>
 <script>
-import message from "./components/message";
-import wxMessage from "./components/wxMessage";
+import message from './components/message';
+import wxMessage from './components/wxMessage';
 export default {
-  name: "toast-list",
+  name: 'toast-list',
   data() {
     return {
-      nowPage: "customer",
+      nowPage: 'customer',
 
       fullscreenLoading: false // 整屏loading
     };
@@ -429,6 +429,9 @@ body {
   .flex-x {
     display: flex;
     justify-content: flex-end;
+  }
+  .flex-1{
+    flex: 1;
   }
 }
 </style>

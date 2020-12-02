@@ -39,6 +39,31 @@
       >
       </el-option>
     </el-select>
+    <!-- end 下拉模式 -->
+
+    <!-- start 单选平铺模式 -->
+    <el-radio-group v-model="newValue" @change="input" v-if="!isMulti&&selectType==2">
+      <el-radio
+        v-for="item in options"
+        :label="item.text" 
+        :key="item.value"
+        :value="item.value">
+        {{item.text}}
+      </el-radio>
+    </el-radio-group>
+    <!-- end 单选平铺模式 -->
+
+    <!-- start 多选平铺模式 -->
+    <el-checkbox-group v-model="newValue" @change="input" v-if="isMulti&&selectType==2">
+      <el-checkbox  
+        v-for="item in options" 
+        :label="item.text" 
+        :key="item.id">
+        {{item.text}}
+      </el-checkbox>
+    </el-checkbox-group>
+    <!-- end 多选平铺模式 -->
+
   </div>
 </template>
 
@@ -58,6 +83,13 @@ export default {
       default: true,
     },
   },
+  data(){
+    return{
+      newValue: this.value,
+      selectType:this.field.setting.selectType || 1
+    }
+
+  },
   computed: {
     isMulti() {
       let setting = this.field.setting || {};
@@ -76,7 +108,6 @@ export default {
         }
         return d;
       });
-
       return this.source || dataSource || [];
     },
   },
@@ -131,6 +162,15 @@ export default {
     //     top: 4px;
     //   }
     // }
+  }
+  .el-radio-group,.el-checkbox-group{
+    width: 100%;
+    display: flex;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    label{
+      padding: 0;
+    }
   }
 }
 </style>

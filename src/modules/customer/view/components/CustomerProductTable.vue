@@ -126,6 +126,10 @@
 </template>
 
 <script>
+import {
+  getProductFields
+} from '@src/api/ProductApi'
+
 import {formatDate} from '@src/util/lang';
 
 const link_reg = /((((https?|ftp?):(?:\/\/)?)(?:[-;:&=\+\$]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\?\+=&;:%!\/@.\w_]*)#?(?:[-\+=&;%!\?\/@.\w_]*))?)/g
@@ -150,7 +154,8 @@ export default {
         pageSize: 10,
         pageNum: 1,
         totalItems: 0,
-      }
+      },
+      dynamicProductFields: []
     }
   },
   computed: {
@@ -160,7 +165,7 @@ export default {
     customerConfig() {
       let initData = this.initData;
       return {
-        fieldInfo: (initData.productFields || []).sort(
+        fieldInfo: this.dynamicProductFields.sort(
           (a, b) => a.orderId - b.orderId
         )
       };
@@ -188,7 +193,14 @@ export default {
     },
 
   },
-  mounted() {
+  async mounted() {
+    try {
+      // 获取产品自定义字段
+      let res = await getProductFields({isFromSetting: false});
+      this.dynamicProductFields = res.data || [];
+    } catch (error) {
+      console.error('customer-product-table fetch product fields error',error);
+    }
     this.revertStorage();
     this.columns = this.buildTableColumn();
     this.fetchData();
