@@ -182,7 +182,7 @@ export default class UserCard extends Vue {
   }
   
   private getUserInfoUsedTime(value: string | null): string | number {
-    return this.getUserInfoData(value, 'H')
+    return this.getUserInfoData(value, '小时')
   }
   
   private getUserInfoTashRate(value: string | null): string | number {

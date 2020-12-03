@@ -271,7 +271,7 @@ class TaskAllotUserTableRender extends TaskAllotUserTableMethods {
     // 工作状态
     if (column.field === TaslAllotTableColumnFieldEnum.State) return this.renderColumnWithState(value)
     // 距离
-    if (column.field === TaslAllotTableColumnFieldEnum.LineDistance) return this.renderColumnWithLineDistance(value)
+    if (column.field === TaslAllotTableColumnFieldEnum.LineDistance) return this.renderColumnWithLineDistance(value, scope.row)
     // 驾车距离
     if (column.field === TaslAllotTableColumnFieldEnum.Distance) return this.renderColumnWithDistance(value, scope.row)
     // 驾车时间
@@ -293,11 +293,13 @@ class TaskAllotUserTableRender extends TaskAllotUserTableMethods {
   /** 
    * @description 渲染距离表格列
   */
-  public renderColumnWithLineDistance(value: string) {
+  public renderColumnWithLineDistance(value: string, row: any = {}) {
     let distance = Number(value) 
     if (isNaN(distance)) return value
     
-    return distance ? `${(distance / 1000).toFixed(2)} km` : fmt_display_text(distance)
+    // 最后登录时间
+    let lastLoginTime = DateUtil.getTimeDiffStr(row?.lastLoginTime || row?.attribute?.lastLocateTime)
+    return distance ? `${(distance / 1000).toFixed(2)} ${lastLoginTime && `(${lastLoginTime}前)` }` : fmt_display_text(distance)
   }
   
   /** 
@@ -307,9 +309,7 @@ class TaskAllotUserTableRender extends TaskAllotUserTableMethods {
     let distance = Number(value) 
     if (isNaN(distance)) return value
     
-    // 最后登录时间
-    let lastLoginTime = DateUtil.getTimeDiffStr(row?.lastLoginTime || row?.attribute?.lastLocateTime)
-    return distance ? `${(distance / 1000).toFixed(2)} ${lastLoginTime && `(${lastLoginTime}前)` }` : fmt_display_text(distance)
+    return distance ? `${(distance / 1000).toFixed(2)}` : fmt_display_text(distance)
   }
   
   /** 
