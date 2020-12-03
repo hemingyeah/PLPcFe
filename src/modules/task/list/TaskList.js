@@ -2284,7 +2284,7 @@ export default {
         this.searchParams = {...this.searchParams, ...par}
         
         for(let key in par) {
-          if (par[key] && JSON.stringify(par[key]) !== "[]" && JSON.stringify(par[key]) !== "{}") {
+          if (par[key] !== null && par[key] !== undefined && par[key] !== '' && JSON.stringify(par[key]) !== "[]" && JSON.stringify(par[key]) !== "{}") {
             this.searchParams[key] = par[key]
           } else {
             this.searchParams[key] = this.searchParams_spare[key]
