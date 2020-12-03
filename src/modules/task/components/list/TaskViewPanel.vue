@@ -388,7 +388,7 @@ export default {
                   });
                 });
               } else if (
-                item.property === "executor" ||
+                item.property === "executorUser" ||
                 item.operator === "user"
               ) {
                 this.getSimpleUserListByIds(item.inValue, (content) => {
@@ -744,6 +744,15 @@ export default {
             continue;
           }
 
+          if (tv.fieldName === 'executor') {
+            params.systemConditions.push({
+              property: 'executorUser',
+              operator: tv.operatorValue,
+              inValue: form[fn],
+            });
+            continue;
+          }
+          
           if (
             MultiFieldNames.indexOf(tv.formType) !== -1 ||
             tv.formType === "user"

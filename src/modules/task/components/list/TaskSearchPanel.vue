@@ -656,6 +656,15 @@ export default {
           continue;
         }
 
+        if (tv.fieldName === 'executor') {
+          params.systemConditions.push({
+            property: 'executorUser',
+            operator: tv.operatorValue,
+            inValue: form[fn],
+          });
+          continue;
+        }
+
         if (
           MultiFieldNames.indexOf(tv.formType) !== -1 ||
           tv.formType === "user"

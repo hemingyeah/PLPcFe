@@ -45,7 +45,6 @@ export default {
   computed: {
     fields() {
       const { fields } = this.config;
-      console.log(fields)
       const list = [];
       fields.map((item) => {
         if (

@@ -218,7 +218,7 @@ export default {
           } else if (key === "tags" && item.returnDatas()[key].length) {
             data[key] = item.returnDatas()[key];
           } else {
-            data[key] = item.returnDatas()[key];
+            // data[key] = item.returnDatas()[key];
           }
         }
       });
