@@ -417,7 +417,7 @@ const BizTeamSelect = {
     if(this.popperVisible) clazz.push('biz-team-select-open')
     
     return (
-      <div class='el-select el-input--small el-input--suffix' {...attrs}>
+      <div class='el-select el-input--small el-input--suffix biz-team-select-block' {...attrs}>
         <div class={clazz} onClick={e => this.showPopper(e)}>
           <input id={this.id} name={this.name} type="text" value={this.formValue}/>
           {/* { this.renderClear(h) } */}
