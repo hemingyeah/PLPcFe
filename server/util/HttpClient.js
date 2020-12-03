@@ -21,7 +21,7 @@ module.exports = {
     
     let requestOptions = getRequestOptions(path, method, options);
 
-    console.log(`${colors.bgYellow('request -> requestOptions')}`, requestOptions)
+    // console.log(`${colors.bgYellow('request -> requestOptions')}`, requestOptions)
 
     return new Promise((resolve, reject) => {
       let req = https.request(requestOptions, res => {
@@ -73,7 +73,7 @@ module.exports = {
 
     let proxyOptions = getProxyOptions(ctx, options);
 
-    console.log(`${colors.bgYellow('proxy -> proxyOptions')}`, proxyOptions);
+    // console.log(`${colors.bgYellow('proxy -> proxyOptions')}`, proxyOptions);
 
     return new Promise((resolve, reject) => {
       let req = https.request(proxyOptions, res => {

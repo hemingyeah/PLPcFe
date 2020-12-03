@@ -36,10 +36,7 @@ export default {
         .map(f => {
           if (f.formType === 'address' && f.isSystem) {
             f.isNull = this.initData.isAddressAllowNull ? 1 : 0;
-          } else if (f.fieldName === 'tags' && f.isSystem) {
-            // 接口返回的是服务团队 多端这里转换下
-            f.displayName = '服务部门';
-          } 
+          }
           return f;
         })
         .filter(f => {

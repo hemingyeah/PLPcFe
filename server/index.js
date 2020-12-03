@@ -26,7 +26,8 @@ server.init = async function(){
   server.use(koaStatic(path.resolve(__dirname, '../public'), {index: '_index.html'}));
 
   // 获取 cookie
-  let cookie = isNotLocalEnv ? await getCookie() : '';
+  // let cookie = isNotLocalEnv ? await getCookie() : '';
+  let cookie = 'VIPPUBLINKJSESSIONID=b2b8e5b2-30b0-4dd6-a75c-a409e3ea6975';
 
   // 售后宝环境中间件
   server.use(shbEnvMiddleware({ isNotLocalEnv, cookie }));

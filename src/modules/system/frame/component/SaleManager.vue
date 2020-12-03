@@ -8,10 +8,10 @@
             <i class="iconfont icon-fe-close"></i>
           </button>
         </div>
-        <!-- <div class="saleManager-qrcode">
+        <div v-if="!tenantType" class="saleManager-qrcode">
           <img :src="saleManagerQRCode" alt="专属客服"/>
           <p>钉钉扫码联系专属客服</p>
-        </div> -->
+        </div>
         <!-- <div class="saleManager-qrcode">
           <div class="saleManager-qrcode-block" ref="qrcode"></div>
         </div> -->
@@ -30,6 +30,7 @@ import QRCode from 'qrcodejs2';
 
 export default {
   name: 'sale-manager',
+  inject: ['initData'],
   props: {
     show: { // 是否显示组件
       type: Boolean,
@@ -45,6 +46,9 @@ export default {
     }
   },
   computed: {
+    tenantType() {
+      return this.initData.tenantType;
+    },
     saleManagerQRCode(){
       return `/files/getQrcode?fileName=${this.qrcode}`;
     }

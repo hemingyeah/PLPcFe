@@ -850,11 +850,11 @@
           class="dialog-footer flex-x"
           v-if="partDealData.data.state === 'suspending' || partDealData.data.state === 'dealing'"
         >
-          <!-- 多端隐藏 -->
-          <!-- <div class="ding-btn" v-if="partDealData.data.cancel" @click="dingMessage">
+          <!-- tenantType=0 钉钉端  -->
+          <div class="ding-btn" v-if="!tenantType && partDealData.data.cancel" @click="dingMessage">
             <i class="iconfont icon-Ding"></i>
             DING
-          </div> -->
+          </div>
 
           <!-- <base-button
             v-if="partDealData.data.state === 'suspending' && partDealData.data.cancel"
@@ -1269,6 +1269,9 @@ export default {
     };
   },
   computed: {
+    tenantType() {
+      return this.initData.tenantType;
+    },
     allowInout() {
       return AuthUtil.hasAuth(this.auths, 'VIP_SPAREPART_INOUT');
     },

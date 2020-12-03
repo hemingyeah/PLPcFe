@@ -29,6 +29,7 @@ const EditionMap = {
 
 export default {
   name: 'version',
+  inject: ['initData'],
   props: {
     edition: {
       type: Number
@@ -50,6 +51,9 @@ export default {
     }
   },
   computed: {
+    tenantType() {
+      return this.initData.tenantType;
+    },
     editionText() {
       return EditionMap[this.edition] || EditionMap[1]
     }
@@ -83,7 +87,8 @@ export default {
       return false;
     },
     seeHelp(){
-      platform.openLink(`https://www.yuque.com/shb/updatelog/${this.version.replace(' ', '')}`);
+      let updatelog = this.tenantType ? 'updatelog2' : 'updatelog'
+      platform.openLink(`https://www.yuque.com/shb/${updatelog}/${this.version.replace(' ', '')}`);
       this.show = false;
     }
   },

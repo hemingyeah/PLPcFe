@@ -548,6 +548,9 @@ export default {
     };
   },
   computed: {
+    tenantType() {
+      return this.initData.tenantType;
+    },
     loadedSystemModal() {
       return this.loadedSystemPopup && this.showSystemPopup;
     },
@@ -563,7 +566,7 @@ export default {
     },
     /** 是否显示devtool */
     showDevTool() {
-      return this.$appConfig.env != "production" || this.initData.env != "prod";
+      return this.$appConfig.env != "production" || this.initData.env != "prod" || this.initData.env != "production";
     },
     /** 用户工作状态颜色配置 */
     userStateMap() {
@@ -765,7 +768,7 @@ export default {
       }
     },
     openHelpDoc(event) {
-      platform.openLink("https://www.yuque.com/shb/help2");
+      platform.openLink(this.tenantType ? 'https://www.yuque.com/shb/help2' : 'https://www.yuque.com/shb/help');
       this.profilePopperVisible = false;
     },
     openUserView(event) {
@@ -1284,7 +1287,7 @@ export default {
     }
     /** * 部分页面引导 数据处理  e*/
     this.checkExports();
-   
+    
     this.getTenantInform();
     this.getShbEdition()
     this.getSystemPopup();
