@@ -98,7 +98,7 @@ export const TaskAllotUserTableEnterpriseEditionColumns = [
   ...TaskAllotUserTableCommonColumns,
   TaskAllotUserTableLineLocationColumn,
   {
-    "label": "距客户(KM)",
+    "label": "距客户(km)",
     "field": "distance",
     "show": true,
     "fixed": false,
