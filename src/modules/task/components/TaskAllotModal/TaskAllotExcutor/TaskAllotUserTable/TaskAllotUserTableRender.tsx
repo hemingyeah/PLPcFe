@@ -189,7 +189,7 @@ class TaskAllotUserTableRender extends TaskAllotUserTableMethods {
             value={this.locationOtherData.maxValue}
             onInput={HandlerMaxValueChanged} 
           />
-          KM
+          km
           <el-button type='primary' class='location-confirm-button' onClick={() => this.handlerLocationOtherChange()}>确定</el-button>
         </div>
       </div>
@@ -297,7 +297,7 @@ class TaskAllotUserTableRender extends TaskAllotUserTableMethods {
     let distance = Number(value) 
     if (isNaN(distance)) return value
     
-    return distance ? `${(distance / 1000).toFixed(2)} KM` : fmt_display_text(distance)
+    return distance ? `${(distance / 1000).toFixed(2)} km` : fmt_display_text(distance)
   }
   
   /** 
