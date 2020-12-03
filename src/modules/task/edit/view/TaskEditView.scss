@@ -73,3 +73,12 @@ body {
 .form-builder {
   margin: 0 auto;
 }
+
+.task-container {
+  .base-modal {
+    .customer-modal-container,
+    .product-container {
+      overflow: visible;
+    }
+  }
+}

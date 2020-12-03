@@ -84,7 +84,7 @@ const TaskAllotUserTableStateColumn = {
 
 /* 工单指派 直线列 */
 const TaskAllotUserTableLineLocationColumn = {
-  "label": "距离",
+  "label": "距离(km)",
   "field": "lineDistance",
   "show": true,
   "fixed": false,
