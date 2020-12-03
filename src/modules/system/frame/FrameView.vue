@@ -1161,6 +1161,9 @@ export default {
     },
     pushTaskListIds(id) {
       this.taskListIds.push(id);
+    },
+    getUserTaskGray() {
+      return this.isUserTaskGray
     }
   },
   created() {
@@ -1169,6 +1172,7 @@ export default {
     window.showExportList = this.checkExports;
     window.exportPopoverToggle = this.exportPopoverToggle;
     window.pushTaskListIds = this.pushTaskListIds;
+    window.getUserTaskGray = this.getUserTaskGray;
 
     window.resizeFrame = function () {
       console.warn("此方法只用于兼容旧页面，无实际效果，不推荐调用");
