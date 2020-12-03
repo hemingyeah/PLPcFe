@@ -702,7 +702,7 @@ export default {
 
       try {
         // 判断客户是否存在
-        if (!isHaveCustomer || isForceUpdateCustomer) {
+        if ((!isHaveCustomer || isForceUpdateCustomer) && product.value) {
           // 客户不存在时则下拉框隐藏
           findComponentDownward(this.$refs.product, 'base-select').close();
 
