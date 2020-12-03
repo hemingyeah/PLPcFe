@@ -4,7 +4,6 @@
     <template v-if="selectType==1">
       <!-- 多选 -->
       <el-select
-        v-if="isMulti"
         :id="`form_${field.fieldName}`"
         :placeholder="placeholder"
         :clearable="clearable"
