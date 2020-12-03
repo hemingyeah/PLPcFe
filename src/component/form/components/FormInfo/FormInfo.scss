@@ -8,6 +8,9 @@
     .ql-snow{
       border: 1px solid $border-color-base;
       border-radius: 0 0 4px 4px;
+      a{
+        color: $color-primary !important;
+      }
     }
     .ql-toolbar{
       background: #fafafa;
