@@ -3,31 +3,32 @@ import {
   getProductDetail,
   deleteProductByIds,
   unbindQrcode,
-  productStatisticsInit
-} from '@src/api/ProductApi';
+  productStatisticsInit,
+  
+} from "@src/api/ProductApi";
 
-import EventTable from '@src/modules/product/components/EventTable.vue';
-import TaskTable from '@src/modules/product/components/TaskTable.vue';
-import PlanTable from '@src/modules/product/components/PlanTable.vue';
-import RemindTable from '@src/modules/product/components/RemindTable.vue';
-import InfoRecord from '@src/modules/product/components/InfoRecord.vue';
-import RemindDialog from '@src/modules/product/components/RemindDialog.vue';
-import BindCodeDialog from '@src/modules/productV2/productView/components/BindCodeDialog.vue';
-import DownloadCodeDialog from '@src/modules/product/components/DownloadCodeDialog.vue';
+import EventTable from "@src/modules/product/components/EventTable.vue";
+import TaskTable from "@src/modules/product/components/TaskTable.vue";
+import PlanTable from "@src/modules/product/components/PlanTable.vue";
+import RemindTable from "@src/modules/product/components/RemindTable.vue";
+import InfoRecord from "@src/modules/product/components/InfoRecord.vue";
+import RemindDialog from "@src/modules/product/components/RemindDialog.vue";
+import PublicDialog from "@src/modules/productV2/productView/components/PublicDialog.vue";
+import DownloadCodeDialog from "@src/modules/product/components/DownloadCodeDialog.vue";
 
-import EditContactDialog from '@src/modules/product/components/EditContactDialog.vue';
-import ProductContactTable from '@src/modules/product/components/ProductContactTable.vue';
-import MiniTable from '@src/modules/productV2/productMenu/WorkTree/compoment/MiniTable';
-
+import EditContactDialog from "@src/modules/product/components/EditContactDialog.vue";
+import ProductContactTable from "@src/modules/product/components/ProductContactTable.vue";
+import MiniTable from "@src/modules/productV2/productMenu/WorkTree/compoment/MiniTable";
+import CatalogView from "@src/modules/productV2/productView/components/CatalogView.vue"
 import {
   isShowCustomerRemind,
   isShowPlanTask
-} from '@src/util/version.ts'
+} from "@src/util/version.ts"
 
-import qs from '@src/util/querystring';
-import AuthUtil from '@src/util/auth';
+import qs from "@src/util/querystring";
+import AuthUtil from "@src/util/auth";
 
-import QRCode from 'qrcodejs2';
+import QRCode from "qrcodejs2";
 /**
  * todo
  * 1. 只判断是否开启了产品二维码功能，如果开启则启用显示二维码、关联等功能，如果没有则不显示产品二维码相关信息，不再判断自助门户设置✅
@@ -35,37 +36,33 @@ import QRCode from 'qrcodejs2';
  * 3. 同步记录更新
  */
 
-import initData from './initData'
+import initData from "./initData"
 export default {
-  name: 'product-view',
-  // props: {
-  //   initData: {
-  //     type: Object,
-  //     default: () => ({}),
-  //   }
-  // },
+  name: "product-view",
+  inject:["initData"],
   data() {
     return {
-      initData,
+      // initData,
       loading: false,
-      currTab: 'info-record',
+      currTab: "info-record",
       showWholeName: -1, // -1代表不显示展开icon 0代表收起 1代表展开
       newestProduct: null,
       tabs: [],
       statisticalData: {}, // tab统计数据
 
       dynamicProductFields: [], // 产品自定义字段
-      leftActiveTab: 'product-view',
-      rightActiveTab: 'info-record',
-      collapseDirection: '',
+      leftActiveTab: "product-view",
+      rightActiveTab: "info-record",
+      collapseDirection: "",
       nowGuideStep: 5,
       guideSearchModelSave: false,
       guideDropdownMenu: false,
       isGuide: false,
       popperOptions: {
-        boundariesElement: 'viewport',
+        boundariesElement: "viewport",
         removeOnDestroy: true
       },
+      dialogType:""
     }
   },
 
@@ -79,14 +76,15 @@ export default {
   },
   computed: {
     hasLinkman() {
-      let field = this.dynamicProductFields.filter(item => item.formType == 'customer')[0];
+      let field = this.dynamicProductFields.filter(item => item.formType == "customer")[0];
       return field && field.setting.customerOption?.linkman;
     },
     hasAddress() {
-      let field = this.dynamicProductFields.filter(item => item.formType == 'customer')[0];
+      let field = this.dynamicProductFields.filter(item => item.formType == "customer")[0];
       return field && field.setting.customerOption?.address;
     },
     product() {
+      console.log(this.initData.product, "this.initData.product")
       return this.newestProduct || this.initData.product || {};
     },
     customer() {
@@ -122,7 +120,7 @@ export default {
     hasEditCustomerAuth() {
       let customer = this.customer;
       let loginUserId = this.loginUser.userId;
-      return AuthUtil.hasAuthWithDataLevel(this.permission, 'CUSTOMER_EDIT',
+      return AuthUtil.hasAuthWithDataLevel(this.permission, "CUSTOMER_EDIT",
         // 团队权限判断
         () => {
           let tags = Array.isArray(customer.tags) ? customer.tags : [];
@@ -148,27 +146,27 @@ export default {
     },
     fields() {
       let fixedFields = [{
-        displayName: '',
-        formType: 'separator'
+        displayName: "",
+        formType: "separator"
       },
       {
-        displayName: '创建人',
-        fieldName: 'createUser',
-        formType: 'user',
+        displayName: "创建人",
+        fieldName: "createUser",
+        formType: "user",
         isSystem: 1,
         orderId: 10001
       },
       {
-        displayName: '创建时间',
-        fieldName: 'createTime',
-        formType: 'datetime',
+        displayName: "创建时间",
+        fieldName: "createTime",
+        formType: "datetime",
         isSystem: 1,
         orderId: 10002
       },
       {
-        displayName: '系统编号',
-        fieldName: 'id',
-        formType: 'text',
+        displayName: "系统编号",
+        fieldName: "id",
+        formType: "text",
         isSystem: 1,
         orderId: 10003
       },
@@ -176,10 +174,10 @@ export default {
 
       if (this.initData?.productConfig?.qrcodeEnabled) {
         fixedFields.push({
-          displayName: '二维码编号',
-          fieldName: 'qrcodeId',
+          displayName: "二维码编号",
+          fieldName: "qrcodeId",
           isSystem: 1,
-          formType: 'text',
+          formType: "text",
           orderId: 10000
         })
       }
@@ -187,33 +185,33 @@ export default {
       return this.dynamicProductFields
         .concat(fixedFields)
         .map(f => {
-          if (f.fieldName === 'name') {
+          if (f.fieldName === "name") {
             f.orderId = -11;
           }
 
-          if (f.fieldName === 'serialNumber') {
+          if (f.fieldName === "serialNumber") {
             f.orderId = -10;
           }
 
-          if (f.fieldName === 'type') {
+          if (f.fieldName === "type") {
             f.orderId = -9;
           }
 
-          if (f.fieldName === 'customer') {
+          if (f.fieldName === "customer") {
             f.orderId = -8;
           }
 
-          if (f.fieldName === 'linkman') {
+          if (f.fieldName === "linkman") {
             f.orderId = -7;
             f.show = true
           }
 
-          if (f.fieldName === 'linkmanPhone') {
+          if (f.fieldName === "linkmanPhone") {
             f.orderId = -6;
             f.show = true
           }
 
-          if (f.fieldName === 'address') {
+          if (f.fieldName === "address") {
             f.orderId = -5;
             f.show = true
           }
@@ -283,7 +281,7 @@ export default {
      * 4. 创建工单权限
      */
     allowCreateTask() {
-      return !this.isDelete && this.hasEditProductAuth && AuthUtil.hasAuth(this.permission, 'TASK_ADD');
+      return !this.isDelete && this.hasEditProductAuth && AuthUtil.hasAuth(this.permission, "TASK_ADD");
     },
     /**
      * 满足以下提交可以创建事件
@@ -294,7 +292,7 @@ export default {
      * 4. 新建事件权限
      */
     allowCreateEvent() {
-      return !this.isDelete && this.hasEditProductAuth && AuthUtil.hasAuth(this.permission, 'CASE_ADD');
+      return !this.isDelete && this.hasEditProductAuth && AuthUtil.hasAuth(this.permission, "CASE_ADD");
     },
     /**
      * 满足以下条件可以创建计划任务
@@ -307,7 +305,7 @@ export default {
      */
     allowCreatePlanTask() {
       let planTaskEnabled = this.initData.planTaskEnabled;
-      return !this.isDelete && this.hasEditProductAuth && planTaskEnabled && AuthUtil.hasEveryAuth(this.permission, ['TASK_ADD', 'TASK_DISPATCH'])
+      return !this.isDelete && this.hasEditProductAuth && planTaskEnabled && AuthUtil.hasEveryAuth(this.permission, ["TASK_ADD", "TASK_DISPATCH"])
     },
     /**
      * 当前用户是否是该客户负责人
@@ -326,7 +324,7 @@ export default {
     hasEditProductAuth() {
       let customer = this.product.customer;
       let loginUserId = this.loginUser.userId;
-      return AuthUtil.hasAuthWithDataLevel(this.permission, 'PRODUCT_EDIT',
+      return AuthUtil.hasAuthWithDataLevel(this.permission, "PRODUCT_EDIT",
         // 团队权限判断
         () => {
           let tags = Array.isArray(customer.tags) ? customer.tags : [];
@@ -362,8 +360,8 @@ export default {
     // 折叠面板缓存
     let collapse = sessionStorage.getItem(`product_collapse_${this.product.id}`);
     let collapseDirection = sessionStorage.getItem(`product_collapseDirection_${this.product.id}`);
-    this.collapse = JSON.parse(collapse || 'true');
-    this.collapseDirection = collapseDirection || '';
+    this.collapse = JSON.parse(collapse || "true");
+    this.collapseDirection = collapseDirection || "";
   },
   async mounted() {
     try {
@@ -373,64 +371,73 @@ export default {
       });
       this.dynamicProductFields = res.data || [];
     } catch (error) {
-      console.error('product-view fetch product fields error', error);
+      console.error("product-view fetch product fields error", error);
     }
     // this.updateProductNameStyle();
     this.createCode();
     this.fetchStatisticalData();
     // this.refreshProduct();
 
-    this.$eventBus.$on('product_view.open_remind_dialog', this.openRemindDialog); // 打开提醒弹窗
-    this.$eventBus.$on('product_view.update_detail', this.refreshProduct); // 更新详情
-    this.$eventBus.$on('product_view_record_update', this.fetchStatisticalData); // 更新动态
-    this.$eventBus.$on('product_view_remind_update', this.fetchStatisticalData); // 更新提醒
-    this.$eventBus.$on('product_view.select_tab', this.selectTab);
+    this.$eventBus.$on("product_view.open_remind_dialog", this.openRemindDialog); // 打开提醒弹窗
+    // this.$eventBus.$on("product_view.update_detail", this.refreshProduct); // 更新详情
+    this.$eventBus.$on("product_view_record_update", this.fetchStatisticalData); // 更新动态
+    this.$eventBus.$on("product_view_remind_update", this.fetchStatisticalData); // 更新提醒
+    this.$eventBus.$on("product_view.select_tab", this.selectTab);
   },
   beforeDestroy() {
-    this.$eventBus.$off('product_view.open_remind_dialog', this.openRemindDialog);
-    this.$eventBus.$off('product_view.update_detail', this.refreshProduct);
-    this.$eventBus.$off('product_view_record_update', this.fetchStatisticalData);
-    this.$eventBus.$off('product_view_remind_update', this.fetchStatisticalData);
-    this.$eventBus.$off('product_view.select_tab', this.selectTab);
+    this.$eventBus.$off("product_view.open_remind_dialog", this.openRemindDialog);
+    // this.$eventBus.$off("product_view.update_detail", this.refreshProduct);
+    this.$eventBus.$off("product_view_record_update", this.fetchStatisticalData);
+    this.$eventBus.$off("product_view_remind_update", this.fetchStatisticalData);
+    this.$eventBus.$off("product_view.select_tab", this.selectTab);
   },
   methods: {
-    getAddress(field) {
-      if (!field) return '';
-      return field.province + field.city + field.dist + field.address || ''
+    dialogBind(e){
+      if(this.dialogType == "linkcQrcode"){
+        this.refreshProduct();
+      }else{
+        this.product.catalogId = e.catalogId;
+      }
+      this.$refs.producInfoRecord.searchRecord()
     },
-    openBindCodeDialog() {
-      this.$refs.bindCodeDialog.open();
+    getAddress(field) {
+      if (!field) return "";
+      return field.province + field.city + field.dist + field.address || ""
+    },
+    openPublicDialog(e) {
+      this.dialogType = e;
+      this.$refs.publicDialog.open();
     },
     openDownloadCodeDialog() {
       this.$refs.downloadCodeDialog.open();
     },
     async unbindQrcodeFromProduct() {
-      if (!await this.$platform.confirm('删除后，该二维码将会失效，确定删除该二维码？')) return;
+      if (!await this.$platform.confirm("删除后，该二维码将会失效，确定删除该二维码？")) return;
 
       unbindQrcode({
         productId: this.product.id,
       })
         .then(res => {
           if (res.status) return this.$platform.notification({
-            title: '失败',
+            title: "失败",
             message: (h => ( <div> {
-              res.message || '发生未知错误'
+              res.message || "发生未知错误"
             } </div>))(this.$createElement),
-            type: 'error',
+            type: "error",
           });
 
           this.refreshProduct();
-          this.$eventBus.$emit('product_info_record.update_record_list');
+          this.$eventBus.$emit("product_info_record.update_record_list");
 
           this.$platform.notification({
-            title: '删除成功',
-            type: 'success',
+            title: "删除成功",
+            type: "success",
           });
 
         })
         .catch(e => {
 
-          console.error('e', e)
+          console.error("e", e)
         })
 
     },
@@ -440,14 +447,14 @@ export default {
 
       let url = `${window.location.origin}/qrcode/${this.initData.domain}?qrcodeId=${this.product.qrcodeId}`;
 
-      this.$refs.qrcode.innerHTML = '';
+      this.$refs.qrcode.innerHTML = "";
       this.$nextTick(() => {
         let qrcode = new QRCode(this.$refs.qrcode, {
           text: url,
-          width: 120,
-          height: 120,
-          colorDark: '#000000',
-          colorLight: '#ffffff',
+          width: 250,
+          height: 250,
+          colorDark: "#000000",
+          colorLight: "#ffffff",
           correctLevel: QRCode.CorrectLevel.H
         });
       })
@@ -457,7 +464,7 @@ export default {
     updateProductNameStyle() {
       let cnEl = this.$refs.customerName;
       let width = cnEl.offsetWidth;
-      let maxWidth = cnEl.closest('h3').offsetWidth;
+      let maxWidth = cnEl.closest("h3").offsetWidth;
 
       this.showWholeName = maxWidth - 20 < width ? 0 : -1;
     },
@@ -474,16 +481,16 @@ export default {
             this.createCode();
           }
         })
-        .catch(e => console.error('e', e));
+        .catch(e => console.error("e", e));
     },
     editProduct(id) {
       window.location.href = `/customer/product/edit/${this.product.id}`
     },
     addProduct(id) {
       this.$platform.openTab({
-        id: 'customer_product_create',
-        title: '新建产品',
-        url: '/customer/product/create',
+        id: "customer_product_create",
+        title: "新建产品",
+        url: "/customer/product/create",
         reload: true,
         close: true,
       });
@@ -493,17 +500,17 @@ export default {
     },
     async deleteProduct() {
       try {
-        if (!await this.$platform.confirm('确定要删除该产品？')) return;
+        if (!await this.$platform.confirm("确定要删除该产品？")) return;
 
         const result = await deleteProductByIds(this.productId);
         if (!result.status) {
-          let fromId = window.frameElement.getAttribute('fromid');
+          let fromId = window.frameElement.getAttribute("fromid");
           this.$platform.refreshTab(fromId);
 
           window.location.reload();
         }
       } catch (e) {
-        console.error('product-view delete product error', e);
+        console.error("product-view delete product error", e);
       }
     },
     goBack() {
@@ -511,11 +518,11 @@ export default {
     },
     /** 从客户创建工单 */
     createTask(typeId) {
-      let fromId = window.frameElement.getAttribute('id');
+      let fromId = window.frameElement.getAttribute("id");
 
       this.$platform.openTab({
-        id: 'createTask',
-        title: '新建工单',
+        id: "createTask",
+        title: "新建工单",
         close: true,
         url: `/task/createFromProduct/${this.productId}?defaultTypeId=${typeId}`,
         fromId
@@ -523,11 +530,11 @@ export default {
     },
     /** 从客户创建事件 */
     createEvent(typeId) {
-      let fromId = window.frameElement.getAttribute('id');
+      let fromId = window.frameElement.getAttribute("id");
 
       this.$platform.openTab({
-        id: 'createEvent',
-        title: '新建事件',
+        id: "createEvent",
+        title: "新建事件",
         close: true,
         url: `/event/createFromProduct/${this.productId}?defaultTypeId=${typeId}`,
         fromId
@@ -535,11 +542,11 @@ export default {
     },
     /** 从客户创建计划工单 */
     createPlanTask(typeId) {
-      let fromId = window.frameElement.getAttribute('id');
+      let fromId = window.frameElement.getAttribute("id");
 
       this.$platform.openTab({
-        id: 'createPlan',
-        title: '新建计划任务',
+        id: "createPlan",
+        title: "新建计划任务",
         close: true,
         url: `/task/planTask/create?defaultTypeId=${typeId}&productId=${this.productId}`,
         fromId
@@ -553,7 +560,7 @@ export default {
 
       this.$platform.openTab({
         id: `customer_view_${customerId}`,
-        title: '客户详情',
+        title: "客户详情",
         close: true,
         url: `/customer/view/${customerId}?noHistory=1`,
       })
@@ -585,14 +592,14 @@ export default {
       return [{
         displayName: `信息动态(${recordQuantity || 0})`,
         component: InfoRecord.name,
-        slotName: 'record-tab',
+        slotName: "record-tab",
         show: true,
       }, {
-        displayName: taskQuantity ? `工单(${unfinishedTaskQuantity || 0}/${taskQuantity >= 1000 ? '999+' : taskQuantity})` : '工单(0)',
+        displayName: taskQuantity ? `工单(${unfinishedTaskQuantity || 0}/${taskQuantity >= 1000 ? "999+" : taskQuantity})` : "工单(0)",
         component: TaskTable.name,
         show: true,
       }, {
-        displayName: eventQuantity ? `事件(${unfinishedEventQuantity || 0}/${eventQuantity >= 1000 ? '999+' : eventQuantity})` : '事件(0)',
+        displayName: eventQuantity ? `事件(${unfinishedEventQuantity || 0}/${eventQuantity >= 1000 ? "999+" : eventQuantity})` : "事件(0)",
         component: EventTable.name,
         show: true,
       }, {
@@ -611,57 +618,65 @@ export default {
     },
 
     openDialog(action) {
-      if (action === 'address') {
+      if (action === "address") {
         this.$refs.EditAddressDialog.openDialog();
-      } else if (action === 'contact') {
+      } else if (action === "contact") {
         this.$refs.EditContactDialog.openDialog();
-      } else if (action === 'remark') {
+      } else if (action === "remark") {
         this.$refs.addRemarkDialog.openDialog();
-      } else if (action === 'remind') {
+      } else if (action === "remind") {
         this.$refs.addRemindDialog.openDialog();
       }
     },
 
     dleteData() {
-      this.$confirm('此操作将删除该目录以及目录下所有的内容?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning',
+      this.$confirm("此操作将删除该目录以及目录下所有的内容?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
       }).then(() => {
         delTreeList({
           ids: [this.dataInfo.id]
         }).then((res) => {
           if (res.code != 0) {
             this.$notify.error({
-              title: '网络错误',
+              title: "网络错误",
               message: res.message,
               duration: 2000,
             });
           } else {
             window.parent.flashSomePage({
-              type: 'productV2_catalog_edit'
+              type: "productV2_catalog_edit"
             })
-            window.location.href = '/productV2/catalog/list'
+            window.location.href = "/productV2/catalog/list"
           }
         }).catch()
       })
     },
     alterData() {
       this.$platform.openTab({
-        id: 'productV2_catalog_edit',
-        title: '产品目录编辑',
+        id: "productV2_catalog_edit",
+        title: "产品目录编辑",
         close: true,
         url: `/productV2/catalog/edit?id=${this.dataInfo.id}`,
       })
     },
     creatData() {
       this.$platform.openTab({
-        id: 'productV2_catalog_edit',
-        title: '产品目录编辑',
+        id: "productV2_catalog_edit",
+        title: "产品目录编辑",
         close: true,
-        url: '/productV2/catalog/edit',
+        url: "/productV2/catalog/edit",
       })
-    }
+    },
+    openProductMenuTab(id) {
+      this.$platform.openTab({
+        id: `productV2_catalog_view_${id}`,
+        title: "产品目录详情",
+        close: true,
+        url: `/productV2/catalog/view?id=${id}`
+      });
+    },
   },
   components: {
     [EventTable.name]: EventTable,
@@ -670,10 +685,11 @@ export default {
     [RemindTable.name]: RemindTable,
     [InfoRecord.name]: InfoRecord,
     [RemindDialog.name]: RemindDialog,
-    [BindCodeDialog.name]: BindCodeDialog,
+    [PublicDialog.name]: PublicDialog,
     [DownloadCodeDialog.name]: DownloadCodeDialog,
     [EditContactDialog.name]: EditContactDialog,
     [ProductContactTable.name]: ProductContactTable,
-    MiniTable
+    MiniTable,
+    [CatalogView.name]:CatalogView,
   }
 }

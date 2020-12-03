@@ -8,10 +8,10 @@
             <div class="product-name overHideCon-1">
               {{ product.name }}
             </div>
-            <div class="flex-x mar-t-8">
+            <div class="flex-x mar-t-8" v-if="product.catalogId">
               产品目录:
-              <div v-if="1==1" class="flex-1 over-x-s color-primary cur-point" style="white-space: nowrap;">
-                产品目录:产品目录:产品目录:产品目录:产品目录:产品目录:产品目录:产品目录:产品目录:产品目录:产品目录:产品目录:产品目录:产品目录:产品目录:产品目录:产品目录:产品目录:产品目录:产品目录:产品目录:产品目录:产品目录:产品目录:
+              <div class="flex-1 over-x-s color-primary cur-point" style="white-space: nowrap;" @click="openProductMenuTab(product.catalogId)">
+                {{product.catalogPathName}}
               </div>
             </div>
           </div>
@@ -66,13 +66,24 @@
                   </el-dropdown-menu>
                 </el-dropdown>
               </div>
-              <div class="mar-l-8 flex-x" @click="openBindCodeDialog">
-                <el-button type="primary"
+              <div class="mar-l-8 flex-x" v-if="!product.qrcodeId">
+                <el-button type="primary" @click="openPublicDialog('linkQrcode')"
                 ><i class="iconfont icon-add1"></i>关联二维码</el-button
                 >
               </div>
             </div>
             <div class="fle-x mar-l-20">
+              <el-tooltip
+                v-if="product.qrcodeId"
+                :popper-options="popperOptions"
+                content="查看二维码"
+                placement="top"
+              >
+                <i
+                  class="iconfont icon-qrcode cur-point"
+                  @click="leftActiveTab='qrcode-view'"
+                ></i>
+              </el-tooltip>
               <el-tooltip
                 :popper-options="popperOptions"
                 content="加提醒"
@@ -216,7 +227,7 @@
                 </template>
 
                 <div slot="qrcodeId" slot-scope="{ value }">
-                  <div class="form-view-row">
+                  <!-- <div class="form-view-row">
                     <label>产品二维码</label>
                     <div class="form-view-row-content" v-show="value">
                       <span>{{ value }}</span>
@@ -238,12 +249,15 @@
                       <a
                         href="javascript:;"
                         class="link"
-                        @click="openBindCodeDialog"
+                        @click="openPublicDialog('linkQrcode')"
                       >关联二维码</a
                       >
                     </div>
-                  </div>
+                  </div> -->
                 </div>
+                <div slot="catalogId" >
+                </div>
+                
 
                 <template slot="createTime" slot-scope="{ value }">
                   <div class="form-view-row" v-if="value">
@@ -256,8 +270,58 @@
               </form-view>
             </el-tab-pane>
             <el-tab-pane label="产品目录" name="catalog-view">
+              <div class="flex-x jus-center" v-if="!product.catalogId">
+                <div class="flex-y">
+                  <img src="@src/assets/img/productV2/catalogNone.png" class="size-160 mar-t-50 mar-b-8" alt="">
+                  <div class="mar-b-12">暂未关联产品目录</div> 
+                  <el-button @click="openPublicDialog('linkCatalog')" >关联产品目录</el-button>
+                </div>
+              </div>
+             
+              <template v-else>
+                <catalog-view :prop-data="{id:product.catalogId}" />
+              </template>
             </el-tab-pane>
             <el-tab-pane label="产品二维码" name="qrcode-view">
+              <div class="flex-x jus-center" v-if="!product.qrcodeId">
+                <div class="flex-y">
+                  <img src="@src/assets/img/productV2/qrcodeNone.png" class="size-160 mar-t-50 mar-b-8" alt="">
+                  <div class="mar-b-12">暂未关联产品二维码</div> 
+                  <el-button @click="openPublicDialog('linkQrcode')" >关联产品二维码</el-button>
+                </div>
+              </div>
+              
+              <template v-else>
+                <div class="box-12">
+                  <div class="form-view-row">
+                    <label>产品二维码</label>
+                    <div class="form-view-row-content " v-show="product.qrcodeId">
+                      <span>{{ product.qrcodeId }}</span>
+                      <div class="qrcodeBtn">
+                        <div ref="qrcode" style="margin: 10px 0;"></div>
+                        <div class="flex-x jus-bet">
+                          <el-button @click="openDownloadCodeDialog">下载</el-button>
+
+
+                          <el-button type="danger" @click="unbindQrcodeFromProduct">删除</el-button>
+                        </div>
+                      </div>
+                    <!-- <a
+                      href="javascript:;"
+                      class="link"
+                      @click="openDownloadCodeDialog"
+                    >下载</a
+                    >
+                    <a
+                      href="javascript:;"
+                      class="link"
+                      @click="unbindQrcodeFromProduct"
+                    >删除</a
+                    > -->
+                    </div>
+                  </div>
+                </div>
+              </template>
             </el-tab-pane>
 
             
@@ -283,7 +347,7 @@
               name="info-record"
             >
               <info-record
-                ref="producMmenuInfoRecord"
+                ref="producInfoRecord"
                 :share-data="propsForSubComponents"
               />
             </el-tab-pane>
@@ -331,12 +395,6 @@
             >
               <remind-table :share-data="propsForSubComponents"></remind-table>
             </el-tab-pane>
-            <el-tab-pane label="备件" name="part">
-              <!-- <mini-table :id="product.id" data-type="part" page-type="view" /> -->
-            </el-tab-pane>
-            <el-tab-pane label="知识库" name="wiki">
-              <!-- <mini-table :id="product.id" data-type="wiki" page-type="view" /> -->
-            </el-tab-pane>
           </el-tabs>
         </div>
       </template>
@@ -345,7 +403,8 @@
     <!-- end 工单详情折叠面板 -->
 
     <remind-dialog ref="addRemindDialog" :product="product"></remind-dialog>
-    <bind-code :product-id="product.id" ref="bindCodeDialog"></bind-code>
+    <public-dialog :product-id="product.id" :dialog-type="dialogType" @dialogBind="dialogBind" ref="publicDialog"/>
+    <download-code :code-data="downloadCodeData" ref="downloadCodeDialog"></download-code>
 
     <!-- tour s -->
     <v-tour
@@ -413,7 +472,7 @@
 </template>
 
 <script>
-import ProductDetailView from './ProductDetailView';
+import ProductDetailView from "./ProductDetailView";
 export default ProductDetailView;
 </script>
 
@@ -628,5 +687,9 @@ export default ProductDetailView;
       }
     }
   }
+}
+
+.qrcodeBtn{
+  width: 250px;
 }
 </style>

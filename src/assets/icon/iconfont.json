@@ -6,6 +6,13 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "18608409",
+      "name": "qrcode",
+      "font_class": "qrcode",
+      "unicode": "e6da",
+      "unicode_decimal": 59098
+    },
+    {
       "icon_id": "18558502",
       "name": "file-copy",
       "font_class": "file-copy",

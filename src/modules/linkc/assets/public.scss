@@ -45,6 +45,10 @@
   margin-top: 12px;
 }
 
+.mar-t-50 {
+  margin-top: 50px;
+}
+
 .mar-l-6 {
   margin-left: 6px;
 }
@@ -449,6 +453,9 @@
 .jus-center {
   justify-content: center;
 }
+.jus-bet {
+  justify-content: space-between;
+}
 
 .over-x-h {
   overflow-x: hidden;
@@ -466,4 +473,13 @@
     display: none;
     /* Chrome Safari */
   }
+}
+
+.size-160{
+  width: 160px;
+  height: 160px;
+}
+
+.normal-form-view-box{
+  padding: 8px 20px;
 }

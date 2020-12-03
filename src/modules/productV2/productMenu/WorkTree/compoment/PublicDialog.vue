@@ -54,7 +54,7 @@
               :loading="selectLoading"
             >
               <el-option
-                v-for="item in options"
+                v-for="item in (dialogData[dialogType] && dialogData[dialogType].options)"
                 :key="item.id"
                 :label="dialogType == 'linkWiki' ? item.title : dialogType== 'cloneMenu'? item.pathName : item.name"
                 :value="item.id"
@@ -121,17 +121,17 @@ import {
   getPageCloneData,
   getPagePart,
   getPageWiki,
-} from '@src/api/ProductV2Api';
-import _ from 'lodash';
+} from "@src/api/ProductV2Api";
+import _ from "lodash";
 export default {
-  name: 'public-dialog',
+  name: "public-dialog",
   props: {
     visibleProp: {
       type: Boolean,
     },
     dialogType: {
       type: String,
-      default: 'addMenu',
+      default: "addMenu",
     },
     initData: {
       type: Object,
@@ -141,40 +141,42 @@ export default {
     return {
       dialogData: {
         addMenu: {
-          title: '添加目录',
+          title: "添加目录",
         },
         addMenuChild: {
-          title: '添加目录',
+          title: "添加目录",
         },
         cloneMenu: {
-          title: '选择需要复制的目录',
+          title: "选择需要复制的目录",
           http: getPageCloneData,
+          options: [],
         },
         renameMenuChild: {
-          title: '重命名',
+          title: "重命名",
         },
         linkPart: {
-          title: '关联备件',
+          title: "关联备件",
           http: getPagePart,
+          options: [],
         },
         linkWiki: {
-          title: '关联知识库',
+          title: "关联知识库",
           http: getPageWiki,
+          options: [],
         },
       },
       nowChooseArr: [],
       selectedSparepart: [],
       ruleForm: {
-        name: '',
+        name: "",
       },
       rules: {
         name: [
-          { required: true, message: '请输入目录名称', trigger: 'blur' },
-          { min: 1, max: 30, message: '最多30个字符', trigger: 'change' },
+          { required: true, message: "请输入目录名称", trigger: "blur" },
+          { min: 1, max: 30, message: "最多30个字符", trigger: "change" },
         ],
       },
       selectLoading: false,
-      options: [],
       btnLoading: false,
     };
   },
@@ -184,7 +186,7 @@ export default {
         return this.visibleProp;
       },
       set(val) {
-        this.$emit('changeVisibleProp', val);
+        this.$emit("changeVisibleProp", val);
       },
     },
   },
@@ -192,49 +194,48 @@ export default {
     visible(newVal, oldVal) {
       if (newVal == false) {
         if (
-          this.dialogType == 'addMenu'
-          || this.dialogType == 'renameMenuChild'
-          || this.dialogType == 'addMenuChild'
+          this.dialogType == "addMenu"
+          || this.dialogType == "renameMenuChild"
+          || this.dialogType == "addMenuChild"
         )
-          this.$refs['ruleForm'].resetFields();
+          this.$refs["ruleForm"].resetFields();
         this.nowChooseArr = [];
         this.btnLoading = false;
-        // this.$refs.comLenovoselect.resetSerchList();
       }
     },
     initData(newVal, oldVal) {
-      if (this.dialogType == 'renameMenuChild')
-        this.$set(this.ruleForm, 'name', newVal.name);
+      if (this.dialogType == "renameMenuChild")
+        this.$set(this.ruleForm, "name", newVal.name);
     },
   },
   methods: {
     confirm() {
       if (
-        this.dialogType == 'addMenu'
-        || this.dialogType == 'addMenuChild'
-        || this.dialogType == 'renameMenuChild'
+        this.dialogType == "addMenu"
+        || this.dialogType == "addMenuChild"
+        || this.dialogType == "renameMenuChild"
       ) {
-        this.$refs['ruleForm'].validate((valid) => {
-          if (valid) this.$emit('confirm', { catalogName: this.ruleForm.name });
+        this.$refs["ruleForm"].validate((valid) => {
+          if (valid) this.$emit("confirm", { catalogName: this.ruleForm.name });
         });
       } else if (
-        this.dialogType == 'linkPart'
-        || this.dialogType == 'linkWiki'
-        || this.dialogType == 'cloneMenu'
+        this.dialogType == "linkPart"
+        || this.dialogType == "linkWiki"
+        || this.dialogType == "cloneMenu"
       ) {
-        this.$emit('confirm', { nowChooseArr: this.nowChooseArr });
+        this.$emit("confirm", { nowChooseArr: this.nowChooseArr });
       }
     },
     dataUpdate(e, key) {
       this[key] = e;
     },
     calculateClass(e, t) {
-      let str = '';
+      let str = "";
       if (e.slotNowData) {
         for (let index = 0; index < e.slotNowData.length; index++) {
           const element = e.slotNowData[index];
           if (element.orderId === t.orderId) {
-            str = 'checked-item';
+            str = "checked-item";
           }
         }
       }
@@ -255,7 +256,7 @@ export default {
           if (!res) {
             return;
           }
-          this.options = res.result.list;
+          this.dialogData[this.dialogType].options = res.result.list;
         })
         .catch((err) => {})
         .finally(() => {
@@ -268,11 +269,11 @@ export default {
     searchPart(params) {
       // params has three properties include keyword、pageSize、pageNum.
       const pms = params || {};
-      pms.repertoryId = this.repertoryId || '';
+      pms.repertoryId = this.repertoryId || "";
       pms.with_OOS = false;
       pms.keyWord = pms.keyword;
       return this.$http
-        .get('/task/spare/list', pms)
+        .get("/task/spare/list", pms)
         .then((res) => {
           if (!res || !res.list) return;
           res.list = res.list.map((template) =>
@@ -293,9 +294,9 @@ export default {
       let newValue = value[0];
 
       for (let key in this.sparepart) {
-        if (key == 'salePrice') {
+        if (key == "salePrice") {
           this.sparepart.salePrice = newValue.salePrice.toFixed(2);
-        } else if (key == 'number') {
+        } else if (key == "number") {
           this.sparepart.number = newValue.availableNum > 1 ? 1 : newValue.availableNum;
         } else {
           this.sparepart[key] = newValue[key];

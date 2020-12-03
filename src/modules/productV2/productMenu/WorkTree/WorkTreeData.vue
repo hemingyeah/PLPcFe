@@ -47,7 +47,7 @@
             <el-checkbox-group v-model="fieldIds">
               <template v-for="item in fields">
                 <el-checkbox
-                  :checked="item.hideform"
+                  
                   v-if="item.isSystem != 1"
                   :label="item.id"
                   :key="item.id"
@@ -183,41 +183,42 @@
   </div>
 </template>
 <script>
-import _ from 'lodash';
-import MiniTable from './compoment/MiniTable';
-import Uploader from 'packages/BaseUpload/uploader';
-import NoDataView from '@src/component/common/NoDataViewNew';
-import fields from './fiedls';
+import _ from "lodash";
+import MiniTable from "@src/modules/productV2/productMenu/WorkTree/compoment/MiniTable.vue";
+import Uploader from "packages/BaseUpload/uploader";
+import NoDataView from "@src/component/common/NoDataViewNew";
+import fields from "./fiedls";
 
 import {
   getProductMenuField,
   getPageInfo,
   setPageInfo,
   clearCatalogData,
-} from '@src/api/ProductV2Api';
+} from "@src/api/ProductV2Api";
 
 const urlKey = {
-  catalogName: 'catalog_name',
-  productDesc: 'product_desc',
-  productVideo: 'product_video',
-  productPic: 'product_pic',
-  productExplain: 'product_explain',
+  catalogName: "catalog_name",
+  productDesc: "product_desc",
+  productVideo: "product_video",
+  productPic: "product_pic",
+  productExplain: "product_explain",
 };
+let fieldIds_ = [];
 export default {
-  name: 'work-tree-data',
+  name: "work-tree-data",
   props: {
     propData: {
       type: Object,
       default: () => ({}),
     },
   },
-  inject: ['rootDataChange', 'changeTreeDetail'],
+  inject: ["rootDataChange", "changeTreeDetail"],
   data() {
     return {
       form: {
-        name: '',
-        resource: '',
-        desc: '',
+        name: "",
+        resource: "",
+        desc: "",
       },
       fileList: [],
       fields: [],
@@ -236,7 +237,7 @@ export default {
     propData(newVal, oldVal) {
       this.$set(
         this.productMenuValue,
-        'catalog_name',
+        "catalog_name",
         _.cloneDeep(newVal.name)
       );
       if (newVal.canEditConData && newVal.conData) {
@@ -244,9 +245,10 @@ export default {
       }
     },
     fieldIds(newVal, oldVal) {
+      console.log(newVal, "newVal")
       this.fields.map((item) => {
-        if (newVal.indexOf(item.id) > -1) item['hideform'] = true;
-        else item['hideform'] = false;
+        if (newVal.indexOf(item.id) > -1 || item.isSystem == 1) item["hideform"] = false;
+        else item["hideform"] = true;
         return item;
       });
     },
@@ -261,17 +263,18 @@ export default {
           const sortedFields = fields
             .sort((a, b) => a.orderId - b.orderId)
             .map((item) => {
-              if (item.fieldName == 'catalogNum') item['disabled'] = true;
+              if (item.fieldName == "catalogNum") item["disabled"] = true;
               return item;
             });
-          this.fielIdArr = sortedFields.map((item) => {
+             
+          fieldIds_ = sortedFields.filter(item=>item.isSystem != 1).map((item) => {
             return item.id;
           });
-          console.log(sortedFields)
+          console.log(sortedFields, fieldIds_)
           this.fields = sortedFields;
         } else {
           this.$notify.error({
-            title: '网络错误',
+            title: "网络错误",
             message,
             duration: 2000,
           });
@@ -283,7 +286,7 @@ export default {
     initProductMenuValue() {
       return {
         catalog_name: this.propData.name,
-        product_desc: '',
+        product_desc: "",
         product_video: [],
         product_pic: [],
         product_explain: [],
@@ -297,40 +300,40 @@ export default {
       this.$previewVideo(file.url);
     },
     onBeforeUploadImage(file) {
-      const isJPG = file.type === 'image/jpeg' || file.type === 'image/png';
+      const isJPG = file.type === "image/jpeg" || file.type === "image/png";
       const isLt2M = file.size / 1024 / 1024 < 2;
 
       if (!isJPG) {
-        this.$message.error('上传头像图片只能是 JPG/PNG 格式!');
+        this.$message.error("上传头像图片只能是 JPG/PNG 格式!");
       }
       if (!isLt2M) {
-        this.$message.error('上传头像图片大小不能超过 2MB!');
+        this.$message.error("上传头像图片大小不能超过 2MB!");
       }
       // this.fileList.push(file);
       return isJPG && isLt2M;
     },
     onBeforeUploadVideo(file) {
-      const isMP4 = file.type === 'video/mp4';
+      const isMP4 = file.type === "video/mp4";
       const isLt10M = file.size / 1024 / 1024 < 10;
 
       if (!isMP4) {
-        this.$message.error('上传视频只能是 MP4 格式!');
+        this.$message.error("上传视频只能是 MP4 格式!");
       }
       if (!isLt10M) {
-        this.$message.error('上传视频大小不能超过 10MB!');
+        this.$message.error("上传视频大小不能超过 10MB!");
       }
       // this.fileList.push(file);
       return isMP4 && isLt10M;
     },
     UploadImage(param) {
-      Uploader.upload(param.file, '/files/upload')
+      Uploader.upload(param.file, "/files/upload")
         .then((result) => {
-          console.log(result, 'result');
+          console.log(result, "result");
           if (result.status != 0) {
             this.$message({
               message: `${result.message}`,
               duration: 1500,
-              type: 'error',
+              type: "error",
             });
             return;
           }
@@ -344,11 +347,11 @@ export default {
             fileSize: file.fileSizeStr,
           };
           // param.file['ossUrl'] = item.url;
-          this.$set(this.productMenuValue, 'productPic', [
+          this.$set(this.productMenuValue, "productPic", [
             ...this.productMenuValue.productPic,
             item,
           ]);
-          console.log(this.productMenuValue, 'productMenuValue.productPic');
+          console.log(this.productMenuValue, "productMenuValue.productPic");
         })
         .catch((err) => {
           console.warn(err);
@@ -374,20 +377,20 @@ export default {
       let value = this.productMenuValue;
 
       this.$set(value, fieldName, newValue);
-      this.$emit('input', value);
+      this.$emit("input", value);
     },
     setMenuInfo() {
-      this.rootDataChange('nowEditMenu', { ...this.propData, conData: 1 });
-      this.changeTreeDetail('conData', 1);
+      this.rootDataChange("nowEditMenu", { ...this.propData, conData: 1 });
+      this.changeTreeDetail("conData", 1);
     },
     resetForm() {
       // 清空校验结果
       setTimeout(() => {
         try {
           this.$refs.form.$children.map((child) => {
-            if (child.$el.className == 'form-item err') {
+            if (child.$el.className == "form-item err") {
               child.$el.dispatchEvent(
-                new CustomEvent('form.clear.validate', { bubbles: false })
+                new CustomEvent("form.clear.validate", { bubbles: false })
               );
             }
           });
@@ -397,29 +400,29 @@ export default {
     async submit() {
       const validateRes = await this.$refs.form.validate();
       if (!validateRes) return;
-      this.rootDataChange('fullscreenLoading', true);
+      this.rootDataChange("fullscreenLoading", true);
       let url_data = this.transferData();
       this.btnLoading = true;
       setPageInfo(url_data)
         .then((res) => {
           if (res.code != 0) {
             this.$notify.error({
-              title: '网络错误',
+              title: "网络错误",
               message: res.message,
               duration: 2000,
             });
           } else {
             this.$message({
-              message: '保存成功',
-              type: 'success',
+              message: "保存成功",
+              type: "success",
             });
             window.parent.flashSomePage({
-              type: 'M_PRODUCT_CATALOG',
+              type: "M_PRODUCT_CATALOG",
             });
           }
         })
         .finally(() => {
-          this.rootDataChange('fullscreenLoading', false);
+          this.rootDataChange("fullscreenLoading", false);
           this.btnLoading = false;
         });
     },
@@ -431,9 +434,9 @@ export default {
         obj[key] = tran_data[key];
         delete tran_data[key];
       }
-      obj['attribute'] = tran_data;
-      obj['id'] = this.propData.id;
-      obj['fieldIds'] = this.fieldIds;
+      obj["attribute"] = tran_data;
+      obj["id"] = this.propData.id;
+      obj["fieldIds"] = fieldIds_.filter(item=>!this.fieldIds.some(ele=>ele == item));
       return obj;
     },
     reflashPage(id) {
@@ -445,13 +448,15 @@ export default {
           res.result.catalogInfo.productVideo = res.result.catalogInfo.productVideo || [];
           res.result.catalogInfo.productPic = res.result.catalogInfo.productPic || [];
           res.result.catalogInfo.productExplain = res.result.catalogInfo.productExplain || [];
-          this.$set(this, 'productMenuValue', res.result.catalogInfo);
-          if (res.result.selectField) {
-            this.$set(this, 'fieldIds', res.result.selectField);
+          this.$set(this, "productMenuValue", res.result.catalogInfo);
+          
+          if (res.result.selectField.length) {
+            
+            this.$set(this, "fieldIds", fieldIds_.filter(item=>!res.result.selectField.some(ele=>ele == item)));
           }
         } else {
           this.$notify.error({
-            title: '网络错误',
+            title: "网络错误",
             message: res.message,
             duration: 2000,
           });
@@ -460,15 +465,15 @@ export default {
       // this.$set(this, 'flashPartType', false);
       // this.$set(this, 'flashProductType', false);
       this.$nextTick(() => {
-        this.$set(this, 'flashPartType', true);
-        this.$set(this, 'flashProductType', true);
+        this.$set(this, "flashPartType", true);
+        this.$set(this, "flashProductType", true);
       });
     },
     deletInfo() {
-      this.$confirm('此操作将删除该目录所编辑的内容?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning',
+      this.$confirm("此操作将删除该目录所编辑的内容?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
       })
         .then(() => {
           this.btnLoading = true;
@@ -477,21 +482,21 @@ export default {
           })
             .then((res) => {
               if (res.code == 0) {
-                this.rootDataChange('nowEditMenu', {
+                this.rootDataChange("nowEditMenu", {
                   ...this.propData,
                   conData: 0,
                 });
-                this.changeTreeDetail('conData', 0);
+                this.changeTreeDetail("conData", 0);
                 this.$message({
-                  message: '删除成功',
-                  type: 'success',
+                  message: "删除成功",
+                  type: "success",
                 });
                 window.parent.flashSomePage({
-                  type: 'M_PRODUCT_CATALOG',
+                  type: "M_PRODUCT_CATALOG",
                 });
               } else {
                 this.$notify.error({
-                  title: '网络错误',
+                  title: "网络错误",
                   message: res.message,
                   duration: 2000,
                 });
@@ -504,7 +509,7 @@ export default {
         .catch(() => {});
     },
     reflashTable(type) {
-      if (type == 'part') {
+      if (type == "part") {
         this.$refs.form.$slots.product_menu_part[2].child.reflash();
         // this.$set(this, 'flashPartType', false);
         // this.$nextTick(() => {

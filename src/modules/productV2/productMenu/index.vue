@@ -58,11 +58,11 @@
   </div>
 </template>
 <script>
-import _ from 'lodash';
+import _ from "lodash";
 
-import workTreeDraggable from '@src/modules/productV2/productMenu/WorkTree/workTreeDraggable';
-import WorkTreeData from '@src/modules/productV2/productMenu/WorkTree/WorkTreeData';
-import PublicDialog from '@src/modules/productV2/productMenu/WorkTree/compoment/PublicDialog';
+import workTreeDraggable from "@src/modules/productV2/productMenu/WorkTree/workTreeDraggable";
+import WorkTreeData from "@src/modules/productV2/productMenu/WorkTree/WorkTreeData";
+import PublicDialog from "@src/modules/productV2/productMenu/WorkTree/compoment/PublicDialog";
 
 import {
   getTreeList,
@@ -70,7 +70,7 @@ import {
   setPagerelationPartOrWiki,
   renameTree,
   cloneMenu,
-} from '@src/api/ProductV2Api';
+} from "@src/api/ProductV2Api";
 
 let finded = false;
 export default {
@@ -87,10 +87,10 @@ export default {
     return {
       allType: true,
       visibleProp: false,
-      dialogType: 'addMenu',
+      dialogType: "addMenu",
       treeData: [
         {
-          id: '',
+          id: "",
           tasks: [],
         },
       ],
@@ -102,7 +102,7 @@ export default {
       childData: {},
       sortMenu: {},
       dialogInitData: {},
-      fasterFindId: '',
+      fasterFindId: "",
     };
   },
   components: {
@@ -141,52 +141,52 @@ export default {
     dialogConfirm(e) {
       this.$refs.publicDialog.changeBtnLoading(true);
       switch (this.dialogType) {
-      case 'addMenu':
+      case "addMenu":
         e = {
           ...e,
-          parentId: '',
+          parentId: "",
           pathName: `${e.catalogName}`,
           orderId: this.treeData[0].tasks.length,
           showList: 1,
         };
         this.addMenu(e);
         break;
-      case 'addMenuChild':
+      case "addMenuChild":
         e = {
           ...e,
           parentId: this.childData.id,
           pathName: [
             ..._.cloneDeep(this.childData.pathNameArr),
             e.catalogName,
-          ].join('/'),
+          ].join("/"),
           orderId: this.treeData[0].tasks.length,
           showList: 1,
         };
         this.addMenu(e);
         break;
-      case 'renameMenuChild':
+      case "renameMenuChild":
         e = {
           ...e,
-          pathName: [...this.childData.pathNameArr, e.catalogName].join('/'),
+          pathName: [...this.childData.pathNameArr, e.catalogName].join("/"),
           id: this.childData.id,
         };
         this.renameMenu(e);
         break;
-      case 'linkPart':
+      case "linkPart":
         if (Object.keys(e).length) {
-          this.link('part', e.nowChooseArr);
+          this.link("part", e.nowChooseArr);
         } else {
           this.changeVisibleProp(false);
         }
         break;
-      case 'linkWiki':
+      case "linkWiki":
         if (Object.keys(e).length) {
-          this.link('wiki', e.nowChooseArr);
+          this.link("wiki", e.nowChooseArr);
         } else {
           this.changeVisibleProp(false);
         }
         break;
-      case 'cloneMenu':
+      case "cloneMenu":
         if (e.nowChooseArr && e.nowChooseArr.length > 0) {
           this.$refs.workTreeData.reflashPage(e.nowChooseArr[0]);
           cloneMenu({
@@ -195,16 +195,16 @@ export default {
           }).then((res) => {
             if (res.code == 0) {
               this.$message({
-                message: '复制成功',
-                type: 'success',
+                message: "复制成功",
+                type: "success",
               });
               window.parent.flashSomePage({
-                type: 'M_PRODUCT_CATALOG',
+                type: "M_PRODUCT_CATALOG",
               });
               this.changeVisibleProp(false);
             } else {
               this.$notify.error({
-                title: '网络错误',
+                title: "网络错误",
                 message: res.message,
                 duration: 2000,
               });
@@ -222,7 +222,7 @@ export default {
     },
     rootDataChange(key, val) {
       this.$set(this, key, val);
-      if (key == 'nowEditMenu') this.$refs.workTreeData.resetForm();
+      if (key == "nowEditMenu") this.$refs.workTreeData.resetForm();
     },
     getTreeData() {
       this.fullscreenLoading = true;
@@ -241,30 +241,33 @@ export default {
                 nowIndex: 0,
               };
               if (this.fasterFindId) {
-                try {
-                  let fasterEditRoot_ = this.fasterFindRootById(
-                    this.treeData[0].tasks,
-                    this.fasterFindId,
-                    [0]
+                // try {
+                let fasterEditRoot_ = this.fasterFindRootById(
+                  this.treeData[0].tasks,
+                  this.fasterFindId,
+                  [0]
+                );
+                fasterEditRoot_["canEditConData"] = !(
+                  fasterEditRoot_.tasks.length > 0
+                );
+                nowEditMenu = fasterEditRoot_;
+
+                if (fasterEditRoot_.indexArr.length > 2) {
+                  this.fasterShowList(
+                    this.treeData,
+                    fasterEditRoot_.indexArr,
+                    0
                   );
-                  fasterEditRoot_['canEditConData'] = !(
-                    fasterEditRoot_.tasks.length > 0
-                  );
-                  nowEditMenu = fasterEditRoot_;
-                  if (fasterEditRoot_.indexArr.length > 2) {
-                    this.fasterShowList(
-                      this.treeData,
-                      fasterEditRoot_.indexArr,
-                      0
-                    );
-                  }
-                } catch (error) {}
+                }
+                // } catch (error) {
+                //   console.warn("getTreeList error", error);
+                // }
               }
               this.nowEditMenu = nowEditMenu;
             }
           } else {
             this.$notify.error({
-              title: '网络错误',
+              title: "网络错误",
               message: res.message,
               duration: 2000,
             });
@@ -280,16 +283,16 @@ export default {
           if (res.code == 0) {
             if (res.result) {
               res.result.tasks = [];
-              if (this.dialogType == 'addMenu') {
-                this.changeTree('add', [0], res.result);
+              if (this.dialogType == "addMenu") {
+                this.changeTree("add", [0], res.result);
               } else {
-                this.changeTree('add', this.childData.indexArr, res.result);
+                this.changeTree("add", this.childData.indexArr, res.result);
               }
             }
             this.changeVisibleProp(false);
           } else {
             this.$notify.error({
-              title: '网络错误',
+              title: "网络错误",
               message: res.message,
               duration: 2000,
             });
@@ -316,7 +319,7 @@ export default {
             this.changeVisibleProp(false);
           } else {
             this.$notify.error({
-              title: '网络错误',
+              title: "网络错误",
               message: res.message,
               duration: 2000,
             });
@@ -335,9 +338,9 @@ export default {
           0,
           indexArr.length - 1
         );
-        if (type == 'add') {
+        if (type == "add") {
           element.push(data);
-        } else if (type == 'delete') {
+        } else if (type == "delete") {
           if (this.nowEditMenu && this.nowEditMenu.id == des.id) {
             this.nowEditMenu = {};
           }
@@ -368,20 +371,25 @@ export default {
     },
     fasterFindRootById(arr, id, indexArr) {
       let item;
+      
       for (let index = 0; index < arr.length; index++) {
+
+        let indexArr_ = _.cloneDeep(indexArr)
         if (finded) {
           break;
         }
         if (arr[index].id == id) {
           finded = true;
           item = arr[index];
-          indexArr.push(index);
-          item['indexArr'] = indexArr;
-          item['nowIndex'] = index;
+          indexArr_.push(index);
+          item["indexArr"] = indexArr_;
+          item["nowIndex"] = index;
           break;
         } else if (arr[index].tasks.length > 0) {
-          indexArr.push(index);
-          return this.fasterFindRootById(arr[index].tasks, id, indexArr);
+          indexArr_.push(index);
+          item = this.fasterFindRootById(arr[index].tasks, id, indexArr_);
+        } else if (arr[index].tasks.length <= 0) {
+          continue;
         }
       }
       if (finded) {
@@ -390,12 +398,13 @@ export default {
     },
     fasterShowList(data, indexArr, index) {
       let root = data[indexArr[index]].tasks;
+      // debugger;
       if (index < indexArr.length - 2) {
         index++;
         if (index > 0 && indexArr.length > 2) {
-          root[indexArr[index]]['showList'] = 1;
+          root[indexArr[index]]["showList"] = 1;
         }
-        return this.fasterShowList(root, indexArr, index);
+        if (root.length) this.fasterShowList(root, indexArr, index);
       }
     },
     link(type, data) {
@@ -409,11 +418,11 @@ export default {
             this.changeVisibleProp(false);
             this.$refs.workTreeData.reflashTable(type);
             window.parent.flashSomePage({
-              type: 'M_PRODUCT_CATALOG',
+              type: "M_PRODUCT_CATALOG",
             });
           } else {
             this.$notify.error({
-              title: '网络错误',
+              title: "网络错误",
               message: res.message,
               duration: 2000,
             });

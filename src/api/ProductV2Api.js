@@ -1,5 +1,5 @@
-import http from '@src/util/http';
-const headUrl = '/api/customer'
+import http from "@src/util/http";
+const headUrl = "/api/customer";
 
 /** ------------ start 产品 ----------------------- */
 /**
@@ -8,7 +8,7 @@ const headUrl = '/api/customer'
  * @returns {*}
  */
 function getProductMenuField(params) {
-  return http.get(`${headUrl}/outside/pc/catalog/setting/select`, params)
+  return http.get(`${headUrl}/outside/pc/catalog/setting/select`, params);
 }
 
 /**
@@ -17,7 +17,7 @@ function getProductMenuField(params) {
  * @returns {*}
  */
 function setProductMenuField(params) {
-  return http.post(`${headUrl}/outside/pc/catalog/setting/save`, params)
+  return http.post(`${headUrl}/outside/pc/catalog/setting/save`, params);
 }
 
 /**
@@ -26,7 +26,7 @@ function setProductMenuField(params) {
  * @returns {*}
  */
 function getTreeList(params) {
-  return http.get(`${headUrl}/outside/pc/catalog/treeList`, params)
+  return http.get(`${headUrl}/outside/pc/catalog/treeList`, params);
 }
 
 /**
@@ -35,7 +35,7 @@ function getTreeList(params) {
  * @returns {*}
  */
 function setTreeList(params) {
-  return http.post(`${headUrl}/outside/pc/catalog/saveTree`, params)
+  return http.post(`${headUrl}/outside/pc/catalog/saveTree`, params);
 }
 
 /**
@@ -44,7 +44,7 @@ function setTreeList(params) {
  * @returns {*}
  */
 function sortTreeList(params) {
-  return http.post(`${headUrl}/outside/pc/catalog/treeSort`, params)
+  return http.post(`${headUrl}/outside/pc/catalog/treeSort`, params);
 }
 
 /**
@@ -53,9 +53,8 @@ function sortTreeList(params) {
  * @returns {*}
  */
 function delTreeList(params) {
-  return http.post(`${headUrl}/outside/pc/catalog/batchDelete`, params)
+  return http.post(`${headUrl}/outside/pc/catalog/batchDelete`, params);
 }
-
 
 /**
  * 目录树设置详情
@@ -63,7 +62,7 @@ function delTreeList(params) {
  * @returns {*}
  */
 function setInfoTreeList(params) {
-  return http.post(`${headUrl}/outside/pc/catalog/saveInfo`, params)
+  return http.post(`${headUrl}/outside/pc/catalog/saveInfo`, params);
 }
 
 /**
@@ -72,7 +71,7 @@ function setInfoTreeList(params) {
  * @returns {*}
  */
 function getPageList(params) {
-  return http.post(`${headUrl}/outside/pc/catalog/pageList`, params)
+  return http.post(`${headUrl}/outside/pc/catalog/pageList`, params);
 }
 
 /**
@@ -81,9 +80,8 @@ function getPageList(params) {
  * @returns {*}
  */
 function getPageInfo(params) {
-  return http.get(`${headUrl}/outside/pc/catalog/info`, params)
+  return http.get(`${headUrl}/outside/pc/catalog/info`, params);
 }
-
 
 /**
  * 目录详情关联产品列表查询
@@ -92,7 +90,7 @@ function getPageInfo(params) {
  * @returns {*}
  */
 function getPageProduct(params) {
-  return http.get(`${headUrl}/outside/pc/catalog/product`, params)
+  return http.get(`${headUrl}/outside/pc/catalog/product`, params);
 }
 
 /**
@@ -102,10 +100,8 @@ function getPageProduct(params) {
  * @returns {*}
  */
 function setPageRelationProduct(params) {
-  return http.post(`${headUrl}/outside/pc/catalog/relationProduct`, params)
+  return http.post(`${headUrl}/outside/pc/catalog/relationProduct`, params);
 }
-
-
 
 /**
  * 目录详情关联备件列表查询
@@ -114,7 +110,7 @@ function setPageRelationProduct(params) {
  * @returns {*}
  */
 function getPageLinkPart(params) {
-  return http.get(`${headUrl}/outside/pc/catalog/part`, params)
+  return http.get(`${headUrl}/outside/pc/catalog/part`, params);
 }
 
 /**
@@ -124,9 +120,8 @@ function getPageLinkPart(params) {
  * @returns {*}
  */
 function getPageLinkWiki(params) {
-  return http.get(`${headUrl}/outside/pc/catalog/wiki`, params)
+  return http.get(`${headUrl}/outside/pc/catalog/wiki`, params);
 }
-
 
 /**
  * 目录详情关联备件或知识库
@@ -137,7 +132,7 @@ function getPageLinkWiki(params) {
  * @returns {*}
  */
 function setPagerelationPartOrWiki(params) {
-  return http.post(`${headUrl}/outside/pc/catalog/relationPartOrWiki`, params)
+  return http.post(`${headUrl}/outside/pc/catalog/relationPartOrWiki`, params);
 }
 
 /**
@@ -147,9 +142,8 @@ function setPagerelationPartOrWiki(params) {
  * @returns {*}
  */
 function getPageWiki(params) {
-  return http.get(`${headUrl}/outside/pc/catalog/getWiki`, params)
+  return http.get(`${headUrl}/outside/pc/catalog/getWiki`, params);
 }
-
 
 /**
  * 目录详情关联知识库列表查询
@@ -158,7 +152,7 @@ function getPageWiki(params) {
  * @returns {*}
  */
 function setPageInfo(params) {
-  return http.post(`${headUrl}/outside/pc/catalog/edit`, params)
+  return http.post(`${headUrl}/outside/pc/catalog/edit`, params);
 }
 
 /**
@@ -168,7 +162,7 @@ function setPageInfo(params) {
  * @returns {*}
  */
 function getPageCloneData(params) {
-  return http.get(`${headUrl}/outside/pc/catalog/cloneData`, params)
+  return http.get(`${headUrl}/outside/pc/catalog/cloneData`, params);
 }
 
 /**
@@ -178,9 +172,8 @@ function getPageCloneData(params) {
  * @returns {*}
  */
 function getPagePart(params) {
-  return http.get(`${headUrl}/outside/pc/catalog/getPart`, params)
+  return http.get(`${headUrl}/outside/pc/catalog/getPart`, params);
 }
-
 
 /**
  * 获取关联的知识库列表
@@ -189,9 +182,8 @@ function getPagePart(params) {
  * @returns {*}
  */
 function getPagelinkWiki(params) {
-  return http.get(`${headUrl}/outside/pc/catalog/getWiki`, params)
+  return http.get(`${headUrl}/outside/pc/catalog/getWiki`, params);
 }
-
 
 /**
  * 目录重命名
@@ -200,9 +192,8 @@ function getPagelinkWiki(params) {
  * @returns {*}
  */
 function renameTree(params) {
-  return http.post(`${headUrl}/outside/pc/catalog/updateTree`, params)
+  return http.post(`${headUrl}/outside/pc/catalog/updateTree`, params);
 }
-
 
 /**
  * 目录关联备件知识库单独删除
@@ -211,7 +202,7 @@ function renameTree(params) {
  * @returns {*}
  */
 function removePartOrWiki(params) {
-  return http.post(`${headUrl}/outside/pc/catalog/removePartOrWiki`, params)
+  return http.post(`${headUrl}/outside/pc/catalog/removePartOrWiki`, params);
 }
 
 /**
@@ -221,7 +212,7 @@ function removePartOrWiki(params) {
  * @returns {*}
  */
 function clearCatalogData(params) {
-  return http.get(`${headUrl}/outside/pc/catalog/clearCatalogData`, params)
+  return http.get(`${headUrl}/outside/pc/catalog/clearCatalogData`, params);
 }
 
 /**
@@ -231,7 +222,7 @@ function clearCatalogData(params) {
  * @returns {*}
  */
 function getMenuRecord(params) {
-  return http.get(`${headUrl}/outside/pc/catalog/record`, params)
+  return http.get(`${headUrl}/outside/pc/catalog/record`, params);
 }
 
 /**
@@ -241,10 +232,8 @@ function getMenuRecord(params) {
  * @returns {*}
  */
 function getTreeListNode(params) {
-  
-  return http.get(`${headUrl}/outside/pc/catalog/getTreeListNode`, params)
+  return http.get(`${headUrl}/outside/pc/catalog/getTreeListNode`, params);
 }
-
 
 /**
  * 克隆某个目录
@@ -253,10 +242,8 @@ function getTreeListNode(params) {
  * @returns {*}
  */
 function cloneMenu(params) {
-  
-  return http.get(`${headUrl}/outside/pc/catalog/clone`, params)
+  return http.get(`${headUrl}/outside/pc/catalog/clone`, params);
 }
-
 
 /**
  * 目录详情tab的数量
@@ -265,8 +252,7 @@ function cloneMenu(params) {
  * @returns {*}
  */
 function productMenuStatistics(params) {
-  
-  return http.get(`${headUrl}/outside/pc/catalog/relation/statistics`, params)
+  return http.get(`${headUrl}/outside/pc/catalog/relation/statistics`, params);
 }
 
 /**
@@ -275,11 +261,8 @@ function productMenuStatistics(params) {
  * @returns {*}
  */
 function getPageLinkProduct(params) {
-  
-  return http.get(`${headUrl}/outside/pc/catalog/product`, params)
+  return http.get(`${headUrl}/outside/pc/catalog/product`, params);
 }
-
-
 
 /**
  * 搜索产品列表轻量
@@ -288,8 +271,7 @@ function getPageLinkProduct(params) {
  * @returns {*}
  */
 function searchProduct(params) {
-  
-  return http.get(`${headUrl}/outside/pc/product/info`, params)
+  return http.get(`${headUrl}/outside/pc/product/getCloneProductData`, params);
 }
 
 /**
@@ -299,8 +281,7 @@ function searchProduct(params) {
  * @returns {*}
  */
 function searchQrcode(params) {
-  
-  return http.get(`${headUrl}/outside/pc/product/qrcode`, params)
+  return http.get(`${headUrl}/outside/pc/product/qrcode`, params);
 }
 
 /**
@@ -310,8 +291,7 @@ function searchQrcode(params) {
  * @returns {*}
  */
 function searchAllcatalog(params) {
-  
-  return http.get(`${headUrl}/outside/pc/catalog/catalogList`, params)
+  return http.get(`${headUrl}/outside/pc/catalog/catalogList`, params);
 }
 
 /**
@@ -321,8 +301,10 @@ function searchAllcatalog(params) {
  * @returns {*}
  */
 function getListProductFields(params) {
-  
-  return http.get(`${headUrl}/outside/pc/product/getProductAndCatalogTemplate`, params)
+  return http.get(
+    `${headUrl}/outside/pc/product/getProductAndCatalogTemplate`,
+    params
+  );
 }
 
 
@@ -358,5 +340,5 @@ export {
   searchProduct,
   searchQrcode,
   searchAllcatalog,
-  getListProductFields
-}
+  getListProductFields,
+};
