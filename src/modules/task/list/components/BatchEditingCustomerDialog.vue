@@ -45,6 +45,7 @@ export default {
   computed: {
     fields() {
       const { fields } = this.config;
+      console.log(fields)
       const list = [];
       fields.map((item) => {
         if (
@@ -53,7 +54,9 @@ export default {
           item.field != "attachment" &&
           item.field != "customer" &&
           item.field != "relationProduct" &&
-          item.field != "relationCustomer"
+          item.field != "relationCustomer" &&
+          item.formType !== "relationCustomer" && 
+          item.formType !== "relationProduct"
         ) {
           list.push(item);
         }
