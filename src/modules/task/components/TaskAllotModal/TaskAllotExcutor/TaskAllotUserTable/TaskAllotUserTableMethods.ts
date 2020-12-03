@@ -516,6 +516,7 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
       getTaskAllotUserInfo(params).then((data: getTaskAllotUserInfoResult) => {
         let isSuccess = data.success
         if (!isSuccess) {
+          this.isDisableLoadmore = true
           return Platform.alert(data.message)
         }
         // 解析数据
