@@ -95,6 +95,14 @@ const BizTeamSelect = {
       loadmoreOptions: {
         disabled: false,
         callback: this.loadmore
+      },
+      // 组件关闭
+      onClose: event => {
+        let target = event.target;
+        let data = this.$data;
+        if(target == data.$referenceEl || this.$refs.popper.contains(target)) return;
+        
+        this.close()
       }
     }
   },
@@ -398,14 +406,6 @@ const BizTeamSelect = {
     }
   },
   render(h){
-    const attrs = {
-      directives: [
-        {
-          name: 'clickoutside',
-          value: this.close
-        }
-      ]
-    }
     let clazz = ['biz-team-select', 'el-input', 'el-input__inner']
     
     if (this.disabled) {
@@ -419,16 +419,19 @@ const BizTeamSelect = {
     if(this.popperVisible) clazz.push('biz-team-select-open')
     
     return (
-      <div class='el-select el-input--small el-input--suffix biz-team-select-block' {...attrs}>
+      <div class='el-select el-input--small el-input--suffix biz-team-select-block'>
         <div class={clazz} onClick={e => this.showPopper(e)}>
           <input id={this.id} name={this.name} type="text" value={this.formValue}/>
-          {/* { this.renderClear(h) } */}
+          { this.renderClear(h) }
           { this.multiple ? this.renderMultiple(h) : this.renderSingle(h) }
           { this.renderPopper(h) }
           { this.renderArrow(h) }
         </div>
       </div>
     )
+  },
+  mounted(){
+    document.addEventListener('click', this.onClose, true);
   },
   beforeDestroy(){
     // 销毁popper
@@ -438,6 +441,9 @@ const BizTeamSelect = {
         this.$data.$parentEl.removeChild(this.$refs.popper);
       }
     }
+  },
+  destroyed(){
+    document.removeEventListener('click', this.onClose, true);
   }
 }
 

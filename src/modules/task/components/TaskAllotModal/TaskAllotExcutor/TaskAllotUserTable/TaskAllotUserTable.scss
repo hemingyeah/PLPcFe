@@ -252,6 +252,20 @@
   .task-allot-user-table-column {
     font-size: 13px;
   }
+  .biz-team-select-clear {
+    display: none;
+  }
+  .biz-team-select-block {
+    .biz-team-select-tag {
+      padding-right: 0;
+    }
+    .el-input__suffix {
+      display: block;
+    }
+    .iconfont {
+      color: #c0c4cc;
+    }
+  }
 }
 
 .task-allot-user-table-column {

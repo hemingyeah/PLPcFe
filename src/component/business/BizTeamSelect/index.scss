@@ -194,13 +194,12 @@
     white-space: nowrap;
     font-size: 13px;
   }
-
+  
   i{
     border-radius: 50%;
     margin-left: 2px;
     font-size: 13px;
     line-height: 13px;
-    transform: scale(0.7);
     font-size: 12px;
     width: 16px;
     height: 16px;
@@ -246,5 +245,11 @@
   width: 100%;
   .biz-team-select {
     height: 100%;
+  }
+  .el-input__suffix {
+    display: none;
+  }
+  .iconfont {
+    transform: scale(0.9);
   }
 }

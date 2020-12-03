@@ -906,7 +906,7 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
    * @description 还原排序方式数据
   */
   public async revertSort() {
-    this.selectSortord = await this.getDataToStorage(StorageKeyEnum.TaskAllotTableSort, AllotSortedEnum.Distance)
+    this.selectSortord = await this.getDataToStorage(StorageKeyEnum.TaskAllotTableSort, AllotSortedEnum.FinishTaskByMonth)
   }
   
   /** 
