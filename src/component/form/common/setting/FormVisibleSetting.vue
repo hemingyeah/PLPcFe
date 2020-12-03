@@ -9,7 +9,7 @@
       </el-checkbox>
     </div>
     <div class="form-setting-item" v-if="visibleConfig.visible == 1">
-      <el-select v-model="visibleConfig.role" @change="update" placeholder="请选择授权角色" multiple>
+      <el-select v-model="visibleConfig.role" @change="update" placeholder="请选择授权角色" multiple clearable>
         <el-option v-for="item in roleList" :key="item.id" :label="item.name" :value="item.id"></el-option>
       </el-select>
     </div>
@@ -36,7 +36,7 @@ export default {
     */
     roleList() {
       let parent = findComponentUpward(this, 'form-design');
-      return parent.roleList;
+      return parent.roleList.filter(item => item.id !=1)
     }
   },
   methods: {

@@ -139,29 +139,64 @@ export default {
   methods: {
     //批量导入
     openImportDialog(){
+      let repeat = this.checkTreeNodeRepeat(this.source);
+      if(repeat.length){
+        FormUtil.notification([{ message:repeat, title: '重复项'}], this.$createElement);
+        return;
+      }
       this.$refs.bulkImport.open();
     },
     importSucc(res){
       let { data } = res;
-      data.forEach(item=>{
-        this.mergeTreeOption(this.source,item);
-      })
+      // data.forEach(item=>{
+      //   this.mergeTreeOption(this.source,item);
+      // })
+      let newOptions = this.mergeTreeOption(this.exportSetting(this.source).dataSource,data);
+
+      this.source = this.initSource(null, false, newOptions, null);
+      this.initselectedOption();
+
     },
     importFail(error) {
       this.$message.error(error);
     },
-    mergeTreeOption(parent,item){
-      // 递归合并树节点
-      const { value ,children } = item;
-      let name = value ?  value: `${this.deepZhChar[parent.deep]}级选项 ${parent.children.length + 1}`;
-      let option = new Option(name, false, parent);
-      if( Array.isArray(children) && children.length>0 ){
-        children.forEach(element=>{
-          this.mergeTreeOption(option,element);
+    //TODO:追加合并树节点
+    mergeTreeOption(oldTree,newTree) {
+      let objMap = {};
+      let tree = [];
+      if (!oldTree && !newTree) return []
+      if(!oldTree) return newTree;
+      if(!newTree) return oldTree;
+      oldTree.forEach(item=>{
+        objMap[item.value] =  item.children || []
+      });
+      newTree.forEach(item=>{
+         if(objMap[item.value]){
+            objMap[item.value] = this.mergeTreeOption(objMap[item.value],item.children)
+         }else{
+            objMap[item.value] = item.children || []
+         }
+      });
+      for(let key in objMap){
+        tree.push({
+            value:key,
+            children:objMap[key]
         })
-      } 
-      parent.children.push(option);
+      }
+      return tree 
     },
+    // mergeTreeOption(parent,item){
+    //   // 递归合并树节点
+    //   const { value ,children } = item;
+    //   let name = value ?  value: `${this.deepZhChar[parent.deep]}级选项 ${parent.children.length + 1}`;
+    //   let option = new Option(name, false, parent);
+    //   if( Array.isArray(children) && children.length>0 ){
+    //     children.forEach(element=>{
+    //       this.mergeTreeOption(option,element);
+    //     })
+    //   } 
+    //   parent.children.push(option);
+    // },
     //批量编辑
     batchEdit(){
       let newValues = this.optionText.split('\n').filter(option => option);

@@ -62,6 +62,9 @@ export default {
     isEdit: {
       type: Boolean,
       default: false 
+    },
+    maxLength:{
+      type: Number,
     }
   },
   data() {
@@ -104,9 +107,21 @@ export default {
     },
     update(delta, oldDelta, source) {
       // delta 推荐的数据格式，为了兼容旧数据，文档的内容还是直接保存html
+     
+      //TODO:说明信息文字限制
+      if( this.maxLength && this.editor.getLength() - 1 > this.maxLength) {
+        this.$message.warning(`描述信息长度不能超过${this.maxLength}个字符`);
+        this.editor.deleteText(this.maxLength, 4)
+        return;
+      }
+      
+      
       let html = this.editor.container.firstChild.innerHTML;
-
-      this.$emit('input', html)
+      if(this.editor.getLength() - 1 == 0){
+        this.$emit('input', '')
+      }else{
+        this.$emit('input', html)
+      }
     },
     chooseFile(uploadType){
       if(this.pending) return platform.alert('请等待图片上传完成');

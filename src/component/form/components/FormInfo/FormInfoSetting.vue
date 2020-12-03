@@ -5,7 +5,7 @@
       <div class="form-common-setting-panel">
         <h4 class="form-item-title">{{ setting.name }}</h4>
       </div>
-      <base-editor :placeholder="placeHolder"  v-model="field.placeHolder" @input="getInput" ref="editor" :toolbarOptions="toolbarOptions"></base-editor>
+      <base-editor :placeholder="placeHolder"  v-model="field.placeHolder" @input="getInput" ref="editor" :toolbarOptions="toolbarOptions" :maxLength="maxLength"></base-editor>
     </div>
     <div class="form-setting-group">
       <p class="form-item-text-msg">您可以在表单中放置一段内容说明来引导用户进行内容填写，效果图示：</p>
