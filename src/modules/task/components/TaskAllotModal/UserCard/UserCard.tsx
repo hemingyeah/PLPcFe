@@ -240,6 +240,11 @@ export default class UserCard extends Vue {
    * @description 渲染用户信息详情
   */
   private renderUserCardDetail(): VNode {
+    // 平均响应用时
+    let rangeAccept = this.getUserInfoUsedTime(this.userCardInfo.rangeAccept)
+    // 平均工作用时
+    let rangeWork = this.getUserInfoUsedTime(this.userCardInfo.rangeWork)
+
     return (
       <div class='user-card-detail'>
         <div class='user-card-detail-row'>
@@ -252,10 +257,16 @@ export default class UserCard extends Vue {
         </div>
         <div class='user-card-detail-row'>
           <div class='user-card-detail-row-item'>
-            平均响应用时: {this.getUserInfoUsedTime(this.userCardInfo.rangeAccept)}
+            平均响应用时: 
+            <el-tooltip content={rangeAccept} placement='top'>
+              <span>{rangeAccept}</span>
+            </el-tooltip>
           </div>
           <div class='user-card-detail-row-item'>
-            平均工作用时: {this.getUserInfoUsedTime(this.userCardInfo.rangeWork)}
+            平均工作用时: 
+            <el-tooltip content={rangeWork} placement='top'>
+              <span>{rangeWork}</span>
+            </el-tooltip>
           </div>
         </div>
         <div class='user-card-detail-row'>
