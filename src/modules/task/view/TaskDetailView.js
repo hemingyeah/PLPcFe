@@ -841,15 +841,15 @@ export default {
     allot() {
       // 新工单新指派
       if (this.isRestructAllot) {
+        this.$refs.TaskAllotModal.outsideShow()
+      } else {
         this.pending = true;
         location.href = `/task/allotTask?id=${this.task.id}`;
-      } else {
-        this.$refs.TaskAllotModal.outsideShow()
       }
     },
     // 转派工单
     redeploy() {
-      // 新工单新指派
+      // 新工单新转派
       if (this.isRestructAllot) {
         this.$refs.TaskAllotModal.outsideShow()
       } else {
