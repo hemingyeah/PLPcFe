@@ -6,7 +6,7 @@
         <el-tooltip placement="top" popper-class="form-displaymode-setting-tooltip" >
           <div slot="content">
               <div>平铺</div>
-              <div class="form-displaymode-setting-item">未勾选“多选”时，平铺的显示效果为：<span class="circle"></span>选择1  <span class="circle"></span>选择2</div>
+              <div class="form-displaymode-setting-item">未勾选“多选”时，平铺的显示效果为：<span class="circle"></span>选项1  <span class="circle"></span>选项2</div>
               <div class="form-displaymode-setting-item">勾选“多选”时，平铺的显示效果为：<span class="square"></span>选项1  <span class="square"></span>选项2</div>
           </div>
           <i class="iconfont icon-question"></i>
