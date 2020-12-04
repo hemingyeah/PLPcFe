@@ -178,6 +178,8 @@
                   <!-- <a href="javascript:;" @click="goCallCenterSetting">呼叫中心设置</a>
                   <a href="javascript:;" @click="goCallCenterWorkbench">呼叫工作台</a>
                   <a href="javascript:;" @click="goCallCenter">呼叫中心</a> -->
+                  <a href="javascript:;" @click="goTaskType">工单类型设置</a>
+                  <a href="javascript:;" @click="goTaskFlow">工单流程设置</a>
                 </div>
               </el-popover>
 
@@ -952,6 +954,22 @@ export default {
         id: "task_list",
         title: "工单列表",
         url: "/task",
+        reload: true,
+      });
+    },
+    goTaskType() {
+      platform.openTab({
+        id: "task_type_setting",
+        title: "工单类型设置",
+        url: "/setting/task/manage",
+        reload: true,
+      });
+    },
+    goTaskFlow() {
+      platform.openTab({
+        id: "task_flow_setting",
+        title: "工单流程设置",
+        url: "/setting/task/flow",
         reload: true,
       });
     },

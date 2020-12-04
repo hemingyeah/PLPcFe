@@ -43,6 +43,26 @@ router.get('/setting/task/field/task', async ctx => {
   ctx.body = Template.renderWithHtml('工单表单设置', body, script, modConfig.template)
 });
 
+router.get('/setting/task/manage', async ctx => {
+  let modConfig = modules['setting.task.manage'];
+  let script = ['/setting.task.manage.js'];
+  let { url, headers } = ctx.request;
+  let result = await HttpClient.request(url, 'get', null, { headers });
+  let body = result.body;
+  
+  ctx.body = Template.renderWithHtml('工单类型设置', body, script, modConfig.template)
+});
+
+router.get('/setting/task/flow', async ctx => {
+  let modConfig = modules['setting.task.flow'];
+  let script = ['/setting.task.flow.js'];
+  let { url, headers } = ctx.request;
+  let result = await HttpClient.request(url, 'get', null, { headers });
+  let body = result.body;
+  
+  ctx.body = Template.renderWithHtml('工单流程设置', body, script, modConfig.template)
+});
+
 router.get('/setting/task/field/taskReceipt', async ctx => {
   let modConfig = modules['setting.task.receipt_fields'];
   let script = ['/setting.task.receipt_fields.js'];
