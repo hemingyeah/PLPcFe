@@ -93,6 +93,14 @@ export default {
                 _self.chooseFile('video'); // 上传视频
                 
               },
+              link(value) {
+                if(value){
+                  console.log(333)
+                  this.$el.querySelector('#editor input').setAttribute("placeholder","新文本内容");
+                }
+
+
+              }
             }
           },
         },
@@ -104,6 +112,12 @@ export default {
 
       this.editor.on('text-change', this.update); 
       document.addEventListener('paste', this.handlerPaste);
+      
+      //修改超链接placeholder示例
+      this.$el.querySelector('input').setAttribute("placeholder","http://www.shb.ltd");
+      this.$el.querySelector('input').setAttribute("data-link","http://www.shb.ltd");
+      
+      
     },
     update(delta, oldDelta, source) {
       // delta 推荐的数据格式，为了兼容旧数据，文档的内容还是直接保存html
