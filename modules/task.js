@@ -3,6 +3,10 @@ module.exports = {
     entry: './src/modules/task/edit/index.js',
     template: 'src/templates/map.html',
   },
+  'task.edit.allot': {
+    entry: './src/modules/task/editAllot/index.js',
+    template: 'src/templates/map.html',
+  },
   'task.view': {
     entry: './src/modules/task/view/index.js',
     template: 'src/templates/map.html',

@@ -87,18 +87,26 @@ router.get("/", async (ctx) => {
   );
 })
 
-// 示例: 
-// router.use('/outside/es/*', (ctx) =>
-//   HttpClient.proxy(ctx, {
-//     force: true,
-//     httpProtocol: 'http',
-//     host: '127.0.0.1',
-//     port: 10006,
-//     headers: {
-//       cookie: 'VIPPUBLINKJSESSIONID=a644d918-3065-4760-b2a4-a47d50230230',
-//     },
-//   })
-// )
+/** 
+ * @description 示例：
+ * router 里面不推荐写自定义的路由, 写路由也不要提交，仅供个人使用
+*/
+router.use('/temp', (ctx) =>
+  HttpClient.proxy(ctx, {
+    // 是否强制使用当前配置
+    force: true,
+    // http协议，非 http 则为 https
+    httpProtocol: 'http',
+    // 主机地址
+    host: '127.0.0.1',
+    // 端口
+    port: 10006,
+    // 头信息
+    headers: {
+      cookie: 'VIPPUBLINKJSESSIONID=a644d918-3065-4760-b2a4-a47d50230230',
+    },
+  })
+)
 
 router.use("", performanceRouter.routes());
 router.use("", customerRouter.routes(), customerRouter.allowedMethods());

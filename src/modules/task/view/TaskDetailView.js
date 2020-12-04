@@ -85,6 +85,10 @@ export default {
       guideSearchModelSave: false,
       guideDropdownMenu: false,
       isGuide: false,
+      // 显示详情向导
+      showTaskDetailGuide: false,
+      // 是否显示指派弹窗
+      showAllotModal: false
     }
   },
   computed: {
@@ -633,6 +637,10 @@ export default {
     /* 是否显示服务报告 根据版本控制的 */
     isShowReport() {
       return isShowReport()
+    },
+    /* 是否开始新工单的新指派 */
+    isRestructAllot() {
+      return this.initData?.restructAllot === true
     }
   },
   methods: {
@@ -830,11 +838,23 @@ export default {
     },
     // 指派工单
     allot() {
-      this.$refs.TaskAllotModal.outsideShow()
+      // 新工单新指派
+      if (this.isRestructAllot) {
+        this.pending = true;
+        location.href = `/task/allotTask?id=${this.task.id}`;
+      } else {
+        this.$refs.TaskAllotModal.outsideShow()
+      }
     },
     // 转派工单
     redeploy() {
-      this.$refs.TaskAllotModal.outsideShow()
+      // 新工单新指派
+      if (this.isRestructAllot) {
+        this.$refs.TaskAllotModal.outsideShow()
+      } else {
+        this.pending = true;
+        location.href = `/task/redeploy?id=${this.task.id}`;
+      }
     },
     // 打印工单
     printTask() {
@@ -1143,8 +1163,11 @@ export default {
         this.rightActiveTab = this.viewBalanceTab ? "balance-tab" : this.viewFeedbackTab ? "feedback-tab" : "card-tab";
       }
       
+      // 是否显示详情向导
+      this.showTaskDetailGuide = !storageGet(TASK_GUIDE_DETAIL)
       // 来自指派列表的指派操作
-      if (query.allot && this.allowAllotTask) {
+      this.showAllotModal = query.allot && this.allowAllotTask
+      if (this.showAllotModal && !this.showTaskDetailGuide) {
         this.allot()
       }
       
@@ -1152,9 +1175,12 @@ export default {
       
       this.$nextTick(() => {
         setTimeout(() => {
-          if (!storageGet(TASK_GUIDE_DETAIL)) this.$tours["myTour"].start(), this.nowGuideStep = 1, storageSet(TASK_GUIDE_DETAIL, "4");
+          if (this.showTaskDetailGuide) {
+            this.$tours['myTour'].start();
+            this.nowGuideStep = 1;
+            storageSet(TASK_GUIDE_DETAIL, '4');
+          }
         }, 1000)
-
       })
 
     } catch (e) {
@@ -1167,6 +1193,11 @@ export default {
     },
     collapseDirection(newValue) {
       sessionStorage.setItem(`task_collapseDirection_${this.task.id}`, newValue);
+    },
+    nowGuideStep(newValue) {
+      if (newValue == 5 && this.showTaskDetailGuide && this.showAllotModal) {
+        this.allot()
+      }
     }
   },
   components: {
