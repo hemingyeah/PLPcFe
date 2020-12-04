@@ -633,6 +633,7 @@ export default {
 }
 
 .cascader-setting-modal-footer{
+  width: 100%;
   display: flex;
   flex-flow: row nowrap;
   .cascader-setting-import-btn{
@@ -707,6 +708,11 @@ export default {
   font-size: 14px;
   color: #666;
   margin: 32px 0;
+}
+.form-select-setting-modal {
+  .dialog-footer{
+    width: 100%;
+  }
 }
 </style>
 
