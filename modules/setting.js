@@ -9,10 +9,10 @@ module.exports = {
     entry: './src/modules/setting/performance/index.js'
   },
   'setting.task.fields': {
-    entry: './src/modules/setting/task/fields.js'
+    entry: './src/modules/setting/task/taskFormSetting/taskFormView/index.js'
   },
   'setting.task.receipt_fields': {
-    entry: './src/modules/setting/task/receipt_fields.js',
+    entry: './src/modules/setting/task/taskFormSetting/taskReceiptFormView/index.js',
   },
   'system.mall.index' : {
     entry: "./src/modules/system/mall/index.js"

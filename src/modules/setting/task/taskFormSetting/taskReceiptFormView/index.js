@@ -1,8 +1,9 @@
 import Vue from '@src/common/entry';
-import TaskFieldsSettingView from './views/TaskFieldsSettingView.vue';
 import http from '@src/util/http';
+import taskReceiptFormView from './taskReceiptFormView.vue';
 
 Vue.prototype.$http = http;
+
 // 处理注入的参数
 let initData = {};
 try {
@@ -16,7 +17,7 @@ const app = new Vue({
   provide: {
     initData: Object.freeze(initData)
   },
-  render: h => h(TaskFieldsSettingView),
+  render: h => h(taskReceiptFormView),
   el: '#app'
 });
 

@@ -1,0 +1,26 @@
+html, body {
+  height: 100%;
+}
+
+.setting-task {
+  height: 100%;
+  background-color: $bg-color-l1;
+  overflow-y: hidden;
+
+  &-header {
+    height: 48px;
+    padding: 0 12px;
+    color: #fff;
+    font-size: $font-size-large;
+    background: linear-gradient(270deg, #1FDBB7 0%, #12C1D6 100%);
+
+    display: flex;
+    align-items: center;
+    flex-flow: row nowrap;
+    justify-content: space-between;
+  }
+
+  &-design {
+    height: calc(100% - 48px);
+  }
+}
