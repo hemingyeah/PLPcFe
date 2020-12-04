@@ -390,7 +390,6 @@ export default {
       });
 
       arr.forEach((item) => {
-        console.log(item.classify, item)
         if (item.isSystem && item.classify) {
           if (Number(item.isSystem) === 1 && Number(item.classify) === 2) {
             this.baseRepertory = item
@@ -437,13 +436,12 @@ export default {
       const { manager } = this.baseRepertory;
       let isManage;
       if (manager) {
+        
        isManage = Array.isArray(manager) ? manager : JSON.parse(manager)
-
-       isManage.some((item) => {
-          return item.userId == this.userId;
-        });
-      }
-      return isManage;
+        return isManage.some((item) => {
+            return item.userId == this.userId;
+          });
+        }
     },
     /*清空 */
     toggleSelection() {
