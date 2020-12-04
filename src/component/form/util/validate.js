@@ -75,10 +75,11 @@ function formula(fields, field) {
   // 验证是否存在已删除的无效字段
   for(let i = 0; i < formula.length; i++) {
     let index = fields.findIndex(field => field.fieldName == formula[i].value);
-    let isDelete = !formula[i].isOperator && index == -1;
+    let field = fields[index];
+    let isDelete = !formula[i].isOperator && (!field || !!field.isHidden);
 
     if(isDelete){
-      message.push('存在已删除的无效字段');
+      message.push('存在已删除或已隐藏的无效字段');
       break;
     }
   }

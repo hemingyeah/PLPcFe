@@ -96,10 +96,11 @@ export default {
     formula() {
       let formula = this.field.setting.formula || [];
 
-      // 判断计算公式的运算对象是否已被删除，增加标识
+      // 判断计算公式的运算对象是否已删除或已隐藏，增加标识
       formula.map(item => {
         let index = this.fields.findIndex(field => field.fieldName == item.value);
-        item.isDelete = !item.isOperator && index == -1;
+        let field = this.fields[index];
+        item.isDelete = !item.isOperator && (!field || !!field.isHidden);
       })
 
       return formula;

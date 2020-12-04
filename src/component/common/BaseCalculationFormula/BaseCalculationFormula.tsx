@@ -100,7 +100,7 @@ export default class BaseCalculationFormula extends Vue {
     // 判断是否存在已删除的无效字段
     let invalidFields = this.calculationFormula.filter(item => item.isDelete);
     if (invalidFields.length) {
-      this.errorMessage = '存在已被删除的无效字段，请重新配置计算公式'
+      this.errorMessage = '存在已删除或已隐藏的无效字段，请重新配置计算公式'
       return
     }
 
