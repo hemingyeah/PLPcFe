@@ -41,7 +41,7 @@
     <!-- start 默认当前时间 -->
     <div class="form-setting-group form-setting-item">
       <h4 class="form-item-title">默认当前时间</h4>
-      <div class="form-item-box form-date-type">
+      <div class="form-item-box">
         <el-checkbox v-model="defaultValueConfig.isCurrentDate" @change="update(defaultValueConfig, 'defaultValueConfig', true)" :true-label="1" :false-label="0">默认当前时间</el-checkbox>
       </div>
     </div>

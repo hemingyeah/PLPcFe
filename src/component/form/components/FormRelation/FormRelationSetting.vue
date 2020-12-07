@@ -1,27 +1,49 @@
 <template>
   <div class="form-setting-panel">
-    <h3>基础字段 -- {{ setting.name }}</h3>
-    <div class="form-setting-group">
-      <input type="text" placeholder="[必填] 请输入字段标题" data-prop="displayName" :value="field.displayName" @input="updateForDom" :maxlength="nameMaxLength">
+    <!-- start 标题 -->
+    <form-title-setting
+      :field="field"
+      :setting="setting"
+      @input="updateForDom"
+    ></form-title-setting>
+    <!-- end 标题 -->
+
+    <!-- start 描述信息 -->
+    <form-describe-setting
+      :field="field"
+      @input="updateForDom"
+    ></form-describe-setting>
+    <!-- end 描述信息 -->
+
+    <!-- start 关联项字段 -->
+    <div class="form-setting-group form-setting-item">
+      <h4 class="form-item-title">关联项字段</h4>
+      <div class="form-setting-group"> 
+        <el-select class="form-setting-select" v-model="selectedRelatedField">
+          <el-option
+            v-for="item in options"
+            :key="item.fieldName"
+            :label="item.displayName"
+            :value="item.fieldName">
+          </el-option>
+        </el-select>
+      </div>
     </div>
-    <div class="form-setting-group">
-      <textarea placeholder="请在此添加描述信息" rows="3" data-prop="placeHolder" :value="field.placeHolder" @input="updateForDom" :maxlength="placeholderMaxLength"></textarea>
+    <!-- end 关联项字段 -->
+
+    <!-- start 字段权限 -->
+    <div class="form-setting-group form-setting-item">
+      <h4 class="form-item-title">字段权限</h4>
+      <div class="form-item-box">
+        <!-- 移动端列表展示 -->
+        <mobile-show-setting v-if="isTaskMode" :field="field" :fields="fields" @input="update"></mobile-show-setting>
+        <!-- 可见性 -->
+        <form-visible-setting :field="field" @input="update"></form-visible-setting>
+        <!-- 支持高级搜索 -->
+        <form-search-setting :field="field" @input="update"></form-search-setting>
+      </div>
     </div>
-    <h3>关联项字段</h3>
-    <div class="form-setting-group"> 
-      <el-select v-model="selectedRelatedField">
-        <el-option
-          v-for="item in options"
-          :key="item.fieldName"
-          :label="item.displayName"
-          :value="item.fieldName">
-        </el-option>
-      </el-select>
-    </div>
-    <div class="form-setting-group">
-      <el-checkbox :value="field.isSearch" @input="update($event, 'isSearch')" :true-label="1" :false-label="0">搜索</el-checkbox>
-      <mobile-show-setting v-if="isTaskMode" :field="field" :fields="fields" @input="update"></mobile-show-setting>
-    </div>
+    <!-- end 字段权限 -->
   </div>
 </template>
 <script>
@@ -194,8 +216,8 @@ export default {
 
       this.update(value, prop);
     },
-    update(value, prop) {
-      this.$emit('input', { value, prop });
+    update(value, prop, isSetting = false){
+      this.$emit('input', {value, prop, isSetting});
     }
   }
 }

@@ -1,12 +1,11 @@
 <template>
   <div class="form-setting-panel task-customer-setting">
     <!-- start 标题 -->
-    <h3 class="form-setting-panel-title">
-      {{field.displayName}}
-    </h3>
+    <div class="form-setting-group form-common-setting">
+      <h3 class="form-setting-panel-title">{{ field.displayName }}</h3>
+      <div class="form-design-warning">该字段为系统内置字段，暂不支持修改、删除。</div>
+    </div>
     <!-- end 标题 -->
-
-    <div class="form-design-warning">该字段为系统内置字段，暂不支持修改、删除。</div>
 
     <!-- start 关联项 -->
     <div class="form-setting-group form-setting-item">
