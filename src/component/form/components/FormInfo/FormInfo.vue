@@ -27,7 +27,7 @@ export default {
       let element = event.target;
       let imgSrc =  element.currentSrc;
 
-      if (!/\.(png|bmp|gif|jpg|jpeg|tiff)$/i.test(imgSrc) || !element) return
+      if ((!/\.(png|bmp|gif|jpg|jpeg|tiff|tif|jfif|ico|pcx|tga)$/i.test(imgSrc) && !imgSrc) || !element) return
 
       let list = event.target.closest('.ql-editor');
       let images = Array.prototype.slice.call(list.querySelectorAll('img'));

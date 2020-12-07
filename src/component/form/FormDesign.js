@@ -740,20 +740,20 @@ const FormDesign = {
     renderTabHeader(){
       if(!this.hasSystemField) return (
         <div class="form-design-tabs">
-          <div class="form-design-tab">基础字段</div>
+          <div class="form-design-tab">基础控件</div>
         </div>
       );
 
       return (
         <div class="form-design-tabs form-design-withSys">
-          <div class={['form-design-tab', this.fieldGroup == 0 ? 'form-design-tab-active' : null]} onClick={e => this.fieldGroup = 0}>基础字段</div>
-          <div class={['form-design-tab', this.fieldGroup == 1 ? 'form-design-tab-active' : null]} onClick={e => this.fieldGroup = 1}>系统字段</div>
+          <div class={['form-design-tab', this.fieldGroup == 0 ? 'form-design-tab-active' : null]} onClick={e => this.fieldGroup = 0}>基础控件</div>
+          <div class={['form-design-tab', this.fieldGroup == 1 ? 'form-design-tab-active' : null]} onClick={e => this.fieldGroup = 1}>系统控件</div>
         </div>
       )
     },
     renderFieldList(fields){
       if(fields.length == 0){
-        return <div class="form-design-field-empty">暂无可添加的{this.fieldGroup == 0 ? '基础' : '系统'}字段</div>
+        return <div class="form-design-field-empty">暂无可添加的{this.fieldGroup == 0 ? '基础' : '系统'}控件</div>
       }
 
       return fields.map(field => {

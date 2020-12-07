@@ -1,7 +1,7 @@
 <template>
   <div class="cascader-setting-option" :class="{'cascader-setting-option-default': option.isDefault, 'cascader-setting-option-active': active}" :data-option-id="option.id">
     <div class="cascader-setting-left">
-      <button type="button" class="btn-text handle" v-show="option.deep == 1"> <i class="iconfont icon-tuozhuaipaixu"></i></button>
+      <button type="button" class="btn-text handle"> <i class="iconfont icon-tuozhuaipaixu"></i></button>
       <el-input type="textarea" rows="1" v-model="option.value" @input="input" @focus="choose" :maxlength="optionMaxLength" @blur="validate"/>
     </div>
     <div class="cascader-setting-right">
