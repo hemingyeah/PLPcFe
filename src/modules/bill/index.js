@@ -8,7 +8,6 @@ mtracker();
 Vue.prototype.$http = http;
 Vue.prototype.$eventBus = new Vue();
 
-
 const BillListViewComp = Vue.extend(BillList);
 const app = new BillListViewComp();
 
