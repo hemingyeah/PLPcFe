@@ -4,8 +4,8 @@ import {Popover,Loading} from 'element-ui';
 import Vue from 'vue';
 
 
-import Platform from 'src/util/Platform';
-import Http from 'src/util/HttpUtil';
+import Platform from '@src/util/Platform';
+import Http from '@src/util/HttpUtil';
 
 import PerformanceRule from './PerformanceRule.vue';
 

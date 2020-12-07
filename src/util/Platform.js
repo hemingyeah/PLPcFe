@@ -157,14 +157,16 @@ export function notification(params = {}){
 
 /** 
  * @description 是否为多端环境
+ * @returns {Boolean}
 */
 function isMultiEnd() {
   let location = window.location
-  return location.endsWith('linker.ltd')
+  return location.hostname.endsWith('linker.ltd')
 }
 
 /** 
  * @description 是否为钉钉桌面版
+ * @returns {Boolean}
 */
 function isDingDingDesktop() {
   return inDingTalk()
@@ -172,14 +174,23 @@ function isDingDingDesktop() {
 
 /** 
  * @description 是否为钉钉网页版
+ * @returns {Boolean}
 */
 function isDingDingWeb() {
-  return location.endsWith('shb.ltd')
+  let location = window.location
+  return location.hostname.endsWith('shb.ltd')
+}
+
+/** 
+ * @description 是否为钉钉版本
+ * @returns {Boolean}
+*/
+function isDingTalk() {
+  return isDingDingDesktop() || isDingDingWeb()
 }
 
 // 判断是否是多端环境(企业版)
-const host = window.location.host;
-export const isEnterprise = true // host === 'shb.linker.ltd';
+export const isEnterprise = isMultiEnd()
 
 export default {
   isEnterprise,
@@ -194,5 +205,6 @@ export default {
   notification,
   isMultiEnd,
   isDingDingDesktop,
-  isDingDingWeb
+  isDingDingWeb,
+  isDingTalk
 };

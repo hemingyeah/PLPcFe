@@ -436,7 +436,7 @@ import {
 
 /* util */
 import _ from "lodash";
-import Axios from "axios";
+import Platform from '@src/util/Platform'
 
 const newTaskGuideStore = require("@src/component/guide/taskV2Store");
 const GuideStoreObj = {
@@ -754,7 +754,7 @@ export default {
       }
     },
     openHelpDoc(event) {
-      platform.openLink(this.tenantType ? 'https://www.yuque.com/shb/help2' : 'https://www.yuque.com/shb/help');
+      platform.openLink(!Platform.isDingTalk() ? 'https://www.yuque.com/shb/help2' : 'https://www.yuque.com/shb/help');
       this.profilePopperVisible = false;
     },
     openUserView(event) {

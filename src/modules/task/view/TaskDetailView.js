@@ -13,6 +13,7 @@ import {
   storageGet,
   storageSet
 } from "@src/util/storage";
+import Platform from '@src/util/Platform'
 
 /* component */
 import CancelTaskDialog from './components/CancelTaskDialog.vue';
@@ -477,14 +478,13 @@ export default {
       let { state, executor } = this.task;
       let hasExecutor = executor && executor.userId;
       let allowDing = false;
-
+      
       try {
-        let rootWindow = getRootWindow(window);
-        allowDing = this.initData.canViewTask && rootWindow.inDingTalkPC() && state != "closed" && hasExecutor;
+        allowDing = this.initData.canViewTask && Platform.isDingDingDesktop() && state != 'closed' && hasExecutor;
       } catch (error) {
-        console.warn("Caused: TaskView allowDing -> error", error) 
+        console.warn('Caused: TaskView allowDing -> error', error) 
       }
-
+      
       return allowDing;
     },
     /** 
@@ -919,7 +919,7 @@ export default {
     // DING
     ding(all = true) {
       let { id, taskNo, executor, synergies } = this.task;
-
+      
       let users = [];
       users.push(executor.staffId);
       

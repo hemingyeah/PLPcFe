@@ -1,10 +1,10 @@
 <template>
 
   <base-modal
-      :title=" uploadTemplateType == 'report' ? '设置服务报告自定义模板' : '设置打印自定义模板'"
-      describe="使用前，请阅读使用说明" width="700px" class="form-select-setting-modal"
-      @cancel="cancel"
-      :show.sync="isShow" :mask-closeable="false">
+    :title=" uploadTemplateType == 'report' ? '设置服务报告自定义模板' : '设置打印自定义模板'"
+    describe="使用前，请阅读使用说明" width="700px" class="form-select-setting-modal"
+    @cancel="cancel"
+    :show.sync="isShow" :mask-closeable="false">
 
 
     <span slot="describe" class="describe-text" @click="describeClick">使用前，请阅读使用说明</span>
@@ -18,7 +18,7 @@
       </div>
       <div class="upload-content-line">
         <p class="upload-content-desc">2、上传打印模板</p>
-        <base-upload @input="input" :value="value" :fileType="fileType" :isShowOperateContent="isShowOperateContent"></base-upload>
+        <base-upload @input="input" :value="value" :file-type="fileType" :is-show-operate-content="isShowOperateContent"></base-upload>
       </div>
       <p class="note-text">注：上传的模板仅支持[xlsx]格式的文件</p>
     </div>
@@ -31,14 +31,14 @@
 </template>
 
 <script>
-import {getTaskTemplate,savePrintTemplate,saveReportTemplate} from "@src/api/TaskApi.ts";
-import platform from "@src/platform";
+import { savePrintTemplate, saveReportTemplate } from '@src/api/TaskApi.ts';
+import platform from '@src/platform';
 export default {
-  name: "TemplateUploadDialog",
+  name: 'template-upload-dialog',
   props: {
     id : {
       type : String,
-      default: ""
+      default: ''
     },
     isShowUploadModal: {
       type: Boolean,
@@ -46,7 +46,7 @@ export default {
     },
     uploadTemplateType : {
       type : String,
-      default: ""
+      default: ''
     },
     reportSetting: {
       type: Object,
@@ -62,25 +62,19 @@ export default {
       isShow : false,
       value : [],
       isShowOperateContent : true,
-      fileType : "xlsx"
+      fileType : 'xlsx'
     }
   },
   methods : {
     cancel(res) {
-      console.log("cancal")
-      this.$emit("hideModal")
-      //将后台拿到的数据全部清空
+      this.$emit('hideModal')
+      // 将后台拿到的数据全部清空
 
     },
     close() {
-      console.log("点击下方关闭按钮");
       this.cancel();
     },
     input(newValue) {
-      console.log("baseupload的input事件")
-      console.log(newValue)
-      console.log("uploadTemplateType")
-      console.log(this.uploadTemplateType)
       if(newValue.length) {
         this.uploadTemplate(newValue);
       }else{
@@ -91,29 +85,19 @@ export default {
       // this.$emit('input', newValue);
     },
     async downloadTemplate() {
-      console.log("下载模板")
-      console.log(this.id);
-      // getTaskTemplate({typeId:this.id}).then(res => {
-      //   console.log("----")
-      //   console.log(res)
-      // });
-
-      let a = document.createElement("a");
+      let a = document.createElement('a');
       a.href = `/setting/taskType/getTemplateDic?typeId=${this.id}`;
       a.click();
-
     },
     uploadTemplate(newValue) {
-      let _size = (newValue.size/1024).toFixed(2) + "KB";
+      let _size = `${(newValue.size / 1024).toFixed(2) }KB`;
       let p_templates = [
-        {id:newValue.id,filename:newValue.fileName,url:newValue.ossUrl,fileSize:_size}
+        {id:newValue.id, filename:newValue.fileName, url:newValue.ossUrl, fileSize:_size}
       ];
-
       let _obj = {
         typeId:this.id,
         p_templates
       }
-
       this.didUpload(_obj);
     },
     deleteTemplate() {
@@ -122,9 +106,9 @@ export default {
     },
     async didUpload(_obj) {
       let result;
-      if(this.uploadTemplateType == "report") {
+      if(this.uploadTemplateType == 'report') {
         result = await saveReportTemplate(_obj);
-      }else if(this.uploadTemplateType == "print") {
+      }else if(this.uploadTemplateType == 'print') {
         result = await savePrintTemplate(_obj);
       }
       if(result.status == 1){
@@ -136,38 +120,25 @@ export default {
     },
   },
   watch : {
-    isShowUploadModal(newVal,oldVal) {
+    isShowUploadModal(newVal, oldVal) {
       this.isShow = newVal;
     },
-    uploadTemplateType(newVal,oldVal) {
-      console.log()
-      // console.log("watch uploadTemplateType")
-      // console.log(newVal)
-      // console.log(this.reportSetting)
-      if(newVal == "report") {
-        console.log("报告模板")
-        console.log(this.reportSetting)
-        this.value = (this.reportSetting.hasOwnProperty("templates") && this.reportSetting.templates) ?
-            this.reportSetting.templates : [];
-      }else if(newVal == "print"){
-        console.log("打印模板111112221122")
-        console.log(this.printSetting)
-        this.value = (this.printSetting.hasOwnProperty("templates") && this.printSetting.templates) ?
-            this.printSetting.templates : [];
+    uploadTemplateType(newVal, oldVal) {
+      if(newVal == 'report') {
+        this.value = (this.reportSetting.hasOwnProperty('templates') && this.reportSetting.templates)
+          ? this.reportSetting.templates : [];
+      }else if(newVal == 'print'){
+        this.value = (this.printSetting.hasOwnProperty('templates') && this.printSetting.templates)
+          ? this.printSetting.templates : [];
       }
-      console.log(this.value);
     },
-    reportSetting(newVal,oldVal) {
-      console.log("reportSetting")
-      console.log(newVal)
+    reportSetting(newVal, oldVal) {
+      // 
     },
-    printSetting(newVal,oldVal) {
-      console.log("printSetting")
-      console.log(newVal)
+    printSetting(newVal, oldVal) {
+      // 
     },
-    value(newVal,oldVal) {
-      console.log("value")
-      console.log(newVal)
+    value(newVal, oldVal) {
       if(newVal.length) {
         this.isShowOperateContent = false;
       }else{

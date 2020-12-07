@@ -74,7 +74,7 @@
         <div class="top-btn-group">
           <base-button type="primary" icon="icon-add" @event="openDialog">新建</base-button>
           <base-button type="ghost" icon="icon-qingkongshanchu" @event="deleteReport">删除</base-button>
-          <a href="https://www.yuque.com/shb/help/operating#IbBYe" target="_blank">如何通过绩效报告统计部门或个人数据？</a>
+          <a :href="performanceReportLink" target="_blank">如何通过绩效报告统计部门或个人数据？</a>
         </div>
 
 
@@ -231,6 +231,7 @@ import _ from 'lodash';
 import { formatDate, } from '@src/util/lang';
 import {getPerformanceReports, deletePerformanceReports, getApprovePersonList} from '@src/api/PerformanceApi';
 import EditPerformanceReportDialog from './components/EditPerformanceReportDialog.vue';
+import Platform from '@src/util/Platform'
 
 export default {
   name: 'list-view',
@@ -336,6 +337,14 @@ export default {
     },
     userId () {
       return this.initData.loginUserId;
+    },
+    // 是否在钉钉环境
+    isDingTalk() {
+      return Platform.isDingTalk()
+    },
+    // 绩效报告介绍链接
+    performanceReportLink() {
+      return this.isDingTalk ? 'https://www.yuque.com/shb/help/operating#IbBYe' : 'https://www.yuque.com/shb/help2/gbrdc7#IbBYe'
     }
   },
   mounted() {

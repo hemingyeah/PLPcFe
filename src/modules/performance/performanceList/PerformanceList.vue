@@ -79,7 +79,7 @@
       <div class="page-panel-body clearfix">
         <el-button type="primary" icon="el-icon-plus"  :loading="dialogWaitting" @click="addReport" v-if="allowEdit"> 新建</el-button>
         <el-button type="danger" icon="el-icon-delete" :disabled="deleting" @click="remove" v-if="allowEdit"> 删除</el-button>  
-        <a href="https://help.shb.ltd/doc?id=10501#Performance_report" @click.prevent="openDoc">如何通过绩效报告统计部门或个人数据?</a>
+        <a @click.prevent="openDoc">如何通过绩效报告统计部门或个人数据?</a>
 
         <div class="pull-right">
           <el-button-group>
@@ -166,14 +166,16 @@
   </div>
 </template>
 <script>
-import StorageUtil from 'src/util/StorageUtil';
+import StorageUtil from '@src/util/StorageUtil';
 import AddPerformanceReport from './AddPerformanceReport.vue';
 import errMsg from '../common/errorMsg';
 import ReportStaMode from './ReportStaMode.vue';
 import AddReportSucc from './AddReportSucc.vue';
 import _ from 'lodash';
-import DateUtil from '../../../util/date'
+import DateUtil from '@src/util/date'
+import Platform from '@src/util/Platform'
 const STORAGE_COLNUM_KEY = 'category_list_column';
+
 export default {
   data(){
     return {
@@ -225,13 +227,21 @@ export default {
   },
   computed: {
     showColnums(){
-      //获取当前展示列
+      // 获取当前展示列
       return this.columns.filter(item => item.show);
+    },
+    // 是否在钉钉环境
+    isDingTalk() {
+      return Platform.isDingTalk()
+    },
+    // 绩效报告链接
+    performanceReportLink() {
+      return this.isDingTalk ? 'https://www.yuque.com/shb/help/operating#IbBYe' : 'https://www.yuque.com/shb/help2/operating#IbBYe'
     }
   },
   methods: {
     openDoc(event){
-      this.$platform.openLink(event.target.href);
+      this.$platform.openLink(this.performanceReportLink);
     },
     reset(){
       //清除查询条件

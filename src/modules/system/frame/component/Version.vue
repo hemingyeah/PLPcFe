@@ -19,6 +19,7 @@
 <script>
 import http from '@src/util/http';
 import platform from '@src/platform'
+import Platform from '@src/util/Platform'
 
 const VERSION_NUM_KEY = 'shb_version_num';
 const EditionMap = {
@@ -87,7 +88,7 @@ export default {
       return false;
     },
     seeHelp(){
-      let updatelog = this.tenantType ? 'updatelog2' : 'updatelog'
+      let updatelog = !Platform.isDingTalk() ? 'updatelog2' : 'updatelog'
       platform.openLink(`https://www.yuque.com/shb/${updatelog}/${this.version.replace(' ', '')}`);
       this.show = false;
     }

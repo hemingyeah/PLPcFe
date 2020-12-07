@@ -180,7 +180,7 @@
               <a
                 class
                 href="javascript:;"
-                @click="openLink('https://www.yuque.com/shb/help/XCX')"
+                @click="openLink(this.miniProgramReportlink)"
                 >微信商户，微信支付，微信小程序申请指引</a
               >
             </div>
@@ -379,6 +379,7 @@ import {
   weChat,
   getEventList,
 } from "@src/api/LinkcApi";
+import Platform from 'src/util/Platform'
 
 export default {
   name: "do-myself-set",
@@ -409,7 +410,16 @@ export default {
       }
     },
   },
-  computed: {},
+  computed: {
+    // 是否在钉钉环境
+    isDingTalk() {
+      return Platform.isDingTalk()
+    },
+    // 小程序介绍链接
+    miniProgramReportlink() {
+      return this.isDingTalk ? 'https://www.yuque.com/shb/help/XCX' : 'https://www.yuque.com/shb/help2/XCX'
+    }
+  },
   data() {
     return {
       menuList: [
@@ -487,14 +497,10 @@ export default {
         publicSecret: "",
       },
       wxRuler: {
-        // appId: [{ required: true, message: '请输入APPID', trigger: 'blur' }],
         matchId: [{ required: true, message: "请输入mch_id", trigger: "blur" }],
         apiSecret: [
           { required: true, message: "请输入API密钥", trigger: "blur" },
         ],
-        // secret: [
-        //   { required: true, message: '请输入AppSecret', trigger: 'blur' },
-        // ],
         publicAppId: [
           { required: true, message: "请输入公众号APPID", trigger: "blur" },
         ],
@@ -639,7 +645,6 @@ export default {
             }
           });
           resolve(obj);
-          // console.log(obj, "reverData");
         } catch (error) {
           reject(error);
         }
