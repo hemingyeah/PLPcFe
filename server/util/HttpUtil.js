@@ -139,6 +139,7 @@ function getCookie() {
     location
   } = envMapData;
   let params, options, post_data;
+  
   if(location.endsWith('linker.ltd')){
     // 多端环境
     post_data = queryString.stringify({ account:user.account, password:user.password })

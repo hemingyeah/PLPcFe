@@ -1,7 +1,14 @@
 <template>
-  <div class="base-tree-node" :ref="`${node.id}_base_tree_node`">
-    <div class="base-tree-node-content" :class="{'base-tree-selected': isSelected}" :style="{paddingLeft: `${16 * deep}px`}">
-      <span class="base-tree-node-arrow" :class="{'base-tree-node-arrow-down': isExpand}" @click="toggle"><i class="iconfont icon-arrow-right" v-if="node.children.length > 0"></i></span>
+  <div 
+    class="base-tree-node" 
+    :ref="`${node.id}_base_tree_node`"
+  >
+    <div 
+      class="base-tree-node-content" 
+      :class="{'base-tree-selected': isSelected}" :style="{paddingLeft: `${16 * deep}px`}">
+      <span class="base-tree-node-arrow" :class="{'base-tree-node-arrow-down': isExpand}" @click="toggle">
+        <i class="iconfont icon-arrow-right" v-if="node.children.length > 0"></i>
+      </span>
       <el-checkbox v-if="showCheckbox" :value="node.isChecked" @input="input"/>
       <span class="base-tree-node-name" @click.stop="transmit(node)">
         <tree-node-content/>
@@ -10,11 +17,18 @@
     
     <template v-if="isExpand">
       <base-tree-dept-node 
-        v-for="n in node.children" :key="n.id"
-        :node="n" :selected="selected" :deep="deep + 1" :show-checkbox="showCheckbox"
-        @node-click="transmit" @node-check="$emit('node-check', $event)"
-        :node-render="nodeRender"/>  
+        v-for="n in node.children" 
+        :deep="deep + 1" 
+        :key="n.id"
+        :node="n" 
+        :node-render="nodeRender"
+        :selected="selected" 
+        :show-checkbox="showCheckbox"
+        @node-click="transmit" 
+        @node-check="$emit('node-check', $event)"
+      />  
     </template>
+
   </div>
 </template>
 
@@ -31,8 +45,8 @@ export default {
       default: false
     },
     selected: {
-      type: Object,
-      default: () => ({})
+      type: Array,
+      default: () => []
     },
     deep: {
       type: Number,
@@ -50,16 +64,22 @@ export default {
     }
   },
   computed: {
+    /** 
+     * @description 是否选中
+     * -- 后面考虑下性能
+    */
     isSelected(){
-      let isSelected = false;
-
+      let isSelected = false
+      
       try {
-        isSelected = JSON.stringify(this.node) == JSON.stringify(this.selected);
+        isSelected = this.selected.some(item => {
+          return JSON.stringify(this.node) == JSON.stringify(item)
+        })
       } catch (error) {
-        console.log('hbc: isSelected -> error', error);
+        console.warn('base-tree-dept-node -> isSelected -> error', error)
       }
-
-      return isSelected;
+      
+      return isSelected
     }
   },
   watch: {
@@ -85,9 +105,12 @@ export default {
       render(h){
         const parent = this.$parent;
         const node = parent.node;
-        return parent.nodeRender 
-          ? parent.nodeRender(h, parent.node) 
-          : <span>{node.tagName}</span>;
+        
+        return (
+          parent.nodeRender 
+            ? parent.nodeRender(h, parent.node) 
+            : <span>{node.tagName}</span>
+        )
       }
     }
   }

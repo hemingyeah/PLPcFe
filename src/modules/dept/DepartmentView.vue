@@ -31,7 +31,7 @@
                 <div class="bc-dept" v-if="depts.length > 0">
                   <base-tree-dept
                     :data="depts"
-                    :selected="selectedDept"
+                    :selected="[selectedDept]"
                     :show-checkbox="allowCheckDept"
                     @node-selected="initDeptUser"
                     @node-check="chooseDept"

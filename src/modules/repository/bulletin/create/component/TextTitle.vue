@@ -97,7 +97,6 @@ export default {
   methods: {
     // 点击加号显示标签输入框
     chooseTeam () {
-      // this.$refs.notificationRange.$el.click();
       let max = -1;
       
       let options = {

@@ -107,7 +107,7 @@ const BizTeamSelect = {
         let target = event.target;
         let data = this.$data;
         if (target == data.$referenceEl || this.$refs.popper.contains(target)) return;
-
+        
         this.close()
       }
     }
@@ -135,7 +135,7 @@ const BizTeamSelect = {
       this.loadmoreOptions.disabled = true;
       this.loading = true;
       this.params.pageNum += 1;
-
+      
       this.fetchTeam('merge');
     },
     handleInput: _.debounce(function (event) {
@@ -354,11 +354,11 @@ const BizTeamSelect = {
       }
       return arr;
     },
-
+    
     /** 渲染popper */
     renderPopper(h) {
       let clazz = ['biz-team-select-popper', this.popperClassName].filter(cn => cn);
-
+      
       let style = {
         display: this.popperVisible ? 'block' : 'none',
         width: `${this.popperWidth}px`
@@ -391,7 +391,7 @@ const BizTeamSelect = {
           <div class="biz-team-select-panel" {...panelAttrs} ref="selectPanel">
             {content}
             {/* {this.renderTree(h, this.page.list)} */}
-            <base-tree-dept data={this.page.list} expand={true} on-node-selected={this.choose} nodeRender={this.nodeRender}/>
+            <base-tree-dept data={this.page.list} expand={true} selected={this.value} on-node-selected={this.choose} nodeRender={this.nodeRender}/>
           </div>
         </div>
       )

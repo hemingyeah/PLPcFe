@@ -76,7 +76,7 @@ export default {
         max: 1,
         mountEl: document.querySelector('.departmentEditPanel')
       };
-
+      
       this.$fast.contact.choose('dept_only', options).then(result => {
         let data = result.data || {};
 

@@ -45,27 +45,19 @@
               </el-option>
             </el-select>
           </el-form-item>
-
-          <!-- <el-form-item label="部门" prop="department">
-            <div @click="chooseDepartment" class="department-higher-name">{{ form.department.map(d => d.name).join(',') }}</div>
-          </el-form-item>
-
-          <el-form-item label="团队" prop="team" v-if="initData.canUpdateTag">
-            <biz-team-select v-model="form.team" multiple />
-          </el-form-item> -->
-
+          
         </el-form>
-
+        
       </div>
       <!-- end 编辑表单 -->
-
+      
       <!-- start 底部按钮 -->
       <div class="create-user-panel-bottom">
         <base-button type="primary" @event="validate">保存</base-button>
         <!-- <base-button type="danger" @event="departmentDelete">删除</base-button> -->
       </div>
       <!-- end 底部按钮 -->
-
+      
     </base-panel>
   </div>
 </template>
@@ -187,28 +179,8 @@ export default {
           callback();
         }
       })
-
+      
     }, 500),
-    /* 选择单个部门 */
-    chooseDepartment() { 
-      // TODO: 需要挂载的 el
-      let options = {
-        title: '请选择部门',
-        seeAllOrg: true,
-        max: -1,
-        mountEl: document.querySelector('.createUserPanel')
-      };
-
-      this.$fast.contact.choose('dept_only', options).then(result => {
-        let data = result.data || {};
-
-        if(result.status == 0){
-          this.$set(this.form, 'department', data.depts || [])
-        }
-
-      })
-        .catch(err => console.error(err))
-    },
     close() {
       this.visible = false;
     },

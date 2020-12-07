@@ -89,7 +89,7 @@ export default {
   mounted() {
     this.$nextTick(() => {
       if(!this.showTag) return 
-
+      
       let height = this.$refs.tagName.scrollHeight;
       this.isToggleTagName = height > TEXT_HEIGHT;
     })

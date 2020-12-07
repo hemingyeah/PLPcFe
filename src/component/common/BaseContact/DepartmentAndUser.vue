@@ -1,16 +1,23 @@
 <template>
   <base-modal 
-    :title="title" width="820px"
-    :show.sync="show" @closed="$emit('destroy')" @cancel="$emit('cancel')">
+    width="820px"
+    :title="title" 
+    :show.sync="show" 
+    @closed="$emit('destroy')" 
+    @cancel="$emit('cancel')"
+  >
     <div class="bc-dept-wrap">
       <div class="bc-dept" v-if="depts.length > 0 && departShow">
         <base-tree
-          :data="depts" :selected="selectedDept" :show-checkbox="allowCheckDept"
-          @node-selected="initDeptUser" @node-check="chooseDept" 
+          :data="depts" 
           :node-render="nodeRender"
+          :selected="selectedDept" 
+          :show-checkbox="allowCheckDept"
+          @node-selected="initDeptUser" 
+          @node-check="chooseDept" 
         />
       </div>
-
+      
       <div class="bc-user">
         <div class="bc-search">
           <label class="bc-search-inner">
@@ -18,15 +25,18 @@
             <input type="search" placeholder="搜索全部员工" :value="params.keyword" @input="inputKeyword" maxlength="50" autofocus>
           </label>
         </div>
-
+        
         <div class="bc-user-panel" v-loadmore="loadmoreOptions">
           <p class="bc-contact-search-tip" v-if="mode == 'search' && !loading">为您查询到相关记录{{userPage.total || 0}}条</p>
-
+          
           <contact-user-item 
-            v-for="user in userPage.list" :key="user.userId" 
+            v-for="user in userPage.list" 
+            :key="user.userId" 
             :user="user" @toggle="chooseUser" 
-            :show-user-state="showUserState" :state-color="stateColor"
-            :show-location="showLocation"/>
+            :show-user-state="showUserState" 
+            :state-color="stateColor"
+            :show-location="showLocation"
+          />
           
           <div class="bc-contact-loading" v-if="loading">正在加载，请稍等...</div>
           <div v-if="userPage.total == 0 && !loading && mode == 'choose'" class="bc-contact-empty">
@@ -35,7 +45,7 @@
           </div>
         </div>
       </div>
-
+      
       <div class="bc-chosen" v-if="isMulti">
         <template v-if="allowCheckDept && chosenDept.length > 0">
           <h4>已选部门</h4>
@@ -73,6 +83,8 @@ import {alert} from '@src/platform/message';
 
 import ContactUserItem from './ContactUserItem.vue';
 import DefaultHead from '@src/assets/img/avatar.png';
+
+import { teamNameConversion } from '@src/util/conversionFunctionUtil.ts'
 
 export default {
   name: 'base-contact-dept-user',
@@ -112,12 +124,10 @@ export default {
     lat: {
       type: String,
       default: ''
-      // default: '27.127668'
     },
     lng: {
       type: String,
       default: ''
-      // default: '113.961467'
     },
     // 是否显示定位信息
     showLocation: { 
@@ -156,7 +166,6 @@ export default {
       depts: [], // 部门
       deptUserCount: {},
       selectedDept: {}, // 选中的部门
-      // chosenDept: [], // 选择的部门
       chosenDept: this.selectedDepts.map(dept => {
         return {
           id: dept.id,
@@ -237,7 +246,7 @@ export default {
         }) 
         data.depts = depts;
       }
-
+      
       this.show = false;
       this.$emit('input', data);
     },
@@ -252,13 +261,13 @@ export default {
         this.initDeptUser(this.selectedDept);
         return;
       }
-
+      
       this.searchUser();
     }, 500),
     /** 选择人员 */
     chooseUser(user){
       if(!user) return;
-
+      
       // 单选则直接返回
       if(!this.isMulti) {
         this.show = false;
@@ -272,15 +281,15 @@ export default {
         })
         return;
       }
-
-      user.selected ? this.removeUser(user) : this.addUser(user);
+      
+      user.seleced ? this.removeUser(user) : this.addUser(user);
     },
     /** 添加人员 */
     addUser(user){
       if(!this.allowAddUser) return alert(`最多选择${this.max}人`);
-    
+      
       user.selected = true;
-
+      
       var index = -1;
       var len = this.chosen.length;
       for(var i = 0; i < len;i++){
@@ -338,7 +347,7 @@ export default {
         this.selectedDept = dept;
         this.userPage.list = [];
         this.loading = true;
-
+        
         // 查询用户
         this.params.keyword = '';
         this.params.tagId = this.selectedDept.id;
@@ -365,7 +374,7 @@ export default {
     chooseDept(event){
       let {node, value} = event;
       this.toggleDeptCheckStatus(node, value);
-      this.chosenDept = this.filterChosenDept(this.depts);
+      this.chosenDept = this.filterChosenDept(this.depts).map(teamNameConversion)
     },
     /** 切换该部门及子部门选中状态 */
     toggleDeptCheckStatus(dept, value){
@@ -480,7 +489,7 @@ export default {
             let deptUserCount = result[1] || {};
             this.deptUserCount = deptUserCount.data || {};
           }
-          this.depts = depts;
+          this.depts = depts
           this.initChosenDept(this.depts);
           this.initDeptUser(this.depts[0]); // 默认选中第一个
         })

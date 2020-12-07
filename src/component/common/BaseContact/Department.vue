@@ -14,7 +14,7 @@
           :node-render="nodeRender"
         />
       </div>
-
+      
       <div class="bc-chosen" v-if="isMulti">
         <template v-if="allowCheckDept && chosenDept.length > 0">
           <h4>已选部门</h4>
@@ -41,6 +41,7 @@ import _ from 'lodash';
 import http from '@src/util/http';
 import Page from '@model/Page';
 import {alert} from '@src/platform/message';
+import { teamNameConversion } from '@src/util/conversionFunctionUtil.ts'
 
 export default {
   name: 'base-contact-department',
@@ -109,7 +110,7 @@ export default {
     chooseDept(event){
       let {node, value} = event;
       this.toggleDeptCheckStatus(node, value);
-      this.chosenDept = this.filterChosenDept(this.depts);
+      this.chosenDept = this.filterChosenDept(this.depts).map(teamNameConversion)
     },
     /** 抓取部门数据 */
     fetchDept(){

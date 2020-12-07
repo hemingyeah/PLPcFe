@@ -5,7 +5,7 @@
     <div class="bc-team-wrap">
       <div class="bc-team" v-if="teams.length > 0">
         <base-tree-dept
-          :data="teams" 
+          :data="teams"
           :node-render="nodeRender"
           :selected="selectTeam" 
           :show-checkbox="allowCheckTeam"
@@ -20,10 +20,10 @@
             <input type="search" placeholder="搜索全部员工" :value="params.keyword" @input="inputKeyword" maxlength="50" autofocus>
           </label>
         </div>
-
+        
         <div class="bc-user-panel" v-loadmore="loadmoreOptions">
           <p class="bc-contact-search-tip" v-if="mode == 'search' && !loading">为您查询到相关记录{{userPage.total || 0}}条</p>
-
+          
           <contact-user-item 
             v-for="(user, index) in userPage.list"
             :key="`${user.userId}_${index}`" 
@@ -48,11 +48,10 @@
           <h4>已选团队</h4>
           <div 
             class="bc-chosen-team-user" 
-            v-for="team in chosenTeam" :key="team.id">
-            <!-- <el-tooltip class="item" popper-class="bc-team-tooltip" effect="dark" :content="team.name" placement="top"> -->
+            v-for="team in chosenTeam" :key="team.id"
+          >
             <span>{{team.name}}</span>
             <i class="iconfont icon-fe-close" @click="chooseTeam({node: team, value: false})"></i>
-            <!-- </el-tooltip> -->
           </div>
         </template>
         <!-- end 已选择团队 -->
@@ -64,23 +63,15 @@
             <div class="bc-chosen-team-user-head" :style="{backgroundImage: 'url(' + head(user) + ')'}"></div>
             <div class="bc-chosen-team-user-content" :ref="`bcChosenTeamUserContent${user.userId}_${user.tagId}`">
               <span class="bc-chosen-team-user-name">{{user.displayName}}</span>
-              <!-- <el-tooltip 
-                    class="item" 
-                    popper-class="bc-user-tooltip" 
-                    effect="dark" 
-                    :content="user.tagName" 
-                    placement="top" 
-                    :disabled="!computedShowTooltip(user)"> -->
               <span v-if="!isHideTeam" class="bc-chosen-tema-user-tagname">
                 {{ user.tagName }}
               </span>
-              <!-- </el-tooltip> -->
             </div>
             <i class="iconfont icon-fe-close" @click="removeRepeatUser(user)"></i>
           </div>
         </template>
         <!-- end 已选择人员 -->
-
+        
       </div>
     </div>
     <div class="bc-contact-footer" v-if="isMulti">
@@ -97,6 +88,7 @@ import _ from 'lodash';
 import http from '@src/util/http';
 import Page from '@model/Page';
 import {alert} from '@src/platform/message';
+import { teamNameConversion } from '@src/util/conversionFunctionUtil.ts'
 
 import ContactUserItem from './ContactUserItem.vue';
 import DefaultHead from '@src/assets/img/avatar.png';
@@ -115,7 +107,7 @@ export default {
       type: Function,
       default(data) {
         let callData = {};
-
+        
         // 返回用户
         callData.users = data.users.map(item => {
           let user = {
@@ -130,7 +122,7 @@ export default {
           }
           return user
         });
-
+        
         // 如果允许选择团队
         if(this.allowCheckTeam) {
           callData.teams = data.teams.map(team => {
@@ -140,7 +132,7 @@ export default {
             }
           })
         }
-
+        
         return callData;
       }
     },
@@ -229,7 +221,7 @@ export default {
           tagName: item.tagName,
         }
       }),
-
+      
       params: {
         keyword: '', // 搜索关键词
         tagId: '',
@@ -238,10 +230,10 @@ export default {
         // selectType: ''
       }, // 参数
       userPage: new Page(),
-
+      
       stateColor: {}, //用户工作状态颜色
     }
-
+    
     return data
   },
   computed: {
@@ -302,10 +294,10 @@ export default {
     
       this.$set(user, 'selected', true);
 
-      var index = -1;
-      var len = this.chosen.length;
+      let index = -1;
+      let len = this.chosen.length;
 
-      for(var i = 0; i < len;i++){
+      for(let i = 0; i < len;i++){
         if(user.userId == this.chosen[i].userId){
           index = i;
           break;
@@ -356,7 +348,7 @@ export default {
 
       this.toggleDeptCheckStatus(node, value);
 
-      this.chosenTeam = this.filterChosenTeam(this.teams);
+      this.chosenTeam = this.filterChosenTeam(this.teams).map(teamNameConversion)
     },
     /** 选中一个团队 */
     async initTeamUser(team){
@@ -401,19 +393,11 @@ export default {
       return http.post(this.action, params, false).then(page => {
         // 合并数据
         let rows = page.list || [];
-        // 是否是搜索状态
-        let isSearch = (this.mode !== 'choose');
-
+        
         for(let i = 0; i < rows.length; i++){
           let user = rows[i];
           let index = -1;
-          // 判断当前用户是否含有团队信息
-          // if(!this.isUserHaveTagData) {
-          //   // 判断是否是 搜索状态
-          //   user.tagId = isSearch ? user.tagInfoList.map(l => l.tagId).join(',') : this.selectTeam.id;
-          //   user.tagName = isSearch ? user.tagInfoList.map(l => l.tagName).join(',') : this.selectTeam.name;
-          // }
-
+          
           for(let j = 0; j < this.chosen.length; j++){
             // 匹配数据
             let chosenItem = this.chosen[j];
@@ -425,17 +409,17 @@ export default {
                   : true
                 )
             )
-
+            
             if(isRepeatUser){
               index = j;
               break;
             }
           }
-
+          
           // 存在相同数据且不允许重复数据  则替换原数据
           if(index >= 0){
             this.$set(user, 'selected', true);
-
+            
             let hasTeamDataUser = {
               ...this.chosen[index],
               ...user,
@@ -456,10 +440,8 @@ export default {
         pageNum: this.params.pageNum,
         pageSize: 0
       };
-
+      
       return http.post('/security/tag/tree', params).then(result => {
-        // if(result.status == 1) return [];
-
         let teams = result.list.map(l => {
           let list = {
             ...l,
@@ -473,10 +455,10 @@ export default {
             }) || [],
           }
           list.subDepartments = list.children.slice();
-
+          
           return list;
         }) || [];
-
+        
         return teams;
       }).catch(err => console.error('err', err));
     },

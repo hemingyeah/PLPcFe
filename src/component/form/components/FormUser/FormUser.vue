@@ -5,8 +5,8 @@
       :value="displayName"
       :placeholder="placeholder"
       readonly 
-      @click="choose">
-    <!-- @keydown.enter.prevent="choose" -->
+      @click="choose"
+    >
     <button type="button" class="btn-text form-user-clear" @click="clear" v-if="!isEmpty">
       <i class="iconfont icon-fe-close"></i>
     </button>
@@ -45,7 +45,7 @@ export default {
         let user = this.value || {};
         return user.displayName || user.name;
       }
-
+      
       let value = Array.isArray(this.value) ? this.value : [];
       return value.map(i => i.displayName || i.name).join(',')
     },
@@ -55,7 +55,7 @@ export default {
         let value = this.value || {};
         return !value.userId;
       }
-
+      
       let value = this.value || [];
       return value.length <= 0
     }
@@ -104,9 +104,8 @@ export default {
     padding-right: 32px;
     width: 100%;
     cursor: pointer;
-    //background-color: #f6f9f7;
   }
-
+  
   &:hover .form-user-clear{
     display: block;
   }

@@ -52,13 +52,13 @@ export default {
   computed: {
     isSelected(){
       let isSelected = false;
-
+      
       try {
         isSelected = JSON.stringify(this.node) == JSON.stringify(this.selected);
       } catch (error) {
-        console.log('hbc: isSelected -> error', error);
+        console.warn('base-tree-node -> isSelected -> error', error);
       }
-
+      
       return isSelected;
     }
   },

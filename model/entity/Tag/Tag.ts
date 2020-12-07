@@ -27,6 +27,9 @@ class Tag {
   public tagAddress?: TagAddress = new TagAddress()
   //负责区域
   public tagPlaceList?: TagPlace[] = []
+  
+  // 名字 仅供前端显示使用
+  public name?: string = ''
 }
 
 export default Tag

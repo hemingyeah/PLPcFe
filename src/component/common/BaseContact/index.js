@@ -8,15 +8,17 @@ import Team from './Team.vue';
 import MulTeam from './MulTeam.vue';
 // 选择部门组件
 import Department from './Department.vue';
-
+/* util */
+import Log from '@src/util/log.ts'
 import { destroyComponent } from '@src/util/dom';
 import fastCall from '@src/component/util/fastCall'
 
-const DepartmentAndUserComponent = Vue.extend(DepartmentAndUser);
-const MAX_NUM = 150; // 单次选人上限
 
-function choose(type = 'dept', options = {}){
-  console.log('type:', type);
+const DepartmentAndUserComponent = Vue.extend(DepartmentAndUser);
+
+function choose(type = 'dept', options = {}) {
+  Log.succ(type, 'type', choose.name)
+  
   if(type == 'dept') return deptWithUser(options);
   if(type == 'team') return teamWithUser(options);
   if(type == 'dept_only') return department(options);
@@ -27,7 +29,7 @@ function deptWithUser(options){
   // 处理传入参数
   let selectedUser = [];
   let max = options.max;
-
+  
   if(
     ( typeof max == 'number' || typeof max == 'string' )
     && !isNaN(max) 
@@ -71,30 +73,30 @@ function deptWithUser(options){
       departShow: options.departShow
     }
   });
-
+  
   let ele = document.createElement('div');
   let body = document.body;
   let pending = false;
-
+  
   return new Promise((resolve, reject) => {
     instance.$on('destroy', event => {
       setTimeout(() => destroyComponent(instance), 1500);
     })
-
+    
     instance.$on('input', user => {
       if(pending) return;
-
+      
       pending = true;
       resolve({status: 0, data: user});
     });
     
     instance.$on('cancel', () => {
       if(pending) return;
-
+      
       pending = true;
       resolve({status: 1, message: 'cancel'});
     })
-
+    
     body.appendChild(ele);
     instance.$mount(ele);
   })
@@ -109,7 +111,7 @@ function teamWithUser( options = {} ){
   let action = isEnterprise ? '/security/tag/userList' : '/security/tag/tagComponet/getUserList';
   let selectTypes = ['universal', 'performance'];
   let selectType = 'universal';
-
+  
   if(
     ( typeof max == 'number' || typeof max == 'string' )
     && !isNaN(max) 
@@ -119,13 +121,13 @@ function teamWithUser( options = {} ){
   } else {
     max = 0;
   }
-
+  
   if(options.selected && max !== 1 && Object.keys(options.selected).length > 0) {
     let users = options?.selected?.users;
     let teams = options?.selected?.teams;
     let isUserArray = Array.isArray(users);
     let isTeamArray = Array.isArray(teams);
-
+    
     if(isUserArray) selectedUser = users;
     if(isTeamArray) selectedTeam = teams;
   }
@@ -133,7 +135,7 @@ function teamWithUser( options = {} ){
   if(selectTypes.indexOf(options.selectType) > 0) {
     selectType = options.selectType;
   }
-
+  
   let ele = document.createElement('div');
   let body = document.body;
   let pending = false;
@@ -147,22 +149,18 @@ function teamWithUser( options = {} ){
         /** 取消  */
         cancel() {
           if(pending) return;
-
+          
           pending = true;
           resolve({status: 1, message: 'cancel'});
         },
         /** 销毁  */
         destroy() {
-          let el = this.$el;
-          // this.$destroy(true);
-
-          // el.parentNode && el.parentNode.removeChild(el); 
           setTimeout(() => destroyComponent(this), 1500);
         },
         /** 值的改变  */
         input(user) {
           if(pending) return;
-
+          
           pending = true;
           resolve({status: 0, data: user});
         }
@@ -170,7 +168,7 @@ function teamWithUser( options = {} ){
       render(){
         return (
           isEnterprise 
-            ? <base-contact-team-mul 
+            ? <base-contact-team-mul
               action={action}
               dataFunc={typeof options.dataFunc == 'function' ? options.dataFunc : undefined}
               lat={options.lat}
