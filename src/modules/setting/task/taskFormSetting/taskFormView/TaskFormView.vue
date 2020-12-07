@@ -14,7 +14,7 @@
       <form-design
         v-if="init"
         v-model="fields"
-        mode="task"
+        :mode="mode"
       ></form-design>
     </div>
     <!-- end 表单设计器 -->

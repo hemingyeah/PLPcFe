@@ -150,18 +150,28 @@ export default {
     // }
 
   }
-  .el-radio-group,.el-checkbox-group{
-    width: 100%;
-    label{
-      padding: 0;
-      min-width: 110px;
-      width: auto;
-    }
-    .el-checkbox__label,.el-radio__label{
-      overflow-wrap: break-word;
-      text-overflow: ellipsis; 
-      white-space: normal;
-    }
+}
+</style>
+
+<style lang="scss" scoped>
+.el-radio-group,
+.el-checkbox-group {
+  width: 100%;
+
+  label {
+    width: auto;
+    display: inline-block;
+    margin-right: 20px;
+    padding-left: 0;
+  }
+
+  /deep/ .el-checkbox__label,
+  /deep/ .el-radio__label {
+    overflow-wrap: break-word;
+    text-overflow: ellipsis; 
+    white-space: normal;
+    word-break: break-all;
+    padding-left: 6px;
   }
 }
 </style>

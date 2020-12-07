@@ -11,14 +11,14 @@
     <div class="form-setting-group form-setting-item">
       <h4 class="form-item-title">关联项</h4>
       <div class="form-item-box">
-        <el-checkbox :value="field.setting.customerOption.address" @input="updateOptions($event, 'address')">地址</el-checkbox>
+        <el-checkbox v-model="customerOption.address" @input="updateOptions($event, 'address')">地址</el-checkbox>
       </div>
       <div class="form-item-box">
-        <el-checkbox :value="field.setting.customerOption.linkman" @input="updateOptions($event, 'linkman')">联系人</el-checkbox>
+        <el-checkbox v-model="customerOption.linkman" @input="updateOptions($event, 'linkman')">联系人</el-checkbox>
       </div>
       <div class="form-item-box">
-        <el-checkbox :value="field.setting.customerOption.product" @input="updateOptions($event, 'product')">产品</el-checkbox>
-        <el-checkbox :value="field.setting.customerOption.productNotNull" @input="updateOptions($event, 'productNotNull')" :disabled="!field.setting.customerOption.product">产品必填</el-checkbox>
+        <el-checkbox v-model="customerOption.product" @input="updateOptions($event, 'product')">产品</el-checkbox>
+        <el-checkbox v-model="customerOption.productNotNull" @input="updateOptions($event, 'productNotNull')" :disabled="!customerOption.product">产品必填</el-checkbox>
       </div>
     </div>
     <!-- end 关联项 -->
@@ -39,6 +39,11 @@ export default {
     setting: {
       type: Object,
       default: () => ({})
+    }
+  },
+  computed: {
+    customerOption() {
+      return this.field.setting.customerOption || {}
     }
   },
   methods: {

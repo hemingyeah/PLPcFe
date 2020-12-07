@@ -11,19 +11,22 @@ export default {
   props: {
     templateId: {
       type: String,
+      default: '07d7bd22-b277-4dbf-a147-154e88ab3136' // 暂时写死
+    },
+    templateName: {
+      type: String,
       default: ''
     }
   },
   data(){
     return {
-      templateName: '默认工单',
-      tenantId: '7416b42a-25cc-11e7-a500-00163e12f748',
+      mode: 'task'
     }
   },
   async mounted() {
     try {
-      // TODO: 修改参数
-      let fields = await TaskApi.getFields({ tableName: 'task', typeId: 'c5e6f3de-06d8-45a9-aee4-f3946ace2aed' });
+      // 获取表单字段列表
+      let fields = await TaskApi.getFields({ tableName: this.mode, typeId: this.templateId });
       let sortedFields = fields.sort((a, b) => a.orderId - b.orderId);
 
       // 工单自带的 attachment 字段需要特殊处理, 提交时需要将formType还原
@@ -41,47 +44,44 @@ export default {
     }
   },
   methods: {
+    /** 
+    * @description 提交表单字段设置
+    */
     async submit() {
       try {
         let fields = FormUtil.toField(this.fields);
-        console.log(fields, 88888)
-        let index = 0;
-        fields.forEach(item => {
-          item.tableName = 'task';
-          item.orderId = index++;
-          item.tenantId = this.tenantId;
+
+        fields.forEach((item, index) => {
           item.templateId = this.templateId;
           item.templateName = this.templateName;
+          item.tableName = 'task';
+          item.orderId = index;
+          
+          // 还原工单表单的系统附件的formType
           if(item.formType == 'taskAttachment' && item.isSystem) {
             item.formType = 'attachment';
           }
-        });
-
+        })
+        
+        // 表单字段格式校验
         let message = FormUtil.validate(fields);
         if(!FormUtil.notification(message, this.$createElement)) return;
 
         this.pending = true;
 
         let result = await TaskApi.taskSettingSave(fields);
-        
-        if(result.status == 0){
-          this.$platform.notification({
-            type: 'success',
-            title: '成功',
-            message: '工单字段更新成功'
-          })
-          window.location.href = "/setting/task/field/taskReceipt";
-        }else{
-          this.$platform.notification({
-            type: 'error',
-            title: '工单字段更新失败',
-            message: result.message
-          })
-        }
+
+        let isSuccess = result.status == 0;
+        this.$platform.notification({
+          type: isSuccess ? 'success' : 'error',
+          title: `工单字段更新${isSuccess ? '成功' : '失败'}`,
+          message: isSuccess ? null : result.message
+        })
 
       } catch (error) {
         console.error(error)
       }
+
       this.pending = false;
     }
   }
