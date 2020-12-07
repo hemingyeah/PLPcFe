@@ -82,12 +82,13 @@ export default {
 <style lang="scss" scoped>
 .form-default-value-setting {
   .form-item-title {
-    margin-bottom: 8px;
+    margin-bottom: 0;
   }
 
   .form-item-box {
     input {
       width: 100%;
+      margin-top: 8px;
     }
   }
 }
