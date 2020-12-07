@@ -104,7 +104,7 @@ const LogicalFieldModal = {
     const tooltip = {
       directives: [{name: 'tooltip'}],
       domProps: {
-        title: '在表单中，可以根据单选项的值决定表单中其他字段(位于该字段下方的非系统字段)的显示与隐藏。'
+        title: '在表单中，可以根据单选项的值决定表单中其他字段（位于该字段下方的非系统字段）的显示与隐藏。'
       }
     }
 

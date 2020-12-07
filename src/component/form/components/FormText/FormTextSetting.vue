@@ -54,7 +54,7 @@
       <div class="form-item-box">
         <el-checkbox :value="field.setting.isScanCode" @input="update($event, 'isScanCode', true)" :true-label="1" :false-label="0">
           支持扫码录入
-          <el-tooltip content="支持二维码/条形码，仅支持移动端使用" placement="top">
+          <el-tooltip content="支持扫码二维码/条形码，仅移动端可用" placement="top">
             <i class="iconfont icon-question"></i>
           </el-tooltip>
         </el-checkbox>
