@@ -60,6 +60,9 @@ export default {
         });
       }
 
+      // 远程验证事件处理
+      this.remoteValidateHandler()
+
       this.$emit('update', {newValue, oldValue, field: this.field});
       this.$emit('input', newValue);
     },
