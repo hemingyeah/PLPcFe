@@ -1,13 +1,54 @@
 <template>
-  <h1>工单设置左边导航栏</h1>
+  <ul class="task-nav-bar">
+    <li>
+      <a href="/setting/task/taskSet" :class="current === 'taskSet' && 'active'">
+        <i class="icon-ziyuan iconfont" ></i>
+        工单类型
+      </a>
+    </li>
+    <li>
+      <a href="/setting/taskType/manage" :class="current === 'taskType' && 'active'">
+        <i class="icon-ziyuan iconfont"></i>
+        工单类型设置
+      </a>
+    </li>
+    <li>
+      <a href="/setting/task/cardManage" :class="current === 'cardManage' && 'active'">
+        <i class="icon-ziyuan iconfont"></i>
+        附加组件设置
+      </a>
+    </li>
+  </ul>
 </template>
 
 <script>
 export default {
-    name: 'task-nav-bar'
+  name: 'task-nav-bar',
+  props: {
+    current: String
+  }
 }
 </script>
 
-<style>
-
+<style lang="scss" scoped>
+ul,.task-nav-bar{
+  width: 194px;
+  min-width: 194px;
+  height: 100%;
+  padding: 26px 38px;
+  background: #FFFFFF;
+  border-radius: 4px;
+  list-style: none;
+  li > a{
+    display: inline-block;
+    text-decoration: none;
+    margin-bottom: 26px;
+    font-size: 16px;
+    color: #666666;
+    &.active{
+      font-weight: bold;
+      color: $color-primary;
+    }
+  }
+}
 </style>

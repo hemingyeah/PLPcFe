@@ -12,3 +12,11 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+@mixin text-ellipsis-2 {
+  display: -webkit-box;
+  white-space: normal;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}

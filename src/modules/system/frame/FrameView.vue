@@ -961,7 +961,7 @@ export default {
       platform.openTab({
         id: "task_type_setting",
         title: "工单类型设置",
-        url: "/setting/task/manage",
+        url: "/setting/taskType/manage",
         reload: true,
       });
     },
@@ -969,7 +969,7 @@ export default {
       platform.openTab({
         id: "task_flow_setting",
         title: "工单流程设置",
-        url: "/setting/task/flow",
+        url: "/setting/task/taskFormSet",
         reload: true,
       });
     },

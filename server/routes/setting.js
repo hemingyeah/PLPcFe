@@ -43,7 +43,7 @@ router.get('/setting/task/field/task', async ctx => {
   ctx.body = Template.renderWithHtml('工单表单设置', body, script, modConfig.template)
 });
 
-router.get('/setting/task/manage', async ctx => {
+router.get('/setting/taskType/manage', async ctx => {
   let modConfig = modules['setting.task.manage'];
   let script = ['/setting.task.manage.js'];
   let { url, headers } = ctx.request;
@@ -53,7 +53,7 @@ router.get('/setting/task/manage', async ctx => {
   ctx.body = Template.renderWithHtml('工单类型设置', body, script, modConfig.template)
 });
 
-router.get('/setting/task/flow', async ctx => {
+router.get('/setting/task/taskFormSet', async ctx => {
   let modConfig = modules['setting.task.flow'];
   let script = ['/setting.task.flow.js'];
   let { url, headers } = ctx.request;
