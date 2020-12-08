@@ -17,7 +17,6 @@
             native-type="submit"
           >搜索</base-button>
           <base-button type="ghost" @event="resetParams">重置</base-button>
-          <!-- <a href="/customer/oldList">返回旧版</a> -->
         </div>
         <span class="advanced-search-visible-btn" @click.self="panelSearchAdvancedToggle">
           <i class="iconfont icon-add"></i>

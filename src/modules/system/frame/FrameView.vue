@@ -586,12 +586,12 @@ export default {
     /** 允许切换工单新旧版本 */
     allowChangeTaskVersion() {
       // 企业是否开启工单灰度功能
-      let isTaskGray = this.initData.isTaskGrayFunction;
-      return isTaskGray && this.currentTaskListTab.id;
+      let isTaskGray = this.initData.isTaskGrayFunction
+      return isTaskGray && this.currentTaskListTab.id && Platform.isDingTalk();
     },
   },
   methods: {
-     openReason() {
+    openReason() {
       if (localStorage.getItem('reason_bool')) {
         this.changeTaskVersion(false)
         return

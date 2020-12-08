@@ -30,6 +30,8 @@ enum ComponentNameEnum {
   UserButton = 'user-button',
   // 工单流程步骤
   TaskProcessSteps = 'task-process-steps',
+  // 基础面板侧边栏
+  BasePanelAside = 'base-panel-aside'
 }
 
 export default ComponentNameEnum

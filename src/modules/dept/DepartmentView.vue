@@ -10,7 +10,22 @@
           :loading="synchronousState"
           class="base-button"
           v-if="isWeChat==2 || isWeChat==3"
-        >{{synchronousState?'同步中':'同步企业微信通讯录'}}</el-button>
+        >
+          {{ synchronousState ? '同步中': '同步企业微信通讯录' }}
+        </el-button>
+        
+        <!-- start 同步钉钉通讯录 -->
+        <el-button
+          v-if="isDingTalk"
+          class="base-button"
+          type="primary"
+          :loading="syncDingTalkState"
+          @click="syncDingTalkAddressBook"
+        >
+          {{ syncDingTalkState ? '同步中': '同步钉钉通讯录' }}
+        </el-button>
+        <!-- end 同步钉钉通讯录 -->
+        
         <el-tabs type="card" v-model="activeName" @tab-click="handleClick">
           <el-tab-pane label="组织架构" name="tag">
             <!-- 部门搜索框 -->
@@ -588,7 +603,7 @@
     </div>
     <!-- end 主要内容 -->
 
-    <!-- start 新建/编辑 部门 面板 -->
+    <!-- start 新建/编辑 部门 面板 @deprecated 已废弃 -->
     <department-edit-panel
       ref="departmentEditPanel"
       @create="departmentCreate"

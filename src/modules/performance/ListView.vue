@@ -722,22 +722,6 @@ export default {
         selectType: '',
         selected: this.userList,
         showTeamCheckbox: true,
-        // dataFunc(data) {
-        //   let chosen = data.slice();
-        //   let team = {};
-        //   let group = [];
-
-        //   chosen.forEach(c => {
-        //     let tagId = c.tagId;
-
-        //     if(!team.hasOwnProperty(tagId)) {
-        //       team[tagId] = [];
-        //     }
-        //     team[tagId].push(c)
-        //   });
-
-        //   return team
-        // }
       };
 
       this.$fast.contact.choose('team', options).then(res => {
@@ -747,9 +731,8 @@ export default {
     },
     selectionInit(rows) {
       let isNotOnCurrentPage = false;
-      let report = undefined;
       let row = undefined;
-
+      
       if (rows) {
         for(let i = 0; i < rows.length; i++) {
           row = rows[i];
@@ -758,36 +741,36 @@ export default {
           })
           if(isNotOnCurrentPage) return 
         }
-
+        
         rows.forEach(row => {
           this.$refs.multipleTable.toggleRowSelection(row);
         });
       } else {
         this.$refs.multipleTable.clearSelection();
         this.multipleSelection = [];
-
+        
       }
     },
     selectPerformanceCancel(item) {
       if (!item || !item.id) return;
-
+      
       this.multipleSelection = this.multipleSelection.filter(ms => ms.id !== item.id);
       this.multipleSelection.length < 1 ? this.selectionInit() : this.selectionInit([item]);
     },
     // 批量匹配选中
     matchSelected() {
       if (!this.multipleSelection.length) return;
-
+      
       const selected = this.reports
         .filter(c => {
           if (this.multipleSelection.some(sc => sc.id === c.id)) {
-
+            
             this.multipleSelection = this.multipleSelection.filter(sc => sc.id !== c.id);
             this.multipleSelection.push(c);
             return c;
           }
         }) || [];
-
+      
       this.$nextTick(() => {
         this.selectionInit(selected);
       });
