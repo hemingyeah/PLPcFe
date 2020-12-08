@@ -46,12 +46,12 @@ const ALL_FORM_FIELDS = [
   FormLocation,
   FormInfo,
   FormCustomer,
-  FormRelation,
   FormAutograph,
   FormSparepart,
   FormServiceIterm,
   FormRelatedTask,
-  FormFormula
+  FormFormula,
+  FormRelation,
 ].reduce((acc, val) => (Array.isArray(val) ? acc = acc.concat(val) : acc.push(val)) && acc, []);
 
 const FormFieldMap = {};
@@ -117,8 +117,6 @@ for(let i = 0; i < ALL_FORM_FIELDS.length; i++){
 }
 
 const COMMON_FIELDS = ['text', 'textarea', 'number', 'select', 'cascader', 'attachment', 'user', 'date', 'datetime', 'phone', 'email', 'separator', 'address', 'location', 'info', 'autograph', 'related_task', 'formula'];
-// 工单字段列表，工单彻底改造完成后删除，用 COMMON_FIELDS 替代
-const TASK_FIELDS = ['text', 'textarea', 'number', 'select', 'code', 'attachment', 'user', 'date', 'datetime', 'phone'];
 
 const MODE_MANAGER = {
   base: {
@@ -132,14 +130,14 @@ const MODE_MANAGER = {
   },
   task: {
     include: [
-      ...TASK_FIELDS,
-      ...['taskNo', 'cascader', 'address', 'relationCustomer', 'relationProduct', 'customer', 'level', 'serviceType', 'serviceContent', 'planTime', 'description', 'taskAttachment']
+      ...COMMON_FIELDS,
+      ...['relationCustomer', 'relationProduct', 'level', 'serviceType', 'serviceContent', 'description', 'taskAttachment']
     ]
   },
   task_receipt: {
     include: [
-      ...TASK_FIELDS,
-      ...['cascader', 'address', 'receiptAttachment', 'autograph', 'sparepart', 'serviceIterm', 'systemAutograph']
+      ...COMMON_FIELDS,
+      ...['receiptAttachment', 'autograph', 'sparepart', 'serviceIterm', 'systemAutograph']
     ]
   },
   findMode(mode){

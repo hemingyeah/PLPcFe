@@ -58,6 +58,15 @@
 .form-design-field-wrap {
   margin: 10px 0 0 0;
   cursor: move;
+
+  &.disabled {
+    opacity: .4;
+    cursor: not-allowed;
+
+    .form-design-field:hover {
+      background: none !important;
+    }
+  }
 }
 
 .form-design-field {
