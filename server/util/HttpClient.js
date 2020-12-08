@@ -4,6 +4,7 @@
 const colors = require('colors')
 // utils
 const { isNotLocalEnv } = require('../model/proxyConfigModel');
+const http = require('http')
 const https = require(isNotLocalEnv ? 'https' : 'http');
 const { getRequestOptions, getProxyOptions, toJSON, getBody } = require('./HttpUtil');
 
@@ -20,42 +21,36 @@ module.exports = {
   request(path, method, rawBody, options = {}){
     
     let requestOptions = getRequestOptions(path, method, options);
-
-    // console.log(`${colors.bgYellow('request -> requestOptions')}`, requestOptions)
-
-    return new Promise((resolve, reject) => {
-      let req = https.request(requestOptions, res => {
         let chunks = [];
         let size = 0;
-
-        res.on('data', (chunk) => {
+        
           chunks.push(chunk);
           size += chunk.length;
         })
-    
+        
         // 请求完成
         res.on('end', () => {
           // 拼接返回数据
           let body = Buffer.concat(chunks, size).toString();
-
+          
           // 处理返回值
           let contentType = res.headers['content-type'];
           if (contentType && contentType.indexOf('application/json' >= 0)) {
             body = toJSON(body)
           }
-
+        
           resolve(getBody(res, body, null));
         });
       })
-
+      
       req.on('error', error => {
         console.log(error)
         resolve(getBody(null, null, error));
       });
-
+      
       // 发送数据
       if (rawBody) req.write(rawBody);
-
+      
       req.end();
     });
   },
@@ -67,45 +62,47 @@ module.exports = {
   proxy(ctx, options = {}) {
     let request = ctx.request;
     let response = ctx.response;
-
+    let isHttp = options.httpProtocol === 'http'
+    let protocol = isHttp ? http : https
+    
     let rawBody = request.rawBody;
     let isMultipart = request.is('multipart/form-data');
-
-    let proxyOptions = getProxyOptions(ctx, options);
-
-    // console.log(`${colors.bgYellow('proxy -> proxyOptions')}`, proxyOptions);
-
+    
+    let proxyOptions = getProxyOptions(ctx, options)
+    
+    console.log(`${colors.bgYellow('proxy -> proxyOptions')}`, proxyOptions);
+    
     return new Promise((resolve, reject) => {
-      let req = https.request(proxyOptions, res => {
+      let req = protocol.request(proxyOptions, res => {
         // 设定response的header
         let headers = res.headers;
         for(let name in headers) {
           response.set(name, headers[name])
         }
-
+        
         // 设定请求状态
         response.status = res.statusCode;
         res.pipe(response.res, { end: false })
-
+        
         res.on('end', () => {
           // 此处需要手动调用
           response.res.end()
           resolve()
         })
       })
-
+      
       req.on('error', error => {
         console.log(error)
         reject(error)
       });
-
+      
       // 非附件类请求需要调用end
       if (!isMultipart) {
         if (rawBody) req.write(rawBody)
         req.end();
         return
       }
-
+      
       request.req.pipe(req)
     })
   }

@@ -1,5 +1,6 @@
-const { isNotLocalEnv } = require("./proxyConfigModel");
-const https = require(isNotLocalEnv ? "https" : "http");
+const { isNotLocalEnv } = require('./proxyConfigModel');
+const http = require('http')
+const https = require(isNotLocalEnv ? 'https' : 'http');
 // 默认配置
 const DEFAULT_OPIONS = {
   host: '127.0.0.1',
@@ -9,7 +10,13 @@ const DEFAULT_OPIONS = {
   }
 };
 // https agent
-const AGENT = new https.Agent({
+const HTTPSAGENT = new https.Agent({
+  keepAlive: true,
+  maxSockets: 1024,
+  maxFreeSockets: 256,
+});
+
+const HTTPAGENT = new http.Agent({
   keepAlive: true,
   maxSockets: 1024,
   maxFreeSockets: 256,
@@ -17,5 +24,6 @@ const AGENT = new https.Agent({
 
 module.exports = {
   DEFAULT_OPIONS,
-  AGENT,
+  HTTPSAGENT,
+  HTTPAGENT
 };

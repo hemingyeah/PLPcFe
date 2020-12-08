@@ -15,9 +15,9 @@ import { Message } from 'element-ui'
  * @param win - 当前窗口window对象
  */
 export function getRootWindow(win) {
-  //非frame 环境
+  // 非frame 环境
   if(win === window.top) return win;
-
+  
   if(win.parent.__root_window_ == 'root') return win.parent;
   return getRootWindow(win.parent);
 }

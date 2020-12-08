@@ -63,7 +63,7 @@
 </template>
 
 <script>
-import * as CustomerApi from '@src/api/CustomerApi';
+import * as CustomerApi from '@src/api/CustomerApi.ts';
 import * as LinkmanApi from '@src/api/LinkmanApi';
 
 import FormMixin from '@src/component/form/mixin/form';

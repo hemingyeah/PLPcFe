@@ -621,6 +621,13 @@ export default {
         </div>
       )
     },
+    /* 渲染回访短信dom */
+    renderTaskCodeReviewDom(record = {}){
+      let { action, taskNo, userName } = record;
+      return (
+        <h5><strong>{ userName }</strong> 发送了 { action } #{ taskNo }</h5>
+      )
+    },
     /* 渲染工单支付dom */
     renderTaskPaymentDom(record = {}) {
       let { userName, taskNo } = record;
@@ -718,6 +725,7 @@ export default {
       if (action === '修改') return this.renderTaskEditDom(record)
       if (action === '转交') return this.renderTaskTransferDom(record)
       if (action === '暂停') return this.renderTaskPausedDom(record)
+      if (action === '回访短信') return this.renderTaskCodeReviewDom(record)
       if (action === '回访' || action === '回访并关闭') return this.renderTaskReviewDom(record)
       if (action === '修改结算') return this.renderTaskBalanceDom(record)
       if (action === '服务报告') return this.renderTaskServiceReportDom(record)

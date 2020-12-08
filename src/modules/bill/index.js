@@ -1,6 +1,9 @@
 import Vue from '@src/common/entry';
 import http from '@src/util/http';
 import BillList from './BillList.vue';
+import mtracker from '@src/util/mtracker';
+
+mtracker();
 
 import mtracker from '@src/util/mtracker';
 mtracker();

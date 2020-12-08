@@ -25,7 +25,7 @@ function handler(event){
 const directive = {
   bind(el, binding, vnode){
     let option = binding.value || {};
-
+    
     // 处理触发loadmore的距离
     if(!Lang.isSafeNumber(option.distance)) option.distance = 300;
     

@@ -18,7 +18,7 @@ import * as Utils from '@src/component/form/util';
 import { productTemplateEditBatch } from '@src/api/ProductApi.js';
 import FormItem from '@src/component/form/FormItem.vue';
 // import {searchCustomer} from '@src/api/EcSearchApi.js';
-import * as CustomerApi from '@src/api/CustomerApi';
+import * as CustomerApi from '@src/api/CustomerApi.ts';
 
 export default {
   name: 'batch-edit-product-template-dialog',

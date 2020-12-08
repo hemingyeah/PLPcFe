@@ -62,7 +62,7 @@ module.exports = {
     "no-const-assign": "error", // 禁止修改 const
     "no-dupe-class-members": "error", // 禁止在类中使用重复的名称
     // "prefer-destructuring": ["error", { "object": true, "array": false }], // 对象解构
-    "quotes": ["error", "double"], // 要求字符串尽可能使用单引号
+    "quotes": ["error", "single"], // 要求字符串尽可能使用单引号
     "prefer-template": "error", // 字符串使用模板文字
     "no-duplicate-imports": ["error", { "includeExports": true }], // 仅从 一个路径导入
     // "first": "error", // 将所有导入语句放在非导入语句之上
@@ -88,7 +88,18 @@ module.exports = {
     "no-else-return": "error", // if return 语句
     "spaced-comment": ["warn", "always"], // 注释之前 跟一个空格
     "comma-spacing": ["error", { "before": false, "after": true }], // 逗号间距
-    "computed-property-spacing": ["error", "never"] // 禁止属性内的空格
+    "computed-property-spacing": ["error", "never"], // 禁止属性内的空格
+    "rules": {
+      'import/extensions': [
+        'ignorePackages',
+        {
+          ts: 'never',
+          tsx: 'never',
+          json: 'never',
+          js: 'never',
+        },
+      ],
+    }
   },
   "overrides": [
     {

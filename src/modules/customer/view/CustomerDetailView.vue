@@ -115,7 +115,7 @@
 
 <script>
 import Exception from '@model/Exception'
-import * as CustomerApi from '@src/api/CustomerApi'
+import * as CustomerApi from '@src/api/CustomerApi.ts'
 import Platform from '@src/platform'
 
 import CustomerInfoRecord from './components/CustomerInfoRecord.vue'
