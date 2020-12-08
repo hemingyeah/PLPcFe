@@ -1,17 +1,32 @@
 <template>
   <div class="base-select-container">
-    <div class="content" v-clickoutside="closeList">
-      <div class="base-select-main-content multiple-layout el-select" @click.stop="focusInput" v-if="multiple"
-           :class="{'error': error, 'wrapper-is-focus': isFocus, 'clearable-layout': clearable}">
-
-        <el-tag size="mini" closable v-for="tag in value" :key="tag.value" @close="removeTag(tag)" disable-transitions type="info">
+    <div class="content el-select el-input el-input--small el-input--suffix" v-clickoutside="closeList">
+      <div 
+        class="base-select-main-content multiple-layout el-input el-input__inner" 
+        @click.stop="focusInput" 
+        v-if="multiple"
+        :class="{'error': error, 'wrapper-is-focus': isFocus, 'clearable-layout': clearable}"
+      >
+        
+        <el-tag size="mini" closable v-for="(tag, index) in (collapsed ? value[0] ? [value[0]] : [] : value)" :key="`${tag.value}_${index}`" @close="removeTag(tag)" disable-transitions type="info">
           {{tag.label}}
         </el-tag>
+        
+        <div v-if="collapsed && value.length > 1" class='base-user-select-tag'>
+          + {{value.length - 1}}
+        </div>
         <span v-if="value.length <= 0" class="placeholder-text">
           {{ placeholder }}
         </span>
+        
+        <span class="el-input__suffix">
+          <span class="el-input__suffix-inner">
+            <i class="el-select__caret el-input__icon el-icon-arrow-up" :class="showList && 'is-reverse'"></i>
+          </span>
+        </span>
+        
       </div>
-
+      
       <div 
         class="base-select-main-content" 
         @click.stop="focusInput" 
@@ -22,28 +37,28 @@
         <template v-else>
           {{ value.map(tag => tag.label).join('') }}
         </template>
-
+        
         <span v-if="value.length <= 0" class="placeholder-text">
           {{ placeholder }}
         </span>
       </div>
-
+        
       <i v-if="clearable && value.length" class="iconfont icon-minus-fill clear-btn" @click="clearValue"></i>
-
+        
       <div class="list-wrapper" v-show="showList">
         <div class="arrow"></div>
         <div class="input-container" v-if="!options.length">
           <input type="text" v-model="keyword" @input="searchByKeyword" ref="input" :placeholder="placeholder">
         </div>
-
+        
         <ul class="option-list" v-loadmore="loadmoreOptions" ref="list">
-
-          <li v-for="op in optionList" :key="op.value" @click="selectTag(op)" :class="{'selected': value.some(user => user.value ===op.value)}">
+          
+          <li v-for="(op, index) in optionList" :key="`${op.value}_${index}`" @click="selectTag(op)" :class="{'selected': value.some(user => user.value ===op.value)}">
             <slot name="option" :option="op" v-if="optionSlot"> </slot>
             <template v-else>{{op.label}}</template>
             <div class="checked"></div>
           </li>
-
+          
           <li class="list-message" v-if="message">{{message}}</li>
         </ul>
       </div>
@@ -54,6 +69,8 @@
 <script>
 import Clickoutside from '@src/util/clickoutside';
 import Page from '@model/Page';
+/* util */
+import { uuid } from '@src/util/string'
 
 /**
  * Todo
@@ -96,6 +113,10 @@ export default {
       default: ''
     },
     disabled: {
+      type: Boolean,
+      default: false
+    },
+    collapsed: {
       type: Boolean,
       default: false
     }
@@ -141,10 +162,11 @@ export default {
   },
   methods: {
     focusInput() {
-      if (!this.disabled) {
-        this.isFocus = true;
-        this.initList();
-      }
+      if (this.disabled) return
+      if (this.showList) return this.close()
+      
+      this.isFocus = true
+      this.initList()
     },
     closeList(e) {
       this.showList = false;
@@ -296,7 +318,7 @@ export default {
       }
 
       .el-tag {
-        margin: 5px 2px 0px;
+        margin: 5px 3px 0px;
       }
     }
 
@@ -317,6 +339,7 @@ export default {
     }
 
     .list-wrapper {
+      border-radius: 4px;
       position: absolute;
       left: 0;
       top: calc(100% + 13px);
@@ -402,6 +425,7 @@ export default {
       }
 
       li.selected {
+        background-color: #eef8f7;
         color: $color-primary;
         /*font-weight: 700;*/
 
@@ -415,4 +439,30 @@ export default {
       }
     }
   }
+
+  .base-user-select-tag {
+    background-color: #f0f2f5;
+    height: 22px;
+    margin: 3px;
+    padding: 0 5px;
+    color: #909399;
+    border-radius: 4px;
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+  }
+</style>
+
+<style lang="scss">
+.base-select-container {
+  .el-select {
+    width: 100%;
+  }
+  .el-select .el-input .el-select__caret.is-reverse {
+    transform: rotateZ(0deg);
+  }
+}
+.base-select-main-content {
+
+}
 </style>

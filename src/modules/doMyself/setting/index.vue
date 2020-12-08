@@ -1,6 +1,5 @@
 <template>
   <div class="flex-1" v-loading.fullscreen.lock="fullscreenLoading">
-
     <div class="my-shop-box flex-1">
       <!-- ruler-box start-->
       <div class="box-title">规则配置</div>
@@ -31,7 +30,7 @@
           >
             <div class="mar-b-12">
               <el-radio class="mar-r-16" :label="true"
-              >仅允许客户列表下手机号码访问</el-radio
+                >仅允许客户列表下手机号码访问</el-radio
               >
             </div>
             <div>
@@ -64,13 +63,11 @@
           >
             <div class="mar-b-12">
               <el-radio class="mar-r-16" :label="false"
-              >仅显示客户在线提交的服务事件</el-radio
+                >仅显示客户在线提交的服务事件</el-radio
               >
             </div>
             <div>
-              <el-radio :label="true"
-              >显示所有与该客户相关的服务事件</el-radio
-              >
+              <el-radio :label="true">显示所有与该客户相关的服务事件</el-radio>
               <el-tooltip
                 class="item"
                 effect="dark"
@@ -116,7 +113,7 @@
               ></el-option>
             </el-select>
             <el-button class="mar-l-9" type="primary" @click="goToShopCenter"
-            >查看商城已选项目</el-button
+              >查看商城已选项目</el-button
             >
           </div>
         </div>
@@ -128,7 +125,7 @@
       <!-- info-box start -->
       <div class="info-box flex-x al-s">
         <div class="mar-r-12 flex-1">
-          <div class="flex-x  mar-b-32">
+          <div class="flex-x mar-b-32">
             门户网页地址：
             <el-input
               id="protalUrl"
@@ -138,7 +135,7 @@
               v-model="setData.protalUrl"
             ></el-input>
             <el-button class="mar-l-10" type="primary" @click="copyUrl"
-            >复制</el-button
+              >复制</el-button
             >
           </div>
           <div class="flex-x al-start">
@@ -151,7 +148,7 @@
                     'https://register.shb.ltd/VIP/WechatAndDing.html#DingService_setting'
                   )
                 "
-              >绑定微信或钉钉服务窗</a
+                >绑定微信或钉钉服务窗</a
               >
             </div>
             <div class="flex-y code-box" v-show="setData.protalUrl">
@@ -166,25 +163,25 @@
         </div>
         <div class="flex-1">
           <el-button
-            v-if="!setData.weChatQRCodeUrl"
+            v-if="!setData.writeData"
             class="mar-b-32"
             type="primary"
             @click="submitWx"
-          >填写微信授权资料</el-button
+            >填写微信授权资料</el-button
           >
-          <div class="mar-b-32 h-32 flex-x" v-if="setData.weChatQRCodeUrl">
+          <div class="mar-b-32 h-32 flex-x" v-if="setData.writeData">
             您已提交了微信授权资料，如需变更请联系售后宝管理员
           </div>
           <div class="flex-x al-start">
             <div class="flex-1 mar-r-12">
               <i
-                class="iconfont icon-fabu1 mar-r-6  color-primary cur-point"
+                class="iconfont icon-fabu1 mar-r-6 color-primary cur-point"
               ></i>
               <a
                 class
                 href="javascript:;"
                 @click="openLink('https://www.yuque.com/shb/help/XCX')"
-              >微信商户，微信支付，微信小程序申请指引</a
+                >微信商户，微信支付，微信小程序申请指引</a
               >
             </div>
             <div
@@ -357,7 +354,7 @@
         </el-form>
         <div slot="footer" class="dialog-footer">
           <base-button type="ghost" @event="submitDialog = false"
-          >取消</base-button
+            >取消</base-button
           >
           <base-button type="primary" @event="submitWxData">确定</base-button>
         </div>
@@ -367,14 +364,13 @@
   </div>
 </template>
 <script>
-import draggable from 'vuedraggable'
-import _ from 'lodash'
-import QRCode from 'qrcodejs2'
-import BaseGallery from 'packages/BaseGallery'
+import draggable from "vuedraggable";
+import _ from "lodash";
+import QRCode from "qrcodejs2";
+import BaseGallery from "packages/BaseGallery";
 
-
-import settingMixin from './settingShowCmp/index'
-import headPhone from '@src/assets/img/myShop/headPhone.png'
+import settingMixin from "./settingShowCmp/index";
+import headPhone from "@src/assets/img/myShop/headPhone.png";
 import {
   getRules,
   saveRules,
@@ -382,15 +378,15 @@ import {
   saveInfos,
   weChat,
   getEventList,
-} from '@src/api/LinkcApi'
+} from "@src/api/LinkcApi";
 
 export default {
-  name: 'do-myself-set',
+  name: "do-myself-set",
   mixins: [settingMixin],
   filters: {
     usualNum(val) {
       if (val > 10000) {
-        return `${val / 10000}万`
+        return `${val / 10000}万`;
       }
     },
   },
@@ -404,429 +400,431 @@ export default {
     return {
       cancelInfoData: this.cancelInfoData,
       changeFullscreenLoading: this.changeFullscreenLoading,
-    }
+    };
   },
   watch: {
     submitDialog(value) {
       if (value == false) {
-
-        this.$refs['wxRulerForm'].resetFields()
+        this.$refs["wxRulerForm"].resetFields();
       }
     },
   },
-  computed: {
-  },
+  computed: {},
   data() {
     return {
       menuList: [
         {
-          name: '客户自助门户',
-          icon: 'icon-Gateway',
+          name: "客户自助门户",
+          icon: "icon-Gateway",
         },
         {
-          name: '公众号设置',
-          icon: 'icon-weixin2',
+          name: "公众号设置",
+          icon: "icon-weixin2",
         },
         {
-          name: '短信消息设置',
-          icon: 'icon-duanxin3',
+          name: "短信消息设置",
+          icon: "icon-duanxin3",
         },
         {
-          name: '消息记录',
-          icon: 'icon-message',
+          name: "消息记录",
+          icon: "icon-message",
         },
       ],
       nowMenu: 0,
-      setData: '',
-      radio: '1',
+      setData: "",
+      radio: "1",
       value1: false,
       options: [
         {
-          label: '上架全部备件和服务项目',
+          label: "上架全部备件和服务项目",
           value: true,
         },
         {
-          label: '仅显示选择的备件和服务项目',
+          label: "仅显示选择的备件和服务项目",
           value: false,
         },
       ],
       options_value: 1,
       dataList: [
         {
-          type: 'company-card',
+          type: "company-card",
           id: 1,
           data: {
-            logoUrl: '',
-            name: '',
-            mobile: '',
-            address: '',
-            companyName: '',
+            logoUrl: "",
+            name: "",
+            mobile: "",
+            address: "",
+            companyName: "",
           },
         },
         {
-          type: 'icon-list',
+          type: "icon-list",
           id: 2,
           data: [],
         },
         {
-          type: 'shops-list',
+          type: "shops-list",
           id: 3,
           data: [],
         },
         {
-          type: 'wiki-enter',
+          type: "wiki-enter",
           id: 4,
           data: [],
         },
       ],
       nowSettingDataId: -1,
-      nowSettingIconId: '',
+      nowSettingIconId: "",
       nowSettingData: {},
       fullscreenLoading: false,
       submitDialog: false,
       wxRulerFormData: {
-        appId: '',
-        matchId: '',
-        apiSecret: '',
-        secret: '',
-        publicAppId: '',
-        publicSecret: '',
+        appId: "",
+        matchId: "",
+        apiSecret: "",
+        secret: "",
+        publicAppId: "",
+        publicSecret: "",
       },
       wxRuler: {
         // appId: [{ required: true, message: '请输入APPID', trigger: 'blur' }],
-        matchId: [{ required: true, message: '请输入mch_id', trigger: 'blur' }],
+        matchId: [{ required: true, message: "请输入mch_id", trigger: "blur" }],
         apiSecret: [
-          { required: true, message: '请输入API密钥', trigger: 'blur' },
+          { required: true, message: "请输入API密钥", trigger: "blur" },
         ],
         // secret: [
         //   { required: true, message: '请输入AppSecret', trigger: 'blur' },
         // ],
         publicAppId: [
-          { required: true, message: '请输入公众号APPID', trigger: 'blur' },
+          { required: true, message: "请输入公众号APPID", trigger: "blur" },
         ],
         publicSecret: [
-          { required: true, message: '请输入公众号密钥', trigger: 'blur' },
+          { required: true, message: "请输入公众号密钥", trigger: "blur" },
         ],
       },
       eventList: [],
       headPhone,
-    }
+    };
   },
   created() {
-    this.fullscreenLoading = true
+    this.fullscreenLoading = true;
     Promise.all([this.getSetData(), getEventList(), this.getInfos()])
       .then((res) => {
         if (res[0].status == 200) {
-          this.setData = res[0].data
+          this.setData = res[0].data;
           let qrcode = new QRCode(this.$refs.qrCodeUrl, {
             text: `${this.setData.protalUrl}`, // 需要转换为二维码的内容
             width: 344,
             height: 344,
-            colorDark: '#000000',
-            colorLight: '#ffffff',
+            colorDark: "#000000",
+            colorLight: "#ffffff",
             correctLevel: QRCode.CorrectLevel.H,
-          })
+          });
         } else {
-          this.$notify.close()
+          this.$notify.close();
           this.$notify.error({
-            title: '网络错误',
+            title: "网络错误",
             message: res[0].message,
             duration: 2000,
-          })
+          });
         }
         if (res[1].status == 0) {
-          this.$set(this, 'eventList', res[1].data)
+          this.$set(this, "eventList", res[1].data);
         } else {
-          this.$notify.close()
+          this.$notify.close();
           this.$notify.error({
-            title: '网络错误',
+            title: "网络错误",
             message: res[1].message,
             duration: 2000,
-          })
+          });
         }
         if (res[2].status == 200) {
           this.transData(res[2].data).then((res_) => {
-            this.$set(this, 'dataList', res_)
-          })
+            this.$set(this, "dataList", res_);
+          });
         } else {
-          this.$notify.close()
+          this.$notify.close();
           this.$notify.error({
-            title: '网络错误',
+            title: "网络错误",
             message: res[2].message,
             duration: 2000,
-          })
+          });
         }
       })
       .finally(() => {
         this.$nextTick(() => {
-          this.chooseNowSet(this.dataList[0])
-          this.fullscreenLoading = false
-        })
-      })
+          this.chooseNowSet(this.dataList[0]);
+          this.fullscreenLoading = false;
+        });
+      });
   },
   mounted() {},
   methods: {
     changePage(index) {
       if (this.nowMenu === index) {
-        return
+        return;
       }
       if (index === 2) {
-        window.location.href = '/setting/message/smsmessage'
+        window.location.href = "/setting/message/smsmessage";
       } else if (index === 0) {
-        window.location.href = '/setting/doMyself/doMyselfSet'
+        window.location.href = "/setting/doMyself/doMyselfSet";
       } else if (index === 1) {
-        window.location.href = '/setting/doMyself/wxSet'
+        window.location.href = "/setting/doMyself/wxSet";
       } else if (index === 3) {
-        window.location.href = '/setting/doMyself/toastList'
+        window.location.href = "/setting/doMyself/toastList";
       }
-      this.nowMenu === index
+      this.nowMenu === index;
     },
     transData(data) {
       return new Promise((resolve, reject) => {
         try {
-          let arr = []
+          let arr = [];
           for (let key in data) {
-            let item = data[key]
-            let items = {}
-            if (key == 'baseInfo') {
-              items['type'] = 'company-card'
-              items['data'] = item
-            } else if (key == 'quickInfo') {
-              items['type'] = 'icon-list'
+            let item = data[key];
+            let items = {};
+            if (key == "baseInfo") {
+              items["type"] = "company-card";
+              items["data"] = item;
+            } else if (key == "quickInfo") {
+              items["type"] = "icon-list";
               item.quickInfos.forEach((item_, index_) => {
-                item_.cmpId = item.index
-                item_['id'] = index_ + 1
-              })
-              items['data'] = item.quickInfos || []
-            } else if (key == 'shopResponse') {
-              items['type'] = 'shops-list'
-              items['data'] = item.shopInfos || []
-            } else if (key == 'wikiResponse') {
-              items['type'] = 'wiki-enter'
-              items['data'] = item.wikiInfos || []
+                item_.cmpId = item.index;
+                item_["id"] = index_ + 1;
+              });
+              items["data"] = item.quickInfos || [];
+            } else if (key == "shopResponse") {
+              items["type"] = "shops-list";
+              items["data"] = item.shopInfos || [];
+            } else if (key == "wikiResponse") {
+              items["type"] = "wiki-enter";
+              items["data"] = item.wikiInfos || [];
             }
-            items['id'] = item.index
-            arr[item.index - 1] = items
+            items["id"] = item.index;
+            arr[item.index - 1] = items;
           }
-          resolve(arr)
+          resolve(arr);
           // console.log(arr, "transData");
         } catch (error) {
-          reject(error)
+          reject(error);
         }
-      })
+      });
     },
     reverData() {
       return new Promise((resolve, reject) => {
         try {
-          let data_ = _.cloneDeep(this.dataList)
-          let obj = {}
+          let data_ = _.cloneDeep(this.dataList);
+          let obj = {};
           data_.forEach((item_, indexs_) => {
-            let index_ = indexs_ + 1
-            if (item_.type == 'company-card') {
-              obj['baseInfo'] = { ...item_.data, index: index_ }
-            } else if (item_.type == 'icon-list') {
-              obj['quickInfo'] = { quickInfos: item_.data, index: index_ }
-            } else if (item_.type == 'shops-list') {
-              let ids = item_.data.length > 0
-                ? item_.data.map((res) => {
-                  return res.num
-                })
-                : []
-              obj['shopInfo'] = { marketIds: ids, index: index_ }
-            } else if (item_.type == 'wiki-enter') {
-              let ids = item_.data.length > 0
-                ? item_.data.map((res) => {
-                  return res.num
-                })
-                : []
-              obj['wikiInfo'] = { wikiIds: ids, index: index_ }
+            let index_ = indexs_ + 1;
+            if (item_.type == "company-card") {
+              obj["baseInfo"] = { ...item_.data, index: index_ };
+            } else if (item_.type == "icon-list") {
+              obj["quickInfo"] = { quickInfos: item_.data, index: index_ };
+            } else if (item_.type == "shops-list") {
+              let ids =
+                item_.data.length > 0
+                  ? item_.data.map((res) => {
+                      return res.num;
+                    })
+                  : [];
+              obj["shopInfo"] = { marketIds: ids, index: index_ };
+            } else if (item_.type == "wiki-enter") {
+              let ids =
+                item_.data.length > 0
+                  ? item_.data.map((res) => {
+                      return res.num;
+                    })
+                  : [];
+              obj["wikiInfo"] = { wikiIds: ids, index: index_ };
             }
-          })
-          resolve(obj)
+          });
+          resolve(obj);
           // console.log(obj, "reverData");
         } catch (error) {
-          reject(error)
+          reject(error);
         }
-      })
+      });
     },
     chooseNowSet(item) {
-      if (item.type == 'icon-list') return
-      let id = item.id
+      if (item.type == "icon-list") return;
+      let id = item.id;
       if (this.nowSettingDataId == id) {
-        return
+        return;
       }
-      this.nowSettingDataId = id
+      this.nowSettingDataId = id;
       if (id > 0) {
-        let res_ = this.findNowSetData(this.nowSettingDataId).item
-        this.$set(this, 'nowSettingData', {
+        let res_ = this.findNowSetData(this.nowSettingDataId).item;
+        this.$set(this, "nowSettingData", {
           name: `${res_.type}-data`,
           data: res_.data,
           id: res_.id,
-        })
+        });
       }
     },
     changeThis(item) {
-      let data_ = this.findNowSetData(item.id).item
+      let data_ = this.findNowSetData(item.id).item;
 
       let nowSettingData = {
         id: item.item.cmpId,
         name: `${data_.type}-data`,
         data: data_.data,
         iconSetId: item.item.id,
-      }
-      this.nowSettingDataId = item.item.cmpId
-      this.$set(this, 'nowSettingData', nowSettingData)
+      };
+      this.nowSettingDataId = item.item.cmpId;
+      this.$set(this, "nowSettingData", nowSettingData);
     },
     pushIcon(item) {
-      let index = this.findNowSetData(item.id).index
-      this.dataList[index].data.push(item.item)
+      let index = this.findNowSetData(item.id).index;
+      this.dataList[index].data.push(item.item);
     },
     findNowSetData(id) {
-      let res
+      let res;
       if (id < 0) {
-        return false
+        return false;
       }
       try {
         for (let index = 0; index < this.dataList.length; index++) {
-          const item = this.dataList[index]
+          const item = this.dataList[index];
           if (item.id == id) {
-            res = { item, index }
-            break
+            res = { item, index };
+            break;
           }
         }
       } catch (error) {}
 
-      return res
+      return res;
     },
     saveIconItem(e) {
-      let index = this.findNowSetData(e.id).index
-      this.$set(this.dataList[index].data, `${e.indexs}`, e.item)
+      let index = this.findNowSetData(e.id).index;
+      this.$set(this.dataList[index].data, `${e.indexs}`, e.item);
     },
     changeInfoData(e) {
-      let index = this.findNowSetData(this.nowSettingDataId).index
-      this.$set(this.dataList[index], 'data', e.item)
+      let index = this.findNowSetData(this.nowSettingDataId).index;
+      this.$set(this.dataList[index], "data", e.item);
     },
     deleteIconItem(e) {
-      let index = this.findNowSetData(e.id).index
-      let data_ = _.cloneDeep(this.dataList[index].data)
-      data_.splice(e.indexs, 1)
-      this.$set(this.dataList[index], 'data', data_)
-      this.nowSettingDataId = -1
+      let index = this.findNowSetData(e.id).index;
+      let data_ = _.cloneDeep(this.dataList[index].data);
+      data_.splice(e.indexs, 1);
+      this.$set(this.dataList[index], "data", data_);
+      this.nowSettingDataId = -1;
     },
     cancelInfoData() {
-      return
-      this.nowSettingDataId = -1
+      return;
+      this.nowSettingDataId = -1;
     },
     changeFullscreenLoading(e) {
-      if (this.fullscreenLoading === e) return
-      this.fullscreenLoading = e
+      if (this.fullscreenLoading === e) return;
+      this.fullscreenLoading = e;
     },
     openLink(e) {
-      this.$platform.openLink(e)
+      this.$platform.openLink(e);
     },
     goToShopCenter() {
       // window.location = '/setting/serviceStation/markSpareGray'
-      window.location.href = '/setting/serviceStation/partShop'
+      window.location.href = "/setting/serviceStation/partShop";
     },
     copyUrl() {
-      if (!this.setData.protalUrl) return
+      if (!this.setData.protalUrl) return;
       this.$copyText(`${this.setData.protalUrl}`).then(() => {
         this.$message({
-          message: '已复制好，可贴粘。',
+          message: "已复制好，可贴粘。",
           duration: 1500,
-          type: 'success',
-        })
-      })
+          type: "success",
+        });
+      });
     },
     submitWx() {
-      this.submitDialog = true
+      this.submitDialog = true;
     },
     submitWxData() {
-      this.$refs['wxRulerForm'].validate((valid) => {
+      this.$refs["wxRulerForm"].validate((valid) => {
         if (valid) {
-          this.fullscreenLoading = true
-          let params_ = _.cloneDeep(this.wxRulerFormData)
-          let params = this.$safeParams(params_)
+          this.fullscreenLoading = true;
+          let params_ = _.cloneDeep(this.wxRulerFormData);
+          let params = this.$safeParams(params_);
 
           weChat(params)
             .then((res) => {
               if (res.status == 200) {
                 this.$message({
-                  message: '微信商户信息提交成功',
+                  message: "微信商户信息提交成功",
                   duration: 1500,
-                  type: 'success',
-                })
-                this.setData.weChatQRCodeUrl = res.data
-                this.submitDialog = false
+                  type: "success",
+                });
+                this.setData.weChatQRCodeUrl = res.data;
+                this.setData["writeData"] = true;
+                this.submitDialog = false;
               } else {
-                this.$notify.close()
+                this.$notify.close();
                 this.$notify.error({
-                  title: '网络错误',
+                  title: "网络错误",
                   message: res.message,
                   duration: 2000,
-                })
+                });
               }
             })
             .finally(() => {
-              this.fullscreenLoading = false
-            })
+              this.fullscreenLoading = false;
+            });
         }
-      })
+      });
     },
     getSetData() {
-      return getRules()
+      return getRules();
     },
     getInfos() {
-      return getInfos()
+      return getInfos();
     },
     change(e, key) {
       saveRules({
         type: key,
         state: e,
-      })
+      });
     },
     submitSet() {
       this.$refs.setData.saveData().then(() => {
         this.reverData().then((res) => {
-          this.fullscreenLoading = true
+          this.fullscreenLoading = true;
           saveInfos(res)
             .then((res) => {
               if (res.status == 200) {
                 this.$message({
-                  message: '发布成功，请前往移动端自助门户查看',
+                  message: "发布成功，请前往移动端自助门户查看",
                   duration: 1500,
-                  type: 'success',
-                })
+                  type: "success",
+                });
               } else {
-                this.$notify.close()
+                this.$notify.close();
                 this.$notify.error({
-                  title: '网络错误',
+                  title: "网络错误",
                   message: res.message,
                   duration: 2000,
-                })
+                });
               }
             })
             .finally(() => {
-              this.fullscreenLoading = false
-            })
-        })
-      })
+              this.fullscreenLoading = false;
+            });
+        });
+      });
     },
     previewImg(url) {
-      if (!url) return
-      if (url.target && url.target.nodeName == 'IMG') return BaseGallery.preview(url.target)
-      let imgDom = document.createElement('img')
-      imgDom.src = url
-      BaseGallery.preview(imgDom)
+      if (!url) return;
+      if (url.target && url.target.nodeName == "IMG")
+        return BaseGallery.preview(url.target);
+      let imgDom = document.createElement("img");
+      imgDom.src = url;
+      BaseGallery.preview(imgDom);
     },
   },
   components: {
     draggable,
   },
-}
+};
 </script>
 <style lang="scss">
-@import url('../../linkc/assets/public.scss');
+@import url("../../linkc/assets/public.scss");
 .el-radio {
   font-weight: 400;
 }
@@ -951,7 +949,7 @@ export default {
       box-sizing: border-box;
     }
     .setting-show {
-      background: url('../../../assets/img/iphoneX.png') no-repeat center 0;
+      background: url("../../../assets/img/iphoneX.png") no-repeat center 0;
       background-size: 100% 100%;
       // box-shadow: 0px 4px 8px 0px rgba(0, 0, 0, 0.12);
       position: relative;
@@ -1009,6 +1007,4 @@ export default {
 ::-webkit-scrollbar {
   display: none;
 }
-
-
 </style>

@@ -1,0 +1,275 @@
+// 工单指派人员筛选
+.task-allot-user-filter {
+  background: linear-gradient(180deg, #FAFAFA 0%, #F2F2F2 100%);
+  display: flex;
+  border: 1px solid #ebebeb;
+  border-radius: 3px;
+  padding: 8px 0;
+  transition: .2s;
+  
+  .task-allot-table-user,
+  .biz-team-select,
+  .base-select-container,
+  .el-select {
+    flex: 1;
+  }
+  
+  .base-select-container {
+    .list-wrapper {
+      width: 300px;
+    }
+  }
+  .contact-user-avatar-margin {
+    margin-top: 0;
+  }
+  .contact-user-item {
+    &:hover {
+      background-color: transparent !important;
+    }
+  }
+  & > .el-select,
+  .biz-form-remote-select,
+  .task-allot-table-user,
+  .task-allot-user-table-column {
+    border: 0;
+    margin-left: 8px;
+  }
+  .el-input,
+  .el-input__inner {
+    border: 0;
+    background: linear-gradient(180deg, #FAFAFA 0%, #F2F2F2 100%);
+  }
+  .task-allot-table-user-input,
+  .el-input__suffix .el-input__suffix-inner i {
+    color: $text-color-secondary;
+    font-family: "iconfont" !important;
+  }
+  .el-icon-arrow-up,
+  .task-allot-table-user-input {
+    &:before {
+      // icon-up
+      content: "\e74d";
+    }
+  }
+}
+
+.task-allot-user-table {
+  max-height: 412px;
+  &-column {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    width: 120px;
+  }
+  &-excutor-column {
+    display: flex;
+    justify-content: center;
+    .el-checkbox {
+      margin: 0;
+    }
+    .el-checkbox__inner {
+      border-radius: 50%;
+    }
+  }
+  .biz-team-select-tag {
+    max-width: 100px;
+  }
+}
+
+.task-allot-user-table-block {
+  max-height: 300px;
+  overflow-y: auto;
+  .el-table__body-wrapper {
+    max-height: 250px;
+    overflow-y: scroll;
+  }
+  th .cell {
+    @include text-ellipsis();
+  }
+}
+
+.task-allot-map{
+  &-excutor-window {
+    border-radius: 4px;
+    background-color: $color-primary;
+    color: #fff;
+    
+    line-height: 30px;
+    text-align: center;
+    
+    position: relative;
+    left: 10px;
+    
+    width: 60px;
+  }
+}
+
+.task-allot-user-table-location-select-other {
+  height: 80px;
+  .el-input {
+    width: 90px;
+    margin: 0 10px;
+  }
+  .el-checkbox {
+    margin-left: 10px;
+  }
+  .el-checkbox__inner {
+    height: 20px;
+    width: 20px;
+    &::after {
+      height: 12px;
+      left: 6px;
+      top: 0;
+      width: 7px;
+    }
+  }
+  .location-confirm-button {
+    margin-left: 20px;
+  }
+}
+
+.task-allot-table-user-input {
+  cursor: pointer;
+  border-radius: 2px;
+  border: 1px solid #e0e1e2;
+  font-size: $font-size-base;
+  line-height: 28px;
+  padding: 0 10px;
+  height: 100%;
+    
+  span {
+    display: inline-block;
+  }
+    
+  .el-tag {
+    margin-left: 5px;
+  }
+
+  &-placeholder {
+    color: $text-color-secondary;
+    font-size: $font-size-small;
+  }
+}
+
+.task-allot-user-table-column-field {
+  text-align: center;
+  &-label {
+    color: $color-primary;
+    font-size: $font-size-base;
+  }
+}
+
+.task-allot-table-user-dept {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  .biz-team-select-tag {
+    height: 20px;
+  }
+  .el-tag {
+    max-width: 100px;
+    @include text-ellipsis()
+  }
+}
+
+.el-select-dropdown {
+  .user-state-round {
+    display: inline-block;
+    border-radius: 50%;
+    width: 16px;
+    height: 16px;
+    margin-right: 10px;
+  }
+}
+
+.task-allot-state-select-item {
+  display: flex;
+  align-items: center;
+}
+
+.task-allot-user-table-append-block {
+  height: 30px;
+  line-height: 30px;
+  text-align: center;
+}
+
+.task-allot-user-filter  {
+  & > .el-select,
+  & > .biz-form-remote-select,
+  .task-allot-table-user {
+    position: relative;
+    &:after {
+      background-color: #D9D9D9;
+      content: "";
+      position: absolute;
+      right: 0;
+      top: -4px;
+      width: 1px;
+      height: 40px;
+    }
+  }
+  .biz-team-select-placeholder,
+  .placeholder-text,
+  .task-allot-table-user-input-placeholder,
+  .el-input__inner::placeholder {
+    color: $text-color-primary !important;
+  }
+  .task-allot-table-user-input {
+    border: none;
+    position: relative;
+    &:before {
+      position: absolute;
+      right: 10px;
+      top: 0;
+      transform: rotate(180deg);
+    }
+  }
+  .biz-team-select-tag {
+    background-color: rgba(144, 147, 153, 0.1);
+    border-color: rgba(144, 147, 153, 0.2);
+    color:  #909399;
+  }
+}
+
+.task-allot-user-filter {
+  .base-user-select-tag,
+  .biz-team-select-tag,
+  .el-tag {
+    background-color: transparent;
+    color: $text-color-primary;
+  }
+  .base-user-select-tag {
+    margin-top: 4px;
+  }
+  .el-select__tags-text {
+    font-size: 13px;
+  }
+  .biz-team-select-tag-text,
+  .biz-team-select-tag,
+  .el-tag,
+  .base-user-select-tag,
+  .task-allot-user-table-column {
+    font-size: 13px;
+  }
+  .biz-team-select-clear {
+    display: none;
+  }
+  .biz-team-select-block {
+    .biz-team-select-tag {
+      padding-right: 0;
+    }
+    .el-input__suffix {
+      display: block;
+    }
+    .iconfont {
+      color: #c0c4cc;
+    }
+  }
+}
+
+.task-allot-user-table-column {
+  i.iconfont {
+    font-size: $font-size-larger !important;
+  }
+}

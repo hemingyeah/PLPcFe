@@ -52,22 +52,22 @@ export default {
       let newValue = event.target.value;
       
       if(newValue == this.nativeInputValue) return;
-
+      
       if (newValue === '') {
         this.$nextTick(() => {
           event.target.value = '';
         });
       }
-
+      
       this.$emit('update', {newValue, oldValue, field: this.field});
       this.$emit('input', newValue);
     },
     setNativeInputValue() {
       const input = this.getInput;
-
+      
       if (!input) return;
       if (input.value === this.nativeInputValue) return;
-
+      
       input.value = this.nativeInputValue;
     },
     pasteEventHandler(event) {

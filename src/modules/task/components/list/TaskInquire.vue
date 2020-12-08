@@ -31,8 +31,8 @@ import {
   SettingComponents,
 } from "@src/component/form/components";
 /* api */
-import * as TaskApi from "@src/api/TaskApi.ts";
-import * as CustomerApi from "@src/api/CustomerApi";
+import * as TaskApi from '@src/api/TaskApi.ts';
+import * as CustomerApi from '@src/api/CustomerApi.ts';
 
 /* utils */
 import _ from "lodash";
@@ -218,7 +218,7 @@ export default {
           } else if (key === "tags" && item.returnDatas()[key].length) {
             data[key] = item.returnDatas()[key];
           } else {
-            data[key] = item.returnDatas()[key];
+            // data[key] = item.returnDatas()[key];
           }
         }
       });

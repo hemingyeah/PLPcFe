@@ -589,7 +589,7 @@ export default {
             if (success) {
               $platform.alert('删除成功');
               this.multipleSelection = []
-              this.getTaskCountByState(this.searchParams)
+              this.getTaskCountByState()
               this.initialize();
             }
           }
@@ -763,12 +763,6 @@ export default {
      * 保存视图
      */
     saveView() {
-      const {conditions,systemConditions} = this.$refs.viewPanel.buildTaskInquireParams()
-      if (!systemConditions.length && !conditions.length) {
-        this.$platform.alert("请您先设置查询条件");
-        return
-      }
-
       this.$refs.viewPanel.saveViewBtn(async (viewName) => {
         this.$refs.viewPanel.hide();
         this.getUserViews(viewName)
@@ -789,7 +783,6 @@ export default {
       this.selectColumnState = title;
       this.searchParams = searchModel
       this.searchParams_spare = searchModel
-      this.getTaskCountByState(searchModel);
       this.params = this.initParams(this.params.pageSize);
       this.buildColumns();
       this.createPerspective({id: this.selectId})
@@ -992,9 +985,10 @@ export default {
      * @description 表头更改
      */
     headerDragend(newWidth, oldWidth, column, event) {
+      console.log(column)
       let data = this.columns
         .map((item) => {
-          if (item.displayName === column.label) {
+          if (item.fieldName === column.property) {
             item.width = column.width;
           }
           return item;
@@ -2290,7 +2284,7 @@ export default {
         this.searchParams = {...this.searchParams, ...par}
         
         for(let key in par) {
-          if (par[key] && JSON.stringify(par[key]) !== "[]" && JSON.stringify(par[key]) !== "{}") {
+          if (par[key] !== null && par[key] !== undefined && par[key] !== '' && JSON.stringify(par[key]) !== "[]" && JSON.stringify(par[key]) !== "{}") {
             this.searchParams[key] = par[key]
           } else {
             this.searchParams[key] = this.searchParams_spare[key]

@@ -17,7 +17,7 @@
 </template>
 
 <script>
-import * as CustomerApi from '@src/api/CustomerApi';
+import * as CustomerApi from '@src/api/CustomerApi.ts';
 import FormMixin from "@src/component/form/mixin/form";
 
 export default {
