@@ -65,7 +65,7 @@ const RuleMap = {
 // 远程验证字段是否重复方法
 let repeatRemoteValidate = (mode, field, value, id, changeStatus, resolve, isSample = true, formBuilderComponent = {}) => {
   
-  const remoteFunc = () => {
+  const remoteFunc = (value) => {
     let api = fieldValidateMap[mode];
     let params = { fieldName: field.fieldName, fieldValue: value, id };
     
@@ -93,10 +93,10 @@ let repeatRemoteValidate = (mode, field, value, id, changeStatus, resolve, isSam
       })
     }
     
-    validateFunc()
+    validateFunc(value)
     
   } else {
-    remoteFunc()
+    remoteFunc(value)
   }
 
 }

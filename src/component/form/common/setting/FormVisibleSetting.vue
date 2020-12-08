@@ -3,7 +3,10 @@
     <div class="form-setting-item">
       <el-checkbox v-model="visibleConfig.visible" @change="update" :true-label="1" :false-label="0">
         可见性
-        <el-tooltip content="控制部分角色对字段的查看权限，适用于字段不需要所有人查看的，需要脱敏处理的情况" placement="top">
+        <el-tooltip  placement="top" popper-class="form-msg-setting-tooltip">
+          <div slot="content">
+            <div class="tooltip">控制部分角色对字段的查看权限，适用于字段不需要所有人查看的，<br>需要脱敏处理的情况，系统管理员默认可见</div>
+          </div>
           <i class="iconfont icon-question"></i>
         </el-tooltip>
       </el-checkbox>

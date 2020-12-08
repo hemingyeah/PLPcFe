@@ -276,6 +276,32 @@ const FormDesign = {
 
       return groupFields;
     },
+    fieldControls(){
+      let fieldArr = [];
+      let groupFields = this.availableFields.filter(item => item.isSystem == 0 && item.formType != 'info' && item.formType != 'separator');
+      let layoutFields = this.availableFields.filter(item => item.formType == 'info' || item.formType == 'separator');
+      let sysFields = this.availableFields.filter(f => f.isSystem == 1);
+      sysFields = sysFields.filter(f => this.value.findIndex(v => v.formType == f.formType) == -1);
+      if(groupFields.length){
+        let basisObj = {};
+        basisObj.name = "基础"
+        basisObj.field = groupFields;
+        fieldArr.push(basisObj)
+      }
+      if(sysFields.length){
+        let sysObj = {};
+        sysObj.name = "系统"
+        sysObj.field = sysFields;
+        fieldArr.push(sysObj)
+      }
+      if(layoutFields.length){
+        let layoutObj = {};
+        layoutObj.name = "布局"
+        layoutObj.field = layoutFields;
+        fieldArr.push(layoutObj)
+      }
+      return fieldArr
+    },
     // 是否为空
     isEmpty(){
       return !Array.isArray(this.value) || this.value.length == 0;
@@ -737,23 +763,23 @@ const FormDesign = {
         this.roleList = list;
       }).catch(err => console.error('err', err));
     },
-    renderTabHeader(){
-      if(!this.hasSystemField) return (
+    renderTabHeader(name){
+      return (
         <div class="form-design-tabs">
-          <div class="form-design-tab">基础字段</div>
+          <div class="form-design-tab">{name}控件</div>
         </div>
       );
 
-      return (
-        <div class="form-design-tabs form-design-withSys">
-          <div class={['form-design-tab', this.fieldGroup == 0 ? 'form-design-tab-active' : null]} onClick={e => this.fieldGroup = 0}>基础字段</div>
-          <div class={['form-design-tab', this.fieldGroup == 1 ? 'form-design-tab-active' : null]} onClick={e => this.fieldGroup = 1}>系统字段</div>
-        </div>
-      )
+      // return (
+      //   <div class="form-design-tabs form-design-withSys">
+      //     <div class={['form-design-tab', this.fieldGroup == 0 ? 'form-design-tab-active' : null]} onClick={e => this.fieldGroup = 0}>基础控件</div>
+      //     <div class={['form-design-tab', this.fieldGroup == 1 ? 'form-design-tab-active' : null]} onClick={e => this.fieldGroup = 1}>系统控件</div>
+      //   </div>
+      // )
     },
     renderFieldList(fields){
       if(fields.length == 0){
-        return <div class="form-design-field-empty">暂无可添加的{this.fieldGroup == 0 ? '基础' : '系统'}字段</div>
+        return <div class="form-design-field-empty">暂无可添加的{this.fieldGroup == 0 ? '基础' : '系统'}控件</div>
       }
 
       return fields.map(field => {
@@ -849,10 +875,18 @@ const FormDesign = {
       <div class="form-design">
         <div class="form-design-panel">
           <div class="form-design-left"> 
-            { this.renderTabHeader() }
-            <div class="form-design-tabs-content">
-              { this.renderFieldList(this.filterFields) }
-            </div>
+            {
+              this.fieldControls.map(field => {
+                return(
+                <div class="form-design-widget">
+                  { this.renderTabHeader(field.name) }
+                  <div class="form-design-tabs-content">
+                    { this.renderFieldList(field.field) }
+                  </div>
+                </div>
+                )
+              })
+            }
           </div>
         </div>
         <div class="form-design-main">  

@@ -92,14 +92,6 @@ export default {
               video() {
                 _self.chooseFile('video'); // 上传视频
                 
-              },
-              link(value) {
-                if(value){
-                  console.log(333)
-                  this.$el.querySelector('#editor input').setAttribute("placeholder","新文本内容");
-                }
-
-
               }
             }
           },

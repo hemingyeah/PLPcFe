@@ -61,16 +61,21 @@ export default {
             tv.fieldName = 'cusName';
           }
 
+          if (tv.formType === 'select') { 
+            if(tv.setting.selectType == 2){ 
+              tv.setting.selectType = 1
+            }          
+          }
+
           if (tv.isSystem) {
             tv.orderId -= 100;
           }
-
+          
           // tv.isNull = 0;
           return Object.freeze(tv);
         })
 
       if (!fields || !fields.length) return [];
-
       return fields.sort((a, b) => a.orderId - b.orderId);
     },
   },

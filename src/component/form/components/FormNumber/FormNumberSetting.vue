@@ -28,6 +28,9 @@
           <el-checkbox v-model="decimalConfig.isLimit" @change="update(decimalConfig, 'decimalConfig', true)" :true-label="1" :false-label="0">
             小数位数<input class="digit" type="text" v-model="decimalConfig.digit" oninput="this.value = this.value.replace(/\D/g, '')" @blur="decimalLimit" />位
           </el-checkbox>
+          <el-tooltip placement="top" content="仅可按照设置的小数位数输入，未勾选时不限制">
+            <i class="iconfont icon-question"></i>
+          </el-tooltip>
         </div>
         <div class="form-limits-setting">
           <el-checkbox v-model="limitConig.isLimit" @change="update(limitConig, 'limitConig', true)" :true-label="1" :false-label="0">
@@ -238,6 +241,12 @@ export default {
     width: 60px;
     margin: 0 8px;
     padding: 0 6px;
+  }
+
+  .icon-question {
+    position: relative;
+    top: 4px;
+    left: -4px;
   }
 }
 

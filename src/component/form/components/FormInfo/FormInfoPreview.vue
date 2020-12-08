@@ -42,5 +42,8 @@ export default {
 
     }
   }
+  .form-ql-editor{
+    width: 100%;
+  }
 }
 </style>

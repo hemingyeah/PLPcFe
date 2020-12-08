@@ -54,10 +54,16 @@ export default {
         .map(f => {
           tv = Object.assign({}, f);
 
+          if (tv.formType === 'select') { 
+            if(tv.setting.selectType == 2){ 
+              tv.setting.selectType = 1
+            }          
+          }
+          
           if (tv.isSystem) {
             tv.orderId -= 100;
           }
-
+         
           // tv.isNull = 0;
           return Object.freeze(tv);
         });
