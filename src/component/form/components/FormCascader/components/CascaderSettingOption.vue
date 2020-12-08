@@ -111,7 +111,7 @@ export default {
     outline: none;
     border: 1px solid transparent;
     font-size: 14px;
-    background-color: transparent;
+    background-color: #fff;
     border-radius: 4px;
     border: 1px solid #e0e1e2 ;
 
