@@ -814,6 +814,8 @@ export default {
           taskPool,
           finished,
           costed,
+          offed,
+          closed,
         } = res.result;
         this.filterData = {
           allocated,
@@ -830,7 +832,9 @@ export default {
             + this._number(created)
             + this._number(refused)
             + this._number(finished)
-            + this._number(costed),
+            + this._number(costed)
+            + this._number(closed)
+            + this._number(offed),
           unfinished:
             this._number(created)
             + this._number(refused)
