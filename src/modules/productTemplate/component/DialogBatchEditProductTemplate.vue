@@ -53,7 +53,13 @@ export default {
         .filter(f => !(isRepeat.indexOf(f.formType) > -1 && f.setting.isRepeat == 1))
         .map(f => {
           tv = Object.assign({}, f);
-
+          
+          if (tv.formType === 'select') { 
+            if(tv.setting.selectType == 2){ 
+              tv.setting.selectType = 1
+            }          
+          }
+          
           if (tv.isSystem) {
             tv.orderId -= 100;
           }
