@@ -133,7 +133,21 @@ class TaskAllotModalRender extends TaskAllotModalMethods {
     return (
       <div class='task-allot-reason'>
         <span class='task-allot-nav-title'>转派说明</span>
+        <el-select value={this.transfer} placeholder="请选择" onChange={(v: string) => {this.transfer = v}}>
+          {
+            this.transferList.map(item => {
+              return (
+                <el-option
+                  key={item}
+                  label={item}
+                  value={item}
+                />
+              )
+            })
+          }
+        </el-select>
         <el-input
+          class="task-mt12" 
           type='textarea'
           rows={5}
           placeholder={`${this.reallotRemarkNotNull ? '[必填]' : '[选填]'}转派说明`}
