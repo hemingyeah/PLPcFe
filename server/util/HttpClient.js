@@ -21,9 +21,15 @@ module.exports = {
   request(path, method, rawBody, options = {}){
     
     let requestOptions = getRequestOptions(path, method, options);
+    
+    console.log(`${colors.bgYellow('request -> requestOptions')}`, requestOptions)
+    
+    return new Promise((resolve, reject) => {
+      let req = https.request(requestOptions, res => {
         let chunks = [];
         let size = 0;
         
+        res.on('data', (chunk) => {
           chunks.push(chunk);
           size += chunk.length;
         })
