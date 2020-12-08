@@ -128,7 +128,7 @@ const BizTeamSelect = {
       return (
         Array.isArray(this.value) 
           ? this.value 
-          : null != this.value ? [this.value] : [];
+          : null != this.value ? [this.value] : []
       )
     },
     loadmore() {
