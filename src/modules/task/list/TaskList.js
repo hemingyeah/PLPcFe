@@ -292,6 +292,14 @@ export default {
     }
   },
   mounted() {
+
+    // 
+    if (localStorage.getItem('task_list')) {
+      if (!Array.isArray(JSON.parse(localStorage.getItem('task_list')).columnStatus)) {
+        localStorage.clear()
+      }
+    }
+
     const that = this
     console.log("taskView", this.initData);
     this.taskTypes = [...this.taskTypes, ...this.taskTypeList];
