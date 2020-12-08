@@ -53,7 +53,9 @@ export default {
           item.field != "attachment" &&
           item.field != "customer" &&
           item.field != "relationProduct" &&
-          item.field != "relationCustomer"
+          item.field != "relationCustomer" &&
+          item.formType !== "relationCustomer" && 
+          item.formType !== "relationProduct"
         ) {
           list.push(item);
         }

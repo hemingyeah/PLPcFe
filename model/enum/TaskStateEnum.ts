@@ -17,14 +17,14 @@ type TaskState = {
  * -- 稍微重写了下，暂未拆分，兼容之前的方法
 */
 class TaskStateEnum extends BaseEnum {
-
+  
   static CREATED: TaskState = {
     bgColor: '250, 140, 22',
     color: '#FA8C16',
     name: '待指派',
     value: 'created'
   }
-
+  
   static ALLOCATED: TaskState = {
     bgColor: '250, 174, 20',
     color: '#FAAE14',
@@ -73,39 +73,39 @@ class TaskStateEnum extends BaseEnum {
     name: '已结算',
     value: 'costed',
   };
-
+  
   static CLOSED: TaskState = {
     bgColor: '153, 153, 153',
     color: '#999',
     name: '已关闭',
     value: 'closed',
   };
-
+  
   static OFFED: TaskState = {
     bgColor: '153, 153, 153',
     color: '#999',
     name: '已取消',
     value: 'offed',
   };
-
+  
   static PSUSED: TaskState = {
     bgColor: '245, 108, 108',
     color: '#F56C6C',
     name: '暂停中',
     value: 'paused',
   };
-
+  
   static UNFINISHED: TaskState = {
     bgColor: '245, 108, 108',
     color: '#F56C6C',
     name: '未完成',
     value: 'unfinished',
   };
-
+  
   constructor() {
     super();
   }
-
+  
   /** 
    * @description 根据 value 获取 bgColor
    * @param {String} value 值
@@ -114,7 +114,7 @@ class TaskStateEnum extends BaseEnum {
   static getBgColor(value: string, transparency?: number): string {
     const taskStateEnum: any = TaskStateEnum;
     let bgColor = '';
-
+    
     for (let stateKey in taskStateEnum) {
       let state = taskStateEnum[stateKey];
       if (state.value == value) {
@@ -122,7 +122,7 @@ class TaskStateEnum extends BaseEnum {
         break;
       }
     }
-
+    
     // 错误提示
     if (!bgColor) console.warn('Caused: TaskStateEnum getBgColor got the value is empty')
     // 判断是否有透明度
@@ -131,17 +131,17 @@ class TaskStateEnum extends BaseEnum {
     } else {
       bgColor = `rgb(${bgColor})`
     }
-
+    
     return bgColor;
   }
-
+  
   /** 
    * @description 根据 value 获取 color
    * @param {String} value 值
   */
   static getColor(value: string): string {
     const taskStateEnum: any = TaskStateEnum;
-
+    
     for (let stateKey in taskStateEnum) {
       let state = taskStateEnum[stateKey];
       if (state.value == value) {
@@ -150,17 +150,17 @@ class TaskStateEnum extends BaseEnum {
     }
     // 错误提示
     console.warn('Caused: TaskStateEnum getColor got the value is empty')
-
+    
     return '';
   }
-
+  
   /** 
    * @description 根据 value 获取 name
    * @param {String} value 值
   */
   static getName(value: string): string {
     const taskStateEnum: any = TaskStateEnum;
-
+    
     for (let stateKey in taskStateEnum) {
       let state = taskStateEnum[stateKey];
       if (state.value == value) {
@@ -169,17 +169,17 @@ class TaskStateEnum extends BaseEnum {
     }
     // 错误提示
     console.warn('Caused: TaskStateEnum getName got the value is empty')
-
+    
     return '';
   }
-
+  
   /** 
    * @description 根据 name 获取 value
    * @param {String} name 名字
   */
   static getValue(name: string): string {
     const taskStateEnum: any = TaskStateEnum;
-
+    
     for (let stateKey in taskStateEnum) {
       let state = taskStateEnum[stateKey];
       if (state.name == name) {
@@ -188,22 +188,22 @@ class TaskStateEnum extends BaseEnum {
     }
     // 错误提示
     console.warn('Caused: TaskStateEnum getValue got the value is empty')
-
+    
     return '';
   }
-
+  
   /** 
    * @description 根据工单状态 获取 name
    * @param {Object} task 工单数据
   */
   static getNameForTask(task: any = {}): string {
     if (task.isPaused) return TaskStateEnum.PSUSED.name;
-
+    
     let { state } = task;
-
+    
     return TaskStateEnum.getName(state);
   }
-
+  
   /** 
    * @description 根据工单状态 获取 color
    * @param {Object} task 工单数据
@@ -211,20 +211,20 @@ class TaskStateEnum extends BaseEnum {
   static getColorForTask(task: any= {}): { bgColor: string, color: string} {
     let { state } = task;
     if (task.isPaused) state = TaskStateEnum.PSUSED.value;
-
+    
     return {
       color: TaskStateEnum.getColor(state),
       bgColor: TaskStateEnum.getBgColor(state, 0.2)
     }
   }
-
+  
   /** 
    * @description 根据工单状态 获取 value
    * @param {Object} task 工单数据
   */
   static getValueForTask(task: any= {}): string {
     if(task.isPaused) return TaskStateEnum.PSUSED.value;
-
+    
     let { state } = task;
     
     return TaskStateEnum.getValue(state);

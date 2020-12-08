@@ -30,6 +30,11 @@ class TaskActionEnum extends BaseEnum{
       value: 'allot'
     };
 
+    this.REDEPLOY = {
+      name: '转派',
+      value: 'redeploy'
+    };
+
     this.ACCEPT = {
       name: '接受',
       value: 'accept'

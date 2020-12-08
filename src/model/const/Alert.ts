@@ -22,3 +22,17 @@ export const PLATN_TASK_PERFORM_NUMBER_MAX_MESSAGE: string = `执行次数不能
 export const REQUIRES_PRODUCT_MESSAGE: string = '请选择产品';
 // 计划时间不能早于现在
 export const PLAN_TIME_NOT_LESS_THEN_NOW_MEESSAGE: string = '计划时间不能早于现在';
+// 计划时间不能早于现在
+export const REQUIRE_OTHER_NOTIFICATION_USER_MEESSAGE: string = '请先选择其他需要通知的人';
+// 工单指派地理位置 最大值不能小于最小值
+export const MAX_GREATER_THAN__MIN_MESSAGE: string = '请输入正确的范围';
+// 工单指派地理位置 最大值不能小于最小值
+export const REQUIRED_MIN_MESSAGE: string = '请输入正确的范围';
+// 工单指派地理位置 最大值不能小于最小值
+export const REQUIRED_MAX_MESSAGE: string = '请输入正确的范围';
+// 转派说明必填提示
+export const TASK_NO_REALLOT_REASON_MESSAGE: string = '请填写转派说明';
+// 不能将工单转派给原负责人
+export const TASK_REALLOT_NOT_SAME_USER_MESSAGE: string = '不能将工单转派给原负责人，请检查';
+// 为匹配到分配规则
+export const TASK_NOT_AUTO_DISPATCH_RULE: string = '未匹配到任何规则，请使用「重新匹配」功能刷新结果，或更换派单方式。';

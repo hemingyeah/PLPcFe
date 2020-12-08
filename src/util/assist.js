@@ -7,7 +7,8 @@ function findComponentUpward(context, componentName) {
     parent = parent.$parent;
     if (parent) name = parent.$options.name;
   }
-  return parent;
+  
+  return parent
 }
 
 /* 由一个组件，向上找到所有的指定组件 */
@@ -19,29 +20,33 @@ function findComponentsUpward(context, componentName) {
   if(parent) {
     if(parent.$options.name == componentName) parents.push(parent);
     return parents.concat(findComponentsUpward(parent, componentName))
-  } 
-  return [];
+  }
+  
+  return []
 }
 
 /* 向下找到最近指定组件 */
 function findComponentDownward(context, componentName) {
-  const childrens = context.$children;
-  let children = null;
-
-  if (childrens.length) {
-    for (const child of childrens) {
-      // 判断当前的子元素 名字是否相同
-      if(child.$options.name == componentName) {
-        children = child;
-        break;
-      } else {
-        // 递归判断 当前子元素的 子元素是否相等
-        let isChild = findComponentDownward(child, componentName);
-        if(isChild) break;
+  const childrens = context.$children
+  let children = null
+  
+  if (!childrens.length) return children
+  
+  for (const child of childrens) {
+    // 判断当前的子元素 名字是否相同
+    if(child.$options.name == componentName) {
+      children = child
+      break
+    } else {
+      // 递归判断 当前子元素的 子元素是否相等
+      let isChild = findComponentDownward(child, componentName);
+      if(isChild) {
+        children = isChild
+        break
       }
     }
   }
-
+  
   return children
 }
 

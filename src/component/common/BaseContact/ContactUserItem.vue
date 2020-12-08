@@ -5,6 +5,7 @@
       <div class="contact-user-info">
         <h3>
           <div class="contact-user-name">{{user.displayName}}</div>
+          <div v-if="user && user.isTeamLeader === 1" class="contact-user-leader">主管</div>
           <div class="contact-user-state" v-if="showUserState && user.state">
             <i class="contact-user-state-icon" :style="{backgroundColor: stateColor[user.state]}"></i> 
             <span>{{user.state}}</span>
@@ -19,9 +20,9 @@
             :class="{'base-tree-node-arrow-down': isExpandTagName}" 
             @click.stop="toggleTagName"
           >
-          <i class="iconfont icon-arrow-right">
-          </i>
-        </span>
+            <i class="iconfont icon-arrow-right">
+            </i>
+          </span>
         </p>
       </div>
       <div class="contact-user-addition" v-if="showLocation">
@@ -251,6 +252,10 @@ export default {
 }
 .contact-user-item-tagname-show {
   max-height: 10000px;
+}
+.contact-user-leader{
+  color: $color-primary;
+  margin: 0 10px;
 }
 </style>
 

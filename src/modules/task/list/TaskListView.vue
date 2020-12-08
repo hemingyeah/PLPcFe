@@ -428,9 +428,7 @@
         :task_view_list="task_view_list"
         :customize-list="[...taskFields, ...taskReceiptFields]"
         ref="searchPanel"
-        v-show="advanceds.length"
         @bj="showBj = false"
-        v-if="advanceds.length"
       >
         <div
           class="advanced-search-btn-group task-flex task-buttom"

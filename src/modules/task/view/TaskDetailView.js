@@ -15,19 +15,20 @@ import {
 } from "@src/util/storage";
 
 /* component */
-import CancelTaskDialog from "./components/CancelTaskDialog.vue";
-import PlanTimeDialog from "./components/PlanTimeDialog.vue";
-import ApproveTaskDialog from "./components/ApproveTaskDialog.vue";
-import ProposeApproveDialog from "./components/ProposeApproveDialog.vue";
+import CancelTaskDialog from './components/CancelTaskDialog.vue';
+import PlanTimeDialog from './components/PlanTimeDialog.vue';
+import ApproveTaskDialog from './components/ApproveTaskDialog.vue';
+import ProposeApproveDialog from './components/ProposeApproveDialog.vue';
 
-import TaskInfoRecord from "./components/TaskInfoRecord.vue";
-import TaskReceiptView from "./components/TaskReceipt/View/TaskReceiptView.vue";
-import TaskReceiptEditView from "./components/TaskReceipt/Edit/TaskReceiptEditView.vue";
-import TaskAccount from "./components/TaskAccount.vue";
-import TaskFeedback from "./components/TaskFeedback";
-import TaskCard from "./components/TaskCard";
-import TaskView from "./components/TaskView.vue";
-import TaskTimeDialog from "./components/TaskTimeDialog.vue";
+import TaskInfoRecord from './components/TaskInfoRecord.vue';
+import TaskReceiptView from './components/TaskReceipt/View/TaskReceiptView.vue';
+import TaskReceiptEditView from './components/TaskReceipt/Edit/TaskReceiptEditView.vue';
+import TaskAccount from './components/TaskAccount.vue';
+import TaskFeedback from './components/TaskFeedback';
+import TaskCard from './components/TaskCard';
+import TaskView from './components/TaskView.vue';
+import TaskTimeDialog from './components/TaskTimeDialog.vue';
+import TaskAllotModal from '@src/modules/task/components/TaskAllotModal/TaskAllotModal.tsx'
 
 /* enum */
 import { TaskEventNameMappingEnum } from "@model/enum/EventNameMappingEnum.ts";
@@ -94,7 +95,11 @@ export default {
       guideDropdownMenu: false,
       isGuide: false,
       backList,
-      checkBack: ''
+      checkBack: '',
+      // 显示详情向导
+      showTaskDetailGuide: false,
+      // 是否显示指派弹窗
+      showAllotModal: false
     }
   },
   computed: {
@@ -643,10 +648,13 @@ export default {
     /* 是否显示服务报告 根据版本控制的 */
     isShowReport() {
       return isShowReport()
+    },
+    /* 是否开始新工单的新指派 */
+    isRestructAllot() {
+      return this.initData?.restructAllot === true
     }
   },
   methods: {
-    previousStep() {},
     nextStep() {
       this.nowGuideStep++;
     },
@@ -841,13 +849,23 @@ export default {
     },
     // 指派工单
     allot() {
-      this.pending = true;
-      location.href = `/task/allotTask?id=${this.task.id}`;
+      // 新工单新指派
+      if (this.isRestructAllot) {
+        this.$refs.TaskAllotModal.outsideShow()
+      } else {
+        this.pending = true;
+        location.href = `/task/allotTask?id=${this.task.id}`;
+      }
     },
     // 转派工单
     redeploy() {
-      this.pending = true;
-      location.href = `/task/redeploy?id=${this.task.id}`;
+      // 新工单新转派
+      if (this.isRestructAllot) {
+        this.$refs.TaskAllotModal.outsideShow()
+      } else {
+        this.pending = true;
+        location.href = `/task/redeploy?id=${this.task.id}`;
+      }
     },
     // 打印工单
     printTask() {
@@ -1155,14 +1173,25 @@ export default {
       } else {
         this.rightActiveTab = this.viewBalanceTab ? "balance-tab" : this.viewFeedbackTab ? "feedback-tab" : "card-tab";
       }
-
+      
+      // 是否显示详情向导
+      this.showTaskDetailGuide = !storageGet(TASK_GUIDE_DETAIL)
+      // 来自指派列表的指派操作
+      this.showAllotModal = query.allot && this.allowAllotTask
+      if (this.showAllotModal && !this.showTaskDetailGuide) {
+        this.allot()
+      }
+      
       this.loading = false;
       
       this.$nextTick(() => {
         setTimeout(() => {
-          if (!storageGet(TASK_GUIDE_DETAIL)) this.$tours["myTour"].start(), this.nowGuideStep = 1, storageSet(TASK_GUIDE_DETAIL, "4");
+          if (this.showTaskDetailGuide) {
+            this.$tours['myTour'].start();
+            this.nowGuideStep = 1;
+            storageSet(TASK_GUIDE_DETAIL, '4');
+          }
         }, 1000)
-
       })
 
     } catch (e) {
@@ -1175,6 +1204,11 @@ export default {
     },
     collapseDirection(newValue) {
       sessionStorage.setItem(`task_collapseDirection_${this.task.id}`, newValue);
+    },
+    nowGuideStep(newValue) {
+      if (newValue == 5 && this.showTaskDetailGuide && this.showAllotModal) {
+        this.allot()
+      }
     }
   },
   components: {
@@ -1189,6 +1223,7 @@ export default {
     [TaskFeedback.name]: TaskFeedback,
     [TaskCard.name]: TaskCard,
     [TaskView.name]: TaskView,
-    [TaskTimeDialog.name]: TaskTimeDialog
+    [TaskTimeDialog.name]: TaskTimeDialog,
+    TaskAllotModal
   }
 }

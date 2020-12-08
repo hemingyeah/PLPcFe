@@ -383,7 +383,17 @@
     <!-- start 查看全部时间点 -->
     <task-time-dialog ref="timeAxis" />
     <!-- end 查看全部时间点 -->
-
+    
+    <!-- start 分配弹窗 -->
+    <task-allot-modal 
+      v-if="allowRedeployTask || allowAllotTask" 
+      ref="TaskAllotModal" 
+      :task="task" 
+      :login-user="initData.loginUser"
+      :is-re-allot="allowRedeployTask"
+    />
+    <!-- end 分配弹窗 -->
+    
     <!-- tour s -->
     <v-tour v-if="showTour" name="myTour" :steps="detailSteps" :options="detailOptions" :callbacks="myCallbacks">
       <template slot-scope="tour">

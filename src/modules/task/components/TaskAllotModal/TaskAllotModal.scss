@@ -1,0 +1,137 @@
+/* start 弹窗 */
+.task-allot-modal {
+  display: flex;
+  
+  & > .base-modal {
+    height: calc(100vh - 100px);
+    width: calc(100% - 100px) !important;
+    
+    & > .base-modal-body {
+      display: flex;
+      padding: 0 !important;
+    }
+    
+    & > .base-modal-header {
+      background-color: #fff;
+    }
+    
+  }
+  
+  .task-allot-nav {
+    width: 180px;
+    padding: 0 16px;
+    overflow: auto;
+    overflow-x: hidden;
+  }
+  
+  .task-allot-content {
+    width: calc(100% - 178px);
+    overflow-y: scroll;
+  }
+  
+  .dialog-footer {
+    display: flex;
+    justify-content: flex-end;
+  }
+  
+}
+/* end 弹窗 */
+
+/* start 派单 导航 */
+.task-allot-nav {
+  &-title {
+    display: inline-block;
+    font-size: $font-size-large;
+    font-weight: 600;
+    line-height: 22px;
+    padding: 16px 0 10px;
+  }
+}
+/* end 派单 导航 */
+
+/* start 负责人 */
+.task-allot-executor {
+  &-placeholder {
+    color: $text-color-secondary;
+    list-style: 30px;
+  }
+}
+/* end 负责人 */
+
+/* start 协同人 */
+.task-allot-synergy {
+  &-list {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    .user-button {
+      margin: 0 5px 5px 0;
+    }
+    &-item {
+      display: flex;
+      & > span {
+        color: #999;
+        display: block;
+        width: 20px;
+        font-size: 22px;
+        line-height: 40px;
+      }
+    }
+  }
+}
+/* end 协同人 */
+
+/* start 指派给负责人 内容 */
+.task-allot-user-content {
+  display: flex;
+}
+.task-allot-content-active {
+  height: 100%;
+  width: 100%;
+}
+/* end 指派给负责人 内容 */
+
+/* start 审批弹窗 */
+.task-need-approve-dialog {
+  .base-modal-body {
+    padding: 20px;
+    .base-modal-content,
+    textarea {
+      width: 100%;
+    }
+  }
+}
+/* end 审批弹窗 */
+
+.last-user-button {
+  margin-left: 20px;
+  margin-bottom: 20px;
+}
+.empty-user-button {
+  margin-left: 0;
+}
+
+.task-allot-excutor-container {
+  height: 100%;
+}
+
+.task-allot-excutor {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  flex-flow: column !important;
+  height: 100%;
+  
+  .task-allot-user-table {
+    width: 100%;
+    .task-allot-user-table-block {
+      width: 100%;
+    }
+  }
+  .task-allot-map{
+    flex: 1;
+    min-height: 380px;
+  }
+  .task-allot-user-filter {
+    border-bottom: 0;
+  }
+}

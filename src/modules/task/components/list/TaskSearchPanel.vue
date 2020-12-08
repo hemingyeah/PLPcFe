@@ -656,6 +656,15 @@ export default {
           continue;
         }
 
+        if (tv.fieldName === 'executor') {
+          params.systemConditions.push({
+            property: 'executorUser',
+            operator: tv.operatorValue,
+            inValue: form[fn],
+          });
+          continue;
+        }
+
         if (
           MultiFieldNames.indexOf(tv.formType) !== -1 ||
           tv.formType === "user"
@@ -886,7 +895,7 @@ export default {
             ...JSON.parse(searchField).checkSystemList,
             ...JSON.parse(searchField).checkCustomizeList,
           ].some((v) => {
-            return v === item.displayName;
+            return v === item.fieldName;
           });
           if (!bool) {
             return item;

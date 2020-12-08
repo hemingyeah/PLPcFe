@@ -27,6 +27,10 @@ const BizUserSelect = {
       type: String,
       default: '请选择人员'
     },
+    disabled: {
+      type: Boolean,
+      default: false
+    }
   },
   data() {
     return {
@@ -172,8 +176,10 @@ const BizUserSelect = {
     },
     /** 显示popper */
     showPopper(event) {
+      if (this.disabled) return
+      
       event.stopPropagation();
-
+      
       // 如果没创建popper，先创建
       if (this.$data.$popper == null) {
         document.body.appendChild(this.$refs.popper)
@@ -243,7 +249,7 @@ const BizUserSelect = {
           <input
             type="text" ref="search"
             class="search-user-keyword"
-            placeholder="请选择团队内的成员"
+            placeholder="请选择成员"
             onInput={ this.handleInput } />
           <div class="biz-user-select-panel" { ...panelAttrs }>
             { content }
@@ -298,7 +304,7 @@ const BizUserSelect = {
   render(h) {
     let clazz = ['biz-user-select'];
     return (
-      <div class={ clazz } onClick={ e => this.showPopper(e) }>
+      <div class={ clazz } onClick={ e => !this.disabled && this.showPopper(e) }>
         <input id={ this.id } type="text" />
         { this.renderClear(h) }
         { this.multiple ? this.renderMultiple(h) : this.renderSingle(h) }
@@ -314,7 +320,7 @@ const BizUserSelect = {
     if (this.$data.$popper) {
       this.$data.$popper.destroy();
       if (this.$refs.popper && this.$refs.popper.parentNode == this.$data.$parentEl) {
-        this.$data.$parentEl.removeChild(this.$refs.popper);
+        this.$data.$parentEl && this.$data.$parentEl.removeChild(this.$refs.popper);
       }
     }
   },
