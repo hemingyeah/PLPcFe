@@ -26,9 +26,9 @@
       <div class="task-type-list">
         <task-card-item
           class="task-type-item"
-          v-for="(item, idx) in taskTypeList"
+          v-for="(item, idx) in cardList"
           :key="item.id"
-          :value.sync="taskTypeList[idx]"
+          :value.sync="cardList[idx]"
         ></task-card-item>
       </div>
       <!-- end 已添加附加组件 -->
@@ -47,51 +47,15 @@ export default {
   data() {
     return {
       activeTab: "task-added",
-      taskTypeList: [
+      cardList: [
         {
           id: 1,
-          open: true,
-          teamList: [],
-          typeName: "默认工单类型标题",
-          teams: "杭州市西湖团队",
+          name: '费用备注',
+          description: '记录备注费用信息',
+          inputType: 'single',//单次single 多次multiple
           updateName: "张燕青",
           updateDate: "2020-10-20",
-        },
-        {
-          id: 2,
-          open: true,
-          teamList: [],
-          typeName: "默认工单类型字段超出一行可以换行，最多展示2行",
-          teams: "杭州市西湖团队",
-          updateName: "张燕青",
-          updateDate: "2020-10-20",
-        },
-        {
-          id: 3,
-          open: true,
-          teamList: [],
-          typeName: "默认工单类型字段超出一行可以换行，最多展示2行3",
-          teams: "杭州市西湖团队",
-          updateName: "张燕青",
-          updateDate: "2020-10-20",
-        },
-        {
-          id: 4,
-          open: true,
-          teamList: [],
-          typeName: "默认工单类型4",
-          teams: "杭州市西湖团队",
-          updateName: "张燕青",
-          updateDate: "2020-10-20",
-        },
-        {
-          id: 5,
-          open: true,
-          teamList: [],
-          typeName: "默认工单类型555",
-          teams: "杭州市西湖团队",
-          updateName: "张燕青",
-          updateDate: "2020-10-20",
+          enabled:1 //1开启 0关闭
         },
       ],
 

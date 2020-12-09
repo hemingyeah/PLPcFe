@@ -3,12 +3,14 @@
         <el-row class="task-card-main" type="flex" justify="space-between">
             <el-row type="flex">
                 <el-row class="task-card-content" type="flex">
-                    <h2 class="task-card-name">{{value.typeName}}</h2>
-                    <p class="">发货记录的说明文案发货记录的说明文案发货记</p>
+                    <h2 class="task-card-name">{{value.name}}</h2>
                     <el-row class="task-card-others">
+                    <p class="">{{value.description}}</p>
+
                         <p>已应用范围：<span class="pointer" @click="chooseTeam">{{value.teams}} </span></p>
-                        <div>
-                            最近更新: {{value.updateName}}  {{value.updateDate}}
+                        <div class="task-card-li">
+                            <p>类型：{{value.updateName}}  {{value.updateDate}}</p>
+                            <p>使用统计：<span>查看</span></p>
                         </div>
                     </el-row>
                 </el-row >
@@ -95,8 +97,7 @@ export default {
             height: 100%;
             .task-card-name{
                 margin-bottom: 0;
-                @include text-ellipsis-2;
-                word-break: break-all;
+                @include text-ellipsis();
                 padding-right: 32px;
                 font-size: 16px;
                 color: #333333;
@@ -112,6 +113,13 @@ export default {
                     }
                     &:last-child{
                         margin-bottom: 0;
+                    }
+                }
+                .task-card-li{
+                    display: flex;
+                    justify-content: flex-start;
+                    p{
+                        width: 86px;
                     }
                 }
             }
