@@ -1185,7 +1185,7 @@ export function getTaskAllotDispatchTeamUserList(params: TaskTagUserListSearchMo
  * @description 查询转派工单团队人员列表
  */
 export function getTaskAllotRedeployTeamUserList(params: TaskTagUserListSearchModel): Promise<any> {
-  return http.post('/task/customerTag/dispatch/list', params)
+  return http.post('/task/customerTag/redeploy/list', params)
 }
 
 /**
