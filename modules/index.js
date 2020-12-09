@@ -8,6 +8,7 @@ const repository = require('./repository')
 const dataScreen = require('./dataScreen')
 const bill = require('./bill')
 const task = require('./task')
+const abnormal = require('./abnormal')
 const jobtransfer = require('./jobtransfer')
 const callcenter = require('./callcenter')
 
@@ -58,5 +59,6 @@ module.exports = {
   ...customerContact,
   ...task,
   ...sparePart,
-  ...linkc
+  ...linkc,
+  ...abnormal
 }

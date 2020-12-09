@@ -28,6 +28,7 @@ const callCenterRouter = require("./callcenter");
 const doMyselft = require("./doMyself");
 const customerContact = require("./customerContact");
 const taskRouter = require("./task");
+const abnormalRouter = require('./abnormal');
 const sparePartRouter = require("./sparePart");
 
 const linkcRouter = require("./linkc")
@@ -125,6 +126,7 @@ router.use("", customerContact.routes(), customerContact.allowedMethods());
 router.use("", taskRouter.routes(), taskRouter.allowedMethods());
 router.use("", sparePartRouter.routes(), sparePartRouter.allowedMethods());
 router.use("", linkcRouter.routes(), sparePartRouter.allowedMethods());
+router.use("", abnormalRouter.routes(), abnormalRouter.allowedMethods());
 
 router.all("/*", (ctx) => {
   return HttpClient.proxy(ctx);
