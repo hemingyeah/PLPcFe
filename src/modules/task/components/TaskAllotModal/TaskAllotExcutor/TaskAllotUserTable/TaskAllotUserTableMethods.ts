@@ -1,5 +1,5 @@
 /* api */
-import { getTaskAllotUserInfo, getTaskAllotDispatchTeamUserList, getTaskDispatchTagList, getTaskRedeployTagList } from '@src/api/TaskApi'
+import { getTaskAllotUserInfo, getTaskAllotDispatchTeamUserList, getTaskDispatchTagList, getTaskRedeployTagList, getTaskAllotRedeployTeamUserList } from '@src/api/TaskApi'
 /* computed */
 import TaskAllotUserTableComputed from '@src/modules/task/components/TaskAllotModal/TaskAllotExcutor/TaskAllotUserTable/TaskAllotUserTableComputed'
 /* directive */
@@ -188,9 +188,9 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
    * @description 构建客户地址标记
   */
   public buildCusomterAddressMarker(): void {
-    let { validAddress } = this.customerAddress
+    let { validAddress } = this.taskAddress
     if (!validAddress) {
-      return Log.warn('customerAddress.validAddress is false', this.buildCusomterAddressMarker.name)
+      return Log.warn('taskAddress.validAddress is false', this.buildCusomterAddressMarker.name)
     }
     
     // 添加自定义点标记
@@ -228,16 +228,17 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
    * @description 构建客户地址标记内容
   */
   public buildCustomerAddressMapMarkerInfo(): string {
-    let { lmName, lmPhone, customerAddress, name, id } = this.customer
-    customerAddress = new CustomerAddress(customerAddress)
+    let { tlmName = '', tlmPhone = '' } = this.task
+    let { name = '', id = ''} = this.task?.customer
+    let { taskAddress } = this
     
     return (
       `
         <div class="map-info-window-content">
           <div class="customer-name" onclick="openCustomerViewFunc('${id}')">${ name }</div>
-          <p><label>联系人：</label>${ lmName }</p>
-          <p><label>电话：</label>${ lmPhone }</p>
-          <p><label>地址：</label>${ customerAddress?.toString() }</p>
+          <p><label>联系人：</label>${ tlmName }</p>
+          <p><label>电话：</label>${ tlmPhone }</p>
+          <p><label>地址：</label>${ taskAddress?.toString() }</p>
           <div class="info-window-arrow"></div>
         </div>
       `
@@ -341,8 +342,8 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
       order: orderDetail.order,
       code: orderDetail.code,
       customerId: this.customer.id || '',
-      lat: Number(this.customerAddress.adLatitude),
-      lng: Number(this.customerAddress.adLongitude),
+      lat: this.taskAddress.latitude,
+      lng: this.taskAddress.longitude,
       pageNum: ++this.userPage.pageNum,
       pageSize: this.userPage.pageSize,
       states: this.selectUserState,
@@ -403,13 +404,13 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
    * @description 获取地图中心
   */
   public getMapCenter(): Array<number> {
-    let { customerAddress } = this
-    let { adLatitude, adLongitude } = customerAddress || {}
+    let { taskAddress } = this
+    let { latitude, longitude } = taskAddress || {}
     let center = []
     
     // 是否为有效地址
-    if(customerAddress.validAddress){
-      center = [Number(adLongitude), Number(adLatitude)]
+    if (taskAddress.validAddress) {
+      center = [Number(longitude), Number(latitude)]
     } else{
       // 高德地图不支持国外地址解析，那就手动设置为大首都北京吧
       center = [116.397428, 39.90923]
@@ -484,8 +485,8 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
    * @description 获取团队列表
   */
   public fetchTagList(params: TaskTagListSearchModel) {
-    // TODO: 指派 转派需要区分
-    let fetchTagListFunc = getTaskDispatchTagList
+    // 指派 转派需要区分
+    let fetchTagListFunc = this.isReAllot ? getTaskRedeployTagList : getTaskDispatchTagList
     
     params.customerId = this.customer.id || ''
     
@@ -559,18 +560,18 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
     
     this.teamUserPage = new Page()
     
-    let { customerAddress } = this
-    let { adLatitude = '', adLongitude = '' } = customerAddress || {}
+    let { taskAddress } = this
+    let { latitude = null, longitude = null } = taskAddress || {}
     let params = {
       customerId: this.customer?.id || '',
       keyword: selectParams.keyword,
-      lat: Number(adLatitude),
-      lng: Number(adLongitude),
+      lat: latitude,
+      lng: longitude,
       pageNum: selectParams.pageNum,
       tagId: this.selectTeams ? this.selectTeams.map(team => team.id).join(',') : ''
     }
-    // TODO: 区分指派 转派
-    let fetchTeamUsersFunc = getTaskAllotDispatchTeamUserList
+    // 区分指派 转派
+    let fetchTeamUsersFunc = this.isReAllot ? getTaskAllotRedeployTeamUserList : getTaskAllotDispatchTeamUserList
     
     return (
       fetchTeamUsersFunc(params)
