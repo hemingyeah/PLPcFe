@@ -17,6 +17,9 @@ module.exports = {
   'setting.task.flow': {
     entry: './src/modules/setting/task/taskTypeSetting/flow/index.js'
   },
+  'setting.task.additional': {
+    entry: './src/modules/setting/task/taskAdditionalSetting/manage/index.js'
+  },
   'setting.task.receipt_fields': {
     entry: './src/modules/setting/task/taskFormSetting/taskReceiptFormView/index.js',
   },

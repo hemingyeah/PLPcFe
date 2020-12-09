@@ -180,6 +180,7 @@
                   <a href="javascript:;" @click="goCallCenter">呼叫中心</a> -->
                   <a href="javascript:;" @click="goTaskType">工单类型设置</a>
                   <a href="javascript:;" @click="goTaskFlow">工单流程设置</a>
+                  <a href="javascript:;" @click="goTaskAdditional">附加组件设置</a>
                 </div>
               </el-popover>
 
@@ -970,6 +971,14 @@ export default {
         id: "task_flow_setting",
         title: "工单流程设置",
         url: "/setting/task/taskFormSet",
+        reload: true,
+      });
+    },
+    goTaskAdditional() {
+      platform.openTab({
+        id: "task_additional_setting",
+        title: "附加组件设置",
+        url: "/setting/task/cardManage",
         reload: true,
       });
     },
