@@ -156,26 +156,20 @@
             "
             :min-width="column.minWidth || '120px'"
             :sortable="column.sortable"
-            :show-overflow-tooltip="column.fieldName !== 'pathName' && column.fieldName !== 'productVideo' && column.fieldName !== 'productPic'"
+            :show-overflow-tooltip="column.fieldName !== 'productPic'"
             :align="column.align"
           >
             <template slot-scope="scope">
               <template v-if="column.fieldName === 'pathName'">
                 <sample-tooltip :row="scope.row">
                   <template slot="content" slot-scope="{ isContentTooltip }">
-                    <el-tooltip
-                      :content="scope.row[column.field]"
-                      placement="top"
-                      :disabled="!isContentTooltip"
+                    <a
+                      href=""
+                      class="view-detail-btn"
+                      @click.stop.prevent="openProductMenuTab(scope.row.id)"
                     >
-                      <a
-                        href=""
-                        class="view-detail-btn"
-                        @click.stop.prevent="openProductMenuTab(scope.row.id)"
-                      >
-                        {{ scope.row[column.field] }}
-                      </a>
-                    </el-tooltip>
+                      {{ scope.row[column.field] }}
+                    </a>
                   </template>
                 </sample-tooltip>
               </template>
@@ -184,24 +178,18 @@
                 <template v-if="scope.row.productVideo.length">
                   <sample-tooltip :row="scope.row">
                     <template slot="content" slot-scope="{ isContentTooltip }">
-                      <el-tooltip
-                        :content="scope.row.productVideo[0].filename"
-                        placement="top"
-                        :disabled="!isContentTooltip"
+                      <a
+                        href=""
+                        class="view-detail-btn"
+                        @click.stop.prevent="
+                          previewVideo(scope.row.productVideo[0].url)
+                        "
                       >
-                        <a
-                          href=""
-                          class="view-detail-btn"
-                          @click.stop.prevent="
-                            previewVideo(scope.row.productVideo[0].url)
-                          "
-                        >
-                          {{
-                            scope.row.productVideo[0] &&
-                              scope.row.productVideo[0].filename
-                          }}
-                        </a>
-                      </el-tooltip>
+                        {{
+                          scope.row.productVideo[0] &&
+                            scope.row.productVideo[0].filename
+                        }}
+                      </a>
                     </template>
                   </sample-tooltip>
                 </template>
@@ -225,7 +213,7 @@
                     class="item"
                     effect="dark"
                     :content="scope.row.latesetUpdateRecord"
-                    placement="top"
+                    placement="top-start"
                   >
                     <div @mouseover="showLatestUpdateRecord(scope.row)">
                       {{ scope.row.updateTime | formatDate }}
@@ -256,9 +244,14 @@
               <template v-else-if="column.fieldName == 'address'">
                 {{ getAddress(scope.row.address) }}
               </template>
+              
 
               <template v-else-if="!column.isSystem">
                 {{ scope.row.attribute && scope.row.attribute[column.field] }}
+              </template>
+
+              <template v-else-if="column.fieldName == 'catalogId'">
+                {{ scope.row.pathName }}
               </template>
               <template v-else-if="column.fieldName === 'productPic'">
                 <div class="flex-x">
@@ -525,7 +518,6 @@ export default {
             && f.formType !== "info"
             && f.formType !== "autograph"
             && f.formType !== "attachment"
-            && f.fieldName !== "catalogName"
         )
         .map((f) => {
           if (f.isSystem == 1) {
@@ -747,7 +739,6 @@ export default {
     // 选择列 e
 
     openProductMenuTab(id) {
-
       this.$platform.openTab({
         id: `productV2_catalog_view_${id}`,
         title: "产品目录详情",
@@ -764,7 +755,7 @@ export default {
           this.loading = false;
           res.result.list = res.result.list.map((item) => {
             item.productDesc = item.productDesc || "";
-            item["catalogName"] = "";
+            item["catalogName"] = item.catalogName || "";
             return item;
           });
           this.page = Page.as(Object.freeze(res.result));

@@ -23,15 +23,15 @@
 
 <script>
 /** api */
-import { searchAllcatalog } from '@src/api/ProductV2Api';
+import { searchAllcatalog } from "@src/api/ProductV2Api";
 
 /** mixin */
-import FormMixin from '@src/component/form/mixin/form';
+import FormMixin from "@src/component/form/mixin/form";
 
-import _ from 'lodash';
+import _ from "lodash";
 
 export default {
-  name: 'form-related-catalog',
+  name: "form-related-catalog",
   mixins: [FormMixin],
   props: {
     value: {
@@ -69,27 +69,27 @@ export default {
       let { keyword, pageNum, pageSize } = params;
       params = {
         page: pageNum,
-        pageSize,
+        pageSize:50,
         keyWord: keyword,
       };
 
       return searchAllcatalog(params)
         .then((res) => {
           if (!res || !res.result || !res.result.list) return;
-          res.list = res.result.list.map((item) =>
+          res.result.list = res.result.list.map((item) =>
             Object.freeze({
               label: item.pathName,
               ...item,
             })
           );
 
-          return res;
+          return res.result;
         })
         .catch((e) => console.error(e));
     },
     update(newValue) {
-      console.log('newValue', newValue);
-      this.inputForValue(newValue[0].id);
+      console.log("newValue", newValue);
+      this.inputForValue(newValue[0]);
     },
     previewCatalog(){
       if(!this.comValue.length) return
@@ -97,7 +97,7 @@ export default {
       console.log(this.comValue, this.value)
       this.$platform.openTab({
         id: `productV2_catalog_view_${this.comValue[0].id}`,
-        title: '产品目录详情',
+        title: "产品目录详情",
         close: true,
         url: `/productV2/catalog/view?id=${this.comValue[0].id}`
       });

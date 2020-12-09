@@ -154,7 +154,7 @@
               >绑定微信或钉钉服务窗</a
               >
             </div>
-            <div class="flex-y code-box" v-show="setData.protalUrl">
+            <div class="flex-y al-center code-box" v-show="setData.protalUrl">
               <div
                 class="qrcode cur-point"
                 ref="qrCodeUrl"
@@ -188,7 +188,7 @@
               >
             </div>
             <div
-              class="flex-y code-box mar-l-16 i-can-scale"
+              class="flex-y al-center code-box mar-l-16 i-can-scale"
               v-show="setData.weChatQRCodeUrl"
             >
               <img
@@ -367,14 +367,14 @@
   </div>
 </template>
 <script>
-import draggable from 'vuedraggable'
-import _ from 'lodash'
-import QRCode from 'qrcodejs2'
+import draggable from "vuedraggable"
+import _ from "lodash"
+import QRCode from "qrcodejs2"
 // import BaseGallery from 'packages/BaseGallery'
 
 
-import settingMixin from './settingShowCmp/index'
-import headPhone from '@src/assets/img/myShop/headPhone.png'
+import settingMixin from "./settingShowCmp/index"
+import headPhone from "@src/assets/img/myShop/headPhone.png"
 import {
   getRules,
   saveRules,
@@ -382,10 +382,10 @@ import {
   saveInfos,
   weChat,
   getEventList,
-} from '@src/api/LinkcApi'
+} from "@src/api/LinkcApi"
 
 export default {
-  name: 'do-myself-set',
+  name: "do-myself-set",
   mixins: [settingMixin],
   filters: {
     usualNum(val) {
@@ -410,7 +410,7 @@ export default {
     submitDialog(value) {
       if (value == false) {
 
-        this.$refs['wxRulerForm'].resetFields()
+        this.$refs["wxRulerForm"].resetFields()
       }
     },
   },
@@ -420,92 +420,92 @@ export default {
     return {
       menuList: [
         {
-          name: '客户自助门户',
-          icon: 'icon-Gateway',
+          name: "客户自助门户",
+          icon: "icon-Gateway",
         },
         {
-          name: '公众号设置',
-          icon: 'icon-weixin2',
+          name: "公众号设置",
+          icon: "icon-weixin2",
         },
         {
-          name: '短信消息设置',
-          icon: 'icon-duanxin3',
+          name: "短信消息设置",
+          icon: "icon-duanxin3",
         },
         {
-          name: '消息记录',
-          icon: 'icon-message',
+          name: "消息记录",
+          icon: "icon-message",
         },
       ],
       nowMenu: 0,
-      setData: '',
-      radio: '1',
+      setData: "",
+      radio: "1",
       value1: false,
       options: [
         {
-          label: '上架全部备件和服务项目',
+          label: "上架全部备件和服务项目",
           value: true,
         },
         {
-          label: '仅显示选择的备件和服务项目',
+          label: "仅显示选择的备件和服务项目",
           value: false,
         },
       ],
       options_value: 1,
       dataList: [
         {
-          type: 'company-card',
+          type: "company-card",
           id: 1,
           data: {
-            logoUrl: '',
-            name: '',
-            mobile: '',
-            address: '',
-            companyName: '',
+            logoUrl: "",
+            name: "",
+            mobile: "",
+            address: "",
+            companyName: "",
           },
         },
         {
-          type: 'icon-list',
+          type: "icon-list",
           id: 2,
           data: [],
         },
         {
-          type: 'shops-list',
+          type: "shops-list",
           id: 3,
           data: [],
         },
         {
-          type: 'wiki-enter',
+          type: "wiki-enter",
           id: 4,
           data: [],
         },
       ],
       nowSettingDataId: -1,
-      nowSettingIconId: '',
+      nowSettingIconId: "",
       nowSettingData: {},
       fullscreenLoading: false,
       submitDialog: false,
       wxRulerFormData: {
-        appId: '',
-        matchId: '',
-        apiSecret: '',
-        secret: '',
-        publicAppId: '',
-        publicSecret: '',
+        appId: "",
+        matchId: "",
+        apiSecret: "",
+        secret: "",
+        publicAppId: "",
+        publicSecret: "",
       },
       wxRuler: {
         // appId: [{ required: true, message: '请输入APPID', trigger: 'blur' }],
-        matchId: [{ required: true, message: '请输入mch_id', trigger: 'blur' }],
+        matchId: [{ required: true, message: "请输入mch_id", trigger: "blur" }],
         apiSecret: [
-          { required: true, message: '请输入API密钥', trigger: 'blur' },
+          { required: true, message: "请输入API密钥", trigger: "blur" },
         ],
         // secret: [
         //   { required: true, message: '请输入AppSecret', trigger: 'blur' },
         // ],
         publicAppId: [
-          { required: true, message: '请输入公众号APPID', trigger: 'blur' },
+          { required: true, message: "请输入公众号APPID", trigger: "blur" },
         ],
         publicSecret: [
-          { required: true, message: '请输入公众号密钥', trigger: 'blur' },
+          { required: true, message: "请输入公众号密钥", trigger: "blur" },
         ],
       },
       eventList: [],
@@ -522,36 +522,36 @@ export default {
             text: `${this.setData.protalUrl}`, // 需要转换为二维码的内容
             width: 344,
             height: 344,
-            colorDark: '#000000',
-            colorLight: '#ffffff',
+            colorDark: "#000000",
+            colorLight: "#ffffff",
             correctLevel: QRCode.CorrectLevel.H,
           })
         } else {
           this.$notify.close()
           this.$notify.error({
-            title: '网络错误',
+            title: "网络错误",
             message: res[0].message,
             duration: 2000,
           })
         }
         if (res[1].status == 0) {
-          this.$set(this, 'eventList', res[1].data)
+          this.$set(this, "eventList", res[1].data)
         } else {
           this.$notify.close()
           this.$notify.error({
-            title: '网络错误',
+            title: "网络错误",
             message: res[1].message,
             duration: 2000,
           })
         }
         if (res[2].status == 200) {
           this.transData(res[2].data).then((res_) => {
-            this.$set(this, 'dataList', res_)
+            this.$set(this, "dataList", res_)
           })
         } else {
           this.$notify.close()
           this.$notify.error({
-            title: '网络错误',
+            title: "网络错误",
             message: res[2].message,
             duration: 2000,
           })
@@ -571,13 +571,13 @@ export default {
         return
       }
       if (index === 2) {
-        window.location.href = '/setting/message/smsmessage'
+        window.location.href = "/setting/message/smsmessage"
       } else if (index === 0) {
-        window.location.href = '/setting/doMyself/doMyselfSet'
+        window.location.href = "/setting/doMyself/doMyselfSet"
       } else if (index === 1) {
-        window.location.href = '/setting/doMyself/wxSet'
+        window.location.href = "/setting/doMyself/wxSet"
       } else if (index === 3) {
-        window.location.href = '/setting/doMyself/toastList'
+        window.location.href = "/setting/doMyself/toastList"
       }
       this.nowMenu === index
     },
@@ -588,24 +588,24 @@ export default {
           for (let key in data) {
             let item = data[key]
             let items = {}
-            if (key == 'baseInfo') {
-              items['type'] = 'company-card'
-              items['data'] = item
-            } else if (key == 'quickInfo') {
-              items['type'] = 'icon-list'
+            if (key == "baseInfo") {
+              items["type"] = "company-card"
+              items["data"] = item
+            } else if (key == "quickInfo") {
+              items["type"] = "icon-list"
               item.quickInfos.forEach((item_, index_) => {
                 item_.cmpId = item.index
-                item_['id'] = index_ + 1
+                item_["id"] = index_ + 1
               })
-              items['data'] = item.quickInfos || []
-            } else if (key == 'shopResponse') {
-              items['type'] = 'shops-list'
-              items['data'] = item.shopInfos || []
-            } else if (key == 'wikiResponse') {
-              items['type'] = 'wiki-enter'
-              items['data'] = item.wikiInfos || []
+              items["data"] = item.quickInfos || []
+            } else if (key == "shopResponse") {
+              items["type"] = "shops-list"
+              items["data"] = item.shopInfos || []
+            } else if (key == "wikiResponse") {
+              items["type"] = "wiki-enter"
+              items["data"] = item.wikiInfos || []
             }
-            items['id'] = item.index
+            items["id"] = item.index
             arr[item.index - 1] = items
           }
           resolve(arr)
@@ -622,24 +622,24 @@ export default {
           let obj = {}
           data_.forEach((item_, indexs_) => {
             let index_ = indexs_ + 1
-            if (item_.type == 'company-card') {
-              obj['baseInfo'] = { ...item_.data, index: index_ }
-            } else if (item_.type == 'icon-list') {
-              obj['quickInfo'] = { quickInfos: item_.data, index: index_ }
-            } else if (item_.type == 'shops-list') {
+            if (item_.type == "company-card") {
+              obj["baseInfo"] = { ...item_.data, index: index_ }
+            } else if (item_.type == "icon-list") {
+              obj["quickInfo"] = { quickInfos: item_.data, index: index_ }
+            } else if (item_.type == "shops-list") {
               let ids = item_.data.length > 0
                 ? item_.data.map((res) => {
                   return res.num
                 })
                 : []
-              obj['shopInfo'] = { marketIds: ids, index: index_ }
-            } else if (item_.type == 'wiki-enter') {
+              obj["shopInfo"] = { marketIds: ids, index: index_ }
+            } else if (item_.type == "wiki-enter") {
               let ids = item_.data.length > 0
                 ? item_.data.map((res) => {
                   return res.num
                 })
                 : []
-              obj['wikiInfo'] = { wikiIds: ids, index: index_ }
+              obj["wikiInfo"] = { wikiIds: ids, index: index_ }
             }
           })
           resolve(obj)
@@ -650,7 +650,7 @@ export default {
       })
     },
     chooseNowSet(item) {
-      if (item.type == 'icon-list') return
+      if (item.type == "icon-list") return
       let id = item.id
       if (this.nowSettingDataId == id) {
         return
@@ -658,7 +658,7 @@ export default {
       this.nowSettingDataId = id
       if (id > 0) {
         let res_ = this.findNowSetData(this.nowSettingDataId).item
-        this.$set(this, 'nowSettingData', {
+        this.$set(this, "nowSettingData", {
           name: `${res_.type}-data`,
           data: res_.data,
           id: res_.id,
@@ -675,7 +675,7 @@ export default {
         iconSetId: item.item.id,
       }
       this.nowSettingDataId = item.item.cmpId
-      this.$set(this, 'nowSettingData', nowSettingData)
+      this.$set(this, "nowSettingData", nowSettingData)
     },
     pushIcon(item) {
       let index = this.findNowSetData(item.id).index
@@ -704,13 +704,13 @@ export default {
     },
     changeInfoData(e) {
       let index = this.findNowSetData(this.nowSettingDataId).index
-      this.$set(this.dataList[index], 'data', e.item)
+      this.$set(this.dataList[index], "data", e.item)
     },
     deleteIconItem(e) {
       let index = this.findNowSetData(e.id).index
       let data_ = _.cloneDeep(this.dataList[index].data)
       data_.splice(e.indexs, 1)
-      this.$set(this.dataList[index], 'data', data_)
+      this.$set(this.dataList[index], "data", data_)
       this.nowSettingDataId = -1
     },
     cancelInfoData() {
@@ -726,15 +726,15 @@ export default {
     },
     goToShopCenter() {
       // window.location = '/setting/serviceStation/markSpareGray'
-      window.location.href = '/setting/serviceStation/partShop'
+      window.location.href = "/setting/serviceStation/partShop"
     },
     copyUrl() {
       if (!this.setData.protalUrl) return
       this.$copyText(`${this.setData.protalUrl}`).then(() => {
         this.$message({
-          message: '已复制好，可贴粘。',
+          message: "已复制好，可贴粘。",
           duration: 1500,
-          type: 'success',
+          type: "success",
         })
       })
     },
@@ -742,7 +742,7 @@ export default {
       this.submitDialog = true
     },
     submitWxData() {
-      this.$refs['wxRulerForm'].validate((valid) => {
+      this.$refs["wxRulerForm"].validate((valid) => {
         if (valid) {
           this.fullscreenLoading = true
           let params_ = _.cloneDeep(this.wxRulerFormData)
@@ -752,16 +752,16 @@ export default {
             .then((res) => {
               if (res.status == 200) {
                 this.$message({
-                  message: '微信商户信息提交成功',
+                  message: "微信商户信息提交成功",
                   duration: 1500,
-                  type: 'success',
+                  type: "success",
                 })
                 this.setData.weChatQRCodeUrl = res.data
                 this.submitDialog = false
               } else {
                 this.$notify.close()
                 this.$notify.error({
-                  title: '网络错误',
+                  title: "网络错误",
                   message: res.message,
                   duration: 2000,
                 })
@@ -793,14 +793,14 @@ export default {
             .then((res) => {
               if (res.status == 200) {
                 this.$message({
-                  message: '发布成功，请前往移动端自助门户查看',
+                  message: "发布成功，请前往移动端自助门户查看",
                   duration: 1500,
-                  type: 'success',
+                  type: "success",
                 })
               } else {
                 this.$notify.close()
                 this.$notify.error({
-                  title: '网络错误',
+                  title: "网络错误",
                   message: res.message,
                   duration: 2000,
                 })

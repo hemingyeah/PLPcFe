@@ -237,7 +237,7 @@ export default {
     propData(newVal, oldVal) {
       this.$set(
         this.productMenuValue,
-        "catalog_name",
+        "catalogName",
         _.cloneDeep(newVal.name)
       );
       if (newVal.canEditConData && newVal.conData) {
@@ -245,7 +245,6 @@ export default {
       }
     },
     fieldIds(newVal, oldVal) {
-      console.log(newVal, "newVal")
       this.fields.map((item) => {
         if (newVal.indexOf(item.id) > -1 || item.isSystem == 1) item["hideform"] = false;
         else item["hideform"] = true;
@@ -270,7 +269,6 @@ export default {
           fieldIds_ = sortedFields.filter(item=>item.isSystem != 1).map((item) => {
             return item.id;
           });
-          console.log(sortedFields, fieldIds_)
           this.fields = sortedFields;
         } else {
           this.$notify.error({
@@ -285,11 +283,11 @@ export default {
   methods: {
     initProductMenuValue() {
       return {
-        catalog_name: this.propData.name,
-        product_desc: "",
-        product_video: [],
-        product_pic: [],
-        product_explain: [],
+        catalogName: this.propData.name,
+        productDesc: "",
+        productVideo: [],
+        productPic: [],
+        productExplain: [],
       };
     },
     handlePictureCardPreview(file) {
@@ -328,7 +326,6 @@ export default {
     UploadImage(param) {
       Uploader.upload(param.file, "/files/upload")
         .then((result) => {
-          console.log(result, "result");
           if (result.status != 0) {
             this.$message({
               message: `${result.message}`,
@@ -351,7 +348,6 @@ export default {
             ...this.productMenuValue.productPic,
             item,
           ]);
-          console.log(this.productMenuValue, "productMenuValue.productPic");
         })
         .catch((err) => {
           console.warn(err);
@@ -382,6 +378,7 @@ export default {
     setMenuInfo() {
       this.rootDataChange("nowEditMenu", { ...this.propData, conData: 1 });
       this.changeTreeDetail("conData", 1);
+      this.$set(this, "fieldIds", _.cloneDeep(fieldIds_))
     },
     resetForm() {
       // 清空校验结果
@@ -416,6 +413,7 @@ export default {
               message: "保存成功",
               type: "success",
             });
+            this.changeTreeDetail("conData", 1);
             window.parent.flashSomePage({
               type: "M_PRODUCT_CATALOG",
             });
@@ -430,11 +428,15 @@ export default {
       // 仅用于向接口传参转换数据
       let obj = {};
       let tran_data = _.cloneDeep(this.productMenuValue);
-      for (let key in urlKey) {
-        obj[key] = tran_data[key];
-        delete tran_data[key];
-      }
-      obj["attribute"] = tran_data;
+      obj["attribute"] = {};
+      this.fields.forEach(item=>{
+        let key = item.fieldName;
+        if(item.isSystem){
+          obj[key] = tran_data[key]
+        }else{
+          obj["attribute"][key] = tran_data[key]  
+        }
+      })
       obj["id"] = this.propData.id;
       obj["fieldIds"] = fieldIds_.filter(item=>!this.fieldIds.some(ele=>ele == item));
       return obj;
@@ -448,9 +450,10 @@ export default {
           res.result.catalogInfo.productVideo = res.result.catalogInfo.productVideo || [];
           res.result.catalogInfo.productPic = res.result.catalogInfo.productPic || [];
           res.result.catalogInfo.productExplain = res.result.catalogInfo.productExplain || [];
+          res.result.catalogInfo = {...res.result.catalogInfo, ...res.result.catalogInfo.attribute}
           this.$set(this, "productMenuValue", res.result.catalogInfo);
           
-          if (res.result.selectField.length) {
+          if (res.result.selectField) {
             
             this.$set(this, "fieldIds", fieldIds_.filter(item=>!res.result.selectField.some(ele=>ele == item)));
           }

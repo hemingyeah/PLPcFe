@@ -1,17 +1,7 @@
 <template>
   <div class="product-container" v-loading.fullscreen.lock="loadingPage">
-    <form @submit.prevent="submit" class="base-form" v-if="init" novalidate>
-      <div class="page-title">
-        <div class="title">
-          <button type="button" class="btn-text btn-back" @click="goBack">
-            <i class="iconfont icon-arrow-left"></i> 返回
-          </button>
-          <span class="text">|</span>
-          <button type="submit" :disabled="pending" class="btn btn-primary">
-            提交
-          </button>
-        </div>
-      </div>
+    <div class="base-form " v-if="init" >
+
 
       <product-edit-form
         :fields="productFields"
@@ -20,7 +10,20 @@
         ref="productEditForm"
       >
       </product-edit-form>
-    </form>
+
+
+      <div class="normal-btn-box mar-l-20">
+        <el-button type="primary" @click="submitChooseQrcode" :loading="pending" class="btn btn-primary ">
+          保存并关联二维码
+        </el-button>
+        <el-button @click="submit" :loading="pending">
+          仅保存
+        </el-button>
+         
+      </div>
+    </div>
+
+    <public-dialog :product-id="productId" :dialog-type="'linkQrcode'" @dialogBind="dialogBind" ref="publicDialog"/>
   </div>
 </template>
 
@@ -34,6 +37,7 @@ import {
 } from "@src/api/ProductApi";
 import * as FormUtil from "@src/component/form/util";
 import ProductEditForm from "@src/modules/product/components/ProductEditFormV2.vue";
+import PublicDialog from "@src/modules/productV2/productView/components/PublicDialog.vue";
 
 import * as util from "@src/modules/product/utils/ProductMapping";
 
@@ -50,7 +54,7 @@ export default {
       cloneProduct:this.cloneProduct
     }
   },
-  // inject: ['initData'],
+  inject: ["initData"],
   data() {
     return {
       loadingPage: false,
@@ -58,7 +62,7 @@ export default {
       init: false,
       submitting: false,
       form: {},
-      initData,
+      // initData,
       dynamicProductFields: []
     }
   },
@@ -79,7 +83,7 @@ export default {
     },
     productId() {
       // const matchRes = window.location.href.match(/customer\/product\/edit\/([\w-]*)(\??.*)/);
-      return this.initData.id;
+      return this.initData.id || "";
     },
     // 客户上创建产品会带一个cId
     customer() {
@@ -118,6 +122,7 @@ export default {
         ...this.customer
       }];
     }
+    
 
     /**
      * 初始化所有字段的初始值
@@ -126,7 +131,7 @@ export default {
      * @param {*} target 待合并的值
      */
 
-    this.form = FormUtil.initialize(this.productFields, form)
+    this.form = FormUtil.initialize(this.productFields, form);
 
     this.init = true;
   },
@@ -165,6 +170,7 @@ export default {
                   type: "error",
                 })
               }
+              this.$refs.publicDialog.close();
 
               this.$platform.notification({
                 title: `${action}产品成功`,
@@ -187,6 +193,9 @@ export default {
               console.error(err);
               this.pending = false;
               this.loadingPage = false;
+            })
+            .finally(()=>{
+              this.$refs.publicDialog.changeLoading(false);
             });
         })
         .catch(err => {
@@ -194,6 +203,23 @@ export default {
           this.pending = false;
           this.loadingPage = false;
         })
+    },
+    submitChooseQrcode(){
+      this.$refs.productEditForm.validate()
+        .then(valid => {
+          if (!valid) return Promise.reject("validate fail.");
+          this.$refs.publicDialog.open();
+        })
+        .catch(err => {
+          console.error(err);
+          this.pending = false;
+          this.loadingPage = false;
+        })
+    },
+    dialogBind(e){
+      console.log("dialogBind", e)
+      this.form["qrcodeId"] = e.qrcodeId;
+      this.submit();
     },
     goBack() {
       if(this.action == "create") {
@@ -234,10 +260,11 @@ export default {
      */
 
       this.form = FormUtil.initialize(this.productFields, form)
-    }
+    },
   },
   components: {
     [ProductEditForm.name]: ProductEditForm,
+    [PublicDialog.name]:PublicDialog
   }
 }
 </script>
@@ -248,9 +275,7 @@ body {
 }
 
 .product-container {
-  height: 100%;
   width: 100%;
-  overflow: auto;
   background-color: #fff;
 
   .page-title {

@@ -87,18 +87,18 @@
   </draggable>
 </template>
 <script>
-import draggable from 'vuedraggable';
-import _ from 'lodash';
-import { sortTreeList, delTreeList } from '@src/api/ProductV2Api';
+import draggable from "vuedraggable";
+import _ from "lodash";
+import { sortTreeList, delTreeList } from "@src/api/ProductV2Api";
 const arrTemp = {
-  name: '目录名称',
+  name: "目录名称",
   tasks: [],
   conData: null,
   showList: 1,
 };
 
 export default {
-  inject: ['rootDataChange', 'changeDialog', 'getTreeData', 'changeTree'],
+  inject: ["rootDataChange", "changeDialog", "getTreeData", "changeTree"],
   props: {
     tasks: {
       required: true,
@@ -127,7 +127,7 @@ export default {
   data() {
     return {};
   },
-  name: 'work-tree-draggable',
+  name: "work-tree-draggable",
   methods: {
     showRootList(index) {
       if (this.tasks[index].tasks.length <= 0) return;
@@ -135,7 +135,7 @@ export default {
     },
     checkRootList(index) {
       if(this.nowEditMenu.id == this.tasks[index].id) return
-      this.rootDataChange('nowEditMenu', {
+      this.rootDataChange("nowEditMenu", {
         id: this.tasks[index].id,
         canEditConData: !(this.tasks[index].tasks.length > 0),
         conData: this.tasks[index].conData,
@@ -146,25 +146,26 @@ export default {
     },
     addChildArr(index) {
       let nowMenu = this.tasks[index];
-      this.rootDataChange('childData', {
+      this.rootDataChange("childData", {
         id: nowMenu.id,
         pathName: nowMenu.pathName,
         indexArr: [...this.rootData.indexArr, index],
-        pathNameArr: this.rootData.pathNameArr,
+        pathNameArr: [...this.rootData.pathNameArr, nowMenu.name],
+        orderId:nowMenu.tasks.length
       });
-      this.changeDialog('addMenuChild');
+      this.changeDialog("addMenuChild");
       this.tasks[index].popoverVisible = false;
     },
     deleteNowArr(index) {
       this.tasks[index].popoverVisible = false;
 
       this.$confirm(
-        '此操作将删该目录以及目录下的所有子目录, 是否继续?',
-        '提示',
+        "此操作将删除该目录以及目录下的所有子目录, 是否继续?",
+        "提示",
         {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning',
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning",
         }
       )
         .then(() => {
@@ -173,14 +174,14 @@ export default {
           }).then((res) => {
             if (res.code == 0) {
               this.changeTree(
-                'delete',
+                "delete",
                 [...this.rootData.indexArr],
                 index,
                 this.tasks[index]
               );
             } else {
               this.$notify.error({
-                title: '网络错误',
+                title: "网络错误",
                 message: res.message,
                 duration: 2000,
               });
@@ -191,7 +192,7 @@ export default {
     },
     renameChildArr(index) {
       let nowMenu = this.tasks[index];
-      this.rootDataChange('childData', {
+      this.rootDataChange("childData", {
         id: nowMenu.id,
         pathName: nowMenu.pathName,
         indexArr: [...this.rootData.indexArr, index],
@@ -199,7 +200,7 @@ export default {
         name: nowMenu.name,
         nowIndex: index,
       });
-      this.changeDialog('renameMenuChild');
+      this.changeDialog("renameMenuChild");
       this.tasks[index].popoverVisible = false;
     },
     arrUpdate(e) {
@@ -209,7 +210,7 @@ export default {
         pathName: [
           ..._.cloneDeep(this.rootData.pathNameArr),
           this.sortMenu.name,
-        ].join('/'),
+        ].join("/"),
         orderId: e.newIndex,
         showList: this.sortMenu.showList,
       };
@@ -217,10 +218,10 @@ export default {
         if (res.code == 0) {
           this.sortMenu.pathName = res.result.pathName;
           this.sortMenu.parentId = res.result.parentId;
-          this.rootDataChange('sortMenu', this.sortMenu);
+          this.rootDataChange("sortMenu", this.sortMenu);
         } else {
           this.$notify.error({
-            title: '网络错误',
+            title: "网络错误",
             message: res.message,
             duration: 2000,
           });
@@ -235,7 +236,7 @@ export default {
         pathName: [
           ..._.cloneDeep(this.rootData.pathNameArr),
           this.sortMenu.name,
-        ].join('/'),
+        ].join("/"),
         orderId: e.newIndex,
         showList: this.sortMenu.showList,
       };
@@ -243,10 +244,10 @@ export default {
         if (res.code == 0) {
           this.sortMenu.pathName = res.result.pathName;
           this.sortMenu.parentId = res.result.parentId;
-          this.rootDataChange('sortMenu', this.sortMenu);
+          this.rootDataChange("sortMenu", this.sortMenu);
         } else {
           this.$notify.error({
-            title: '网络错误',
+            title: "网络错误",
             message: res.message,
             duration: 2000,
           });
@@ -255,13 +256,13 @@ export default {
       });
     },
     arrChoose(e) {
-      this.rootDataChange('sortMenu', this.tasks[e.oldIndex]);
+      this.rootDataChange("sortMenu", this.tasks[e.oldIndex]);
     },
     tasksItemMove(e) {
-      this.rootDataChange('nowHoverMenu', { id: this.tasks[e].id });
+      this.rootDataChange("nowHoverMenu", { id: this.tasks[e].id });
     },
     tasksItemLeave(e) {
-      this.rootDataChange('nowHoverMenu', {});
+      this.rootDataChange("nowHoverMenu", {});
     },
     nowHoverMenuShow(e) {
       return e.popoverVisible

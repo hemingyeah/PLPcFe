@@ -159,9 +159,9 @@ export default {
             ..._.cloneDeep(this.childData.pathNameArr),
             e.catalogName,
           ].join("/"),
-          orderId: this.treeData[0].tasks.length,
           showList: 1,
-        };
+          orderId:this.childData.orderId
+        }
         this.addMenu(e);
         break;
       case "renameMenuChild":
@@ -354,7 +354,7 @@ export default {
           this.treeData,
           this.nowEditMenu.indexArr,
           0,
-          this.nowEditMenu.indexArr.length - 2
+          this.nowEditMenu.indexArr.length - 1
         );
         element[this.nowEditMenu.nowIndex][key] = val;
       } catch (error) {

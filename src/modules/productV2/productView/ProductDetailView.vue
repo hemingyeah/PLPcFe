@@ -8,10 +8,10 @@
             <div class="product-name overHideCon-1">
               {{ product.name }}
             </div>
-            <div class="flex-x mar-t-8" v-if="product.catalogId">
+            <div class="flex-x mar-t-8" v-if="dataInfo && dataInfo.catalogId">
               产品目录:
-              <div class="flex-1 over-x-s color-primary cur-point" style="white-space: nowrap;" @click="openProductMenuTab(product.catalogId)">
-                {{product.catalogPathName}}
+              <div class="flex-1 over-x-s color-primary  mar-l-8" style="white-space: nowrap;" >
+                <span @click="openProductMenuTab(dataInfo.catalogId)" class="cur-point">{{dataInfo.catalogPathName}}</span>  
               </div>
             </div>
           </div>
@@ -270,21 +270,21 @@
               </form-view>
             </el-tab-pane>
             <el-tab-pane label="产品目录" name="catalog-view">
-              <div class="flex-x jus-center" v-if="!product.catalogId">
-                <div class="flex-y">
+              <div class="flex-x jus-center" v-if="dataInfo && !dataInfo.catalogId">
+                <div class="flex-y al-center">
                   <img src="@src/assets/img/productV2/catalogNone.png" class="size-160 mar-t-50 mar-b-8" alt="">
                   <div class="mar-b-12">暂未关联产品目录</div> 
                   <el-button @click="openPublicDialog('linkCatalog')" >关联产品目录</el-button>
                 </div>
               </div>
              
-              <template v-else>
-                <catalog-view :prop-data="{id:product.catalogId}" />
+              <template v-show="dataInfo && dataInfo.catalogId">
+                <catalog-view ref="catalogView" :prop-data="{id:dataInfo.catalogId}" />
               </template>
             </el-tab-pane>
             <el-tab-pane label="产品二维码" name="qrcode-view">
-              <div class="flex-x jus-center" v-if="!product.qrcodeId">
-                <div class="flex-y">
+              <div class="flex-x jus-center" v-if="!dataInfo.qrcodeId">
+                <div class="flex-y al-center">
                   <img src="@src/assets/img/productV2/qrcodeNone.png" class="size-160 mar-t-50 mar-b-8" alt="">
                   <div class="mar-b-12">暂未关联产品二维码</div> 
                   <el-button @click="openPublicDialog('linkQrcode')" >关联产品二维码</el-button>
@@ -295,8 +295,8 @@
                 <div class="box-12">
                   <div class="form-view-row">
                     <label>产品二维码</label>
-                    <div class="form-view-row-content " v-show="product.qrcodeId">
-                      <span>{{ product.qrcodeId }}</span>
+                    <div class="form-view-row-content " v-show="dataInfo && dataInfo.qrcodeId">
+                      <span>{{ dataInfo.qrcodeId }}</span>
                       <div class="qrcodeBtn">
                         <div ref="qrcode" style="margin: 10px 0;"></div>
                         <div class="flex-x jus-bet">
@@ -306,18 +306,6 @@
                           <el-button type="danger" @click="unbindQrcodeFromProduct">删除</el-button>
                         </div>
                       </div>
-                    <!-- <a
-                      href="javascript:;"
-                      class="link"
-                      @click="openDownloadCodeDialog"
-                    >下载</a
-                    >
-                    <a
-                      href="javascript:;"
-                      class="link"
-                      @click="unbindQrcodeFromProduct"
-                    >删除</a
-                    > -->
                     </div>
                   </div>
                 </div>

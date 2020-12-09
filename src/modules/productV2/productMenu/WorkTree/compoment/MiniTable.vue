@@ -19,7 +19,7 @@
           label="编号"
           width="180"
         >
-          <!-- <template slot-scope="scope">
+          <template slot-scope="scope">
             <sample-tooltip :row="scope.row">
               <template slot="content" slot-scope="{ isContentTooltip }">
                 <el-tooltip
@@ -30,14 +30,14 @@
                   <a
                     href=""
                     class="view-detail-btn"
-                    @click.stop.prevent="openProductMenuTab(scope.row.id)"
+                    @click.stop.prevent="openMenuTab(scope.row.id)"
                   >
                     {{ scope.row.serialNumber }}
                   </a>
                 </el-tooltip>
               </template>
             </sample-tooltip>
-          </template> -->
+          </template>
         </el-table-column>
         <el-table-column
           show-overflow-tooltip
@@ -76,7 +76,7 @@
                   <a
                     href=""
                     class="view-detail-btn"
-                    @click.stop.prevent="openProductMenuTab(scope.row.id)"
+                    @click.stop.prevent="openMenuTab(scope.row.id)"
                   >
                     {{ scope.row.title }}
                   </a>
@@ -116,7 +116,7 @@
                   <a
                     href=""
                     class="view-detail-btn"
-                    @click.stop.prevent="openProductMenuTab(scope.row.id)"
+                    @click.stop.prevent="openMenuTab(scope.row.productId)"
                   >
                     {{ scope.row.productName }}
                   </a>
@@ -207,26 +207,26 @@
 </template>
 
 <script>
-import mixin from './tableMixin.js';
-import Page from '@model/Page';
-import { formatDate } from '@src/util/lang';
+import mixin from "./tableMixin.js";
+import Page from "@model/Page";
+import { formatDate } from "@src/util/lang";
 
 import {
   getPageLinkPart,
   getPageLinkWiki,
   getPageLinkProduct,
   removePartOrWiki,
-} from '@src/api/ProductV2Api';
+} from "@src/api/ProductV2Api";
 
 export default {
-  name: 'product-menu-mini-table',
+  name: "product-menu-mini-table",
   props: {
     id: {
       type: Number | String,
     },
     pageType: {
       type: String,
-      default: 'view',
+      default: "view",
     },
     dataType: {
       type: String,
@@ -234,8 +234,8 @@ export default {
   },
   filters: {
     formatDate(val) {
-      if (!val) return '';
-      return formatDate(val, 'YYYY-MM-DD HH:mm:ss');
+      if (!val) return "";
+      return formatDate(val, "YYYY-MM-DD HH:mm:ss");
     },
   },
   mixins: [mixin],
@@ -268,7 +268,7 @@ export default {
           } else {
             this.$notify.close();
             this.$notify.error({
-              title: '网络错误',
+              title: "网络错误",
               message: res.message,
               duration: 2000,
             });
@@ -284,13 +284,13 @@ export default {
     dlete(data) {
       this.$confirm(
         `此操作将删除该目录所关联的${
-          this.dataType == 'part' ? '备件' : '知识库'
+          this.dataType == "part" ? "备件" : "知识库"
         }?`,
-        '提示',
+        "提示",
         {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning',
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning",
         }
       )
         .then(() => {
@@ -302,12 +302,12 @@ export default {
             if (res.code == 0) {
               this.reflash();
               window.parent.flashSomePage({
-                type: 'M_PRODUCT_CATALOG',
+                type: "M_PRODUCT_CATALOG",
               });
             } else {
               this.$notify.close();
               this.$notify.error({
-                title: '网络错误',
+                title: "网络错误",
                 message: res.message,
                 duration: 2000,
               });
@@ -334,35 +334,38 @@ export default {
     },
     // 新页面打开通知公告详情
     openFrame(id) {
-      let fromId = window.frameElement.getAttribute('id');
+      let fromId = window.frameElement.getAttribute("id");
 
       this.$platform.openTab({
         id: `document_detail_${this.detail.id}`,
-        title: '知识库列表',
+        title: "知识库列表",
         url: `/wiki/detail/page?wikiId=${this.detail.id}`,
         reload: true,
         close: true,
         fromId,
       });
     },
-    openProductMenuTab(id) {
-      let fromId = '';
+    openMenuTab(id) {
+      let fromId = "";
       try {
-        fromId = window.frameElement.getAttribute('id');
+        fromId = window.frameElement.getAttribute("id");
       } catch (error) {}
-
       this.$platform.openTab({
         id: `${
-          this.dataType == 'part'
-            ? 'productV2_productMenu_view_' : this.dataType == 'wiki'
-              ? 'document_detail_' : 'product_detail_'
+          this.dataType == "part"
+            ? "partV2_category_detail_" : this.dataType == "wiki"
+              ? "document_detail_" : "product_detail_"
         }${id}`,
-        title: '知识库列表',
+        title: `${
+          this.dataType == "part"
+            ? "备件品类详情" : this.dataType == "wiki"
+              ? "知识库详情" : "产品详情"
+        }`,
         close: true,
         url: `${
-          this.dataType == 'part'
-            ? '/productV2/catalog/view?id=' : this.dataType == 'wiki'
-              ? '/wiki/detail/page?wikiId=' : '/customer/product/view/'
+          this.dataType == "part"
+            ? "/partV2/category/detail?id=" : this.dataType == "wiki"
+              ? "/wiki/detail/page?wikiId=" : "/customer/product/view/"
         }${id}`,
         fromId,
       });

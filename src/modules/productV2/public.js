@@ -1,11 +1,13 @@
 const catalogFieldFix = [
   {
-    displayName: "产品目录",
+    displayName: "目录层级",
     fieldName: "pathName",
+    formType: "related_catalog",
     isExport: false,
     show: true,
     orderId: -1,
     isSystem: 1,
+    onlyTable:true,
     tableName:"catalog",
   },
   {
@@ -53,6 +55,38 @@ const catalogFieldFix = [
     isSystem: 1,
     tableName:"catalog",
   },
+]
+
+const catalogFieldFixForProduct = [
+  {
+    displayName: "产品视频",
+    fieldName: "productVideo",
+    formType: "attchment",
+    isExport: false,
+    show: true,
+    orderId: -0.9,
+    isSystem: 1,
+    tableName:"catalog",
+  },
+  {
+    displayName: "产品图片",
+    fieldName: "productPic",
+    formType: "attchment",
+    isExport: false,
+    show: true,
+    orderId: -0.8,
+    isSystem: 1,
+    tableName:"catalog",
+  },
+  {
+    displayName: "产品数量",
+    fieldName: "productNum",
+    formType: "text",
+    isExport: true,
+    show: true,
+    isSystem: 1,
+    tableName:"catalog",
+  }
 ]
 
 const productFieldFix = [
@@ -106,5 +140,6 @@ const productFieldFix = [
 
 export {
   catalogFieldFix,
-  productFieldFix
+  productFieldFix,
+  catalogFieldFixForProduct
 }

@@ -226,7 +226,7 @@
             "
             :min-width="column.minWidth || '120px'"
             :sortable="column.sortable"
-            :show-overflow-tooltip="column.field !== 'name' && column.fieldName !== 'pathName' && column.fieldName !== 'productVideo' && column.fieldName !== 'productPic'"
+            :show-overflow-tooltip="column.field !== 'name' && column.fieldName !== 'productPic'"
             :align="column.align"
           >
             <template slot-scope="scope">
@@ -235,7 +235,7 @@
                   <template slot="content" slot-scope="{ isContentTooltip }">
                     <el-tooltip
                       :content="scope.row[column.field]"
-                      placement="top"
+                      placement="top-start"
                       :disabled="!isContentTooltip"
                     >
                       <a
@@ -285,7 +285,7 @@
                     class="item"
                     effect="dark"
                     :content="scope.row.latesetUpdateRecord"
-                    placement="top"
+                    placement="top-start"
                   >
                     <div @mouseover="showLatestUpdateRecord(scope.row)">
                       {{ scope.row.updateTime | formatDate }}
@@ -350,19 +350,20 @@
               <template v-else-if="column.fieldName === 'pathName'">
                 <sample-tooltip :row="scope.row">
                   <template slot="content" slot-scope="{ isContentTooltip }">
-                    <el-tooltip
+                    <!-- <el-tooltip
                       :content="scope.row[column.field]"
-                      placement="top"
+                      placement="top-start"
                       :disabled="!isContentTooltip"
+                    > -->
+
+                    <a
+                      href=""
+                      class="view-detail-btn"
+                      @click.stop.prevent="openProductMenuTab(scope.row.catalogId)"
                     >
-                      <a
-                        href=""
-                        class="view-detail-btn"
-                        @click.stop.prevent="openProductMenuTab(scope.row.id)"
-                      >
-                        {{ scope.row[column.field] }}
-                      </a>
-                    </el-tooltip>
+                      {{ scope.row[column.field] }}
+                    </a>
+                    <!-- </el-tooltip> -->
                   </template>
                 </sample-tooltip>
               </template>
@@ -398,24 +399,18 @@
                 <template v-if="scope.row.productVideo">
                   <sample-tooltip :row="scope.row">
                     <template slot="content" slot-scope="{ isContentTooltip }">
-                      <el-tooltip
-                        :content="scope.row.productVideo[0].filename"
-                        placement="top"
-                        :disabled="!isContentTooltip"
+                      <a
+                        href=""
+                        class="view-detail-btn"
+                        @click.stop.prevent="
+                          previewVideo(scope.row.productVideo[0].url)
+                        "
                       >
-                        <a
-                          href=""
-                          class="view-detail-btn"
-                          @click.stop.prevent="
-                            previewVideo(scope.row.productVideo[0].url)
-                          "
-                        >
-                          {{
-                            scope.row.productVideo[0] &&
-                              scope.row.productVideo[0].filename
-                          }}
-                        </a>
-                      </el-tooltip>
+                        {{
+                          scope.row.productVideo[0] &&
+                            scope.row.productVideo[0].filename
+                        }}
+                      </a>
                     </template>
                   </sample-tooltip>
                 </template>
@@ -437,7 +432,7 @@
 
       <div class="table-footer">
         <div class="list-info">
-          共<span class="level-padding">{{ page.total }}</span
+          共<span class="level-padding">{{ page.totalElements }}</span
           >记录， 已选中<span
             class="product-selected-count"
             @click="multipleSelectionPanelShow = true"
@@ -456,7 +451,7 @@
           :page-size="page.pageSize"
           :current-page="page.pageNum"
           layout="prev, pager, next, sizes, jumper"
-          :total="page.total"
+          :total="page.totalElements"
         >
         </el-pagination>
       </div>
@@ -530,12 +525,12 @@
       title="导入产品"
       ref="importProductModal"
       @success="search"
-      action="/excels/customer/customerProductImport"
+      action="/excels/customer/customerProductImportNew"
     >
       <div slot="tip">
         <div class="base-import-warn">
           <p>
-            请先下载<a href="/product/import/template">导入模版 </a
+            请先下载<a href="/product/import/templateNew">导入模版 </a
             >，填写完成后再上传导入。
           </p>
           <!--<p>导入产品前，请确保产品所属客户已存在。您可以 <a href="/customer/import/getAllCustomerId">点这里</a>导出包含所有已存在客户的模板</p>-->
@@ -552,17 +547,17 @@
       :validate="checkExportCount"
       :needchoose-break="false"
       method="post"
-      action="/excels/customer/customerProduct"
+      action="/excels/customer/customerProductNew"
     />
     <!-- end 导出工单 -->
 
     <batch-update-dialog
       ref="batchUpdateDialog"
       :selected-ids="selectedIds"
-      :total-items="page.total"
+      :total-items="page.totalElements"
       :build-download-params="buildParams"
       @success="search"
-      action="/excels/customer/customerProductUpdateBatch"
+      action="/excels/customer/customerProductUpdateBatchNew"
     ></batch-update-dialog>
     <biz-select-column ref="advanced" @save="saveColumnStatus" />
     <!-- <base-table-advanced-setting ref="advanced" @save="modifyColumnStatus"/> -->
@@ -595,17 +590,17 @@ import { getRootWindow } from "@src/util/dom";
 import SendMessageDialog from "@src/modules/product/components/SendMessageDialog.vue";
 import BatchEditingDialog from "@src/modules/product/components/BatchEditingDialog.vue";
 import BatchRemindingDialog from "@src/modules/product/components/BatchRemindingDialog.vue";
-import BatchUpdateDialog from "@src/modules/product/components/BatchUpdateDialog.vue";
+import BatchUpdateDialog from "@src/modules/product/components/BatchUpdateDialogV2.vue";
 import SearchPanel from "@src/modules/productV2/productList/compoment/SearchPanel.vue";
 import { storageGet, storageSet } from "@src/util/storage";
 
 import {
-  getProduct,
+  getProductV2,
   deleteProductByIds,
   getUpdateRecord,
 } from "@src/api/ProductApi";
 
-import {catalogFieldFix, productFieldFix} from "@src/modules/productV2/public.js";
+import {catalogFieldFixForProduct, productFieldFix} from "@src/modules/productV2/public.js";
 import {getListProductFields} from "@src/api/ProductV2Api"
 import TeamMixin from "@src/mixins/teamMixin";
 import { isShowCustomerRemind } from "@src/util/version.ts";
@@ -648,7 +643,7 @@ export default {
       selectColumnState:"product_list_select",
       // 头部筛选列表 s
       selectList: [
-        { name: "全部目录", key:"catalogState", value:"" },
+        { name: "全部", key:"catalogState", value:"" },
         { name: "有目录", key:"catalogState", value:1 },
         { name: "无目录", key:"catalogState", value:0 }
       ], 
@@ -727,7 +722,7 @@ export default {
       }
 
       return this.dynamicFields
-        .concat([...fixedFields, ...catalogFieldFix])
+        .concat([...fixedFields, ...catalogFieldFixForProduct])
         .filter(
           (f) =>
             f.formType !== "separator"
@@ -796,6 +791,12 @@ export default {
             f.orderId = 0;
             f.show = true;
           }
+          if (f.fieldName === "catalogId" && f.tableName == "product") {
+            f.fieldName = "pathName"
+          }
+
+          // 系统字段默认显示
+          f["show"] = f.isSystem ? true : f.show 
 
           return f;
         })
@@ -977,7 +978,7 @@ export default {
 
     openProductTab(productId) {
       let fromId = window.frameElement.getAttribute("id");
-
+      console.log(productId)
       this.$platform.openTab({
         id: `product_view_${productId}`,
         title: "产品详情",
@@ -990,12 +991,12 @@ export default {
       const params = this.buildParams();
       this.loading = true;
 
-      return getProduct(params)
+      return getProductV2(params)
         .then((res) => {
           this.loading = false;
           // this.page = Page.as(Object.freeze(res.result));
           let { number, content, totalPages, totalElements, size } = res.result;
-          if(content.length) content.map((item)=> {if(item.catalog){
+          if(content.length) content = content.map((item)=> {if(item.catalog){
             item = {...item, ...item.catalog};
             if(item.catalog.catalogAttribute){
               item.attribute = {...item.attribute, ...item.catalog.catalogAttribute}
@@ -1005,6 +1006,7 @@ export default {
 
           this.page["list"] = content;
           this.page["total"] = totalPages;
+          this.page["totalElements"] = totalElements
           this.page["pageNum"] = number;
           this.page["pageSize"] = size
           this.matchSelected();
@@ -1295,7 +1297,6 @@ export default {
     },
     showAdvancedSetting() {
       window.TDAPP.onEvent("pc：产品管理-选择列事件");
-      console.log(this.columns)
       this.$refs.advanced.open(this.columns);
     },
     /**
@@ -1470,7 +1471,7 @@ export default {
           ...all,
           ...{
             exportTotal: exportAll
-              ? this.page.total : this.selectedIds.length,
+              ? this.page.totalElements : this.selectedIds.length,
           },
         }),
       };
@@ -1536,7 +1537,7 @@ export default {
     /** 检测导出条数 */
     checkExportCount(ids, max) {
       let exportAll = !ids || !ids.length;
-      return exportAll && this.page.total > max
+      return exportAll && this.page.totalElements > max
         ? "为了保障响应速度，暂不支持超过5000条以上的数据导出，请您分段导出。"
         : null;
     },
@@ -1765,7 +1766,6 @@ export default {
     &-nav {
       > div {
         position: relative;
-        cursor: pointer;
         border-top: 1px solid #F5F5F5;
         .state {
           padding-top: 4px;
@@ -1792,6 +1792,7 @@ export default {
               overflow-y: hidden;
               color: #808080;
               line-height: 30px;
+              cursor: pointer;
               &:hover {
                 color: #333;
               }

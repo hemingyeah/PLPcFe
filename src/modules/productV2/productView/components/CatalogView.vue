@@ -1,6 +1,6 @@
 <!--  -->
 <template>
-  <div>
+  <div v-loading="loading">
     <form-view
       class="task-tab-container task-view-containner"
       :fields="fields"
@@ -19,7 +19,7 @@
           <div class="form-view-row-content">
             {{
               dataInfo.linkman &&
-                dataInfo.linkman.name + ' ' + dataInfo.linkman.phone
+                dataInfo.linkman.name + " " + dataInfo.linkman.phone
             }}
           </div>
         </div>
@@ -76,6 +76,7 @@ import { getProductMenuField, getPageInfo } from "@src/api/ProductV2Api";
 import MiniTable from "@src/modules/productV2/productMenu/WorkTree/compoment/MiniTable.vue";
 export default {
   name: "catalog-view",
+  inject: ["changeDataInfo"],
   props: {
     propData: {
       type: Object,
@@ -91,6 +92,7 @@ export default {
       flashProductType: true,
       fields: [],
       dataInfo: {},
+      loading: false,
     };
   },
   created() {
@@ -117,31 +119,40 @@ export default {
     this.resetPage();
   },
   methods: {
-    resetPage() {
+    resetPage(id) {
+      if (!this.propData.id && !id) return;
+      this.loading = true;
       getPageInfo({
-        id: this.propData.id,
-      }).then((res) => {
-        if (res.code == 0) {
-          res.result.catalogInfo.productVideo = res.result.catalogInfo.productVideo || [];
-          res.result.catalogInfo.productPic = res.result.catalogInfo.productPic || [];
-          res.result.catalogInfo.productExplain = res.result.catalogInfo.productExplain || [];
-          if (res.result.selectField.length) {
-            this.fields.map((item) => {
-              if (res.result.selectField.indexOf(item.id) > -1)
-                item["hideform"] = true;
-              else item["hideform"] = false;
-              return item;
+        id: id || this.propData.id,
+      })
+        .then((res) => {
+          if (res.code == 0) {
+            res.result.catalogInfo.productVideo = res.result.catalogInfo.productVideo || [];
+            res.result.catalogInfo.productPic = res.result.catalogInfo.productPic || [];
+            res.result.catalogInfo.productExplain = res.result.catalogInfo.productExplain || [];
+            if (res.result.selectField.length) {
+              this.fields.map((item) => {
+                if (res.result.selectField.indexOf(item.id) > -1)
+                  item["hideform"] = true;
+                else item["hideform"] = false;
+                return item;
+              });
+            }
+            this.changeDataInfo({
+              catalogPathName: res.result.catalogInfo.pathName,
+            });
+            this.$set(this, "dataInfo", res.result.catalogInfo);
+          } else {
+            this.$notify.error({
+              title: "网络错误",
+              message: res.message,
+              duration: 2000,
             });
           }
-          this.$set(this, "dataInfo", res.result.catalogInfo);
-        } else {
-          this.$notify.error({
-            title: "网络错误",
-            message: res.message,
-            duration: 2000,
-          });
-        }
-      });
+        })
+        .finally(() => {
+          this.loading = false;
+        });
     },
   },
 };

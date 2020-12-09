@@ -43,8 +43,8 @@
 
     <div class="dialog-footer" style="margin-top: 15px;">
       <el-button @click="visible = false">取 消</el-button>
-      <el-button type="primary" @click="bind" :disabled="pending"
-      >绑定</el-button
+      <el-button type="primary" @click="bind" :loading="pending"
+      >关联</el-button
       >
     </div>
   </base-modal>
@@ -54,9 +54,7 @@
 import {
   searchQrcode,
   searchAllcatalog,
-  setPageRelationProduct,
 } from "@src/api/ProductV2Api";
-import { bindQrcode } from "@src/api/ProductApi";
 import _ from "lodash";
 
 export default {
@@ -107,51 +105,25 @@ export default {
     open() {
       this.visible = true;
     },
+    close() {
+      this.visible = false;
+    },
     bind() {
-      if (!this.nowChooseArr || !this.productId) return;
+      if (!this.nowChooseArr) return;
 
       this.pending = true;
       if (this.dialogType == "linkQrcode") {
-        bindQrcode({
-          productId: this.productId,
-          qrocdeId: this.nowChooseArr,
-        })
-          .then((res) => {
-            if (res.status)
-              return this.$platform.notification({
-                title: "失败",
-                message: res.message || "发生未知错误",
-                type: "error",
-              });
-            this.reset();
-            this.$emit("dialogBind");
-            // this.$eventBus.$emit("product_view.update_detail");
-            // this.$eventBus.$emit("product_info_record.update_record_list");
-            return this.$platform.notification({
-              title: "绑定二维码成功",
-              type: "success",
-            });
-          })
-          .catch((e) => console.error("e", e))
-          .finally(() => {
-            this.pending = false;
-          });
+        this.$emit("dialogBind", { qrcodeId: this.nowChooseArr });
       } else {
-        setPageRelationProduct({
-          catalogId: this.nowChooseArr,
-          productIds: [this.productId],
-        })
-          .then((res) => {
-            this.$emit("dialogBind", {catalogId:this.nowChooseArr});
-          })
-          .finally(() => {
-            this.pending = false;
-          });
+        this.$emit("dialogBind", { catalogId: this.nowChooseArr });
       }
     },
     reset() {
       this.visible = false;
       this.nowChooseArr = "";
+    },
+    changeLoading(e) {
+      this.pending = e;
     },
 
     lenovoselectSearchData: _.debounce(function(e) {
@@ -186,5 +158,9 @@ export default {
 
 .el-select-dropdown__item {
   height: auto;
+}
+.dialog-footer {
+  display: flex;
+  justify-content: flex-end;
 }
 </style>

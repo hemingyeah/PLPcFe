@@ -1,4 +1,4 @@
-import { getRootWindow } from './dom';
+import { getRootWindow } from "./dom";
 
 const RootWindow = getRootWindow(window);
 
@@ -8,7 +8,7 @@ function getGrayOptions() {
     options = JSON.parse(RootWindow._init);
   } catch (error) {
     options = {};
-    console.warn('getGrayOptions -> error', error)
+    console.warn("getGrayOptions -> error", error)
   }
 
   return options;
@@ -24,7 +24,21 @@ function getCustomerApiPath (){
     isGrayCustomer = false;
   }
   
-  return ''
+  return ""
+}
+
+function getProductV2ApiPath (){
+  // 超级二维码和产品改造灰度
+  let isGrayProductV2 = false;
+  
+  try {
+    let options = getGrayOptions();
+    isGrayProductV2 = options.openSuperCode === true;
+  } catch (error) {
+    isGrayProductV2 = false;
+  }
+  
+  return isGrayProductV2
 }
 
 function getProductApiPath (){
@@ -37,10 +51,11 @@ function getProductApiPath (){
     isGrayProduct = false;
   }
   
-  return ''
+  return ""
 }
 
 export default {
   getCustomerApiPath,
-  getProductApiPath
+  getProductApiPath,
+  getProductV2ApiPath
 };

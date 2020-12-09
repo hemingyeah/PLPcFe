@@ -238,7 +238,7 @@ router.use("/api/customer/outside/pc", (ctx) =>
   })
 );
 
-router.use("/api/customer/outside/es", (ctx) =>
+router.use("/api/elasticsearch/outside/es", (ctx) =>
   HttpClient.proxy(ctx, {
     host: "30.40.58.216",
     port: 10006,

@@ -287,7 +287,6 @@ function searchQrcode(params) {
 /**
  * 搜索所有的产品目录
  * @param params
- *   id : 产品id
  * @returns {*}
  */
 function searchAllcatalog(params) {

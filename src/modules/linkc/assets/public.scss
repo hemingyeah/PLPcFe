@@ -3,13 +3,6 @@
   min-width: 650px;
 }
 
-.al-end {
-  align-items: flex-end;
-}
-
-.al-s {
-  align-items: stretch;
-}
 
 .flex-x {
   display: flex;
@@ -18,11 +11,19 @@
 .flex-y {
   display: flex;
   flex-direction: column;
-  align-items: center;
 }
 
 .flex-1 {
   flex: 1;
+}
+
+
+.al-end {
+  align-items: flex-end !important;
+}
+
+.al-s {
+  align-items: stretch !important;
 }
 
 .flex-w {
@@ -30,7 +31,7 @@
 }
 
 .al-start {
-  align-items: flex-start;
+  align-items: flex-start !important;
 }
 
 .cur-point {
@@ -482,4 +483,18 @@
 
 .normal-form-view-box{
   padding: 8px 20px;
+}
+
+.scroll-y{
+  overflow-y: scroll;
+}
+
+.scroll-box-y{
+  height: 100vh;
+  overflow: hidden;
+}
+.normal-btn-box{
+  padding: 12px 0;
+  display: flex;
+  align-items: center;
 }

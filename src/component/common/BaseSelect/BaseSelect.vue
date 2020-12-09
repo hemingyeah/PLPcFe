@@ -39,7 +39,7 @@
         <ul class="option-list" v-loadmore="loadmoreOptions" ref="list">
          
       
-          <li v-for="op in optionList" :key="getValueKey(op)" @click="selectTag(op)" :class="{'selected': value.some(user => user[valueKey] ===op[valueKey])}">
+          <li v-for="(op, index) in optionList" :key="index" @click="selectTag(op)" :class="{'selected': value.some(user => user[valueKey] ===op[valueKey])}">
             <slot name="option" :option="op" v-if="optionSlot"> </slot>
             <template v-else>{{op.label}}</template>
             <div class="checked"></div>
@@ -53,9 +53,9 @@
 </template>
 
 <script>
-import Clickoutside from '@src/util/clickoutside';
-import Page from '@model/Page';
-import _ from 'lodash'
+import Clickoutside from "@src/util/clickoutside";
+import Page from "@model/Page";
+import _ from "lodash"
 
 /**
  * Todo
@@ -71,7 +71,7 @@ import _ from 'lodash'
  * 10.
  */
 export default {
-  name: 'base-select',
+  name: "base-select",
   props: {
     remoteMethod: Function,
     value: {
@@ -80,7 +80,7 @@ export default {
     },
     valueKey: {
       type: String,
-      default: 'value'
+      default: "value"
     },
     error: {
       type: Boolean,
@@ -99,7 +99,7 @@ export default {
     },
     placeholder: {
       type: String,
-      default: ''
+      default: ""
     },
     disabled: {
       type: Boolean,
@@ -111,7 +111,7 @@ export default {
       showList: false,
       pending: false,
       isFocus: false,
-      keyword: '',
+      keyword: "",
       loadmoreOptions: {
         disabled: false,
         callback: this.loadmore,
@@ -134,20 +134,20 @@ export default {
     message() {
       const {total, hasNextPage, } = this.page;
       if (this.pending) {
-        return '载入更多结果......';
+        return "载入更多结果......";
       }
       if (!total) {
-        return '未找到结果';
+        return "未找到结果";
       }
       if (!hasNextPage) {
-        return '已加载全部结果';
+        return "已加载全部结果";
       }
-      return '载入更多结果......';
+      return "载入更多结果......";
     },
   },
   methods: {
     getValueKey(op){
-      return op[this.valueKey];
+      return `${op[this.valueKey]}`;
     },
     focusInput() {
       if (!this.disabled) {
@@ -159,14 +159,14 @@ export default {
       this.showList = false;
       this.isFocus = false;
       this.pending = true;
-      this.resetStatus('');
+      this.resetStatus("");
     },
     clearValue() {
-      this.$emit('input', []);
+      this.$emit("input", []);
     },
     removeTag(tag) {
       const newVal = this.value.filter(t => t[this.valueKey] !== tag[this.valueKey]);
-      this.$emit('input', newVal);
+      this.$emit("input", newVal);
     },
     selectTag(tag) {
       let newValue = this.value;
@@ -184,7 +184,7 @@ export default {
         }
       }
 
-      this.$emit('input', newValue);
+      this.$emit("input", newValue);
     },
     async loadmore(){
       this.loadmoreOptions.disabled = true;
@@ -195,7 +195,7 @@ export default {
         const res = await this.search();
         this.page.merge(res);
       } catch (e) {
-        console.error('e', e);
+        console.error("e", e);
       }
     },
     search() {
@@ -223,7 +223,7 @@ export default {
           this.page = Page.as(res);
         })
         .catch(e => {
-          console.log('searchByKeyword catch e', e)
+          console.log("searchByKeyword catch e", e)
         });
     }, 800),
     initList() {
@@ -238,11 +238,11 @@ export default {
           this.page = Page.as(res);
         })
         .catch(e => {
-          console.log('initList catch e', e)
+          console.log("initList catch e", e)
         });
     },
     resetStatus(keyword) {
-      this.keyword = keyword || '';
+      this.keyword = keyword || "";
       this.page = new Page();
     },
     close() {
