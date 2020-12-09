@@ -350,6 +350,8 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
       userIds: users.map(user => user.userId)
     }
     
+    Log.info(this.selectTeams.slice(), this.buildSearchUserParams.name, this.buildSearchUserParams.name)
+
     // 团队数据
     if (this.selectTeams.length > 0) {
       params.tagIds = this.selectTeams.map(team => (team.id || ''))
@@ -490,6 +492,8 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
     let fetchTagListFunc = this.isReAllot ? getTaskRedeployTagList : getTaskDispatchTagList
     
     params.customerId = this.customer.id || ''
+    
+    Log.info(params, this.fetchTagList.name, this.fetchTagList.name)
     
     return (
       fetchTagListFunc(params)
@@ -857,6 +861,9 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
       
       this.visibleTeams = tags
       this.TaskAllotExcutorComponent.outsideSetCustomerTags(tags.slice())
+      
+      Log.info(this.visibleTeams.slice(), 'visibleTeams', this.matchTags.name)
+      Log.info(this.selectTeams.slice(), 'selectTeams', this.matchTags.name)
       
     } catch (error) {
       console.warn('TaskAllotUserTableMethods -> matchTags -> error', error)
