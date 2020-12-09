@@ -10,6 +10,7 @@ import FormRepeatSetting from '@src/component/form/common/setting/FormRepeatSett
 import FormVisibleSetting from '@src/component/form/common/setting/FormVisibleSetting.vue';
 import FormDisplaymodeSetting from '@src/component/form/common/setting/FormDisplaymodeSetting.vue';
 import FormDefaultValueSetting from '@src/component/form/common/setting/FormDefaultValueSetting.vue';
+import FormPublicSetting from '@src/component/form/common/setting/FormPublicSetting.vue';
 
 const SettingMixin = {
   computed: {
@@ -32,6 +33,15 @@ const SettingMixin = {
     // 工单移动端展示最大数量
     taskMobileShowMaxLengthMax() {
       return config.TASK_MOBILE_SHOW_MAX_LENGTH_MAX;
+    },
+    /** 
+    * @description 允许设为公用字段
+    * 1.工单表单或回执表单
+    * 2.且不是公共字段
+    */
+    allowPublicSet() {
+      let modeArr = ['task', 'task_receipt'];
+      return modeArr.indexOf(this.mode) > -1 && !this.field.isCommon;
     }
   },
   components: {
@@ -43,7 +53,8 @@ const SettingMixin = {
     [FormRepeatSetting.name]: FormRepeatSetting,
     [FormVisibleSetting.name]: FormVisibleSetting,
     [FormDisplaymodeSetting.name]: FormDisplaymodeSetting,
-    [FormDefaultValueSetting.name]: FormDefaultValueSetting
+    [FormDefaultValueSetting.name]: FormDefaultValueSetting,
+    [FormPublicSetting.name]: FormPublicSetting
   }
 }
 

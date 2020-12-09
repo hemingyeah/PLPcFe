@@ -281,7 +281,7 @@ const FormDesign = {
       let groupFields = this.availableFields.filter(item => item.isSystem == 0 && item.formType != 'info' && item.formType != 'separator');
       let layoutFields = this.availableFields.filter(item => item.formType == 'info' || item.formType == 'separator');
       let sysFields = this.availableFields.filter(f => f.isSystem == 1);
-      sysFields = sysFields.filter(f => this.value.findIndex(v => v.formType == f.formType) == -1);
+      
       if(groupFields.length){
         let basisObj = {};
         basisObj.name = "基础"
@@ -430,6 +430,9 @@ const FormDesign = {
     },
     /** 开始插入字段 */
     beginInsert(field, event) {
+      // 禁止拖拽
+      if (this.draggingDisable(field)) return;
+
       // 屏蔽非鼠标左键的点击事件
       if(event.button !== 0) return;
 
@@ -741,6 +744,9 @@ const FormDesign = {
     },
     /** 立即插入字段 */
     immediateInsert(field, event) {
+      // 禁止拖拽
+      if (this.draggingDisable(field)) return;
+
       let dragEvent = this.$data.$dragEvent;
       if (dragEvent) dragEvent.direction = 0;
 
@@ -784,7 +790,7 @@ const FormDesign = {
 
       return fields.map(field => {
         return (
-          <div class="form-design-field-wrap"
+          <div class={['form-design-field-wrap', {'disabled': this.draggingDisable(field)}]}
             onMousedown={e => this.beginInsert(field, e)}
             onClick={e => this.immediateInsert(field, e)}>
             <div class="form-design-field form-design__ghost"> 
@@ -868,6 +874,12 @@ const FormDesign = {
     onShowBaseModal() {
       if(this.hiddenFields.length==0) return this.$platform.confirm('暂无隐藏字段');
       this.show = true;
+    },
+    /** 
+    * @description 禁止拖拽
+    */
+    draggingDisable(field) {
+      return this.value.findIndex(v => v.fieldName == field.fieldName) > 0;
     }
   },
   render(h){
