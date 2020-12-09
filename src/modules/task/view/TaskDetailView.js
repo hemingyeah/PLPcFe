@@ -950,11 +950,11 @@ export default {
       } else if (action === "finish") {
         this.$refs.taskReceiptEdit.openDialog();
       } else if (action === "balance") {
-        // this.rightActiveTab = "balance-tab";
-        // this.$refs.taskAccount.openDialog("create");
+        this.rightActiveTab = "balance-tab";
+        this.$refs.taskAccount.openDialog("create");
       } else if (action === "feedback") {
-        // this.rightActiveTab = "feedback-tab";
-        // this.$refs.taskFeedback.feedback();
+        this.rightActiveTab = "feedback-tab";
+        this.$refs.taskFeedback.feedback();
       } else if (action === "timeAxis") {
         this.$refs.timeAxis.openDialog();
       }
@@ -1184,7 +1184,7 @@ export default {
       if (query.active == "balance" && this.viewBalanceTab && this.allowBalanceTask) {
         this.openDialog("balance");
       } else {
-        // this.rightActiveTab = this.viewBalanceTab ? "balance-tab" : this.viewFeedbackTab ? "feedback-tab" : "card-tab";
+        this.rightActiveTab = this.viewBalanceTab ? "balance-tab" : this.viewFeedbackTab ? "feedback-tab" : "record";
       }
       
       // 是否显示详情向导
