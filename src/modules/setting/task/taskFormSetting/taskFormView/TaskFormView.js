@@ -2,8 +2,13 @@
 import taskFormSettingMixin from './../common/taskFormSettingMixin';
 /* api */
 import * as TaskApi from '@src/api/TaskApi.ts';
+import * as CustomerApi from '@src/api/CustomerApi';
+import * as ProductApi from '@src/api/ProductApi';
 /* util */
 import * as FormUtil from '@src/component/form/util';
+
+// 关联字段禁用的类型
+const RELATION_DISABLE_FIELDS = ['attachment', 'autograph', 'separator', 'info'];
 
 export default {
   name: 'task-form-setting-view',
@@ -20,7 +25,11 @@ export default {
   },
   data(){
     return {
-      mode: 'task'
+      mode: 'task',
+      relationOptions: { // 关联查询字段关联项数据
+        customerFields: [],
+        productFields: []
+      }
     }
   },
   async mounted() {
@@ -39,11 +48,94 @@ export default {
       this.fields = FormUtil.toFormField(sortedFields);
       this.init = true;
 
+      // 获取客户和产品关联字段关联项数据
+      this.getCustomerFields();
+      this.getProductFields();
+
     } catch (error) {
       console.log('task-form-setting-view: mounted -> error', error)
     }
   },
   methods: {
+    /** 
+    * @description 获取客户关联查询字段关联项数据
+    */
+    getCustomerFields() {
+      CustomerApi.getCustomerFields({ isFromSetting: true })
+        .then(res => {
+          if (res.succ) {
+            // 过滤自定义字段且非禁用类型
+            let fields = res.data.filter(field => field.isSystem == 0 && RELATION_DISABLE_FIELDS.indexOf(field.formType) == -1);
+
+            fields.unshift({
+              'fieldId':'serialNumber',
+              'tableName':'customer',
+              'fieldName':'serialNumber',
+              'displayName':'客户编号',
+              'isSystem':'0',
+              'isSearch':'1',
+              'isAppShow':'0',
+              'formType':'text'
+            }, {
+              'fieldId':'tags',
+              'tableName':'customer',
+              'fieldName':'tags',
+              'displayName':'服务团队',
+              'isSystem':'0',
+              'isSearch':'1',
+              'isAppShow':'0',
+              'formType':'selectMulti'
+            }, {
+              'fieldId':'customerManager',
+              'tableName':'customer',
+              'fieldName':'customerManager',
+              'displayName':'客户负责人',
+              'isSystem':'0',
+              'isSearch':'1',
+              'isAppShow':'0',
+              'formType':'text'
+            })
+            
+            this.relationOptions.customerFields = fields;
+          }
+        })
+        .catch(err => console.warn(err));
+    },
+    /** 
+    * @description 获取产品关联查询字段关联项数据
+    */
+    getProductFields() {
+      ProductApi.getProductFields({ isFromSetting: true })
+        .then(res => {
+          if (res.succ) {
+            // 过滤自定义字段且非禁用类型
+            let fields = res.data.filter(field => field.isSystem == 0 && RELATION_DISABLE_FIELDS.indexOf(field.formType) == -1);
+
+            fields.unshift({
+              'fieldId':'serialNumber',
+              'tableName':'customer',
+              'fieldName':'serialNumber',
+              'displayName':'产品编号',
+              'isSystem':'0',
+              'isSearch':'1',
+              'isAppShow':'1',
+              'formType':'text'
+            }, {
+              'fieldId':'type',
+              'tableName':'customer',
+              'fieldName':'type',
+              'displayName':'产品类型',
+              'isSystem':'0',
+              'isSearch':'1',
+              'isAppShow':'1',
+              'formType':'select'
+            })
+
+            this.relationOptions.productFields = fields;
+          }
+        })
+        .catch(err => console.warn(err));
+    },
     /** 
     * @description 提交表单字段设置
     */

@@ -216,6 +216,10 @@ const FormDesign = {
     max: {
       type: Number,
       default: config.FORM_FIELD_MAX
+    },
+    relationFieldOptions: { // 关联查询字段关联项数据
+      type: Object,
+      default: () => {}
     }
   },
   data(){

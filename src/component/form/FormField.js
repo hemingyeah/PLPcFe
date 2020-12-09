@@ -95,10 +95,6 @@ export default class FormField{
     // 辅助字段
     this.dragging = false; // 当前字段时候正在被拖拽
 
-    if(params.relation_options) {
-      this.relation_options = params.relation_options;
-    }
-
   }
 
   /** @deprecated 兼容旧有写法*/
@@ -126,10 +122,6 @@ export default class FormField{
     option.isAppShow = field.isAppShow;
     option.isHidden = field.isHidden;
     option.isCommon = field.isPublic;
-
-    if(field.relation_options) {
-      option.relation_options = field.relation_options;
-    }
 
     let setting = {};
     let defaultValue = null;
