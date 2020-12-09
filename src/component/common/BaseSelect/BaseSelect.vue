@@ -470,6 +470,6 @@ export default {
   }
 }
 .base-select-main-content {
-
+  height: 100% !important;
 }
 </style>
