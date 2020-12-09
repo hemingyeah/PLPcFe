@@ -47,6 +47,9 @@
     <!-- 柱状图 -->
     <div class="abnormal-piechart">
       <h3>工单异常原因统计</h3>
+      <div class="abnormal-tab task-flex task-ai">
+        <div v-for="(item, index) in tabList" :key="index" @click="TabSwitch(item)" :class="{'active': checkTab === item}">{{item}}</div>
+      </div>
       <div id="columnar" ref="columnar"></div>
       <div class="abnormal-ant">
         <base-button
@@ -97,6 +100,21 @@ export default Abnormal;
     padding: 20px 30px;
     border-radius: 4px;
     margin-top: 10px;
+  }
+  &-tab {
+    justify-content: center;
+    cursor: pointer;
+    >div {
+      height: 34px;
+      padding: 10px 24px;
+      color: #666;
+      background-color: #ccc;
+      padding-top: 8px;
+    }
+    .active {
+      background-color: #13C2C2;
+      color: #fff;
+    }
   }
   .abnormal-ant {
     display: flex;

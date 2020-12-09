@@ -53,6 +53,8 @@ export default {
       pieTabList: [], //饼行table列表
       columnarTabList: [], //柱状图table列表
       tableNames: PIETABLELIST,
+      tabList: ['全部', '拒绝', '暂停'],
+      checkTab: '全部'
     }
   },
   components: {
@@ -134,6 +136,7 @@ export default {
           }
         },
         grid: {
+          top: '1%',
           left: '3%',
           width: '96%'
         },
@@ -157,6 +160,10 @@ export default {
       };
 
       columnarChart.setOption(option)
+    },
+    /*tab切换 */
+    TabSwitch(v) {
+      this.checkTab = v
     }
   }
 };
