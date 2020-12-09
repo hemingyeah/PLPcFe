@@ -33,6 +33,10 @@ const BizFormRemoteSelect = {
     inputDisabled: { // 与混入FormMixin的computed中disabled做区分
       type: Boolean,
       default: false
+    },
+    collapsed: {
+      type: Boolean,
+      default: false
     }
   },
   methods: {
@@ -62,6 +66,7 @@ const BizFormRemoteSelect = {
           scopedSlots={ this.$scopedSlots }
           multiple={ this.multiple }
           disabled={ this.inputDisabled }
+          collapsed={ this.collapsed }
         >
         </base-select>
         { this.cleared && this.value.length > 0 && !this.inputDisabled && clearButton }

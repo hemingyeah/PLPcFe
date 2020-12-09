@@ -54,7 +54,7 @@
 import _ from 'lodash';
 import Page from '@model/Page';
 import { getProductRemindTemplate } from '@src/api/ProductApi';
-import * as CustomerApi from '@src/api/CustomerApi';
+import * as CustomerApi from '@src/api/CustomerApi.ts';
 import { createScheduler, editScheduler} from '@src/api/CommonApi'
 
 export default {

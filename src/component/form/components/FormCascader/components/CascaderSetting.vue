@@ -1,5 +1,5 @@
 <template>
-  <base-modal  name="slide-down" :show.sync="show" :width="maxDeep>3?'1000px':'800px'" class="cascader-setting-modal">
+  <base-modal  name="slide-down" :show.sync="show" :width="maxDeep>3?'1085px':'800px'" class="cascader-setting-modal">
     <div  slot="title" class="cascader-setting-modal-header">
       <div class="cascader-setting-msg">
         <span>配置选择项</span>

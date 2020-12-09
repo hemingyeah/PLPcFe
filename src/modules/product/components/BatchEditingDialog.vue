@@ -17,7 +17,7 @@ import { FormFieldMap, } from '@src/component/form/components';
 import * as Utils from '@src/component/form/util';
 import { editBatchProduct } from '@src/api/ProductApi';
 import FormItem from '@src/component/form/FormItem.vue';
-import * as CustomerApi from '@src/api/CustomerApi';
+import * as CustomerApi from '@src/api/CustomerApi.ts';
 // import {searchCustomer} from '@src/api/EcSearchApi.js';
 
 export default {

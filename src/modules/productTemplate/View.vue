@@ -315,7 +315,7 @@ export default {
     },
     //获取产品表单属性列表
     getProductFieldsReq() {
-      getProductFields({isFromSetting:true}).then((res)=>{
+      getProductFields({isFromSetting:false}).then((res)=>{
         const { status, data, message } = res;
         if( status == 0 ){
           this.fieldsInfo = data;

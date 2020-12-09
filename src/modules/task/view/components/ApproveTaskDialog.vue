@@ -152,7 +152,7 @@ export default {
             if (otherInfo.toPool) return '发布到工单池';
 
             let executor = JSON.parse(otherInfo.taskJson).executor || {};
-            return `指派给${executor.displayName}`;
+            return `指派给${executor.displayName || ''}`;
           }
 
           if (this.approve.action == '转派') {

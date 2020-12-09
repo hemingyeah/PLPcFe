@@ -88,7 +88,18 @@ module.exports = {
     "no-else-return": "error", // if return 语句
     "spaced-comment": ["warn", "always"], // 注释之前 跟一个空格
     "comma-spacing": ["error", { "before": false, "after": true }], // 逗号间距
-    "computed-property-spacing": ["error", "never"] // 禁止属性内的空格
+    "computed-property-spacing": ["error", "never"], // 禁止属性内的空格
+    "rules": {
+      'import/extensions': [
+        'ignorePackages',
+        {
+          ts: 'never',
+          tsx: 'never',
+          json: 'never',
+          js: 'never',
+        },
+      ],
+    }
   },
   "overrides": [
     {

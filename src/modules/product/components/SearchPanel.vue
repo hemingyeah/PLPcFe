@@ -136,7 +136,45 @@ export default {
               }
             ]
           }
-        }
+        },
+        {
+          displayName: '创建人',
+          fieldName: 'createUser',
+          formType: 'user',
+          returnData: 'name',
+          noClearable: true,
+          isExport: false,
+          isNull: 1,
+          isSystem: 1,
+          orderId: -3.5,
+          placeHolder: '请输入创建人'
+        },{
+            displayName: '是否绑定二维码',
+            fieldName: 'qrcodeState',
+            formType: 'select',
+            isExport: false,
+            isNull: 1,
+            isSystem: 1,
+            operator: 'between',
+            orderId: 1000,
+            setting: {
+              isMulti: false,
+              dataSource: [
+                {
+                  text: '全部',
+                  value: ''
+                },
+                {
+                  text: '是',
+                  value: 1
+                },
+                {
+                  text: '否',
+                  value: 2
+                }
+              ]
+            }
+          }
       ];
 
       let hasLinkman = this.config.fields.filter(
@@ -185,47 +223,6 @@ export default {
     computedWhetherAddQrcodeField() {
       this.selfFields = [
         ...this.selfFields,
-        {
-          displayName: '创建人',
-          fieldName: 'createUser',
-          formType: 'user',
-          returnData: 'name',
-          noClearable: true,
-          isExport: false,
-          isNull: 1,
-          isSystem: 1,
-          orderId: -3.5,
-          placeHolder: '请输入创建人'
-        },
-        this.initData?.productConfig?.qrcodeEnabled
-          ? {
-            displayName: '是否绑定二维码',
-            fieldName: 'qrcodeState',
-            formType: 'select',
-            isExport: false,
-            isNull: 1,
-            isSystem: 1,
-            operator: 'between',
-            orderId: 1000,
-            setting: {
-              isMulti: false,
-              dataSource: [
-                {
-                  text: '全部',
-                  value: ''
-                },
-                {
-                  text: '是',
-                  value: 1
-                },
-                {
-                  text: '否',
-                  value: 2
-                }
-              ]
-            }
-          }
-          : {}
       ];
     },
     saveDataToStorage(key, value) {
@@ -527,33 +524,15 @@ export default {
           return form;
         },
         update(event, action) {
-          console.log('update::', event, action);
           if (action === 'tags') {
-            return (this.form.tags = event);
+            return this.$set(this.form,'tags',event);
           }
 
           if (action === 'dist') {
-            return (this.form.area = event);
-          }         
+            return this.$set(this.form,'area',event);
+          }
           const f = event.field;
-          if (f.children && f.children.length > 0) {
-            f.children.forEach(item => {
-              this.form[item] = "";
-            });
-          }
-          if (f.returnData) {
-            let result = f.returnData(event.newValue);
-            this.form = {
-              ...this.form,
-              ...result,
-              [f.fieldName]: event.newValue
-            };
-          } else {
-            this.form = {
-              ...this.form,
-              [f.fieldName]: event.newValue
-            };
-          }
+          this.$set(this.form,f.fieldName,event.newValue);
         },
         createUserInput(event, isTags) {
           if (isTags) {
