@@ -1,5 +1,16 @@
-import http from '@src/util/http';
-import GrayUtil from '@src/util/gray';  
+import http from '@src/util/http'
+import GrayUtil from '@src/util/gray'
+
+import { getCustomerDetailResult } from "@model/param/out/Customer"
+
+/** 
+ * 获取客户信息
+ * @param {string} id - 客户id
+ * @returns Promise<Customer>
+ */
+export function getCustomer(id: string): Promise<getCustomerDetailResult> {
+  return http.get('/customer/get', { id })
+}
 
 
 /** 
@@ -7,7 +18,7 @@ import GrayUtil from '@src/util/gray';
  * @param {string} id - 客户id
  * @returns Promise<Customer>
  */
-export function getForEdit(id) {
+export function getForEdit(id: any) {
   return http.get('/customer/getForEdit', {id})
 }
 
@@ -16,7 +27,7 @@ export function getForEdit(id) {
  * @param {string} customerId - 客户id
  * @returns Promise<Customer>
  */
-export function getUpdateRecord(customerId){
+export function getUpdateRecord(customerId: {} | undefined){
   return http.get('/customer/record/latestOne', customerId)
 }
 
@@ -27,7 +38,7 @@ export function getUpdateRecord(customerId){
  * @param {string} params.module - 客户模块： customer
  * @param {string} params.action - 行为, 值为: 关注 或 取消关注
  */ 
-export function toggleAttention(params){
+export function toggleAttention(params: {} | undefined){
   return http.post('/customer/record/attention/customer', params, false)
 }
 
@@ -37,7 +48,7 @@ export function toggleAttention(params){
  * @param {string} params.customerId - 客户id
  * @returns MsgModal<ArrayList<Map>>
  */
-export function attentionList(params){
+export function attentionList(params: {} | undefined){
   return http.get('/customer/record/attention/list', params)
 }
 
@@ -47,7 +58,7 @@ export function attentionList(params){
  * @param {string} params.customerId - 客户id
  * @param {string} params.userIds - 用户ids, 使用`,`拼接
  */
-export function cancelAttention(params){
+export function cancelAttention(params: {} | undefined){
   return http.post('/customer/record/attention/delete/customer_ids', params, false);
 }
 /**
@@ -59,7 +70,7 @@ export function cancelAttention(params){
  * 
  * @returns MsgModal<List<Team>> 匹配后的数据
  */
-export function matchTag(params){
+export function matchTag(params: {} | undefined){
   return http.get('/customer/tagMatch', params)
 }
 
@@ -71,7 +82,7 @@ export function matchTag(params){
  * @param {string} params.value - 值
  * @returns 成功 - {error: message}， 失败 - {ok: ''}
  */
-export function unique(params){
+export function unique(params: {} | undefined){
   return http.post('/customer/unique', params, false, {cancelable: false})
 }
 
@@ -81,7 +92,7 @@ export function unique(params){
  * @param {String} params.modalId - customerId || productId
  * @param {String} params.modal - customer || product
  */
-export function getRemindOfCustomer(params) {
+export function getRemindOfCustomer(params: {} | undefined) {
   return http.get('/customer/remind/list', params)
 }
 
@@ -91,7 +102,7 @@ export function getRemindOfCustomer(params) {
  * @param {String} params.id - 记录id
  * @returns {*}
  */
-export function deleteComment(params) {
+export function deleteComment(params: {} | undefined) {
   return http.post('/customer/deleteCustomerRecord', params, false)
 }
 
@@ -103,7 +114,7 @@ export function deleteComment(params) {
  * @param {Number} params.pageNum -
  * @returns {*}
  */
-export function getLinkmanOfCustomer(params) {
+export function getLinkmanOfCustomer(params: {} | undefined) {
   return http.get('/customer/linkman/list', params)
 }
 
@@ -116,7 +127,7 @@ export function getLinkmanOfCustomer(params) {
  * @param {Number} params.keyword -
  * @returns {*}
  */
-export function getUserTag(params) {
+export function getUserTag(params: {} | undefined) {
   return http.get('/customer/userTag/list', params)
 }
 
@@ -126,7 +137,7 @@ export function getUserTag(params) {
  * @param {String} params.ids - 客户ids
  * @param {Number} params.isAllLm - 是否是全部联系人
  */
-export function computeSendNum(params) {
+export function computeSendNum(params: {} | undefined) {
   return http.post('/customer/computeSendNum', params)
 }
 
@@ -138,7 +149,7 @@ export function computeSendNum(params) {
  * @param {Number} params.isAllLm - 是否是全部联系人
  * @param {Date} params.sendTime - 发送时间
  */
-export function sendSmsBatch(params) {
+export function sendSmsBatch(params: {} | undefined) {
   return http.post('/customer/sendSmsBatch', params, false);
 }
 
@@ -149,7 +160,7 @@ export function sendSmsBatch(params) {
  * @param {String} params params.mapJson - 修改值
  * @returns {*}
  */
-export function batchEditCustomer(params) {
+export function batchEditCustomer(params: {} | undefined) {
   return http.post('/customer/editBatch', params, false);
 }
 
@@ -158,7 +169,7 @@ export function batchEditCustomer(params) {
  * @param {Object} params - 参数
  * @returns {*}
  */
-export function getCustomerListAsyn(params) {
+export function getCustomerListAsyn(params: {} | undefined) {
   let customerPreFixedPath = GrayUtil.getCustomerApiPath();
   return http.get(`${customerPreFixedPath}/customer/getListAsyn`, params);
 }
@@ -168,7 +179,7 @@ export function getCustomerListAsyn(params) {
  * @param {Object} params - 参数
  * @param {String} params.id - 客户di
  */
-export function getCustomerExeinsyn(params) {
+export function getCustomerExeinsyn(params: {} | undefined) {
   return http.get('/customer/exeinsyn/get', params, false);
 }
 
@@ -176,7 +187,7 @@ export function getCustomerExeinsyn(params) {
  * 查询客户列表
  * @param {Object} params - 参数
  */
-export function getCustomerList(params) {
+export function getCustomerList(params: {} | undefined) {
   let customerPreFixedPath = GrayUtil.getCustomerApiPath();
   return http.post(`${customerPreFixedPath}/customer/list`, params);
 }

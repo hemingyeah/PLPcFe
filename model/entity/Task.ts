@@ -1,10 +1,11 @@
 interface Task {
   // 系统附件
   attachment ?: string[];
-  // 自定义字段
-  attribute ?: Object;
+  // 自定义字段 object
+  attribute ?: any;
   // 任务描述
   description ?: string;
+  id: string
   // 优先级
   level ?: string;
   // 计划时间

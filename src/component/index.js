@@ -25,6 +25,7 @@ import BaseSelectionBar from './common/BaseSelectionBar';
 import BaseServiceStar from './common/BaseServiceStar';
 import BaseCollapse from './common/BaseCollapse';
 import BaseCalculationFormula from './common/BaseCalculationFormula'
+import BaseFlod from './common/BaseFlod/index.ts';
 
 
 // 可快速调用的组件
@@ -101,7 +102,8 @@ const components = [
   BaseCollapse,
   BaseCalculationFormula,
   
-  GuideCompoment
+  GuideCompoment,
+  ...BaseFlod,
 ];
 
 export default {

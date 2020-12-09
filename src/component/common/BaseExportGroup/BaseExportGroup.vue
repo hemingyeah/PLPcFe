@@ -30,8 +30,7 @@
       <div class="base-export-modal-title">
         导出选项
       </div>
-      <el-checkbox v-model="tooltip" class="base-export-field-wrap" title="勾选后，支持将除备件、服务项目、附加组件（多次类型）以外的多行数据导出在一个单元格内，适用于数据透视表等场景。">如果一个字段存在多个值(如多选项)导出在一个单元格中。</el-checkbox>
-      </el-checkbox-group>
+      <el-checkbox v-model="tooltip" class="base-export-field-wrap" title="勾选后，支持将除备件、服务项目、附加组件（多次类型）以外的多行数据导出在一个单元格内，适用于数据透视表等场景。">多选类型的字段在导出时，不同值在同一个单元格中显示（例如：字段名称：1/2/3/4）</el-checkbox>
     </div>
     <div
       class="base-export-modal-content"
@@ -129,7 +128,7 @@ export default {
       pending: false,
       checkedArr: [],
       isCheckedAll: true,
-      tooltip: false,
+      tooltip: true,
       isDownloadNow: false, // 导出是否是立刻下载模式
 
       checked: '',

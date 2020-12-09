@@ -136,7 +136,45 @@ export default {
               }
             ]
           }
-        }
+        },
+        {
+          displayName: '创建人',
+          fieldName: 'createUser',
+          formType: 'user',
+          returnData: 'name',
+          noClearable: true,
+          isExport: false,
+          isNull: 1,
+          isSystem: 1,
+          orderId: -3.5,
+          placeHolder: '请输入创建人'
+        },{
+            displayName: '是否绑定二维码',
+            fieldName: 'qrcodeState',
+            formType: 'select',
+            isExport: false,
+            isNull: 1,
+            isSystem: 1,
+            operator: 'between',
+            orderId: 1000,
+            setting: {
+              isMulti: false,
+              dataSource: [
+                {
+                  text: '全部',
+                  value: ''
+                },
+                {
+                  text: '是',
+                  value: 1
+                },
+                {
+                  text: '否',
+                  value: 2
+                }
+              ]
+            }
+          }
       ];
 
       let hasLinkman = this.config.fields.filter(
@@ -185,47 +223,6 @@ export default {
     computedWhetherAddQrcodeField() {
       this.selfFields = [
         ...this.selfFields,
-        {
-          displayName: '创建人',
-          fieldName: 'createUser',
-          formType: 'user',
-          returnData: 'name',
-          noClearable: true,
-          isExport: false,
-          isNull: 1,
-          isSystem: 1,
-          orderId: -3.5,
-          placeHolder: '请输入创建人'
-        },
-        this.initData?.productConfig?.qrcodeEnabled
-          ? {
-            displayName: '是否绑定二维码',
-            fieldName: 'qrcodeState',
-            formType: 'select',
-            isExport: false,
-            isNull: 1,
-            isSystem: 1,
-            operator: 'between',
-            orderId: 1000,
-            setting: {
-              isMulti: false,
-              dataSource: [
-                {
-                  text: '全部',
-                  value: ''
-                },
-                {
-                  text: '是',
-                  value: 1
-                },
-                {
-                  text: '否',
-                  value: 2
-                }
-              ]
-            }
-          }
-          : {}
       ];
     },
     saveDataToStorage(key, value) {

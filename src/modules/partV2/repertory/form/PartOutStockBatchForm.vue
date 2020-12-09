@@ -60,6 +60,7 @@ export default {
   inject: ['initData'],
   props: {
     sparepartConfig: Object,
+    repertoryId: '', //仓库id
   },
   data(){
     return {
@@ -152,12 +153,14 @@ export default {
       return this.form.some(item => item.id == row.id)
     },
     fetchSparepart(keyword, cb){
+      let repertoryIds = this.repertoryId ? {repertoryId: this.repertoryId} : {}
       let model = {
         keyWord: keyword,
         pageSize: 50,
         pageNum: 1,
         enable: 1,
-        managers: [this.userId]
+        managers: [this.userId],
+        ...repertoryIds
       }
 
       this.$http.get('/partV2/repertory/list', model)

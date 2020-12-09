@@ -49,6 +49,8 @@ $--select-border-color-hover: $input-border-hover-color !default;
 @import "~shb-element-ui/packages/theme-chalk/src/message.scss";
 @import "~shb-element-ui/packages/theme-chalk/src/autocomplete.scss";
 @import "~shb-element-ui/packages/theme-chalk/src/col.scss";
+@import "~shb-element-ui/packages/theme-chalk/src/collapse.scss";
+@import "~shb-element-ui/packages/theme-chalk/src/collapse-item.scss";
 
 .el-input__inner{
   padding-left: 10px;
@@ -85,6 +87,32 @@ $--select-border-color-hover: $input-border-hover-color !default;
 .el-form-item.is-success .el-input__inner, 
 .el-form-item.is-success .el-input__inner:focus, 
 .el-form-item.is-success .el-textarea__inner, 
-.el-form-item.is-success .el-textarea__inner:focus {
+.el-form-item.is-success .el-textarea__inner:focus,
+.el-step__head.is-success .el-step__icon.is-text,
+.el-step__line,
+.el-step__description.is-success {
   border-color: $color-primary;
+}
+
+.el-step__title.is-success, 
+.el-step__head.is-success .el-step__icon.is-text,
+.el-step__line,
+.el-step__description.is-success {
+  color: $color-primary;
+}
+
+.el-select-dropdown__empty {
+  display: none;
+}
+
+.el-step__title {
+  font-size: $font-size-base;
+}
+
+.el-step__head.is-wait .el-step__icon.is-text {
+  background-color: $bg-color-l3;
+  border-color: $bg-color-l3;
+  i {
+    color: $text-color-gray;
+  }
 }

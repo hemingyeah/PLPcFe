@@ -25,7 +25,7 @@
 <script>
 import CustomerEditForm from '../components/CustomerEditForm.vue'
 
-import * as CustomerApi from '@src/api/CustomerApi'
+import * as CustomerApi from '@src/api/CustomerApi.ts'
 import * as FormUtil from '@src/component/form/util'
 import * as util from '../util/customer'
 
