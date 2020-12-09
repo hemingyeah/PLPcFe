@@ -351,9 +351,10 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
     }
     
     // 团队数据
-    let teams: Tag[] = this.selectTeams.length > 0 ? this.selectTeams : this.visibleTeams
-    params.tagIds = teams.map(team => (team.id || ''))
-    
+    if (this.selectTeams.length > 0) {
+      params.tagIds = this.selectTeams.map(team => (team.id || ''))
+    }
+    // 位置信息
     if (distance && isArray(distance)) {
       params.startDistance = String(distance[0])
       params.endDistance = String(distance[1])
