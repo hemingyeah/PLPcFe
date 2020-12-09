@@ -479,33 +479,15 @@ export default {
         },
         update(event, action) {
           if (action === 'tags') {
-            return this.form.tags = event;
+            return this.$set(this.form,'tags',event);
           }
 
           if (action === 'dist') {
-            return this.form.area = event;
+            return this.$set(this.form,'area',event);
           }
-
           const f = event.field;
-          
-          if (f.children && f.children.length > 0) {
-            f.children.forEach(item => {
-              this.form[item] = "";
-            });
-          }
-          if (f.returnData) {
-            let result = f.returnData(event.newValue);
-            this.form = {
-              ...this.form,
-              ...result,
-              [f.fieldName]: event.newValue
-            };
-          } else {
-            this.form = {
-              ...this.form,
-              [f.fieldName]: event.newValue
-            };
-          }
+          this.$set(this.form,f.fieldName,event.newValue);
+
         },
         renderInput(h, field) {
           const f = {
