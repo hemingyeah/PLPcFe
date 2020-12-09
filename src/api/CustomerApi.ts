@@ -197,6 +197,6 @@ export function getCustomerList(params: {} | undefined) {
 * @param {Object} params - 参数
 * @param {String} params.isFromSetting - 是否用于设置页，是：true 否：false
 */
-export function getCustomerFields(params) {
+export function getCustomerFields(params: {} | undefined) {
   return http.get('/customer/getCustomerFields', params);
 }
