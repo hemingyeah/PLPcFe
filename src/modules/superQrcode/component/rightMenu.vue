@@ -67,6 +67,15 @@
         <el-switch v-model="doorOpenState" :disabled='noCatalog'></el-switch>
         <span>{{doorOpenState?'启用':'禁用'}}</span>
       </div>
+      <h4 style="margin-top:20px;">关联事件模板</h4>
+      <el-select style="width:100%;" @change="changeEventType" v-model="copyEventTypeIdList" multiple placeholder="请选择">
+        <el-option
+          v-for="item in allEventTypeList"
+          :key="item.id"
+          :label='item.name'
+          :value='item.id'
+        ></el-option>
+      </el-select>
     </div>
 
     <div v-if="nowOption === 'proInfo'" class="pro-wrapper">
@@ -243,7 +252,9 @@ export default {
         {label:'指定客户负责人',value:'customerManager'}
       ],
       provinceList:['北京','天津','上海','重庆','内蒙古','广西','西藏','宁夏','新疆','河北','山西','辽宁','吉林','黑龙江','江苏','浙江','安徽','福建','江西','山东','河南','湖北','湖南','广东','海南','四川','贵州','云南','陕西','甘肃','青海','香港','澳门','台湾'],
-      userList:[]
+      userList:[],
+
+      copyEventTypeIdList:[]
     };
   },
   props: {
@@ -260,6 +271,14 @@ export default {
       default: () => [],
     },
     rules:{
+      type:Array,
+      default:()=>[]
+    },
+    eventTypeIdList:{
+      type:Array,
+      default:()=>[]
+    },
+    allEventTypeList:{
       type:Array,
       default:()=>[]
     },
@@ -280,6 +299,8 @@ export default {
     this.showFields.forEach(item=>{
       item.showFlag=item.showFlag==='1'?true:false;
     });
+
+    this.copyEventTypeIdList=[...this.eventTypeIdList];
   },
   computed: {
     title() {
@@ -311,6 +332,10 @@ export default {
     },
   },
   methods:{
+    // 绑定事件
+    changeEventType(doorEventType){
+      this.copyEventTypeIdList=doorEventType;
+    },
     // 查看规则详情
     async checkRule(id){
       let res=await queryRuleInfo({id});
@@ -347,13 +372,16 @@ export default {
         params.productIntroduction=this.copyForm.productIntroduction;
       }else if(option==='service'){
         params.doorOpenState=this.doorOpenState?1:0;
+        params.doorEventType=this.copyEventTypeIdList;
       }else if(option==='proInfo'){
         const arr=this.copyForm.showFields.map(item=>{
           return {
             displayName:item.displayName,
             fieldName:item.fieldName,
             isSystem:item.isSystem,
-            showFlag:item.showFlag?'1':'0'
+            showFlag:item.showFlag?'1':'0',
+            formType:item.formType,
+            fieldType:item.fieldType
           }
         }).filter(item=>item.showFlag==='1');
         params.showFields=arr;
@@ -369,7 +397,7 @@ export default {
       let res=await modifyProductSetting(params);
       if(res.code==='200'){
         this.$message({
-          message: res.msg,
+          message: res.data,
           duration: 1500,
           type: 'success',
         });

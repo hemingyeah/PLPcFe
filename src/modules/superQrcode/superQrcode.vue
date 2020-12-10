@@ -37,7 +37,7 @@
         <div class="setting-data-box">
           <div
             class="index-wrapper"
-            v-if="nowOption === 'pic' || nowOption === 'intro'"
+            v-if="nowOption === 'pic' || nowOption === 'intro' || nowOption === 'service'"
           >
             <div
               v-if="
@@ -102,11 +102,34 @@
               <img src="../../assets/img/myShop/logo.png" />
               <a href="javascript:;">详情 ></a>
             </div>
+
+            <div class="service-box" v-if="nowOption==='service'">
+              <ul>
+                <li v-for="(item,index) in eventTypeList" :key="item.id">
+                  <img :src="index | getSrc">
+                  <p>{{item.name}}</p>
+                </li>
+              </ul>
+            </div>
+
           </div>
 
           <div v-if="nowOption === 'contact'" class="contact-wrapper">
             <div class="contact-top">
-              <img src="../../assets/img/myShop/noGood.png" />
+              <div class="contact-info">
+                <img src="../../assets/img/cusService.png">
+                <div class="contact-info-right">
+                  <h3>胜利</h3>
+                  <p>
+                    <i class="iconfont icon-dianhua2"></i>
+                    18888888888
+                  </p>
+                  <p>
+                    <i class="iconfont icon-address"></i>
+                    浙江省杭州市余杭区文一西路未来park
+                  </p>
+                </div>
+              </div>
 
               <ul class="contact-btns">
                 <li>
@@ -127,12 +150,12 @@
             </div>
           </div>
 
-          <ul v-if="nowOption === 'service'" class="service-wrapper">
+          <!-- <ul v-if="nowOption === 'service'" class="service-wrapper">
             <li v-for="item in quickInfos" :key="item.eventTempId">
               <img :src="item.iconType | getSrc">
               <p>{{item.name}}</p>
             </li>
-          </ul>
+          </ul> -->
 
           <div v-if="nowOption === 'comInfo'" class="com-wrapper">
             <img :src="(comData && comData.attribute.logoUrl) || defaultLogo">
@@ -155,7 +178,7 @@
               </li>
             </ul>
 
-            <div id='mapWrapper' style="height:166px;"></div>
+            <div id='mapWrapper' v-if="nowOption==='comInfo'" style="height:166px;"></div>
           </div>
 
           <div v-if="nowOption === 'proInfo' || nowOption==='video' || nowOption==='knowledge'" class="pro-wrapper">
@@ -210,6 +233,9 @@
       :userId='userId'
       :rules='rules'
       :noCatalog='noCatalog'
+      :allEventTypeList='allEventTypeList'
+      :eventTypeIdList='eventTypeIdList'
+      @changeEventType='changeEventType'
       @addPic='addPic'
       @delPic='delPic'
       @save='save'
@@ -229,8 +255,8 @@ import {
   syncCatalogInfo,
   queryProductSetting,
   queryCompanyInfo,
-  queryQuickInfo,
-  querySettingRules
+  querySettingRules,
+  queryEventType
 } from '@src/api/SuperQrcode';
 
 let map=null;
@@ -283,7 +309,11 @@ export default {
       videoFlagShow:true,
       videoTime:'',
 
-      comData:null
+      comData:null,
+
+      allEventTypeList:[],
+      eventTypeList:[],
+      eventTypeIdList:[]
     };
   },
   computed: {
@@ -313,18 +343,49 @@ export default {
     }
   },
   mounted() {
-    const rootWindow=getRootWindow(window);
-    this.tenantId=JSON.parse(rootWindow._init).user.tenantId;
-    this.userId=JSON.parse(rootWindow._init).user.userId;
+    try{
+      const rootWindow=getRootWindow(window);
+      this.tenantId=JSON.parse(rootWindow._init).user.tenantId;
+      this.userId=JSON.parse(rootWindow._init).user.userId;
+    }catch(err){
+      this.tenantId='7416b42a-25cc-11e7-a500-00163e12f748';
+      this.userId='b9510211-d82f-11e8-b3c6-00163e304a25';
+    }
 
     this.getCatalogList();
   },
   filters:{
     getSrc(_type) {
-      return require(`../../assets/img/myShop/icon${_type}.png`);
+      return require(`../../assets/img/myShop/newIcon${_type%5}.png`);
     }
   },
   methods: {
+    // 改变事件类型模板
+    changeEventType(ids){
+      this.eventTypeList=this.allEventTypeList.filter(item=>ids.find(id=>item.id===id));
+    },
+    // 查询事件类型列表
+    async queryEventType(id=''){
+      const params={
+        tenantId:this.tenantId,
+        id:id
+      }
+      let res=await queryEventType(params);
+      if(res.code==='200'){
+        if(id===''){
+          this.allEventTypeList=res.data;
+          this.queryEventType(this.settingInfo.id);
+        }else{
+          this.rightMenuFlag=true;
+          if(res.data){
+            this.eventTypeList=res.data;
+            this.eventTypeIdList=res.data.map(item=>item.id);
+          }
+        }
+      }else{
+        this.$platform.alert(res.msg);
+      }
+    },
     // 查询自助门户快捷入口
     async queryQuickInfo(){
       const params={
@@ -494,7 +555,7 @@ export default {
       let res=await syncCatalogInfo(params);
       if(res.code==='200'){
         this.queryProductSetting();
-        this.queryQuickInfo();
+        // this.queryQuickInfo();
         this.querySettingRules();
         this.queryCompanyInfo();
       }else{
@@ -510,7 +571,8 @@ export default {
       let res=await queryProductSetting(params);
       if(res.code==='200'){
         this.settingInfo=res.data;
-        this.rightMenuFlag=true;
+
+        this.queryEventType();
       }else{
         this.$platform.alert(res.msg);
       }
@@ -733,13 +795,13 @@ p{
         .part-wrapper{
           height: 100%;
           background: url('../../assets/img/beijian.png') no-repeat center center;
-          background-size: cover;
+          background-size: 100% 100%;
         }
 
         .mall-wrapper{
           height: 100%;
           background: url('../../assets/img/mall.png') no-repeat center center;
-          background-size: cover;
+          background-size: 100% 100%;
         }
 
         .pro-wrapper{
@@ -933,9 +995,30 @@ p{
             top: 10px;
             margin-bottom: 25px;
 
-            img {
-              width: 100%;
+            .contact-info{
               height: 160px;
+              display: flex;
+
+              img{
+                width: 100px;
+                height: 140px;
+                margin-left: 10px;
+              }
+              .contact-info-right{
+                padding: 10px 15px 0 20px;
+
+                h3{
+                  margin-bottom: 20px;
+                }
+                p{
+                  margin-bottom: 10px;
+
+                  i{
+                    font-size: 14px;
+                    color:#aaa;
+                  }
+                }
+              }
             }
 
             .contact-btns{
@@ -982,6 +1065,45 @@ p{
         .index-wrapper {
           background: #fff;
           height: 100%;
+
+          .service-box{
+            position: absolute !important;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: #00000066 !important;
+
+            ul{
+              display: flex;
+              justify-content: flex-start;
+              flex-wrap: wrap;
+              background: #fff;
+              position: absolute;
+              bottom: 0;
+              padding-bottom: 10px;
+              margin-bottom: 0;
+              width: 100%;
+
+              li{
+                width: 25%;
+                height: 80px;
+                text-align: center;
+                padding-top: 10px;
+
+                img{
+                  width: 45%;
+                  margin-bottom: 5px;
+                }
+
+                p{
+                  font-size: 13px;
+                  overflow: hidden;
+                  text-overflow:ellipsis;
+                  white-space: nowrap;
+                }
+              }
+            }
+          }
           
           .two-panel {
             display: flex;
