@@ -14,7 +14,7 @@ body {
   display: flex;
   flex-flow: column nowrap;
   overflow: hidden;
-  overflow-y: scroll;
+  // overflow-y: scroll;
 
   // 按钮
   .el-button {
@@ -145,7 +145,7 @@ body {
   padding: 0 12px;
   margin-bottom: 10px;
   position: fixed;
-  width: calc(100% - 40px);
+  width: calc(100% - 36px);
   z-index: 999;
 
   background: #fff;
@@ -409,12 +409,13 @@ body {
 // 工单详情
 .task-detail-main-content {
   // flex: 1;
-  overflow: visible;
+  // overflow: visible;
+  overflow-y: scroll;
 
   &-left,
   &-right {
-    height: 100%;
-    overflow: hidden;
+    // height: 100%;
+    // overflow: hidden;
   }
 
   .collapse-left,
