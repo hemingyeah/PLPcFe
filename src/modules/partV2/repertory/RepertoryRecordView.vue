@@ -187,6 +187,7 @@
         <!-- 选择仓库（默认全部） -->
         <el-row class="block-col-2">
           <el-select
+            v-if="!isStandardEdition"
             filterable
             :value="repertoryName"
             @input="chooseRepertory"
@@ -406,6 +407,8 @@ import StorageUtil from '@src/util/storageUtil';
 const STORAGE_COLNUM_KEY = 'repe_record_list_column';
 const STORAGE_PAGESIZE_KEY = 'repe_record_list_pagesize';
 
+import { isStandardEdition } from '@src/util/version.ts'
+
 export default {
   name: 'repertory-record-view',
   inject: ['initData'],
@@ -492,6 +495,9 @@ export default {
     // 是否允许导入导出
     allowImportAndExport(){
       return AuthUtil.hasAuth(this.auths, 'EXPORT_IN')
+    },
+    isStandardEdition() {
+      return isStandardEdition()
     }
   },
   methods: {

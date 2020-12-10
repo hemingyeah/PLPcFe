@@ -1,5 +1,9 @@
 /* mixin */
 import taskFormSettingMixin from './../common/taskFormSettingMixin';
+/* api */
+import * as TaskApi from '@src/api/TaskApi.ts';
+/* util */
+import * as FormUtil from '@src/component/form/util';
 
 export default {
   name: 'task-receipt-form-setting-view',

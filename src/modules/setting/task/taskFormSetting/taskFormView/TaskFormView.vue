@@ -15,6 +15,7 @@
         v-if="init"
         v-model="fields"
         :mode="mode"
+        :relation-field-options="relationOptions"
       ></form-design>
     </div>
     <!-- end 表单设计器 -->

@@ -278,7 +278,10 @@ function number(value, field = {}, origin = {}, mode, changeStatus, isSample = t
       let decimal = MathUtil.decimalNumber(value);
       
       // 勾选小数位数且设置了小数位数
-      if (isLimit == 1 && digit != '' && decimal > Number(digit)) return resolve(`仅允许输入${digit}位小数`);
+      if (isLimit == 1 && digit != '' && decimal > Number(digit)) {
+        let errMsg = digit == 0 ? '仅允许输入整数' : `仅允许输入${digit}位小数`;
+        return resolve(errMsg);
+      }
     }
       
     // 校验数值范围

@@ -181,7 +181,7 @@ export default {
 
     label {
       display: block;
-      width: 85px;
+      width: 110px;
       padding: 4px 0 0 10px;
       line-height: 24px;
       margin: 0;

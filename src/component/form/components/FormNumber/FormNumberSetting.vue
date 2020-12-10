@@ -110,7 +110,7 @@ import { settingProps } from '@src/component/form/components/props';
 
 import { FORM_FIELD_NUMBER_MAX_LENGTH } from '@src/model/const/Number.ts';
 
-const DECIMAL_MIN_LENGTH = 1;
+const DECIMAL_MIN_LENGTH = 0;
 const DECIMAL_MAX_LENGTH = 5;
 
 export default {

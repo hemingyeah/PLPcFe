@@ -6,6 +6,8 @@ const BaseTimeline = {
   props: {
     data: Array,
     recordRender: Function,
+    headRender: Function,
+    classNameRender: Function,
     loading: Boolean,
     loadmore: Boolean
   },
@@ -26,11 +28,21 @@ const BaseTimeline = {
     }
   },
   render(h){
-    let items = toArray(this.data).map(item => {
-      let content = this.recordRender(h, item);
+    let items = toArray(this.data).map((item, index) => {
+      let content = this.recordRender(h, item, index)
+      let head = this.headRender ? this.headRender(h, item, index) : null
+      let classNames = ['base-timeline-item']
+      if (this.classNameRender) {
+        classNames = classNames.concat(this.classNameRender(h, item, index))
+      }
+      
       return (
-        <div class="base-timeline-item">
-          <div class="base-timeline-head"></div>
+        <div class={classNames}>
+          {
+            head
+              ? head
+              : <div class="base-timeline-head"></div>
+          }
           <div class="base-timeline-main">
             <div class="base-timeline-content">{content}</div>
             <p class="base-timeline-time">{ this.getTime(item) }</p>

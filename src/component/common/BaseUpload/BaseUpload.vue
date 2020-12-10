@@ -5,7 +5,6 @@
     <div class="base-file-list base-file__preview" >
       <base-file-item v-for="file in value" :key="file.id" :file="file" @delete="deleteFile"></base-file-item>        
     </div>
-
     <div class="base-upload-operation">
       <button type="button" class="btn btn-primary base-upload-btn" @click="chooseFile" :disabled="pending" :id="forId" v-if="allowUpload">
         <i class="iconfont icon-loading" v-if="pending"></i>

@@ -1,6 +1,6 @@
 import _ from 'lodash'
 /* 工单流程信息状态 */
-import TaskStateProcessEnum from './../BizProcess/TaskStateProcessEnum.ts'
+import TaskStateProcessEnum from '@model/enum/TaskStateProcessEnum.ts'
 import { fmt_datetime } from '@src/filter/fmt'
 
 const ClassName = {

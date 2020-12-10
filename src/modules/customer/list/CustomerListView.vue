@@ -373,7 +373,7 @@ import BatchRemindingCustomerDialog from './operationDialog/BatchRemindingCustom
 import BatchUpdateCustomerDialog from './operationDialog/BatchUpdateCustomerDialog.vue';
 import SearchPanel from './operationDialog/SearchPanel.vue';
 
-import * as CustomerApi from '@src/api/CustomerApi';
+import * as CustomerApi from '@src/api/CustomerApi.ts';
 // import {searchLinkman} from '@src/api/EcSearchApi.js';
 import TeamMixin from '@src/mixins/teamMixin';
 import { isShowCustomerRemind } from '@src/util/version.ts'
@@ -1022,7 +1022,7 @@ export default {
         .map(field => {
           let sortable = false;
           let minWidth = null;
-
+          
           if (['date', 'datetime', 'number'].indexOf(field.formType) >= 0) {
             sortable = 'custom';
             minWidth = 100;

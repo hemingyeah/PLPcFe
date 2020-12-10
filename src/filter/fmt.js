@@ -1,5 +1,5 @@
 import * as Lang from '@src/util/lang';
-
+import { isNumber } from '@src/util/type'
 
 /** 格式化日期，支持毫秒 */
 export function fmt_date(value){
@@ -178,6 +178,72 @@ export function fmt_h_m_s(sec = 0) {
   return temp ? temp : '--';
 }
 
+/**
+ * @description 格式化数据 (值不存在返回 默认返回0)
+ */
+export function fmt_number(value, defaultValue) {
+  if (typeof defaultValue == undefined) defaultValue = 0
+  
+  if (value == undefined || value == null) {
+    console.warn(`Caused: ${value} is undifined or is null`)
+    return defaultValue
+  }
+  
+  if (isNaN(value)) {
+    console.warn(`Caused: ${value} is NaN`)
+    return defaultValue
+  }
+  
+  const IsErrorType = typeof value == 'string' || typeof value == 'number'
+  // 非数字类型 或 字符串
+  if (!IsErrorType) {
+    console.warn(`Caused: ${value} is not string type`)
+    return defaultValue
+  }
+  
+  let number = Number(value)
+  // 格式化的数字是NaN
+  if (isNaN(number)) {
+    console.warn(`Caused: Number(${number}) is NaN`)
+    return defaultValue
+  }
+  
+  // 非安全数值
+  if(!Lang.isSafeNumber(number)) {
+    console.warn(`Caused: ${number} is not a safeNumber`)
+    return number
+  }
+  
+  return number
+}
+
+export function fmt_number_limit(value, limit) {
+  let isValueNumberType = isNumber(value)
+  let isLimitNumberType = isNumber(limit)
+  if (!isValueNumberType || !isLimitNumberType) return value
+  
+  return limit > value ? `${limit - 1}+` : value
+  
+}
+
+/** 
+ * @description 格式化显示文字
+*/
+export function fmt_display_text(value, text) {
+  return value ? `${value}${text || ''}` : '--'
+}
+
+/** 
+ * @description 格式化显示数组
+ * @param {Number} value 值
+ * @param {Number} num 规定小数的位数，是 0 ~ 20 之间的值，包括 0 和 20，有些实现可以支持更大的数值范围
+*/
+export function fmt_number_to_fixed(value, num) {
+  if (!isNumber(value)) return value
+  
+  return value.toFixed(num)
+}
+
 const fmt = {
   fmt_date,
   fmt_datetime,
@@ -188,7 +254,8 @@ const fmt = {
   fmt_datehour,
   fmt_state,
   fmt_short_time,
-  fmt_h_m_s
+  fmt_h_m_s,
+  fmt_display_text
 }
 
 export default fmt;

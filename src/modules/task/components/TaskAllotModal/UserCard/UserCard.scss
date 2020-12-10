@@ -1,0 +1,126 @@
+.user-card {
+  width: 470px;
+  padding: 30px 0 20px 20px;
+  position: relative;
+  .excutor-button {
+    border-color: $color-primary;
+    color: $color-primary;
+    height: 32px;
+    width: 88px;
+    padding: 0 3px !important;
+    &:hover {
+      color: #fff;
+    }
+  }
+  .synergy-button {
+    border-color: $color-warning;
+    color: $color-warning;
+    margin-left: 8px;
+    height: 32px;
+    width: 88px;
+    padding: 0 3px !important;
+    &:hover {
+      background-color: $color-warning;
+      color: #fff;
+    }
+  }
+}
+
+.user-card-close {
+  cursor: pointer;
+  color: $text-color-secondary;
+  position: absolute;
+  right: 20px;
+  top: 6px;
+  i {
+    font-size: $font-size-base;
+  }
+}
+
+.user-card-header {
+  border-bottom: 1px solid $border-color-base;
+  display: flex;
+  padding: 0 12px 12px 0;
+  &-head {
+    display: flex;
+    align-items: center;
+    img {
+      border-radius: 50%;
+      height: 40px;
+      width: 40px;
+    }
+  }
+  &-head,
+  &-content,
+  &-button-group {
+    margin-left: 10px;
+  }
+}
+
+.user-card-header-content {
+  color: $text-color-regular;
+  &-name {
+    cursor: pointer;
+    font-size: $font-size-base;
+    font-weight: 600;
+    line-height: 20px;
+    i {
+      color: #FFB302;
+      margin-left: 10px;
+    }
+  }
+  &-state {
+    span {
+      display: inline-block;
+      margin-right: 10px;
+    }
+    .user-state-round {
+      border-radius: 50%;
+      height: 12px;
+      width: 12px;
+    }
+  }
+  &-name, &-state, &-team {
+    line-height: 20px;
+  }
+  .user-card-header-content-team {
+    i {
+      cursor: pointer;
+      color: #FFB302;
+      margin-right: 10px;
+    }
+  }
+}
+
+.user-card-header-content {
+  &-top {
+    display: flex;
+    &-left {
+      flex: 1;
+    }
+    .user-card-header-button-group {
+      width: 200px;
+    }
+  }
+}
+
+.user-card-time,
+.user-card-detail {
+  color: $text-color-primary;
+  margin-top: 12px;
+  margin-right: 30px;
+}
+
+.user-card-detail {
+  &-row {
+    display: flex;
+    justify-content: space-between;
+    line-height: 30px;
+    align-items: center;
+    &-item {
+      text-align: left;
+      width: 180px;
+      @include text-ellipsis();
+    }
+  }
+}

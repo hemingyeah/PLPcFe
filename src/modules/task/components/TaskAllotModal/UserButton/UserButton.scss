@@ -1,0 +1,52 @@
+.user-add-button {
+  border: 1px dashed $color-primary;
+  cursor: pointer;
+  border-radius: 50%;
+  
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  height: 44px;
+  width: 44px;
+  
+  i {
+    color: $color-primary;
+    font-size: 20px;
+  }
+}
+
+.user-button {
+  width: 44px;
+  position: relative;
+  
+  &-head {
+    border-radius: 50%;
+    height: 44px;
+    width: 44px;
+  }
+  
+  &-delete {
+    cursor: pointer;
+    
+    display: none;
+    width: 12px;
+    height: 12px;
+    
+    position: absolute;
+    top: -5px;
+    right: 0;
+  }
+  
+  &-name {
+    width: 100%;
+    text-align: center;
+    @include text-ellipsis();
+  }
+  
+  &:hover {
+    .user-button-delete {
+      display: block;
+    }
+  }
+}
