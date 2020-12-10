@@ -19,7 +19,7 @@
       <!-- end 折叠按钮 -->
     </div>
 
-    <div :class="['base-collapse-right', {'active': collapse == 'right'}]" v-if="showCollapse">
+    <div :class="['base-collapse-right', {'active': collapse == 'right'}]">
       <slot name="right"></slot>
     </div>
   </div>
