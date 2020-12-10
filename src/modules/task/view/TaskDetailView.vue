@@ -195,7 +195,7 @@
     <!-- end 顶部操作区 -->
 
     <!-- start 工单详情折叠面板 -->
-    <base-collapse class="task-detail-main-content" :show-collapse="showCollapse" :direction.sync="collapseDirection" :style="`margin-top: ${collapse ? marTop : 67}px`">
+    <base-collapse class="task-detail-main-content" :show-collapse="showCollapse" :direction.sync="collapseDirection" :style="`margin-top: ${collapse ? marTop - 4 : 60}px`">
 
       <!-- start 工单详情 -->
       <template slot="left">
