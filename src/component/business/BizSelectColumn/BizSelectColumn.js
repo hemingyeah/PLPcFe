@@ -31,8 +31,14 @@ function convertColumnWithSave(field = {}) {
 */
 const BizSelectColumn = {
   name: "biz-select-column",
+  props:{
+    sotrageKey:{
+      type:String | Number,
+      default:TASK_GUIDE_SELECT_COLUMN
+    }
+  },
   data() {
-    let guideSelectColumn = !storageGet(TASK_GUIDE_SELECT_COLUMN);
+    let guideSelectColumn = !storageGet(this.sotrageKey);
     return {
       columnSortList: [],
       columnTree: {},
@@ -378,8 +384,8 @@ const BizSelectColumn = {
       this.originColumns = _.cloneDeep(columns)
       this.taskType = taskType
       this.columnTree = this.columnsDataGrouped(_.cloneDeep(columns))
-      if (storageGet(TASK_GUIDE_SELECT_COLUMN) == 1) this["guideSelectColumn"] = false;
-      else storageSet(TASK_GUIDE_SELECT_COLUMN, "1")
+      if (storageGet(this.sotrageKey) == 1) this["guideSelectColumn"] = false;
+      else storageSet(this.sotrageKey, "1")
       this.show = true
     },
     /** 

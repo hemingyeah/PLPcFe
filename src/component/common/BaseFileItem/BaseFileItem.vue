@@ -31,10 +31,10 @@
 
 <script>
 // TODO: 识别更多类型的文件
-import platform from '@src/platform/index';
+import platform from "@src/platform/index";
 
 export default {
-  name: 'base-file-item',
+  name: "base-file-item",
   props: {
     file: {
       type: Object,
@@ -47,54 +47,54 @@ export default {
     },
     size: {
       type: String,
-      default: 'normal',
+      default: "normal",
     }
   },
   computed:{
     icon(){
       let file = this.file;
-      let icon = '';
+      let icon = "";
       const name = file.filename || file.url;
 
       if (/\.(png|bmp|gif|jpg|jpeg|tiff)$/i.test(name)) {
-        icon = 'img';
+        icon = "img";
       } else if (/\.(ppt|pptx)$/i.test(name)) {
-        icon = 'ppt-file-icon';
+        icon = "ppt-file-icon";
       } else if (/\.(mp3)$/i.test(name)) {
-        icon = 'voice-file-icon';
+        icon = "voice-file-icon";
       } else if (/\.(mp4)$/i.test(name)) {
-        icon = 'video-file-icon';
+        icon = "video-file-icon";
       } else if (/\.(zip)$/i.test(name)) {
-        icon = 'zip-file-icon';
+        icon = "zip-file-icon";
       } else if (/\.(pdf)$/i.test(name)) {
-        icon = 'pdf-file-icon';
+        icon = "pdf-file-icon";
       } else if (/\.(xls|xlsx)$/i.test(name)) {
-        icon = 'xls-file-icon';
+        icon = "xls-file-icon";
       } else if (/\.(doc|docx)$/i.test(name)) {
-        icon = 'doc-file-icon';
+        icon = "doc-file-icon";
       } else if (/\.(txt)$/i.test(name)) {
-        icon = 'txt-file-icon';
+        icon = "txt-file-icon";
       } else {
-        icon = 'other-file-icon';
+        icon = "other-file-icon";
       }
 
-      if (this.size === 'small') {
+      if (this.size === "small") {
         icon = `small-${icon}`;
       }
 
       return icon;
     },
     clazz(){
-      let clazz = ['base-file-preview'];
+      let clazz = ["base-file-preview"];
 
       if(!this.isImage){
-        clazz = clazz.concat(['base-file-icon', this.icon])
+        clazz = clazz.concat(["base-file-icon", this.icon])
       }
 
-      if (this.size === 'small') {
-        clazz.push('small-base-file-preview')
+      if (this.size === "small") {
+        clazz.push("small-base-file-preview")
         if(!this.isImage){
-          clazz.push('small-base-file-icon')
+          clazz.push("small-base-file-icon")
         }
       }
 
@@ -104,17 +104,17 @@ export default {
       let styl = {};
       
       if(this.isImage) {
-        let suffix = this.file.url.indexOf('http') == 0 ? 'x-oss-process=image/resize,m_lfit,h_88,w_88' : 'isCmp=true';
-        let url = `${this.file.url}${this.file.url.indexOf('?') >= 0 ? '&' : '?'}${suffix}`;
+        let suffix = this.file.url.indexOf("http") == 0 ? "x-oss-process=image/resize,m_lfit,h_88,w_88" : "isCmp=true";
+        let url = `${this.file.url}${this.file.url.indexOf("?") >= 0 ? "&" : "?"}${suffix}`;
         styl.backgroundImage = `url(${url})`;
-        styl.cursor = 'pointer';
+        styl.cursor = "pointer";
       }
 
       return styl;
     },
     // 是否为图片
     isImage(){
-      return this.icon === 'img' || this.icon === 'small-img';
+      return this.icon === "img" || this.icon === "small-img";
     }
   },
   methods: {
@@ -122,11 +122,11 @@ export default {
       return `/files/download?fileId=${file.id}`;
     },
     preview(event){
-      let element = event.target.querySelector('img');
+      let element = event.target.querySelector("img");
       if(!this.isImage || !element) return;
 
-      let list = event.target.closest('.base-file__preview');
-      let images = Array.prototype.slice.call(list.querySelectorAll('img'));
+      let list = event.target.closest(".base-file__preview");
+      let images = Array.prototype.slice.call(list.querySelectorAll("img"));
 
       let currIndex = 0;
       let urls = images.map((item, index) => {
@@ -144,10 +144,10 @@ export default {
       try {
         const name = this.file.filename;
         if(await platform.confirm(`确定要删除该附件？\n${name}`)){
-          this.$emit('delete', this.file);
+          this.$emit("delete", this.file);
         }
       } catch (error) {
-        console.error('error', error);
+        console.error("error", error);
       }
     }
   }

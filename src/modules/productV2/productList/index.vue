@@ -559,7 +559,7 @@
       @success="search"
       action="/excels/customer/customerProductUpdateBatchNew"
     ></batch-update-dialog>
-    <biz-select-column ref="advanced" @save="saveColumnStatus" />
+    <biz-select-column ref="advanced" :sotrage-key="'productV2_select_colum'" @save="saveColumnStatus" />
     <!-- <base-table-advanced-setting ref="advanced" @save="modifyColumnStatus"/> -->
 
     <search-panel
@@ -610,12 +610,13 @@ const link_reg = /((((https?|ftp?):(?:\/\/)?)(?:[-;:&=\+\$]+@)?[A-Za-z0-9.-]+|(?
 export default {
   name: "product-list",
   mixins: [TeamMixin],
-  props: {
-    initData: {
-      type: Object,
-      default: () => ({}),
-    },
-  },
+  inject:["initData"],
+  // props: {
+  //   initData: {
+  //     type: Object,
+  //     default: () => ({}),
+  //   },
+  // },
   data() {
     return {
       multipleSelectionPanelShow: false,
@@ -854,7 +855,6 @@ export default {
 
         return field;
       });
-      console.log(arr, "arr_")
 
       let arr_ = [
         {

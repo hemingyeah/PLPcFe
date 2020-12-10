@@ -17,14 +17,14 @@
 </template>
 
 <script>
-import Uploader from '@src/util/uploader';
-import platform from '@src/platform';
+import Uploader from "@src/util/uploader";
+import platform from "@src/platform";
 
-const IMG_TYPE = ['png', 'bmp', 'gif', 'jpg', 'jpeg', 'tiff'];
-const WATERMARK_DEFAULT_POSTION = 'bottomRight'; // 图片水印位置默认右下
+const IMG_TYPE = ["png", "bmp", "gif", "jpg", "jpeg", "tiff"];
+const WATERMARK_DEFAULT_POSTION = "bottomRight"; // 图片水印位置默认右下
 
 export default {
-  name: 'base-upload',
+  name: "base-upload",
   data(){
     return {
       pending: false
@@ -37,11 +37,11 @@ export default {
     },
     displayName: {
       type: String,
-      default: () => '附件',
+      default: () => "附件",
     },
     action: {
       type: String,
-      default: '/files/upload',
+      default: "/files/upload",
     },
     multiple: {
       type: Boolean,
@@ -49,7 +49,7 @@ export default {
     },
     forId: {
       type: String,
-      default: ''
+      default: ""
     },
     value: {
       type: Array,
@@ -57,7 +57,7 @@ export default {
     },
     placeholder: {
       type: String,
-      default: ''
+      default: ""
     },
     isShowOperateContent : {
       type: Boolean,
@@ -73,7 +73,7 @@ export default {
     },
     accept: {
       type: String,
-      default: ''
+      default: ""
     }
   },
   computed: {
@@ -86,8 +86,8 @@ export default {
   },
   methods: {
     chooseFile(){
-      if(!this.allowUpload) return console.warn('Caused: dont chooseFile, because of this.allowUpload is false');
-      if(this.pending) return platform.alert('请等待文件上传完成');
+      if(!this.allowUpload) return console.warn("Caused: dont chooseFile, because of this.allowUpload is false");
+      if(this.pending) return platform.alert("请等待文件上传完成");
       if(this.value.length >= Uploader.FILE_MAX_NUM) {
         return platform.alert(`上传文件数量不能超过${Uploader.FILE_MAX_NUM}个`);
       }
@@ -116,12 +116,12 @@ export default {
         // 需要做文件类型校验
         for (let item of files) {
           let _fileName = item.name;
-          if (!_fileName.includes(Uploader.fileTypeObj[this.fileType]['fileName'])) {
+          if (!_fileName.includes(Uploader.fileTypeObj[this.fileType]["fileName"])) {
             // 没有匹配到
             this.$platform.notification({
-              title: '文件上传失败',
-              message: Uploader.fileTypeObj[this.fileType]['errMsg'],
-              type: 'error',
+              title: "文件上传失败",
+              message: Uploader.fileTypeObj[this.fileType]["errMsg"],
+              type: "error",
             })
             return false;
           }
@@ -138,7 +138,7 @@ export default {
         let {success, error} = result;
         console.log(result);
         if(error && Array.isArray(error) && error.length > 0){
-          let message = error.map(item => item.message).join('\n');
+          let message = error.map(item => item.message).join("\n");
           // 此处不能return
           platform.alert(message)
         }
@@ -153,16 +153,17 @@ export default {
             if(IMG_TYPE.indexOf(currExt) > -1 && !!file.url) {
               params.urls = [file.url];
               params.position = WATERMARK_DEFAULT_POSTION;
-              let waterMarkResult = await _self.$http.post('/dd/file/upload/watermark/position', params);
+              let waterMarkResult = await _self.$http.post("/dd/file/upload/watermark/position", params);
               if(waterMarkResult.length > 0 && waterMarkResult[0].data) {
                 success[i] = waterMarkResult[0].data;
               }
             }
           }
+
+          let value = this.value.concat(success);
+          this.$emit("input", value);
         }
 
-        let value = this.value.concat(success);
-        this.$emit('input', value);
       })
         .catch(err => console.error(err))
         .then(() => this.pending = false)
@@ -171,15 +172,15 @@ export default {
       let index = this.value.indexOf(file);
       if(index >= 0) {
         this.value.splice(index, 1);
-        this.$emit('input', this.value);
+        this.$emit("input", this.value);
       }
     },
     // 返回小写后缀
     getExt(fileName){
-      if(!fileName) return '';
+      if(!fileName) return "";
 
-      let index = fileName.lastIndexOf('.');
-      if(index < 0) return '';
+      let index = fileName.lastIndexOf(".");
+      if(index < 0) return "";
 
       return fileName.substring(index + 1).toLowerCase();
     },

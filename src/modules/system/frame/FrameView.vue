@@ -1018,7 +1018,7 @@ export default {
       platform.openTab({
         id: "productV2_list",
         title: "产品目录",
-        url: "/customer/product",
+        url: "/customer/productV2",
         reload: true,
       });
     },
