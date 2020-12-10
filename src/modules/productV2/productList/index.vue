@@ -105,16 +105,16 @@
           >新建</base-button
           >
           <div
-            class="task-ai task-flex task-font14 task-c6 task-pointer mar-l-20"
+            class="task-ai task-flex task-font14 task-c6 cur-point mar-l-20"
             @click="deleteProducts"
-            v-if="deletePermission"
+            v-if="deletePermission" 
           >
             <i class="iconfont icon-qingkongshanchu task-icon"></i>
             <span class="task-mr4 task-ml4">删除</span>
           </div>
           
           <div
-            class="task-ai task-flex task-font14 task-c6 task-pointer mar-l-24"
+            class="task-ai task-flex task-font14 task-c6 cur-point mar-l-24"
             @click="openDialog('edit')"
             v-if="editedPermission === 3"
           >
@@ -122,7 +122,7 @@
             <span class="task-mr4 task-ml4">批量编辑</span>
           </div>
           <div
-            class="task-ai task-flex task-font14 task-c6 task-pointer mar-l-24"
+            class="task-ai task-flex task-font14 task-c6 cur-point mar-l-24"
             @click="openDialog('remind')"
             v-if="editedPermission === 3 && isShowCustomerRemind"
           >
@@ -130,7 +130,7 @@
             <span class="task-mr4 task-ml4">批量提醒</span>
           </div>
           <div
-            class="task-ai task-flex task-font14 task-c6 task-pointer mar-l-24"
+            class="task-ai task-flex task-font14 task-c6 cur-point mar-l-24"
             @click="openDialog('sendMessage')"
             v-if="editedPermission === 3"
           >
@@ -142,7 +142,7 @@
         <div class="action-button-group flex-x">
           <el-dropdown trigger="click" v-if="exportPermission">
             <div
-              class="task-ai task-flex task-font14 task-c6 task-pointer"
+              class="task-ai task-flex task-font14 task-c6 cur-point"
               @click="trackEventHandler('moreAction')"
             >
               <span class="task-mr4 task-ml4">更多操作</span>
@@ -172,7 +172,7 @@
                 'task-flex',
                 'task-font14',
                 'task-c6',
-                'task-pointer',
+                'cur-point',
                 'task-width103',
               ]"
               id="v-task-step-1"
@@ -599,6 +599,7 @@ import {
   deleteProductByIds,
   getUpdateRecord,
 } from "@src/api/ProductApi";
+import {PRODUCT_LIST_LOCALSTORAGE_20_11_25} from "@src/modules/productV2/storage.js"
 
 import {catalogFieldFixForProduct, productFieldFix} from "@src/modules/productV2/public.js";
 import {getListProductFields} from "@src/api/ProductV2Api"
@@ -1610,14 +1611,14 @@ export default {
       });
     },
     getLocalStorageData() {
-      const dataStr = localStorage.getItem("product_list_localStorage_20_11_25") || "{}";
+      const dataStr = localStorage.getItem(PRODUCT_LIST_LOCALSTORAGE_20_11_25) || "{}";
       return JSON.parse(dataStr);
     },
     saveDataToStorage(key, value) {
       const data = this.getLocalStorageData();
       data[key] = value;
       localStorage.setItem(
-        "product_list_localStorage_20_11_25",
+        PRODUCT_LIST_LOCALSTORAGE_20_11_25,
         JSON.stringify(data)
       );
     },

@@ -62,12 +62,13 @@
 </template>
 
 <script>
-import { storageGet, storageSet } from '@src/util/storage';
-import { string } from 'mathjs';
+import { storageGet, storageSet } from "@src/util/storage";
+import {PRODUCT_SEARCH_MODAL_COM_DATA} from "@src/modules/productV2/storage"
+import { string } from "mathjs";
 let checkSystemList_ = [];
 let checkCustomizeList_ = [];
 export default {
-  name: 'search-set-modal',
+  name: "search-set-modal",
   props: {
     fields: {
       type: Array | string,
@@ -121,7 +122,7 @@ export default {
     },
   },
   mounted() {
-    let obj_ = storageGet('product_search_modal_com_data');
+    let obj_ = storageGet(PRODUCT_SEARCH_MODAL_COM_DATA);
     if (obj_) {
       obj_ = JSON.parse(obj_);
       this.checkSystemList = obj_.checkSystemList;
@@ -140,11 +141,11 @@ export default {
           rest_.push(item);
         }
       });
-      this.$emit('changeDiyFields', rest_);
+      this.$emit("changeDiyFields", rest_);
       checkSystemList_ = this.checkSystemList;
       checkCustomizeList_ = this.checkCustomizeList;
       storageSet(
-        'product_search_modal_com_data',
+        PRODUCT_SEARCH_MODAL_COM_DATA,
         JSON.stringify({
           checkSystemList: this.checkSystemList,
           checkCustomizeList: this.checkCustomizeList,

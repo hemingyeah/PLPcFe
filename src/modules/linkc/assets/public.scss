@@ -36,6 +36,13 @@
 
 .cur-point {
   cursor: pointer;
+  &:hover{
+    color: $color-primary;
+
+  i{
+    color: $color-primary !important;
+  }
+  }
 }
 
 .mar-t-8 {
