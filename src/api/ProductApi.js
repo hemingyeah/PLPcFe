@@ -11,15 +11,12 @@ let headUrl2 = "/api/elasticsearch/outside/es"
  * @returns {*}
  */
 function getProduct(params) {
-  let productPreFixedPath = GrayUtil.getProductV2ApiPath();
-  return productPreFixedPath ? http.post(`${headUrl}/product/pageList`, params) : http.post("/customer/product/list/data", params)
+  return http.post("/customer/product/list/data", params)
   
 }
 
 function getProductV2(params) {
-  let productPreFixedPath = GrayUtil.getProductV2ApiPath();
-  return productPreFixedPath ? http.post(`${headUrl2}/product/pageList`, params) : http.post("/customer/product/list/data", params)
-  
+  return http.post(`${headUrl2}/product/pageList`, params)
 }
 
 /**

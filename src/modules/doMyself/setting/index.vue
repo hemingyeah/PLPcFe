@@ -834,9 +834,6 @@ export default {
 .el-switch__label {
   font-weight: 400;
 }
-.my-shop-box {
-  min-width: 1015px;
-}
 .color-primary {
   color: $color-primary;
 }
