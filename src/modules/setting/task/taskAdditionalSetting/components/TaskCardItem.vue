@@ -12,15 +12,15 @@
                         <div class="task-card-scope">
                             <p>已应用范围：</p>
                              <template v-if="cardData.range.length>1">
-                                <el-dropdown placement="top">
-                                    <span class="pointer">{{cardData.range[0]}}等{{cardData.range.length}}个</span>         
+                                <el-dropdown placement="top" @command="modifyTaskType">
+                                    <span class="pointer">{{cardData.range[0].taskName}}等{{cardData.range.length}}个</span>         
                                     <el-dropdown-menu slot="dropdown">
-                                        <el-dropdown-item v-for="(item,index) in cardData.range" :key="index"  @click="modifyTaskType(item.id)">{{item}}</el-dropdown-item>       
+                                        <el-dropdown-item v-for="(item,index) in cardData.range" :key="index"   :command="item.taskTypeId">{{item.taskName}}</el-dropdown-item>       
                                     </el-dropdown-menu>
                                 </el-dropdown>
                             </template>
                             <template v-else>
-                                <span class="pointer">{{cardData.range[0]}}</span>
+                                <span class="pointer">{{cardData.range[0].taskName}}</span>
                             </template>
                         </div>
                         <div class="task-card-li">
@@ -30,7 +30,7 @@
                     </el-row>
                 </el-row >
             </el-row>
-            <el-switch v-model="cardData.enabled"  active-value="1" inactive-value="0"/>
+            <el-switch v-model="cardData.enabled"  :active-value="1" :inactive-value="0"/>
         </el-row>
 
         <!-- start 操作 -->
@@ -93,6 +93,7 @@ export default {
         },
         //TODO:进入工单详情
         modifyTaskType(id) {
+            console.log(id)
             let taskTypeId = id;
             this.$platform.openTab({
                 id: "task_flow_setting",
@@ -197,11 +198,10 @@ export default {
             cursor: pointer;
             flex: 1;
             text-align: center;
-            line-height: 32px;
-            color: #999999;
-            
+            line-height: 32px;            
             i{
                 font-size: 12px;
+                color: #999999;
             }
             &:hover{
                 color: $color-primary; 

@@ -37,9 +37,11 @@
     </div>
     <!-- end 附加组件设置 -->
 
-    <!-- start 添加编辑附加组件 -->
+    <!-- 添加编辑附加组件 -->
     <edit-cardname-dialog ref="batchCardnameDialog"></edit-cardname-dialog>
-   
+    
+    <!-- 统计 -->
+    <statistical-dialog></statistical-dialog>
   </div>
 </template>
 
@@ -47,6 +49,7 @@
 import TaskNavBar from "../../components/TaskNavBar";
 import TaskCardItem from "../components/TaskCardItem";
 import EditCardnameDialog from "../components/EditCardnameDialog";
+import statisticalDialog from "../components/statisticalDialog";
 
 export default {
   name: "task-manage",
@@ -59,21 +62,21 @@ export default {
           name: '费用备注',
           description: '记录备注费用信息',
           inputType: 'single',//单次single 多次multiple   
-          range:['工单类型1','工单类型2'], 
+          range:[{taskName:'工单类型1',taskTypeId:'ee7a0934-2840-4b55-bcc4-000e6435b70c'},{taskName:'工单类型2',taskTypeId:'ee7a0934-2840-4b55-bcc4-000e6435b70c'}], 
           enabled:1 //1开启 0关闭
         }, {
-          id: "6a4bde67-11ad-11eb-a442-00163e304a25",
+          id: "c5b8b2ab-a47e-11ea-a340-00163e304a22",
           name: '礼品邮寄',
           description: '费用备注费用备注费用备注费用备注费用备注超过16',
           inputType: 'single',//单次single 多次multiple
-          range:['工单类型1'], 
+          range:[{taskName:'工单类型1',taskTypeId:'ee7a0934-2840-4b55-bcc4-000e6435b70c'}], 
           enabled:1 //1开启 0关闭
         },{
-          id: 3,
+          id: "c5b8b2ab-a47e-11ea-a340-00163e304a23",
           name: '费用备注费用备注费用备注费用备注费用备注超过16',
           description: '记录备注费用信息',
           inputType: 'single',//单次single 多次multiple
-          range:['工单类型1'], 
+          range:[{taskName:'工单类型1',taskTypeId:'ee7a0934-2840-4b55-bcc4-000e6435b70c'}], 
           enabled:1 //1开启 0关闭
         },
       ],
@@ -91,14 +94,16 @@ export default {
       this.$refs.batchCardnameDialog.openDialog();
     },
     editRename(id) {
-      this.$refs.batchCardnameDialog.id = id;
+      this.$refs.batchCardnameDialog.form.id = id;
       this.$refs.batchCardnameDialog.openDialog();
     },
   },
   components: {
     [TaskNavBar.name]: TaskNavBar,
     [TaskCardItem.name]: TaskCardItem,
-    [EditCardnameDialog.name]: EditCardnameDialog
+    [EditCardnameDialog.name]: EditCardnameDialog,
+    [statisticalDialog.name]: statisticalDialog
+    
   },
 };
 </script>

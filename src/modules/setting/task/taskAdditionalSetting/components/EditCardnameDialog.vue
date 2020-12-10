@@ -7,14 +7,14 @@
   >
     <div slot="title">
       <span class="el-dialog__title">{{
-        id ? "编辑组件名称" : "新建附加组件"
+        form.id ? "编辑组件名称" : "新建附加组件"
       }}</span>
       <el-tooltip
         class="item"
         effect="dark"
         content="每个附加组件可以有5个自定义字段"
         placement="top"
-        v-if="!id"
+        v-if="!form.id"
       >
         <span><i class="el-icon-question"></i></span>
       </el-tooltip>
@@ -31,7 +31,7 @@
         <el-form-item label="说明:">
           <el-input
             type="textarea"
-            v-model="form.name"
+            v-model="form.description"
             placeholder="请输入说明信息"
           ></el-input>
         </el-form-item>
@@ -46,7 +46,7 @@
               <span><i class="el-icon-question"></i></span>
             </el-tooltip>
           </div>
-          <el-radio-group v-model="form.resource" :disabled="id?true:false">
+          <el-radio-group v-model="form.resource" :disabled="form.id?true:false">
             <el-radio label="single">单次</el-radio>
             <el-radio label="multiple">多次</el-radio>
           </el-radio-group>
@@ -55,7 +55,7 @@
     </div>
     <div slot="footer" class="dialog-footer">
       <el-button @click="onClose('form')">取 消</el-button>
-      <el-button type="primary" @click="onSubmit('form')" v-if="id"
+      <el-button type="primary" @click="onSubmit('form')" v-if="form.id"
         >确 定</el-button
       >
       <el-button type="primary" @click="onSubmit('form')" v-else
@@ -65,14 +65,18 @@
   </base-modal>
 </template>
 <script>
+// api
+import * as SettingTaskApi from "@src/api/SettingTaskApi";
+
 export default {
   name: "edit-cardname-dialog",
   data() {
     return {
       visible: false,
-      id: "",
       form: {
+        id: "",
         name: "",
+        description:"",
         resource: "single"
       },
       rules: {
@@ -83,10 +87,12 @@ export default {
   methods: {
     openDialog() {
       this.visible = true;
+      if(this.form.id) {
+        this.getCardInfoReq()
+      }
     },
     onClose(form) {
       this.visible = false;
-      this.id = "";
       this.$refs[form].resetFields();
     },
     onSubmit(form) {
@@ -98,6 +104,21 @@ export default {
           return false;
         }
       });
+    },
+    //获取附加组件的信息
+    getCardInfoReq() {
+      SettingTaskApi.getCardInfo({id:this.form.id}).then(res=>{
+
+        const { status, message, data } = res;
+        if( status == 0 ){
+          this.form = data;
+
+        }
+
+      }).catch(error=>{
+
+      })
+
     },
   },
 };
