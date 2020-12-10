@@ -1,5 +1,5 @@
 <template>
-  <div class="task-detail-container" v-loading="loading" @scroll="getScroll" ref="container">
+  <div class="task-detail-container" v-loading="loading" ref="container">
     <div class="guide-model-box" v-if="nowGuideStep < 5">
 
     </div>
@@ -195,8 +195,8 @@
     <!-- end 顶部操作区 -->
 
     <!-- start 工单详情折叠面板 -->
-    <base-collapse class="task-detail-main-content" :show-collapse="showCollapse" :direction.sync="collapseDirection" :style="`margin-top: ${collapse ? marTop - 4 : 60}px`">
-
+    <base-collapse class="task-detail-main-content" @scroll="getScroll" :show-collapse="showCollapse" :direction.sync="collapseDirection" :style="`margin-top: ${collapse ? marTop - 4 : 60}px`">
+      
       <!-- start 工单详情 -->
       <template slot="left">
         <div class="task-detail-main-content-left" v-show="collapseDirection != 'left'">

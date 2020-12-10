@@ -1,5 +1,5 @@
 <template>
-  <div class="base-collapse">
+  <div class="base-collapse" @scroll="$emit('scroll', $event)">
     <div :class="['base-collapse-left', {'active': collapse == 'left'}]">
       <slot name="left"></slot>
 

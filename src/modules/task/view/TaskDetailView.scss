@@ -149,7 +149,7 @@ body {
   padding: 0 12px;
   margin-bottom: 10px;
   position: fixed;
-  width: 97.1%;
+  width: calc(100% - 40px);
   z-index: 999;
 
   background: #fff;
@@ -413,11 +413,12 @@ body {
 // 工单详情
 .task-detail-main-content {
   // flex: 1;
+  overflow: auto;
 
   &-left,
   &-right {
     height: 100%;
-    overflow: hidden;
+    // overflow: hidden;
   }
 
   .collapse-left,
@@ -451,7 +452,7 @@ body {
 
     &__content {
       flex: 1;
-      overflow: auto;
+      // overflow: auto;
 
       .el-tab-pane {
         height: 100%;
