@@ -183,11 +183,11 @@
 <script>
 import {getTaskType,modifyOption,modifyConfig} from "@src/api/TaskApi.ts";
 
-import SystemTemplateDialog from "./SystemTemplateDialog";
-import TemplateUploadDialog from "./TemplateUploadDialog";
+import SystemTemplateDialog from "../../components/SystemTemplateDialog";
+import TemplateUploadDialog from "../../components/TemplateUploadDialog";
 
 export default {
-  name: 'other-setting',
+  name: 'other-setting-panel',
   data() {
     return {
       //TODO: id后期需要动态获取

@@ -27,7 +27,7 @@
             </el-tree>
         </div>
         <el-row class="choose-team-footer"  type="flex" justify="space-between" slot="footer">
-            <el-checkbox v-model="flag" @change="checkAll">全选</el-checkbox>
+            <el-checkbox v-model="flag" @change="checkAll" :disabled="loading">全选</el-checkbox>
             <div>
                 <el-button @click="cancel">取消</el-button>
                 <el-button type="primary" @click="update">确定</el-button>
@@ -42,7 +42,7 @@ import _ from "lodash";
 export default {
     name: 'choose-team-dialog',
     props: {
-        visable: {
+        visiable: {
             type: Boolean,
             default: false
         },
@@ -72,7 +72,7 @@ export default {
         }
     },
     watch: {
-        visable(newVal){
+        visiable(newVal){
             this.isShow = newVal;
             if(newVal) {
                 this.checkedTeamList = this.value;
@@ -83,7 +83,7 @@ export default {
     },
     methods: {
         cancel() {
-            this.$emit('update:visable', false);
+            this.$emit('update:visiable', false);
         },
         update() {
             this.$emit('update', this.checkedTeamList);
