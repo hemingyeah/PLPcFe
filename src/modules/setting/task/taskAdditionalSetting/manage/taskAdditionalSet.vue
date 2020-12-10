@@ -17,30 +17,36 @@
             </el-tab-pane>
           </el-tabs>
         </div>
-        <div class="lh-52">
-          <el-button type="primary" icon="el-icon-plus"  :loading="false" @click="addTaskType"> 新建</el-button>
+        <div class="lh-52" v-if="activeTab=='task-added'">
+          <el-button type="primary" icon="el-icon-plus"  :loading="false" @click="addTaskCard"> 新建</el-button>
         </div>
       </div>
       
       <!-- start 已添加附加组件 -->
-      <div class="task-type-list">
+      <div class="task-type-list" v-if="activeTab=='task-added'">
         <task-card-item
           class="task-type-item"
           v-for="(item, idx) in cardList"
           :key="item.id"
-          :value.sync="cardList[idx]"
+          :cardData.sync="cardList[idx]"
+          @editRename="editRename"
         ></task-card-item>
       </div>
       <!-- end 已添加附加组件 -->
 
     </div>
-     <!-- end 附加组件设置 -->
+    <!-- end 附加组件设置 -->
+
+    <!-- start 添加编辑附加组件 -->
+    <edit-cardname-dialog ref="batchCardnameDialog"></edit-cardname-dialog>
+   
   </div>
 </template>
 
 <script>
-import TaskNavBar from "../../components/TaskNavBar.vue";
-import TaskCardItem from "../components/TaskCardItem.vue";
+import TaskNavBar from "../../components/TaskNavBar";
+import TaskCardItem from "../components/TaskCardItem";
+import EditCardnameDialog from "../components/EditCardnameDialog";
 
 export default {
   name: "task-manage",
@@ -49,38 +55,50 @@ export default {
       activeTab: "task-added",
       cardList: [
         {
-          id: 1,
+          id: 'c5b8b2ab-a47e-11ea-a340-00163e304a25',
           name: '费用备注',
           description: '记录备注费用信息',
+          inputType: 'single',//单次single 多次multiple   
+          range:['工单类型1','工单类型2'], 
+          enabled:1 //1开启 0关闭
+        }, {
+          id: "6a4bde67-11ad-11eb-a442-00163e304a25",
+          name: '礼品邮寄',
+          description: '费用备注费用备注费用备注费用备注费用备注超过16',
           inputType: 'single',//单次single 多次multiple
-          updateName: "张燕青",
-          updateDate: "2020-10-20",
+          range:['工单类型1'], 
+          enabled:1 //1开启 0关闭
+        },{
+          id: 3,
+          name: '费用备注费用备注费用备注费用备注费用备注超过16',
+          description: '记录备注费用信息',
+          inputType: 'single',//单次single 多次multiple
+          range:['工单类型1'], 
           enabled:1 //1开启 0关闭
         },
       ],
 
-      isAddTaskTypeModal: false,
     };
   },
   computed: {
-    dragOptions() {
-      return {
-        animation: 0,
-        group: "description",
-        disabled: false,
-        ghostClass: "ghost",
-      };
-    },
+  },
+  mounted() {
+
   },
   methods: {
-    addTaskType() {
-      // 添加工单类型
-      this.isAddTaskTypeModal = true;
+    //新建组件
+    addTaskCard(){
+      this.$refs.batchCardnameDialog.openDialog();
+    },
+    editRename(id) {
+      this.$refs.batchCardnameDialog.id = id;
+      this.$refs.batchCardnameDialog.openDialog();
     },
   },
   components: {
     [TaskNavBar.name]: TaskNavBar,
     [TaskCardItem.name]: TaskCardItem,
+    [EditCardnameDialog.name]: EditCardnameDialog
   },
 };
 </script>
