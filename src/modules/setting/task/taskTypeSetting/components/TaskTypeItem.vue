@@ -19,6 +19,7 @@
                     </el-row>
                 </el-row >
             </el-row>
+            <!-- todo_lc: 无法禁用全部工单类型-->
             <el-switch v-model="value.open" />
         </el-row>
         <el-row class="task-type-opearte" type="flex">
@@ -31,7 +32,7 @@
         </el-row>
         <!-- 选择团队弹窗 -->
         <choose-team-dialog
-            :visable.sync="isShowChooseTeamModal"
+            :visiable.sync="isShowChooseTeamModal"
             :value="value.teamList"
             @update="updateTeamList"/>
     </el-card>
@@ -127,6 +128,11 @@ export default {
                 line-height: 22px;
             }
             .task-type-others{
+                i{
+                    &:hover{
+                        color: $color-primary;
+                    }
+                }
                 p{
                     margin-bottom: 6px;
                     font-size: 12px;
@@ -150,12 +156,17 @@ export default {
             i{
                 font-size: 12px;
             }
-            &:hover{
-                background-color: #F5F5F5;
-            }
         }
         .task-type-opearte-del{
            border-right: 1px solid#F5F5F5; 
+            &:hover{
+                color: $color-danger;
+            }
+        }
+        .task-type-opearte-modify{
+            &:hover{
+                color: $color-primary;
+            }
         }
     }
 }

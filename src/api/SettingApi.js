@@ -94,3 +94,13 @@ export function getSettingTaskTypeEnabledFields(params) {
 export function saveSettingDispatchRule(params) {
   return http.post('/setting/dispatchRule/task/save', params)
 }
+
+/******************** S 工单类型设置 ***************/
+
+/**
+ * 查询行业模板库记录
+ */
+export const getSysTaskTypeList = () => {
+  return http.post('/setting/taskType/getSysList')
+}
+/******************** E 工单类型设置 ***************/

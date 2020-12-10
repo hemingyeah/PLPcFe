@@ -23,7 +23,7 @@
     </div>
 
     <!-- 新建工单类型弹窗 -->
-    <add-task-type-dialog :visable.sync="isAddTaskTypeModal" />
+    <add-task-type-dialog :visiable.sync="isAddTaskTypeModal" />
   </div>
 </template>
 
@@ -91,6 +91,7 @@ export default {
   methods: {
     addTaskType() {
       // 添加工单类型
+      // todo_zr: 需要校验可用工单类型数量 
       this.isAddTaskTypeModal = true;
     }
   },
