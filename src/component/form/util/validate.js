@@ -99,6 +99,9 @@ export function validate(fields){
   return fields.map(field => {
     let message = common(field);
 
+    // 服务团队不需要校验
+    if(field.fieldName == 'tags') return; 
+
     if(isSelect(field) || isMultiSelect(field)){
       message = message.concat(select(field));
     }
