@@ -21,7 +21,7 @@
           <el-button type="primary" >搜索</el-button>
         </div>
         <div class="search-right">
-           <el-button type="primary" plain @click="onSubmit('form')"  >导出</el-button>
+           <el-button type="primary" plain @click="exportStatistics">导出</el-button>
         </div>
       </div>
         <el-table
@@ -95,8 +95,8 @@
 
     </div>
     <div slot="footer" class="dialog-footer">
-      <el-button @click="onClose('form')">取 消</el-button>
-      <el-button type="primary" @click="onSubmit('form')" >确 定</el-button>
+      <el-button @click="onClose">取 消</el-button>
+      <el-button type="primary" @click="onClose" >确 定</el-button>
     </div>
   </base-modal>
 </template>
@@ -138,17 +138,9 @@ export default {
     },
     onClose(form) {
       this.visible = false;
-      this.$refs[form].resetFields();
     },
-    onSubmit(form) {
-      this.$refs[form].validate((valid) => {
-        if (valid) {
-          alert("submit!");
-        } else {
-          console.log("error submit!!");
-          return false;
-        }
-      });
+    //导出统计
+    exportStatistics() {
     },
 
     handleSelectionChange(val) {
@@ -163,7 +155,6 @@ export default {
       this.form.pageSize = pageSize;
       this.form.pageNum = 1;
 
-      this.search("", false);
     },
     /**
      * @description 页码跳转
@@ -171,8 +162,6 @@ export default {
      */
     jumpPage(pageNum) {
       this.form.pageNum = pageNum;
-      this.tableData = [];
-      this.search(this.searchParams, false);
     },
     //获取附加组件的信息
     getCardInfoReq() {

@@ -25,7 +25,7 @@
                         </div>
                         <div class="task-card-li">
                             <p>类型：<span class="task_type">{{cardData.inputType=='single'?'单次':'多次'}}</span></p>
-                            <p>使用统计：<span class="task_see">查看</span></p>
+                            <p>使用统计：<span class="task_see" @click="onSee">查看</span></p>
                         </div>
                     </el-row>
                 </el-row >
@@ -101,6 +101,10 @@ export default {
                 url: `/setting/task/taskFormSet?taskTypeId=${taskTypeId}`,
                 reload: true,
             });
+        },
+        //查看统计
+        onSee() {
+
         },
         updateTeamList(teamList){
             console.log(teamList);
