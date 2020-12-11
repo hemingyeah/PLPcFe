@@ -704,6 +704,7 @@ export default {
           this.StatisticalData = res
           this.StatisticalData.callQuantity = callCount
           this.tabs = this.buildTabs()
+          localStorage.setItem('customer_remind_count',res.remindQuantity)
         })
         .catch(err => console.error('fetchStatisticalData', err))
     },
