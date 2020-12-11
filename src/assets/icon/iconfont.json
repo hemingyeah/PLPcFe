@@ -6,16 +6,58 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "18724448",
+      "name": "描述",
+      "font_class": "fdn-description",
+      "unicode": "e6e1",
+      "unicode_decimal": 59105
+    },
+    {
+      "icon_id": "18723880",
+      "name": "优先级",
+      "font_class": "fdn-level",
+      "unicode": "e6e0",
+      "unicode_decimal": 59104
+    },
+    {
+      "icon_id": "18723534",
+      "name": "服务内容",
+      "font_class": "fdn-serviceContent",
+      "unicode": "e6df",
+      "unicode_decimal": 59103
+    },
+    {
+      "icon_id": "18723506",
+      "name": "服务类型",
+      "font_class": "fdn-serviceType",
+      "unicode": "e6dd",
+      "unicode_decimal": 59101
+    },
+    {
+      "icon_id": "18724078",
+      "name": "服务类型",
+      "font_class": "fdn-serviceIterm",
+      "unicode": "ec44",
+      "unicode_decimal": 60484
+    },
+    {
+      "icon_id": "18722807",
+      "name": "签名",
+      "font_class": "fdn-systemAutograph",
+      "unicode": "e6bd",
+      "unicode_decimal": 59069
+    },
+    {
       "icon_id": "18707515",
       "name": "产品关联",
-      "font_class": "chanpinguanlian",
+      "font_class": "fdn-relationProduct",
       "unicode": "e6dc",
       "unicode_decimal": 59100
     },
     {
       "icon_id": "18707000",
       "name": "客户关联",
-      "font_class": "kehuguanlian1",
+      "font_class": "fdn-relationCustomer",
       "unicode": "e6db",
       "unicode_decimal": 59099
     },
@@ -230,13 +272,6 @@
       "unicode_decimal": 59070
     },
     {
-      "icon_id": "18073478",
-      "name": "基础控件-签名",
-      "font_class": "fdn-autograph",
-      "unicode": "e6bd",
-      "unicode_decimal": 59069
-    },
-    {
       "icon_id": "18073477",
       "name": "基础控件-单行文本",
       "font_class": "fdn-text",
@@ -260,7 +295,7 @@
     {
       "icon_id": "18073468",
       "name": "基础控件-备件",
-      "font_class": "beijian",
+      "font_class": "fdn-sparepart",
       "unicode": "e6b8",
       "unicode_decimal": 59064
     },
@@ -312,6 +347,20 @@
       "font_class": "fdn-attachment",
       "unicode": "e6ad",
       "unicode_decimal": 59053
+    },
+    {
+      "icon_id": "18723687",
+      "name": "基础控件-附件",
+      "font_class": "fdn-taskAttachment",
+      "unicode": "ec42",
+      "unicode_decimal": 60482
+    },
+    {
+      "icon_id": "18723716",
+      "name": "基础控件-附件",
+      "font_class": "fdn-receiptAttachment",
+      "unicode": "ec43",
+      "unicode_decimal": 60483
     },
     {
       "icon_id": "18073382",

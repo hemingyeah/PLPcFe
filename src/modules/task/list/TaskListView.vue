@@ -72,26 +72,26 @@
                     </el-dropdown-menu>
                   </el-dropdown>
 
-              <el-input
-                v-model="params.keyword"
-                v-trim:blur
-                :placeholder="
-                  taskSearchInputPlaceholderMap[keyword_select] ||
-                    taskSearchInputPlaceholderMap.default
-                "
-                class="task-with-input task-ml12"
-              >
-                <el-select
-                  v-model="keyword_select"
-                  slot="prepend"
-                  placeholder="请选择"
-                  class="task-with-select"
-                >
-                  <el-option label="表单内容" value=""></el-option>
-                  <el-option label="备注" value="按工单备注"></el-option>
-                  <el-option label="附加组件" value="按附加组件"></el-option>
-                </el-select>
-              </el-input>
+                  <el-input
+                    v-model="params.keyword"
+                    v-trim:blur
+                    :placeholder="
+                      taskSearchInputPlaceholderMap[keyword_select] ||
+                        taskSearchInputPlaceholderMap.default
+                    "
+                    class="task-with-input task-ml12"
+                  >
+                    <el-select
+                      v-model="keyword_select"
+                      slot="prepend"
+                      placeholder="请选择"
+                      class="task-with-select"
+                    >
+                      <el-option label="表单内容" value=""></el-option>
+                      <el-option label="备注" value="按工单备注"></el-option>
+                      <el-option label="附加组件" value="按附加组件"></el-option>
+                    </el-select>
+                  </el-input>
 
                   <base-button
                     type="primary"
@@ -219,6 +219,25 @@
                 >
                   {{ `进行中(${filterData.processing || 0})` }}
                 </div>
+                <!-- 已完成工单 -->
+                <div
+                  v-for="item in taskView"
+                  :key="`${item.createTime}${Math.random() * 1000}`"
+                  @click="
+                    checkFilter({
+                      id: item.id,
+                      name: '已完成工单',
+                      searchModel: item.searchModel,
+                      title: 'finished',
+                    })
+                  "
+                  v-show="item.id === selectIds.finished"
+                  :class="{
+                    'task-c2': item.id === filterId,
+                  }"
+                >
+                  {{ `已完成(${filterData.finished || 0})` }}
+                </div>
                 <!-- 异常工单 -->
                 <div
                   v-for="item in taskView"
@@ -258,25 +277,7 @@
                 >
                   {{ `未完成(${filterData.unfinished || 0})` }}
                 </div>
-                <!-- 已完成工单 -->
-                <div
-                  v-for="item in taskView"
-                  :key="`${item.createTime}${Math.random() * 1000}`"
-                  @click="
-                    checkFilter({
-                      id: item.id,
-                      name: '已完成工单',
-                      searchModel: item.searchModel,
-                      title: 'finished',
-                    })
-                  "
-                  v-show="item.id === selectIds.finished"
-                  :class="{
-                    'task-c2': item.id === filterId,
-                  }"
-                >
-                  {{ `已完成(${filterData.finished || 0})` }}
-                </div>
+
               </div>
             </div>
             <div
@@ -633,37 +634,37 @@
                       }}
                     </div>
                   </template>
-                <!-- 创建方式 -->
-                <template v-else-if="column.field === 'source'">
-                  <span>{{ scope.row["source"]}}</span>
-                </template>
+                  <!-- 创建方式 -->
+                  <template v-else-if="column.field === 'source'">
+                    <span>{{ scope.row["source"]}}</span>
+                  </template>
 
-                <!-- 关联事件 -->
-                <template v-else-if="column.field === 'eventNo'">
-                  <div class="view-detail-btn task-client"
-                    @click.stop="openEventTab(scope.row)"
+                  <!-- 关联事件 -->
+                  <template v-else-if="column.field === 'eventNo'">
+                    <div class="view-detail-btn task-client"
+                         @click.stop="openEventTab(scope.row)"
+                    >
+                      {{ scope.row["eventNo"]}}
+                    </div>
+                  </template>
+                  <!-- 联系人 -->
+                  <template v-else-if="column.field === 'tlmName'">
+                    <div>
+                      {{ scope.row["linkMan"] && scope.row["linkMan"].name }}
+                    </div>
+                  </template>
+                  <!-- 电话 -->
+                  <template v-else-if="column.field === 'tlmPhone'">
+                    <div>
+                      {{ scope.row["linkMan"] && scope.row["linkMan"].phone }}
+                    </div>
+                  </template>
+                  <!-- 自定义的选择类型字段显示， 与type 区别-->
+                  <template
+                    v-else-if="column.formType === 'select' && !column.isSystem"
                   >
-                    {{ scope.row["eventNo"]}}
-                  </div>
-                </template>
-                <!-- 联系人 -->
-                <template v-else-if="column.field === 'tlmName'">
-                  <div>
-                    {{ scope.row["linkMan"] && scope.row["linkMan"].name }}
-                  </div>
-                </template>
-                <!-- 电话 -->
-                <template v-else-if="column.field === 'tlmPhone'">
-                  <div>
-                    {{ scope.row["linkMan"] && scope.row["linkMan"].phone }}
-                  </div>
-                </template>
-                <!-- 自定义的选择类型字段显示， 与type 区别-->
-                <template
-                  v-else-if="column.formType === 'select' && !column.isSystem"
-                >
-                  {{ scope.row.attribute[column.field] | displaySelect }}
-                </template>
+                    {{ scope.row.attribute[column.field] | displaySelect }}
+                  </template>
 
                   <!-- 更新时间 -->
                   <template v-else-if="column.field === 'updateTime'">
@@ -1061,7 +1062,7 @@
 </template>
 
 <script>
-import TaskList from "./TaskList";
+import TaskList from './TaskList';
 export default TaskList;
 </script>
 <style lang="scss">

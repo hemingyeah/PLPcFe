@@ -55,7 +55,7 @@ export default {
   },
   methods: {
     buildForm() {
-      if (Object.keys(this.form).length === this.fields.length) return;
+      // if (Object.keys(this.form).length === this.fields.length) return;
       this.initFormVal();
     },
     createUserInput(event, isTags) {

@@ -23,7 +23,7 @@ import DefaultHead from '@src/assets/img/avatar.png'
 import { TaskAllotPoolInfoData } from '@src/modules/task/components/TaskAllotModal/TaskAllotPool/TaskAllotPoolInterface'
 /* model */
 import Page from '@model/Page'
-import { getCustomerTagTaskPoolCountResult, getTaskPoolAuthUsersResult, getTaskPoolSubscriptionUsersResult, getUserListByTagResult, getTaskSearchListResult } from '@model/param/out/Task'
+import { getCustomerTagTaskPoolCountResult, getTaskPoolAuthUsersResult, getTaskPoolSubscriptionUsersResult, getTaskSearchListResult } from '@model/param/out/Task'
 import { REQUIRE_OTHER_NOTIFICATION_USER_MEESSAGE } from '@src/model/const/Alert'
 import { DepeMultiUserResult } from '@src/modules/task/components/TaskAllotModal/TaskAllotModalInterface'
 /* vue */
@@ -189,7 +189,7 @@ export default class TaskAllotPool extends Vue {
     this.taskPoolList.forEach((task: any) => {
       let { longitude, latitude } = task?.address || {}
       // 无经纬度
-      if (!longitude && !latitude) return
+      if (!longitude || !latitude) return
       
       // 工单标记
       let taskMarker = new AMap.Marker({

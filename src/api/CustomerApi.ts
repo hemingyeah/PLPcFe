@@ -12,7 +12,6 @@ export function getCustomer(id: string): Promise<getCustomerDetailResult> {
   return http.get('/customer/get', { id })
 }
 
-
 /** 
  * 获取客户信息，用于客户编辑
  * @param {string} id - 客户id
