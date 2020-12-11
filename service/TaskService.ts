@@ -87,6 +87,22 @@ function getCustomerFieldValue2string(data: any, fieldName: string, formType: st
 			let locationData = Attribute[fieldName]
 			result = locationData.address || ''
 		}
+		// 人员类型
+		else if (formType == FieldTypeMappingEnum.User) {
+			let attributeValue = Attribute[fieldName]
+			let isMuti = Array.isArray(attributeValue) // 多选
+			result = isMuti ? attributeValue.map((i: any) => i.displayName).join(',') : attributeValue.displayName || ''
+		}
+		// 关联工单
+		else if (formType == FieldTypeMappingEnum.RelatedTask) {
+			let attributeValue = Attribute[fieldName]
+			result = attributeValue.map((i: any) => i.taskNo).join(',')
+		}
+		// 多级菜单
+		else if (formType == FieldTypeMappingEnum.Cascader) {
+			let attributeValue = Attribute[fieldName]
+			result = attributeValue.join('/')
+		}
 		// 其他自定义字段
 		else {
 			let attributeValue =  Attribute[fieldName];

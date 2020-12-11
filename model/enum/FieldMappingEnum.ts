@@ -20,6 +20,9 @@ export enum FieldTypeMappingEnum {
   Info = 'info',
   Location = 'location',
   Select = 'select',
+  User = 'user',
+  Cascader = 'cascader',
+  RelatedTask = 'related_task'
 }
 
 /* 工单字段映射 */
