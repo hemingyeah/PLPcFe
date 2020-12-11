@@ -822,7 +822,7 @@ export default {
             continue;
           }
 
-          if (tv.formType === "cascader" || (tv.formType === 'select' && tv.setting.isMulti)) {
+          if (tv.formType === "cascader") {
             params.conditions.push({
               property: fn,
               operator: tv.operator,

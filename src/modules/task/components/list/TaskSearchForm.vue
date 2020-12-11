@@ -1,7 +1,7 @@
 <script>
 /* api */
 import * as TaskApi from "@src/api/TaskApi.ts";
-import * as CustomerApi from "@src/api/CustomerApi.ts";
+import * as CustomerApi from "@src/api/CustomerApi";
 
 /* utils */
 import _ from "lodash";
@@ -55,7 +55,7 @@ export default {
   },
   methods: {
     buildForm() {
-      // if (Object.keys(this.form).length === this.fields.length) return;
+      if (Object.keys(this.form).length === this.fields.length) return;
       this.initFormVal();
     },
     createUserInput(event, isTags) {
@@ -81,7 +81,7 @@ export default {
         if (field.fieldName === "tags") {
           tv = [];
         }
-        if (field.formType === "area" || field.formType === "cascader" || (field.formType === 'select' && field.setting.isMulti)) {
+        if (field.formType === "area" || field.formType === "cascader") {
           tv = [];
         }
 

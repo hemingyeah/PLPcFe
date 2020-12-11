@@ -61,6 +61,7 @@ export default {
   computed: {
     isMulti() {
       let setting = this.field.setting || {};
+      if (this.field.formType === 'select' && !this.field.isSystem) return false
       return setting.isMulti;
     },
     options() {
