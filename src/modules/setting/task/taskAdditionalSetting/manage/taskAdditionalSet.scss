@@ -1,15 +1,16 @@
-
-.task-additional-container{
+.task-additional-container {
   display: flex;
   overflow: auto;
   height: 100vh;
   padding: 16px;
   background: #F5F5F5;
   overflow-y: hidden;
-  .task-additional-right{
+
+  .task-additional-right {
     flex: 1;
     margin-left: 13px;
-    .task-tab-header{
+
+    .task-tab-header {
       display: flex;
       justify-content: space-between;
       margin-bottom: 12px;
@@ -17,24 +18,32 @@
       width: 100%;
       background: #FFFFFF;
       border-radius: 4px;
-      .task-tabs{
-        .tabs_msg{
+
+      .task-tabs {
+        .tabs_msg {
           width: 763px;
           height: 34px;
           margin-top: 11px;
           color: #666666;
           line-height: 20px;
+
+          span {
+            color: #333333;
+          }
         }
-        
+
       }
     }
-    .lh-52{
+
+    .lh-52 {
       margin-top: 30px;
     }
-    .task-type-list{
+
+    .task-type-list {
       display: flex;
       flex-flow: wrap;
-      .task-type-item{
+
+      .task-type-item {
         margin: 0 12px 12px 0;
       }
     }

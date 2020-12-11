@@ -18,10 +18,10 @@
           </el-date-picker>
           <el-input v-model="form.taskNoStr" placeholder="请输入工单编号"></el-input>
           <el-input v-model="form.userNameStr" placeholder="请输入操作人"></el-input>
-          <el-button type="primary" >搜索</el-button>
+          <el-button type="primary">搜索</el-button>
         </div>
         <div class="search-right">
-           <el-button type="primary" plain @click="exportStatistics">导出</el-button>
+          <el-button type="primary" plain @click="exportStatistics">导出</el-button>
         </div>
       </div>
         <el-table
@@ -108,7 +108,7 @@ export default {
   name: 'statistical-dialog',
   data() {
     return {
-      visible: true,
+      visible: false,
       totalElements:100,
       form: {
         cardId: '6a4bde67-11ad-11eb-a442-00163e304a25',

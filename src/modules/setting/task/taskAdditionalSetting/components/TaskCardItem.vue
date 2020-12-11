@@ -93,7 +93,6 @@ export default {
         },
         //TODO:进入工单详情
         modifyTaskType(id) {
-            console.log(id)
             let taskTypeId = id;
             this.$platform.openTab({
                 id: "task_flow_setting",
@@ -104,7 +103,7 @@ export default {
         },
         //查看统计
         onSee() {
-
+            this.$emit('onSeeStatistical','c5b8b2ab-a47e-11ea-a340-00163e304a25')
         },
         updateTeamList(teamList){
             console.log(teamList);
@@ -142,7 +141,6 @@ export default {
                     font-size: 16px;
                     color: #333333;
                     line-height: 22px;
-                    display: in;
                 }
                 .task-card-des{
                     font-size: 12px; 
@@ -206,10 +204,11 @@ export default {
             i{
                 font-size: 12px;
                 color: #999999;
+                &:hover{
+                    color: $color-primary; 
+                }
             }
-            &:hover{
-                color: $color-primary; 
-            }
+           
         }
         .task-card-opearte-more{
            border-right: 1px solid#F5F5F5;

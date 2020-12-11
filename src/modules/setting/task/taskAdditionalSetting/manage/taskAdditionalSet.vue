@@ -13,7 +13,7 @@
                 <p class="tabs_msg">附加组件是在服务工单中用于管理工单信息的辅助工具，可以让您分类记录工单的信息，附加组件可以从模块库中导入或创建。如需将关联组件应用在服务工单上，请在不同的工单类型中添加附加组件</p>
             </el-tab-pane>
             <el-tab-pane name="task-import" label="从模版库添加">
-              <p class="tabs_msg">附加组件库里，提供了丰富的模板，点击预览</p>
+              <p class="tabs_msg">附加组件库里，提供了丰富的模板，点击<span>预览</span>可查看使用案例。</p>
             </el-tab-pane>
           </el-tabs>
         </div>
@@ -30,9 +30,16 @@
           :key="item.id"
           :cardData.sync="cardList[idx]"
           @editRename="editRename"
+          @onSeeStatistical="onSeeStatistical"
         ></task-card-item>
       </div>
       <!-- end 已添加附加组件 -->
+
+      <!-- start 从模版库添加 -->
+      <div class="task-type-list" v-if="activeTab=='task-import'">
+        <template-library></template-library>
+      </div>
+      <!-- end 从模版库添加 -->
 
     </div>
     <!-- end 附加组件设置 -->
@@ -41,7 +48,7 @@
     <edit-cardname-dialog ref="batchCardnameDialog"></edit-cardname-dialog>
     
     <!-- 统计 -->
-    <statistical-dialog></statistical-dialog>
+    <statistical-dialog ref="statisteDialog"></statistical-dialog>
   </div>
 </template>
 
@@ -50,12 +57,13 @@ import TaskNavBar from "../../components/TaskNavBar";
 import TaskCardItem from "../components/TaskCardItem";
 import EditCardnameDialog from "../components/EditCardnameDialog";
 import statisticalDialog from "../components/statisticalDialog";
+import templateLibrary from "../components/templateLibrary";
 
 export default {
   name: "task-manage",
   data() {
     return {
-      activeTab: "task-added",
+      activeTab: "task-import",
       cardList: [
         {
           id: 'c5b8b2ab-a47e-11ea-a340-00163e304a25',
@@ -93,17 +101,24 @@ export default {
     addTaskCard(){
       this.$refs.batchCardnameDialog.openDialog();
     },
+    //重命名
     editRename(id) {
       this.$refs.batchCardnameDialog.form.id = id;
       this.$refs.batchCardnameDialog.openDialog();
     },
+    //查看统计
+    onSeeStatistical(id) {
+      this.$refs.statisteDialog.openDialog();
+
+    }
+
   },
   components: {
     [TaskNavBar.name]: TaskNavBar,
     [TaskCardItem.name]: TaskCardItem,
     [EditCardnameDialog.name]: EditCardnameDialog,
-    [statisticalDialog.name]: statisticalDialog
-    
+    [statisticalDialog.name]: statisticalDialog,
+    [templateLibrary.name]: templateLibrary   
   },
 };
 </script>
