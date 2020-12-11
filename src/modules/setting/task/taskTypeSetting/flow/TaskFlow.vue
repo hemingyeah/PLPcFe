@@ -6,7 +6,20 @@
         <p class="return-btn">返回</p>
         <div>
           <el-row type="flex">
-            <i class="type-color"></i>
+            <el-popover
+              placement="bottom"
+              width="224"
+              trigger="click">
+              <div class="choose-color-box">
+                <i
+                  v-for="color in taskTypeColor"
+                  :key="color"
+                  @click="typeColor = color"
+                  :style="{background: color}">
+                </i>
+              </div>
+              <i slot="reference" class="type-color" :style="{background: typeColor}"></i>
+            </el-popover>
             <el-input class="type-name" v-model="typeName" placeholder="请输入工单类型名称"></el-input>
           </el-row>
         </div>
@@ -33,20 +46,41 @@
 </template>
 
 <script>
+// utils
+import { parse } from '@src/util/querystring';
+// components
 import FlowSettingPanel from './tabs/FlowSettingPanel.vue'
 import OtherSettingPanel from './tabs/OtherSettingPanel.vue'
+
+const TASK_TYPE_COLOR = ['#737F7C','#266FFF','#5255FF','#8552FF','#BC52FF','#FF52D4','#FF9526','#6ECF40','#00B8D5','#0BA194']
 
 export default {
   name: 'setting-flow',
   data() {
     return {
+      type: 'add', // 创建类型: add 新建工单类型; edit 编辑工单类型; template 模板创建;
+      taskTypeId: '',
+
+      typeColor: '#737F7C',
       typeName: '修改工单类型设置',
       pending: false,
+
+      flowSetting: {
+
+      },
+
+      advancedSetting: {
+
+      },
+
 
       currTab: 0
     }
   },
   computed: {
+    taskTypeColor() {
+      return TASK_TYPE_COLOR;
+    },
     settingStep() {
       return [
         {
@@ -68,6 +102,11 @@ export default {
     submit() {
 
     }
+  },
+  mounted() {
+    let query = parse(window.location.search) || {};
+    this.type = query.type;
+    this.taskTypeId = query.taskTypeId;
   },
   components: {
     [FlowSettingPanel.name]: FlowSettingPanel,

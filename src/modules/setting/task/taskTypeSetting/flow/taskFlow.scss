@@ -23,12 +23,12 @@
                     padding-bottom: 4px;
                     border-bottom: 1px solid #FFFFFF;
                     .type-color{
+                        cursor: pointer;
                         display: inline-block;
                         width: 14px;
                         height: 14px;
                         margin-top: 4px;
                         border-radius: 50%;
-                        background: #FFAE00;
                     }
                 }
             }
@@ -89,6 +89,21 @@
     }
 }
 
+.choose-color-box{
+    i{
+        cursor: pointer;
+        display: inline-block;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        margin-right: 12px;
+        &:nth-child(5n){
+            margin-right: 0;
+        }
+    }
+}
+
+
 /** element-ui style **/
 /deep/.type-name, .el-input{
     display: inline-block;
@@ -98,6 +113,12 @@
         height: 24px;
         font-size: 16px;
         color: #FFFFFF !important;
+        &::-webkit-input-placeholder{
+            color: rgba(255, 255, 255, 0.8);
+        }
+        &::-ms-input-placeholder{
+            color: rgba(255, 255, 255, 0.8);
+        }
     }
 
 }
