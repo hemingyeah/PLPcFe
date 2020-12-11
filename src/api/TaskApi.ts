@@ -1,19 +1,54 @@
-import http from "@src/util/http";
+import http from "@src/util/http"
 import {
   TaskCreateAndEditModel,
   PlanTaskCreateAndEditModel,
-} from "@model/param/in/Task";
-import GrayUtil from "@src/util/gray";
+  TaskSearchListModel,
+  TaskGetCardDetailListModel,
+  TaskAllotUserListByTagModel,
+  TaskAutoDispatchResultListModel,
+  TaskUserCardSearchModel,
+  TaskAllotUserSearchModel,
+  TaskAllotApproveGetModel,
+  TaskAllotModel,
+  TaskTagListSearchModel,
+  TaskTagUserListSearchModel,
+  TaskAllotTaskPoolModel,
+  TaskPoolAuthUsersGetModel,
+  TaskPoolSubscriptionUsersGetModel,
+  CustomerTahTaskPoolCountGetModel,
+  TaskPoolSearchModel,
+  TaskReAllotTaskPoolModel
+} from "@model/param/in/Task"
+
+import { 
+  getUserViewsResult, 
+  getTaskCountByStateResult, 
+  getTaskSearchListResult,
+  getTaskFilterWithPartResult,
+  getLatestRecordResult,
+  getUserListByTagResult,
+  getTaskConfigResult,
+  getAutoDispatchResultListResult,
+  getTaskUserCardInfoResult,
+  getTaskAllotUserInfoResult,
+  getTaskAllotApproveResult,
+  getTaskAllotResult,
+  getTaskTagListResult,
+  getTaskAllotTaskPoolResult,
+  getTaskPoolAuthUsersResult,
+  getTaskPoolSubscriptionUsersResult,
+  getCustomerTagTaskPoolCountResult,
+  getTaskAllotTaskPollApproveResult,
+  getTaskTypeResult
+} from '@model/param/out/Task'
+
+import GrayUtil from '@src/util/gray'
 
 const fixedPrefixTaskPath = "/api/task";
 const ElASTICSEARCH = "/api/elasticsearch";
 const fixedPrefixPaymentPath = "/api/payment";
 const CUSTOMER = 'api/customer'
 const APPS = 'api/app'
-
-// const fixedPrefixTaskPath = "";
-// const ElASTICSEARCH = "";
-// const fixedPrefixPaymentPath = "";
 
 /* ------------- start 旧工单api ---------------- */
 
@@ -264,8 +299,8 @@ export function finishApproveCheck(params: {} | undefined) {
  * @param {String} params.taskId - 工单id
  * @return {MsgModal<String>} 最近更新记录
  */
-export function getTaskUpdateRecord(params: {} | undefined) {
-  return http.get("/task/getLatestRecord", params, false);
+export function getTaskUpdateRecord(params: { taskId: string }): Promise<getLatestRecordResult> {
+  return http.get("/task/getLatestRecord", params, false)
 }
 
 /**
@@ -292,16 +327,13 @@ export function getCountForCreate(params: {} | undefined) {
  * @param {String} params.phone - 手机号
  */
 export function getCustomerByPhone(params: {} | undefined) {
-  // return new Promise((resolve, reject) => {
-  //   resolve({"status":0,"message":"ok","data":[{"createUser":null,"updateUser":null,"createTime":null,"updateTime":"2019-06-05 09:38:53","id":"0b100c91-4c54-11e9-bfc9-00163e304a25","customerId":null,"customer":{"createUser":null,"updateUser":null,"createTime":null,"updateTime":null,"id":"0ad15181-4c54-11e9-bfc9-00163e304a25","name":"新建客户-黄宝成5","enName":null,"serialNumber":null,"status":null,"level":null,"superior":null,"teamId":null,"customerManager":null,"customerManagerName":null,"remark":null,"industry":null,"type":null,"taskCount":null,"productCount":null,"isDelete":null,"attribute":{},"companyNature":null,"tagIds":null,"tags":[],"createUserId":null,"createLoginUser":null,"lmName":null,"lmPhone":null,"lmEmail":null,"customerAddress":{"adCountry":"","adDist":"市北区","adProvince":"山东省","adCity":"青岛市","adAddress":"洪山坡街道伊春路162号鹏飞花园","adLongitude":120.39465500,"adLatitude":36.10926700,"addressType":0,"validAddress":true},"source":null,"guideProfessions":[],"isGuideData":false,"products":[],"focus":false,"guideData":false},"name":"新建客户-黄宝成5","sex":null,"position":null,"department":null,"isMain":1,"remark":null,"phone":"17664666980","email":null,"weixin":null,"attribute":null,"postcode":null,"head":null,"fax":null,"enabled":null,"address":null,"guideProfessions":[],"isGuideData":false,"productId":null,"tenantId":null,"guideData":false},{"createUser":"b9510211-d82f-11e8-b3c6-00163e304a25","updateUser":"b9510211-d82f-11e8-b3c6-00163e304a25","createTime":"2020-08-24 09:49:31","updateTime":"2020-08-24 09:49:31","id":"0d741a48-e5ac-11ea-9929-00163e304a25","customerId":null,"customer":{"createUser":null,"updateUser":null,"createTime":null,"updateTime":null,"id":"0cf315b8-e5ac-11ea-9929-00163e304a25","name":"测试新建客户1111","enName":null,"serialNumber":null,"status":null,"level":null,"superior":null,"teamId":null,"customerManager":null,"customerManagerName":null,"remark":null,"industry":null,"type":null,"taskCount":null,"productCount":null,"isDelete":null,"attribute":{},"companyNature":null,"tagIds":null,"tags":[],"createUserId":null,"createLoginUser":null,"lmName":null,"lmPhone":null,"lmEmail":null,"customerAddress":{"adCountry":"","adDist":"市北区","adProvince":"山东省","adCity":"青岛市","adAddress":"","adLongitude":120.37473100,"adLatitude":36.08760900,"addressType":0,"validAddress":true},"source":null,"guideProfessions":[],"isGuideData":false,"products":[],"focus":false,"guideData":false},"name":"测试新建客户","sex":null,"position":null,"department":null,"isMain":1,"remark":null,"phone":"17664666980","email":null,"weixin":null,"attribute":null,"postcode":null,"head":null,"fax":null,"enabled":null,"address":null,"guideProfessions":[],"isGuideData":false,"productId":null,"tenantId":null,"guideData":false},{"createUser":null,"updateUser":null,"createTime":null,"updateTime":"2019-06-05 09:38:53","id":"0f36aade-5057-11e9-bfc9-00163e304a25","customerId":null,"customer":{"createUser":null,"updateUser":null,"createTime":null,"updateTime":null,"id":"0f10639b-5057-11e9-bfc9-00163e304a25","name":"测试事件新建客户团队","enName":null,"serialNumber":null,"status":null,"level":null,"superior":null,"teamId":null,"customerManager":null,"customerManagerName":null,"remark":null,"industry":null,"type":null,"taskCount":null,"productCount":null,"isDelete":null,"attribute":{},"companyNature":null,"tagIds":null,"tags":[],"createUserId":null,"createLoginUser":null,"lmName":null,"lmPhone":null,"lmEmail":null,"customerAddress":{"adCountry":"中国","adDist":"市北区","adProvince":"山东省","adCity":"青岛市","adAddress":"万科","adLongitude":120.38278900,"adLatitude":36.11956300,"addressType":0,"validAddress":true},"source":null,"guideProfessions":[],"isGuideData":false,"products":[],"focus":false,"guideData":false},"name":"测试事件新建客户团队","sex":null,"position":null,"department":null,"isMain":1,"remark":null,"phone":"17664666980","email":null,"weixin":null,"attribute":null,"postcode":null,"head":null,"fax":null,"enabled":null,"address":null,"guideProfessions":[],"isGuideData":false,"productId":null,"tenantId":null,"guideData":false},{"createUser":null,"updateUser":null,"createTime":null,"updateTime":"2019-06-05 09:38:53","id":"14b4dba8-4c6e-11e9-bfc9-00163e304a25","customerId":null,"customer":{"createUser":null,"updateUser":null,"createTime":null,"updateTime":null,"id":"14a11269-4c6e-11e9-bfc9-00163e304a25","name":"测试工单新建客户2","enName":null,"serialNumber":null,"status":null,"level":null,"superior":null,"teamId":null,"customerManager":null,"customerManagerName":null,"remark":null,"industry":null,"type":null,"taskCount":null,"productCount":null,"isDelete":null,"attribute":{},"companyNature":null,"tagIds":null,"tags":[],"createUserId":null,"createLoginUser":null,"lmName":null,"lmPhone":null,"lmEmail":null,"customerAddress":{"adCountry":"中国","adDist":"浦东新区","adProvince":"上海市","adCity":"市辖区","adAddress":"陆家嘴街道东方明珠广播电视塔","adLongitude":121.50003500,"adLatitude":31.23925000,"addressType":0,"validAddress":true},"source":null,"guideProfessions":[],"isGuideData":false,"products":[],"focus":false,"guideData":false},"name":"测试工单新建客户2","sex":null,"position":null,"department":null,"isMain":1,"remark":null,"phone":"17664666980","email":null,"weixin":null,"attribute":null,"postcode":null,"head":null,"fax":null,"enabled":null,"address":null,"guideProfessions":[],"isGuideData":false,"productId":null,"tenantId":null,"guideData":false},{"createUser":null,"updateUser":null,"createTime":"2018-11-28 22:54:37","updateTime":"2018-11-28 22:54:37","id":"8782826f-f31d-11e8-b3c6-00163e304a25","customerId":null,"customer":{"createUser":null,"updateUser":null,"createTime":null,"updateTime":null,"id":"19bfcb90-f317-11e8-b3c6-00163e304a25","name":"繁體字客戶","enName":null,"serialNumber":null,"status":null,"level":null,"superior":null,"teamId":null,"customerManager":null,"customerManagerName":null,"remark":null,"industry":null,"type":null,"taskCount":null,"productCount":null,"isDelete":null,"attribute":{},"companyNature":null,"tagIds":null,"tags":[],"createUserId":null,"createLoginUser":null,"lmName":null,"lmPhone":null,"lmEmail":null,"customerAddress":{"adCountry":"","adDist":"东城区","adProvince":"北京市","adCity":"市辖区","adAddress":"1","adLongitude":116.41635700,"adLatitude":39.92835300,"addressType":0,"validAddress":true},"source":null,"guideProfessions":[],"isGuideData":false,"products":[],"focus":false,"guideData":false},"name":"黄宝成","sex":null,"position":null,"department":null,"isMain":0,"remark":null,"phone":"17664666980","email":null,"weixin":null,"attribute":null,"postcode":null,"head":null,"fax":null,"enabled":null,"address":null,"guideProfessions":[],"isGuideData":false,"productId":null,"tenantId":null,"guideData":false},{"createUser":null,"updateUser":"f6725463-e733-11e8-b3c6-00163e304a25","createTime":null,"updateTime":"2019-05-10 16:49:24","id":"1ca6eddf-70a2-11e9-bfc9-00163e304a25","customerId":null,"customer":{"createUser":null,"updateUser":null,"createTime":null,"updateTime":null,"id":"1c8a3bfd-70a2-11e9-bfc9-00163e304a25","name":"新建客户地址测试04","enName":null,"serialNumber":null,"status":null,"level":null,"superior":null,"teamId":null,"customerManager":null,"customerManagerName":null,"remark":null,"industry":null,"type":null,"taskCount":null,"productCount":null,"isDelete":null,"attribute":{},"companyNature":null,"tagIds":null,"tags":[],"createUserId":null,"createLoginUser":null,"lmName":null,"lmPhone":null,"lmEmail":null,"customerAddress":{"adCountry":"中国","adDist":"李沧区","adProvince":"山东省","adCity":"青岛市","adAddress":"哈哈","adLongitude":120.43269700,"adLatitude":36.14546300,"addressType":0,"validAddress":true},"source":null,"guideProfessions":[],"isGuideData":false,"products":[],"focus":false,"guideData":false},"name":"新建客户地址测试01","sex":null,"position":null,"department":null,"isMain":1,"remark":null,"phone":"17664666980","email":null,"weixin":null,"attribute":null,"postcode":null,"head":null,"fax":null,"enabled":null,"address":null,"guideProfessions":[],"isGuideData":false,"productId":null,"tenantId":null,"guideData":false},{"createUser":"b9510211-d82f-11e8-b3c6-00163e304a25","updateUser":"b9510211-d82f-11e8-b3c6-00163e304a25","createTime":"2020-08-23 17:08:00","updateTime":"2020-08-24 11:51:28","id":"246079cc-e520-11ea-9929-00163e304a25","customerId":null,"customer":{"createUser":null,"updateUser":null,"createTime":null,"updateTime":null,"id":"2412d72f-e520-11ea-9929-00163e304a25","name":"月初","enName":null,"serialNumber":null,"status":null,"level":null,"superior":null,"teamId":null,"customerManager":null,"customerManagerName":null,"remark":null,"industry":null,"type":null,"taskCount":null,"productCount":null,"isDelete":null,"attribute":{},"companyNature":null,"tagIds":null,"tags":[],"createUserId":null,"createLoginUser":null,"lmName":null,"lmPhone":null,"lmEmail":null,"customerAddress":{"adCountry":"","adDist":"市北区","adProvince":"山东省","adCity":"青岛市","adAddress":"","adLongitude":120.37473100,"adLatitude":36.08760900,"addressType":0,"validAddress":true},"source":null,"guideProfessions":[],"isGuideData":false,"products":[],"focus":false,"guideData":false},"name":"月初","sex":"","position":null,"department":"","isMain":1,"remark":"","phone":"17664666980","email":null,"weixin":null,"attribute":null,"postcode":null,"head":null,"fax":null,"enabled":null,"address":"1c09e7ab-e5ba-11ea-9929-00163e304a25","guideProfessions":[],"isGuideData":false,"productId":[],"tenantId":null,"guideData":false},{"createUser":null,"updateUser":"f6725463-e733-11e8-b3c6-00163e304a25","createTime":null,"updateTime":"2019-05-10 16:51:26","id":"286bf03b-6f1e-11e9-bfc9-00163e304a25","customerId":null,"customer":{"createUser":null,"updateUser":null,"createTime":null,"updateTime":null,"id":"2846e8c5-6f1e-11e9-bfc9-00163e304a25","name":"测试新建客户001","enName":null,"serialNumber":null,"status":null,"level":null,"superior":null,"teamId":null,"customerManager":null,"customerManagerName":null,"remark":null,"industry":null,"type":null,"taskCount":null,"productCount":null,"isDelete":null,"attribute":{},"companyNature":null,"tagIds":null,"tags":[],"createUserId":null,"create
-  // })
   return http.get("task/getCustomerByPhone", params, false);
 }
 
 /**
  * @description 获取工单配置
  */
-export function getTaskConfig() {
+export function getTaskConfig(): Promise<getTaskConfigResult> {
   return http.get("/task/getTaskConfig", {}, false);
 }
 
@@ -710,7 +742,7 @@ export function deleteComponent(params: {} | undefined) {
  * @param {Object} params - 参数对象
  * @param {String} params.id - 工单id
  */
-export function getTaskType(params: {} | undefined) {
+export function getTaskType(params: { id: string } | undefined): Promise<getTaskTypeResult> {
   return http.get("/setting/taskType/getOne", params);
 }
 
@@ -748,12 +780,10 @@ export function getTaskCardDetailList(params: {} | undefined) {
 /**
  * 顶部筛选, 状态数据展示
  */
-export function getTaskCountByState(params: {} | undefined) {
-  return http.post(
-    `${ElASTICSEARCH}/outside/es/task/getTaskCountByState`,
-    params
-  );
+export function getTaskCountByState(params: {} | undefined): Promise<getTaskCountByStateResult> {
+  return http.post(`${ElASTICSEARCH}/outside/es/task/getTaskCountByState`, params)
 }
+
 /**
  * 存为视图
  * @param {Object} params -对象参数
@@ -897,9 +927,10 @@ export function getTaskTemplate(params: {} | undefined) {
  * @param {string} params.searchCondition	 - 关键词搜索类型
  * @param {string} params.view	 - 视图
  */
-export function search(params: {} | undefined) {
-  return http.post(`${ElASTICSEARCH}/outside/es/task/search`, params);
+export function search(params: TaskSearchListModel): Promise<getTaskSearchListResult> {
+  return http.post(`${ElASTICSEARCH}/outside/es/task/search`, params)
 }
+
 /*
  * 工单设置，回执合规设置模块 保存自定义打印模板
  * @param {Object} params - 参数对象
@@ -966,11 +997,11 @@ export function getRelatedInfo(params: {} | undefined) {
 }
 
 /**
- * @description 是否删除工单列表
- * @param {Object} 删除对象id
+ * @description 筛选已经关联过备件的工单
+ * @param {String} taskIds 查询的工单ids example: taskIds=1&taskIds=2
  */
-export function withPart(params: Object = {}) {
-  return http.get(`/task/filter/withPart?${params}`);
+export function withPart(taskIds: string): Promise<getTaskFilterWithPartResult> {
+  return http.get(`/task/filter/withPart?${taskIds}`)
 }
 
 /**
@@ -1062,26 +1093,31 @@ export function dialout(params: object) {
 
 /**
  * @description 获取视图
+ * @return {getUserViewsResult} 视图列表
  */
-export function getUserViews(params: object) {
-  return http.get(
-    `${fixedPrefixTaskPath}/outside/pc/view/getUserViews`,
-    params
-  );
+export function getUserViews(): Promise<getUserViewsResult> {
+  return http.get(`${fixedPrefixTaskPath}/outside/pc/view/getUserViews`)
 }
 
 /**
- * @description 获取附件
+ * @description 根据工单类型id获取其附加组件信息
  */
-export function getCardDetailList(params: object) {
-  return http.get("/task/getCardDetailList", params);
+export function getCardDetailList(params: TaskGetCardDetailListModel): Promise<Map<string, any>[]> {
+  return http.get(`/task/getCardDetailList`, params)
 }
 
 /**
  * @description 查询一个视图
  */
 export function getOneView(params: string) {
-  return http.get(`${fixedPrefixTaskPath}/outside/pc/view/getOneView/${params}`);
+  return http.get(`${fixedPrefixTaskPath}/outside/pc/view/getOneView/${params}`)
+}
+
+/**
+ * @description 查询指派人员列表
+ */
+export function getUserListByTag(params: TaskAllotUserListByTagModel): Promise<getUserListByTagResult> {
+  return http.post('/task/allotMap/userListByTag', params)
 }
 
 /**
@@ -1123,5 +1159,153 @@ export function getSimpleCustomerList(params: object = []) {
 export function getSimpleTagListByIds(params: object = []) {
   return http.post(`${APPS}/outside/tag/getSimpleTagListByIds`, params)
 }
+
+/** 
+ * @description 查询指派工单池人员列表
+*/
+export function getTaskAllotPoolUserList(params: TaskAllotUserListByTagModel): Promise<getUserListByTagResult> {
+  return http.post('/task/allotMap/userListByTag', params)
+}
+
+/**
+ * @description 查询工单池工单列表
+ */
+export function getTaskAllotPoolList(params: any): Promise<any> {
+  return http.post(`${ElASTICSEARCH}/outside/dd/es/task/taskPool`, params)
+}
+
+/**
+ * @description 查询指派工单团队人员列表
+ */
+export function getTaskAllotDispatchTeamUserList(params: TaskTagUserListSearchModel): Promise<any> {
+  return http.post('/task/customerTag/dispatch/list', params)
+}
+
+/**
+ * @description 查询转派工单团队人员列表
+ */
+export function getTaskAllotRedeployTeamUserList(params: TaskTagUserListSearchModel): Promise<any> {
+  return http.post('/task/customerTag/redeploy/list', params)
+}
+
+/**
+ * @description 自动派单-获取预估列表结果
+ */
+export function getAutoDispatchResultList(params: TaskAutoDispatchResultListModel): Promise<getAutoDispatchResultListResult> {
+  return http.post(`${fixedPrefixTaskPath}/outside/pc/task/autoDispatchResultList`, params)
+}
+
+/**
+ * @description 自动派单-审批结果
+ */
+export function getTaskAutoDispatchApprove(params: any): Promise<any> {
+  return http.post('/task/approve/autoDispatch', params)
+}
+
+/**
+ * @description 自动派单-提交开始派单
+ */
+export function taskAutoDispatch(params: any): Promise<any> {
+  return http.post(`${fixedPrefixTaskPath}/outside/pc/task/autoDispatch`, params)
+}
+
+/**
+ * @description 工单指派-获取人员卡片信息
+ */
+export function getTaskUserCardInfo(params: TaskUserCardSearchModel): Promise<getTaskUserCardInfoResult> {
+  return http.post(`${ElASTICSEARCH}/outside/es/task/getUserCardInfo`, params)
+}
+
+/**
+ * @description 工单指派-获取人员列表信息
+ */
+export function getTaskAllotUserInfo(params: TaskAllotUserSearchModel): Promise<getTaskAllotUserInfoResult> {
+  return http.post(`${ElASTICSEARCH}/outside/es/task/getAllotUserInfo`, params)
+}
+
+/**
+ * @description 工单指派-指派前验证是否审批接口
+ */
+export function getTaskAllotApprove(params: TaskAllotApproveGetModel): Promise<getTaskAllotApproveResult> {
+  return http.post('/task/confirmAllotTo', params)
+}
+
+/**
+ * @description 工单指派-验证指派到工单池是否需要审批
+ */
+export function getTaskAllotTaskPoolApprove(params: TaskAllotTaskPoolModel): Promise<getTaskAllotTaskPollApproveResult> {
+  return http.post('/task/approve/allotTaskToPool', params)
+}
+
+/**
+ * @description 工单指派-指派工单-到负责人
+ */
+export function taskAllotExcutor(params: TaskAllotModel): Promise<getTaskAllotResult> {
+  return http.post(`${fixedPrefixTaskPath}/outside/pc/task/allot`, params)
+}
+
+/**
+ * @description 工单转派
+ */
+export function taskReAllot(params: TaskAllotModel): Promise<getTaskAllotResult> {
+  return http.post(`${fixedPrefixTaskPath}/outside/pc/task/reallot`, params)
+}
+
+/**
+ * @description 工单转派到工单池
+ */
+export function taskReAllotTaskPool(params: TaskReAllotTaskPoolModel): Promise<getTaskAllotResult> {
+  return http.post(`${fixedPrefixTaskPath}/outside/dd/task/allotToPool`, params)
+}
+
+/**
+ * @description 工单指派-指派工单池
+ */
+export function taskAllotTaskPoll(params: TaskAllotTaskPoolModel): Promise<getTaskAllotTaskPoolResult> {
+  return http.post(`${fixedPrefixTaskPath}/outside/pc/task/allotToPool`, params)
+}
+
+/**
+ * @description 工单指派-团队列表
+ */
+export function getTaskDispatchTagList(params: TaskTagListSearchModel): Promise<getTaskTagListResult> {
+  return http.get('/task/tag/dispatch/customerTagList', params)
+}
+
+/**
+ * @description 工单指派-团队列表
+ */
+export function getTaskRedeployTagList(params: TaskTagListSearchModel): Promise<getTaskTagListResult> {
+  return http.get('/task/tag/redeploy/customerTagList', params)
+}
+
+/**
+ * @description 工单指派-获取工单池可以接单用户列表
+ */
+export function getTaskPoolAuthUserList(params: TaskPoolAuthUsersGetModel): Promise<getTaskPoolAuthUsersResult> {
+  return http.get('/task/taskPool/user/list', params)
+}
+
+/**
+ * @description 工单指派-获取订阅工单池用户列表
+ */
+export function getTaskPoolSubscriptionUserList(): Promise<getTaskPoolSubscriptionUsersResult> {
+  return http.get(`${fixedPrefixTaskPath}/outside/dd/task/list/taskPoolSubscriptionUserAndCount`)
+}
+
+/**
+ * @description 工单指派-根据客户团队统计工单池数量
+ */
+export function getCustomerTagTaskPoolCount(params: CustomerTahTaskPoolCountGetModel): Promise<getCustomerTagTaskPoolCountResult> {
+  return http.post(`${ElASTICSEARCH}/outside/es/task/getCusTagsTaskPoolCount`, params)
+}
+
+/**
+ * @description 工单PC工单池查询
+ */
+export function getTaskPoolList(params: TaskPoolSearchModel): Promise<getTaskSearchListResult> {
+  return http.post(`${ElASTICSEARCH}/outside/es/task/taskPool`, params)
+}
+
 
 /* -------------  end  新工单api ---------------- */

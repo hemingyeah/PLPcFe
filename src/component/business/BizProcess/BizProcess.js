@@ -3,7 +3,7 @@ import './BizProcess.scss'
 import _ from 'lodash'
 /* 工单流程信息状态 */
 import TaskStateEnum from '@model/enum/TaskStateEnum.ts';
-import TaskStateProcessEnum from './TaskStateProcessEnum.ts'
+import TaskStateProcessEnum from '@model/enum/TaskStateProcessEnum.ts'
 
 const TaskStateProcessArray = [
   TaskStateProcessEnum.CREATED,

@@ -1,7 +1,7 @@
 <script>
 /* api */
 import * as TaskApi from "@src/api/TaskApi.ts";
-import * as CustomerApi from "@src/api/CustomerApi";
+import * as CustomerApi from "@src/api/CustomerApi.ts";
 
 /* utils */
 import _ from "lodash";
@@ -55,7 +55,7 @@ export default {
   },
   methods: {
     buildForm() {
-      if (Object.keys(this.form).length === this.fields.length) return;
+      // if (Object.keys(this.form).length === this.fields.length) return;
       this.initFormVal();
     },
     createUserInput(event, isTags) {

@@ -15,19 +15,20 @@ import {
 } from "@src/util/storage";
 
 /* component */
-import CancelTaskDialog from "./components/CancelTaskDialog.vue";
-import PlanTimeDialog from "./components/PlanTimeDialog.vue";
-import ApproveTaskDialog from "./components/ApproveTaskDialog.vue";
-import ProposeApproveDialog from "./components/ProposeApproveDialog.vue";
+import CancelTaskDialog from './components/CancelTaskDialog.vue';
+import PlanTimeDialog from './components/PlanTimeDialog.vue';
+import ApproveTaskDialog from './components/ApproveTaskDialog.vue';
+import ProposeApproveDialog from './components/ProposeApproveDialog.vue';
 
-import TaskInfoRecord from "./components/TaskInfoRecord.vue";
-import TaskReceiptView from "./components/TaskReceipt/View/TaskReceiptView.vue";
-import TaskReceiptEditView from "./components/TaskReceipt/Edit/TaskReceiptEditView.vue";
-import TaskAccount from "./components/TaskAccount.vue";
-import TaskFeedback from "./components/TaskFeedback";
-import TaskCard from "./components/TaskCard";
-import TaskView from "./components/TaskView.vue";
-import TaskTimeDialog from "./components/TaskTimeDialog.vue";
+import TaskInfoRecord from './components/TaskInfoRecord.vue';
+import TaskReceiptView from './components/TaskReceipt/View/TaskReceiptView.vue';
+import TaskReceiptEditView from './components/TaskReceipt/Edit/TaskReceiptEditView.vue';
+import TaskAccount from './components/TaskAccount.vue';
+import TaskFeedback from './components/TaskFeedback';
+import TaskCard from './components/TaskCard';
+import TaskView from './components/TaskView.vue';
+import TaskTimeDialog from './components/TaskTimeDialog.vue';
+import TaskAllotModal from '@src/modules/task/components/TaskAllotModal/TaskAllotModal.tsx'
 
 /* enum */
 import { TaskEventNameMappingEnum } from "@model/enum/EventNameMappingEnum.ts";
@@ -74,7 +75,7 @@ export default {
       hasCallCenterModule: localStorage.getItem("call_center_module") == 1,
       stateButtonData: [], // 工单当前状态下主操作按钮
       leftActiveTab: "task-view",
-      rightActiveTab: "",
+      rightActiveTab: "record",
       collapseDirection: "",
       popperOptions: {
         boundariesElement: "viewport",
@@ -84,6 +85,11 @@ export default {
       guideSearchModelSave: false,
       guideDropdownMenu: false,
       isGuide: false,
+      marTop: 197,
+      // 显示详情向导
+      showTaskDetailGuide: false,
+      // 是否显示指派弹窗
+      showAllotModal: false
     }
   },
   computed: {
@@ -632,15 +638,40 @@ export default {
     /* 是否显示服务报告 根据版本控制的 */
     isShowReport() {
       return isShowReport()
+    },
+    /* 是否开始新工单的新指派 */
+    isRestructAllot() {
+      return this.initData?.restructAllot === true
     }
   },
   methods: {
-    previousStep() {},
     nextStep() {
       this.nowGuideStep++;
     },
     stopStep() {
       this.nowGuideStep = this.detailSteps.length + 1;
+    },
+    /**
+     * 折叠
+     */
+    collapseBtn() {
+      this.$refs.container.scrollTop = 0; 
+      this.collapse = !this.collapse; 
+      
+      this.$nextTick(() => {
+        setTimeout(() => {
+          this.marTop = this.$refs.header.clientHeight + 25
+        }, 200)
+      })
+    },
+    /**
+     * 滚动的距离
+     */
+    getScroll({target}) {
+      const scrollTop = target.scrollTop;
+      if (scrollTop >= 80) {
+        this.collapse = false
+      }
     },
     // 是否含有某一指定权限
     hasAuth(keys) {
@@ -830,13 +861,23 @@ export default {
     },
     // 指派工单
     allot() {
-      this.pending = true;
-      location.href = `/task/allotTask?id=${this.task.id}`;
+      // 新工单新指派
+      if (this.isRestructAllot) {
+        this.$refs.TaskAllotModal.outsideShow()
+      } else {
+        this.pending = true;
+        location.href = `/task/allotTask?id=${this.task.id}`;
+      }
     },
     // 转派工单
     redeploy() {
-      this.pending = true;
-      location.href = `/task/redeploy?id=${this.task.id}`;
+      // 新工单新转派
+      if (this.isRestructAllot) {
+        this.$refs.TaskAllotModal.outsideShow()
+      } else {
+        this.pending = true;
+        location.href = `/task/redeploy?id=${this.task.id}`;
+      }
     },
     // 打印工单
     printTask() {
@@ -1059,6 +1100,7 @@ export default {
 
     this.collapse = JSON.parse(collapse || "true");
     this.collapseDirection = collapseDirection || "";
+
   },
   async mounted() {
     try {
@@ -1142,21 +1184,34 @@ export default {
       if (query.active == "balance" && this.viewBalanceTab && this.allowBalanceTask) {
         this.openDialog("balance");
       } else {
-        this.rightActiveTab = this.viewBalanceTab ? "balance-tab" : this.viewFeedbackTab ? "feedback-tab" : "card-tab";
+        this.rightActiveTab = this.viewBalanceTab ? "balance-tab" : this.viewFeedbackTab ? "feedback-tab" : "record";
       }
-
+      
+      // 是否显示详情向导
+      this.showTaskDetailGuide = !storageGet(TASK_GUIDE_DETAIL)
+      // 来自指派列表的指派操作
+      this.showAllotModal = query.allot && this.allowAllotTask
+      if (this.showAllotModal && !this.showTaskDetailGuide) {
+        this.allot()
+      }
+      
       this.loading = false;
       
       this.$nextTick(() => {
         setTimeout(() => {
-          if (!storageGet(TASK_GUIDE_DETAIL)) this.$tours["myTour"].start(), this.nowGuideStep = 1, storageSet(TASK_GUIDE_DETAIL, "4");
+          if (this.showTaskDetailGuide) {
+            this.$tours['myTour'].start();
+            this.nowGuideStep = 1;
+            storageSet(TASK_GUIDE_DETAIL, '4');
+          }
         }, 1000)
-
       })
 
     } catch (e) {
       console.error("error ", e)
     }
+
+    this.marTop = this.$refs.header.clientHeight + 12
   },
   watch: {
     collapse(newValue) {
@@ -1164,6 +1219,11 @@ export default {
     },
     collapseDirection(newValue) {
       sessionStorage.setItem(`task_collapseDirection_${this.task.id}`, newValue);
+    },
+    nowGuideStep(newValue) {
+      if (newValue == 5 && this.showTaskDetailGuide && this.showAllotModal) {
+        this.allot()
+      }
     }
   },
   components: {
@@ -1178,6 +1238,7 @@ export default {
     [TaskFeedback.name]: TaskFeedback,
     [TaskCard.name]: TaskCard,
     [TaskView.name]: TaskView,
-    [TaskTimeDialog.name]: TaskTimeDialog
+    [TaskTimeDialog.name]: TaskTimeDialog,
+    TaskAllotModal
   }
 }

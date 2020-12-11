@@ -1,0 +1,90 @@
+/* start 弹窗 */
+#allot-rule-modal {
+  display: flex;
+  .base-modal {
+    width: 840px !important;
+  }
+  .base-modal-body {
+    padding: 20px;
+  }
+  .el-radio {
+    margin-right: 10px;
+  }
+}
+
+.allot-rule-modal-group {
+  .el-select {
+    margin-bottom: 10px;
+  }
+}
+
+.allot-rule-modal-order {
+  width: 100%;
+}
+
+.allot-rule-modal-task-type {
+  position: relative;
+  & > span {
+    display: inline-block;
+    line-height: 50px;
+  }
+  .task-type-select-clear {
+    position: absolute;
+    right: 5px;
+    top: 54px;
+  }
+}
+
+.allot-rule-modal-condition {
+  &-field {
+    & > span {
+      display: block;
+      line-height: 50px;
+    }
+    .el-select {
+      margin-right: 5px;
+    }
+  }
+}
+
+.allot-rule-modal-customer-tag {
+  &-operator {
+    line-height: 50px;
+    .el-select {
+      margin: 0 10px;
+    }
+  }
+  & > div {
+    width: 100%;
+  }
+}
+
+.allot-rule-modal-disabled {
+  .el-tag__close,
+  .el-icon-close,
+  .el-icon-error,
+  .icon-yemianshanchu {
+    display: none;
+  }
+
+}
+
+.allot-rule-modal-role-select,
+.allot-rule-modal-type-select {
+  .list-wrapper {
+    height: 210px;
+    padding-top: 4px;
+  }
+  .input-container {
+    display: none;
+  }
+}
+
+.allot-rule-modal {
+  .base-select-container {
+    .option-list {
+      max-height: 200px;
+    }
+  }
+}
+/* end 弹窗 */

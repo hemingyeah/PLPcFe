@@ -6,6 +6,209 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "11952315",
+      "name": "皇冠",
+      "font_class": "huangguan",
+      "unicode": "e6d1",
+      "unicode_decimal": 59089
+    },
+    {
+      "icon_id": "10885634",
+      "name": "暂停",
+      "font_class": "zanting",
+      "unicode": "e6d0",
+      "unicode_decimal": 59088
+    },
+    {
+      "icon_id": "18192549",
+      "name": "calculator",
+      "font_class": "fdn-formula",
+      "unicode": "e6cf",
+      "unicode_decimal": 59087
+    },
+    {
+      "icon_id": "18139123",
+      "name": "产品详情-产品提醒",
+      "font_class": "chanpinxiangqing-chanpintixing",
+      "unicode": "e6ce",
+      "unicode_decimal": 59086
+    },
+    {
+      "icon_id": "18139115",
+      "name": "产品详情-计划任务",
+      "font_class": "chanpinxiangqing-jihuarenwu",
+      "unicode": "e6cd",
+      "unicode_decimal": 59085
+    },
+    {
+      "icon_id": "18082356",
+      "name": "运算-删除",
+      "font_class": "shanchu2",
+      "unicode": "e6cb",
+      "unicode_decimal": 59083
+    },
+    {
+      "icon_id": "18076819",
+      "name": "calendar",
+      "font_class": "fdn-date",
+      "unicode": "e6b1",
+      "unicode_decimal": 59057
+    },
+    {
+      "icon_id": "18073545",
+      "name": "基础控件-数字",
+      "font_class": "fdn-number",
+      "unicode": "e6ca",
+      "unicode_decimal": 59082
+    },
+    {
+      "icon_id": "18073538",
+      "name": "基础控件-扫码",
+      "font_class": "fdn-code",
+      "unicode": "e6c9",
+      "unicode_decimal": 59081
+    },
+    {
+      "icon_id": "18073536",
+      "name": "基础控件-服务内容",
+      "font_class": "fuwuneirong",
+      "unicode": "e6c8",
+      "unicode_decimal": 59080
+    },
+    {
+      "icon_id": "18073525",
+      "name": "基础控件-定位",
+      "font_class": "fdn-address",
+      "unicode": "e6c7",
+      "unicode_decimal": 59079
+    },
+    {
+      "icon_id": "18073514",
+      "name": "基础组件-客户关联",
+      "font_class": "kehuguanlian",
+      "unicode": "e6c6",
+      "unicode_decimal": 59078
+    },
+    {
+      "icon_id": "18073488",
+      "name": "基础控件-分割线",
+      "font_class": "fdn-separator",
+      "unicode": "e6bf",
+      "unicode_decimal": 59071
+    },
+    {
+      "icon_id": "18073482",
+      "name": "基础控件-时间",
+      "font_class": "fdn-datetime",
+      "unicode": "e6be",
+      "unicode_decimal": 59070
+    },
+    {
+      "icon_id": "18073478",
+      "name": "基础控件-签名",
+      "font_class": "fdn-autograph",
+      "unicode": "e6bd",
+      "unicode_decimal": 59069
+    },
+    {
+      "icon_id": "18073477",
+      "name": "基础控件-单行文本",
+      "font_class": "fdn-text",
+      "unicode": "e6bb",
+      "unicode_decimal": 59067
+    },
+    {
+      "icon_id": "18073474",
+      "name": "基础控件-知识库",
+      "font_class": "zhishiku",
+      "unicode": "e6ba",
+      "unicode_decimal": 59066
+    },
+    {
+      "icon_id": "18073471",
+      "name": "基础控件-说明信息",
+      "font_class": "fdn-info",
+      "unicode": "e6b9",
+      "unicode_decimal": 59065
+    },
+    {
+      "icon_id": "18073468",
+      "name": "基础控件-备件",
+      "font_class": "beijian",
+      "unicode": "e6b8",
+      "unicode_decimal": 59064
+    },
+    {
+      "icon_id": "18073467",
+      "name": "基础控件-下拉",
+      "font_class": "fdn-select",
+      "unicode": "e6b7",
+      "unicode_decimal": 59063
+    },
+    {
+      "icon_id": "18073463",
+      "name": "基础控件-多级菜单",
+      "font_class": "fdn-cascader",
+      "unicode": "e6b5",
+      "unicode_decimal": 59061
+    },
+    {
+      "icon_id": "18073457",
+      "name": "基础控件-多行文本",
+      "font_class": "fdn-textarea",
+      "unicode": "e6b3",
+      "unicode_decimal": 59059
+    },
+    {
+      "icon_id": "18073440",
+      "name": "基础控件-电话",
+      "font_class": "fdn-phone",
+      "unicode": "e6b2",
+      "unicode_decimal": 59058
+    },
+    {
+      "icon_id": "18073392",
+      "name": "基础控件-人员",
+      "font_class": "fdn-user",
+      "unicode": "e6af",
+      "unicode_decimal": 59055
+    },
+    {
+      "icon_id": "18073389",
+      "name": "基础控件-关联",
+      "font_class": "fdn-related_task",
+      "unicode": "e6ae",
+      "unicode_decimal": 59054
+    },
+    {
+      "icon_id": "18073387",
+      "name": "基础控件-附件",
+      "font_class": "fdn-attachment",
+      "unicode": "e6ad",
+      "unicode_decimal": 59053
+    },
+    {
+      "icon_id": "18073382",
+      "name": "地址",
+      "font_class": "fdn-location",
+      "unicode": "e6ac",
+      "unicode_decimal": 59052
+    },
+    {
+      "icon_id": "18073226",
+      "name": "基础控件-邮箱",
+      "font_class": "fdn-email",
+      "unicode": "e6ab",
+      "unicode_decimal": 59051
+    },
+    {
+      "icon_id": "15235798",
+      "name": "Icon_up",
+      "font_class": "Icon_up",
+      "unicode": "e6c3",
+      "unicode_decimal": 59075
+    },
+    {
       "icon_id": "17754706",
       "name": "拖拽排序",
       "font_class": "tuozhuaipaixu",
@@ -15,7 +218,7 @@
     {
       "icon_id": "17736171",
       "name": "隐藏字段",
-      "font_class": "yincangziduan",
+      "font_class": "fdn-hidden",
       "unicode": "e6c0",
       "unicode_decimal": 59072
     },
@@ -25,125 +228,6 @@
       "font_class": "jieshishuoming1",
       "unicode": "e6c1",
       "unicode_decimal": 59073
-    },
-    {
-      "icon_id": "17735035",
-      "name": "知识库",
-      "font_class": "zhishiku",
-      "unicode": "e6ab",
-      "unicode_decimal": 59051
-    },
-    {
-      "icon_id": "17735036",
-      "name": "地址",
-      "font_class": "dizhi",
-      "unicode": "e6ac",
-      "unicode_decimal": 59052
-    },
-    {
-      "icon_id": "17735037",
-      "name": "服务内容",
-      "font_class": "fuwuneirong",
-      "unicode": "e6ad",
-      "unicode_decimal": 59053
-    },
-    {
-      "icon_id": "17735038",
-      "name": "产品关联",
-      "font_class": "chanpinguanlian",
-      "unicode": "e6ae",
-      "unicode_decimal": 59054
-    },
-    {
-      "icon_id": "17735039",
-      "name": "备件管理",
-      "font_class": "beijianguanli1",
-      "unicode": "e6af",
-      "unicode_decimal": 59055
-    },
-    {
-      "icon_id": "17735040",
-      "name": "电话",
-      "font_class": "dianhua3",
-      "unicode": "e6b1",
-      "unicode_decimal": 59057
-    },
-    {
-      "icon_id": "17735041",
-      "name": "客户关联",
-      "font_class": "kehuguanlian",
-      "unicode": "e6b2",
-      "unicode_decimal": 59058
-    },
-    {
-      "icon_id": "17735042",
-      "name": "时间",
-      "font_class": "shijian1",
-      "unicode": "e6b3",
-      "unicode_decimal": 59059
-    },
-    {
-      "icon_id": "17735043",
-      "name": "多行文本",
-      "font_class": "duohangwenben",
-      "unicode": "e6b5",
-      "unicode_decimal": 59061
-    },
-    {
-      "icon_id": "17735044",
-      "name": "日期",
-      "font_class": "riqi1",
-      "unicode": "e6b7",
-      "unicode_decimal": 59063
-    },
-    {
-      "icon_id": "17735045",
-      "name": "人员",
-      "font_class": "renyuan1",
-      "unicode": "e6b8",
-      "unicode_decimal": 59064
-    },
-    {
-      "icon_id": "17735046",
-      "name": "附件",
-      "font_class": "fujian",
-      "unicode": "e6b9",
-      "unicode_decimal": 59065
-    },
-    {
-      "icon_id": "17735047",
-      "name": "多级菜单",
-      "font_class": "duojicaidan",
-      "unicode": "e6ba",
-      "unicode_decimal": 59066
-    },
-    {
-      "icon_id": "17735048",
-      "name": "下拉菜单",
-      "font_class": "xialacaidan",
-      "unicode": "e6bb",
-      "unicode_decimal": 59067
-    },
-    {
-      "icon_id": "17735049",
-      "name": "扫码",
-      "font_class": "saoma",
-      "unicode": "e6bd",
-      "unicode_decimal": 59069
-    },
-    {
-      "icon_id": "17735050",
-      "name": "数字",
-      "font_class": "shuzi",
-      "unicode": "e6be",
-      "unicode_decimal": 59070
-    },
-    {
-      "icon_id": "17735051",
-      "name": "单行文本",
-      "font_class": "danhangwenben",
-      "unicode": "e6bf",
-      "unicode_decimal": 59071
     },
     {
       "icon_id": "17734549",

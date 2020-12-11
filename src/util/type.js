@@ -18,7 +18,7 @@ export function isArray(array) {
  * @description 是否为 数字类型
 */
 export function isNumber(number) {
-  return typeOf(number) === 'number'
+  return typeOf(number) === 'number' && !isNaN(number)
 }
 
 /** 

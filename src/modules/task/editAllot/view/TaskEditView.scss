@@ -1,0 +1,84 @@
+body {
+  padding: 10px;
+}
+
+// 工单编号
+.form-taskNo {
+  color: #8a8a8a;
+  line-height: 32px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+// 工单新建编辑容器
+.task-container {
+  height: 100%;
+  width: 100%;
+  overflow: auto;
+  background-color: #fff;
+  
+  .page-title {
+    border-bottom: 1px solid #f4f7f5;
+    padding: 12px 10px;
+    display: flex;
+    justify-content: space-between;
+    
+    .iconfont {
+      font-size: 12px;
+    }
+    
+    .title {
+      display: flex;
+      justify-content: space-between;
+      span.text {
+        line-height: 34px;
+        margin-right: 12px;
+      }
+    }
+  }
+}
+
+// form
+.form-builder {
+  width: 655px;
+  padding: 10px 0 0 10px;
+  
+  .input-and-btn {
+    display: flex !important;
+    flex-flow: row nowrap;
+    
+    .form-item,
+    .form-text,
+    .form-select,
+    .biz-team-select {
+      flex: 1;
+    }
+    
+    .base-dist-picker {
+      padding-right: 0;
+    }
+    
+    button {
+      margin-left: 10px;
+    }
+  }
+}
+
+.el-steps {
+  width: 655px;
+  margin: 30px auto 0;
+}
+
+.form-builder {
+  margin: 0 auto;
+}
+
+.task-container {
+  .base-modal {
+    .customer-modal-container,
+    .product-container {
+      overflow: visible;
+    }
+  }
+}

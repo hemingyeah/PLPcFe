@@ -1,0 +1,60 @@
+.task-allot-auto {
+  padding: 16px 20px 16px 80px;
+  &-header {
+    display: flex;
+    justify-content: flex-end;
+    .el-button {
+      max-width: 88px !important;
+    }
+  }
+  &-match {
+    color: $color-primary;
+  }
+  &-nomatch {
+    color: $text-color-primary;
+    font-weight: 600;
+  }
+  &-item {
+    .el-checkbox {
+      margin-left: 10px;
+    }
+  }
+  &-empty {
+    height: 200px;
+    line-height: 200px;
+    text-align: center;
+  }
+}
+
+.task-allot-auto {
+  .base-timeline-head {
+    height: 28px;
+    width: 28px;
+    left: -16px;
+    line-height: 28px;
+    text-align: center;
+    &-no-match {
+      background-color: #fff !important;
+      border: 1px solid #E6E6E6;
+      color: $text-color-secondary;
+      &:hover {
+        background-color: #fff !important;
+      }
+    }
+    &-before,
+    &-match {
+      border: none !important;
+      background-color: $color-primary !important;
+      color: #fff;
+      &:hover {
+        background-color: $color-primary !important;
+      }
+    }
+  }
+  .base-timeline-item-before {
+    border-color: $color-primary;
+  }
+  &-item-name {
+    cursor: pointer;
+  }
+}

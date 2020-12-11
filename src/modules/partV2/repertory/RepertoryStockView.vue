@@ -101,7 +101,7 @@
       <div class="top-btn-group">
         <!--<base-button type="primary" icon="el-icon-plus" @event="create" v-if="allowEdit">新建</base-button>-->
         <!--<base-button type="ghost" icon="el-icon-delete" v-if="allowEdit" @event="remove">删除</base-button>-->
-        <el-select :value="repertoryName" filterable @input="chooseRepertory($event);trackEventHandler('chooseRepertory')" class="srp-list-form-item" style="width: 150px;">
+        <el-select v-if="!isStandardEdition" :value="repertoryName" filterable @input="chooseRepertory($event);trackEventHandler('chooseRepertory')" class="srp-list-form-item" style="width: 150px;">
           <el-option value="" label="全部仓库"></el-option>
           <el-option v-for="item in visibleRepertories" :key="item.id" :value="item.id" :label="item.name"></el-option>
         </el-select>
@@ -547,7 +547,7 @@ import StorageUtil from '@src/util/storageUtil';
 
 import BaseGallery from 'packages/BaseGallery/index'
 
-import { isShowPartTransfer, isShowPartApply, isShowMoreSperaParts } from '@src/util/version.ts'
+import { isShowPartTransfer, isShowPartApply, isShowMoreSperaParts, isStandardEdition } from '@src/util/version.ts'
 
 const STORAGE_COLNUM_KEY = 'repertory_list_column';
 const STORAGE_PAGESIZE_KEY = 'repertory_list_pagesize';
@@ -719,6 +719,9 @@ export default {
     },
     isShowMoreSperaParts() {
       return isShowMoreSperaParts()
+    },
+    isStandardEdition() {
+      return isStandardEdition()
     }
   },
   methods: {
@@ -1482,7 +1485,6 @@ export default {
 
       let remark = await form.remarkText();
       
-      
       try {
         let result = await this.$http.post(`/partV2/approve/allot/initiate/batch?remark=${remark}`, partSparesData);
   
@@ -1490,7 +1492,7 @@ export default {
           
           this.$platform.toast('批量分配成功').then(() => {
             this.initialize()
-            this.isPartSparesDialog = false;
+            this.isPartSparesBatchDialog = false;
           });
 
         } else{
