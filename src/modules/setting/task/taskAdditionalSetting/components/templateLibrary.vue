@@ -16,8 +16,13 @@
                 </div>
                 <div class="task-card-footer">
                     <el-button type="primary" plain >预览</el-button>
-                    <el-button type="primary" @click="importcard('single')">添加为单次</el-button>
-                    <el-button type="primary" @click="importcard('multiple')">添加为多次</el-button>
+                    <el-tooltip class="item" effect="dark" content="每个工单中填写一组该数据" placement="top">
+                      <el-button type="primary" @click="importcard('single')">添加为单次</el-button>
+                    </el-tooltip>
+                    <el-tooltip class="item" effect="dark" content="每个工单中填写多组该数据" placement="top">
+                      <el-button type="primary" @click="importcard('multiple')">添加为多次</el-button>
+                    </el-tooltip>
+                   
                 </div>
 
             </div>

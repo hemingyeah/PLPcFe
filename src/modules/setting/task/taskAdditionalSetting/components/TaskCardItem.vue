@@ -13,14 +13,14 @@
                             <p>已应用范围：</p>
                              <template v-if="cardData.range.length>1">
                                 <el-dropdown placement="top" @command="modifyTaskType">
-                                    <span class="pointer">{{cardData.range[0].taskName}}等{{cardData.range.length}}个</span>         
+                                    <span class="pointer">{{cardData.range[0].name}}等{{cardData.range.length}}个</span>         
                                     <el-dropdown-menu slot="dropdown">
-                                        <el-dropdown-item v-for="(item,index) in cardData.range" :key="index"   :command="item.taskTypeId">{{item.taskName}}</el-dropdown-item>       
+                                        <el-dropdown-item v-for="(item,index) in cardData.range" :key="index"   :command="item.id">{{item.name}}</el-dropdown-item>       
                                     </el-dropdown-menu>
                                 </el-dropdown>
                             </template>
                             <template v-else>
-                                <span class="pointer">{{cardData.range[0].taskName}}</span>
+                                <span class="pointer" @click="modifyTaskType(cardData.range[0].id)">{{cardData.range[0].name}}</span>
                             </template>
                         </div>
                         <div class="task-card-li">
@@ -30,7 +30,7 @@
                     </el-row>
                 </el-row >
             </el-row>
-            <el-switch v-model="cardData.enabled"  :active-value="1" :inactive-value="0"/>
+            <el-switch v-model="cardData.enabled"  :active-value="1" :inactive-value="0" @change="statusChange(cardData.enabled)"/>
         </el-row>
 
         <!-- start 操作 -->
@@ -52,11 +52,21 @@
                 <i class="icon-ziyuan iconfont">编辑</i>
             </div>
         </el-row>
-         <!-- end 操作 -->
+        <!-- end 操作 -->
+
+        <!-- 添加编辑附加组件 -->
+        <edit-cardname-dialog  :id="cardData.id" ref="batchCardnameDialog"></edit-cardname-dialog>
+
+        <!-- 统计 -->
+        <statistical-dialog :id="cardData.id" :specialfrom="cardData.specialfrom" ref="statisteDialog" ></statistical-dialog>
     </el-card>
 </template>
 
 <script>
+import * as SettingTaskApi from "@src/api/SettingTaskApi";
+
+import EditCardnameDialog from "../components/EditCardnameDialog";
+import statisticalDialog from "../components/statisticalDialog";
 export default {
     name: 'task-card-item',
     props: {
@@ -65,13 +75,11 @@ export default {
     },
     data() {
         return {
-            isShowChooseTeamModal: false  // 选择可用团队弹窗
         }
     },
+    mounted() {
+    },
     methods: {
-        chooseTeam() {
-            this.isShowChooseTeamModal = true;
-        },
         //删除组件
         delTaskCard() {
             this.$confirm('组件删除后，所有使用该组件的信息将被删除，且不能恢复，确认是否删除？', '提示', {
@@ -79,17 +87,37 @@ export default {
                 cancelButtonText: '取消',
                 type: 'warning',
             }).then(() => {
-                // todo_zr
-                this.$platform.notification({
-                    title: "删除成功",
-                    type: "success",
-                });
+                SettingTaskApi.onDeleteCard({id:this.cardData.id}).then(res=>{
+                    const { status, message, data } = res;
+                    if(status == 0){
+                        this.$message.success('删除成功');
+                        location.reload()
+                    }else{
+                        this.$message.error(message);
+                    }
+                }).catch(error=>{
+                    console.log(error)
+                })
             });
+        },
+
+        // 禁用/开启附加组件
+        statusChange(state) {
+            let enabled = state ? 1 : 0;
+            SettingTaskApi.onCardChange({id:this.cardData.id,enabled:enabled}).then(res=>{
+                const { status, message, data } = res;
+                if(status == 0){
+                    this.$message.success('操作成功');
+                }else{
+                    this.$message.error(message);
+                }
+            }).catch(error=>{
+                console.log(error)
+            })
         },
         //重命名
         editRename() {
-            this.$emit('editRename','c5b8b2ab-a47e-11ea-a340-00163e304a25')
-
+            this.$refs.batchCardnameDialog.openDialog();
         },
         //TODO:进入工单详情
         modifyTaskType(id) {
@@ -103,7 +131,7 @@ export default {
         },
         //查看统计
         onSee() {
-            this.$emit('onSeeStatistical','c5b8b2ab-a47e-11ea-a340-00163e304a25')
+            this.$refs.statisteDialog.openDialog();
         },
         updateTeamList(teamList){
             console.log(teamList);
@@ -114,6 +142,8 @@ export default {
         }
     },
     components: {
+        [EditCardnameDialog.name]: EditCardnameDialog,
+        [statisticalDialog.name]: statisticalDialog    
     }
 }
 </script>

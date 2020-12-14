@@ -18,7 +18,7 @@
           </el-tabs>
         </div>
         <div class="lh-52" v-if="activeTab=='task-added'">
-          <el-button type="primary" icon="el-icon-plus"  :loading="false" @click="addTaskCard"> 新建</el-button>
+          <el-button type="primary" icon="el-icon-plus"  :loading="false" @click="addTaskCard">新建</el-button>
         </div>
       </div>
       
@@ -29,8 +29,6 @@
           v-for="(item, idx) in cardList"
           :key="item.id"
           :cardData.sync="cardList[idx]"
-          @editRename="editRename"
-          @onSeeStatistical="onSeeStatistical"
         ></task-card-item>
       </div>
       <!-- end 已添加附加组件 -->
@@ -44,11 +42,8 @@
     </div>
     <!-- end 附加组件设置 -->
 
-    <!-- 添加编辑附加组件 -->
+    <!-- 创建附加组件 -->
     <edit-cardname-dialog ref="batchCardnameDialog"></edit-cardname-dialog>
-    
-    <!-- 统计 -->
-    <statistical-dialog ref="statisteDialog"></statistical-dialog>
   </div>
 </template>
 
@@ -56,35 +51,37 @@
 import TaskNavBar from "../../components/TaskNavBar";
 import TaskCardItem from "../components/TaskCardItem";
 import EditCardnameDialog from "../components/EditCardnameDialog";
-import statisticalDialog from "../components/statisticalDialog";
 import templateLibrary from "../components/templateLibrary";
 
 export default {
   name: "task-manage",
   data() {
     return {
-      activeTab: "task-import",
+      activeTab: "task-added",
       cardList: [
         {
-          id: 'c5b8b2ab-a47e-11ea-a340-00163e304a25',
+          id: 'b7a32503-2704-11ea-bfc9-00163e304a25',
           name: '费用备注',
           description: '记录备注费用信息',
+          specialfrom: null,
           inputType: 'single',//单次single 多次multiple   
-          range:[{taskName:'工单类型1',taskTypeId:'ee7a0934-2840-4b55-bcc4-000e6435b70c'},{taskName:'工单类型2',taskTypeId:'ee7a0934-2840-4b55-bcc4-000e6435b70c'}], 
+          range:[{name:'工单类型1',id:'ee7a0934-2840-4b55-bcc4-000e6435b70c'},{name:'工单类型2',taskTypeId:'ee7a0934-2840-4b55-bcc4-000e6435b70c'}], 
           enabled:1 //1开启 0关闭
         }, {
-          id: "c5b8b2ab-a47e-11ea-a340-00163e304a22",
-          name: '礼品邮寄',
+          id: "ccdddc47-390b-11ea-bfc9-00163e304a25",
+          name: '单次组件一',
           description: '费用备注费用备注费用备注费用备注费用备注超过16',
+          specialfrom: null,
           inputType: 'single',//单次single 多次multiple
-          range:[{taskName:'工单类型1',taskTypeId:'ee7a0934-2840-4b55-bcc4-000e6435b70c'}], 
+          range:[{name:'工单类型1',id:'ee7a0934-2840-4b55-bcc4-000e6435b70c'}], 
           enabled:1 //1开启 0关闭
         },{
-          id: "c5b8b2ab-a47e-11ea-a340-00163e304a23",
-          name: '费用备注费用备注费用备注费用备注费用备注超过16',
-          description: '记录备注费用信息',
+          id: "d98f1607-e20a-11ea-9929-00163e304a25",
+          name: '工时记录',
+          description: '工时记录信息',
+          specialfrom: null,
           inputType: 'single',//单次single 多次multiple
-          range:[{taskName:'工单类型1',taskTypeId:'ee7a0934-2840-4b55-bcc4-000e6435b70c'}], 
+          range:[{name:'工单类型1',id:'ee7a0934-2840-4b55-bcc4-000e6435b70c'}], 
           enabled:1 //1开启 0关闭
         },
       ],
@@ -100,24 +97,12 @@ export default {
     //新建组件
     addTaskCard(){
       this.$refs.batchCardnameDialog.openDialog();
-    },
-    //重命名
-    editRename(id) {
-      this.$refs.batchCardnameDialog.form.id = id;
-      this.$refs.batchCardnameDialog.openDialog();
-    },
-    //查看统计
-    onSeeStatistical(id) {
-      this.$refs.statisteDialog.openDialog();
-
     }
-
   },
   components: {
     [TaskNavBar.name]: TaskNavBar,
     [TaskCardItem.name]: TaskCardItem,
     [EditCardnameDialog.name]: EditCardnameDialog,
-    [statisticalDialog.name]: statisticalDialog,
     [templateLibrary.name]: templateLibrary   
   },
 };

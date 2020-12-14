@@ -6,6 +6,7 @@ import mtracker from '@src/util/mtracker';
 import taskAdditionalSet from './taskAdditionalSet.vue';
 
 Vue.prototype.$http = http;
+Vue.prototype.$eventBus = new Vue();
 mtracker();
 
 // 处理注入的参数

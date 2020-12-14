@@ -10,7 +10,7 @@
       <div class="statistical-search">
         <div class="search-left">
           <el-date-picker
-            v-model="form.timeRange"
+            v-model="timeArrRange"
             type="daterange"
             range-separator="-"
             start-placeholder="开始日期"
@@ -31,28 +31,32 @@
           class="page-table statistical-table"
           :highlight-current-row="false"
           border
-          header-row-class-name="page-table-header"
-          
+          header-row-class-name="page-table-header" 
           stripe
           @selection-change="handleSelectionChange">
-          <el-table-column
-            type="selection"
-            width="55">
-          </el-table-column>
+          <el-table-column prop="taskNo" label="工单编号" width="150"></el-table-column>
+          <template v-if="specialfrom != '工时记录'">
+            <el-table-column  
+              v-for="(column, index) in columns" 
+              :key="`${column.field}_${index}`"
+              :prop="column.fieldName" 
+              :label="column.displayName"
+              width="120">
+            </el-table-column>
+          </template>
+          <template v-else>
+            <el-table-column  
+              v-for="(column, index) in columns" 
+              :key="`${column.field}_${index}`"
+              :prop="column.fieldName" 
+              :label="column.displayName"
+              width="120">
+              <template slot-scope="scope">{{ scope.row.date }}</template>
+            </el-table-column>
+          </template>    
           <el-table-column
             prop="name"
-            label="工单编号"
-            width="120">
-            <template slot-scope="scope">{{ scope.row.date }}</template>
-          </el-table-column>
-          <el-table-column
-            prop="name"
-            label="礼品"
-            width="120">
-          </el-table-column>
-          <el-table-column
-            prop="name"
-            label="收货人"
+            label="操作人"
             show-overflow-tooltip>
           </el-table-column>
           <el-table-column
@@ -80,7 +84,7 @@
               </div>
             </div>
             <el-pagination
-              v-if="this.tableData.length"
+              v-if="this.tableData"
               class="comment-list-table-footer-pagination"
               background
               @current-change="jumpPage"
@@ -103,10 +107,22 @@
 <script>
 // api
 import * as SettingTaskApi from "@src/api/SettingTaskApi";
+// util
+import * as Lang from "@src/util/lang/index.js";
 
 export default {
   name: 'statistical-dialog',
+  props: {
+    id:{
+      type: String,
+    },
+    specialfrom:{
+      type: String
+    }
+  },
   data() {
+    let startDate = Lang.formatDate(new Date() - 29 * 24 * 60 * 60 * 1000,"YYYY-MM-DD");
+    let endDate = Lang.formatDate(new Date(), "YYYY-MM-DD");
     return {
       visible: false,
       totalElements:100,
@@ -114,26 +130,41 @@ export default {
         cardId: '6a4bde67-11ad-11eb-a442-00163e304a25',
         pageNum: 1,
         pageSize: 10,
-        timeRange: '',//2020/11/11 - 2020/12/10
+        timeRange: [startDate,endDate],//2020/11/11 - 2020/12/10
         taskNoStr: '',
-        userNameStr: ''
-       
+        userNameStr: ''    
       },
-      tableData:[{
-        name:"测试111"
-
-      }],
+      tableData:[],
       multipleSelection:[],
+      cardFieldsData:[],
       rules: {
         name: [{ required: true, message: "请输入名称", trigger: "blur" }],
       },
     };
   },
+  computed: {
+    timeArrRange() {
+      let startDate = Lang.formatDate(new Date() - 29 * 24 * 60 * 60 * 1000,"YYYY-MM-DD");
+      let endDate = Lang.formatDate(new Date(), "YYYY-MM-DD");
+      
+      this.form.timeRange = `${startDate.replace(/-/g, '/')} - ${endDate.replace(/-/g, '/')}`;
+      return [startDate,endDate]
+    },
+
+    columns() {
+      let cardFields = this.cardFieldsData.filter((item)=>item.cardId==this.id);
+
+      if(cardFields.length) return cardFields[0].fields;
+      return [];
+    }
+  },
   methods: {
     openDialog() {
       this.visible = true;
-      if(this.form.id) {
-        this.getCardInfoReq()
+      if(this.id) {
+        this.form.cardId = this.id;
+        this.getCardFields()
+        this.getCardCountReq();
       }
     },
     onClose(form) {
@@ -163,14 +194,23 @@ export default {
     jumpPage(pageNum) {
       this.form.pageNum = pageNum;
     },
-    //获取附加组件的信息
-    getCardInfoReq() {
-      SettingTaskApi.getCardInfo({id:this.form.id}).then(res=>{
+
+    //获取统计Fields列表
+    getCardFields() {
+      SettingTaskApi.getCardFields().then(res=>{
         const { status, message, data } = res;
         if( status == 0 ){
-          this.form = data;
+          this.cardFieldsData = data;
         }
+      }).catch(error=>{})
+    },
 
+    //获取统计列表
+    getCardCountReq() {
+      SettingTaskApi.getCardCount(this.form).then(res=>{
+        const { status, message, list } = res;
+        let cardList = list
+        this.tableData = list;
       }).catch(error=>{
 
       })
