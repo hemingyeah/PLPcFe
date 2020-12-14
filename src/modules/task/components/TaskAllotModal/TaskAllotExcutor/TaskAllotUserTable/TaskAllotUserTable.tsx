@@ -37,16 +37,8 @@ export default class TaskAllotUserTable extends TaskAllotUserTableRender {
   
   render(h: CreateElement) {
     return (
-      <div class='task-allot-user-table'>
-        <div class='task-allot-user-filter'>
-          {this.isAllotByTag && this.renderTeamSelect()}
-          {this.isAllotByTag && this.renderChooseUserByTeam()}
-          {!this.isAllotByTag && this.renderChooseUserByDept()}
-          {this.renderLocationSelect()}
-          {this.renderWorkStateSelect()}
-          {this.renderSortordSelect()}
-          {this.renderSelectColumn()}
-        </div>
+      <div class={ComponentNameEnum.TaskAllotUserTable}>
+        {this.renderTaskAllotUserTableHeader()}
         <div class='task-allot-user-table-block'>
           <el-table
             border

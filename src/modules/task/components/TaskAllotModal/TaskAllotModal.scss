@@ -8,11 +8,13 @@
     
     & > .base-modal-body {
       display: flex;
+      flex-wrap: wrap;
+      flex-flow: column;
       padding: 0 !important;
     }
     
     & > .base-modal-header {
-      background-color: #fff;
+      background-color: #FAFAFA;
     }
     
   }
@@ -25,7 +27,7 @@
   }
   
   .task-allot-content {
-    width: calc(100% - 178px);
+    flex: 1;
     overflow-y: scroll;
   }
   
@@ -122,9 +124,14 @@
   height: 100%;
   
   .task-allot-user-table {
+    height: 100%;
     width: 100%;
     .task-allot-user-table-block {
+      height: 100%;
       width: 100%;
+      .el-table {
+        height: 100%;
+      }
     }
   }
   .task-allot-map{
@@ -135,3 +142,35 @@
     border-bottom: 0;
   }
 }
+
+/* start new  */
+.task-allot-modal-header {
+  display: flex;
+  justify-content: space-between;
+  height: 64px;
+  width: 100%;
+  padding: 16px 16px 12px 16px;
+  &-type {
+    display: flex;
+  }
+  &-mode {
+    margin-left: 24px;
+    .el-radio-button__inner {
+      box-shadow: none;
+    }
+    .is-active {
+      .el-radio-button__inner {
+        border-color: $color-warning;
+        background-color: $color-warning;
+      }
+    }
+  }
+}
+
+.task-allot-modal-result-button {
+  button {
+    width: 122px;
+    max-width: 100% !important;
+  }
+}
+/* end new  */

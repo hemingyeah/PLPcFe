@@ -866,7 +866,7 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
       Log.info(this.selectTeams.slice(), 'selectTeams', this.matchTags.name)
       
     } catch (error) {
-      console.warn('TaskAllotUserTableMethods -> matchTags -> error', error)
+      Log.error(error, this.matchTags.name)
     }
   }
   

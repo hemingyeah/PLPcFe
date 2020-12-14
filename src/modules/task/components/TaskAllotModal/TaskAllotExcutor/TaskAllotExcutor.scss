@@ -77,3 +77,22 @@
   }
 }
 /* end 客户地址地图 */
+
+/* start new */
+.task-allot-executor-header {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 16px 16px;
+  &-row {
+    display: flex;
+    flex: 1;
+    margin-right: 24px;
+    &-label {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-width: 90px;
+    }
+  }
+}
+/* new new */

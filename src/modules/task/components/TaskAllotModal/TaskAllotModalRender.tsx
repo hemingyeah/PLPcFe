@@ -4,71 +4,12 @@ import TaskAllotTypeEnum from '@model/enum/TaskAllotTypeEnum'
 import LoginUser from '@model/entity/LoginUser/LoginUser'
 /* methods */
 import TaskAllotModalMethods from '@src/modules/task/components/TaskAllotModal/TaskAllotModalMethods'
+/* model */
+import { TaskAllotTypeModeEnum } from '@src/modules/task/components/TaskAllotModal/TaskAllotModalModel'
+/* vue */
 import { VNode } from 'vue'
 
 class TaskAllotModalRender extends TaskAllotModalMethods {
-  /** 
-   * @description 渲染工单派单类型
-  */
-  public renderTaskAllotType(): VNode {
-    // 作用域插槽
-    const scopedSlots: { [x: string]: ((y: Function) => VNode) | undefined } = {}
-    
-    // 未开启工单池
-    if (!(this.taskConfig.taskPoolOn === true) || this.isTaskInTaskPool) {
-      scopedSlots.taskPool = this.renderTaskAllotTypeTaskPool(this.isTaskInTaskPool)
-    }
-    
-    // 未开启自动派单 或 转派
-    if (!(this.taskConfig.autoDispatch === true) || this.isReAllot) {
-      scopedSlots.autoDispatch = this.renderTaskAllotAutoDispatch(this.isReAllot)
-    }
-    
-    return (
-      <task-allot-type
-        scopedSlots={scopedSlots}
-        type={this.allotType}
-        taskConfig={this.taskConfig}
-        onChange={(value: TaskAllotTypeEnum) => this.handlerAllotTypeChange(value)}
-      />
-    )
-  }
-  
-  /** 
-   * @description 渲染工单派单类型 工单池
-  */
-  public renderTaskAllotTypeTaskPool(isTaskInTaskPool: boolean = false): (x: Function) => VNode {
-    let content = isTaskInTaskPool ? '该工单已在工单池中，无法再次发布' : '尚未启用工单池派单功能，如需开启请到 系统管理-工单功能设置中配置' 
-    
-    const taskPoolSlot = (props: Function): VNode => {
-      return (
-        <el-tooltip content={content}  placement='top'>
-          {props(true)}
-        </el-tooltip>
-      )
-    }
-    
-    return taskPoolSlot
-  }
-  
-  /** 
-   * @description 渲染工单派单类型 自动派单
-   * @param {Boolean} isReAllot 是否是转派
-  */
-  public renderTaskAllotAutoDispatch(isReAllot: boolean = false): (x: Function) => VNode {
-    let content = isReAllot ? '转派工单时无法使用自动分配规则' : '尚未启用自动分配功能，如需开启请到 系统管理-工单设置中开启「启用自动分配规则」设置'
-    
-    const autoDispatchSlot = (props: Function): VNode => {
-      return (
-        <el-tooltip content={content}  placement='top'>
-          {props(true)}
-        </el-tooltip>
-      )
-    }
-    
-    return autoDispatchSlot
-  }
-  
   /** 
    * @description 渲染负责人
   */
@@ -83,6 +24,39 @@ class TaskAllotModalRender extends TaskAllotModalMethods {
           ? <user-button user={this.executorUser} userDeleteFunc={(user: LoginUser) => this.deleteExcutorUser(user)} />
           : <div class='task-allot-executor-placeholder'>请在右侧选择</div>
         }
+      </div>
+    )
+  }
+  
+  /** 
+   * @description 渲染工单派单头部派单选择
+  */
+  public renderLasTasktAllotResultButton(): VNode {
+    return (
+      <div class='task-allot-modal-result-button'>
+        <el-button type='primary' plain onClick={(event: MouseEvent) => this.useLastTaskAllotResult(event)}>
+          上一次派单结果
+        </el-button>
+      </div>
+    )
+  }
+  
+  /** 
+   * @description 渲染转派说明
+  */
+  public renderReAllotReason(): VNode | null {
+    if (!this.isReAllot) return null
+    
+    return (
+      <div class='task-allot-reason'>
+        <span class='task-allot-nav-title'>转派说明</span>
+        <el-input
+          type='textarea'
+          rows={5}
+          placeholder={`${this.reallotRemarkNotNull ? '[必填]' : '[选填]'}转派说明`}
+          value={this.reason}
+          onInput={(value: string) => this.reason = value}
+        />
       </div>
     )
   }
@@ -125,21 +99,76 @@ class TaskAllotModalRender extends TaskAllotModalMethods {
   }
   
   /** 
-   * @description 渲染转派说明
+   * @description 渲染工单派单头部
   */
-  public renderReAllotReason(): VNode | null {
-    if (!this.isReAllot) return null
+  public renderTaskAllotHeader(): VNode {
+    return (
+      <div class='task-allot-modal-header'>
+        {this.renderTaskAllotHeaderType()}
+        {this.renderLasTasktAllotResultButton()}
+      </div>
+    )
+  }
+  
+  /** 
+   * @description 渲染工单派单头部派单方式
+  */
+  public renderTaskAllotHeaderType(): VNode {
+    /**
+     * 是否显示工单池类型
+     * 1. 工单设置 -> 工单池 开启
+     * 2. 且该工单目前不在工单池中
+    */
+    const isShowTaskPoolType: boolean = Boolean(this.taskConfig.taskPoolOn === true && !this.isTaskInTaskPool)
+    /** 
+     * 是否显示自动派单类型
+     * 1. 工单设置 -> 自动派单 开启
+     * 2. 且非转派 (仅支持指派)
+    */
+    const isShowAutoDispatchType: boolean = Boolean(this.taskConfig.autoDispatch === true && !this.isReAllot)
+    return (
+      <div class='task-allot-modal-header-type'>
+        <el-radio-group value={this.allotType} onInput={(value: TaskAllotTypeEnum) => this.handlerAllotTypeChange(value)}>
+          <el-radio-button label={TaskAllotTypeEnum.Person}>
+            { this.isReAllot ? '转派给工单负责人' : '指派给工单负责人' }
+          </el-radio-button>
+          {
+            isShowTaskPoolType && (
+              <el-radio-button label={TaskAllotTypeEnum.Pool}>
+                指派到工单池
+              </el-radio-button>
+            )
+          }
+          {
+            isShowAutoDispatchType && (
+              <el-radio-button label={TaskAllotTypeEnum.Auto}>
+                自动分配
+              </el-radio-button>
+            )
+          }
+        </el-radio-group>
+        {this.renderTaskAllotHeaderMode()}
+      </div>
+    )
+  }
+  
+  /** 
+   * @description 渲染工单派单头部派单模式
+  */
+  public renderTaskAllotHeaderMode(): VNode | null {
+    const isTaskAllotByMap: boolean = this.taskConfig.taskAllotByMap === true
+    if (!isTaskAllotByMap) return null
     
     return (
-      <div class='task-allot-reason'>
-        <span class='task-allot-nav-title'>转派说明</span>
-        <el-input
-          type='textarea'
-          rows={5}
-          placeholder={`${this.reallotRemarkNotNull ? '[必填]' : '[选填]'}转派说明`}
-          value={this.reason}
-          onInput={(value: string) => this.reason = value}
-        />
+      <div class='task-allot-modal-header-mode'>
+        <el-radio-group value={this.allotTypeMode} onInput={(value: TaskAllotTypeModeEnum) => this.handlerAllotTypeModeChange(value)}>
+          <el-radio-button label={TaskAllotTypeModeEnum.List}>
+            列表
+          </el-radio-button>
+          <el-radio-button label={TaskAllotTypeModeEnum.Map}>
+            地图
+          </el-radio-button>
+        </el-radio-group>
       </div>
     )
   }

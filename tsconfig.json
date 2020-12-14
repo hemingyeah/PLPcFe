@@ -14,21 +14,18 @@
     "module": "esnext",
     // 这可以对 `this` 上的数据属性进行更严格的推断
     "strict": true,
-
     "moduleResolution": "node",
     "experimentalDecorators": true,
     //jsx需要使用preserve模式
     "jsx": "preserve",
     //允许编译js
     "allowJs": true,
-
     "baseUrl": ".",
     "paths": {
       "@src/*": ["src/*"],
       "@model/*": ["model/*"],
       "@service/*": ["service/*"]
     },
-    
     "lib": [
       "esnext",
       "dom",

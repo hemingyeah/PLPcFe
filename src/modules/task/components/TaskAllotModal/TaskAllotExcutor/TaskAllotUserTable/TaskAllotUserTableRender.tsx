@@ -17,6 +17,8 @@ import { fmt_display_text } from '@src/filter/fmt'
 import { isArray } from 'lodash'
 import { convertSecondsToHourMinuteText } from '@src/util/time'
 import DateUtil from '@src/util/date'
+/* vue */
+import { VNode } from 'vue'
 
 class TaskAllotUserTableRender extends TaskAllotUserTableMethods {
   /** 
@@ -384,6 +386,28 @@ class TaskAllotUserTableRender extends TaskAllotUserTableMethods {
     
     return (
       <div class='task-allot-user-table-append-block'>{ this.isDisableLoadmore ? '已加载全部结果' : '载入更多结果...' }</div>
+    )
+  }
+  
+  /** 
+   * @description 渲染工单指派人员表格头部
+  */
+  public renderTaskAllotUserTableHeader(): VNode {
+    return (
+      <div class='task-allot-user-table-header'>
+        {this.renderTaskAllotUserTableHeaderLabels()}
+      </div>
+    )
+  }
+  
+  /** 
+   * @description 渲染工单指派人员表格头部 标签列表
+  */
+  public renderTaskAllotUserTableHeaderLabels() {
+    return (
+      <div>
+        
+      </div>
     )
   }
 }

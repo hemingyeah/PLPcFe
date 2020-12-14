@@ -41,15 +41,7 @@ export default class TaskAllotModal extends TaskAllotModalRender {
     return (
       <base-modal show={this.showTaskAllotModal} {...attrs}>
         
-        <div class='task-allot-nav'>
-          <div class='task-allot-type'>
-            <span class='task-allot-nav-title'>派单方式</span>
-            {this.renderTaskAllotType()}
-          </div>
-          {this.renderExcutor()}
-          {this.renderSynergy()}
-          {this.renderReAllotReason()}
-        </div>
+        {this.renderTaskAllotHeader()}
         
         <div class='task-allot-content'>
           <keep-alive>
@@ -58,8 +50,12 @@ export default class TaskAllotModal extends TaskAllotModalRender {
                 <task-allot-excutor
                   ref='TaskAllotExcutorComponent'
                   customer={this.customer}
-                  task={this.task}
+                  isShowSynergy={this.allowModifySynergyUser}
+                  isReAllot={this.isReAllot}
                   loginUser={this.loginUser}
+                  mode={this.allotTypeMode}
+                  task={this.task}
+                  taskConfig={this.taskConfig}
                   stateColorMap={this.stateColorMap}
                   onSetExecutor={(user: LoginUser) => this.setExecutorUser(user)} 
                   onSetSynergy={(user: LoginUser) => this.setSynergyUser(user)} 

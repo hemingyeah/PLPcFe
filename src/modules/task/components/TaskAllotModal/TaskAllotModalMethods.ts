@@ -17,9 +17,7 @@ import { getStateColorMap } from '@src/api/SettingApi'
 import TaskAllotModalComputed from '@src/modules/task/components/TaskAllotModal/TaskAllotModalComputed'
 /* enum */
 import TaskAllotTypeEnum from '@model/enum/TaskAllotTypeEnum'
-import TaskActionEnum from '@model/enum/TaskActionEnum'
 import ComponentNameEnum from '@model/enum/ComponentNameEnum'
-import LeaderEnum from '@model/enum/LeaderEnum'
 /* entity */
 import Approve from '@model/entity/Approve'
 import LoginUser from '@model/entity/LoginUser/LoginUser'
@@ -30,20 +28,18 @@ import TaskAllotUserInfo from '@model/entity/TaskAllotUserInfo'
 import { 
   AutoDispatchApproveParams, 
   DepeMultiUserResult,
-  AutoDispatchParams, 
-  TaskAllotApproveParams, 
+  AutoDispatchParams,
   AllotExcutorParams,
   AllotTaskPoolParams,
   User,
   ReAllotTaskPoolParams
 } from '@src/modules/task/components/TaskAllotModal/TaskAllotModalInterface'
 /* model */
+import { TaskAllotTypeModeEnum } from '@src/modules/task/components/TaskAllotModal/TaskAllotModalModel'
 import { TASK_NOT_AUTO_DISPATCH_RULE, TASK_NO_EXECUTOR_MESSAGE, TASK_NO_REALLOT_REASON_MESSAGE, TASK_REALLOT_NOT_SAME_USER_MESSAGE } from '@src/model/const/Alert'
 import { getCustomerDetailResult } from '@model/param/out/Customer'
 import { getTaskAllotApproveResult, getTaskAllotResult, getTaskAllotTaskPollApproveResult, getTaskAllotTaskPoolResult, getTaskConfigResult, getTaskTypeResult } from '@model/param/out/Task'
 import { TaskPoolNotificationTypeEnum } from '@src/modules/task/components/TaskAllotModal/TaskAllotPool/TaskAllotPoolModel'
-/* service */
-import { checkApprove } from '@service/TaskService'
 /* types */
 import StateColorMap from '@model/types/StateColor'
 import AutoDispatchListItem from '@model/types/AutoDispatchListItem'
@@ -331,7 +327,7 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
         this.customer = Object.freeze(result.data || {})
         
         // @ts-ignore
-        this.$refs.TaskAllotExcutorComponent.outsideFetchUsers()
+        this.$refs?.TaskAllotExcutorComponent.outsideFetchUsers()
         
       }).catch(err => {
         console.error(err)
@@ -617,18 +613,27 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
     this.loadedComponents.push(LoadComponentMap[type])
   }
   
+    /** 
+   * @description 派单方式模式变化
+  */
+  public handlerAllotTypeModeChange(type: TaskAllotTypeModeEnum) {
+    this.allotTypeMode = type
+  }
+  
   /** 
    * @description 初始化
   */
   public async initialize() {
     try {
+      
       await this.fetchStateColor()
       await this.fetchCustomer()
       // 非转派时获取客户负责人带入协同人
       !this.isReAllot && await this.fetchSynergyUserWithCustomerManager()
+      
     } catch (error) {
       this.toggleTaskAllotExecutorComponentPending()
-      console.error('TaskAllotModalMethods -> initialize -> error', error)
+      Log.error(error, this.initialize.name)
     } finally {
       this.pending = false
     }
@@ -921,6 +926,14 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
   public toggleTaskAllotExecutorComponentPending(pending: boolean = false) {
     // @ts-ignore
     this.$refs.TaskAllotExcutorComponent?.outsideSetPending(pending)
+  }
+  
+  /** 
+   * @description 使用上次派单结果
+  */
+  public useLastTaskAllotResult(event: MouseEvent): void {
+    // @ts-ignore 取消按钮的焦点
+    event?.target?.parentNode?.blur()
   }
 }
 

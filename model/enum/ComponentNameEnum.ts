@@ -8,6 +8,8 @@ enum ComponentNameEnum {
   TaskAllotModal = 'task-allot-modal',
   // 工单指派人员表格
   TaskAllotUserTable = 'task-allot-user-table',
+  // 工单指派人员地图
+  TaskAllotUserMap = 'task-allot-user-map',
   // 工单自动分配
   TaskAllotAuto = 'task-allot-auto',
   // 工单分配给负责人

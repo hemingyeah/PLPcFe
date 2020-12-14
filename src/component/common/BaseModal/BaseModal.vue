@@ -185,6 +185,7 @@ export default {
 }
 
 .base-modal-header {
+  background-color: #FAFAFA;
   min-height: 44px;
   position: relative;
   padding: 10px 15px 10px 20px;

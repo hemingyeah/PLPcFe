@@ -10,11 +10,6 @@ import { findComponentDownward } from '@src/util/assist'
 
 class TaskAllotModalComputed extends TaskAllotModalData {
   
-  /* 工单派单负责人表格组件 */
-  get TaskAllotExcutorTableComponent(): any {
-    return findComponentDownward(this, ComponentNameEnum.TaskAllotUserTable)
-  }
-  
   get allotContentStyle() {
     return {
       [TaskAllotTypeEnum.Person]: { display: this.allotType === TaskAllotTypeEnum.Person ? 'block' : 'none' },
@@ -90,6 +85,11 @@ class TaskAllotModalComputed extends TaskAllotModalData {
   */
   get reallotRemarkNotNull(): boolean {
     return this.taskConfig?.reallotRemarkNotNull === true
+  }
+  
+  /* 工单派单负责人表格组件 */
+  get TaskAllotExcutorTableComponent(): any {
+    return findComponentDownward(this, ComponentNameEnum.TaskAllotUserTable)
   }
 }
 

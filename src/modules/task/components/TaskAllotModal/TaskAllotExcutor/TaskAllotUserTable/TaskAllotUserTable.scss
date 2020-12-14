@@ -54,7 +54,7 @@
 }
 
 .task-allot-user-table {
-  max-height: 412px;
+  // max-height: 412px;
   &-column {
     cursor: pointer;
     display: flex;
@@ -78,11 +78,13 @@
 }
 
 .task-allot-user-table-block {
-  max-height: 300px;
   overflow-y: auto;
   .el-table__body-wrapper {
-    max-height: 250px;
+    height: 100%;
     overflow-y: scroll;
+    table {
+      height: 100%;
+    }
   }
   th .cell {
     @include text-ellipsis();

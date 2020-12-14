@@ -7,6 +7,8 @@ import TaskType from '@model/entity/TaskType'
 /* enum */
 import TaskAllotTypeEnum from '@model/enum/TaskAllotTypeEnum'
 import ComponentNameEnum from '@model/enum/ComponentNameEnum'
+/* model */
+import { TaskAllotTypeModeEnum } from '@src/modules/task/components/TaskAllotModal/TaskAllotModalModel'
 /* props */
 import TaskAllotModalProps from '@src/modules/task/components/TaskAllotModal/TaskAllotModalProps'
 /* types */
@@ -17,12 +19,12 @@ import { TaskPoolNotificationTypeEnum } from '@src/modules/task/components/TaskA
 class TaskAllotModalData extends TaskAllotModalProps {
   /* 派单方式 */
   public allotType: TaskAllotTypeEnum = TaskAllotTypeEnum.Person
+  /* 派单方式 模式(列表，地图) */
+  public allotTypeMode: TaskAllotTypeModeEnum = TaskAllotTypeModeEnum.List
   /* 客户信息 */
   public customer: Customer = {}
   /* 负责人 */
   public executorUser: LoginUser | TaskAllotUserInfo | null = null
-  /* 是否是按团队派单 */
-  public isAllotByTag: boolean = true
   /* 是否使用匹配出的预估结果 */
   public isUsedResult: boolean = false
   /* 已经加载的组件列表 TODO: 实现 keep-alive component 功能 */
