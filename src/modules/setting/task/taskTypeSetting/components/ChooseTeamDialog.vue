@@ -23,6 +23,7 @@
                 node-key="id"
                 ref="teamTree"
                 highlight-current
+                check-strictly
                 :props="defaultProps">
             </el-tree>
         </div>
@@ -30,18 +31,26 @@
             <el-checkbox v-model="flag" @change="checkAll" :disabled="loading">全选</el-checkbox>
             <div>
                 <el-button @click="cancel">取消</el-button>
-                <el-button type="primary" @click="update">确定</el-button>
+                <el-button type="primary" :loading="pedding" @click="update">确定(已选择{{checkedTeamList.length}})</el-button>
             </div>
         </el-row>
     </base-modal>
 </template>
 
 <script>
-import * as TeamApi from '@src/api/TeamApi';
 import _ from "lodash";
+
+/** api */
+import * as TeamApi from '@src/api/TeamApi';
+import * as SettingApi from "@src/api/SettingApi";
+
 export default {
     name: 'choose-team-dialog',
     props: {
+        id: {
+            type: String,
+            default: ''
+        },
         visiable: {
             type: Boolean,
             default: false
@@ -60,7 +69,8 @@ export default {
             teamIds: [],
             checkedTeamList: [],
 
-            loading: false
+            loading: false,
+            pedding: false
         }
     },
     computed: {
@@ -86,8 +96,20 @@ export default {
             this.$emit('update:visiable', false);
         },
         update() {
-            this.$emit('update', this.checkedTeamList);
-            this.cancel();
+            let params = {
+                id: this.id,
+                tagIds: this.checkedTeamList.length === 0 ? '' : this.checkedTeamList.join(',')
+            };
+            this.pedding = true;
+            SettingApi.changeTags(params).then(res => {
+                this.pedding = false;
+                this.$emit('update', this.checkedTeamList);
+                this.cancel();
+            }).catch(err => {
+                console.log('changeTag => err', err);
+            }).finally(() => {
+                this.pedding = false;
+            })
         },
         fetchTagList(keyword = '') {
             let params = {

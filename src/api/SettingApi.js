@@ -100,7 +100,50 @@ export function saveSettingDispatchRule(params) {
 /**
  * 查询行业模板库记录
  */
-export const getSysTaskTypeList = () => {
-  return http.post('/setting/taskType/getSysList')
+export function getSysTaskTypeList() {
+  return http.post('/setting/taskType/getSysList');
 }
+
+/**
+ * 工单类型排序
+ * 
+ * @param {object} params 工单类型排序
+ */
+export function taskTypeOrder(params) {
+  return http.post('/task/taskTypeOrder/update', params);
+}
+
+
+/**
+ * 启用/关闭工单类型
+ * 
+ * @param {string} params.id 工单类型id
+ * @param {number} params.enabled 工单类型开启/关闭
+ */
+export function taskTypeEnable(params) {
+  return http.post('/setting/taskType/enable', params, false);
+}
+
+/**
+ * 删除工单类型
+ * 
+ * @param {string} params.typeId 工单类型id  
+ */
+export function delTaskType(params) {
+  return http.post('/setting/taskType/delete', params, false);
+}
+
+/**
+ * 更新工单类型可用团队
+ * 
+ * @param {string} params.id 工单类型id  
+ * @param {string} params.tagIds 可用团队id (英文逗号分割)
+ */
+export function changeTags(params) {
+  return http.post('/setting/taskType/changeTags', params, false);
+}
+
+
+
+
 /******************** E 工单类型设置 ***************/

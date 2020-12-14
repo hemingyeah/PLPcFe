@@ -12,6 +12,7 @@
     <!-- start 表单设计器 -->
     <div class="setting-task-design">
       <form-design
+        ref="formDesign"
         v-if="init"
         v-model="fields"
         :mode="mode"
@@ -19,6 +20,13 @@
       ></form-design>
     </div>
     <!-- end 表单设计器 -->
+
+    <!-- 客户关联查询和产品关联查询字段设置关联项弹窗 -->
+    <relation-options-modal
+      ref="relationOptionsModal"
+      @confirm="relationOptionsConfirm"
+    >
+    </relation-options-modal>
   </div>
 </template>
 

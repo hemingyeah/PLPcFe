@@ -6,6 +6,8 @@ import * as CustomerApi from '@src/api/CustomerApi';
 import * as ProductApi from '@src/api/ProductApi';
 /* util */
 import * as FormUtil from '@src/component/form/util';
+/* components */
+import RelationOptionsModal from './components/RelationOptionsModal/RelationOptionsModal.tsx';
 
 // 关联字段禁用的类型
 const RELATION_DISABLE_FIELDS = ['attachment', 'autograph', 'separator', 'info'];
@@ -26,13 +28,20 @@ export default {
   data(){
     return {
       mode: 'task',
+      relationField: {},
       relationOptions: { // 关联查询字段关联项数据
         customerFields: [],
         productFields: []
+      },
+      relationOptionsMap: {
+        relationCustomer: 'customerFields',
+        relationProduct: 'productFields'
       }
     }
   },
   async mounted() {
+    this.$eventBus.$on('task_form_design_relation_options_set', this.openRelatedOptionsDialog);
+
     try {
       // 获取表单字段列表
       let fields = await TaskApi.getFields({ tableName: this.mode, typeId: this.templateId });
@@ -175,6 +184,36 @@ export default {
       }
 
       this.pending = false;
+    },
+    /** 
+    * @description 打开关联项设置弹窗
+    * 从左侧基础控件拖入客户关联字段或者产品关联字段时打开弹窗
+    */
+    openRelatedOptionsDialog(field) {
+      this.relationField = field;
+
+      // 关联项字段列表
+      let relationTypeOption = this.relationOptionsMap[field.formType];
+      let relationOptions = this.relationOptions[relationTypeOption];
+
+      let isCustomer = field.formType == 'relationCustomer';
+      this.$refs.relationOptionsModal.open(relationOptions, isCustomer);
+    },
+    /** 
+    * @description 关联项设置成功
+    */
+    relationOptionsConfirm(options) {
+      for (let index = 0; index < options.length; index++) {
+        const item = options[index];
+        // this.$refs.formDesign.insertField(this.relationField, this.fields, this.fields.length + (index + 1), item)
+        this.$refs.formDesign.immediateInsert(this.relationField, null, item);
+      }
     }
+  },
+  beforeDestroy() {
+    this.$eventBus.$off('task_form_design_relation_options_set', this.openRelatedOptionsDialog);
+  },
+  components: {
+    RelationOptionsModal
   }
 }

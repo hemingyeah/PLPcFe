@@ -2,89 +2,150 @@
     <el-card class="task-type" :body-style="{padding: '0px', height: '100%'}" shadow="hover">
         <el-row class="task-type-main" type="flex" justify="space-between">
             <el-row type="flex">
-                <i class="task-type-color"></i>
+                <i class="task-type-color" :style="{'background-color': taskType.config.color}"></i>
                 <el-row class="task-type-content" type="flex">
                     <h2 class="task-type-name">
-                        {{value.typeName}}
+                        {{taskType.name}}
                     </h2>
                     <el-row class="task-type-others">
                         <p>
                             可用团队: 
-                            <span class="pointer" @click="chooseTeam">{{value.teams}} </span>
-                            <i class="icon-ziyuan iconfont pointer" @click="chooseTeam"></i>
+                            <span class="pointer" @click="chooseTeam">{{taskType.tags | formatTeamName}} </span>
+                            <i class="iconfont icon-bianji1 pointer" @click="chooseTeam"></i>
                         </p>
                         <p>
-                            最近更新: {{value.updateName}}  {{value.updateDate}}
+                            最近更新: {{taskType.updateName}}  {{taskType.createTime}}
                         </p>
                     </el-row>
                 </el-row >
             </el-row>
-            <!-- todo_lc: 无法禁用全部工单类型-->
-            <el-switch v-model="value.open" />
+            <el-switch
+                :value="taskType.enabled"
+                :active-value="1"
+                :inactive-value="0"
+                @change="switchEnabled"/>
         </el-row>
         <el-row class="task-type-opearte" type="flex">
             <div class="task-type-opearte-del" @click="delTaskType">
-                <i class="icon-ziyuan iconfont">删除</i>
+                <i class="iconfont icon-shanchu-copy">删除</i>
             </div>
             <div class="task-type-opearte-modify" @click="modifyTaskType">
-                <i class="icon-ziyuan iconfont">编辑</i>
+                <i class="iconfont icon-bianji1">编辑</i>
             </div>
         </el-row>
         <!-- 选择团队弹窗 -->
         <choose-team-dialog
+            :id="taskType.id"
             :visiable.sync="isShowChooseTeamModal"
-            :value="value.teamList"
+            :value="taskType.tags"
             @update="updateTeamList"/>
     </el-card>
 </template>
 
 <script>
+import _ from "lodash";
+/** api */
+import * as SettingApi from "@src/api/SettingApi";
+
+/** component */
 import ChooseTeamDialog from '../components/ChooseTeamDialog.vue';
 
 export default {
     name: 'task-type-item',
     props: {
-        value: Object,
-        default: () => {}
+        taskType: {
+            type: Object,
+            default: () => {}
+        },
+        typeNum: {   // 已经开启的数量
+            type: Number,
+            default: 0
+        },
+        maxTypeNum: {
+            type: Number,
+            default: 0
+        },
     },
     data() {
         return {
             isShowChooseTeamModal: false  // 选择可用团队弹窗
         }
     },
+    filters: {
+        formatTeamName(tagIds) {
+            return tagIds.length === 0 ? '全部团队' : tagIds[0];
+        }
+    },
     methods: {
+        switchEnabled: _.throttle(function(value) {
+            if(value === 1 && this.typeNum >= this.maxTypeNum) {
+                return this.$message.warning(`最多只能同时存在${this.maxTypeNum}种工单类型`);
+            }
+
+            if(value === 0 && this.typeNum <= 1) {
+                return this.$message.warning(`无法禁用全部工单类型`);
+            }
+
+            let params = {
+                id: this.taskType.id,
+                enabled: value
+            }
+            SettingApi.taskTypeEnable(params).then(res => {
+                this.taskType.enabled = value;
+            }).catch(err => {
+                console.log("taskType enabled => err", err);
+            });
+        }, 300),
         chooseTeam() {
             this.isShowChooseTeamModal = true;
         },
         delTaskType() {
+            if(this.typeNum <= 1) {
+                return this.$message.warning(`无法删除全部工单类型`);
+            }
             this.$confirm('确认删除该工单类型？删除后将无法恢复', '提示', {
                 confirmButtonText: '确定',
                 cancelButtonText: '取消',
                 type: 'error',
             }).then(() => {
-                // todo_zr
-                this.$platform.notification({
-                    title: "删除成功",
-                    type: "success",
+                let params = {
+                    typeId: this.taskType.id
+                }
+
+                SettingApi.delTaskType(params).then(res => {
+                    this.$platform.notification({
+                        title: "删除成功",
+                        type: "success",
+                    });
+                    this.$emit("update");
+                }).catch(err => {
+                    console.log("delete taskType => err", err);
                 });
             });
         },
         modifyTaskType() {
             // 修改工单类型
-            let taskTypeId = this.value.id;
+            let taskTypeId = this.taskType.id;
             this.$platform.openTab({
                 id: "task_flow_setting",
                 title: "工单流程设置",
-                url: `/setting/task/taskFormSet?taskTypeId=${taskTypeId}`,
+                url: `/setting/task/taskFormSet?type=eidt&taskTypeId=${taskTypeId}`,
                 reload: true,
             });
         },
+        /**
+         * 更新taskType
+         */
+        updateTaskType(obj) {
+            this.$emit('updateAttr', obj);
+        },
+        /**
+         * 更新可用团队
+         */
         updateTeamList(teamList){
-            console.log(teamList);
-            this.$emit('update:value', {
-                ...this.value,
-                teamList
-            })
+            this.updateTaskType({
+                tags: teamList
+            });
         }
     },
     components: {
@@ -111,7 +172,6 @@ export default {
             height: 14px;
             line-height: 22px;
             margin: 2px 5px 0 0;
-            background: #FFAE00;
             border-radius: 50%;
         }
         .task-type-content{
@@ -129,6 +189,7 @@ export default {
             }
             .task-type-others{
                 i{
+                    font-size: 12px;
                     &:hover{
                         color: $color-primary;
                     }

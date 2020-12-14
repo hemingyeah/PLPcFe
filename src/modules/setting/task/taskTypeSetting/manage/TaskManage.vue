@@ -15,21 +15,40 @@
         v-model="taskTypeList"
         v-bind="dragOptions"
         tag="div"
+        @change="updateTaskTypeOrder"
       >
-        <transition-group class="task-type-list" type="transition" name="flip-list">
-          <task-type-item class="task-type-item" v-for="(item, idx) in taskTypeList" :key="item.id" :value.sync="taskTypeList[idx]"></task-type-item>
+        <transition-group
+          class="task-type-list"
+          type="transition"
+          name="flip-list">
+          <task-type-item
+            class="task-type-item"
+            v-for="(item, idx) in taskTypeList"
+            :key="item.id"
+            :task-type="taskTypeList[idx]"
+            :type-num="enableTypeNum"
+            :max-type-num="maxTypeNum"
+            @update="fetchTaskTypeList"
+            @updateAttr="obj => {
+              updateTaskType(item, obj)
+            }">
+          </task-type-item>
         </transition-group>
       </draggable>
     </div>
 
     <!-- 新建工单类型弹窗 -->
-    <add-task-type-dialog :visiable.sync="isAddTaskTypeModal" />
+    <add-task-type-dialog :visiable.sync="isAddTaskTypeModal" :taskTypeList="taskTypeList"/>
   </div>
 </template>
 
 <script>
 import draggable from 'vuedraggable';
 
+/** api */
+import * as SettingApi from "@src/api/SettingApi";
+
+/** component */
 import TaskNavBar from '../../components/TaskNavBar.vue';
 import TaskTypeItem from '../components/TaskTypeItem.vue';
 import AddTaskTypeDialog from '../components/AddTaskTypeDialog';
@@ -38,44 +57,11 @@ export default {
   name: 'task-manage',
   data() {
     return {
-      taskTypeList: [{
-        id: 1,
-        open: true, teamList: [],
-        typeName: '默认工单类型标题',
-        teams: '杭州市西湖团队',
-        updateName: '张燕青',
-        updateDate: '2020-10-20'
-      },{
-        id: 2,
-        open: true, teamList: [],
-        typeName: '默认工单类型字段超出一行可以换行，最多展示2行',
-        teams: '杭州市西湖团队',
-        updateName: '张燕青',
-        updateDate: '2020-10-20'
-      },{
-        id: 3,
-        open: true, teamList: [],
-        typeName: '默认工单类型字段超出一行可以换行，最多展示2行3',
-        teams: '杭州市西湖团队',
-        updateName: '张燕青',
-        updateDate: '2020-10-20'
-      },{
-        id: 4,
-        open: true, teamList: [],
-        typeName: '默认工单类型4',
-        teams: '杭州市西湖团队',
-        updateName: '张燕青',
-        updateDate: '2020-10-20'
-      },{
-        id: 5,
-        open: true, teamList: [],
-        typeName: '默认工单类型555',
-        teams: '杭州市西湖团队',
-        updateName: '张燕青',
-        updateDate: '2020-10-20'
-      }],
+      taskTypeList: [],
+      maxTypeNum: 10,  // todo_zr 需要接口获取
 
-      isAddTaskTypeModal: false
+      isAddTaskTypeModal: false,
+      pedding: false,
     }
   },
   computed: {
@@ -86,14 +72,60 @@ export default {
         disabled: false,
         ghostClass: "ghost"
       };
+    },
+    enableTypeNum() {
+      return this.taskTypeList.filter(item => item.enabled === 1).length;
     }
   },
   methods: {
+    updateTaskType(taskType, updateObj) {
+      for (const key in updateObj) {
+        if (updateObj.hasOwnProperty(key)) {
+          taskType[key] = updateObj[key];
+        }
+      }
+    },
+    /** 添加工单类型 */
     addTaskType() {
       // 添加工单类型
       // todo_zr: 需要校验可用工单类型数量 
       this.isAddTaskTypeModal = true;
+    },
+    /** 工单类型排序 */
+    updateTaskTypeOrder(data) {
+      console.log(data);
+      let params = {};
+      this.taskTypeList.forEach((item, idx) => {
+        params[item.id] = idx +1;
+      })
+
+      SettingApi.taskTypeOrder(params).then(() => {
+        console.log('updateTaskTypeOrder success');
+      }).catch(err => {
+        console.log('updateTaskTypeOrder => err', err);
+      });
+    },
+    fetchTaskTypeList() {
+      // 获取工单类型列表
+      // todo_zr: 当前接口只取启用的
+      this.pedding = true;
+      SettingApi.getSettingTaskTypeList().then((res) => {
+        this.pedding = false;
+        // 排序
+        let taskTypeList = res.list.sort((a, b) => a.orderId > b.orderId);
+        this.taskTypeList = taskTypeList.map(item => {
+          item.enabled = 1;
+          return item;
+        }) || [];
+      }).catch(err => {
+        console.error("fetch taskTypeList => error", err);
+      }).finally(() => {
+        this.pedding = false;
+      })
     }
+  },
+  mounted() {
+    this.fetchTaskTypeList();
   },
   components: {
     [TaskNavBar.name]: TaskNavBar,
@@ -140,6 +172,7 @@ export default {
     .task-type-list{
       display: flex;
       flex-flow: wrap;
+      min-height: 300px;
       .task-type-item{
         margin: 0 12px 12px 0;
       }

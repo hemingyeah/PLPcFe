@@ -10,7 +10,7 @@
             @click.native="clickFlow(key)">
             <el-row type="flex" justify="space-between">
                 <div>
-                    <i class="iconfont icon-ziyuan"></i>
+                    <i :class="['iconfont', flowMap[key].icon]" :style="{color: key === 'close' && '#F56C6C'}"></i>
                     {{flowMap[key].name}}
                 </div>
                 <div v-if="flowMap[key].isOpen || flowMap[key].isSystem" class="open-tag">已开启</div>

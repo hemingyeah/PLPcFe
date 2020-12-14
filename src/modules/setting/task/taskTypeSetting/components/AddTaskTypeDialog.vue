@@ -26,14 +26,18 @@
             </el-row>
             <el-row v-if="clickedTaskType === 'copy'" class="choose-copy-type" type="flex" >
                 <label>工单类型</label>
-                <el-select v-model="taskType" placeholder="请选择工单类型">
-                    <el-option
-                        v-for="item in taskTypeList"
-                        :key="item.id"
-                        :label="item.typeName"
-                        :value="item.id">
-                    </el-option>
-                </el-select>
+                <el-form :model="form" ref="form" :rules="rules">
+                    <el-form-item prop="taskType">
+                        <el-select v-model="form.taskType" placeholder="请选择工单类型">
+                            <el-option
+                                v-for="item in taskTypeList"
+                                :key="item.id"
+                                :label="item.name"
+                                :value="item.id">
+                            </el-option>
+                        </el-select>
+                    </el-form-item>
+                </el-form>
             </el-row>
             <el-button v-if="clickedTaskType === 'copy'" class="next-btn" type="primary" @click="gotoNext">下一步</el-button>
         </div>
@@ -44,10 +48,12 @@
 </template>
 
 <script>
+// assets
 import taskTemplateBlank from "@src/assets/img/setting/task-template-blank.png";
 import taskTemplateCopy from "@src/assets/img/setting/task-template-copy.png";
 import taskTemplateTrade from "@src/assets/img/setting/task-template-trade.png";
 
+// components
 import ChooseTradeDialog from './ChooseTradeDialog.vue';
 
 export default {
@@ -56,6 +62,10 @@ export default {
         visiable: {
             type: Boolean,
             default: false
+        },
+        taskTypeList: {
+            type: Array,
+            default: () => []
         }
     },
     computed: {
@@ -80,29 +90,22 @@ export default {
                     bgImg: taskTemplateTrade
                 },
             ]
+        },
+        rules() {
+            return {
+                taskType: [{ required: true, message: '请选择工单类型', trigger: 'blur' }]
+            }
         }
     },
     data() {
         return {
-            taskTypeList: [{
-                id: 1,
-                open: true, teamList: [],
-                typeName: '默认工单类型标题',
-                teams: '杭州市西湖团队',
-                updateName: '张燕青',
-                updateDate: '2020-10-20'
-            },{
-                id: 2,
-                open: true, teamList: [],
-                typeName: '默认工单类型字段超出一行可以换行，最多展示2行',
-                teams: '杭州市西湖团队',
-                updateName: '张燕青',
-                updateDate: '2020-10-20'
-            }],
             clickedTaskType: '',
             hoverTaskType: '',
 
-            taskType: '',
+            form: {
+                taskType: '',
+            },
+            
             isShow: false,
             isShowChooseTradeDialog: false,
         }
@@ -134,7 +137,7 @@ export default {
                     this.$platform.openTab({
                         id: "task_flow_setting",
                         title: "工单流程设置",
-                        url: `/setting/task/taskFormSet`,
+                        url: `/setting/task/taskFormSet?type=add`,
                         reload: true
                     });
                     this.cancel();
@@ -147,17 +150,17 @@ export default {
             }
         },
         gotoNext() {
-            if(!this.taskType) {
-                this.$platform.alert('请选择工单类型');
-                return;
-            }
-            this.$platform.openTab({
-                id: "task_flow_setting",
-                title: "工单流程设置",
-                url: `/setting/task/taskFormSet?taskTypeId=${this.taskType}`,
-                reload: true,
+            this.$refs.form.validate((valid) => {
+                if (valid) {
+                    this.$platform.openTab({
+                        id: "task_flow_setting",
+                        title: "工单流程设置",
+                        url: `/setting/task/taskFormSet?type=template&taskTypeId=${this.form.taskType}`,
+                        reload: true,
+                    });
+                    this.cancel();
+                }
             });
-            this.cancel();
         }
     },
     components: {

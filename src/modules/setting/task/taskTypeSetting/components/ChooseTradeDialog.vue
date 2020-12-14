@@ -18,7 +18,7 @@
                 </div>
             </el-row>
             <el-row class="trade-list" type="flex" justify="space-between">
-                <el-row class="trade-item pointer apply" type="flex" v-for="item in industryItems" :key="item.taskTypeId">
+                <el-row class="trade-item pointer apply" type="flex" v-for="item in industryItems" :key="item.taskTypeId" @click.native="openFormsetTab(item.taskTypeId)">
                     <div class="trade-item-left" :style="{'background-color': getColor(item.taskTypeName)}">
                         <i :class="['iconfont', getIcon(item.taskTypeName)]"></i>
                     </div>
@@ -149,6 +149,14 @@ export default {
                 console.error('fetchSysTaskTypeList => error', e);
             })
         },
+        openFormsetTab(taskTypeId) {
+            this.$platform.openTab({
+                id: "task_flow_setting",
+                title: "工单流程设置",
+                url: `/setting/task/taskFormSet?type=template&taskTypeId=${taskTypeId}`,
+                reload: true,
+            });
+        },
         cancel() {
             this.$emit('update:visiable', false);
         },
@@ -205,6 +213,9 @@ export default {
                     background: #13C2C2;
                     border-radius: 2px;
                 }
+            }
+            &:nth-child(2n){
+                margin-right: 0;
             }
             &-left{
                 width: 32px;
