@@ -437,6 +437,12 @@ const FormDesign = {
       // 禁止拖拽
       if (this.draggingDisable(field)) return;
 
+      // 拖拽客户关联、产品关联字段
+      if(field.formType == 'relationCustomer' || field.formType == 'relationProduct') {
+        this.$eventBus.$emit('task_form_design_relation_options_set', field);
+        return;
+      }
+
       // 屏蔽非鼠标左键的点击事件
       if(event.button !== 0) return;
 
@@ -730,12 +736,13 @@ const FormDesign = {
     },
 
     /** 添加新字段 */
-    insertField(option = {}, value, index) {
+    insertField(option = {}, value, index, setting) {
       let newField = new FormField({
         formType: option.formType,
         displayName: option.name,
         fieldName: option.fieldName,
-        isSystem: option.isSystem
+        isSystem: option.isSystem,
+        setting: setting || {}
       });
       
       let arr = cloneDeep(value ? value : this.value);
@@ -747,7 +754,7 @@ const FormDesign = {
       return newField;
     },
     /** 立即插入字段 */
-    immediateInsert(field, event) {
+    immediateInsert(field, event, setting) {
       // 禁止拖拽
       if (this.draggingDisable(field)) return;
 
@@ -757,7 +764,7 @@ const FormDesign = {
       // 限制字段数量
       if (this.value.length >= this.max) return 
     
-      let newField = this.insertField(field, this.value, this.value.length);
+      let newField = this.insertField(field, this.value, this.value.length, setting);
       this.insertedField = newField;
     },
     scrollPreviewList(e) {

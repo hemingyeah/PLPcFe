@@ -1,0 +1,62 @@
+.related-options-modal {
+  .base-modal-body {
+    padding: 20px 30px;
+
+    display: flex;
+    flex-flow: row nowrap;
+
+    .relation-options-panel {
+      flex: 1;
+      border: 1px solid $color-border-l2;
+      border-radius: $border-radius-base;
+
+      h4 {
+        padding: 12px;
+        margin-bottom: 0;
+
+        display: flex;
+        justify-content: space-between;
+
+        span {
+          font-weight: normal;
+          color: $text-color-secondary;
+        }
+      }
+
+      label {
+        display: block;
+        color: $text-color-regular;
+      }
+
+      .el-checkbox-group {
+        padding: 4px 0 0 12px;
+        height: calc(100% - 43px);
+        overflow-y: auto;
+
+        .el-checkbox__label {
+          overflow-wrap: break-word;
+          text-overflow: ellipsis; 
+          white-space: normal;
+          word-break: break-all;
+        }
+      }
+
+      .relation-options-selected-panel {
+        padding: 4px 12px 0 12px;
+        height: calc(100% - 43px);
+        overflow-y: auto;
+      }
+    }
+
+    .relation-options-icon {
+      margin: 0 12px;
+
+      display: flex;
+      align-items: center;
+
+      i {
+        color: $text-color-secondary;
+      }
+    }
+  }
+}
