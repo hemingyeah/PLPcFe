@@ -117,6 +117,10 @@ export default {
           if (formType === "updateTime") {
             f.displayName = "更新时间";
           }
+          if(formType == "related_catalog" && f.tableName == "product"){
+            // 转换产品类型表单数据
+            f.fieldName = "catalogId"
+          }
 
           return Object.freeze({
             ...f,

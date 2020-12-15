@@ -89,30 +89,36 @@
                 list-type="picture-card"
                 :on-preview="handlePictureCardPreview"
                 :before-upload="onBeforeUploadImage"
-                :http-request="UploadImage"
+                :http-request="UploadImagePic"
                 :file-list="productMenuValue.productPic"
+                :on-exceed="onExceedPic"
+                multiple
+                :limit="5"
               >
                 <i class="el-icon-plus"></i>
               </el-upload>
             </form-item>
           </template>
+
+          <template slot="thumbnail" slot-scope="{ field }">
+            <form-item class="upload-img" :label="field.displayName">
+              <el-upload
+                action="string"
+                list-type="picture-card"
+                :on-preview="handlePictureCardPreview"
+                :before-upload="onBeforeUploadImage"
+                :http-request="UploadImageThu"
+                :file-list="productMenuValue.thumbnail"
+                :on-exceed="onExceedThu"
+                :limit="1"
+              >
+                <i class="el-icon-plus"></i>
+              </el-upload>
+            </form-item>
+          </template>
+
+          
           <!-- <el-form ref="form" :model="form" label-width="110px">
-        <div class="normal-title-2-inside">
-          <div>选择目录显示字段</div>
-        </div>
-
-        <el-form-item label-width="20px">
-          <el-checkbox-group v-model="form.type">
-            <el-checkbox label="美食/餐厅线上活动" name="type"></el-checkbox>
-            <el-checkbox label="地推活动" name="type"></el-checkbox>
-            <el-checkbox label="线下主题活动" name="type"></el-checkbox>
-            <el-checkbox label="单纯品牌曝光" name="type"></el-checkbox>
-          </el-checkbox-group>
-        </el-form-item>
-
-        <div class="normal-title-2-inside">
-          <div>添加目录信息</div>
-        </div>
 
         <el-form-item label="产品简介">
           <el-input type="textarea" v-model="form.desc"></el-input>
@@ -263,6 +269,7 @@ export default {
             .sort((a, b) => a.orderId - b.orderId)
             .map((item) => {
               if (item.fieldName == "catalogNum") item["disabled"] = true;
+              if(item.fieldName == "productVideo") item["limit"] = 1;
               return item;
             });
              
@@ -288,7 +295,14 @@ export default {
         productVideo: [],
         productPic: [],
         productExplain: [],
+        thumbnail:[]
       };
+    },
+    onExceedPic(){
+      this.$message.error("最多上传5张图片!");
+    },
+    onExceedThu(){
+      this.$message.error("最多上传1张图片!");
     },
     handlePictureCardPreview(file) {
       this.$previewImg(file.url);
@@ -323,7 +337,7 @@ export default {
       // this.fileList.push(file);
       return isMP4 && isLt10M;
     },
-    UploadImage(param) {
+    UploadImagePic(param) {
       Uploader.upload(param.file, "/files/upload")
         .then((result) => {
           if (result.status != 0) {
@@ -345,6 +359,37 @@ export default {
           };
           // param.file['ossUrl'] = item.url;
           this.$set(this.productMenuValue, "productPic", [
+            ...this.productMenuValue.productPic,
+            item,
+          ]);
+        })
+        .catch((err) => {
+          console.warn(err);
+        })
+        .finally(() => {});
+    },
+    UploadImageThu(param) {
+      Uploader.upload(param.file, "/files/upload")
+        .then((result) => {
+          if (result.status != 0) {
+            this.$message({
+              message: `${result.message}`,
+              duration: 1500,
+              type: "error",
+            });
+            return;
+          }
+
+          let file = result.data;
+          let item = {
+            id: file.id,
+            filename: file.fileName,
+            // 如果后端返回url,必须使用。如果后端不返回，需要拼接
+            url: file.ossUrl || file.url || `/files/get?fileId=${file.id}`,
+            fileSize: file.fileSizeStr,
+          };
+          // param.file['ossUrl'] = item.url;
+          this.$set(this.productMenuValue, "thumbnail", [
             ...this.productMenuValue.productPic,
             item,
           ]);
@@ -377,7 +422,7 @@ export default {
     },
     setMenuInfo() {
       this.rootDataChange("nowEditMenu", { ...this.propData, conData: 1 });
-      this.changeTreeDetail("conData", 1);
+      // this.changeTreeDetail("conData", 1);
       this.$set(this, "fieldIds", _.cloneDeep(fieldIds_))
     },
     resetForm() {
@@ -450,6 +495,7 @@ export default {
           res.result.catalogInfo.productVideo = res.result.catalogInfo.productVideo || [];
           res.result.catalogInfo.productPic = res.result.catalogInfo.productPic || [];
           res.result.catalogInfo.productExplain = res.result.catalogInfo.productExplain || [];
+          res.result.catalogInfo.thumbnail = res.result.catalogInfo.thumbnail || [];
           res.result.catalogInfo = {...res.result.catalogInfo, ...res.result.catalogInfo.attribute}
           this.$set(this, "productMenuValue", res.result.catalogInfo);
           

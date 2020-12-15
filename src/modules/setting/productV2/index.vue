@@ -33,10 +33,10 @@
   </div>
 </template>
 <script>
-import ProductSet from '@src/modules/setting/productV2/productSet';
-import ProductMenuSet from '@src/modules/setting/productV2/productMenuSet';
+import ProductSet from "@src/modules/setting/productV2/productSet";
+import ProductMenuSet from "@src/modules/setting/productV2/productMenuSet";
 export default {
-  name: 'product-menu-setting',
+  name: "product-menu-setting",
   props: {
     initData: {
       type: Object,
@@ -52,14 +52,14 @@ export default {
     return {
       menuList: [
         {
-          name: '产品管理设置',
-          icon: 'icon-shezhi-chanpinguanlishezhi',
-          comName: 'product-set',
+          name: "产品管理设置",
+          icon: "icon-shezhi-chanpinguanlishezhi",
+          comName: "product-set",
         },
         {
-          name: '产品目录设置',
-          icon: 'icon-shezhi-chanpinmulu',
-          comName: 'product-menu-set',
+          name: "产品目录设置",
+          icon: "icon-shezhi-chanpinmulu",
+          comName: "product-menu-set",
         },
       ],
       nowMenu: 1, // 0 客户自助门户 1 公众号设置 2 短信消息设置 3 消息记录
@@ -80,9 +80,9 @@ export default {
         return;
       }
       if (index === 0) {
-        window.location.href = '/setting/product/productType';
+        window.location.href = "/setting/product/productType";
       } else if (index === 1) {
-        window.location.href = '/setting/productV2/catalog/setting?type=productMenu';
+        window.location.href = "/setting/productV2/catalog/setting?type=productMenu";
       }
       this.nowMenu === index;
     },
@@ -114,9 +114,6 @@ export default {
 }
 .font-16 {
   font-size: 16px;
-}
-.font-w-600 {
-  font-weight: 500;
 }
 .al-c {
   align-items: center !important;

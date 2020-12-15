@@ -88,8 +88,8 @@ export default {
     chooseFile(){
       if(!this.allowUpload) return console.warn("Caused: dont chooseFile, because of this.allowUpload is false");
       if(this.pending) return platform.alert("请等待文件上传完成");
-      if(this.value.length >= Uploader.FILE_MAX_NUM) {
-        return platform.alert(`上传文件数量不能超过${Uploader.FILE_MAX_NUM}个`);
+      if(this.value.length >= this.limit) {
+        return platform.alert(`上传文件数量不能超过${this.limit}个`);
       }
 
       this.$refs.input.value = null;
@@ -101,11 +101,11 @@ export default {
       
       let allFilesLength = this.value.length + files.length;
 
-      if(allFilesLength > Uploader.FILE_MAX_NUM) {
-        let message = `上传文件数量不能超过${Uploader.FILE_MAX_NUM}个`;
-        let max = Uploader.FILE_MAX_NUM - this.value.length;
+      if(allFilesLength > this.limit) {
+        let message = `上传文件数量不能超过${this.limit}个`;
+        let max = this.limit - this.value.length;
 
-        if(max > 0 && files.length < Uploader.FILE_MAX_NUM){
+        if(max > 0 && files.length < this.limit){
           message += `, 您还能上传${max}个文件`;
         }
 

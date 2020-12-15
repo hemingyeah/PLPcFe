@@ -1,6 +1,8 @@
 import http from "@src/util/http";
 const headUrl = "/api/customer";
 
+let headUrl2 = "/api/elasticsearch/outside/es"
+
 /** ------------ start 产品 ----------------------- */
 /**
  * 获取产品目录表单
@@ -307,6 +309,20 @@ function getListProductFields(params) {
 }
 
 
+/**
+ * 获取产品列表有无目录的数量
+ * @param params
+ *   id : 产品id
+ * @returns {*}
+ */
+function getProductLinkCatalogCount(params) {
+  return http.get(
+    `${headUrl2}/product/catalogCount`,
+    params
+  );
+}
+
+
 
 export {
   getProductMenuField,
@@ -340,4 +356,5 @@ export {
   searchQrcode,
   searchAllcatalog,
   getListProductFields,
+  getProductLinkCatalogCount,
 };

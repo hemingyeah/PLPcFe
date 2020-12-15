@@ -134,9 +134,13 @@ export function initialize(fields = [], origin = {}, callback){
     let { isCurrentDate, isCurrentUser } = defaultValueConfig || {};
     let dateType = setting.dateType || "yyyy-MM-dd";
     // 客户和编号类型不出初始化值
-    if(field.formType == "customer" || field.formType == "eventNo" || field.formType == "related_task" || field.formType == "taskNo" || field.formType == "related_catalog") return;
+    if(field.formType == "customer" || field.formType == "eventNo" || field.formType == "related_task" || field.formType == "taskNo") return;
     // 如果已经存在值 则无需初始化
     if(result[fieldName]) return;
+
+    if(field.formType == "related_catalog"){
+      defaultValue = [];
+    }
     
     // 屏蔽工单上单选里不存在默认值
     if(isSelect(field) && dataSource.indexOf(defaultValue) < 0) defaultValue = "";

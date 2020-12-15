@@ -1,5 +1,6 @@
 <template>
-  <div class="product-list-container" v-loading.fullscreen.lock="loading">
+  <div class="product-list-container"
+       v-loading.fullscreen.lock="loading">
     <div class="product-list-search-group-container bg-w">
       <!-- <form class="base-search" onsubmit="return false;">
         <div class="product-list-base-search-group">
@@ -33,34 +34,30 @@
       <div class="task-list-header-seach ">
         <form onsubmit="return false;">
           <div class="seach task-span1 task-flex task-ai guide-box">
-            <div style="position: relative;" ></div>
+            <div style="position: relative;"></div>
 
-            <el-input
-              v-model="searchModel.keyword"
-              placeholder="请输入产品编号或产品名称"
-              class="task-with-input task-ml12"
-            >
+            <el-input v-model="searchModel.keyword"
+                      placeholder="请输入产品编号或产品名称"
+                      class="task-with-input task-ml12">
             </el-input>
 
-            <base-button
-              type="primary"
-              @event="searchModel.pageNum = 1;
-                      search();
-                      trackEventHandler('search');"
-              native-type="submit"
-              class="task-ml12"
-            >
+            <base-button type="primary"
+                         @event="searchModel.pageNum = 1;
+                                 search();
+                                 trackEventHandler('search');"
+                         native-type="submit"
+                         class="task-ml12">
               搜索
             </base-button>
-            <base-button type="ghost" @event="resetParams" class="task-ml12">
+            <base-button type="ghost"
+                         @event="resetParams"
+                         class="task-ml12">
               重置
             </base-button>
             <div class="guide-box">
-              <div
-                id="v-task-step-2"
-                :class="['advanced-search-visible-btn', 'task-ml12']"
-                @click.self="panelSearchAdvancedToggle"
-              >
+              <div id="v-task-step-2"
+                   :class="['advanced-search-visible-btn', 'task-ml12']"
+                   @click.self="panelSearchAdvancedToggle">
                 <i class="iconfont icon-gaojisousuo task-font12 task-mr4"></i>
                 高级搜索
               </div>
@@ -72,18 +69,17 @@
       <div class="task-list-header-nav bg-w">
         <div class="task-flex">
           <div class="task-font14 task-c6 state">产品目录：</div>
-          <div class="list list-crate" :style="`width: ${navWidth}px`">
+          <div class="list list-crate"
+               :style="`width: ${navWidth}px`">
             <div class="list-item task-flex task-ai">
-              <div
-                v-for="(item, index) in selectList"
-                :key="index"
-                class="task-nav-create"
-                :class="{ 'task-c2': selectId === item.value }"
-                @click.stop="
-                  createPerspective(item)
-                "
-              >
-                {{ item.name }}
+              <div v-for="(item, index) in selectList"
+                   :key="index"
+                   class="task-nav-create"
+                   :class="{ 'task-c2': selectId === item.value }"
+                   @click.stop="
+                     createPerspective(item)
+                   ">
+                {{ item.name }} {{`${selectCount && selectCount[item.key] ? `(${selectCount[item.key]})` : ''}`}}
               </div>
             </div>
           </div>
@@ -91,60 +87,46 @@
       </div>
     </div>
 
-    
-
     <div class="product-list-section">
       <!--operation bar start-->
       <div class="operation-bar-container">
         <div class="top-btn-group flex-x">
-          <base-button
-            type="primary"
-            icon="icon-add"
-            @event="goToCreate"
-            v-if="createdPermission"
-          >新建</base-button
-          >
-          <div
-            class="task-ai task-flex task-font14 task-c6 cur-point mar-l-20"
-            @click="deleteProducts"
-            v-if="deletePermission" 
-          >
+          <base-button type="primary"
+                       icon="icon-add"
+                       @event="goToCreate"
+                       v-if="createdPermission">新建</base-button>
+          <div class="task-ai task-flex task-font14 task-c6 cur-point mar-l-20"
+               @click="deleteProducts"
+               v-if="deletePermission">
             <i class="iconfont icon-qingkongshanchu task-icon"></i>
             <span class="task-mr4 task-ml4">删除</span>
           </div>
-          
-          <div
-            class="task-ai task-flex task-font14 task-c6 cur-point mar-l-24"
-            @click="openDialog('edit')"
-            v-if="editedPermission === 3"
-          >
+
+          <div class="task-ai task-flex task-font14 task-c6 cur-point mar-l-24"
+               @click="openDialog('edit')"
+               v-if="editedPermission === 3">
             <i class="iconfont icon-edit task-icon"></i>
             <span class="task-mr4 task-ml4">批量编辑</span>
           </div>
-          <div
-            class="task-ai task-flex task-font14 task-c6 cur-point mar-l-24"
-            @click="openDialog('remind')"
-            v-if="editedPermission === 3 && isShowCustomerRemind"
-          >
+          <div class="task-ai task-flex task-font14 task-c6 cur-point mar-l-24"
+               @click="openDialog('remind')"
+               v-if="editedPermission === 3 && isShowCustomerRemind">
             <i class="iconfont icon-notification task-icon"></i>
             <span class="task-mr4 task-ml4">批量提醒</span>
           </div>
-          <div
-            class="task-ai task-flex task-font14 task-c6 cur-point mar-l-24"
-            @click="openDialog('sendMessage')"
-            v-if="editedPermission === 3"
-          >
+          <div class="task-ai task-flex task-font14 task-c6 cur-point mar-l-24"
+               @click="openDialog('sendMessage')"
+               v-if="editedPermission === 3">
             <i class="iconfont icon-duanxin3 task-icon"></i>
             <span class="task-mr4 task-ml4">发送短信</span>
           </div>
         </div>
 
         <div class="action-button-group flex-x">
-          <el-dropdown trigger="click" v-if="exportPermission">
-            <div
-              class="task-ai task-flex task-font14 task-c6 cur-point"
-              @click="trackEventHandler('moreAction')"
-            >
+          <el-dropdown trigger="click"
+                       v-if="exportPermission">
+            <div class="task-ai task-flex task-font14 task-c6 cur-point"
+                 @click="trackEventHandler('moreAction')">
               <span class="task-mr4 task-ml4">更多操作</span>
               <i class="iconfont icon-triangle-down task-icon"></i>
             </div>
@@ -166,18 +148,16 @@
           <!-- 选择列 -->
           <div class="guide-box mar-l-25">
             <!-- <div class="guide-disable-cover" v-if="nowGuideStep == 2"></div> -->
-            <div
-              :class="[
-                'task-ai',
-                'task-flex',
-                'task-font14',
-                'task-c6',
-                'cur-point',
-                'task-width103',
-              ]"
-              id="v-task-step-1"
-              @click="showAdvancedSetting"
-            >
+            <div :class="[
+                   'task-ai',
+                   'task-flex',
+                   'task-font14',
+                   'task-c6',
+                   'cur-point',
+                   'task-width103',
+                 ]"
+                 id="v-task-step-1"
+                 @click="showAdvancedSetting">
               <span class="task-mr4 task-ml4">选择列</span>
               <i class="iconfont icon-triangle-down task-icon"></i>
             </div>
@@ -186,63 +166,52 @@
       </div>
 
       <div style="background: #fff;padding: 0 10px">
-        <base-selection-bar
-          ref="baseSelectionBar"
-          v-model="multipleSelection"
-          @toggle-selection="toggleSelection"
-          @show-panel="() => (multipleSelectionPanelShow = true)"
-        />
+        <base-selection-bar ref="baseSelectionBar"
+                            v-model="multipleSelection"
+                            @toggle-selection="toggleSelection"
+                            @show-panel="() => (multipleSelectionPanelShow = true)" />
       </div>
 
-      <el-table
-        stripe
-        :data="page.list"
-        :highlight-current-row="false"
-        :row-key="getRowKey"
-        :border="true"
-        @select="handleSelection"
-        @select-all="handleSelection"
-        @sort-change="sortChange"
-        @header-dragend="headerDragend"
-        :class="['task-list-table', 'common-list-table']"
-        header-row-class-name="common-list-table-header taks-list-table-header"
-        ref="multipleTable"
-      >
-        <el-table-column
-          type="selection"
-          width="48"
-          align="center"
-          class-name="flex-x jus-center"
-        ></el-table-column>
+      <el-table stripe
+                :data="page.list"
+                :highlight-current-row="false"
+                :row-key="getRowKey"
+                :border="true"
+                @select="handleSelection"
+                @select-all="handleSelection"
+                @sort-change="sortChange"
+                @header-dragend="headerDragend"
+                :class="['task-list-table', 'common-list-table']"
+                header-row-class-name="common-list-table-header taks-list-table-header"
+                ref="multipleTable">
+        <el-table-column type="selection"
+                         width="48"
+                         align="center"
+                         class-name="flex-x jus-center"></el-table-column>
         <template v-for="(column, index) in columns">
-          <el-table-column
-            v-if="column.show"
-            :key="`${column.field}_${index}`"
-            :label="column.label"
-            :prop="column.field"
-            :width="column.width"
-            :class-name="
-              column.field == 'name' ? 'product-name-superscript-td' : ''
-            "
-            :min-width="column.minWidth || '120px'"
-            :sortable="column.sortable"
-            :show-overflow-tooltip="column.field !== 'name' && column.fieldName !== 'productPic'"
-            :align="column.align"
-          >
+          <el-table-column v-if="column.show"
+                           :key="`${column.field}_${index}`"
+                           :label="column.label"
+                           :prop="column.field"
+                           :width="column.width"
+                           :class-name="
+                             column.field == 'name' ? 'product-name-superscript-td' : ''
+                           "
+                           :min-width="column.minWidth || '120px'"
+                           :sortable="column.sortable"
+                           :show-overflow-tooltip="column.field !== 'name' && column.fieldName !== 'productPic'"
+                           :align="column.align">
             <template slot-scope="scope">
               <template v-if="column.field === 'name'">
                 <sample-tooltip :row="scope.row">
-                  <template slot="content" slot-scope="{ isContentTooltip }">
-                    <el-tooltip
-                      :content="scope.row[column.field]"
-                      placement="top-start"
-                      :disabled="!isContentTooltip"
-                    >
-                      <a
-                        href=""
-                        class="view-detail-btn"
-                        @click.stop.prevent="openProductTab(scope.row.id)"
-                      >
+                  <template slot="content"
+                            slot-scope="{ isContentTooltip }">
+                    <el-tooltip :content="scope.row[column.field]"
+                                placement="top-start"
+                                :disabled="!isContentTooltip">
+                      <a href=""
+                         class="view-detail-btn"
+                         @click.stop.prevent="openProductTab(scope.row.id)">
                         {{ scope.row[column.field] }}
                       </a>
                     </el-tooltip>
@@ -250,20 +219,16 @@
                 </sample-tooltip>
               </template>
               <template v-else-if="column.field === 'customer'">
-                <a
-                  href=""
-                  class="view-detail-btn"
-                  @click.stop.prevent="createCustomerTab(scope.row.customer.id)"
-                >
+                <a href=""
+                   class="view-detail-btn"
+                   @click.stop.prevent="createCustomerTab(scope.row.customer.id)">
                   {{ scope.row.customerName }}
                 </a>
               </template>
               <template v-else-if="column.field === 'productTemplate'">
-                <a
-                  href=""
-                  class="view-detail-btn"
-                  @click.stop.prevent="createTemplateTab(scope.row.templateId)"
-                >
+                <a href=""
+                   class="view-detail-btn"
+                   @click.stop.prevent="createTemplateTab(scope.row.templateId)">
                   {{ scope.row.templateName }}
                 </a>
               </template>
@@ -274,19 +239,15 @@
               <template v-else-if="column.formType === 'cascader'">
                 {{ scope.row[column.field] | displaySelect }}
               </template>
-              <template
-                v-else-if="column.formType === 'select' && !column.isSystem"
-              >
+              <template v-else-if="column.formType === 'select' && !column.isSystem">
                 {{ scope.row.attribute[column.field] | displaySelect }}
               </template>
               <template v-else-if="column.field === 'updateTime'">
                 <template v-if="scope.row.latesetUpdateRecord">
-                  <el-tooltip
-                    class="item"
-                    effect="dark"
-                    :content="scope.row.latesetUpdateRecord"
-                    placement="top-start"
-                  >
+                  <el-tooltip class="item"
+                              effect="dark"
+                              :content="scope.row.latesetUpdateRecord"
+                              placement="top-start">
                     <div @mouseover="showLatestUpdateRecord(scope.row)">
                       {{ scope.row.updateTime | formatDate }}
                     </div>
@@ -301,12 +262,10 @@
               <template v-else-if="column.formType === 'address'">
                 {{ formatCustomizeAddress(scope.row.attribute[column.field]) }}
               </template>
-              <template
-                v-else-if="
-                  column.formType === 'user' &&
-                    scope.row.attribute[column.field]
-                "
-              >
+              <template v-else-if="
+                column.formType === 'user' &&
+                  scope.row.attribute[column.field]
+              ">
                 {{ getUserName(column, scope.row.attribute[column.field]) }}
               </template>
               <template v-else-if="column.formType === 'location'">
@@ -324,11 +283,9 @@
               <template v-else-if="column.field === 'createTime'">
                 {{ scope.row.createTime | formatDate }}
               </template>
-              <div
-                v-else-if="column.formType === 'textarea'"
-                v-html="buildTextarea(scope.row.attribute[column.field])"
-                @click="openOutsideLink"
-              ></div>
+              <div v-else-if="column.formType === 'textarea'"
+                   v-html="buildTextarea(scope.row.attribute[column.field])"
+                   @click="openOutsideLink"></div>
 
               <template v-else-if="column.fieldName == 'linkmanName'">
                 {{ scope.row.linkman.name }}
@@ -346,43 +303,35 @@
                 {{ scope.row.attribute[column.field] }}
               </template>
 
-
               <template v-else-if="column.fieldName === 'pathName'">
-                <sample-tooltip :row="scope.row">
-                  <template slot="content" slot-scope="{ isContentTooltip }">
-                    <!-- <el-tooltip
-                      :content="scope.row[column.field]"
-                      placement="top-start"
-                      :disabled="!isContentTooltip"
-                    > -->
+                <sample-tooltip :row="scope.row"
+                                v-if="scope.row[column.field]">
+                  <template slot="content"
+                            slot-scope="{ isContentTooltip }">
 
-                    <a
-                      href=""
-                      class="view-detail-btn"
-                      @click.stop.prevent="openProductMenuTab(scope.row.catalogId)"
-                    >
-                      {{ scope.row[column.field] }}
+                    <a href=""
+                       class="view-detail-btn"
+                       @click.stop.prevent="openProductMenuTab(scope.row.catalogId)">
+                      {{ scope.row[column.field] || '' }}
                     </a>
-                    <!-- </el-tooltip> -->
                   </template>
                 </sample-tooltip>
               </template>
 
               <template v-else-if="column.fieldName === 'productPic'">
-                <div class="flex-x" v-if="scope.row.productPic">
+                <div class="flex-x"
+                     v-if="scope.row.productPic">
                   <div class="flex-x goods-img-list flex-1">
                     <template v-for="(item, index) in scope.row.productPic">
-                      <img
-                        :key="index"
-                        v-if="index <= 4"
-                        class="curs-point"
-                        :src="
-                          item.url
-                            ? `${item.url}?x-oss-process=image/resize,m_fill,h_32,w_32`
-                            : defaultImg
-                        "
-                        @click.stop="previewImg(item.url)"
-                      />
+                      <img :key="index"
+                           v-if="index <= 4"
+                           class="curs-point"
+                           :src="
+                             item.url
+                               ? `${item.url}?x-oss-process=image/resize,m_fill,h_32,w_32`
+                               : defaultImg
+                           "
+                           @click.stop="previewImg(item.url)" />
                     </template>
                     <div>
                       {{
@@ -398,14 +347,13 @@
               <template v-else-if="column.fieldName === 'productVideo'">
                 <template v-if="scope.row.productVideo">
                   <sample-tooltip :row="scope.row">
-                    <template slot="content" slot-scope="{ isContentTooltip }">
-                      <a
-                        href=""
-                        class="view-detail-btn"
-                        @click.stop.prevent="
-                          previewVideo(scope.row.productVideo[0].url)
-                        "
-                      >
+                    <template slot="content"
+                              slot-scope="{ isContentTooltip }">
+                      <a href=""
+                         class="view-detail-btn"
+                         @click.stop.prevent="
+                           previewVideo(scope.row.productVideo[0].url)
+                         ">
                         {{
                           scope.row.productVideo[0] &&
                             scope.row.productVideo[0].filename
@@ -422,9 +370,8 @@
                 {{ scope.row[column.field] }}
               </template>
 
-
               <!-- 移植自产品目录列表并同步更新 s -->
-            
+
             </template>
           </el-table-column>
         </template>
@@ -432,50 +379,40 @@
 
       <div class="table-footer">
         <div class="list-info">
-          共<span class="level-padding">{{ page.totalElements }}</span
-          >记录， 已选中<span
-            class="product-selected-count"
-            @click="multipleSelectionPanelShow = true"
-          >{{ multipleSelection.length }}</span
-          >条
-          <span class="product-selected-count" @click="toggleSelection()"
-          >清空</span
-          >
+          共<span class="level-padding">{{ page.totalElements }}</span>记录， 已选中<span class="product-selected-count"
+                                                                                   @click="multipleSelectionPanelShow = true">{{ multipleSelection.length }}</span>条
+          <span class="product-selected-count"
+                @click="toggleSelection()">清空</span>
         </div>
-        <el-pagination
-          class="product-table-pagination"
-          background
-          @current-change="jump"
-          @size-change="handleSizeChange"
-          :page-sizes="[10, 20, 50]"
-          :page-size="page.pageSize"
-          :current-page="page.pageNum"
-          layout="prev, pager, next, sizes, jumper"
-          :total="page.totalElements"
-        >
+        <el-pagination class="product-table-pagination"
+                       background
+                       @current-change="jump"
+                       @size-change="handleSizeChange"
+                       :page-sizes="[10, 20, 50]"
+                       :page-size="page.pageSize"
+                       :current-page="page.pageNum"
+                       layout="prev, pager, next, sizes, jumper"
+                       :total="page.totalElements">
         </el-pagination>
       </div>
     </div>
 
-    <base-panel
-      class="product-panel"
-      :show.sync="multipleSelectionPanelShow"
-      width="420px"
-    >
+    <base-panel class="product-panel"
+                :show.sync="multipleSelectionPanelShow"
+                width="420px">
       <h3 slot="title">
         <span>已选中产品({{ multipleSelection.length }})</span>
-        <i
-          v-if="multipleSelection.length"
-          class="iconfont icon-qingkongshanchu product-panel-btn"
-          @click="toggleSelection()"
-          title="清空已选中数据"
-          data-placement="right"
-          v-tooltip
-        ></i>
+        <i v-if="multipleSelection.length"
+           class="iconfont icon-qingkongshanchu product-panel-btn"
+           @click="toggleSelection()"
+           title="清空已选中数据"
+           data-placement="right"
+           v-tooltip></i>
       </h3>
 
       <div class="product-selected-panel">
-        <div class="product-selected-tip" v-if="!multipleSelection.length">
+        <div class="product-selected-tip"
+             v-if="!multipleSelection.length">
           <img src="@src/assets/img/no-data.png" />
           <p>暂无选中的数据，请从列表中选择。</p>
         </div>
@@ -484,17 +421,13 @@
             <div class="product-selected-row product-selected-head">
               <span class="product-selected-name">产品</span>
             </div>
-            <div
-              class="product-selected-row"
-              v-for="c in multipleSelection"
-              :key="c.id"
-            >
+            <div class="product-selected-row"
+                 v-for="c in multipleSelection"
+                 :key="c.id">
               <span class="product-selected-sn">{{ c.name }}</span>
-              <button
-                type="button"
-                class="product-selected-delete"
-                @click="removeFromSelection(c)"
-              >
+              <button type="button"
+                      class="product-selected-delete"
+                      @click="removeFromSelection(c)">
                 <i class="iconfont icon-fe-close"></i>
               </button>
             </div>
@@ -503,80 +436,68 @@
       </div>
     </base-panel>
 
-    <send-message-dialog
-      ref="messageDialog"
-      :selected-ids="selectedIds"
-      :sms-rest="smsRest"
-    ></send-message-dialog>
+    <send-message-dialog ref="messageDialog"
+                         :selected-ids="selectedIds"
+                         :sms-rest="smsRest"></send-message-dialog>
 
-    <batch-editing-dialog
-      ref="batchEditingDialog"
-      :config="{ fields: onlyProductFields, productTypes: productTypes }"
-      :callback="search"
-      :selected-ids="selectedIds"
-    ></batch-editing-dialog>
+    <batch-editing-dialog ref="batchEditingDialog"
+                          :config="{ fields: onlyProductFields, productTypes: productTypes }"
+                          :callback="search"
+                          :selected-ids="selectedIds"></batch-editing-dialog>
 
-    <batch-reminding-dialog
-      ref="batchRemindingDialog"
-      :selected-ids="selectedIds"
-    ></batch-reminding-dialog>
+    <batch-reminding-dialog ref="batchRemindingDialog"
+                            :selected-ids="selectedIds"></batch-reminding-dialog>
 
-    <base-import
-      title="导入产品"
-      ref="importProductModal"
-      @success="search"
-      action="/excels/customer/customerProductImportNew"
-    >
+    <base-import title="导入产品"
+                 ref="importProductModal"
+                 @success="search"
+                 action="/excels/customer/customerProductImportNew">
       <div slot="tip">
         <div class="base-import-warn">
           <p>
-            请先下载<a href="/product/import/templateNew">导入模版 </a
-            >，填写完成后再上传导入。
+            请先下载<a href="/product/import/templateNew">导入模版 </a>，填写完成后再上传导入。
           </p>
           <!--<p>导入产品前，请确保产品所属客户已存在。您可以 <a href="/customer/import/getAllCustomerId">点这里</a>导出包含所有已存在客户的模板</p>-->
         </div>
       </div>
     </base-import>
     <!-- start 导出工单 -->
-    <base-export-group
-      ref="exportPanel"
-      :alert="exportAlert"
-      :columns="exportColumns"
-      :build-params="buildExportParams"
-      :group="true"
-      :validate="checkExportCount"
-      :needchoose-break="false"
-      method="post"
-      action="/excels/customer/customerProductNew"
-    />
+    <base-export-group ref="exportPanel"
+                       :alert="exportAlert"
+                       :columns="exportColumns"
+                       :build-params="buildExportParams"
+                       :group="true"
+                       :validate="checkExportCount"
+                       :needchoose-break="false"
+                       method="post"
+                       action="/excels/customer/customerProductNew" />
     <!-- end 导出工单 -->
 
-    <batch-update-dialog
-      ref="batchUpdateDialog"
-      :selected-ids="selectedIds"
-      :total-items="page.totalElements"
-      :build-download-params="buildParams"
-      @success="search"
-      action="/excels/customer/customerProductUpdateBatchNew"
-    ></batch-update-dialog>
-    <biz-select-column ref="advanced" :sotrage-key="'productV2_select_colum'" @save="saveColumnStatus" />
+    <batch-update-dialog ref="batchUpdateDialog"
+                         :selected-ids="selectedIds"
+                         :total-items="page.totalElements"
+                         :build-download-params="buildParams"
+                         @success="search"
+                         action="/excels/customer/customerProductUpdateBatchNew"></batch-update-dialog>
+    <biz-select-column ref="advanced"
+                       :sotrage-key="'productV2_select_colum'"
+                       @save="saveColumnStatus" />
     <!-- <base-table-advanced-setting ref="advanced" @save="modifyColumnStatus"/> -->
 
-    <search-panel
-      :init-data="initData"
-      :config="{
-        fields: onlyProductFields,
-      }"
-      ref="searchPanel"
-    >
-      <div class="advanced-search-btn-group" slot="footer">
-        <base-button type="ghost" @event="resetParams">重置</base-button>
-        <base-button type="primary" @event="powerfulSearch" native-type="submit"
-        >搜索</base-button
-        >
+    <search-panel :init-data="initData"
+                  :config="{
+                    fields: onlyProductFields,
+                  }"
+                  ref="searchPanel">
+      <div class="advanced-search-btn-group"
+           slot="footer">
+        <base-button type="ghost"
+                     @event="resetParams">重置</base-button>
+        <base-button type="primary"
+                     @event="powerfulSearch"
+                     native-type="submit">搜索</base-button>
       </div>
     </search-panel>
-
 
   </div>
 </template>
@@ -587,10 +508,10 @@ import _ from "lodash";
 import Page from "@model/Page";
 import { formatDate } from "@src/util/lang";
 import { getRootWindow } from "@src/util/dom";
-import SendMessageDialog from "@src/modules/product/components/SendMessageDialog.vue";
-import BatchEditingDialog from "@src/modules/product/components/BatchEditingDialog.vue";
-import BatchRemindingDialog from "@src/modules/product/components/BatchRemindingDialog.vue";
-import BatchUpdateDialog from "@src/modules/product/components/BatchUpdateDialogV2.vue";
+import SendMessageDialog from "@src/modules/productV2/productList/compoment/SendMessageDialog.vue";
+import BatchEditingDialog from "@src/modules/productV2/productList/compoment/BatchEditingDialog.vue";
+import BatchRemindingDialog from "@src/modules/productV2/productList/compoment/BatchRemindingDialog.vue";
+import BatchUpdateDialog from "@src/modules/productV2/productList/compoment/BatchUpdateDialog.vue";
 import SearchPanel from "@src/modules/productV2/productList/compoment/SearchPanel.vue";
 import { storageGet, storageSet } from "@src/util/storage";
 
@@ -598,11 +519,13 @@ import {
   getProductV2,
   deleteProductByIds,
   getUpdateRecord,
+  getProductFields
 } from "@src/api/ProductApi";
-import {PRODUCT_LIST_LOCALSTORAGE_20_11_25} from "@src/modules/productV2/storage.js"
 
-import {catalogFieldFixForProduct, productFieldFix} from "@src/modules/productV2/public.js";
-import {getListProductFields} from "@src/api/ProductV2Api"
+import { PRODUCT_LIST_LOCALSTORAGE_20_11_25 } from "@src/modules/productV2/storage.js"
+
+import { catalogFieldFixForProduct, productFieldFix } from "@src/modules/productV2/public.js";
+import { getListProductFields, getProductLinkCatalogCount } from "@src/api/ProductV2Api"
 import TeamMixin from "@src/mixins/teamMixin";
 import { isShowCustomerRemind } from "@src/util/version.ts";
 
@@ -611,14 +534,14 @@ const link_reg = /((((https?|ftp?):(?:\/\/)?)(?:[-;:&=\+\$]+@)?[A-Za-z0-9.-]+|(?
 export default {
   name: "product-list",
   mixins: [TeamMixin],
-  inject:["initData"],
+  inject: ["initData"],
   // props: {
   //   initData: {
   //     type: Object,
   //     default: () => ({}),
   //   },
   // },
-  data() {
+  data () {
     return {
       multipleSelectionPanelShow: false,
       page: new Page(),
@@ -633,7 +556,7 @@ export default {
         pageSize: 10,
         pageNum: 1,
         orderDetail: {},
-        catalogState:"",
+        catalogState: "",
         moreConditions: {
           conditions: [],
         },
@@ -642,42 +565,42 @@ export default {
       dynamicFields: [],
       filterTeams: [],
       tableKey: (Math.random() * 1000) >> 2,
-      selectColumnState:"product_list_select",
+      selectColumnState: "product_list_select",
       // 头部筛选列表 s
       selectList: [
-        { name: "全部", key:"catalogState", value:"" },
-        { name: "有目录", key:"catalogState", value:1 },
-        { name: "无目录", key:"catalogState", value:0 }
-      ], 
+        { name: "全部", key: "", value: "" },
+        { name: "有目录", key: "buildCatalogNum", value: 1 },
+        { name: "无目录", key: "unBuildCatalogNum", value: 0 }
+      ],
+      selectCount: null,
       navWidth: window.innerWidth - 120,
       selectId: "",
       // 头部筛选列表 e
     };
   },
   computed: {
-    auth() {
+    auth () {
       return (
         this.initData?.loginUser?.authorities || this.initData?.authorities
       );
     },
-    editedPermission() {
+    editedPermission () {
       return this.auth.PRODUCT_EDIT;
     },
-    createdPermission() {
+    createdPermission () {
       return this.auth.PRODUCT_CREATE;
     },
-    viewedPermission() {
+    viewedPermission () {
       return this.auth.CUSTOMER_VIEW === 3;
     },
-    deletePermission() {
+    deletePermission () {
       return this.auth.PRODUCT_EDIT === 3 && this.auth.PRODUCT_DELETE;
     },
-    exportPermission() {
+    exportPermission () {
       return this.auth.EXPORT_IN;
     },
-    productFields() {
-      let fixedFields = productFieldFix;
-
+    productFields () {
+      let fixedFields = _.cloneDeep(productFieldFix);
       if (this.initData.productConfig.qrcodeEnabled) {
         fixedFields.push({
           displayName: "二维码编号",
@@ -687,9 +610,11 @@ export default {
           isSystem: 1,
           placeholder: "请输入产品二维码",
           orderId: 10001,
-          tableName:"product",
+          tableName: "product",
         });
       }
+
+
       let field = this.dynamicFields.filter(
         (item) => item.formType == "customer"
       )[0];
@@ -700,7 +625,7 @@ export default {
           formType: "text",
           isExport: true,
           isSystem: 0,
-          tableName:"product",
+          tableName: "product",
         });
 
         fixedFields.push({
@@ -708,7 +633,7 @@ export default {
           fieldName: "phone",
           isExport: true,
           isSystem: 0,
-          tableName:"product",
+          tableName: "product",
         });
       }
 
@@ -719,12 +644,12 @@ export default {
           isExport: true,
           formType: "text",
           isSystem: 0,
-          tableName:"product",
+          tableName: "product",
         });
       }
 
-      return this.dynamicFields
-        .concat([...fixedFields, ...catalogFieldFixForProduct])
+      // .concat([...fixedFields, ...catalogFieldFixForProduct])
+      return this.dynamicFields.concat([...fixedFields])
         .filter(
           (f) =>
             f.formType !== "separator"
@@ -794,29 +719,31 @@ export default {
             f.show = true;
           }
           if (f.fieldName === "catalogId" && f.tableName == "product") {
+            // 转换产品类型表单数据
             f.fieldName = "pathName"
           }
 
           // 系统字段默认显示
-          f["show"] = f.isSystem ? true : f.show 
+          f["show"] = f.isSystem ? true : f.show
 
           return f;
         })
         .sort((a, b) => a.orderId - b.orderId);
     },
-    onlyProductFields(){
-      return this.productFields.filter(item=>item.tableName == "product")
+    onlyProductFields () {
+      
+      return this.productFields.filter(item => item.tableName == "product").map(item => { if (item.formType == "related_catalog") { item.fieldName = "catalogId" } return item })
     },
-    productTypes() {
+    productTypes () {
       return this.initData.productConfig.productType || [];
     },
-    panelWidth() {
+    panelWidth () {
       return `${420 * this.columnNum}px`;
     },
-    selectedIds() {
+    selectedIds () {
       return this.multipleSelection.map((p) => p.id);
     },
-    exportColumns() {
+    exportColumns () {
       let arr = [
         {
           label: "产品系统编号",
@@ -861,34 +788,34 @@ export default {
         {
           label: "产品信息",
           value: "productExport",
-          columns: arr.filter(item=>item.tableName == "product"),
+          columns: arr.filter(item => item.tableName == "product"),
         },
         {
           label: "产品目录信息",
           value: "catalogExport",
-          columns: arr.filter(item=>item.tableName == "catalog"),
+          columns: arr.filter(item => item.tableName == "catalog"),
         },
       ];
       return arr_
     },
-    smsRest() {
+    smsRest () {
       return this.initData.smsRest || 0;
     },
-    isShowCustomerRemind() {
+    isShowCustomerRemind () {
       return isShowCustomerRemind();
     },
   },
   filters: {
-    formatTags({ customer }) {
+    formatTags ({ customer }) {
       if (!customer) return "";
       if (!customer.tags || !customer.tags.length) return "";
       return customer.tags.map((t) => t.tagName).join(" ");
     },
-    formatDate(val) {
+    formatDate (val) {
       if (!val) return "";
       return formatDate(val, "YYYY-MM-DD HH:mm:ss");
     },
-    displaySelect(value) {
+    displaySelect (value) {
       if (!value) return null;
       if (value && typeof value === "string") {
         return value;
@@ -899,14 +826,15 @@ export default {
       return null;
     },
   },
-  async mounted() {
-    this.buildColumns();
+  async mounted () {
+    // this.buildColumns();
 
     // 获取产品动态字段
     try {
-      let res = await getListProductFields();
-      this.dynamicFields = res.result || [];
+      let res = await getProductFields({ isFromSetting: true });
+      this.dynamicFields = res.data || [];
       this.buildColumns();
+      this.getSelectCount();
     } catch (error) {
       console.error("product-list fetch product fields error", error);
     }
@@ -925,23 +853,23 @@ export default {
       this.updateProductRemindCount
     );
   },
-  beforeDestroy() {
+  beforeDestroy () {
     this.$eventBus.$off(
       "product_list.update_product_list_remind_count",
       this.updateProductRemindCount
     );
   },
   methods: {
-    getAddress(field) {
+    getAddress (field) {
       return field.province + field.city + field.dist + field.address || "";
     },
-    getRelatedTask(field) {
+    getRelatedTask (field) {
       return Array.isArray(field)
         ? field.map((item) => item.taskNo).join(",")
         : "";
     },
     // 处理人员显示
-    getUserName(field, value) {
+    getUserName (field, value) {
       // 多选
       if (Array.isArray(value)) {
         return value.map((i) => i.displayName || i.name).join(",");
@@ -950,34 +878,34 @@ export default {
       let user = value || {};
       return user.displayName || user.name;
     },
-    openOutsideLink(e) {
+    openOutsideLink (e) {
       let url = e.target.getAttribute("url");
       if (!url) return;
       if (!/http/gi.test(url))
         return this.$platform.alert("请确保输入的链接以http或者https开始");
       this.$platform.openLink(url);
     },
-    buildTextarea(value) {
+    buildTextarea (value) {
       return value
         ? value.replace(link_reg, (match) => {
           return `<a href="javascript:;" target="_blank" url="${match}">${match}</a>`;
         })
         : "";
     },
-    powerfulSearch() {
+    powerfulSearch () {
       this.searchModel.pageNum = 1;
       this.searchModel.moreConditions = this.$refs.searchPanel.buildParams();
 
       this.search();
     },
-    formatCustomizeAddress(ad) {
+    formatCustomizeAddress (ad) {
       if (null == ad) return "";
 
       const { province, city, dist, address } = ad;
       return [province, city, dist, address].filter((d) => !!d).join("-");
     },
 
-    openProductTab(productId) {
+    openProductTab (productId) {
       let fromId = window.frameElement.getAttribute("id");
       console.log(productId)
       this.$platform.openTab({
@@ -988,21 +916,26 @@ export default {
         fromId,
       });
     },
-    search() {
+    // 搜索
+    search () {
       const params = this.buildParams();
       this.loading = true;
+      
 
       return getProductV2(params)
         .then((res) => {
           this.loading = false;
           // this.page = Page.as(Object.freeze(res.result));
           let { number, content, totalPages, totalElements, size } = res.result;
-          if(content.length) content = content.map((item)=> {if(item.catalog){
-            item = {...item, ...item.catalog};
-            if(item.catalog.catalogAttribute){
-              item.attribute = {...item.attribute, ...item.catalog.catalogAttribute}
-            }}
-          return item
+          if (content.length) content = content.map((item) => {
+            if (item.catalog) {
+              item = { ...item, ...item.catalog };
+              item["catalogId"] = item.catalogId || ""
+              if (item.catalog.catalogAttribute) {
+                item.attribute = { ...item.attribute, ...item.catalog.catalogAttribute }
+              }
+            }
+            return item
           })
 
           this.page["list"] = content;
@@ -1014,13 +947,13 @@ export default {
         })
         .catch((e) => console.error("fetch product catch an error", e));
     },
-    buildParams() {
+    buildParams () {
       const sm = Object.assign({}, this.searchModel);
       let params = {
         keyword: sm.keyword,
         pageSize: sm.pageSize,
         pageNum: sm.pageNum,
-        catalogState:sm.catalogState
+        catalogState: sm.catalogState
       };
 
       if (Object.keys(sm.orderDetail || {}).length) {
@@ -1039,11 +972,11 @@ export default {
 
       return params;
     },
-    jump(pageNum) {
+    jump (pageNum) {
       this.searchModel.pageNum = pageNum;
       this.search();
     },
-    resetParams() {
+    resetParams () {
       window.TDAPP.onEvent("pc：产品管理-重置事件");
       this.searchIncludeMoreConditions = false;
       this.searchModel = {
@@ -1051,7 +984,7 @@ export default {
         pageNum: 1,
         pageSize: this.page.pageSize,
         orderDetail: {},
-        catalogState:"",
+        catalogState: "",
         moreConditions: {
           conditions: [],
         },
@@ -1060,7 +993,7 @@ export default {
       this.$refs.searchPanel.resetParams();
       this.search();
     },
-    openDialog(action) {
+    openDialog (action) {
       if (action === "sendMessage") {
         window.TDAPP.onEvent("pc：产品管理-发送短信事件");
         this.$refs.messageDialog.openSendMessageDialog();
@@ -1088,7 +1021,7 @@ export default {
       }
     },
     // operation
-    async deleteProducts() {
+    async deleteProducts () {
       window.TDAPP.onEvent("pc：产品管理-删除事件");
       if (!this.multipleSelection.length) {
         return this.$platform.alert("请选择需要删除的产品");
@@ -1120,7 +1053,7 @@ export default {
       }
     },
     // 批量添加提醒成功后，更新产品的提醒数量
-    updateProductRemindCount() {
+    updateProductRemindCount () {
       let count = 0;
       this.page.list = this.page.list.map((product) => {
         count = product.attribute.remindCount || 0;
@@ -1135,7 +1068,7 @@ export default {
       this.matchSelected();
     },
     // table method
-    handleSelection(selection) {
+    handleSelection (selection) {
       let tv = this.selectionCompute(selection);
 
       let original = this.multipleSelection.filter((ms) =>
@@ -1162,7 +1095,7 @@ export default {
       this.$refs.baseSelectionBar.openTooltip();
     },
     // 计算已选择
-    selectionCompute(selection) {
+    selectionCompute (selection) {
       let tv = [];
 
       tv = this.multipleSelection.filter((ms) =>
@@ -1172,7 +1105,7 @@ export default {
 
       return tv;
     },
-    sortChange(option) {
+    sortChange (option) {
       try {
         const { prop, order } = option;
         if (!order) {
@@ -1213,13 +1146,13 @@ export default {
         console.error("e", e);
       }
     },
-    handleSizeChange(pageSize) {
+    handleSizeChange (pageSize) {
       this.saveDataToStorage("pageSize", pageSize);
       this.searchModel.pageSize = pageSize;
       this.searchModel.pageNum = 1;
       this.search();
     },
-    toggleSelection(rows) {
+    toggleSelection (rows) {
       let isNotOnCurrentPage = false;
       let item = undefined;
       let row = undefined;
@@ -1241,7 +1174,7 @@ export default {
       }
     },
 
-    removeFromSelection(c) {
+    removeFromSelection (c) {
       if (!c || !c.id) return;
 
       this.multipleSelection = this.multipleSelection.filter(
@@ -1257,7 +1190,7 @@ export default {
     /**
      * @description 表头更改
      */
-    headerDragend(newWidth, oldWidth, column, event) {
+    headerDragend (newWidth, oldWidth, column, event) {
       console.log(newWidth, oldWidth, column, event, 12312312)
       let data = this.columns
         .map((item) => {
@@ -1280,7 +1213,7 @@ export default {
      * @description 修改选择列设置
      * @param {Object} event 事件对象
      */
-    modifyColumnStatus(event) {
+    modifyColumnStatus (event) {
       let columns = event.data || [],
         colMap = columns.reduce(
           (acc, col) => (acc[col.field] = col) && acc,
@@ -1296,7 +1229,7 @@ export default {
 
       this.saveColumnStatusToStorage();
     },
-    showAdvancedSetting() {
+    showAdvancedSetting () {
       window.TDAPP.onEvent("pc：产品管理-选择列事件");
       this.$refs.advanced.open(this.columns);
     },
@@ -1304,7 +1237,7 @@ export default {
      * @description 修改选择列设置
      * @param {Object} event 事件对象
      */
-    saveColumnStatus(event) {
+    saveColumnStatus (event) {
       let columns = event.data || [];
 
       this.columns = [];
@@ -1315,7 +1248,7 @@ export default {
       });
     },
 
-    saveColumnStatusToStorage() {
+    saveColumnStatusToStorage () {
       const localStorageData = this.getLocalStorageData();
       let columnsStatus = null;
 
@@ -1342,7 +1275,7 @@ export default {
 
     // 选择列 e
 
-    buildColumns() {
+    buildColumns () {
       const localStorageData = this.getLocalStorageData();
 
       let columnStatus = localStorageData.columnStatus && localStorageData.columnStatus[this.selectColumnState];
@@ -1409,10 +1342,10 @@ export default {
               : "";
             show = localField.show !== false;
           }
-          
+
 
           col.show = show;
-          if(col.formType == "related_catalog"){
+          if (col.formType == "related_catalog") {
             col.show = true;
           }
           col.width = width;
@@ -1422,26 +1355,11 @@ export default {
         });
     },
 
-    // buildExportParams(checkedArr, ids) {
-    //   let exportAll = !ids || !ids.length;
-    //   let exportSearchModel = exportAll
-    //     ? {
-    //       ...this.buildParams(),
-    //       exportTotal: this.page.total,
-    //     }
-    //     : { exportTotal: ids.length };
-
-    //   return {
-    //     productChecked: checkedArr.join(','),
-    //     data: exportAll ? '' : ids.join(','),
-    //     exportSearchModel: JSON.stringify(exportSearchModel),
-    //   };
-    // },
     /**
      * @description 构建导出参数
      * @return {Object} 导出参数
      */
-    buildExportParams(checkedMap, ids, exportOneRow) {
+    buildExportParams (checkedMap, ids, exportOneRow) {
       const {
         productExport,
         catalogExport
@@ -1462,7 +1380,7 @@ export default {
         productIds: this.selectedIds,
         tagIds: loginUser.tagIds,
         tenantId: JSON.parse(rootWindow._init).user.tenantId,
-      } ;
+      };
 
       let exportSearchModel = {
 
@@ -1479,7 +1397,7 @@ export default {
       /** ********************* *********************/
       // 产品信息
       let export_product = this.exportData(0, productExport)
-      
+
       // 产品目录信息
       let export_catalog = this.exportData(1, catalogExport)
 
@@ -1487,13 +1405,13 @@ export default {
       params["data"] = exportAll ? "" : this.selectedIds.join(",");
       params["catalogExport"] = export_catalog.join(",");
       params["productExport"] = export_product.join(",");
-      
+
       return params;
     },
     /**
      * 导出数据
      */
-    exportData(number, list = []) {
+    exportData (number, list = []) {
       const export_list = this.exportColumns
       if (number === 3) {
         let cardField = []
@@ -1508,9 +1426,9 @@ export default {
           let bool = list.some(item => {
             if (v.exportAlias) {
               return v.exportAlias === item
-            } 
+            }
             return v.fieldName === item
-            
+
           })
           if (bool) {
             return v.exportAlias ? v.exportAlias : v.fieldName
@@ -1524,9 +1442,9 @@ export default {
         let bool = list.some(item => {
           if (v.exportAlias) {
             return v.exportAlias === item
-          } 
+          }
           return v.fieldName === item
-          
+
         })
         if (bool) {
           return v.exportAlias ? v.exportAlias : v.fieldName
@@ -1536,14 +1454,14 @@ export default {
       })
     },
     /** 检测导出条数 */
-    checkExportCount(ids, max) {
+    checkExportCount (ids, max) {
       let exportAll = !ids || !ids.length;
       return exportAll && this.page.totalElements > max
         ? "为了保障响应速度，暂不支持超过5000条以上的数据导出，请您分段导出。"
         : null;
     },
 
-    exportProduct(exportAll) {
+    exportProduct (exportAll) {
       let ids = [];
       let fileName = `${formatDate(new Date(), "YYYY-MM-DD")}产品数据.xlsx`;
       if (!exportAll) {
@@ -1553,7 +1471,7 @@ export default {
       }
       this.$refs.exportPanel.open(ids, fileName);
     },
-    showLatestUpdateRecord(row) {
+    showLatestUpdateRecord (row) {
       if (row.latesetUpdateRecord) return;
       getUpdateRecord({
         productId: row.id,
@@ -1573,7 +1491,7 @@ export default {
         .catch((e) => console.error("e", e));
     },
 
-    createCustomerTab(productId) {
+    createCustomerTab (productId) {
       let fromId = window.frameElement.getAttribute("id");
 
       this.$platform.openTab({
@@ -1585,7 +1503,7 @@ export default {
       });
     },
 
-    createTemplateTab(templateId) {
+    createTemplateTab (templateId) {
       let fromId = window.frameElement.getAttribute("id");
 
       this.$platform.openTab({
@@ -1596,7 +1514,7 @@ export default {
         fromId,
       });
     },
-    goToCreate() {
+    goToCreate () {
       window.TDAPP.onEvent("pc：产品管理-新建事件");
       // window.location = '/customer/product/create';
       let fromId = window.frameElement.getAttribute("id");
@@ -1610,11 +1528,11 @@ export default {
         fromId,
       });
     },
-    getLocalStorageData() {
+    getLocalStorageData () {
       const dataStr = localStorage.getItem(PRODUCT_LIST_LOCALSTORAGE_20_11_25) || "{}";
       return JSON.parse(dataStr);
     },
-    saveDataToStorage(key, value) {
+    saveDataToStorage (key, value) {
       const data = this.getLocalStorageData();
       data[key] = value;
       localStorage.setItem(
@@ -1622,7 +1540,7 @@ export default {
         JSON.stringify(data)
       );
     },
-    revertStorage() {
+    revertStorage () {
       const { pageSize, column_number } = this.getLocalStorageData();
       if (pageSize) {
         this.searchModel.pageSize = pageSize;
@@ -1630,7 +1548,7 @@ export default {
       if (column_number) this.columnNum = Number(column_number);
     },
     // 匹配选中的列
-    matchSelected() {
+    matchSelected () {
       if (!this.multipleSelection.length) return;
 
       const selected = this.page.list.filter((c) => {
@@ -1648,14 +1566,14 @@ export default {
       });
     },
     // 获取团队列表
-    getTeamList(params) {
+    getTeamList (params) {
       return this.getBizTeamList(
         params,
         this.filterTeams,
         this.viewedPermission
       );
     },
-    panelSearchAdvancedToggle() {
+    panelSearchAdvancedToggle () {
       window.TDAPP.onEvent("pc：产品管理-高级搜索事件");
       this.$refs.searchPanel.open();
       this.$nextTick(() => {
@@ -1667,7 +1585,7 @@ export default {
       });
     },
     // TalkingData事件埋点
-    trackEventHandler(type) {
+    trackEventHandler (type) {
       if (type === "search") {
         window.TDAPP.onEvent("pc：产品管理-搜索事件");
         return;
@@ -1677,14 +1595,14 @@ export default {
         return;
       }
     },
-    getRowKey(row) {
+    getRowKey (row) {
       return row.id || "";
     },
     /**
      * 创建视角
      */
-    createPerspective(item, bool = false){
-      this.searchModel[item.key] = item.value;
+    createPerspective (item, bool = false) {
+      this.searchModel.catalogState = item.value;
       this.selectId = item.value;
       this.searchModel.pageNum = 1;
       this.search();
@@ -1692,7 +1610,7 @@ export default {
     /**
      * @description 导出提示
      */
-    exportAlert(result, params = {}) {
+    exportAlert (result, params = {}) {
       // let taskQueryInputString = params?.taskQueryInput || "{}";
       // let taskQueryInput = JSON.parse(taskQueryInputString);
       // let ids = taskQueryInput.ids || [];
@@ -1706,14 +1624,20 @@ export default {
       this.$platform.alert(result.message);
     },
 
+    getSelectCount () {
+      getProductLinkCatalogCount().then(res => {
+        this.selectCount = res.result
+      })
+    },
+
     // 移植产品目录表单 s
-    previewVideo(e) {
+    previewVideo (e) {
       this.$previewVideo(e);
     },
-    previewImg(url) {
+    previewImg (url) {
       this.$previewImg(url);
     },
-    openProductMenuTab(id) {
+    openProductMenuTab (id) {
       this.$platform.openTab({
         id: `productV2_catalog_view_${id}`,
         title: "产品目录详情",
@@ -1722,6 +1646,7 @@ export default {
       });
     },
     // 移植产品目录表单 e
+
   },
   components: {
     SearchPanel,
@@ -1767,13 +1692,13 @@ export default {
     &-nav {
       > div {
         position: relative;
-        border-top: 1px solid #F5F5F5;
+        border-top: 1px solid #f5f5f5;
         .state {
           padding-top: 4px;
           padding-left: 11px;
           width: 90px;
           font-weight: 500;
-          background-color: #FAFAFA;
+          background-color: #fafafa;
         }
         .element-icon i {
           position: absolute;
@@ -1804,7 +1729,6 @@ export default {
     }
   }
 }
-
 </style>
 
 <style lang="scss">
@@ -2121,7 +2045,7 @@ body {
     }
   }
 }
-.el-table .cell{
+.el-table .cell {
   line-height: 31px;
 }
 </style>

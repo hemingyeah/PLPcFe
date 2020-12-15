@@ -12,16 +12,16 @@
 
 <script>
 
-import {formatDate} from '@src/util/lang';
-import { FormFieldMap, } from '@src/component/form/components';
-import * as Utils from '@src/component/form/util';
-import { editBatchProduct } from '@src/api/ProductApi';
-import FormItem from '@src/component/form/FormItem.vue';
-import * as CustomerApi from '@src/api/CustomerApi';
+import {formatDate} from "@src/util/lang";
+import { FormFieldMap, } from "@src/component/form/components";
+import * as Utils from "@src/component/form/util";
+import { editBatchProduct } from "@src/api/ProductApi";
+import FormItem from "@src/component/form/FormItem.vue";
+import * as CustomerApi from "@src/api/CustomerApi";
 // import {searchCustomer} from '@src/api/EcSearchApi.js';
 
 export default {
-  name: 'batch-editing-dialog',
+  name: "batch-editing-dialog",
   props: {
     config: {
       type: Object,
@@ -42,8 +42,8 @@ export default {
   computed: {
     fields() {
       let tv = null;
-      let formTypes = ['attachment', 'separator', 'location', 'info'];
-      let fieldNames = ['createUser', 'createTime', 'updateTime', 'productTemplate', 'tags', 'remindCount', 'qrcodeId', 'linkmanName', 'phone', 'address'];
+      let formTypes = ["attachment", "separator", "location", "info"];
+      let fieldNames = ["createUser", "createTime", "updateTime", "productTemplate", "tags", "remindCount", "qrcodeId", "linkmanName", "phone", "address"];
 
       let fields = (this.config.fields || [])
         .filter(f => formTypes.indexOf(f.formType) < 0 && !fieldNames.some(key => key === f.fieldName))
@@ -67,10 +67,10 @@ export default {
     }
   },
   mounted() {
-    this.$el.addEventListener('form.add.field', this.addFieldHandler);
+    this.$el.addEventListener("form.add.field", this.addFieldHandler);
   },
   beforeDestroy() {
-    this.$el.removeEventListener('form.add.field', this.addFieldHandler);
+    this.$el.removeEventListener("form.add.field", this.addFieldHandler);
   },
   methods: {
     addFieldHandler(event) {
@@ -89,8 +89,8 @@ export default {
 
           this.pending = false;
           this.$platform.notification({
-            type: !failure ? 'success' : 'error',
-            title: `批量编辑产品${!failure ? '成功' : '失败'}`,
+            type: !failure ? "success" : "error",
+            title: `批量编辑产品${!failure ? "成功" : "失败"}`,
             message: !failure ? null : res.message
           });
 
@@ -99,7 +99,7 @@ export default {
           this.reset();
           this.callback && this.callback();
         })
-        .catch(e => console.error('e', e));
+        .catch(e => console.error("e", e));
     },
     reset() {
       this.$refs.batchForm.reset();
@@ -108,7 +108,7 @@ export default {
     open() {
 
       if (!this.selectedIds.length) {
-        return this.$platform.alert('请选择需要批量编辑的产品目录');
+        return this.$platform.alert("请选择需要批量编辑的产品");
       }
 
       this.reset();
@@ -122,15 +122,15 @@ export default {
         mapJson: JSON.stringify({
           [sf.fieldName]: form[sf.fieldName],
         }),
-        ids: this.selectedIds.join(','),
+        ids: this.selectedIds.join(","),
       };
 
-      if (this.selectedFieldName === 'tags') {
+      if (this.selectedFieldName === "tags") {
         params.mapJson = JSON.stringify({
           [sf.fieldName]: form[sf.fieldName].map(({id, tagName}) => ({id, tagName}))
         })
       }
-      if (sf.formType === 'user') {
+      if (sf.formType === "user") {
         tv = form[sf.fieldName];
 
         params.mapJson = JSON.stringify({
@@ -141,7 +141,7 @@ export default {
           },
         })
       }
-      if (sf.fieldName === 'manager') {
+      if (sf.fieldName === "manager") {
         tv = form[sf.fieldName];
 
         params.mapJson = JSON.stringify({
@@ -152,25 +152,25 @@ export default {
           },
         })
       }
-      if (sf.formType === 'datetime') {
+      if (sf.formType === "datetime") {
         tv = form[sf.fieldName];
         params.mapJson = JSON.stringify({
           [sf.fieldName]: tv,
         })
       }
-      if (sf.formType === 'date') {
+      if (sf.formType === "date") {
         tv = form[sf.fieldName];
         params.mapJson = JSON.stringify({
           [sf.fieldName]: tv,
         })
       }
 
-      if (sf.formType === 'address') {
+      if (sf.formType === "address") {
         tv = form[sf.fieldName];
         params.mapJson = JSON.stringify({
           [sf.fieldName]: {
             ...tv,
-            all: [tv.province, tv.city, tv.dist, tv.address].filter(str => !!str).join('')
+            all: [tv.province, tv.city, tv.dist, tv.address].filter(str => !!str).join("")
           },
         })
       }
@@ -181,7 +181,7 @@ export default {
   },
   components: {
     BatchForm: {
-      name: 'batch-form',
+      name: "batch-form",
       props: {
         fields: {
           type: Array,
@@ -234,7 +234,7 @@ export default {
           /**
            * 选择团队使用的是单独的组件，不是统一的form组件，所以更新时的返回值不同，需要特殊处理
           */
-          if (this.selectedField.fieldName === 'customer') {
+          if (this.selectedField.fieldName === "customer") {
             this.form[this.selectedField.fieldName] = event;
             return
           }
@@ -249,7 +249,7 @@ export default {
               this.inputRemoteSearch.customer.options = res.list;
               this.inputRemoteSearch.customer.loading = false;
             })
-            .catch(err => console.error('searchCustomerManager function catch err', err));
+            .catch(err => console.error("searchCustomerManager function catch err", err));
         },
         selectField(val) {
           this.selectedField = this.fields.filter(f => f.fieldName === val)[0];
@@ -259,17 +259,17 @@ export default {
              * 2、切换字段的时候，重新注册一遍，是因为： 切换前后两个字段类型相同，不会触发字段的组件的重新注册，form-item 的 field 就不会更新，还是切换之前的 field
              */
 
-          if (this.selectedField.formType === 'address' && this.selectedField.isSystem) {
+          if (this.selectedField.formType === "address" && this.selectedField.isSystem) {
             let [province, city, dist] = this.defaultAddress;
             this.form[this.selectedField.fieldName] = {
-              province: province || '',
-              city: city || '',
-              dist: dist || ''
+              province: province || "",
+              city: city || "",
+              dist: dist || ""
             }
           }
 
           this.dispatch({
-            type: 'form.add.field',
+            type: "form.add.field",
             params: {
               value: () => this.form[this.selectedField.fieldName],
               field: this.selectedField,
@@ -278,7 +278,7 @@ export default {
           })
 
           this.dispatch({
-            type: 'form.clear.validate',
+            type: "form.clear.validate",
           })
         },
         renderSelector() {
@@ -301,19 +301,19 @@ export default {
 
           if (!sf.formType) return null;
 
-          if (sf.fieldName === 'customer') {
+          if (sf.fieldName === "customer") {
             return h(
-              'el-select',
+              "el-select",
               {
                 props: {
                   filterable: true,
                   remote: true,
                   clearable: true,
-                  'reserve-keyword': true,
-                  'remote-method': this.searchCustomer,
+                  "reserve-keyword": true,
+                  "remote-method": this.searchCustomer,
                   value: this.form[sf.fieldName],
                   loading: this.inputRemoteSearch.customer.loading,
-                  placeholder: '请输入关键词搜索',
+                  placeholder: "请输入关键词搜索",
                 },
                 on: {
                   input: event => {
@@ -325,7 +325,7 @@ export default {
               this.inputRemoteSearch.customer.options
                 .map(op => (
                   h(
-                    'el-option',
+                    "el-option",
                     {
                       props: {
                         key: op.id,
@@ -364,7 +364,7 @@ export default {
               <label class="form-name">修改字段</label>
               <div>{this.renderSelector()}</div>
             </div>
-            <form-item label={'修改为'}>
+            <form-item label={"修改为"}>
               {this.renderInput(h)}
             </form-item>
           </div>

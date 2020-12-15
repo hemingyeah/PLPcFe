@@ -1,35 +1,44 @@
 <template>
   <div class="product-list-container" v-loading.fullscreen.lock="loading">
-    <div class="product-list-search-group-container">
-      <form class="base-search" onsubmit="return false;">
-        <div class="product-list-base-search-group">
-          <el-input
-            v-model="searchModel.keyword"
-            placeholder="根据产品目录信息搜索"
-          >
-            <i slot="prefix" class="el-input__icon el-icon-search"></i>
-          </el-input>
-          <base-button
-            type="primary"
-            @event="
-              searchModel.pageNum = 1;
-              search();
-              trackEventHandler('search');
-            "
-            native-type="submit"
-          >搜索</base-button
-          >
-          <base-button type="ghost" @event="resetParams">重置</base-button>
-        </div>
-        <span
-          class="advanced-search-visible-btn"
-          @click.self="panelSearchAdvancedToggle"
-        >
-          <i class="iconfont icon-add"></i>
-          高级搜索
-        </span>
-      </form>
+    <div class="product-list-search-group-container flex-x jus-end bg-w">
+      <!-- 搜索 -->
+      <div class="task-list-header-seach ">
+        <form onsubmit="return false;">
+          <div class="seach task-span1 task-flex task-ai guide-box">
+            <div style="position: relative;"></div>
+
+            <el-input v-model="searchModel.keyword"
+                      placeholder="根据产品目录信息搜索"
+                      class="task-with-input task-ml12">
+            </el-input>
+
+            <base-button type="primary"
+                         @event="searchModel.pageNum = 1;
+                                 search();
+                                 trackEventHandler('search');"
+                         native-type="submit"
+                         class="task-ml12">
+              搜索
+            </base-button>
+            <base-button type="ghost"
+                         @event="resetParams"
+                         class="task-ml12">
+              重置
+            </base-button>
+            <div class="guide-box">
+              <div id="v-task-step-2"
+                   :class="['advanced-search-visible-btn', 'task-ml12']"
+                   @click.self="panelSearchAdvancedToggle">
+                <i class="iconfont icon-gaojisousuo task-font12 task-mr4"></i>
+                高级搜索
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
     </div>
+
+
 
     <div class="product-list-section">
       <!--operation bar start-->
@@ -156,7 +165,7 @@
             "
             :min-width="column.minWidth || '120px'"
             :sortable="column.sortable"
-            :show-overflow-tooltip="column.fieldName !== 'productPic'"
+            :show-overflow-tooltip="column.fieldName !== 'productPic' && column.fieldName !== 'thumbnail'"
             :align="column.align"
           >
             <template slot-scope="scope">
@@ -276,6 +285,24 @@
                           : ''
                       }}
                     </div>
+                  </div>
+                </div>
+              </template>
+              <template v-else-if="column.fieldName === 'thumbnail'">
+                <div class="flex-x">
+                  <div class="flex-x goods-img-list flex-1">
+                    <template v-for="(item, index) in scope.row.thumbnail">
+                      <img
+                        :key="index"
+                        class="curs-point"
+                        :src="
+                          item.url
+                            ? `${item.url}?x-oss-process=image/resize,m_fill,h_32,w_32`
+                            : defaultImg
+                        "
+                        @click.stop="previewImg(item.url)"
+                      />
+                    </template>
                   </div>
                 </div>
               </template>
@@ -1582,5 +1609,79 @@ body {
 }
 .el-table .cell{
   line-height: 31px;
+}
+</style>
+
+
+<style lang="scss" scoped>
+.task-list {
+  &-header {
+    background: #ffffff;
+    box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, 0.06);
+    border-radius: 4px;
+    margin-bottom: 12px;
+    border-top: none;
+
+    &-seach {
+      padding: 6px 0;
+
+      .seach {
+        justify-content: flex-end;
+        padding-right: 16px;
+
+        .advanced-search-visible-btn {
+          width: 98px;
+          height: 32px;
+          background: #e9f9f9;
+          border-radius: 4px;
+          border: 1px solid #d0f3f4;
+          font-size: 14px;
+          color: #13c2c2;
+          line-height: 32px;
+          text-align: center;
+          cursor: pointer;
+        }
+      }
+    }
+
+    &-nav {
+      > div {
+        position: relative;
+        border-top: 1px solid #f5f5f5;
+        .state {
+          padding-top: 4px;
+          padding-left: 11px;
+          width: 90px;
+          font-weight: 500;
+          background-color: #fafafa;
+        }
+        .element-icon i {
+          position: absolute;
+          right: 12px;
+          top: 6px;
+        }
+        .list {
+          width: 90%;
+          overflow: hidden;
+          // height: 30px;
+          .list-item {
+            > div {
+              padding-left: 11px;
+              font-size: 13px;
+              width: 130px;
+              height: 30px;
+              overflow-y: hidden;
+              color: #808080;
+              line-height: 30px;
+              cursor: pointer;
+              &:hover {
+                color: #333;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
 }
 </style>

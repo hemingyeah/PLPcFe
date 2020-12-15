@@ -31,6 +31,16 @@ const catalogFieldFix = [
     tableName:"catalog",
   },
   {
+    displayName: "缩略图",
+    fieldName: "thumbnail",
+    formType: "attchment",
+    isExport: false,
+    show: true,
+    orderId: -0.7,
+    isSystem: 1,
+    tableName:"catalog",
+  },
+  {
     displayName: "产品数量",
     fieldName: "productNum",
     formType: "text",
@@ -91,13 +101,20 @@ const catalogFieldFixForProduct = [
 
 const productFieldFix = [
   {
+    displayName: "产品类型",
+    fieldName: "catalogId",
+    formType: "related_catalog",
+    isExport: 1,
+    isSystem: 1,
+    tableName:"product",
+  },
+  {
     displayName: "最近更新",
     fieldName: "updateTime",
     formType: "date",
     isExport: false,
     isSystem: 1,
     tableName:"product",
-
   },
   {
     displayName: "产品模板",

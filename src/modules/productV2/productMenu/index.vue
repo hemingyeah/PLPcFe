@@ -286,6 +286,9 @@ export default {
               if (this.dialogType == "addMenu") {
                 this.changeTree("add", [0], res.result);
               } else {
+                if(this.nowEditMenu && this.nowEditMenu.id == this.childData.id){
+                  this.nowEditMenu.canEditConData = false;
+                }
                 this.changeTree("add", this.childData.indexArr, res.result);
               }
             }
@@ -354,8 +357,9 @@ export default {
           this.treeData,
           this.nowEditMenu.indexArr,
           0,
-          this.nowEditMenu.indexArr.length - 1
+          this.nowEditMenu.indexArr.length - 2
         );
+        console.log(element, "element")
         element[this.nowEditMenu.nowIndex][key] = val;
       } catch (error) {
         console.warn(error);

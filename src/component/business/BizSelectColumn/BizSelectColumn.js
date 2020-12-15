@@ -393,11 +393,14 @@ const BizSelectColumn = {
     */
     renderField(field = {}, parent = {}, parentOfParent = {}) {
       return (
-        <div class="biz-select-column-field">
-          <el-checkbox value={ field.show } label={ field.displayName } onInput={ value => this.checkboxFieldChange(value, field, parent, parentOfParent) }>
-            { field.displayName }
-          </el-checkbox>
-        </div>
+
+        <el-tooltip class="item" effect="dark" content={ field.displayName } placement="top">
+          <div class="biz-select-column-field">
+            <el-checkbox value={ field.show } label={ field.displayName } onInput={ value => this.checkboxFieldChange(value, field, parent, parentOfParent) }>
+              { field.displayName }
+            </el-checkbox>
+          </div>
+        </el-tooltip>
       )
     },
     /** 

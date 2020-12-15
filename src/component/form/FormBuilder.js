@@ -3,7 +3,6 @@ import * as util from "./util";
 
 function createFormField(h, field, comp){
   if(null == comp.build) return comp.build;
-
   let data = {
     props: {
       field,
