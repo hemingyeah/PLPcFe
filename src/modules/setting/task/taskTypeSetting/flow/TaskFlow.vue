@@ -11,16 +11,21 @@
               width="224"
               trigger="click">
               <div class="choose-color-box">
-                <i
+                <div
                   v-for="color in taskTypeColor"
                   :key="color"
                   @click="typeColor = color"
                   :style="{background: color}">
-                </i>
+                  <i class="el-icon-check" v-if="typeColor === color"></i>
+                </div>
               </div>
-              <i slot="reference" class="type-color" :style="{background: typeColor}"></i>
+              <el-tooltip slot="reference"  effect="dark" content="修改工单类型颜色" placement="bottom">
+                <i class="type-color" :style="{background: typeColor}"></i>
+              </el-tooltip>
             </el-popover>
-            <el-input class="type-name" v-model="typeName" placeholder="请输入工单类型名称"></el-input>
+            <el-tooltip effect="dark" content="修改工单类型名称" placement="bottom">
+              <el-input class="type-name" v-model="typeName" placeholder="请输入工单类型名称"></el-input>
+            </el-tooltip>
           </el-row>
         </div>
       </el-row>
@@ -49,8 +54,8 @@
 // utils
 import { parse } from '@src/util/querystring';
 // components
-import FlowSettingPanel from './tabs/FlowSettingPanel.vue'
-import OtherSettingPanel from './tabs/OtherSettingPanel.vue'
+import FlowSettingPanel from './tabs/FlowSettingPanel';
+import OtherSettingPanel from './tabs/OtherSettingPanel';
 
 const TASK_TYPE_COLOR = ['#737F7C','#266FFF','#5255FF','#8552FF','#BC52FF','#FF52D4','#FF9526','#6ECF40','#00B8D5','#0BA194']
 

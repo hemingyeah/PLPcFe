@@ -15,7 +15,7 @@
                 </div>
                 <div v-if="flowMap[key].isOpen || flowMap[key].isSystem" class="open-tag">已开启</div>
                 <div class="open-btn" @click.stop>
-                    <el-switch v-model="open" v-if="!flowMap[key].isSystem" />
+                    <el-switch v-model="flowMap[key].isOpen" v-if="!flowMap[key].isSystem" />
                 </div>
             </el-row>
         </el-row>
@@ -27,7 +27,7 @@
                 {{flowMap[currFlow].desc}}
             </div>
             <div class="setting-flow-main-content">
-                <flow-setting  :type="currFlow" style="height: 100%"/>
+                <flow-setting  :type="currFlow" :setting="flowMap[currFlow]" :commonSetting="commonSetting" style="height: 100%"/>
             </div>
         </div>
         <!--E 流程设置 -->
@@ -46,7 +46,18 @@ export default {
 
             flowSetting: {},
             flowMap,
+            commonSetting: { // 流程公共设置
+                planRemindSetting:{ //计划时间提醒设置
+                    state: false,
+                    isAhead: 1,
+                    minutes: '',
+                },
+                notice: '', // 超时提醒类型
+                noticeUsers: '', // 超时提醒指定人员
 
+                allowPause: false, // 允许暂停工单开关
+                allowCancel: false, // 允许取消工单开关
+            }
         }
     },
     methods: {

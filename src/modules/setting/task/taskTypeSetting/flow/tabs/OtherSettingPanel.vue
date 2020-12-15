@@ -1,446 +1,263 @@
 <template>
-  <div class="other-setting-container">
-    <div class="setting-item">
-      <h2>回执其他设置</h2>
-      <div class="setting-line">
-        <div class="title-line">
-          <p class="p-title">允许修改工单费用折扣</p>
-          <p class="p-desc">如果启用该选项，允许工单负责人修改工单折扣费</p>
-        </div>
-        <div>
-          <el-checkbox-group v-model="taskPrice">
-            <el-checkbox label="修改单品价格" @change="modifyOption('editUnitPrice',$event,'修改单品价格')"></el-checkbox>
-            <el-checkbox label="修改工单总折扣价" @change="modifyOption('showDiscountCost',$event,'修改工单总折扣价')"></el-checkbox>
-          </el-checkbox-group>
-        </div>
-      </div>
-      <div class="setting-line">
-        <div>
-          <div class="title-line">
-            <p class="p-title">发送服务报告</p>
-            <p class="p-desc">可在PC端或移动端针对完成的工单生成电子服务报告</p>
-          </div>
-          <el-switch style="float: right;margin-right: 30px;"
-              v-model="reportForm.isReport"
-                     @change="modifyOption('serviceReport',$event,'服务报告')"
-              active-text="开启"
-              inactive-text="禁用">
-          </el-switch>
-        </div>
-        <transition name="fade">
-          <div v-if="reportForm.isReport">
-            <el-radio-group v-model="reportForm.templateSelect" @change="modifyOption('srSysTemplate',!$event,'服务报告模板')">
-              <div style="display: inline-block;margin-right: 30px;">
-                <el-radio :label="0">使用系统模板</el-radio>
-                <button type="button" class="btn setting-btn-primary"
-                        @click="showSystemPanel('report')"
-                        :disabled="reportForm.templateSelect == 1">设置字段</button>
-              </div>
-              <div style="display: inline-block;">
-                <el-radio :label="1">上传自己的模板</el-radio>
-                <button type="button" class="btn setting-btn-primary"
-                        @click="showSelfPanel('report')"
-                        :disabled="reportForm.templateSelect == 0">配置</button>
-              </div>
-
-            </el-radio-group>
-          </div>
-        </transition>
-      </div>
-      <div class="setting-line">
-        <div>
-          <div class="title-line">
-            <p class="p-title">启用打印功能</p>
-            <p class="p-desc">可以在PC端打印工单信息</p>
-          </div>
-          <el-switch style="float: right;margin-right: 30px;"
-                     v-model="printForm.isPrint"
-                     @change="modifyOption('printTask',$event,'打印功能')"
-                     active-text="开启"
-                     inactive-text="禁用">
-          </el-switch>
-        </div>
-        <transition name="fade">
-          <div v-if="printForm.isPrint">
-          <el-radio-group v-model="printForm.templateSelect" @change="modifyOption('ptSysTemplate',!$event,'打印功能模板')">
-            <div style="display: inline-block;margin-right: 30px;">
-              <el-radio :label="0">使用系统模板</el-radio>
-              <button type="button" class="btn setting-btn-primary"
-                      @click="showSystemPanel('print')"
-                      :disabled="printForm.templateSelect == 1">
-                设置字段
-              </button>
+    <div class="other-setting-panel">
+        <div class="other-setting-main">
+            <!--S 生成服务报告 -->
+            <div class="setting-service-report">
+                <h2>
+                    生成服务报告
+                    <el-switch class="ml-16"/>
+                </h2>
+                可在PC端或移动端针对完成的工单生成电子服务报告
+                <div class="mt-8">
+                    <el-radio-group v-model="radio">
+                        <el-radio :label="0" class="mr-50">
+                            使用系统模
+                            <el-button 
+                                :type="radio === 0 ? 'primary': 'default'" 
+                                :disabled="radio === 1" 
+                                plain 
+                                size="small"
+                                @click="openTemplateDialog('reportSetting')">
+                                设置
+                            </el-button>
+                        </el-radio>
+                        <el-radio :label="1">
+                            上传个人模板
+                            <el-button 
+                                :type="radio === 1 ? 'primary': 'default'" 
+                                :disabled="radio === 0" 
+                                plain 
+                                size="small">
+                                设置
+                            </el-button>
+                        </el-radio>
+                    </el-radio-group>
+                </div>
+                <p class="mt-8">
+                    电子服务报告显示浮现【服务完成】的水印
+                    <el-switch />
+                </p>
             </div>
-            <div style="display: inline-block;">
-              <el-radio :label="1">上传自己的模板</el-radio>
-              <button type="button" class="btn setting-btn-primary"
-                      @click="showSelfPanel('print')"
-                      :disabled="printForm.templateSelect == 0">配置</button>
+            <!--E 生成服务报告 -->
+
+            <!--S 启用打印功能 -->
+            <div class="setting-photo">
+                <h2>
+                    启用打印功能
+                    <el-switch class="ml-16" />
+                </h2>
+                可以在PC端打印工单信息
+                <div class="mt-8">
+                    <el-radio-group v-model="radio">
+                        <el-radio :label="0" class="mr-50">
+                            使用系统模板
+                            <el-button 
+                                :type="radio === 0 ? 'primary': 'default'" 
+                                :disabled="radio === 1" 
+                                plain 
+                                size="small"
+                                @click="openTemplateDialog('printSetting')">
+                                设置
+                            </el-button>
+                        </el-radio>
+                        <el-radio :label="1">
+                            上传个人模板
+                            <el-button 
+                                :type="radio === 1 ? 'primary': 'default'" 
+                                :disabled="radio === 0" 
+                                plain 
+                                size="small">
+                                设置
+                            </el-button>
+                        </el-radio>
+                    </el-radio-group>
+                </div>
+                
             </div>
-          </el-radio-group>
+            <!--E 启用打印功能 -->
+
+            <!--S 启用拍照设置 -->
+            <div class="setting-photo">
+                <h2>
+                    启用拍照设置
+                    <el-switch
+                        class="ml-16"
+                        v-model="cameraForm.attUploadLimitMobile"/>
+                </h2>
+                开启后，上传照片时只可现场拍摄上传，将不能够在相册选择并进行上传
+            </div>
+            <!--E 启用拍照设置 -->
+
+            <!--S 照片水印设置 -->
+            <div class="setting-water-mark" v-if="cameraForm.attUploadLimitMobile">
+                <h2>
+                    照片水印设置
+                    <el-switch class="ml-16" v-model="cameraForm.photoWatermark"/>
+                </h2>
+                开启后，照片将在
+                <el-select
+                    v-model="cameraForm.watermarkPosition"
+                    placeholder="请选择水印位置">
+                    <el-option
+                        v-for="item in waterMarkDirection"
+                        :key="item.value"
+                        :label="item.label"
+                        :value="item.value">
+                    </el-option>
+                </el-select>
+                自动浮现水印说明以下信息
+                <div class="mt-8">
+                    <el-select class="w-542" v-model="cameraForm.watermarkContent" multiple placeholder="请选择水印位置">
+                        <el-option
+                            v-for="item in photoInfoArr"
+                            :key="item.value"
+                            :label="item.label"
+                            :value="item.value">
+                        </el-option>
+                    </el-select>
+                </div>
+            </div>
+            <!--E 照片水印设置 -->
+
+            <!--S 位置异常设置 -->
+            <div class="setting-postion-exception">
+                <h2>
+                    位置异常提醒
+                    <el-switch class="ml-16" v-model="cameraForm.positionExceptionFlag" />
+                </h2>
+                <p>
+                    开启后，在以下节点时若负责人超出工单距离
+                    <el-input class="w-120" v-model="cameraForm.exceptionRange" placeholder="请输入距离"></el-input>
+                    公里
+                </p>
+                将在工单流程中提示位置异常
+                <div class="mt-8">
+                    <el-select class="w-542" v-model="cameraForm.exceptionFlagFlows" multiple placeholder="请选择">
+                        <el-option
+                            v-for="item in processArr"
+                            :key="item.value"
+                            :label="item.label"
+                            :value="item.value">
+                        </el-option>    
+                    </el-select> 
+                </div>
+            </div>
+            <!--E 位置异常设置 -->
         </div>
-        </transition>
-      </div>
+
+        <!-- 系统模板设置字段弹窗 -->
+        <system-template-dialog :visiable.sync="isShowSystemModal" :type="templateType" :typeId="typeId"/>
     </div>
-
-
-    <div class="setting-item">
-      <h2>回执合规设置</h2>
-      <div class="setting-line">
-        <div>
-          <div class="title-line">
-            <p class="p-title">启用拍照设置</p>
-            <p class="p-desc">开启后，上传照片时只可现场拍摄上传，将不能够在相册选择并进行上传</p>
-          </div>
-          <el-switch style="float: right;margin-right: 30px;"
-                     v-model="cameraForm.attUploadLimitMobile"
-                     @change="modifyConfig('attUploadLimitMobile',$event,'拍照功能')"
-                     active-text="开启"
-                     inactive-text="禁用">
-          </el-switch>
-        </div>
-      </div>
-      <transition name="fade">
-        <div class="setting-line" v-if="cameraForm.attUploadLimitMobile">
-        <div>
-          <div class="title-line">
-            <p class="p-title">照片水印设置</p>
-            <p class="p-desc">开启后，照片将在
-              <el-select v-model="cameraForm.watermarkPosition"
-                         @change="modifyConfig('watermarkPosition',$event,'照片水印位置')"
-                         placeholder="请选择水印位置">
-                <el-option
-                    v-for="(item,index) in waterMarkDirection"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value">
-                </el-option>
-              </el-select>
-              自动浮现水印说明以下信息</p>
-          </div>
-          <el-switch style="float: right;margin-right: 30px;"
-                     v-model="cameraForm.photoWatermark"
-                     @change="modifyConfig('photoWatermark',$event,'照片水印')"
-                     active-text="开启"
-                     inactive-text="禁用">
-          </el-switch>
-        </div>
-        <el-select v-model="cameraForm.watermarkContent" multiple
-                   @change="modifyConfigMultiple('watermarkContent',$event,'照片水印信息')"
-                   style="width: 40%" placeholder="请选择所需展示信息">
-          <el-option
-              v-for="(item,index) in photoInfoArr"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value">
-          </el-option>
-        </el-select>
-      </div>
-      </transition>
-      <div class="setting-line">
-        <div>
-          <div class="title-line">
-            <p class="p-title">位置异常提示</p>
-            <p class="p-desc">开启后，在以下节点时若负责人超出工单距离
-              <el-input v-model="cameraForm.exceptionRange"
-                        @blur="checkNum('exceptionRange',cameraForm.exceptionRange,'位置异常提醒距离')"
-                        style="width: 100px;" placeholder="请输入距离"></el-input>
-              公里，将在工单流程中提示位置异常
-              </p>
-          </div>
-          <el-switch style="float: right;margin-right: 30px;"
-                     v-model="cameraForm.positionExceptionFlag"
-                     @change="modifyConfig('positionExceptionFlag',$event,'位置异常提示')"
-                     active-text="开启"
-                     inactive-text="禁用">
-          </el-switch>
-        </div>
-        <el-select v-model="cameraForm.exceptionFlagFlows" multiple
-                   @change="modifyConfigMultiple('exceptionFlagFlows',$event,'节点距离')"
-                   style="width: 40%" placeholder="请选择">
-          <el-option
-              v-for="(item,index) in processArr"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value">
-          </el-option>
-        </el-select>
-      </div>
-    </div>
-
-    <slot></slot>
-
-    <system-template-dialog :id="id" :isShowSystemModal="isShowSystemModal" :clickType="clickType" @hideModal="hideModal"></system-template-dialog>
-    <template-upload-dialog :id="id" :isShowUploadModal="isShowUploadModal" :uploadTemplateType="uploadTemplateType"
-                            :reportSetting="reportSetting" :printSetting="printSetting"
-                            @hideModal="hideModal">
-
-    </template-upload-dialog>
-
-  </div>
 </template>
 
 <script>
-import {getTaskType,modifyOption,modifyConfig} from "@src/api/TaskApi.ts";
-
+// api
+import * as TaskApi from '@src/api/TaskApi.ts';
+// components 
 import SystemTemplateDialog from "../../components/SystemTemplateDialog";
 import TemplateUploadDialog from "../../components/TemplateUploadDialog";
 
 export default {
-  name: 'other-setting-panel',
-  data() {
-    return {
-      //TODO: id后期需要动态获取
-      id : "1",
-      taskForm : {
-        "editUnitPrice" : "修改单品价格",
-        "showDiscountCost" : "修改工单总折扣价"
-      },
-      taskPrice : [],
-      reportForm : {
-        isReport : true,
-        templateSelect : 0,
-      },
-      printForm : {
-        isPrint : true,
-        templateSelect : 0,
-      },
-      cameraForm : {
-        attUploadLimitMobile : true,
-        photoWatermark : true,
-        watermarkPosition : "",
-        watermarkContent : [],
-        positionExceptionFlag : true,
-        exceptionRange : "",
-        exceptionFlagFlows : []
-      },
-      waterMarkDirection : [
-        {label : "左上", value : "topLeft"},
-        {label : "左下", value : "bottomLeft"},
-        {label : "右上", value : "topRight"},
-        {label : "右下", value : "bottomRight"},
-      ],
-      photoInfoArr : [
-        {label : "操作人姓名", value : "name"},
-        {label : "拍摄时间", value : "time"},
-        {label : "拍摄地点", value : "position"},
-      ],
-      processArr : [
-        {label : "开始", value : "start"},
-        {label : "完成", value : "finish"}
-      ],
-      isShowSystemModal : false,
-      isShowUploadModal : false,
-      clickType : "",
-      templateTypeTemp : "",
-      clickTypeTemp : "",
-      uploadTemplateType : "",
-      reportSetting: {},
-      printSetting : {}
-    }
-  },
-  created() {
-    this.getTaskType();
-  },
-  methods: {
+    name: 'other-setting-panel',
+    data() {
+        return {
+            typeId: '83dbe928-e8d2-495b-99b5-25541067ba4d',
 
-    showSystemPanel(clickType) {
-      //clickType区分服务报告还是打印
-      this.$emit("submit",{clickType})
-      this.clickTypeTemp = clickType;
-    },
-    didShowSystemPanel() {
-      this.isShowSystemModal = true;
-      this.clickType = this.clickTypeTemp;
-    },
-    showSelfPanel(type) {
-      console.log("显示自己的模板")
-      console.log(type)
-      this.isShowUploadModal = true;
-      this.uploadTemplateType = type;
-    },
-    hideModal() {
-      //系统弹窗
-      this.isShowSystemModal = false;
-      //自选弹窗
-      this.isShowUploadModal = false;
-      //类型
-      this.clickType = "";
-    },
-    checkNum(name,value,desc) {
-      if(isNaN(value) || !value.trim()) {
-        return this.$platform.notification({
-          title: '失败',
-          message: '距离只支持数字',
-          type: 'error',
-        })
-      }if(value < 0 ) {
-        return this.$platform.notification({
-          title: '失败',
-          message: '距离不可以为负数',
-          type: 'error',
-        })
-      }else{
-        this.modifyConfig(name,value,desc);
-      }
-    },
+            radio: '',
+            cameraForm : {
+                attUploadLimitMobile : true,
+                photoWatermark : true,
+                watermarkPosition : "",
+                watermarkContent : [],
+                positionExceptionFlag : true,
+                exceptionRange : "",
+                exceptionFlagFlows : []
+            },
 
-    async getTaskType() {
-      //工单回执其他模块设置信息回显
-      let baseInfo = await getTaskType({id : this.id});
-
-      if(!baseInfo.status) {
-        let {data} = baseInfo;
-        this.taskPrice = [];
-        this.filterPrice("editUnitPrice",data.options.editUnitPrice);
-        this.filterPrice("showDiscountCost",data.options.showDiscountCost);
-
-        this.reportForm.isReport = data.options.serviceReport == null || data.options.serviceReport;
-        if(data.options.srSysTemplate == null || data.options.srSysTemplate) {
-          this.reportForm.templateSelect = 0;
-        }else if(data.options.srSysTemplate != null && !data.options.srSysTemplate) {
-          this.reportForm.templateSelect = 1;
+            isShowSystemModal : false,
+            templateType: 'service',
+            isShowUploadModal : false,
         }
-
-        this.printForm.isPrint = data.options.printTask == null || data.options.printTask;
-        if(data.options.ptSysTemplate == null || data.options.ptSysTemplate) {
-          this.printForm.templateSelect = 0;
-        }else if(data.options.ptSysTemplate != null && !data.options.ptSysTemplate) {
-          this.printForm.templateSelect = 1;
+    },
+    computed: {
+        waterMarkDirection() {
+            return [
+                {label : "左上", value : "topLeft"},
+                {label : "左下", value : "bottomLeft"},
+                {label : "右上", value : "topRight"},
+                {label : "右下", value : "bottomRight"},
+            ]
+        },
+        photoInfoArr() {
+            return [
+                {label : "操作人姓名", value : "name"},
+                {label : "拍摄时间", value : "time"},
+                {label : "拍摄地点", value : "position"},
+            ]
+        },
+        processArr() { 
+            return  [
+                {label : "开始", value : "start"},
+                {label : "完成", value : "finish"}
+            ]
+        },
+    },
+    methods: {
+        openTemplateDialog(type) {
+            this.templateType = type;
+            this.isShowSystemModal = true;
         }
-
-        Object.assign(this.cameraForm,data.config.positionExceptionConfig);
-
-        this.reportSetting = data.reportSetting;
-        this.printSetting = data.printSetting;
-
-      }
-
     },
-    filterPrice(key,value) {
-      if (value) this.taskPrice.push(this.taskForm[key]);
+    mounted() {
     },
-    async modifyOption(name,state,desc) {
-      let result = await modifyOption({id:this.id,name,state});
-
-      if (result.status){
-        return this.$platform.notification({
-          title: '失败',
-          message: res.message || '',
-          type: 'error',
-        })
-      } else{
-        return this.$platform.notification({
-          title: '成功',
-          message: `设置${desc}配置`,
-          type: 'success',
-        });
-      }
-
-    },
-
-    modifyConfigMultiple(name,value,desc) {
-      let _value = value.join(",");
-      this.modifyConfig(name,_value,desc);
-    },
-
-    async modifyConfig(name,value,desc) {
-      let result = await modifyConfig({typeId:this.id,name,value});
-
-      if (result.status){
-        return this.$platform.notification({
-          title: '失败',
-          message: res.message || '',
-          type: 'error',
-        })
-      } else{
-        return this.$platform.notification({
-          title: '成功',
-          message: `设置${desc}配置`,
-          type: 'success',
-        });
-      }
-
+    components: {
+        [SystemTemplateDialog.name]: SystemTemplateDialog
     }
-
-  },
-  watch : {
-    'cameraForm.exceptionRange'(newValue,oldValue) {
-      if(newValue && parseFloat(newValue) != newValue) {
-        this.cameraForm.exceptionRange = oldValue;
-      }
-    }
-  },
-
-  components : {
-    TemplateUploadDialog,
-    [SystemTemplateDialog.name] : SystemTemplateDialog
-  }
 }
 </script>
 
-<style lang="scss">
-
-.other-setting-container {
-  background: #fff;
-  margin-top: 30px;
-  margin-bottom: 10px;
-  padding: 10px;
-
-  h2 {
-    font-size: 16px;
-    font-weight: 500;
-  }
-
-  .setting-item {
-    padding-left: 15px;
-    line-height: 30px;
-    padding-top: 10px;
-    border-top: 1px solid #dddddd;
-    padding-bottom: 30px;
-
-    .setting-line{
-      margin-top: 10px;
+<style lang="scss" scoped>
+.other-setting-panel{
+    width: 100%;
+    height: calc(100vh - 48px);
+    padding: 16px 12px 24px 12px;
+    background: #F5F5F5;
+    .other-setting-main{
+        height: 100%;
+        background: #FFFFFF;
+        border-radius: 4px;
+        padding: 20px 50px;
+        & > div {
+            font-size: 14px;
+            color: #999999;
+            h2{
+                color: #333333;
+                font-size: 16px;
+                margin: 12px 0;
+            }
+            p{
+                margin-bottom: 8px;
+                color: #666666;
+            }
+        }
     }
-
-    .title-line{
-      display: inline-block;
-    }
-
-    .p-title{
-      margin-right: 10px;
-      font-size: 14px;
-      font-weight: 600;
-      display: block;
-    }
-
-    .p-desc{
-      color: #333333;
-      font-size: 12px;
-    }
-
-  }
-
-}
-
-.fade-enter{
-  opacity: 0;
-}
-.fade-enter-to{
-  opacity: 1;
-}
-.fade-enter-active{
-  transition: opacity 0.3s;
-}
-.fade-leave{
-  opacity: 1;
-}
-.fade-leave-to{
-  opacity: 0;
-}
-.fade-leave-active{
-  transition: opacity 0.3s;
 }
 
 
+.w-120{
+    width: 120px;
+}
+.w-542{
+    width: 542px;
+}
+
+.mr-50{
+    margin-right: 50px;
+}
+.ml-16{
+    margin-left: 16px;
+}
+.mt-8{
+    margin-top: 8px;
+}
 </style>

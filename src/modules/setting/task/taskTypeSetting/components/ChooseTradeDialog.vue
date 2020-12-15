@@ -23,12 +23,21 @@
                         <i :class="['iconfont', getIcon(item.taskTypeName)]"></i>
                     </div>
                     <div class="trade-item-main">
-                        <h2>{{item.taskTypeName}}</h2>
-                        <!--todo_zr label标签 -->
+                        <el-row type="flex">
+                            <h2>
+                                {{item.taskTypeName}}
+                            </h2>
+                            <div v-for="label in item.labels" :key="label" class="trade-item-tag">
+                                {{label}}
+                            </div>
+                        </el-row>
                          <p v-html="item.description"></p>
                     </div>
                 </el-row>
             </el-row>
+        </div>
+        <div slot="footer" class="dialog-footer">
+            <el-button type="primary" @click="cancel">上一步</el-button>
         </div>
     </base-modal>
 </template>
@@ -230,6 +239,16 @@ export default {
                 width: 310px;
                 h2{
                     font-size: 14px;
+                }
+                .trade-item-tag{
+                    height: 22px;
+                    border-radius: 11px;
+                    text-align: center;
+                    padding: 0 9px;
+                    margin-left: 4px;
+                    line-height: 22px;
+                    color: #FFFFFF;
+                    background-color: #e8bf1d;
                 }
                 p{
                     margin:0;
