@@ -90,13 +90,22 @@
 }
 
 .choose-color-box{
-    i{
+    div{
         cursor: pointer;
+        position: relative;
         display: inline-block;
         width: 30px;
         height: 30px;
         border-radius: 50%;
         margin-right: 12px;
+        i{
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 24px;
+            color: #FFFFFF;
+        }
         &:nth-child(5n){
             margin-right: 0;
         }
