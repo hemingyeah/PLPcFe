@@ -28,7 +28,7 @@
           class="task-type-item"
           v-for="(item, idx) in cardList"
           :key="item.id"
-          :cardData.sync="cardList[idx]"
+          :card.sync="cardList[idx]"
         ></task-card-item>
       </div>
       <!-- end 已添加附加组件 -->
@@ -66,7 +66,8 @@ export default {
           specialfrom: null,
           inputType: 'single',//单次single 多次multiple   
           range:[{name:'工单类型1',id:'ee7a0934-2840-4b55-bcc4-000e6435b70c'},{name:'工单类型2',taskTypeId:'ee7a0934-2840-4b55-bcc4-000e6435b70c'}], 
-          enabled:1 //1开启 0关闭
+          enabled:1, //1开启 0关闭
+          config:{}
         }, {
           id: "ccdddc47-390b-11ea-bfc9-00163e304a25",
           name: '单次组件一',
@@ -74,15 +75,18 @@ export default {
           specialfrom: null,
           inputType: 'single',//单次single 多次multiple
           range:[{name:'工单类型1',id:'ee7a0934-2840-4b55-bcc4-000e6435b70c'}], 
-          enabled:1 //1开启 0关闭
+          enabled:1, //1开启 0关闭
+          config:{}
         },{
           id: "d98f1607-e20a-11ea-9929-00163e304a25",
           name: '工时记录',
           description: '工时记录信息',
-          specialfrom: null,
+          specialfrom: '工时记录',
           inputType: 'single',//单次single 多次multiple
           range:[{name:'工单类型1',id:'ee7a0934-2840-4b55-bcc4-000e6435b70c'}], 
-          enabled:1 //1开启 0关闭
+          enabled:1, //1开启 0关闭
+          config:{ distanceStatis: true,autoLocation: true}
+
         },
       ],
 

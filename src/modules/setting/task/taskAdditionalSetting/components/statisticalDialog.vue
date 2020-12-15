@@ -18,7 +18,7 @@
           </el-date-picker>
           <el-input v-model="form.taskNoStr" placeholder="请输入工单编号"></el-input>
           <el-input v-model="form.userNameStr" placeholder="请输入操作人"></el-input>
-          <el-button type="primary">搜索</el-button>
+          <el-button type="primary" @click="onSearch">搜索</el-button>
         </div>
         <div class="search-right">
           <el-button type="primary" plain @click="exportStatistics">导出</el-button>
@@ -33,37 +33,100 @@
           border
           header-row-class-name="page-table-header" 
           stripe
+          tooltip-effect="dark"
           @selection-change="handleSelectionChange">
           <el-table-column prop="taskNo" label="工单编号" width="150"></el-table-column>
-          <template v-if="specialfrom != '工时记录'">
+
+          <!-- start 非工时记录列表数据 -->
+          <template v-if="card.specialfrom != '工时记录'">
             <el-table-column  
               v-for="(column, index) in columns" 
               :key="`${column.field}_${index}`"
               :prop="column.fieldName" 
               :label="column.displayName"
-              width="120">
+              :min-width="column.minWidth || '120px'">
+              <template slot-scope="scope">
+              <!-- start 自定义字段 -->
+                <template v-if="scope.row.taskCardInfo.attribute[column.fieldName]">
+                  <template v-if="isMulti(column)">
+                    {{ (scope.row.taskCardInfo.attribute[column.fieldName] || []).join('，') }}
+                  </template>
+                   <template v-else-if="column.formType == 'attachment'">
+                    <span class="column-attachment" v-if="scope.row.taskCardInfo.attribute[column.fieldName] && scope.row.taskCardInfo.attribute[column.fieldName].length">
+                    <i class="iconfont icon-attachment"></i>
+                    共{{ scope.row.taskCardInfo.attribute[column.fieldName].length }}个附件
+                  </span>
+                  </template>
+                  <template v-else>
+                    {{scope.row.taskCardInfo.attribute[column.fieldName]}}
+                  </template>
+                </template>
+                <!-- end 自定义字段 -->
+                <template v-else>
+                  {{ scope.row[column.fieldName] }}
+                </template>
+              </template>
+            </el-table-column>
+            <el-table-column prop="userName" label="操作人">
+              <template slot-scope="scope">
+                <template v-if="scope.row.taskCardInfo.attribute['userName']">
+                  <template >
+                    {{scope.row.taskCardInfo.attribute['userName']}}
+                  </template>
+                </template>
+              </template>
+            </el-table-column>
+            <el-table-column prop="updateTime" label="操作时间" width="160" >
+              <template slot-scope="scope">
+                <template v-if="scope.row.taskCardInfo.attribute['updateTime']">
+                  <template >
+                    {{scope.row.taskCardInfo.attribute['updateTime'] | formatDate}}
+                  </template>
+                </template>
+              </template>
             </el-table-column>
           </template>
+          <!-- start 非工时记录列表数据 -->
+
+          <!-- start 工时记录统计列表数据-->
           <template v-else>
             <el-table-column  
               v-for="(column, index) in columns" 
               :key="`${column.field}_${index}`"
               :prop="column.fieldName" 
               :label="column.displayName"
-              width="120">
-              <template slot-scope="scope">{{ scope.row.date }}</template>
+              :show-overflow-tooltip="column.showTooltip"
+              :min-width="column.minWidth || '120px'">
+              <template slot-scope="scope">
+
+                <!-- start 附件类型 -->
+                <template v-if="column.formType === 'attachment'">
+                  <span class="column-attachment" v-if="scope.row[column.fieldName] && scope.row[column.fieldName].length">
+                    <i class="iconfont icon-attachment"></i>
+                    共{{ scope.row[column.fieldName].length }}个附件
+                  </span>
+                </template>
+                <!-- end 附件类型 -->
+
+                <!-- start 多选 -->
+                <template v-else-if="isMulti(column)">
+                  {{ (scope.row[column.fieldName] || []).join('，') }}
+                </template>
+                <!-- end 多选 -->
+
+                <!-- start 开始结速时间 -->
+                <template v-else-if="column.fieldName === 'startTime' || column.fieldName === 'endTime' || column.fieldName === 'operateTime'">
+                  {{scope.row[column.fieldName] | formatDate}}
+                </template>
+                <!-- end 开始结速时间 -->
+
+                <template v-else>
+                  {{ scope.row[column.fieldName] }}
+                </template>
+              </template>
             </el-table-column>
-          </template>    
-          <el-table-column
-            prop="name"
-            label="操作人"
-            show-overflow-tooltip>
-          </el-table-column>
-          <el-table-column
-            prop="name"
-            label="操作时间"
-            show-overflow-tooltip>
-          </el-table-column>
+          </template>  
+          <!-- end 工时记录统计列表数据-->  
         </el-table>
           <div class="table-footer comment-list-table-footer">
             <div class="comment-list-table-footer-info task-flex task-ai">
@@ -108,21 +171,18 @@
 // api
 import * as SettingTaskApi from "@src/api/SettingTaskApi";
 // util
-import * as Lang from "@src/util/lang/index.js";
+import { formatDate } from "@src/util/lang/index.js";
+import fieldUtil from './cardField';
 
 export default {
   name: 'statistical-dialog',
   props: {
-    id:{
-      type: String,
-    },
-    specialfrom:{
-      type: String
+    card:{
+      type: Object,
+      default: () => ({})
     }
   },
   data() {
-    let startDate = Lang.formatDate(new Date() - 29 * 24 * 60 * 60 * 1000,"YYYY-MM-DD");
-    let endDate = Lang.formatDate(new Date(), "YYYY-MM-DD");
     return {
       visible: false,
       totalElements:100,
@@ -130,7 +190,7 @@ export default {
         cardId: '6a4bde67-11ad-11eb-a442-00163e304a25',
         pageNum: 1,
         pageSize: 10,
-        timeRange: [startDate,endDate],//2020/11/11 - 2020/12/10
+        timeRange: [],//2020/11/11 - 2020/12/10
         taskNoStr: '',
         userNameStr: ''    
       },
@@ -142,27 +202,61 @@ export default {
       },
     };
   },
+  filters: {
+    formatDate(val) {
+      if (!val) return '';
+      return formatDate(val, 'YYYY-MM-DD HH:mm')
+    }
+  },
   computed: {
+    /** 
+    * @description 默认时间
+    */
     timeArrRange() {
-      let startDate = Lang.formatDate(new Date() - 29 * 24 * 60 * 60 * 1000,"YYYY-MM-DD");
-      let endDate = Lang.formatDate(new Date(), "YYYY-MM-DD");
+      let startDate = formatDate(new Date() - 29 * 24 * 60 * 60 * 1000,"YYYY-MM-DD");
+      let endDate = formatDate(new Date(), "YYYY-MM-DD");
       
       this.form.timeRange = `${startDate.replace(/-/g, '/')} - ${endDate.replace(/-/g, '/')}`;
       return [startDate,endDate]
     },
 
+    /** 
+    * @description 表头设置
+    */
     columns() {
-      let cardFields = this.cardFieldsData.filter((item)=>item.cardId==this.id);
-
-      if(cardFields.length) return cardFields[0].fields;
-      return [];
+      let cardFields = this.cardFieldsData.filter((item)=>item.cardId==this.card.id);
+       if(cardFields.length>0){
+        if(this.card.specialfrom == '工时记录'){
+          let fields = fieldUtil.toTableFields(cardFields[0].fields, this.card.config);
+          return fields.filter(field => field.enabled == 1);
+        }else{
+          cardFields[0].fields.forEach(item=>{
+            if(item.formType == 'attachment'|| item.formType == 'datetime'){
+              item.minWidth = '160' ;
+            }
+          })
+          return cardFields[0].fields;
+        }
+       }
     }
   },
   methods: {
+    /** 
+    * @description 字段是否是多选类型
+    */
+    isMulti(field) {
+      let { formType, setting = {}} = field;
+      if (formType === 'selectMulti') return true;
+      if (formType === 'select' && setting.isMulti) return true;
+      return false;
+    },
+   /** 
+    * @description 打开统计弹窗
+    */
     openDialog() {
       this.visible = true;
-      if(this.id) {
-        this.form.cardId = this.id;
+      if(this.card.id) {
+        this.form.cardId = this.card.id;
         this.getCardFields()
         this.getCardCountReq();
       }
@@ -177,6 +271,14 @@ export default {
     handleSelectionChange(val) {
       this.multipleSelection = val;
     },
+    
+    /** 
+    * @description 搜索
+    */
+    onSearch() {
+      this.getCardCountReq()
+    },
+
     /**
      * @description 页大小改变操作
      * @param {Number} pageSize 页大小
@@ -209,12 +311,39 @@ export default {
     getCardCountReq() {
       SettingTaskApi.getCardCount(this.form).then(res=>{
         const { status, message, list } = res;
-        let cardList = list
-        this.tableData = list;
+        if(this.card.specialfrom != '工时记录'){  
+          this.tableData = list.map(item=>{
+            // if(JSON.stringify(item.taskCardInfo)!=='{}'&&item.taskCardInfo.inputType) return item
+          })
+        }else{
+          this.tableData = list;
+        }
+        
       }).catch(error=>{
 
       })
 
+    },
+    isJOSN:function (value) {
+      if (typeof Array.isArray === "function") {
+        return Array.isArray(value);
+      }else{
+        return Object.prototype.toString.call(value) === "[object Array]";
+      }
+    },
+    isAttachment:function (value) {
+      console.log(value)
+      if(value && value.length>0){
+        for(var i=0;i<value.length;i++){
+            if(value[i].id){
+                return true
+            }else{
+                return false
+            }
+        }
+      }else {
+        return false
+      }
     },
   },
 };
