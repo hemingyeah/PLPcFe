@@ -31,19 +31,19 @@
 </template>
 
 <script>
-import * as FormUtil from '@src/component/form/util';
+import * as FormUtil from "@src/component/form/util";
 // import http from '@src/util/http';
-import platform from '@src/platform';
+import platform from "@src/platform";
 import {
   getProductMenuField,
   setProductMenuField,
-} from '@src/api/ProductV2Api';
+} from "@src/api/ProductV2Api";
 /* mixin */
-import fieldMixin from '@src/mixins/fieldMixin';
-import FormDesignMixin from '@src/mixins/formDesign';
+import fieldMixin from "@src/mixins/fieldMixin";
+import FormDesignMixin from "@src/mixins/formDesign";
 
 export default {
-  name: 'setting-product-menu-fields-view',
+  name: "setting-product-menu-fields-view",
   mixins: [fieldMixin, FormDesignMixin],
   props: {
     initData: {
@@ -54,7 +54,7 @@ export default {
   data() {
     return {
       loading: true,
-      excludeFormType: ['separator', 'email', 'phone', 'radio'],
+      excludeFormType: ["separator", "email", "phone", "radio"],
       fields: [],
       pending: false,
       maxField: this.initData.fieldNum,
@@ -68,22 +68,22 @@ export default {
     this.getFieldsInfoReq();
   },
   beforeDestroy() {
-    window.removeEventListener('resize', this.resizeHandler);
+    window.removeEventListener("resize", this.resizeHandler);
   },
   methods: {
     back() {
       window.parent.frameHistoryBack(window);
     },
     resizeHandler(event) {
-      this.computedFormWidthAndHeight('setting-product');
+      this.computedFormWidthAndHeight("setting-product");
     },
     async submit() {
       try {
         let fields = FormUtil.toField(this.fields);
 
         fields.forEach((item) => {
-          item.tableName = 'product';
-          if (item.fieldName == 'serialNumber' && item.isSystem) {
+          item.tableName = "product";
+          if (item.fieldName == "serialNumber" && item.isSystem) {
             item.setting.serialNumberUnique = item.setting.serialNumberUnique === true;
           }
         });
@@ -96,15 +96,15 @@ export default {
         setProductMenuField(fields).then((result) => {
           if (result.code == 0) {
             platform.notification({
-              type: 'success',
-              title: '成功',
-              message: '产品目录字段更新成功',
+              type: "success",
+              title: "成功",
+              message: "产品类型字段更新成功",
             });
             return window.location.reload();
           }
           platform.notification({
-            type: 'error',
-            title: '产品目录字段更新失败',
+            type: "error",
+            title: "产品类型字段更新失败",
             message: result.message,
           });
         });

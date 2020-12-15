@@ -7,7 +7,7 @@
       value-key="id"
       :remote-method="remoteMethod"
       @input="update"
-      :placeholder="placeholder || '请选择产品目录'"
+      :placeholder="placeholder || '请选择产品类型'"
     >
       <div class="related-task-option" slot="option" slot-scope="{ option }">
         <div class="related-task-option-desc">
@@ -97,7 +97,7 @@ export default {
       console.log(this.comValue, this.value)
       this.$platform.openTab({
         id: `productV2_catalog_view_${this.comValue[0].id}`,
-        title: "产品目录详情",
+        title: "产品类型详情",
         close: true,
         url: `/productV2/catalog/view?id=${this.comValue[0].id}`
       });

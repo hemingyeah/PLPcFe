@@ -5,7 +5,7 @@ let headUrl2 = "/api/elasticsearch/outside/es"
 
 /** ------------ start 产品 ----------------------- */
 /**
- * 获取产品目录表单
+ * 获取产品类型表单
  * @param params
  * @returns {*}
  */
@@ -14,7 +14,7 @@ function getProductMenuField(params) {
 }
 
 /**
- * 保存产品目录表单
+ * 保存产品类型表单
  * @param params
  * @returns {*}
  */
@@ -287,7 +287,7 @@ function searchQrcode(params) {
 }
 
 /**
- * 搜索所有的产品目录
+ * 搜索所有的产品类型
  * @param params
  * @returns {*}
  */

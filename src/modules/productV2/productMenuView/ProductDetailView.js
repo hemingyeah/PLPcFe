@@ -286,7 +286,7 @@ export default {
     alterData() {
       this.$platform.openTab({
         id: "productV2_catalog_edit",
-        title: "产品目录编辑",
+        title: "产品类型编辑",
         close: true,
         url: `/productV2/catalog/edit?id=${this.dataInfo.id}`,
       })
@@ -294,7 +294,7 @@ export default {
     creatData() {
       this.$platform.openTab({
         id: "productV2_catalog_edit",
-        title: "产品目录编辑",
+        title: "产品类型编辑",
         close: true,
         url: "/productV2/catalog/edit",
       })

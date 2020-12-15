@@ -79,9 +79,9 @@ const BizSelectColumn = {
       let productSystemFieldsGroup = []
       // 产品自定义字段组
       let productAttributeFieldsGroup = []
-      // 产品目录系统字段组
+      // 产品类型系统字段组
       let catalogSystemFieldsGroup = []
-      // 产品目录自定义字段组
+      // 产品类型自定义字段组
       let catalogAttributeFieldsGroup = []
       
      
@@ -135,8 +135,8 @@ const BizSelectColumn = {
         attribute: { name: "自定义字段", columns: attributeFieldsGroup, checked: false, root: true, toggle: true},
         productSystem: { name: "产品系统字段", columns: productSystemFieldsGroup, checked: false, root: true, toggle: true },
         productAttribute: { name: "产品自定义字段", columns: productAttributeFieldsGroup, checked: false, root: true, toggle: true},
-        catalogSystem: { name: "产品目录系统字段", columns: catalogSystemFieldsGroup, checked: false, root: true, toggle: true },
-        catalogAttribute: { name: "产品目录自定义字段", columns: catalogAttributeFieldsGroup, checked: false, root: true, toggle: true},
+        catalogSystem: { name: "产品类型系统字段", columns: catalogSystemFieldsGroup, checked: false, root: true, toggle: true },
+        catalogAttribute: { name: "产品类型自定义字段", columns: catalogAttributeFieldsGroup, checked: false, root: true, toggle: true},
         
       }
 

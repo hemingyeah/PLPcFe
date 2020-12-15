@@ -114,7 +114,7 @@ export function packToForm(field, product){
   }
 
   if(catalogId){
-    // 产品目录关联组件解析form
+    // 产品类型关联组件解析form
     let obj = {
       id:catalogId,
       pathName:product.catalogPathName

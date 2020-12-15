@@ -57,7 +57,7 @@ export default {
           comName: "product-set",
         },
         {
-          name: "产品目录设置",
+          name: "产品类型设置",
           icon: "icon-shezhi-chanpinmulu",
           comName: "product-menu-set",
         },

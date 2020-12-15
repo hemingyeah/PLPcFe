@@ -9,7 +9,7 @@
               {{ product.name }}
             </div>
             <div class="flex-x mar-t-8" v-if="dataInfo && dataInfo.catalogId">
-              产品目录:
+              产品类型:
               <div class="flex-1 over-x-s color-primary  mar-l-8" style="white-space: nowrap;" >
                 <span @click="openProductMenuTab(dataInfo.catalogId)" class="cur-point">{{dataInfo.catalogPathName}}</span>  
               </div>
@@ -269,12 +269,12 @@
                 </template>
               </form-view>
             </el-tab-pane>
-            <el-tab-pane label="产品目录" name="catalog-view">
+            <el-tab-pane label="产品类型" name="catalog-view">
               <div class="flex-x jus-center" v-if="dataInfo && !dataInfo.catalogId">
                 <div class="flex-y al-center">
                   <img src="@src/assets/img/productV2/catalogNone.png" class="size-160 mar-t-50 mar-b-8" alt="">
-                  <div class="mar-b-12">暂未关联产品目录</div> 
-                  <el-button @click="openPublicDialog('linkCatalog')" >关联产品目录</el-button>
+                  <div class="mar-b-12">暂未关联产品类型</div> 
+                  <el-button @click="openPublicDialog('linkCatalog')" >关联产品类型</el-button>
                 </div>
               </div>
              

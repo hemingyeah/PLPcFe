@@ -261,7 +261,7 @@ let obj = {
       tableName: "product",
       isSystem: 1,
       fieldName: "catalogId",
-      displayName: "产品目录",
+      displayName: "产品类型",
       formType: "related_catalog",
       defaultValue: null,
       isNull: 1,

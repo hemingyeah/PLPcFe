@@ -175,12 +175,12 @@
                   >新建工单呼叫中心</a
                   >
                   <a href="javascript:;" @click="goTaskList">工单列表</a>
-                  <a href="javascript:;" @click="goProductMenu">产品目录管理</a>
+                  <a href="javascript:;" @click="goProductMenu">产品类型管理</a>
                   <a href="javascript:;" @click="goProductMenuList"
-                  >产品目录列表</a
+                  >产品类型列表</a
                   >
                   <a href="javascript:;" @click="goProductMenuField"
-                  >产品目录设置</a
+                  >产品类型设置</a
                   >
                   <a href="javascript:;" @click="goProductList">产品列表</a>
                   <!-- <a href="javascript:;" @click="goCallCenterSetting">呼叫中心设置</a>
@@ -1001,7 +1001,7 @@ export default {
     goProductMenu() {
       platform.openTab({
         id: "productV2_catalog_edit",
-        title: "产品目录管理",
+        title: "产品类型管理",
         url: "/productV2/catalog/edit",
         reload: true,
       });
@@ -1009,7 +1009,7 @@ export default {
     goProductMenuList() {
       platform.openTab({
         id: "M_PRODUCT_CATALOG",
-        title: "产品目录列表",
+        title: "产品类型列表",
         url: "/productV2/catalog/list",
         reload: true,
       });
@@ -1017,7 +1017,7 @@ export default {
     goProductList() {
       platform.openTab({
         id: "productV2_list",
-        title: "产品目录",
+        title: "产品类型",
         url: "/customer/productV2",
         reload: true,
       });
@@ -1025,7 +1025,7 @@ export default {
     goProductMenuField() {
       platform.openTab({
         id: "productV2_set_field",
-        title: "产品目录设置",
+        title: "产品类型设置",
         url: "/setting/productV2/catalog/setting?type=productMenuSet",
         reload: true,
       });

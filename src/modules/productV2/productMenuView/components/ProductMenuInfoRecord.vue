@@ -23,17 +23,17 @@
 </template>
 
 <script>
-import { trimAll } from '@src/util/lang';
-import Page from '@model/Page';
-import platform from '@src/platform';
+import { trimAll } from "@src/util/lang";
+import Page from "@model/Page";
+import platform from "@src/platform";
 
 import {
   getProductTemplateRecord,
   productTemplateCreateRecord,
   productTemplateDeleteRecord,
-} from '@src/api/ProductApi.js';
+} from "@src/api/ProductApi.js";
 
-import { getMenuRecord } from '@src/api/ProductV2Api.js';
+import { getMenuRecord } from "@src/api/ProductV2Api.js";
 function createAttachmentDom(h, attachments) {
   return attachments && attachments.length > 0 ? (
     <div class="base-timeline-attachment base-file__preview">
@@ -42,12 +42,12 @@ function createAttachmentDom(h, attachments) {
       ))}
     </div>
   ) : (
-    ''
+    ""
   );
 }
 
 export default {
-  name: 'product-menu-info-record',
+  name: "product-menu-info-record",
   props: {
     shareData: {
       type: Object,
@@ -59,7 +59,7 @@ export default {
     },
   },
   watch: {
-    'propData.id'(newV, oldV) {
+    "propData.id"(newV, oldV) {
       // if (newV) this.initRecord();
     },
   },
@@ -104,7 +104,7 @@ export default {
   mounted() {
     // this.initRecord();
     this.$eventBus.$on(
-      'customer_info_record.update_record_list',
+      "customer_info_record.update_record_list",
       this.searchRecord
     );
   },
@@ -116,14 +116,14 @@ export default {
      * 3. 该客户没有被删除
      */
     allowDeleteRecord(item) {
-      let isDelete = item.content && item.content.isDelete == 'true';
+      let isDelete = item.content && item.content.isDelete == "true";
       let authorities = this.authorities;
       let user = this.loginUser;
       let isCreator = item.userId == user.userId;
 
       return (
         !isDelete
-        && ((authorities['PRODUCT_EDIT'] && authorities['PRODUCT_EDIT'] == 3)
+        && ((authorities["PRODUCT_EDIT"] && authorities["PRODUCT_EDIT"] == 3)
           || isCreator)
         && this.allowOperate
       );
@@ -139,7 +139,7 @@ export default {
           showInOwn: form.showInOwn,
           content: {
             updateContent: form.content,
-            updateType: 'ptRecord',
+            updateType: "ptRecord",
           },
         };
 
@@ -147,9 +147,9 @@ export default {
         const isSucc = result.status == 0;
 
         this.$platform.notification({
-          title: `添加备注${isSucc ? '成功' : '失败'}`,
+          title: `添加备注${isSucc ? "成功" : "失败"}`,
           message: !isSucc && result.message,
-          type: isSucc ? 'success' : 'error',
+          type: isSucc ? "success" : "error",
         });
 
         if (isSucc) {
@@ -169,20 +169,20 @@ export default {
     /** 删除备注 */
     async deleteRemark(record) {
       try {
-        if (!(await platform.confirm('您确认删除该备注吗？'))) return;
+        if (!(await platform.confirm("您确认删除该备注吗？"))) return;
 
         const result = await productTemplateDeleteRecord({ id: record.id });
         const isSucc = result.status == 0;
 
         this.$platform.notification({
-          title: `删除备注${isSucc ? '成功' : '失败'}`,
+          title: `删除备注${isSucc ? "成功" : "失败"}`,
           message: !isSucc && result.message,
-          type: isSucc ? 'success' : 'error',
+          type: isSucc ? "success" : "error",
         });
 
         if (isSucc) this.initRecord();
       } catch (e) {
-        console.error('product template deleteRemark  err', e);
+        console.error("product template deleteRemark  err", e);
       }
     },
     /** 抓取信息动态 */
@@ -220,7 +220,7 @@ export default {
         primaryName,
       } = item;
 
-      if (action == '备注') {
+      if (action == "备注") {
         return [
           <h5 class="main-info">
             <strong>{userName}</strong> 添加了备注
@@ -242,7 +242,7 @@ export default {
               </button>
             )}
           </h5>,
-          content.isDelete == 'true' ? (
+          content.isDelete == "true" ? (
             <p class="text-danger">
               {content.deleteUserName}于{content.deleteTime} 删除了该备注。
             </p>
@@ -257,16 +257,16 @@ export default {
 
       return [
         <h5>
-          <strong>{userName}</strong> {action}了 产品目录。
+          <strong>{userName}</strong> {action}了 产品类型。
         </h5>,
         content ? (
           content.updateFields ? (
             <p class="secondary-info">修改字段：{content.updateFields}</p>
           ) : (
-            ''
+            ""
           )
         ) : (
-          ''
+          ""
         ),
         createAttachmentDom(h, attachments),
       ];
@@ -281,7 +281,7 @@ export default {
         this.recordPage.list = [];
         this.recordPage.merge(result);
 
-        this.$emit('changeRecordCount', result.total);
+        this.$emit("changeRecordCount", result.total);
       } catch (error) {
         console.error(`searchRecord ${error}`);
       }

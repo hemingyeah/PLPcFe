@@ -12,7 +12,7 @@ router.get("/productV2/catalog/edit", async ctx => {
     headers: reqHeaders
   });
   let body = result.body;
-  ctx.body = Template.renderWithHtml("产品目录管理", body, script, modConfig.template)
+  ctx.body = Template.renderWithHtml("产品类型管理", body, script, modConfig.template)
 });
 router.get("/productV2/catalog/list", async ctx => {
   //  指定id M_PRODUCT_CATALOG
@@ -23,7 +23,7 @@ router.get("/productV2/catalog/list", async ctx => {
     headers: reqHeaders
   });
   let body = result.body;
-  ctx.body = Template.renderWithHtml("产品目录列表", body, script, modConfig.template)
+  ctx.body = Template.renderWithHtml("产品类型列表", body, script, modConfig.template)
 });
 
 router.get("/productV2/catalog/view", async ctx => {
@@ -33,7 +33,7 @@ router.get("/productV2/catalog/view", async ctx => {
   let url = `/task/view/${ctx.params.id}`;
   let result = await HttpClient.request(url, "get", null, {headers: reqHeaders});
   let body = result.body;
-  ctx.body = Template.renderWithHtml("产品目录详情", body, script, modConfig.template)
+  ctx.body = Template.renderWithHtml("产品类型详情", body, script, modConfig.template)
 });
 
 
@@ -45,7 +45,7 @@ router.get("/setting/productV2/catalog/setting", async ctx => {
     headers: reqHeaders
   });
   let body = result.body;
-  ctx.body = Template.renderWithHtml("产品目录设置", body, script, modConfig.template)
+  ctx.body = Template.renderWithHtml("产品类型设置", body, script, modConfig.template)
 });
 
 router.get("/setting/productV2/settingField", async ctx => {
@@ -67,7 +67,7 @@ router.get("/setting/productV2/catalog/settingField", async ctx => {
     headers: reqHeaders
   });
   let body = result.body;
-  ctx.body = Template.renderWithHtml("产品目录表单设置", body, script, modConfig.template)
+  ctx.body = Template.renderWithHtml("产品类型表单设置", body, script, modConfig.template)
 });
 
 router.get("/productV2/catalog/view/:id", async ctx => {
@@ -78,7 +78,7 @@ router.get("/productV2/catalog/view/:id", async ctx => {
   let result = await HttpClient.request(`/customer/product/view/${ctx.params.id}`, "get", null, {headers: reqHeaders});
   let body = result.body;
   
-  ctx.body = Template.renderWithHtml("产品目录详情", body, script, modConfig.template)
+  ctx.body = Template.renderWithHtml("产品类型详情", body, script, modConfig.template)
 });
 
 

@@ -760,7 +760,7 @@ export default {
     alterData() {
       this.$platform.openTab({
         id: "productV2_catalog_edit",
-        title: "产品目录编辑",
+        title: "产品类型编辑",
         close: true,
         url: `/productV2/catalog/edit?id=${this.dataInfo.id}`,
       });
@@ -768,7 +768,7 @@ export default {
     creatData() {
       this.$platform.openTab({
         id: "productV2_catalog_edit",
-        title: "产品目录编辑",
+        title: "产品类型编辑",
         close: true,
         url: "/productV2/catalog/edit",
       });
@@ -776,7 +776,7 @@ export default {
     openProductMenuTab(id) {
       this.$platform.openTab({
         id: `productV2_catalog_view_${id}`,
-        title: "产品目录详情",
+        title: "产品类型详情",
         close: true,
         url: `/productV2/catalog/view?id=${id}`,
       });

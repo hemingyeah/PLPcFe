@@ -17,7 +17,7 @@
         <div class="normal-title-1">
           <div class="flex-1">编辑目录详细信息</div>
           <el-button @click="showDialog('cloneMenu')"
-          >复制其他产品目录</el-button
+          >复制其他产品类型</el-button
           >
         </div>
 

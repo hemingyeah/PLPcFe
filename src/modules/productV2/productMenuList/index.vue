@@ -8,7 +8,7 @@
             <div style="position: relative;"></div>
 
             <el-input v-model="searchModel.keyword"
-                      placeholder="根据产品目录信息搜索"
+                      placeholder="根据产品类型信息搜索"
                       class="task-with-input task-ml12">
             </el-input>
 
@@ -79,7 +79,7 @@
             </div>
             <el-dropdown-menu slot="dropdown">
               <el-dropdown-item>
-                <div @click="openDialog('importProduct')">导入产品目录</div>
+                <div @click="openDialog('importProduct')">导入产品类型</div>
               </el-dropdown-item>
               <el-dropdown-item>
                 <div @click="exportProduct(false)">导出</div>
@@ -366,7 +366,7 @@
         <template v-else>
           <div class="product-selected-list">
             <div class="product-selected-row product-selected-head">
-              <span class="product-selected-sn">产品目录</span>
+              <span class="product-selected-sn">产品类型</span>
             </div>
             <div
               class="product-selected-row"
@@ -720,7 +720,7 @@ export default {
       this.saveColumnStatusToStorage();
     },
     showAdvancedSetting() {
-      window.TDAPP.onEvent("pc：产品目录管理-选择列事件");
+      window.TDAPP.onEvent("pc：产品类型管理-选择列事件");
       this.$refs.advanced.open(this.columns);
     },
     /**
@@ -768,7 +768,7 @@ export default {
     openProductMenuTab(id) {
       this.$platform.openTab({
         id: `productV2_catalog_view_${id}`,
-        title: "产品目录详情",
+        title: "产品类型详情",
         close: true,
         url: `/productV2/catalog/view?id=${id}`
       });
@@ -841,12 +841,12 @@ export default {
       // }
 
       // if (action === 'edit') {
-      //   window.TDAPP.onEvent('批量编辑	pc：产品目录管理-批量编辑事件');
+      //   window.TDAPP.onEvent('批量编辑	pc：产品类型管理-批量编辑事件');
       //   this.$refs.batchEditingDialog.open();
       // }
 
       // if (action === 'remind') {
-      //   window.TDAPP.onEvent('批量提醒	pc：产品目录管理-批量提醒事件');
+      //   window.TDAPP.onEvent('批量提醒	pc：产品类型管理-批量提醒事件');
       //   this.$refs.batchRemindingDialog.openBatchRemindingDialog();
       // }
 
@@ -863,13 +863,13 @@ export default {
     },
     // operation
     async deleteProducts() {
-      window.TDAPP.onEvent("pc：产品目录管理-删除事件");
+      window.TDAPP.onEvent("pc：产品类型管理-删除事件");
       if (!this.multipleSelection.length) {
-        return this.$platform.alert("请选择需要删除的产品目录");
+        return this.$platform.alert("请选择需要删除的产品类型");
       }
 
       try {
-        if (!(await this.$platform.confirm("确定要删除选择的产品目录？")))
+        if (!(await this.$platform.confirm("确定要删除选择的产品类型？")))
           return;
 
         const ids = this.multipleSelection.map((p) => p.id);
@@ -1151,7 +1151,7 @@ export default {
 
     exportProduct(exportAll) {
       let ids = [];
-      let fileName = `${formatDate(new Date(), "YYYY-MM-DD")}产品目录数据.xlsx`;
+      let fileName = `${formatDate(new Date(), "YYYY-MM-DD")}产品类型数据.xlsx`;
       if (!exportAll) {
         if (!this.multipleSelection.length)
           return this.$platform.alert("请选择要导出的数据");
@@ -1192,12 +1192,12 @@ export default {
     },
 
     goToCreate() {
-      window.TDAPP.onEvent("pc：产品目录管理-新建事件");
+      window.TDAPP.onEvent("pc：产品类型管理-新建事件");
       let fromId = window.frameElement.getAttribute("id");
 
       this.$platform.openTab({
         id: "productV2_catalog_edit",
-        title: "新建产品目录",
+        title: "新建产品类型",
         url: "/productV2/catalog/edit",
         reload: true,
         close: true,
@@ -1247,7 +1247,7 @@ export default {
       );
     },
     panelSearchAdvancedToggle() {
-      window.TDAPP.onEvent("pc：产品目录管理-高级搜索事件");
+      window.TDAPP.onEvent("pc：产品类型管理-高级搜索事件");
       this.$refs.searchPanel.open();
       this.$nextTick(() => {
         let forms = document.getElementsByClassName("advanced-search-form");
@@ -1260,11 +1260,11 @@ export default {
     // TalkingData事件埋点
     trackEventHandler(type) {
       if (type === "search") {
-        window.TDAPP.onEvent("pc：产品目录管理-搜索事件");
+        window.TDAPP.onEvent("pc：产品类型管理-搜索事件");
         return;
       }
       if (type === "moreAction") {
-        window.TDAPP.onEvent("pc：产品目录管理-更多操作事件");
+        window.TDAPP.onEvent("pc：产品类型管理-更多操作事件");
         return;
       }
     },

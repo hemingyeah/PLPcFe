@@ -92,8 +92,8 @@ export default {
           options: [],
         },
         linkCatalog: {
-          title: "关联产品目录",
-          lable: "产品目录",
+          title: "关联产品类型",
+          lable: "产品类型",
           http: searchAllcatalog,
 
           options: [],

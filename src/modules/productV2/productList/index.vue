@@ -68,7 +68,7 @@
       <!-- 筛选 -->
       <div class="task-list-header-nav bg-w">
         <div class="task-flex">
-          <div class="task-font14 task-c6 state">产品目录：</div>
+          <div class="task-font14 task-c6 state">产品类型：</div>
           <div class="list list-crate"
                :style="`width: ${navWidth}px`">
             <div class="list-item task-flex task-ai">
@@ -303,6 +303,9 @@
                 {{ scope.row.attribute[column.field] }}
               </template>
 
+
+              <!-- 移植自产品类型列表并同步更新 s -->
+
               <template v-else-if="column.fieldName === 'pathName'">
                 <sample-tooltip :row="scope.row"
                                 v-if="scope.row[column.field]">
@@ -364,13 +367,12 @@
                 </template>
               </template>
 
-              <!-- 移植自产品目录列表并同步更新 e -->
+              <!-- 移植自产品类型列表并同步更新 e -->
 
               <template v-else>
                 {{ scope.row[column.field] }}
               </template>
 
-              <!-- 移植自产品目录列表并同步更新 s -->
 
             </template>
           </el-table-column>
@@ -791,7 +793,7 @@ export default {
           columns: arr.filter(item => item.tableName == "product"),
         },
         {
-          label: "产品目录信息",
+          label: "产品类型信息",
           value: "catalogExport",
           columns: arr.filter(item => item.tableName == "catalog"),
         },
@@ -1398,7 +1400,7 @@ export default {
       // 产品信息
       let export_product = this.exportData(0, productExport)
 
-      // 产品目录信息
+      // 产品类型信息
       let export_catalog = this.exportData(1, catalogExport)
 
       params["exportOneRow"] = exportOneRow
@@ -1630,7 +1632,7 @@ export default {
       })
     },
 
-    // 移植产品目录表单 s
+    // 移植产品类型表单 s
     previewVideo (e) {
       this.$previewVideo(e);
     },
@@ -1640,12 +1642,12 @@ export default {
     openProductMenuTab (id) {
       this.$platform.openTab({
         id: `productV2_catalog_view_${id}`,
-        title: "产品目录详情",
+        title: "产品类型详情",
         close: true,
         url: `/productV2/catalog/view?id=${id}`
       });
     },
-    // 移植产品目录表单 e
+    // 移植产品类型表单 e
 
   },
   components: {
