@@ -62,7 +62,8 @@ export default {
   .address-tip {
     margin: 0;
     line-height: 30px;
-    color: #666;
+    color: $text-color-secondary;
+    font-size: $font-size-small;
   }
 
 </style>

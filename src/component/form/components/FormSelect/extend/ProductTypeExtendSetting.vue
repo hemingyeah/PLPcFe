@@ -33,7 +33,7 @@
 <!--          <span class="form-select-setting-defaultValue" v-else>默认</span>-->
 
           <button
-              type="button" class="btn-text form-select-setting-default"
+              type="button" :class="['btn-text', 'form-select-setting-default', option.isDefault && 'btn-active']"
               @click="setDefaultOption(option)">
             <i class="iconfont icon-check-fill"></i>
           </button>
