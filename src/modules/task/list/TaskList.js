@@ -147,6 +147,8 @@ export default {
       guideSearchModelSave: false,
       guideDropdownMenu: false,
       isGuide:false,
+      abnormalData: {},
+      abnormals: AbnormalList
     };
   },
   computed: {
@@ -316,6 +318,7 @@ export default {
     this.getUserViews();
     this.getTaskCountByState();
     this.revertStorage();
+    this.getTurnOnTaskExceptionNodeInfo()
 
     this.$nextTick(() => {
       setTimeout(() => {
@@ -333,6 +336,25 @@ export default {
       // storageSet(TASK_GUIDE_DROPDOWN_MENU, '1')
     },
     previousStep() {},
+    /**获取用户开启的配置节点 以及工单搜索范围 和 异常原因字段值 */
+    async getTurnOnTaskExceptionNodeInfo() {
+      const {success, result} = await TaskApi.getTurnOnTaskExceptionNodeInfo()
+      if(success) {
+        this.abnormalData = result
+        this.abnormalData['hoverText'] = result.taskCustomExceptionNodeList.map(item => {return item.exceptionName}).join(',')
+        
+        this.abnormals = this.abnormals.map(item => {
+          for(let key in result) {
+            if (item.)
+          }
+        })
+
+        // if (title === 'exception') {
+        //   this.seoSetList = [...this.seoSetList, ...this.abnormals]
+        // }
+      }
+
+    },
     nextStep() {
       this.nowGuideStep ++;
     },
@@ -792,6 +814,13 @@ export default {
       this.searchParams = searchModel
       this.searchParams_spare = searchModel
       this.params = this.initParams(this.params.pageSize);
+
+      if (title === 'exception') {
+        this.seoSetList = [...this.seoSetList, ...this.abnormals]
+      }
+
+
+
       this.buildColumns();
       this._exportColumns()
       this.createPerspective({id: this.selectId})

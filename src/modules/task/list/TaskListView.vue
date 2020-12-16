@@ -291,7 +291,7 @@
                   }"
                 >
                   <el-tooltip
-                    content="当前已选择 当前超时、曾超时、当前暂停、曾暂停、位置错误 为异常工单"
+                    :content="`当前已选择 ${abnormalData.hoverText}`"
                     placement="top"
                   >
                     <span> {{ `异常工单(${filterData.exception || 0})` }}</span>
@@ -388,29 +388,13 @@
             <div class="list" :style="typeHeight">
               <div class="list-item task-flex task-ai">
                 <div
-                  v-for="item in taskTypes"
-                  :key="item.id"
+                  v-for="item in abnormalData.taskCustomExceptionNodeList"
+                  :key="item.englishName"
                   class="task-nav-create"
-                  :class="{ 'task-c2': currentTaskType.id === item.id }"
-                  @click="changeTaskType(item)"
                 >
-                  {{ item.name }}
+                  {{ item.exceptionName }}
                 </div>
               </div>
-            </div>
-            <div
-              class="element-icon"
-              v-if="taskTypes.length * 130 > navWidth"
-              @click="
-                typeHeight =
-                  typeHeight === `height:30px` ? `height:auto` : `height:30px`
-              "
-            >
-              <i
-                class="el-icon-arrow-down task-icon"
-                v-if="typeHeight === 'height:30px'"
-              ></i>
-              <i class="el-icon-arrow-up task-icon" v-else></i>
             </div>
           </div>
         </div>
