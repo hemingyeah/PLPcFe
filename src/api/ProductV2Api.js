@@ -1,7 +1,53 @@
 import http from "@src/util/http";
 const headUrl = "/api/customer";
+const ruleHeader = '/api/linkc';
 
 let headUrl2 = "/api/elasticsearch/outside/es"
+
+/** ------------ start 规则 ----------------------- */
+/**
+ * 获取规则列表
+ * @param params
+ * @returns {*}
+ */
+function queryAllRules(params){
+  return http.get(`${ruleHeader}/outside/superCode/rule/queryAllRules`,params);
+}
+
+/**
+ * 删除规则
+ * @param params
+ * @returns {*}
+ */
+function removeDistributeRule(params){
+  return http.post(`${ruleHeader}/outside/superCode/rule/removeDistributeRule`,params);
+}
+/**
+ * 移动规则
+ * @param params
+ * @returns {*}
+ */
+function moveRule(params){
+  return http.post(`${ruleHeader}/outside/superCode/rule/saveSort`,params);
+}
+
+/**
+ * 启用/禁用规则
+ * @param params
+ * @returns {*}
+ */
+function modifyDistributeRule(params){
+  return http.post(`${ruleHeader}/outside/superCode/rule/modifyDistributeRule`,params);
+}
+
+/**
+ * 启用/禁用功能设置
+ * @param params
+ * @returns {*}
+ */
+function saveFunc(params){
+  return http.post('/setting/product/config/save',params,false);
+}
 
 /** ------------ start 产品 ----------------------- */
 /**
@@ -357,4 +403,9 @@ export {
   searchAllcatalog,
   getListProductFields,
   getProductLinkCatalogCount,
+  queryAllRules,
+  removeDistributeRule,
+  moveRule,
+  modifyDistributeRule,
+  saveFunc
 };

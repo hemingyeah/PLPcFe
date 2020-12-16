@@ -79,11 +79,6 @@ export default {
       if (this.nowMenu === index) {
         return;
       }
-      if (index === 0) {
-        window.location.href = "/setting/product/productType";
-      } else if (index === 1) {
-        window.location.href = "/setting/productV2/catalog/setting?type=productMenu";
-      }
       this.nowMenu = index;
     },
   },

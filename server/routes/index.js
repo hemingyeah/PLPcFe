@@ -116,6 +116,13 @@ router.use('/api/customer/outside/pc', (ctx) =>
   })
 );
 
+router.use('/api/linkc', (ctx) =>
+  HttpClient.proxy(ctx, {
+    host: '30.40.63.238',
+    port: 10016,
+  })
+);
+
 router.use('/api/elasticsearch/outside/es', (ctx) =>
   HttpClient.proxy(ctx, {
     host: '30.40.58.216',

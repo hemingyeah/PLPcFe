@@ -31,6 +31,7 @@ async function shbEnvMiddlewareHandler(ctx, next, options) {
         .replace('/api/part', '')
         .replace('/api/customer', '')
         .replace('/api/weixin', '')
+        .replace('/api/linkc','')
     )
 
     request.originalUrl = originalUrl;
