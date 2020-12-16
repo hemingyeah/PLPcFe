@@ -1172,6 +1172,7 @@ export default {
     window.showExportList = this.checkExports;
     window.exportPopoverToggle = this.exportPopoverToggle;
     window.pushTaskListIds = this.pushTaskListIds;
+    window.loginUser = this.loginUser;
     window.getUserTaskGray = this.getUserTaskGray;
 
     window.resizeFrame = function () {

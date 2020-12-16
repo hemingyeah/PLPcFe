@@ -41,7 +41,8 @@ export default {
       loadingPage: false,
       form: {},
       init: false,
-      auth: {}
+      auth: {},
+      fieldInfo: []
     }
   },
   computed: {
@@ -55,7 +56,7 @@ export default {
       return this.initData.eventId || ''
     },
     fields() {
-      let originFields = this.initData.fieldInfo || []
+      let originFields = this.fieldInfo || []
       let sortedFields = originFields
         .sort((a, b) => a.orderId - b.orderId)
         .map(f => {
@@ -201,6 +202,12 @@ export default {
   },
   async mounted() {
     try {
+      // 获取客户表单字段列表
+      let result = await CustomerApi.getCustomerFields({isFromSetting: true});
+      if (result.succ) {
+        this.fieldInfo = result.data;
+      }
+      
       this.auth = this.initData.auth || {}
       // 初始化默认值
       let form = {}

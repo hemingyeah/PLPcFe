@@ -23,12 +23,15 @@ export default {
   margin: 20px 0;
   text-align: left;
   background: #eef8f8;
-
+  display: flex;
+  justify-content: space-between;
+  color: $color-primary;
+  padding-right: 10px;
   & > span{
     margin: 0;
     font-size: 14px;
     padding-left: 10px;
-    color: #55B7B4;
+    color: $color-primary;
   }
 }
 </style>

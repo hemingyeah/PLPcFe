@@ -62,9 +62,15 @@
           <template v-else-if="column.formType === 'address'">
             {{formatCustomizeAddress(scope.row.attribute[column.field])}}
           </template>
-          <template v-else-if="column.formType === 'user' && scope.row.attribute[column.field]">
-            {{scope.row.attribute[column.field].displayName || scope.row.attribute[column.field].name}}
+          <template v-else-if="column.formType == 'related_task'">
+            {{ getRelatedTask(scope.row.attribute[column.field]) }}
           </template>
+          <template v-else-if="column.formType === 'user' && scope.row.attribute[column.field]">
+            {{ getUserName(column, scope.row.attribute[column.field]) }}
+          </template>
+          <template v-else-if="column.formType === 'cascader' && scope.row.attribute[column.field]">
+              {{ scope.row.attribute[column.field] | displayCascader }}
+            </template>
           <template v-else-if="column.formType === 'location'">
             {{ scope.row.attribute[column.field] && scope.row.attribute[column.field].address}}
           </template>
@@ -126,6 +132,10 @@
 </template>
 
 <script>
+import {
+  getProductFields
+} from '@src/api/ProductApi'
+
 import {formatDate} from '@src/util/lang';
 
 const link_reg = /((((https?|ftp?):(?:\/\/)?)(?:[-;:&=\+\$]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\?\+=&;:%!\/@.\w_]*)#?(?:[-\+=&;%!\?\/@.\w_]*))?)/g
@@ -150,7 +160,8 @@ export default {
         pageSize: 10,
         pageNum: 1,
         totalItems: 0,
-      }
+      },
+      dynamicProductFields: []
     }
   },
   computed: {
@@ -160,7 +171,7 @@ export default {
     customerConfig() {
       let initData = this.initData;
       return {
-        fieldInfo: (initData.productFields || []).sort(
+        fieldInfo: this.dynamicProductFields.sort(
           (a, b) => a.orderId - b.orderId
         )
       };
@@ -186,14 +197,43 @@ export default {
       }
       return null;
     },
-
+    displayCascader(value) {
+      if (!value) return null;
+      if (value && typeof value === 'string') {
+        return value;
+      }
+      if (Array.isArray(value) && value.length) {
+        return value.join('/');
+      }
+      return null;
+    }
   },
-  mounted() {
+  async mounted() {
+    try {
+      // 获取产品自定义字段
+      let res = await getProductFields({isFromSetting: false});
+      this.dynamicProductFields = res.data || [];
+    } catch (error) {
+      console.error('customer-product-table fetch product fields error',error);
+    }
     this.revertStorage();
     this.columns = this.buildTableColumn();
     this.fetchData();
   },
   methods: {
+    getRelatedTask(field) {
+      return Array.isArray(field) ? field.map(item => item.taskNo).join(',') : '';
+    },
+    // 处理人员显示
+    getUserName(field, value) {
+      // 多选
+      if(Array.isArray(value)) {
+        return value.map(i => i.displayName || i.name).join(',');
+      }
+      
+      let user = value || {};
+      return user.displayName || user.name;
+    },
     getAddress(field) {
       return field.province + field.city + field.dist + field.address || ''
     },
@@ -333,6 +373,7 @@ export default {
             && f.formType !== 'attachment'
             && f.formType !== 'separator'
             && f.formType !== 'info'
+            && f.formType !== 'autograph'
         )
         .map(field => {
           let sortable = false;

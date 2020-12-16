@@ -1,6 +1,6 @@
 import {randomString} from '@src/util/lang';
 import Field from '@model/Field';
-import { isSelect, isMultiSelect } from './util';
+import { isSelect, isMultiSelect ,isCascader} from './util';
 import * as FormInfoConfig from './components/FormInfo/config';
 
 /** 补全formType 为select时的所需字段 */
@@ -29,7 +29,7 @@ function fillPropForSelect(params){
     })
 
     // 没有选项，添加默认项
-    if(options.length == 0) options.push({value: '选项1', isDefault: false});
+    if(options.length == 0) options.push({value: '', isDefault: false},{value: '', isDefault: false},{value: '', isDefault: false});
     
   }
 
@@ -59,6 +59,7 @@ export default class FormField{
     this.displayName = params.displayName || '标题'; 
     // 是否必填   0 - 必填，1 - 非必填
     this.isNull = typeof params.isNull == 'number' ? params.isNull : 1; 
+
     // 是否允许搜索 0 - 不允许，1 - 允许
     this.isSearch = typeof params.isSearch == 'number' ? params.isSearch : 0; 
     this.placeHolder = params.placeHolder; // 提示信息
@@ -67,6 +68,8 @@ export default class FormField{
     this.isSystem = typeof params.isSystem == 'number' ? params.isSystem : 0;
     // 工单专属字段： 是否在移动端显示 0 - 不显示，1 - 显示
     this.isAppShow = typeof params.isAppShow == 'number' ? params.isAppShow : 0;
+    // 是否隐藏   1 - 隐藏，0 - 不隐藏
+    this.isHidden = typeof params.isHidden == 'number' ? params.isHidden : 0; 
 
     // formType 为select时需要补全一下字段
     let {options, isMulti, dependencies} = fillPropForSelect(params)
@@ -79,6 +82,11 @@ export default class FormField{
     // // 处理客户地址
     if (this.fieldName === 'customerAddress' && this.isSystem && !params.setting.customerAddressConfig) {
       this.setting.customerAddressConfig = {};
+    }
+    
+    // 多级菜单设置默认项
+    if(isCascader(params)){
+      this.setting = { maxDeep: 2, dataSource:[{value:'一级选项 1', children:[{ value : '二级选项 1'}]}]}
     }
   
     // 辅助字段
@@ -113,6 +121,7 @@ export default class FormField{
     option.placeHolder = field.placeHolder;
     option.isSystem = field.isSystem;
     option.isAppShow = field.isAppShow;
+    option.isHidden = field.isHidden;
 
     if(field.relation_options) {
       option.relation_options = field.relation_options;
@@ -141,10 +150,10 @@ export default class FormField{
       option.placeHolder = option.placeHolder || FormInfoConfig.PLACE_HOLDER;
     }
 
-    if(field.formType === 'cascader') {
+    if(field.formType === 'cascader' || field.formType === 'text' || field.formType === 'textarea' || field.formType === 'number') {
       defaultValue = field.defaultValue;
     }
-    
+
     if (field.setting) {
       setting = {
         ...field.setting,

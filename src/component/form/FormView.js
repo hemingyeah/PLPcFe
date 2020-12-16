@@ -26,6 +26,27 @@ const FormView = {
   },
 
   methods: {
+    //TODO :预览图片
+    previewImage(event){
+      let element = event.target;
+      let imgSrc =  element.currentSrc;
+
+      if ((!/\.(png|bmp|gif|jpg|jpeg|tiff|tif|jfif|ico|pcx|tga)$/i.test(imgSrc) && !imgSrc) || !element) return
+
+      let list = event.target.closest('.ql-editor');
+      let images = Array.prototype.slice.call(list.querySelectorAll('img'));
+
+      let currIndex = 0;
+      let urls = images.map((item, index) => {
+        if(item == element) currIndex = index;
+        return item.getAttribute('src');
+      });
+      platform.imagePreview({
+        imageDom: list,
+        currIndex,
+        urls
+      });  
+    },
     toggleDisplay(id) {
       this.sectionState[id] = !this.sectionState[id];
     },
@@ -48,7 +69,12 @@ const FormView = {
       
       // 人员
       if (field.formType === 'user') {
-        return value && (value.displayName || value.name)
+        // 多选
+        if(Array.isArray(value)) {
+          return value.map(i => i.displayName || i.name).join(',');
+        }
+      
+        return value && (value.displayName || value.name);
       }
       
       return value;
@@ -140,7 +166,9 @@ const FormView = {
       return (
         <div class="form-view-row">
           <div class="form-view-row-content form-view-info-content">
-            {value}
+            <div class="form-ql-editor ql-container">
+              <div class="ql-editor" domPropsInnerHTML={value} onClick={(e) => this.previewImage(e)}></div>
+            </div>       
           </div>
         </div>
       )
@@ -155,6 +183,44 @@ const FormView = {
         </div>
       )
     },
+    buildRelatedTask({displayName, value}) {
+      if(Array.isArray(value) && value.length > 0) {
+        let _renderContent = value.map((item, index) => {
+          let taskId = item.taskId || "";
+          let taskNo = item.taskNo || "";
+          
+          return (
+            <span>
+              <a href="javascript:;" class="link-text" style="margin: 0" onClick={() => {
+                this.$platform.openTab({
+                  id: `task_view_${taskId}`,
+                  title: '工单详情',
+                  close: true,
+                  url: `/task/view/${taskId}?noHistory=1`,
+                })
+              }}>
+                {taskNo}
+              </a>
+              {index < value.length - 1 && ','}
+            </span>
+          );
+        });
+        
+        return (            
+          <div class="form-view-row">
+            <label>{displayName}</label>
+            <div
+              class="form-view-row-content">
+              {_renderContent}
+            </div>
+          </div>)
+      }
+
+      return (
+        <div class="form-view-row">
+          <label>{displayName}</label>
+        </div>);
+    },
 
     openMap({address, title}) {
       if (!address) return;
@@ -163,9 +229,9 @@ const FormView = {
     },
   
     mapFieldToDom(field, createElement) {
-      let {formType, fieldName, displayName, isSystem} = field;
+      let {formType, fieldName, displayName, isSystem, isHidden, isVisible} = field;
       if (formType === 'separator') {
-        const cn = `iconfont icon-nav-down ${!this.sectionState[field.id] && 'reversal'}`;
+        const cn = `iconfont icon-fdn-select ${!this.sectionState[field.id] && 'reversal'}`;
         return displayName ? (
           <h4 class="section-title">
             {displayName}
@@ -173,6 +239,11 @@ const FormView = {
           </h4>
         ) : null;
       }
+      // 如果为隐藏的字段不显示
+      if(isHidden == 1) return null;
+
+      // 判断是否可见
+      if(isVisible == false) return null;    
       
       const originalObj = this.value;
       
@@ -240,7 +311,7 @@ const FormView = {
       if (formType === 'user') {
         params = {
           ...params,
-          value: value && (value.displayName || value.name)
+          value: this.formatValue(field, value)
         };
       }
       
@@ -306,6 +377,14 @@ const FormView = {
           ...params,
           value: fmt_datetime(value)
         };
+      }
+
+      if(formType === 'related_task') {
+        params = {
+          ...params,
+          value: value
+        };
+        return this.buildRelatedTask(params);
       }
       
       // other types: text date number datetime phone

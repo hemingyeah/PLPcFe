@@ -18,11 +18,13 @@ import FormInfo from './FormInfo';
 import FormCascader from './FormCascader';
 import FormCustomer from './FormCustomer';
 import FormRelation from './FormRelation';
+import FormRelatedTask from './FormRelatedTask';
 
 import FormAutograph from './FormAutograph'
 import FormSparepart from './FormSparepart'
 import FormServiceIterm from './FormServiceIterm'
 
+import FormFormula from './FormFormula/index.ts';
 
 // 所有字段
 const ALL_FORM_FIELDS = [
@@ -30,6 +32,7 @@ const ALL_FORM_FIELDS = [
   FormTextarea,
   FormNumber,
   FormSelect,
+  FormCascader,
   FormCode,
   FormAttachment,
   FormUser,
@@ -42,12 +45,13 @@ const ALL_FORM_FIELDS = [
   FormAddress,
   FormLocation,
   FormInfo,
-  FormCascader,
   FormCustomer,
   FormRelation,
   FormAutograph,
   FormSparepart,
-  FormServiceIterm
+  FormServiceIterm,
+  FormRelatedTask,
+  FormFormula
 ].reduce((acc, val) => (Array.isArray(val) ? acc = acc.concat(val) : acc.push(val)) && acc, []);
 
 const FormFieldMap = {};
@@ -112,7 +116,7 @@ for(let i = 0; i < ALL_FORM_FIELDS.length; i++){
   FormFieldMap[formField.formType] = field;
 }
 
-const COMMON_FIELDS = ['text', 'textarea', 'number', 'select', 'code', 'attachment', 'user', 'date', 'datetime', 'phone', 'email', 'separator', 'address', 'location', 'info'];
+const COMMON_FIELDS = ['text', 'textarea', 'number', 'select', 'cascader', 'attachment', 'user', 'date', 'datetime', 'phone', 'email', 'separator', 'address', 'location', 'info', 'autograph', 'related_task', 'formula'];
 // 工单字段列表，工单彻底改造完成后删除，用 COMMON_FIELDS 替代
 const TASK_FIELDS = ['text', 'textarea', 'number', 'select', 'code', 'attachment', 'user', 'date', 'datetime', 'phone'];
 

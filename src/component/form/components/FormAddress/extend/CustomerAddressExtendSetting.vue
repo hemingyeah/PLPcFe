@@ -1,6 +1,8 @@
 <template>
   <div class="form-setting-panel">
-    <h3>系统字段 -- {{setting.name}}</h3>
+    <!-- start 标题 -->
+    <h3 class="form-setting-panel-title">{{field.displayName}}</h3>   
+    <!-- end 标题 -->
     <p class="form-design-warning">该字段为系统内置字段，暂不支持修改、删除。</p>
     <div class="form-setting-group">
       <el-checkbox :value="field.isNull" @input="update($event, 'isNull')" :true-label="0" :false-label="1">必填</el-checkbox>
@@ -60,7 +62,8 @@ export default {
   .address-tip {
     margin: 0;
     line-height: 30px;
-    color: #666;
+    color: $text-color-secondary;
+    font-size: $font-size-small;
   }
 
 </style>

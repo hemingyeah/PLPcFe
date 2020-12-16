@@ -347,6 +347,16 @@ function searchCustomerLinkmanForProduct(params) {
   return http.get(`${productPreFixedPath}/product/linkmanRelation`, params);
 }
 
+/**
+ * 产品表单属性列表
+ * @param {String} params.isFromSetting -- 是否用于设置页面，是：true 否：false
+ * @returns Promise<>
+ */
+function getProductFields(params) {
+  return http.get('/getProductFields', params);
+}
+
+
 
 /** ------------ end 产品模板 ----------------------- */
 
@@ -382,5 +392,6 @@ export {
   editBatchProduct,
   getProductRemindTemplate,
   searchCustomerAddressForProduct,
-  searchCustomerLinkmanForProduct
+  searchCustomerLinkmanForProduct,
+  getProductFields
 };

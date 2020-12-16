@@ -111,11 +111,17 @@
             <template v-else-if="column.formType === 'select'">
               {{ scope.row[column.field] | displaySelect }}
             </template>
-            <template v-else-if="column.formType === 'user'">
-              {{ scope.row[column.field] && (scope.row[column.field].displayName || scope.row[column.field].name) }}
+            <template v-else-if="column.formType === 'user' && scope.row.attribute[column.field]">
+              {{ getUserName(column, scope.row.attribute[column.field]) }}
+            </template>
+            <template v-else-if="column.formType === 'cascader' && scope.row.attribute[column.field]">
+              {{ scope.row.attribute[column.field] | displayCascader }}
             </template>
             <template v-else-if="column.formType === 'location'">
               {{ scope.row.attribute[column.field] && scope.row.attribute[column.field].address}}
+            </template>
+            <template v-else-if="column.formType == 'related_task'">
+              {{ getRelatedTask(scope.row.attribute[column.field]) }}
             </template>
             <template v-else-if="column.formType === 'address'">
               {{ scope.row.attribute[column.field] && scope.row.attribute[column.field].all}}
@@ -225,7 +231,7 @@
     <batch-edit-product-template-dialog
       ref="batchEditProductTemplateDialog"
       :fields="productFields"
-      :config="{fields: initData.productFields, productTypes: initData.productConfig.productTypes}"
+      :config="{fields: fieldsInfo, productTypes: initData.productConfig.productTypes}"
       :callback="search"
       :selected-ids="selectedIds">
 
@@ -243,7 +249,7 @@ import Page from '@model/Page';
 import platform from '@src/platform'
 import { formatDate } from '@src/util/lang';
 
-import { getProductTemplateList, productTemplateDelete } from '@src/api/ProductApi.js'
+import { getProductTemplateList, productTemplateDelete, getProductFields } from '@src/api/ProductApi.js'
 
 import SearchPanel from './component/SearchPanel.vue';
 import DialogBatchEditProductTemplate from './component/DialogBatchEditProductTemplate.vue';
@@ -328,12 +334,13 @@ export default {
           conditions: [],
         },
       },
+      fieldsInfo:[]
     }
   },
   computed: {
     // 高级搜索 占位符
     advancedSearchPlaceholder() {
-      let fields = this.initData.productFields || [];
+      let fields = this.fieldsInfo || [];
       return {
         name: fields.filter(f => f.fieldName == 'name')[0].placeHolder || '',
         serialNumber: fields.filter(f => f.fieldName == 'serialNumber')[0].placeHolder || '',
@@ -360,8 +367,8 @@ export default {
       return this.multipleSelection.map(item => item.id) || [];
     },
     productFields() {
-      return (this.initData.productFields || [])
-        .filter(f => f.formType !== 'separator')
+      return (this.fieldsInfo || [])
+        .filter(f => f.formType !== 'separator' && f.formType !== 'autograph')
         .map(f => {
 
           // 调整字段顺序
@@ -393,29 +400,45 @@ export default {
       }
       return null;
     },
+    displayCascader(value) {
+      if (!value) return null;
+      if (value && typeof value === 'string') {
+        return value;
+      }
+      if (Array.isArray(value) && value.length) {
+        return value.join('/');
+      }
+      return null;
+    },
     formatDate(val) {
       if (!val) return '';
       return formatDate(val, 'YYYY-MM-DD HH:mm:ss')
     },
   },
-  mounted() {
+  async mounted() {
     this.auth = (this.initData && this.initData.authorities) || {};
 
-
+    const { status, data, message } = await getProductFields({isFromSetting:false});
+    if( status == 0 ){
+      this.fieldsInfo = data;
+    }
     this.productTemplateConfig = {
       productConfig: (this.initData && this.initData.productConfig) || {productType: []},
-      productFields: (this.initData.productFields || []).sort((a, b) => a.orderId - b.orderId)
+      productFields: (this.fieldsInfo || []).sort((a, b) => a.orderId - b.orderId)
     };
     this.inputRemoteSearch.type.options = [...this.productTemplateConfig.productConfig.productType];
 
     this.paramsSearchRevert();
     this.columns = this.buildTableColumn();
     this.search();
-
+  
     // [tab_spec]标准化刷新方式
     window.__exports__refresh = this.search;
   },
   methods: {
+    getRelatedTask(field) {
+      return Array.isArray(field) ? field.map(item => item.taskNo).join(',') : '';
+    },
     showAdvancedSetting(){
       window.TDAPP.onEvent('pc：产品管理-选择列事件');
 
@@ -498,7 +521,7 @@ export default {
 
       let baseColumns = this.buildTableFixedColumns();
       let customizedColumns = this.productTemplateConfig.productFields
-        .filter(f => !f.isSystem && f.formType !== 'attachment' && f.formType !== 'separator' && f.formType !== 'info' && f.fieldName !== 'customer')
+        .filter(f => !f.isSystem && f.formType !== 'attachment' && f.formType !== 'separator' && f.formType !== 'info' && f.fieldName !== 'customer' && f.formType !== 'autograph')
         .map(field => {
           let sortable = false;
           let minWidth = null;
@@ -521,6 +544,7 @@ export default {
           }
 
           return {
+            ...field,
             label: field.displayName,
             field: field.fieldName,
             formType: field.formType,
@@ -854,10 +878,10 @@ export default {
       if (tv.length > this.selectedLimit) {
         this.$nextTick(() => {
           original.length > 0
-          ? unSelected.forEach(row => {
+            ? unSelected.forEach(row => {
               this.$refs.productTemplateTable.toggleRowSelection(row, false);
             })
-          : this.$refs.productTemplateTable.clearSelection();
+            : this.$refs.productTemplateTable.clearSelection();
         })
         return this.$platform.alert(`最多只能选择${this.selectedLimit}条数据`);
       }
@@ -1063,6 +1087,16 @@ export default {
     getRowKey(row) {
       return row.id
     },
+    // 处理人员显示
+    getUserName(field, value) {
+      // 多选
+      if(Array.isArray(value)) {
+        return value.map(i => i.displayName || i.name).join(',');
+      }
+      
+      let user = value || {};
+      return user.displayName || user.name;
+    }
   },
   components: {
     [DialogBatchEditProductTemplate.name]: DialogBatchEditProductTemplate,

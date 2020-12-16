@@ -2,20 +2,25 @@
   <div class="form-date">
     <el-date-picker
       :id="`form_${field.fieldName}`"
-      type="date"
-      prefix-icon="iconfont icon-fd-date"
+      :type="dateObj.type"
+      prefix-icon="iconfont icon-fdn-date"
       :editable="false"
       clearable
       :placeholder="placeholder"
-      value-format="yyyy-MM-dd"
+      :value-format="dateObj.format"
       :value="value"
+      :format="dateObj.format"
       @input="choose"
     />
   </div>
 </template>
 
 <script>
-import FormMixin from '@src/component/form/mixin/form'
+import FormMixin from '@src/component/form/mixin/form';
+import pickerOption from './pickerOption';
+/* utils */
+import { fmt_data_time } from '@src/util/lang'; 
+
 export default {
   name: 'form-date',
   mixins: [FormMixin],
@@ -24,6 +29,30 @@ export default {
       type: String,
       default: ''
     }
+  },
+  computed: {
+    /** 
+     * @description 匹配日期格式
+     * 若设置了日期格式返回匹配数据
+     * 否择返回默认设置，兼容老数据
+    */
+    dateObj() {
+      let  dateTypeObj = pickerOption.find((item=> item.format == this.field.setting.dateType));
+      if(dateTypeObj && JSON.stringify(dateTypeObj) !== '{}') return dateTypeObj;
+      return { type:'date',format: "yyyy-MM-dd" }  
+    }
+  },
+  mounted() {
+    let { defaultValueConfig, dateType} = this.field.setting || {};
+    let { isCurrentDate } = defaultValueConfig || {};
+
+    // 日期 若设置默认值，将系统时间设为默认值
+    if( JSON.stringify(defaultValueConfig) !== '{}' && isCurrentDate == 1){
+      let defaultValue = fmt_data_time(new Date(),dateType);
+      if(!this.value){
+        this.choose(defaultValue);
+      }    
+     }   
   },
   methods: {
     choose(newValue) {

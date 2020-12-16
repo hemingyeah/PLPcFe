@@ -8,8 +8,8 @@
         :class="{'error': error, 'wrapper-is-focus': isFocus, 'clearable-layout': clearable}"
       >
         
-        <el-tag size="mini" closable v-for="(tag, index) in (collapsed ? value[0] ? [value[0]] : [] : value)" :key="`${tag.value}_${index}`" @close="removeTag(tag)" disable-transitions type="info">
-          {{tag.label}}
+        <el-tag size="mini" closable v-for="tag in (collapsed ? value[0] ? [value[0]] : [] : value)" :key="getValueKey(tag)" @close="removeTag(tag)" disable-transitions type="info">
+          {{tag.label || tag[valueKey]}}
         </el-tag>
         
         <div v-if="collapsed && value.length > 1" class='base-user-select-tag'>
@@ -52,8 +52,8 @@
         </div>
         
         <ul class="option-list" v-loadmore="loadmoreOptions" ref="list">
-          
-          <li v-for="(op, index) in optionList" :key="`${op.value}_${index}`" @click="selectTag(op)" :class="{'selected': value.some(user => user.value ===op.value)}">
+
+          <li v-for="op in optionList" :key="getValueKey(op)" @click="selectTag(op)" :class="{'selected': value.some(user => user[valueKey] ===op[valueKey])}">
             <slot name="option" :option="op" v-if="optionSlot"> </slot>
             <template v-else>{{op.label}}</template>
             <div class="checked"></div>
@@ -92,6 +92,10 @@ export default {
     value: {
       type: Array,
       default: () => ([]),
+    },
+    valueKey: {
+      type: String,
+      default: 'value'
     },
     error: {
       type: Boolean,
@@ -161,6 +165,9 @@ export default {
     },
   },
   methods: {
+    getValueKey(op){
+      return op[this.valueKey];
+    },
     focusInput() {
       if (this.disabled) return
       if (this.showList) return this.close()
@@ -178,7 +185,7 @@ export default {
       this.$emit('input', []);
     },
     removeTag(tag) {
-      const newVal = this.value.filter(t => t.value !== tag.value);
+      const newVal = this.value.filter(t => t[this.valueKey] !== tag[this.valueKey]);
       this.$emit('input', newVal);
     },
     selectTag(tag) {
@@ -190,10 +197,10 @@ export default {
         this.resetStatus();
 
       } else {
-        if (this.value.every(t => t.value !== tag.value)) {
+        if (this.value.every(t => t[this.valueKey] !== tag[this.valueKey])) {
           newValue.push(tag);
         } else {
-          newValue = newValue.filter(t => t.value !== tag.value);
+          newValue = newValue.filter(t => t[this.valueKey] !== tag[this.valueKey]);
         }
       }
 
@@ -463,6 +470,6 @@ export default {
   }
 }
 .base-select-main-content {
-
+  height: 100% !important;
 }
 </style>

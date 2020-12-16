@@ -4,7 +4,7 @@
       <el-checkbox :value="field.isAppShow" @input="update" :true-label="1" :false-label="0" :disabled="isDisabled">
         移动端展示
         ( {{ mobileShowField.length }}/{{ taskMobileShowMaxLengthMax }})
-        <i class="iconfont icon-info"></i>
+        <i class="iconfont icon-question"></i>
       </el-checkbox>
     </el-tooltip>
   </div>

@@ -19,6 +19,9 @@
 import Uploader from '@src/util/uploader';
 import platform from '@src/platform';
 
+const IMG_TYPE = ['png', 'bmp', 'gif', 'jpg', 'jpeg', 'tiff'];
+const WATERMARK_DEFAULT_POSTION = 'bottomRight'; // 图片水印位置默认右下
+
 export default {
   name: 'base-upload',
   data(){
@@ -63,9 +66,13 @@ export default {
       type : String,
       default: null
     },
+    isWaterMark: { // 加上水印
+      type: Boolean,
+      default: false
+    },
     accept: {
       type: String,
-      default: ""
+      default: ''
     }
   },
   computed: {
@@ -105,14 +112,14 @@ export default {
       }
 
       if(this.fileType) {
-        //需要做文件类型校验
+        // 需要做文件类型校验
         for (let item of files) {
           let _fileName = item.name;
-          if (!_fileName.includes(Uploader.fileTypeObj[this.fileType]["fileName"])) {
-            //没有匹配到
+          if (!_fileName.includes(Uploader.fileTypeObj[this.fileType]['fileName'])) {
+            // 没有匹配到
             this.$platform.notification({
               title: '文件上传失败',
-              message: Uploader.fileTypeObj[this.fileType]["errMsg"],
+              message: Uploader.fileTypeObj[this.fileType]['errMsg'],
               type: 'error',
             })
             return false;
@@ -125,19 +132,36 @@ export default {
       }
 
       this.pending = true;
-      Uploader.batchUploadWithParse({files, action: this.action}).then((result = {}) => {
+      let _self = this;
+      Uploader.batchUploadWithParse({files, action: this.action}).then(async (result = {}) => {
         let {success, error} = result;
-
+        console.log(result);
         if(error && Array.isArray(error) && error.length > 0){
           let message = error.map(item => item.message).join('\n');
           // 此处不能return
           platform.alert(message)
         }
 
-        if(success && Array.isArray(success) && success.length > 0){
-          let value = this.value.concat(success);
-          this.$emit('input', value);
+        if(success && Array.isArray(success) && success.length > 0 && this.isWaterMark){
+          // 判断是否需要加水印
+          for(let i = 0; i < success.length; i ++) {
+            let file = success[i];
+            let currExt = this.getExt(file.filename);
+
+            let params = {};
+            if(IMG_TYPE.indexOf(currExt) > -1 && !!file.url) {
+              params.urls = [file.url];
+              params.position = WATERMARK_DEFAULT_POSTION;
+              let waterMarkResult = await _self.$http.post('/dd/file/upload/watermark/position', params);
+              if(waterMarkResult.length > 0 && waterMarkResult[0].data) {
+                success[i] = waterMarkResult[0].data;
+              }
+            }
+          }
         }
+
+        let value = this.value.concat(success);
+        this.$emit('input', value);
       })
         .catch(err => console.error(err))
         .then(() => this.pending = false)
@@ -148,7 +172,16 @@ export default {
         this.value.splice(index, 1);
         this.$emit('input', this.value);
       }
-    }
+    },
+    // 返回小写后缀
+    getExt(fileName){
+      if(!fileName) return '';
+
+      let index = fileName.lastIndexOf('.');
+      if(index < 0) return '';
+
+      return fileName.substring(index + 1).toLowerCase();
+    },
   }
 }
 </script>
