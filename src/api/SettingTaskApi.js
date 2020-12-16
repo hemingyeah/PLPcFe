@@ -3,6 +3,15 @@ import http from '@src/util/HttpUtil';
 /* ------------- start 附加组件设置 ---------------- */
 
 /**
+ * @description 获取附加组件列表
+ * @param {Object} params -- 参数对象
+ * @param {String} params.id -- 组件id
+ */
+export const getAllCardList =  (params = {} ) => {
+  return http.get('/outside/pc/task/getAllCardList', params)
+}
+
+/**
  * @description 通过组件id获取附加组件信息
  * @param {Object} params -- 参数对象
  * @param {String} params.id -- 组件id
@@ -17,7 +26,7 @@ export const getCardInfo =  (params = {} ) => {
  * @param {String} params.inputType -- single单次 multiple多次
  */
 export const cardImport =  (params = {}) => {
-  return http.post('/setting/task/card/import', params)
+  return http.post('/setting/task/card/import', params,false)
 }
 
 /**
@@ -82,6 +91,15 @@ export const getCardCount =  (params = {}) => {
 export const getCardFields =  (params = {}) => {
   return http.get('/setting/task/cardManage/getFields', params)
 }
+
+/**
+ * @description 附加组件库
+ * @param {Object} 
+ */
+export const getCardSysList =  (params = {}) => {
+  return http.post('/setting/card/getSysList', params)
+}
+
 
 
 /* ------------- end 附加组件设置 ---------------- */

@@ -1,26 +1,30 @@
 <template>
   <div class="template-library-content">
+    <!--start tabs选项 -->
     <ul class="tabs-card-type">
-      <li :class="{'active': tabIndex == index}" v-for="(item,index) in cardTabs" :key="index" @click="onTabsCard(index)">{{item}}</li>
+      <li :class="{'active': tabIndex == index}" v-for="(item,index) in cardSysList" :key="index" @click="onTabsCard(index)">{{item.name}}</li>
     </ul>
-    <div class="tabs-card-item">
-        <el-card class="tabs-card-box" shadow="hover" v-for="o in 2" :key="o" >
+    <!--end tabs选项 -->
+
+    <!--start 组件库列表 -->
+    <div class="tabs-card-item" >
+        <el-card class="tabs-card-box" shadow="hover" v-for="carditem in cardSysList[tabIndex].list" :key="carditem.cardId" >
             <div  class="tabs-card-li">
                 <div class="task-card-inforn"> 
-                    <h2 class="task-card-name">发货记录<span class="task-card-angle">物流</span></h2>                                       
-                    <p class="task-card-des">发货记录的说明文案发货记录的说明文案发货记录的说明最多2行</p>
+                    <h2 class="task-card-name">{{carditem.cardName}}<span class="task-card-angle">{{carditem.type}}</span></h2>                                       
+                    <p class="task-card-des">{{carditem.description}}</p>
                 </div>
                 <div class="task-card-fields">
                     <p>包含字段：</p>
-                    <p class="fields-list">收货人，联系方式，发货地址，物流公司，物流编号</p>
+                    <p class="fields-list">{{carditem.fields}}</p>
                 </div>
                 <div class="task-card-footer">
-                    <el-button type="primary" plain >预览</el-button>
+                    <el-button type="primary" plain class="preview">预览</el-button>
                     <el-tooltip class="item" effect="dark" content="每个工单中填写一组该数据" placement="top">
-                      <el-button type="primary" @click="importcard('single')">添加为单次</el-button>
+                      <el-button type="primary" @click="importcard(carditem.cardId,'single')">添加为单次</el-button>
                     </el-tooltip>
                     <el-tooltip class="item" effect="dark" content="每个工单中填写多组该数据" placement="top">
-                      <el-button type="primary" @click="importcard('multiple')">添加为多次</el-button>
+                      <el-button type="primary" @click="importcard(carditem.cardId,'multiple')">添加为多次</el-button>
                     </el-tooltip>
                    
                 </div>
@@ -28,6 +32,7 @@
             </div>
         </el-card>
     </div>
+    <!--end  组件库列表 -->
 
   </div>
 </template>
@@ -35,19 +40,23 @@
 import * as SettingTaskApi from "@src/api/SettingTaskApi";
 export default {
   name: 'template-library',
+  props: {
+    cardSysList:{
+      type: Array,
+      default: () => ([])
+    }
+  },
   data() {
     return {
-        cardTabs:['全部','物流','质量','产品','客诉','费用','市场','工时'],
-        tabIndex:0,
+      tabIndex:0,
     };
   },
   methods: {
     onTabsCard(index){
-        this.tabIndex = index;
+      this.tabIndex = index;
     },
     //添加为单次/多次
     importcard(cid,inputType) {
-        var ele = event.currentTarget;
         SettingTaskApi.cardImport({cardId:cid,inputType:inputType}).then(res=>{
         const { status, message, data } = res;
         if(status==0){
@@ -55,7 +64,6 @@ export default {
             location.reload()
         }else{
             this.$message.error(message);
-            location.reload()
         }
       }).catch(error=>{
 
@@ -150,6 +158,13 @@ export default {
         .task-card-footer{
             display: flex;
             justify-content: flex-end;
+            .preview{
+              &:hover{
+                  background: #e7f9f9;
+                  border-color: #a1e7e7;
+                  color: #13C2C2;
+              }
+            }
         }
 
     }

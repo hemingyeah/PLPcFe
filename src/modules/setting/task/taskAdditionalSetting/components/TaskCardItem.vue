@@ -4,33 +4,33 @@
             <el-row type="flex">
                 <el-row class="task-card-content" type="flex">
                     <div class="task-card-inforn"> 
-                        <h2 class="task-card-name"><el-tooltip class="item" effect="dark" :content="cardData.name" :disabled="cardData.name.length<13" placement="top-start"><span>{{cardData.name}}</span></el-tooltip></h2>                                       
-                        <p class="task-card-des">{{cardData.description}}</p>
+                        <h2 class="task-card-name"><el-tooltip class="item" effect="dark" :content="card.name" :disabled="card.name.length<13" placement="top-start"><span>{{card.name}}</span></el-tooltip></h2>                                       
+                        <p class="task-card-des">{{card.description}}</p>
                     </div>
                     
                     <el-row class="task-card-others">
                         <div class="task-card-scope">
                             <p>已应用范围：</p>
-                             <template v-if="cardData.range.length>1">
+                             <template v-if="card.range.length>1">
                                 <el-dropdown placement="top" @command="modifyTaskType">
-                                    <span class="pointer">{{cardData.range[0].name}}等{{cardData.range.length}}个</span>         
+                                    <span class="pointer">{{card.range[0].name}}等{{card.range.length}}个</span>         
                                     <el-dropdown-menu slot="dropdown">
-                                        <el-dropdown-item v-for="(item,index) in cardData.range" :key="index"   :command="item.id">{{item.name}}</el-dropdown-item>       
+                                        <el-dropdown-item v-for="(item,index) in card.range" :key="index"   :command="item.id">{{item.name}}</el-dropdown-item>       
                                     </el-dropdown-menu>
                                 </el-dropdown>
                             </template>
                             <template v-else>
-                                <span class="pointer" @click="modifyTaskType(cardData.range[0].id)">{{cardData.range[0].name}}</span>
+                                <span class="pointer" @click="modifyTaskType(card.range[0].id)">{{card.range[0].name}}</span>
                             </template>
                         </div>
                         <div class="task-card-li">
-                            <p>类型：<span class="task_type">{{cardData.inputType=='single'?'单次':'多次'}}</span></p>
+                            <p>类型：<span class="task_type">{{card.inputType=='single'?'单次':'多次'}}</span></p>
                             <p>使用统计：<span class="task_see" @click="onSee">查看</span></p>
                         </div>
                     </el-row>
                 </el-row >
             </el-row>
-            <el-switch v-model="cardData.enabled"  :active-value="1" :inactive-value="0" @change="statusChange(cardData.enabled)"/>
+            <el-switch v-model="card.enabled"  :active-value="1" :inactive-value="0" @change="statusChange(card.enabled)"/>
         </el-row>
 
         <!-- start 操作 -->
@@ -55,10 +55,10 @@
         <!-- end 操作 -->
 
         <!-- 添加编辑附加组件 -->
-        <edit-cardname-dialog  :id="cardData.id" ref="batchCardnameDialog"></edit-cardname-dialog>
+        <edit-cardname-dialog  :id="card.id" ref="batchCardnameDialog"></edit-cardname-dialog>
 
         <!-- 统计 -->
-        <statistical-dialog :id="cardData.id" :specialfrom="cardData.specialfrom" ref="statisteDialog" ></statistical-dialog>
+        <statistical-dialog :card="card" ref="statisteDialog" ></statistical-dialog>
     </el-card>
 </template>
 
@@ -70,7 +70,7 @@ import statisticalDialog from "../components/statisticalDialog";
 export default {
     name: 'task-card-item',
     props: {
-        cardData: Object,
+        card: Object,
         default: () => {}
     },
     data() {
@@ -87,7 +87,7 @@ export default {
                 cancelButtonText: '取消',
                 type: 'warning',
             }).then(() => {
-                SettingTaskApi.onDeleteCard({id:this.cardData.id}).then(res=>{
+                SettingTaskApi.onDeleteCard({id:this.card.id}).then(res=>{
                     const { status, message, data } = res;
                     if(status == 0){
                         this.$message.success('删除成功');
@@ -104,7 +104,7 @@ export default {
         // 禁用/开启附加组件
         statusChange(state) {
             let enabled = state ? 1 : 0;
-            SettingTaskApi.onCardChange({id:this.cardData.id,enabled:enabled}).then(res=>{
+            SettingTaskApi.onCardChange({id:this.card.id,enabled:enabled}).then(res=>{
                 const { status, message, data } = res;
                 if(status == 0){
                     this.$message.success('操作成功');
@@ -135,8 +135,8 @@ export default {
         },
         updateTeamList(teamList){
             console.log(teamList);
-            this.$emit('update:cardData', {
-                ...this.cardData,
+            this.$emit('update:card', {
+                ...this.card,
                 teamList
             })
         }
