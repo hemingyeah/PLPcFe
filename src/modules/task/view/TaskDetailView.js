@@ -84,7 +84,7 @@ export default {
       hasCallCenterModule: localStorage.getItem("call_center_module") == 1,
       stateButtonData: [], // 工单当前状态下主操作按钮
       leftActiveTab: "task-view",
-      rightActiveTab: "",
+      rightActiveTab: "record",
       collapseDirection: "",
       popperOptions: {
         boundariesElement: "viewport",
@@ -96,6 +96,7 @@ export default {
       isGuide: false,
       backList,
       checkBack: '',
+      marTop: 197,
       // 显示详情向导
       showTaskDetailGuide: false,
       // 是否显示指派弹窗
@@ -661,6 +662,28 @@ export default {
     stopStep() {
       this.nowGuideStep = this.detailSteps.length + 1;
     },
+    /**
+     * 折叠
+     */
+    collapseBtn() {
+      this.$refs.container.scrollTop = 0; 
+      this.collapse = !this.collapse; 
+      
+      this.$nextTick(() => {
+        setTimeout(() => {
+          this.marTop = this.$refs.header.clientHeight + 25
+        }, 200)
+      })
+    },
+    /**
+     * 滚动的距离
+     */
+    getScroll({target}) {
+      const scrollTop = target.scrollTop;
+      if (scrollTop >= 80) {
+        this.collapse = false
+      }
+    },
     // 是否含有某一指定权限
     hasAuth(keys) {
       return AuthUtil.hasAuth(this.permission, keys);
@@ -1088,6 +1111,7 @@ export default {
 
     this.collapse = JSON.parse(collapse || "true");
     this.collapseDirection = collapseDirection || "";
+
   },
   async mounted() {
     try {
@@ -1171,7 +1195,7 @@ export default {
       if (query.active == "balance" && this.viewBalanceTab && this.allowBalanceTask) {
         this.openDialog("balance");
       } else {
-        this.rightActiveTab = this.viewBalanceTab ? "balance-tab" : this.viewFeedbackTab ? "feedback-tab" : "card-tab";
+        this.rightActiveTab = this.viewBalanceTab ? "balance-tab" : this.viewFeedbackTab ? "feedback-tab" : "record";
       }
       
       // 是否显示详情向导
@@ -1197,6 +1221,8 @@ export default {
     } catch (e) {
       console.error("error ", e)
     }
+
+    this.marTop = this.$refs.header.clientHeight + 12
   },
   watch: {
     collapse(newValue) {

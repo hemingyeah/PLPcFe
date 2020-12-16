@@ -96,7 +96,7 @@
                     v-trim:blur
                     :placeholder="
                       taskSearchInputPlaceholderMap[keyword_select] ||
-                      taskSearchInputPlaceholderMap.default
+                        taskSearchInputPlaceholderMap.default
                     "
                     class="task-with-input task-ml12"
                   >
@@ -108,10 +108,7 @@
                     >
                       <el-option label="表单内容" value=""></el-option>
                       <el-option label="备注" value="按工单备注"></el-option>
-                      <el-option
-                        label="附加组件"
-                        value="按附加组件"
-                      ></el-option>
+                      <el-option label="附加组件" value="按附加组件"></el-option>
                     </el-select>
                   </el-input>
 
@@ -256,6 +253,30 @@
                 >
                   {{ `进行中(${filterData.processing || 0})` }}
                 </div>
+                <!-- 已完成工单 -->
+                <div
+                  v-for="item in taskView"
+                  :key="`${item.createTime}${Math.random() * 1000}`"
+                  @click="
+                    checkFilter({
+                      id: item.id,
+                      name: '已完成工单',
+                      searchModel: item.searchModel,
+                      title: 'finished',
+                    })
+                  "
+                  v-show="item.id === selectIds.finished"
+                  :class="{
+                    'task-c2': item.id === filterId,
+                  }"
+                >
+                  <el-tooltip
+                    content="当前已选择 当前超时、曾超时、当前暂停、曾暂停、位置错误 为异常工单"
+                    placement="top"
+                  >
+                    <span> {{ `异常工单(${filterData.exception || 0})` }}</span>
+                  </el-tooltip>
+                </div>
                 <!-- 异常工单 -->
                 <div
                   v-for="item in taskView"
@@ -274,12 +295,7 @@
                     'task-c2': item.id === filterId,
                   }"
                 >
-                  <el-tooltip
-                    content="当前已选择 当前超时、曾超时、当前暂停、曾暂停、位置错误 为异常工单"
-                    placement="top"
-                  >
-                    <span> {{ `异常工单(${filterData.exception || 0})` }}</span>
-                  </el-tooltip>
+                  {{ `异常工单(${filterData.exception || 0})` }}
                 </div>
                 <!-- 未完成工单 -->
                 <div
@@ -300,25 +316,7 @@
                 >
                   {{ `未完成(${filterData.unfinished || 0})` }}
                 </div>
-                <!-- 已完成工单 -->
-                <div
-                  v-for="item in taskView"
-                  :key="`${item.createTime}${Math.random() * 1000}`"
-                  @click="
-                    checkFilter({
-                      id: item.id,
-                      name: '已完成工单',
-                      searchModel: item.searchModel,
-                      title: 'finished',
-                    })
-                  "
-                  v-show="item.id === selectIds.finished"
-                  :class="{
-                    'task-c2': item.id === filterId,
-                  }"
-                >
-                  {{ `已完成(${filterData.finished || 0})` }}
-                </div>
+
               </div>
             </div>
             <div
@@ -726,16 +724,15 @@
                   </template>
                   <!-- 创建方式 -->
                   <template v-else-if="column.field === 'source'">
-                    <span>{{ scope.row["source"] }}</span>
+                    <span>{{ scope.row["source"]}}</span>
                   </template>
 
                   <!-- 关联事件 -->
                   <template v-else-if="column.field === 'eventNo'">
-                    <div
-                      class="view-detail-btn task-client"
-                      @click.stop="openEventTab(scope.row)"
+                    <div class="view-detail-btn task-client"
+                         @click.stop="openEventTab(scope.row)"
                     >
-                      {{ scope.row["eventNo"] }}
+                      {{ scope.row["eventNo"]}}
                     </div>
                   </template>
                   <!-- 联系人 -->
@@ -1159,7 +1156,7 @@
 </template>
 
 <script>
-import TaskList from "./TaskList";
+import TaskList from './TaskList';
 export default TaskList;
 </script>
 <style lang="scss">

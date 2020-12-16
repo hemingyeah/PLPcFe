@@ -145,8 +145,8 @@ export interface TaskAllotUserSearchModel {
   userIds?: string[],
   // 只能排序 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8
   code: number,
-  lng?: number,
-  lat?: number,
+  lng?: number | null,
+  lat?: number | null,
   pageNum: number,
   pageSize: number
 }
@@ -265,8 +265,8 @@ export interface TaskTagUserListSearchModel {
   pageNum: number,
   keyword: string,
   customerId: string
-  lat?: string | number,
-  lng?: string | number,
+  lat?: string | number | null,
+  lng?: string | number | null,
   // 以逗号分隔
   tagId: string
 }

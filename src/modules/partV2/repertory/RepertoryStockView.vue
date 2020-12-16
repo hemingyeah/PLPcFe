@@ -1485,7 +1485,6 @@ export default {
 
       let remark = await form.remarkText();
       
-      
       try {
         let result = await this.$http.post(`/partV2/approve/allot/initiate/batch?remark=${remark}`, partSparesData);
   
@@ -1493,7 +1492,7 @@ export default {
           
           this.$platform.toast('批量分配成功').then(() => {
             this.initialize()
-            this.isPartSparesDialog = false;
+            this.isPartSparesBatchDialog = false;
           });
 
         } else{
