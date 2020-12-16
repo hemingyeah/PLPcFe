@@ -20,6 +20,13 @@ function packFields(fields, config) {
                 ...field
             }, )
         }
+        // 附件
+        if (field.formType == 'attachment') {
+            newFields.push({
+                ...field,
+                minWidth: '160px',
+            })
+        }
 
         //在开始时间，结速时间后加位置
         else if (field.formType == 'datetime') {

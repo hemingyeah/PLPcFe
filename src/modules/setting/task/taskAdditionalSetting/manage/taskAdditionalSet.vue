@@ -8,7 +8,7 @@
     <div class="task-additional-right">
       <div class="task-tab-header">
         <div class="task-tabs">
-          <el-tabs v-model="activeTab">
+          <el-tabs v-model="activeTab" @tab-click="switchTab">
             <el-tab-pane name="task-added" label="已添加的组件">
                 <p class="tabs_msg">附加组件是在服务工单中用于管理工单信息的辅助工具，可以让您分类记录工单的信息，附加组件可以从模块库中导入或创建。如需将关联组件应用在服务工单上，请在不同的工单类型中添加附加组件</p>
             </el-tab-pane>
@@ -35,7 +35,7 @@
 
       <!-- start 从模版库添加 -->
       <div class="task-type-list" v-if="activeTab=='task-import'">
-        <template-library></template-library>
+        <template-library :cardSysList="cardSysList"></template-library>
       </div>
       <!-- end 从模版库添加 -->
 
@@ -48,10 +48,16 @@
 </template>
 
 <script>
+// api
+import * as SettingTaskApi from "@src/api/SettingTaskApi";
+//util
+import { isShowCardWorkTime } from '@src/util/version.ts'
+// components
 import TaskNavBar from "../../components/TaskNavBar";
 import TaskCardItem from "../components/TaskCardItem";
 import EditCardnameDialog from "../components/EditCardnameDialog";
 import templateLibrary from "../components/templateLibrary";
+import { forEach } from 'lodash';
 
 export default {
   name: "task-manage",
@@ -89,18 +95,98 @@ export default {
 
         },
       ],
+      cardSysList:[]
 
     };
   },
-  computed: {
-  },
   mounted() {
-
+    this.initCard();
+    this.initCardSysList()
   },
   methods: {
+    switchTab(tab){
+      if(this.activeTab == tab) return;
+      if(this.activeTab == 'task-added'){
+        this.initCard();
+      }
+      if(this.activeTab == 'task-import'){
+        this.initCardSysList()
+      }
+    },
     //新建组件
     addTaskCard(){
       this.$refs.batchCardnameDialog.openDialog();
+    },
+    //获取附加组件列表
+    initCard() {
+      SettingTaskApi.getAllCardList().then(res=>{
+        const { status, message, result } = res;
+        if(status == 0){
+          // this.cardList = result    
+        }else{
+          this.$message.error(message);
+        }
+      }).catch(error=>{
+        console.log(error)
+      })
+    },
+    //获取组件库列表
+    initCardSysList() {
+      SettingTaskApi.getCardSysList().then(res=>{
+        const { status, message, data } = res;
+        if(status == 0){
+            var cardList = data || [];
+            if(!isShowCardWorkTime) {
+                cardList = cardList.filter(function(card) {
+                    return card.cardName !== '工时记录';
+                })
+            }
+            let cardSysList = [];
+            var cardAll = cardList.slice();
+         
+            let wuliu = []
+            let zhiliang = []
+            let chanpin = []
+            let shichang = []
+            let kesu = []
+            let feiyong = []
+            let gongshi = []
+            if(cardAll&&cardAll.length>0){
+              cardAll.forEach((item=>{
+                if(item.cardName=='发货记录'||item.cardName=='退货登记'){
+                      item['type']='物流'
+                      wuliu.push(item)
+                  }else if(item.cardName=='产品故障记录'|| item.cardName=='质检登记'){
+                      item['type']='质量'
+                      zhiliang.push(item)
+                  }else if(item.cardName=='设备信息记录'|| item.cardName=='配置信息'){
+                      item['type']='产品'
+                      chanpin.push(item)
+                  }else if(item.cardName=='礼品邮寄'||item.cardName=='市场活动'||item.cardName=='访问调查'){
+                      item['type']='市场'
+                      shichang.push(item)
+                  }else if(item.cardName=='质量投诉'){
+                      item['type']='客诉'
+                      kesu.push(item)
+                  }else if(item.cardName=='费用备注'){
+                      item['type']='费用'
+                      feiyong.push(item)
+                  }else if(item.cardName=='工时记录'){
+                      item['type']='工时'
+                      gongshi.push(item)
+                  }
+              }))
+            }
+            cardSysList.push({name:'全部',list:cardAll},{name:'物流',list:wuliu},{name:'质量',list:zhiliang},{name:'产品',list:chanpin},{name:'市场',list:shichang},{name:'客诉',list:kesu},{name:'费用',list:feiyong},{name:'工时',list:gongshi})
+            this.cardSysList = cardSysList;
+           
+          
+        }else{
+          this.$message.error(message);
+        }
+      }).catch(error=>{
+        console.log(error)
+      })
     }
   },
   components: {

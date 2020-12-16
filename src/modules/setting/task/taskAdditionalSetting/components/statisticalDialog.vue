@@ -14,14 +14,17 @@
             type="daterange"
             range-separator="-"
             start-placeholder="开始日期"
-            end-placeholder="结束日期">
+            end-placeholder="结束日期"
+            @change="onTimeChange"
+            value-format="yyyy/MM/dd"
+            >
           </el-date-picker>
           <el-input v-model="form.taskNoStr" placeholder="请输入工单编号"></el-input>
           <el-input v-model="form.userNameStr" placeholder="请输入操作人"></el-input>
           <el-button type="primary" @click="onSearch">搜索</el-button>
         </div>
-        <div class="search-right">
-          <el-button type="primary" plain @click="exportStatistics">导出</el-button>
+        <div class="search-right">       
+          <a :href="`/setting/task/card/count/export?cardId=${card.id}`">导出</a>
         </div>
       </div>
         <el-table
@@ -34,8 +37,12 @@
           header-row-class-name="page-table-header" 
           stripe
           tooltip-effect="dark"
-          @selection-change="handleSelectionChange">
-          <el-table-column prop="taskNo" label="工单编号" width="150"></el-table-column>
+          v-loading="loading">
+          <el-table-column prop="taskNo" label="工单编号" width="150">
+            <template slot-scope="scope">
+              <a @click="openTaskView(scope.row.taskId)">{{scope.row.taskNo}}</a>
+            </template>
+          </el-table-column>
 
           <!-- start 非工时记录列表数据 -->
           <template v-if="card.specialfrom != '工时记录'">
@@ -51,20 +58,20 @@
                   <template v-if="isMulti(column)">
                     {{ (scope.row.taskCardInfo.attribute[column.fieldName] || []).join('，') }}
                   </template>
-                   <template v-else-if="column.formType == 'attachment'">
-                    <span class="column-attachment" v-if="scope.row.taskCardInfo.attribute[column.fieldName] && scope.row.taskCardInfo.attribute[column.fieldName].length">
-                    <i class="iconfont icon-attachment"></i>
-                    共{{ scope.row.taskCardInfo.attribute[column.fieldName].length }}个附件
-                  </span>
+                  <!-- start 附件类型 -->
+                  <template v-else-if="column.formType == 'attachment'">
+                    <div class="column-attachment" v-for="(file,index) in scope.row.taskCardInfo.attribute[column.fieldName]" :key="index">
+                      <el-tooltip class="item" effect="dark" :content="file.filename" placement="top">
+                        <a :href="file.url" >{{file.filename}}</a> 
+                      </el-tooltip>
+                    </div>
                   </template>
+                  <!-- end 附件类型 -->
                   <template v-else>
                     {{scope.row.taskCardInfo.attribute[column.fieldName]}}
                   </template>
-                </template>
+                </template> 
                 <!-- end 自定义字段 -->
-                <template v-else>
-                  {{ scope.row[column.fieldName] }}
-                </template>
               </template>
             </el-table-column>
             <el-table-column prop="userName" label="操作人">
@@ -100,11 +107,12 @@
               <template slot-scope="scope">
 
                 <!-- start 附件类型 -->
-                <template v-if="column.formType === 'attachment'">
-                  <span class="column-attachment" v-if="scope.row[column.fieldName] && scope.row[column.fieldName].length">
-                    <i class="iconfont icon-attachment"></i>
-                    共{{ scope.row[column.fieldName].length }}个附件
-                  </span>
+                <template v-if="column.formType === 'attachment' && scope.row[column.fieldName] && scope.row[column.fieldName].length">
+                  <div class="column-attachment" v-for="(file,index) in valueAtt_href(scope.row[column.fieldName])" :key="index">
+                    <el-tooltip class="item" effect="dark" :content="file.filename" placement="top">
+                      <a :href="file.url" >{{file.filename}}</a> 
+                    </el-tooltip>
+                  </div>
                 </template>
                 <!-- end 附件类型 -->
 
@@ -184,22 +192,20 @@ export default {
   },
   data() {
     return {
+      loading: true,
       visible: false,
-      totalElements:100,
+      totalElements:0,
       form: {
-        cardId: '6a4bde67-11ad-11eb-a442-00163e304a25',
+        cardId: '',
         pageNum: 1,
         pageSize: 10,
-        timeRange: [],//2020/11/11 - 2020/12/10
+        timeRange: "",//2020/11/11 - 2020/12/10
         taskNoStr: '',
         userNameStr: ''    
       },
       tableData:[],
-      multipleSelection:[],
       cardFieldsData:[],
-      rules: {
-        name: [{ required: true, message: "请输入名称", trigger: "blur" }],
-      },
+      timeArrRange:[],
     };
   },
   filters: {
@@ -209,17 +215,6 @@ export default {
     }
   },
   computed: {
-    /** 
-    * @description 默认时间
-    */
-    timeArrRange() {
-      let startDate = formatDate(new Date() - 29 * 24 * 60 * 60 * 1000,"YYYY-MM-DD");
-      let endDate = formatDate(new Date(), "YYYY-MM-DD");
-      
-      this.form.timeRange = `${startDate.replace(/-/g, '/')} - ${endDate.replace(/-/g, '/')}`;
-      return [startDate,endDate]
-    },
-
     /** 
     * @description 表头设置
     */
@@ -240,7 +235,44 @@ export default {
        }
     }
   },
+  mounted() {
+    this.timeRange();
+  },
   methods: {
+    valueAtt_href(field) {
+      return JSON.parse(field)
+    },
+    /** 
+    * @description 默认时间
+    */
+    timeRange() {
+      this.timeArrRange = [formatDate(new Date() - 29 * 24 * 60 * 60 * 1000,"YYYY-MM-DD"),formatDate(new Date(), "YYYY-MM-DD")];
+      this.form.timeRange = this.timeArrRange.join('-')
+    },
+
+    onTimeChange(e) {
+      if(e){
+        this.form.timeRange = this.timeArrRange.join('-')
+      }else{
+        this.form.timeRange = [];
+      }
+    },
+
+    /** 
+    * @description 查看工单详情
+    */
+    openTaskView(taskId) {
+      let fromId = window.frameElement.getAttribute('id');
+      this.$platform.openTab({
+        id: `task_view_${taskId}`,
+        title: '工单详情',
+        close: true,
+        url: `/task/view/${taskId}`,
+        fromId
+      });
+
+    },
+
     /** 
     * @description 字段是否是多选类型
     */
@@ -255,6 +287,7 @@ export default {
     */
     openDialog() {
       this.visible = true;
+
       if(this.card.id) {
         this.form.cardId = this.card.id;
         this.getCardFields()
@@ -263,15 +296,15 @@ export default {
     },
     onClose(form) {
       this.visible = false;
+      this.timeRange();
+      this.form = {
+        pageNum: 1,
+        pageSize: 10,
+        timeRange: [],
+        taskNoStr: '',
+        userNameStr: ''    
+      }
     },
-    //导出统计
-    exportStatistics() {
-    },
-
-    handleSelectionChange(val) {
-      this.multipleSelection = val;
-    },
-    
     /** 
     * @description 搜索
     */
@@ -284,9 +317,9 @@ export default {
      * @param {Number} pageSize 页大小
      */
     handleSizeChange(pageSize) {
-
       this.form.pageSize = pageSize;
       this.form.pageNum = 1;
+      this.getCardCountReq();
 
     },
     /**
@@ -295,6 +328,7 @@ export default {
      */
     jumpPage(pageNum) {
       this.form.pageNum = pageNum;
+      this.getCardCountReq();
     },
 
     //获取统计Fields列表
@@ -311,40 +345,22 @@ export default {
     getCardCountReq() {
       SettingTaskApi.getCardCount(this.form).then(res=>{
         const { status, message, list } = res;
+
+        this.totalElements = res.total;
         if(this.card.specialfrom != '工时记录'){  
-          this.tableData = list.map(item=>{
-            // if(JSON.stringify(item.taskCardInfo)!=='{}'&&item.taskCardInfo.inputType) return item
-          })
+          let newData = list.filter(item=> typeof item.taskCardInfo == 'object')
+          this.tableData = newData;
         }else{
           this.tableData = list;
         }
+
+        this.loading = false;
         
       }).catch(error=>{
 
       })
 
-    },
-    isJOSN:function (value) {
-      if (typeof Array.isArray === "function") {
-        return Array.isArray(value);
-      }else{
-        return Object.prototype.toString.call(value) === "[object Array]";
-      }
-    },
-    isAttachment:function (value) {
-      console.log(value)
-      if(value && value.length>0){
-        for(var i=0;i<value.length;i++){
-            if(value[i].id){
-                return true
-            }else{
-                return false
-            }
-        }
-      }else {
-        return false
-      }
-    },
+    }
   },
 };
 </script>
@@ -377,12 +393,30 @@ export default {
             margin-right: 12px;
             width: 168px;
           }
-
+        }
+        .search-right{
+          a{
+            width: 58px;
+            height: 32px;
+            background: #E9F9F9;
+            border-radius: 4px;
+            border: 1px solid #D0F3F4;
+            color: #13C2C2;
+            text-decoration: none;
+            padding: 6px 10px;
+          }
         }
       }
       .statistical-table{
         padding: 0;
         margin-top: 17px;  
+        a{
+          width: 100%;
+          color: #13C2C2;
+          cursor: pointer;
+          display: block;
+          @include text-ellipsis();
+        }
       }
       .table-footer{
         margin-top: 17px;
