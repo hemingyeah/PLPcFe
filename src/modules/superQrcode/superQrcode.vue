@@ -279,7 +279,7 @@ export default {
       defaultLogo:require('../../assets/img/tenant_defaultLogo.jpg'),
       options: [
         { label: "首页配置项",show:true },
-        { label: "企业图片", type: "pic",show:true },
+        { label: "产品图片", type: "pic",show:true },
         { label: "产品简介", type: "intro",show:true },
         { label: "马上联系", type: "contact",show:true },
         { label: "自助服务", type: "service",show:true },
