@@ -148,7 +148,8 @@ export default {
       guideDropdownMenu: false,
       isGuide:false,
       abnormalData: {},
-      abnormals: AbnormalList
+      abnormals: AbnormalList,
+      exceptionNodes: '', // 选择异常
     };
   },
   computed: {
@@ -336,6 +337,10 @@ export default {
       // storageSet(TASK_GUIDE_DROPDOWN_MENU, '1')
     },
     previousStep() {},
+    /**异常选择 */
+    checkAbnormal({englishName}){
+      this.exceptionNodes = englishName
+    },
     /**获取用户开启的配置节点 以及工单搜索范围 和 异常原因字段值 */
     async getTurnOnTaskExceptionNodeInfo() {
       const {success, result} = await TaskApi.getTurnOnTaskExceptionNodeInfo()
@@ -346,11 +351,11 @@ export default {
         const {taskExceptionReasonList} = result
         this.abnormals = this.abnormals.map((item, index) => {
           item.setting['isMulti'] = false
-          item.setting['dataSource'] = []
-          if (item.fieldName.indexOf(taskExceptionReasonList[index].englishName) !== -1) {
-            item.setting['dataSource'] = taskExceptionReasonList[index].exceptionReason
-            item['englishName'] = taskExceptionReasonList[index].englishName
-          }
+          taskExceptionReasonList.forEach(v => {
+            if (item.englishName === v.englishName) {
+              item.setting['dataSource'] = v.exceptionReason
+            }
+          })
           return item
         })
 

@@ -390,6 +390,8 @@
                 <div
                   v-for="item in abnormalData.taskCustomExceptionNodeList"
                   :key="item.englishName"
+                  @click="checkAbnormal(item)"
+                  :class="{ 'task-c2': exceptionNodes === item.englishName }"
                   class="task-nav-create"
                 >
                   {{ item.exceptionName }}
