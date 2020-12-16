@@ -1,5 +1,5 @@
 /* components */
-import ContactUserItem from '@src/component/common/BaseContact/ContactUserItem.vue';
+import ContactUserItem from '@src/component/common/BaseContact/ContactUserItem.vue'
 /* enum */
 import ComponentNameEnum from '@model/enum/ComponentNameEnum'
 /* scss */

@@ -4,10 +4,12 @@ import TaskAllotExecutorData from '@src/modules/task/components/TaskAllotModal/T
 import TaskAddress from '@model/entity/TaskAddress'
 /* enum */
 import ComponentNameEnum from '@model/enum/ComponentNameEnum'
+import { TaskAllotTypeModeEnum } from '@src/modules/task/components/TaskAllotModal/TaskAllotModalModel'
 /* util */
 import { findComponentUpward } from '@src/util/assist'
 
 class TaskAllotExecutorComputed extends TaskAllotExecutorData {
+  
   /* 是否允许修改协同人 */
   get allowModifySynergyUser(): boolean {
     return Boolean(this.TaskAllotModalComponent?.allowModifySynergyUser)
@@ -45,7 +47,21 @@ class TaskAllotExecutorComputed extends TaskAllotExecutorData {
   get isShowTaskAllotUserMapComponent(): boolean {
     return this.loadedComponents.includes(ComponentNameEnum.TaskAllotUserMap)
   }
-
+  
+  /** 
+   * @description 是否为地图模式
+  */
+  get isMapMode(): boolean {
+    return this.mode === TaskAllotTypeModeEnum.Map
+  }
+  
+  get modeComponents(): { [x: string]: { [y: string]: string } } {
+    return {
+      [TaskAllotTypeModeEnum.List]: { display: this.mode === TaskAllotTypeModeEnum.List ? 'block' : 'none' },
+      [TaskAllotTypeModeEnum.Map]: { display: this.mode === TaskAllotTypeModeEnum.Map ? 'block' : 'none' }
+    }
+  }
+  
   /**
    * @description 工单客户地址地址 
    * 工单新建后地址信息在taddress里面，新建的信息在address里面

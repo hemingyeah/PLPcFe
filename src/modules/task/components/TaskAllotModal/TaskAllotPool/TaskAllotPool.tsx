@@ -150,7 +150,7 @@ export default class TaskAllotPool extends Vue {
       let user: LoginUser = taskPoolUser.user
       let { longitude, latitude } = user
       // 无经纬度
-      if (!longitude && !latitude) return
+      if (!longitude || !latitude) return
       
       // 用户标记
       let userMarker = new AMap.Marker({

@@ -1,3 +1,5 @@
+/* components */
+import UiInput from '@src/component/ui/UiInput/UiInput.tsx'
 /* entity */
 import Tag from '@model/entity/Tag/Tag'
 import LoginUser from '@model/entity/LoginUser/LoginUser'
@@ -6,7 +8,7 @@ import { ElSelectOption, UserState } from '@src/modules/task/components/TaskAllo
 /* methods */
 import TaskAllotUserTableMethods from '@src/modules/task/components/TaskAllotModal/TaskAllotExcutor/TaskAllotUserTable/TaskAllotUserTableMethods'
 /* model */
-import { TaslAllotTableColumnFieldEnum } from '@src/modules/task/components/TaskAllotModal/TaskAllotExcutor/TaskAllotUserTable/TaskAllotUserTableModel'
+import { AllotSortedEnum, TaslAllotTableColumnFieldEnum, AllotLabelEnum } from '@src/modules/task/components/TaskAllotModal/TaskAllotExcutor/TaskAllotUserTable/TaskAllotUserTableModel'
 import { TaskTagListSearchModel } from '@model/param/in/Task'
 /* types */
 import Column from '@model/types/Column'
@@ -253,10 +255,11 @@ class TaskAllotUserTableRender extends TaskAllotUserTableMethods {
   */
   public renderSelectColumn() {
     return (
-      <div class='task-allot-user-table-column' onClick={() => this.showAdvancedSetting()}>
-        <span>选择列</span>
-        <i class="iconfont icon-triangle-down task-icon"></i>
-      </div>
+      <UiInput>
+        <div class='task-allot-user-table-column' onClick={() => this.showAdvancedSetting()}>
+          <span>选择列</span>
+        </div>
+      </UiInput>
     )
   }
   
@@ -396,6 +399,7 @@ class TaskAllotUserTableRender extends TaskAllotUserTableMethods {
     return (
       <div class='task-allot-user-table-header'>
         {this.renderTaskAllotUserTableHeaderLabels()}
+        {this.renderTaskAllotUserTableHeaderSelectBlock()}
       </div>
     )
   }
@@ -404,10 +408,60 @@ class TaskAllotUserTableRender extends TaskAllotUserTableMethods {
    * @description 渲染工单指派人员表格头部 标签列表
   */
   public renderTaskAllotUserTableHeaderLabels() {
+    const SortLabelChangeHandler = (value: AllotSortedEnum) => {
+      this.tableSortLabel = value === this.tableSortLabel ? null : value
+    }
+    
     return (
-      <div>
-        
+      <div class='task-allot-user-table-header-label'>
+        {
+          this.tableSortLabelOptionss.map((sortLabel: ElSelectOption) => {
+            const classNames = [
+              'task-allot-user-table-sort-label',
+              this.tableSortLabel === sortLabel.value ? 'task-allot-user-table-sort-label-active' : ''
+            ]
+            return (
+              <div class={classNames} onClick={() => SortLabelChangeHandler(sortLabel.value as AllotSortedEnum)}>
+                { sortLabel.label }
+              </div>
+            )
+          })
+        }
       </div>
+    )
+  }
+  
+  /** 
+   * @description 渲染工单指派人员表格头部 select选择
+  */
+  public renderTaskAllotUserTableHeaderSelectBlock() {
+    return (
+      <div class='task-allot-user-table-header-select-block'>
+        { this.renderTaskAllotUserTableHeaderLabelSelect() }
+        { this.renderSelectColumn() }
+      </div>
+    )
+  }
+  
+  /** 
+   * @description 渲染工单指派人员表格头部 select选择
+  */
+  public renderTaskAllotUserTableHeaderLabelSelect() {
+    return (
+      <el-select
+        placeholder="员工标签"
+        value={this.selectLabel}
+        onInput={(value: AllotLabelEnum) => this.handlerLabelChange(value)}
+      > 
+        {
+          
+          this.labelOptions.map((labelOption: ElSelectOption) => {
+            return (
+              <el-option key={labelOption.value} value={labelOption.value} label={labelOption.label} />
+            )
+          })
+        }
+      </el-select>
     )
   }
 }

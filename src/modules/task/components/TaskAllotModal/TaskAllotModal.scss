@@ -1,41 +1,36 @@
 /* start 弹窗 */
 .task-allot-modal {
   display: flex;
-  
   & > .base-modal {
     height: calc(100vh - 100px);
     width: calc(100% - 100px) !important;
-    
     & > .base-modal-body {
       display: flex;
       flex-wrap: wrap;
       flex-flow: column;
       padding: 0 !important;
     }
-    
     & > .base-modal-header {
       background-color: #FAFAFA;
     }
-    
   }
-  
   .task-allot-nav {
     width: 180px;
     padding: 0 16px;
     overflow: auto;
     overflow-x: hidden;
   }
-  
   .task-allot-content {
     flex: 1;
     overflow-y: scroll;
   }
-  
   .dialog-footer {
     display: flex;
     justify-content: flex-end;
   }
-  
+  .el-radio-button__inner {
+    box-shadow: none !important;
+  }
 }
 /* end 弹窗 */
 
@@ -155,9 +150,6 @@
   }
   &-mode {
     margin-left: 24px;
-    .el-radio-button__inner {
-      box-shadow: none;
-    }
     .is-active {
       .el-radio-button__inner {
         border-color: $color-warning;

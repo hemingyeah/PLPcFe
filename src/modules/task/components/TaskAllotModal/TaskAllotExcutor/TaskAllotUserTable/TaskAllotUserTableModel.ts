@@ -190,3 +190,15 @@ export enum AllotLocationEnum {
   // 全部
   All = -1
 }
+
+/* 工单指派 人员列表 人员标签枚举 */
+export enum AllotLabelEnum {
+  // 空
+  Null = '',
+  // 主管
+  Leader = 0,
+  // 距离最近
+  DistanceSort = 1,
+  // 好评率前三
+  DegreeTopThree = 2
+}

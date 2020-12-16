@@ -11,7 +11,6 @@ import HookEnum from '@model/enum/HookEnum'
 import StorageModuleEnum from '@model/enum/StorageModuleEnum'
 import StorageKeyEnum from '@model/enum/StorageKeyEnum'
 /* entity */
-import CustomerAddress from '@model/entity/CustomerAddress'
 import LoginUser from '@model/entity/LoginUser/LoginUser'
 import TaskAllotUserInfo from '@model/entity/TaskAllotUserInfo'
 import Tag from '@model/entity/Tag/Tag'
@@ -26,14 +25,19 @@ import Column from '@model/types/Column'
 import { getTaskAllotUserInfoResult, getTaskTagListResult } from '@model/param/out/Task'
 import { MAX_GREATER_THAN__MIN_MESSAGE, REQUIRED_MIN_MESSAGE, REQUIRED_MAX_MESSAGE } from '@src/model/const/Alert'
 import { TaskAllotUserSearchModel, TaskTagListSearchModel } from '@model/param/in/Task'
-import { AllotSortedEnum, AllotLocationEnum, TaslAllotTableColumnFieldEnum } from './TaskAllotUserTableModel'
+import {
+  AllotSortedEnum, 
+  AllotLocationEnum,
+  TaslAllotTableColumnFieldEnum,
+  AllotLabelEnum
+} from '@src/modules/task/components/TaskAllotModal/TaskAllotExcutor/TaskAllotUserTable/TaskAllotUserTableModel'
 /* util */
 import * as _ from 'lodash'
 import Platform from '@src/util/platform'
 import Log from '@src/util/log.ts'
 import { storageGet, storageSet } from '@src/util/storage.ts'
 import { isString, isObject, isArray } from '@src/util/type'
-import { openTabForTaskView, openTabForCustomerView } from '@src/util/business/openTab'
+import { openTabForCustomerView } from '@src/util/business/openTab'
 import { objectArrayIntersection } from '@src/util/array'
 
 declare let AMap: any
@@ -46,7 +50,7 @@ const SortedMap: { [x: string]: number } = {
   [TaslAllotTableColumnFieldEnum.LineDistance]: AllotSortedEnum.Distance
 }
 
-const OrderMap = {
+const OrderMap: { [x: number]: boolean } = {
   [AllotSortedEnum.Distance]: true,
   [AllotSortedEnum.TaskDegreePercentByMonth]: false,
   [AllotSortedEnum.TaskWorkUsedTimeByMonth]: true,
@@ -351,7 +355,7 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
     }
     
     Log.info(this.selectTeams.slice(), this.buildSearchUserParams.name, this.buildSearchUserParams.name)
-
+    
     // 团队数据
     if (this.selectTeams.length > 0) {
       params.tagIds = this.selectTeams.map(team => (team.id || ''))
@@ -429,7 +433,7 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
     return document.querySelector('.task-allot-user-table-block .el-table__body-wrapper')
   }
   
-    /** 
+  /** 
    * @description 获取排序参数
   */
   public getParamOrderDetail(): { order: boolean, code: number } {
@@ -437,15 +441,13 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
       Object.keys(this.orderDetail).length > 0 
         ? this.orderDetail
         : {
-          code: this.selectSortord, 
-          // @ts-ignore
+          code: this.selectSortord,
           order: OrderMap[this.selectSortord] === undefined ? true : OrderMap[this.selectSortord]
         }
     )
     
     return orderDetail
   }
-  
   /** 
    * @description 获取位置参数
   */
@@ -707,7 +709,7 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
     
     if (!order) {
       this.orderDetail = {}
-      this.selectSortord = this.backupSelectSorted
+      // this.selectSortord = this.backupSelectSorted
       return this.initialize()
     }
     
@@ -718,12 +720,12 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
       code: SortedMap[prop],
     }
     
-    if (this.backupSelectSorted == null) {
-      this.backupSelectSorted = this.selectSortord
-    }
+    // if (this.backupSelectSorted == null) {
+    //   this.backupSelectSorted = this.selectSortord
+    // }
     
-    this.orderDetail = orderDetail
-    this.selectSortord = null
+    // this.orderDetail = orderDetail
+    // this.selectSortord = null
     this.initialize()
   }
   
@@ -742,6 +744,17 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
     this.backupSelectSorted = value
     // 保存
     this.saveDataToStorage(StorageKeyEnum.TaskAllotTableSort, value)
+    // 初始化
+    this.initialize()
+  }
+  
+  /**
+   * @description 标签变化事件
+  */
+  public handlerLabelChange(value: AllotLabelEnum): void {
+    Log.succ(Log.Start, this.handlerLabelChange.name)
+    
+    this.selectLabel = value
     // 初始化
     this.initialize()
   }
@@ -836,6 +849,7 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
   }
   
   /** 
+   * @deprecated
    * @description 匹配服务团队
   */
   public async matchTags(): Promise<void> {

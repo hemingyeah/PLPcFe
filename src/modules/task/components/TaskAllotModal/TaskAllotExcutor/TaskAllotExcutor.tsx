@@ -17,6 +17,7 @@ import TaskAllotExecutorRender from '@src/modules/task/components/TaskAllotModal
   name: ComponentNameEnum.TaskAllotExcutor,
   components: {
     TaskAllotUserTable,
+    TaskAllotUserMap,
     UserCard
   }
 })
@@ -25,24 +26,27 @@ export default class TaskAllotExcutor extends TaskAllotExecutorRender {
   render(h: CreateElement) {
     // 属性列表
     const attrs = this.getAttributes()
-    // 是否为地图模式
-    const isMapMode = this.mode === TaskAllotTypeModeEnum.Map
     
     return (
       <div class={ComponentNameEnum.TaskAllotExcutor} {...attrs}>
         { this.renderTaskAllotExecutorHeader() }
         { 
           this.isShowTaskAllotUserTableComponent && (
-            <task-allot-user-table 
+            <task-allot-user-table
               ref='TaskAllotUserTableComponent' 
               changePending={(pending: boolean) => this.outsideSetPending(pending)}
+              style={this.modeComponents[TaskAllotTypeModeEnum.List]}
             >
             </task-allot-user-table>
           )
         }
         { 
-          isMapMode && this.isShowTaskAllotUserMapComponent && (
-            <TaskAllotUserMap /> 
+          this.isMapMode && this.isShowTaskAllotUserMapComponent && (
+            <task-allot-user-map
+              ref='TaskAllotUserMapComponent'
+              style={this.modeComponents[TaskAllotTypeModeEnum.Map]} 
+            >
+            </task-allot-user-map>
           )
         }
       </div>

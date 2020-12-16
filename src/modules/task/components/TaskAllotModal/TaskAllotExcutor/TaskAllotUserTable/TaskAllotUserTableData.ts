@@ -8,7 +8,13 @@ import TaskAllotUserInfo from '@model/entity/TaskAllotUserInfo'
 import { ElSelectOption } from '@src/modules/task/components/TaskAllotModal/TaskAllotExcutor/TaskAllotUserTable/TaskAllotUserTableInterface'
 /* model */
 import Page from '@model/Page'
-import { AllotSortedEnum, AllotLocationEnum, TaskAllotUserTableEnterpriseEditionColumns, TaskAllotUserTableStandEditionColumns } from '@src/modules/task/components/TaskAllotModal/TaskAllotExcutor/TaskAllotUserTable/TaskAllotUserTableModel'
+import { 
+  AllotSortedEnum, 
+  AllotLocationEnum, 
+  TaskAllotUserTableEnterpriseEditionColumns, 
+  TaskAllotUserTableStandEditionColumns,
+  AllotLabelEnum
+} from '@src/modules/task/components/TaskAllotModal/TaskAllotExcutor/TaskAllotUserTable/TaskAllotUserTableModel'
 /* types */
 import Column from '@model/types/Column'
 /* util */
@@ -24,6 +30,11 @@ class TaskAllotUserTableData extends TaskAllotUserTableComponents {
   public AMap: any = null
   /* 地图弹窗对象 */
   public AMapInfoWindow: any = null
+  /* 表格列 */
+  public columns: Column[] = (
+    // 企业版 和 标准版 有所区分 (企业版支持 车程, 驾车距离)
+    isEnterpriseEdition() ? TaskAllotUserTableEnterpriseEditionColumns : TaskAllotUserTableStandEditionColumns
+  )
   /* 是否禁用加载更多 */
   public isDisableLoadmore: boolean = false
   /* 最后一次点击的标记头像 */
@@ -45,7 +56,9 @@ class TaskAllotUserTableData extends TaskAllotUserTableComponents {
   /* 当前选择的工作状态 */
   public selectUserState: string[] = []
   /* 当前选择的排序方式 */
-  public selectSortord: number | null = AllotSortedEnum.FinishTaskByMonth
+  public selectSortord: number = AllotSortedEnum.FinishTaskByMonth
+  /* 当前选择的标签 */
+  public selectLabel: AllotLabelEnum = AllotLabelEnum.Null
   /* 当前选择的排序方式 备份数据 */
   public backupSelectSorted: number | null = AllotSortedEnum.FinishTaskByMonth
   /* 表格key 随机数 */
@@ -79,6 +92,13 @@ class TaskAllotUserTableData extends TaskAllotUserTableComponents {
     maxValue: null,
     isChecked: false
   }
+  /* 标签配置列表 */
+  public labelOptions: ElSelectOption[] = [
+    { label: '员工标签', value: AllotLabelEnum.Null },
+    { label: '主管', value: AllotLabelEnum.Leader },
+    { label: '距离最近', value: AllotLabelEnum.DistanceSort },
+    { label: '好评率前三', value: AllotLabelEnum.DegreeTopThree }
+  ]
   /* 排序方式列表 */
   public sortordOptions: ElSelectOption[] = [
     { label: '距离最近', value: AllotSortedEnum.Distance },
@@ -88,11 +108,13 @@ class TaskAllotUserTableData extends TaskAllotUserTableComponents {
     { label: '30天内接单响应最快', value: AllotSortedEnum.TaskAcceptTimeByMonth },
     { label: '30天内完成最多', value: AllotSortedEnum.FinishTaskByMonth },
   ]
-  /* 表格列 */
-  public columns: Column[] = (
-    // 企业版 和 标准版 有所区分 (企业版支持 车程, 驾车距离)
-    isEnterpriseEdition() ? TaskAllotUserTableEnterpriseEditionColumns : TaskAllotUserTableStandEditionColumns
-  )
+  /* 表格排序筛选配置列表 */
+  public tableSortLabelOptionss: ElSelectOption[] = [
+    { label: '距离优先',  value: AllotSortedEnum.Distance },
+    { label: '今日接单量低到高',  value: AllotSortedEnum.ExecutorTaskByMonth },
+    { label: '好评优先',  value: AllotSortedEnum.TaskDegreePercentByMonth },
+  ]
+  public tableSortLabel: AllotSortedEnum | null = null 
 }
 
 export default TaskAllotUserTableData

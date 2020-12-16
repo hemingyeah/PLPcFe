@@ -69,8 +69,6 @@
 <script>
 import Clickoutside from '@src/util/clickoutside';
 import Page from '@model/Page';
-/* util */
-import { uuid } from '@src/util/string'
 
 /**
  * Todo

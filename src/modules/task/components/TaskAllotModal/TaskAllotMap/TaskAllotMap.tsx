@@ -4,7 +4,6 @@ import { CreateElement } from 'vue'
 /* entity */
 import Customer from '@model/entity/Customer'
 import TaskAddress from '@model/entity/TaskAddress'
-import CustomerAddress from '@model/entity/CustomerAddress'
 /* enum */
 import ComponentNameEnum from '@model/enum/ComponentNameEnum'
 import EventNameEnum from '@model/enum/EventNameEnum'
@@ -25,6 +24,8 @@ export default class TaskAllotMap extends Vue {
   @Prop() readonly idName: string | undefined
   // 自定义事件
   @Prop() readonly handlerCustomFunc: Function | undefined
+  // 设置地图事件
+  @Prop() readonly setMapFunc: Function | undefined
   
   /* 地图对象 */
   private AMap: any = null
@@ -157,7 +158,9 @@ export default class TaskAllotMap extends Vue {
     
     // 自定义操作
     this.handlerCustomFunc && this.handlerCustomFunc(this.AMap, this.AMapInfoWindow)
-    
+    // 设置地图数据
+    this.setMapFunc && this.setMapFunc(this.AMap)
+    // Log
     Log.succ(Log.End, this.mapInit.name)
   }
   

@@ -59,8 +59,7 @@
     cursor: pointer;
     display: flex;
     align-items: center;
-    justify-content: space-around;
-    width: 120px;
+    width: 80px;
   }
   &-excutor-column {
     display: flex;
@@ -275,3 +274,33 @@
     font-size: $font-size-larger !important;
   }
 }
+
+/* start new */
+.task-allot-user-table-header {
+  display: flex;
+  justify-content: space-between;
+  padding: 16px;
+  &-label,
+  &-select-block {
+    display: flex;
+    align-items: center;
+    & > div {
+      margin-left: 8px;
+    }
+  }
+  .task-allot-user-table-sort-label {
+    background-color: $bg-color-l3;
+    border-radius: 12px;
+    cursor: pointer;
+    display: inline-block;
+    font-size: $font-size-small;
+    margin-right: 12px;
+    padding: 3px 12px;
+    transition: all 0.5s ease;
+    &-active {
+      background-color: $color-primary;
+      color: #fff;
+    }
+  }
+}
+/* end new */

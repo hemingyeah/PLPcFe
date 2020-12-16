@@ -1,9 +1,8 @@
 /* start 地图 */
 .task-allot-map {
   display: flex;
-  #MapContainer {
+  #TaskAllotUserMapContainer {
     height: 100%;
-    // width: calc(100% - 450px);
     flex: 1;
     .staff-header {
       border-radius: 50%;
@@ -89,9 +88,12 @@
     margin-right: 24px;
     &-label {
       display: flex;
-      justify-content: center;
+      justify-content: flex-start;
       align-items: center;
-      min-width: 90px;
+      min-width: 70px;
+    }
+    &:last-child {
+      margin-right: 0;
     }
   }
 }
