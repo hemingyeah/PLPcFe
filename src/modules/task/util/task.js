@@ -164,6 +164,12 @@ export function packToForm(fields, data){
         value = value.filter(img => !img.receipt);
       }
     }
+    
+    // 产品关联查询
+    if (field.formType === TaskFieldNameMappingEnum.RelationProduct) {
+      let fieldValue = task[fieldName];
+      if (!Array.isArray(fieldValue) && fieldValue) task[fieldName] = [fieldValue];
+    }
 
     isSystem == 1 && (task[fieldName] = value);
 

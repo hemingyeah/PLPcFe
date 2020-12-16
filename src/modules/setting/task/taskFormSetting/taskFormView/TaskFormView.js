@@ -204,9 +204,19 @@ export default {
     */
     relationOptionsConfirm(options) {
       for (let index = 0; index < options.length; index++) {
-        const item = options[index];
-        // this.$refs.formDesign.insertField(this.relationField, this.fields, this.fields.length + (index + 1), item)
-        this.$refs.formDesign.immediateInsert(this.relationField, null, item);
+        const setting = options[index];
+        const field = _.cloneDeep(this.relationField);
+        
+        // 设置该关联查询字段的标题为关联项标题
+        field.name = setting.displayName;
+
+        // 删除setting多余字段
+        delete setting.displayName;
+
+        // 加延时异步是因为form-design的insertField方法更新value异步会导致选择多个关联项时只能插入一个
+        setTimeout(() => {
+          this.$refs.formDesign.immediateInsert(field, null, setting);
+        }, 0)
       }
     }
   },

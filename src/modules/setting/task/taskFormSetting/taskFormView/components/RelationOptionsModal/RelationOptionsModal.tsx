@@ -39,7 +39,7 @@ export default class RelationOptionsModal extends Vue {
   /* 已选择的关联项 */
   private selectedRelationItem: Array<any> = []
   /* 可以关联的最大数量 */
-  private selectedRelationArrayMaxLength: Number = 5
+  private selectedRelationArrayMaxLength: Number = 4
 
   /* 已选择的关联项数组 */
   get selectedRelationArray(): any[] {
@@ -115,7 +115,7 @@ export default class RelationOptionsModal extends Vue {
   private renderRelationOptions() {
     return (
       <div class='relation-options-panel'>
-        <h4>全部关联项</h4>
+        <h4>全部字段</h4>
         <el-checkbox-group
           value={this.selectedRelationItem}
           onInput={(value: []) => this.selectedRelationItem = value}
@@ -143,7 +143,7 @@ export default class RelationOptionsModal extends Vue {
   private renderSelectedRelationOptions() {
     return (
       <div class='relation-options-panel'>
-        <h4>已选关联项<span>{this.selectedRelationArray.length}/{this.selectedRelationArrayMaxLength}</span></h4>
+        <h4>已选字段<span>{this.selectedRelationArray.length}/{this.selectedRelationArrayMaxLength}</span></h4>
         <div class='relation-options-selected-panel'>
           {
             this.selectedRelationArray.map((item: any) => {
@@ -173,7 +173,7 @@ export default class RelationOptionsModal extends Vue {
       class: 'related-options-modal',
       props: {
         show: this.show,
-        title: '关联项配置'
+        title: '关联显示项配置'
       },
       on: {
         'update:show': (val: boolean) => {

@@ -88,4 +88,12 @@ export default {
       return result;
     }, {})
   },
+  /* 工单表单显示字段 过滤 产品关联字段 */
+  taskFormFields() {
+    return this.fields.filter(field => field.formType != TaskFieldNameMappingEnum.RelationProduct);
+  },
+  /* 产品关联字段 */
+  relationProductfields() {
+    return this.fields.filter(field => field.formType == TaskFieldNameMappingEnum.RelationProduct);
+  }
 };

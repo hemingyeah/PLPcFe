@@ -96,7 +96,11 @@ export enum TaskFieldNameMappingEnum {
   // 更新时间
   UpdateTime = 'updateTime',
   // 工作用时
-  WorkUsedTimeStr = 'workUsedTimeStr'
+  WorkUsedTimeStr = 'workUsedTimeStr',
+  // 产品关联字段
+  RelationProduct = 'relationProduct',
+  // 客户关联字段
+  RelationCustomer = 'relationCustomer'
 }
 
 /* 客户字段映射 */
