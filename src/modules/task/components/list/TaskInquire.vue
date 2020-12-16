@@ -665,6 +665,10 @@ export default {
             f.setting.isMulti = true;
           }
 
+          if (f.formType === 'select' && !f.isSystem) {
+            f.setting.isMulti = false;
+          }
+
           let childComp = null;
 
           if (f.fieldName == 'customer') {
