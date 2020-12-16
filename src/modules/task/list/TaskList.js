@@ -343,11 +343,18 @@ export default {
         this.abnormalData = result
         this.abnormalData['hoverText'] = result.taskCustomExceptionNodeList.map(item => {return item.exceptionName}).join(',')
         
-        this.abnormals = this.abnormals.map(item => {
-          for(let key in result) {
-            if (item.)
+        const {taskExceptionReasonList} = result
+        this.abnormals = this.abnormals.map((item, index) => {
+          item.setting['isMulti'] = false
+          item.setting['dataSource'] = []
+          if (item.fieldName.indexOf(taskExceptionReasonList[index].englishName) !== -1) {
+            item.setting['dataSource'] = taskExceptionReasonList[index].exceptionReason
+            item['englishName'] = taskExceptionReasonList[index].englishName
           }
+          return item
         })
+
+        console.log(this.abnormals)
 
         // if (title === 'exception') {
         //   this.seoSetList = [...this.seoSetList, ...this.abnormals]
