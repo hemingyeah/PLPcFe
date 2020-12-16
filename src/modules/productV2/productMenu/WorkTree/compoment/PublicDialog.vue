@@ -24,8 +24,8 @@
             class="demo-ruleForm"
             status-icon
           >
-            <el-form-item label="目录名称" prop="name">
-            <el-input v-model="ruleForm.name"></el-input> </el-form-item
+            <el-form-item label="类型名称" prop="name">
+            <el-input v-model="ruleForm.name" maxlength="30"></el-input> </el-form-item
           ></el-form>
         </template>
         <template v-else>
@@ -36,7 +36,7 @@
                   ? '备件'
                   : dialogType == 'linkWiki'
                     ? '知识库'
-                    : '目录'
+                    : '类型'
               }}：
             </div>
             <el-select
@@ -141,13 +141,13 @@ export default {
     return {
       dialogData: {
         addMenu: {
-          title: "添加目录",
+          title: "添加产品类型",
         },
         addMenuChild: {
-          title: "添加目录",
+          title: "添加产品类型",
         },
         cloneMenu: {
-          title: "选择需要复制的目录",
+          title: "选择需要复制的产品类型",
           http: getPageCloneData,
           options: [],
         },
@@ -172,7 +172,7 @@ export default {
       },
       rules: {
         name: [
-          { required: true, message: "请输入目录名称", trigger: "blur" },
+          { required: true, message: "请输入类型名称", trigger: "blur" },
           { min: 1, max: 30, message: "最多30个字符", trigger: "change" },
         ],
       },

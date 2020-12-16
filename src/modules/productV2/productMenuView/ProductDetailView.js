@@ -39,12 +39,15 @@ const {
   TASK_GUIDE_DETAIL
 } = require("@src/component/guide/taskV2Store");
 
+let getUrlObj;
+
 export default {
   name: "product-detail-view",
   inject: ["initData"],
   mixins: [tourGuide],
   data() {
-    let id = this.$getUrlObj(window).id;
+    getUrlObj = this.$getUrlObj(window);
+    let id = getUrlObj.id;
     return {
       loading: false,
       pending: false,
@@ -260,7 +263,7 @@ export default {
     },
 
     dleteData() {
-      this.$confirm("此操作将删除该目录以及目录下所有的内容?", "提示", {
+      this.$confirm("此操作将删除该类型以及类型下所有的内容?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning",
@@ -305,7 +308,6 @@ export default {
   },
   async created() {
 
-    let getUrlObj = this.$getUrlObj(window);
 
     this.loading = true;
     getPageInfo({
@@ -394,10 +396,10 @@ export default {
   },
   watch: {
     collapse(newValue) {
-      sessionStorage.setItem(`product_menu_collapse_${this.datainfo.id}`, newValue);
+      sessionStorage.setItem(`product_menu_collapse_${getUrlObj.id}`, newValue);
     },
     collapseDirection(newValue) {
-      sessionStorage.setItem(`product_collapseDirection_${this.datainfo.id}`, newValue);
+      sessionStorage.setItem(`product_collapseDirection_${getUrlObj.id}`, newValue);
     }
   },
   components: {

@@ -75,7 +75,7 @@
         </div>
 
         <div class="collapse-left" v-show="collapseDirection == 'left'">
-          工单详情
+          详细信息
         </div>
       </template>
       <!-- end 工单详情 -->
@@ -182,7 +182,7 @@
 </template>
 
 <script>
-import ProductDetailView from './ProductDetailView';
+import ProductDetailView from "./ProductDetailView";
 export default ProductDetailView;
 </script>
 

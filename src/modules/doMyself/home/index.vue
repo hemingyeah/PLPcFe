@@ -103,7 +103,7 @@ export default {
       } else if (index === 3) {
         window.location.href = "/setting/doMyself/toastList";
       }
-      this.nowMenu === index;
+      this.nowMenu = index;
     },
   },
   components: {

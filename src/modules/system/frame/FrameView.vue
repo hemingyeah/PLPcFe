@@ -183,6 +183,7 @@
                   >产品类型设置</a
                   >
                   <a href="javascript:;" @click="goProductList">产品列表</a>
+                  <a href="javascript:;" @click="goProductEdit">V2新建产品</a>
                   <!-- <a href="javascript:;" @click="goCallCenterSetting">呼叫中心设置</a>
                   <a href="javascript:;" @click="goCallCenterWorkbench">呼叫工作台</a>
                   <a href="javascript:;" @click="goCallCenter">呼叫中心</a> -->
@@ -1019,6 +1020,14 @@ export default {
         id: "productV2_list",
         title: "产品类型",
         url: "/customer/productV2",
+        reload: true,
+      });
+    },
+    goProductEdit(){
+      platform.openTab({
+        id: "productV2_edit",
+        title: "新建产品V2",
+        url: "/customer/product/createV2",
         reload: true,
       });
     },

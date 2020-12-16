@@ -283,7 +283,7 @@ export default {
     },
     dlete(data) {
       this.$confirm(
-        `此操作将删除该目录所关联的${
+        `此操作将删除该类型所关联的${
           this.dataType == "part" ? "备件" : "知识库"
         }?`,
         "提示",

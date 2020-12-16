@@ -66,7 +66,7 @@
         </form>
       </div>
       <!-- 筛选 -->
-      <div class="task-list-header-nav bg-w">
+      <!-- <div class="task-list-header-nav bg-w">
         <div class="task-flex">
           <div class="task-font14 task-c6 state">产品类型：</div>
           <div class="list list-crate"
@@ -84,7 +84,7 @@
             </div>
           </div>
         </div>
-      </div>
+      </div> -->
     </div>
 
     <div class="product-list-section">
@@ -571,8 +571,8 @@ export default {
       // 头部筛选列表 s
       selectList: [
         { name: "全部", key: "", value: "" },
-        { name: "有目录", key: "buildCatalogNum", value: 1 },
-        { name: "无目录", key: "unBuildCatalogNum", value: 0 }
+        { name: "有产品类型", key: "buildCatalogNum", value: 1 },
+        { name: "无产品类型", key: "unBuildCatalogNum", value: 0 }
       ],
       selectCount: null,
       navWidth: window.innerWidth - 120,
@@ -608,7 +608,7 @@ export default {
           displayName: "二维码编号",
           fieldName: "qrcodeId",
           formType: "text",
-          isExport: false,
+          export: false,
           isSystem: 1,
           placeholder: "请输入产品二维码",
           orderId: 10001,
@@ -625,7 +625,7 @@ export default {
           displayName: "联系人",
           fieldName: "linkmanName",
           formType: "text",
-          isExport: true,
+          export: true,
           isSystem: 0,
           tableName: "product",
         });
@@ -633,7 +633,7 @@ export default {
         fixedFields.push({
           displayName: "电话",
           fieldName: "phone",
-          isExport: true,
+          export: true,
           isSystem: 0,
           tableName: "product",
         });
@@ -643,7 +643,7 @@ export default {
         fixedFields.push({
           displayName: "地址",
           fieldName: "address",
-          isExport: true,
+          export: true,
           formType: "text",
           isSystem: 0,
           tableName: "product",
@@ -792,11 +792,11 @@ export default {
           value: "productExport",
           columns: arr.filter(item => item.tableName == "product"),
         },
-        {
-          label: "产品类型信息",
-          value: "catalogExport",
-          columns: arr.filter(item => item.tableName == "catalog"),
-        },
+        // {
+        //   label: "产品类型信息",
+        //   value: "catalogExport",
+        //   columns: arr.filter(item => item.tableName == "catalog"),
+        // },
       ];
       return arr_
     },
@@ -863,7 +863,7 @@ export default {
   },
   methods: {
     getAddress (field) {
-      return field.province + field.city + field.dist + field.address || "";
+      return (field && field.province + field.city + field.dist + field.address) || "";
     },
     getRelatedTask (field) {
       return Array.isArray(field)

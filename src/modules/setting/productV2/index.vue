@@ -72,7 +72,7 @@ export default {
       productSet: 0,
       productMenuSet: 1,
     };
-    this.nowMenu = typeObj[type] || 1;
+    this.nowMenu = typeObj[type];
   },
   methods: {
     changePage(index) {
@@ -84,7 +84,7 @@ export default {
       } else if (index === 1) {
         window.location.href = "/setting/productV2/catalog/setting?type=productMenu";
       }
-      this.nowMenu === index;
+      this.nowMenu = index;
     },
   },
   components: {

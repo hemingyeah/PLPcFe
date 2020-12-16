@@ -3,19 +3,19 @@
     <div class="flex-1 scroll-data">
       <template v-if="!propData.canEditConData">
         <no-data-view
-          :notice-msg="'非空目录不可以建目录详细信息'"
+          :notice-msg="'非空类型不可以建类型详细信息'"
         ></no-data-view>
       </template>
       <template v-else-if="!propData.conData">
-        <no-data-view :notice-msg="'空目录下可以建目录详细信息'">
+        <no-data-view :notice-msg="'空类型下可以建类型详细信息'">
         </no-data-view>
         <div class="text-center mar-t-24">
-          <el-button @click="setMenuInfo">新建目录信息</el-button>
+          <el-button @click="setMenuInfo">新建类型信息</el-button>
         </div>
       </template>
       <div v-show="propData.canEditConData && propData.conData">
         <div class="normal-title-1">
-          <div class="flex-1">编辑目录详细信息</div>
+          <div class="flex-1">编辑类型详细信息</div>
           <el-button @click="showDialog('cloneMenu')"
           >复制其他产品类型</el-button
           >
@@ -29,11 +29,11 @@
           @update="update"
         >
           <div class="normal-title-2">
-            <div>选择目录显示字段</div>
+            <div>选择产品类型显示字段</div>
             <el-tooltip
               class="item"
               effect="dark"
-              content="目录字段在系统管理中配置"
+              content="类型字段在系统管理中配置"
               placement="bottom"
             >
               <i class="iconfont icon-help color-999 mar-l-8 cur-point"></i>
@@ -42,7 +42,7 @@
 
           <div class="pad-l-10 mar-b-30">
             <div class="font-12 color-999 mar-b-10">
-              *被隐藏的字段，将不会出现在这个目录信息中（系统字段不可隐藏）
+              *被隐藏的字段，将不会出现在这个类型信息中（系统字段不可隐藏）
             </div>
             <el-checkbox-group v-model="fieldIds">
               <template v-for="item in fields">
@@ -97,6 +97,9 @@
               >
                 <i class="el-icon-plus"></i>
               </el-upload>
+              <div class="font-12 color-999 mar-t-10">
+                最多上传5张图片，建议尺寸
+              </div>
             </form-item>
           </template>
 
@@ -114,6 +117,9 @@
               >
                 <i class="el-icon-plus"></i>
               </el-upload>
+              <div class="font-12 color-999 mar-t-10">
+                最多上传1张图片，建议尺寸
+              </div>
             </form-item>
           </template>
 
@@ -201,6 +207,7 @@ import {
   setPageInfo,
   clearCatalogData,
 } from "@src/api/ProductV2Api";
+import { warn } from "vue-class-component/lib/util";
 
 const urlKey = {
   catalogName: "catalog_name",
@@ -268,6 +275,7 @@ export default {
           const sortedFields = fields
             .sort((a, b) => a.orderId - b.orderId)
             .map((item) => {
+              if (item.fieldName == "catalogName") item["maxlength"] = 30;
               if (item.fieldName == "catalogNum") item["disabled"] = true;
               if(item.fieldName == "productVideo") item["limit"] = 1;
               return item;
@@ -459,6 +467,12 @@ export default {
               type: "success",
             });
             this.changeTreeDetail("conData", 1);
+            try {
+              let fromId = window.frameElement.getAttribute("fromid")
+              this.$platform.refreshTab(fromId)
+            } catch (error) {
+              console.warn(error, "error try catch");
+            }
             window.parent.flashSomePage({
               type: "M_PRODUCT_CATALOG",
             });
@@ -519,7 +533,7 @@ export default {
       });
     },
     deletInfo() {
-      this.$confirm("此操作将删除该目录所编辑的内容?", "提示", {
+      this.$confirm("此操作将删除该类型所编辑的内容?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning",

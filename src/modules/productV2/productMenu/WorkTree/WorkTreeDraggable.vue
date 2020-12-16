@@ -53,7 +53,7 @@
             >
               <div class="item-menu-box">
                 <div @click.stop="addChildArr(index)" v-show="!el.conData">
-                  添加子集目录
+                  添加子集类型
                 </div>
                 <div @click.stop="renameChildArr(index)">
                   重命名
@@ -91,7 +91,7 @@ import draggable from "vuedraggable";
 import _ from "lodash";
 import { sortTreeList, delTreeList } from "@src/api/ProductV2Api";
 const arrTemp = {
-  name: "目录名称",
+  name: "类型名称",
   tasks: [],
   conData: null,
   showList: 1,
@@ -160,7 +160,7 @@ export default {
       this.tasks[index].popoverVisible = false;
 
       this.$confirm(
-        "此操作将删除该目录以及目录下的所有子目录, 是否继续?",
+        "此操作将删除该类型以及类型下的所有子类, 是否继续?",
         "提示",
         {
           confirmButtonText: "确定",

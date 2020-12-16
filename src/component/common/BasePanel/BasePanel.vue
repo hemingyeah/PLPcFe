@@ -1,53 +1,78 @@
 <template>
-  <transition-group tag="div" name="slide-left" @after-leave="$emit('closed')">
-    <template v-if="diyTransfer">
-      <slot name="diyTransferCon" v-if="show">
-      
-      </slot>
-    </template>
-    <template v-else>
-      <!-- <div v-show="show" class="base-panel-mask" @click.self="close"> -->
-      <aside v-if="show && !re" key="aside1" class="base-panel" :style="{width: width}" @click.stop>
-        <slot name="header">
-          <header class="base-panel-title">
-            <slot name="title">
-              <h3>{{title}}</h3>
-            </slot>
-            <button type="button" @click="close" class="base-panel-close">
-              <i class="iconfont icon-fe-close"></i>
-            </button>
-          </header>
-        </slot>
+  <transition v-if="diyTransfer"
+              tag="div"
+              name="slide-left"
+              @after-leave="$emit('closed')">
+    <slot name="diyTransferCon"
+          v-if="show">
 
-        <slot></slot>
-
-        <slot name="footer"></slot>
-      </aside>
-      <aside v-show="show && re" key="aside2" class="base-panel" :style="{width: width}" @click.stop>
-        <slot name="header">
-          <header class="base-panel-title">
-            <slot name="title">
-              <h3>{{title}}</h3>
-            </slot>
-            <button type="button" @click="close" class="base-panel-close">
-              <i class="iconfont icon-fe-close"></i>
-            </button>
-          </header>
-        </slot>
-
-        <slot></slot>
-
-        <slot name="footer"></slot>
-      </aside>
-    </template>
+    </slot>
 
     <!-- </div> -->
-  </transition-group>
+  </transition>
+
+  <transition v-else-if="show && !re"
+              tag="div"
+              name="slide-left"
+              @after-leave="$emit('closed')">
+    <!-- <div v-show="show" class="base-panel-mask" @click.self="close"> -->
+    <aside v-if="show && !re"
+           key="aside1"
+           class="base-panel"
+           :style="{width: width}"
+           @click.stop>
+      <slot name="header">
+        <header class="base-panel-title">
+          <slot name="title">
+            <h3>{{title}}</h3>
+          </slot>
+          <button type="button"
+                  @click="close"
+                  class="base-panel-close">
+            <i class="iconfont icon-fe-close"></i>
+          </button>
+        </header>
+      </slot>
+
+      <slot></slot>
+
+      <slot name="footer"></slot>
+    </aside>
+  </transition>
+
+  <transition v-else
+              tag="div"
+              name="slide-left"
+              @after-leave="$emit('closed')">
+    <aside v-show="show && re"
+           key="aside2"
+           class="base-panel"
+           :style="{width: width}"
+           @click.stop>
+      <slot name="header">
+        <header class="base-panel-title">
+          <slot name="title">
+            <h3>{{title}}</h3>
+          </slot>
+          <button type="button"
+                  @click="close"
+                  class="base-panel-close">
+            <i class="iconfont icon-fe-close"></i>
+          </button>
+        </header>
+      </slot>
+
+      <slot></slot>
+
+      <slot name="footer"></slot>
+    </aside>
+  </transition>
+
 </template>
 
 <script>
 export default {
-  name: 'base-panel',
+  name: "base-panel",
   props: {
     title: String,
     re: {
@@ -67,36 +92,35 @@ export default {
     },
     width: {
       type: String,
-      default: '360px'
+      default: "360px"
     }
   },
   methods: {
-    close() {
-      this.$emit('close');
+    close () {
+      this.$emit("close");
       // 兼容sync
-      this.$emit('update:show', false);
+      this.$emit("update:show", false);
     },
     /** 监听文档的点击事件，如果点击组件外的元素，关闭组件 */
-    handleClickOutside(e) {
+    handleClickOutside (e) {
       let { isTrusted, detail } = e;
       if (!isTrusted && (detail == null || !detail.isTrusted)) return;
 
       if (this.show && !this.$el.contains(e.target)) this.close();
     }
   },
-  mounted() {
+  mounted () {
     if (this.re) return
-    document.addEventListener('click', this.handleClickOutside, false);
+    document.addEventListener("click", this.handleClickOutside, false);
   },
-  destroyed() {
+  destroyed () {
     if (this.re) return
-    document.removeEventListener('click', this.handleClickOutside);
+    document.removeEventListener("click", this.handleClickOutside);
   }
 };
 </script>
 
 <style lang="scss">
-
 .base-panel {
   position: fixed;
   top: 0;

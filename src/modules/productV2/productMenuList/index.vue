@@ -347,7 +347,7 @@
       width="420px"
     >
       <h3 slot="title">
-        <span>已选中目录({{ multipleSelection.length }})</span>
+        <span>已选中类型({{ multipleSelection.length }})</span>
         <i
           v-if="multipleSelection.length"
           class="iconfont icon-qingkongshanchu product-panel-btn"
@@ -464,8 +464,8 @@ import _ from "lodash";
 import Page from "@model/Page";
 import { formatDate } from "@src/util/lang";
 import BatchEditingDialog from "@src/modules/productV2/productMenuList/compoment/BatchEditingDialog.vue";
-import BatchRemindingDialog from "@src/modules/product/components/BatchRemindingDialog.vue";
-import BatchUpdateDialog from "@src/modules/product/components/BatchUpdateDialog.vue";
+import BatchRemindingDialog from "@src/modules/productV2/productMenuList/compoment/BatchRemindingDialog.vue";
+import BatchUpdateDialog from "@src/modules/productV2/productMenuList/compoment/BatchUpdateDialog.vue";
 import SearchPanel from "@src/modules/productV2/productMenuList/compoment/SearchPanel.vue";
 
 import { getUpdateRecord } from "@src/api/ProductApi";
@@ -766,11 +766,18 @@ export default {
     // 选择列 e
 
     openProductMenuTab(id) {
+      let fromId;
+      try {
+        fromId = window.frameElement.getAttribute("id");
+      } catch (error) {
+        
+      }
       this.$platform.openTab({
         id: `productV2_catalog_view_${id}`,
         title: "产品类型详情",
         close: true,
-        url: `/productV2/catalog/view?id=${id}`
+        url: `/productV2/catalog/view?id=${id}`,
+        fromId
       });
     },
     search() {

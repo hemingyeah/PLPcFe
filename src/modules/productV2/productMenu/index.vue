@@ -28,7 +28,7 @@
               @click.stop="changeDialog('addMenu')"
             >
               <i class="iconfont icon-zhankai"></i>
-              新建一级目录
+              新建一级分类
             </div>
             <div
               class="draggable-data-btn-item cur-point"
@@ -241,27 +241,28 @@ export default {
                 nowIndex: 0,
               };
               if (this.fasterFindId) {
-                // try {
-                let fasterEditRoot_ = this.fasterFindRootById(
-                  this.treeData[0].tasks,
-                  this.fasterFindId,
-                  [0]
-                );
-                fasterEditRoot_["canEditConData"] = !(
-                  fasterEditRoot_.tasks.length > 0
-                );
-                nowEditMenu = fasterEditRoot_;
-
-                if (fasterEditRoot_.indexArr.length > 2) {
-                  this.fasterShowList(
-                    this.treeData,
-                    fasterEditRoot_.indexArr,
-                    0
+                try {
+                  let fasterEditRoot_ = this.fasterFindRootById(
+                    this.treeData[0].tasks,
+                    this.fasterFindId,
+                    [0]
                   );
+
+                  fasterEditRoot_["canEditConData"] = !(
+                    fasterEditRoot_.tasks.length > 0
+                  );
+                  nowEditMenu = fasterEditRoot_;
+
+                  if (fasterEditRoot_.indexArr.length > 2) {
+                    this.fasterShowList(
+                      this.treeData,
+                      fasterEditRoot_.indexArr,
+                      0
+                    );
+                  }
+                } catch (error) {
+                  console.warn("getTreeList error", error);
                 }
-                // } catch (error) {
-                //   console.warn("getTreeList error", error);
-                // }
               }
               this.nowEditMenu = nowEditMenu;
             }

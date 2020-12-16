@@ -774,11 +774,18 @@ export default {
       });
     },
     openProductMenuTab(id) {
+      let fromId;
+      try {
+        fromId = window.frameElement.getAttribute("id");
+      } catch (error) {
+        
+      }
       this.$platform.openTab({
         id: `productV2_catalog_view_${id}`,
         title: "产品类型详情",
         close: true,
         url: `/productV2/catalog/view?id=${id}`,
+        fromId
       });
     },
     changeDataInfo(e){

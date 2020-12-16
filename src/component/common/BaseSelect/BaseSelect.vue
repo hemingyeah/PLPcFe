@@ -1,7 +1,7 @@
 <template>
   <div class="base-select-container">
     <div class="content" v-clickoutside="closeList">
-      <div class="base-select-main-content multiple-layout el-select" @click.stop="focusInput" v-if="multiple"
+      <div class="base-select-main-content multiple-layout el-select" ref="normalInput" @click.stop="focusInput" v-if="multiple"
            :class="{'error': error, 'wrapper-is-focus': isFocus, 'clearable-layout': clearable}">
 
         <el-tag size="mini" closable v-for="tag in value" :key="getValueKey(tag)" @close="removeTag(tag)" disable-transitions type="info">
@@ -15,6 +15,7 @@
       <div 
         class="base-select-main-content" 
         @click.stop="focusInput" 
+        ref="normalInput"
         v-else
         :class="{'error': error, 'wrapper-is-focus': isFocus, 'clearable-layout': clearable,}"
       >
@@ -30,7 +31,7 @@
 
       <i v-if="clearable && value.length" class="iconfont icon-minus-fill clear-btn" @click="clearValue"></i>
 
-      <div class="list-wrapper" v-show="showList">
+      <div class="list-wrapper" v-show="showList" :style="selectCon ? `top:${(selectCon.top +selectCon.height +13)}px;left:${ selectCon.left}px;width:${selectCon.width}px` : ''">
         <div class="arrow"></div>
         <div class="input-container" v-if="!options.length">
           <input type="text" v-model="keyword" @input="searchByKeyword" ref="input" :placeholder="placeholder">
@@ -54,8 +55,10 @@
 
 <script>
 import Clickoutside from "@src/util/clickoutside";
+let timeInterval;
 import Page from "@model/Page";
 import _ from "lodash"
+import { log } from "mathjs";
 
 /**
  * Todo
@@ -117,8 +120,23 @@ export default {
         callback: this.loadmore,
         distance: 10,
       },
-      page: new Page()
+      page: new Page(),
+      selectCon:null
     }
+  },
+  watch:{
+    showList(newV, oldV){
+      if(newV == true){
+        timeInterval = setInterval(()=>{
+          this.selectCon = this.$refs["normalInput"].getBoundingClientRect();
+        }, 100)
+      }else{
+        clearInterval(timeInterval)
+      }
+    }
+  },
+  beforeDestroy(){
+    clearInterval(timeInterval)
   },
   computed: {
     optionList() {
@@ -326,7 +344,7 @@ export default {
     }
 
     .list-wrapper {
-      position: absolute;
+      position: fixed;
       left: 0;
       top: calc(100% + 13px);
       width: 100%;
