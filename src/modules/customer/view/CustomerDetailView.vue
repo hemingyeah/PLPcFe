@@ -659,10 +659,13 @@ export default {
         const params = { ids: this.customer.id }
         const result = await this.$http.post('/customer/delete', params)
         if (!result.status) {
-          let fromId = window.frameElement.getAttribute('fromid')
-          this.$platform.refreshTab(fromId)
+          let id = window.frameElement.dataset.id
+          this.$platform.closeTab(id)
 
-          window.location.reload()
+          // let fromId = window.frameElement.getAttribute('fromid')
+          // this.$platform.refreshTab(fromId)
+
+          // window.location.reload()
         }
       } catch (e) {
         console.error('customer-detail-view deleteCustomer error', e)
