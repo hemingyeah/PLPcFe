@@ -99,6 +99,11 @@ export default {
 
     };
   },
+  computed: {
+    isShowCardWorkTime() {
+      return isShowCardWorkTime()
+    }
+  },
   mounted() {
     this.initCard();
     this.initCardSysList()
@@ -130,20 +135,24 @@ export default {
         console.log(error)
       })
     },
-    //获取组件库列表
+
+    /** 
+    * @description 获取组件库列表
+    * 1.工时记录灰度控制 isShowCardWorkTime true显示 false隐藏
+    */
     initCardSysList() {
       SettingTaskApi.getCardSysList().then(res=>{
         const { status, message, data } = res;
         if(status == 0){
             var cardList = data || [];
-            if(!isShowCardWorkTime) {
+          
+            if(!this.isShowCardWorkTime) {
                 cardList = cardList.filter(function(card) {
                     return card.cardName !== '工时记录';
                 })
             }
             let cardSysList = [];
             var cardAll = cardList.slice();
-         
             let wuliu = []
             let zhiliang = []
             let chanpin = []
@@ -178,9 +187,11 @@ export default {
               }))
             }
             cardSysList.push({name:'全部',list:cardAll},{name:'物流',list:wuliu},{name:'质量',list:zhiliang},{name:'产品',list:chanpin},{name:'市场',list:shichang},{name:'客诉',list:kesu},{name:'费用',list:feiyong},{name:'工时',list:gongshi})
-            this.cardSysList = cardSysList;
-           
-          
+            if(!this.isShowCardWorkTime){
+              this.cardSysList = cardSysList.filter(item=>item.name !== '工时') 
+            }else{
+              this.cardSysList = cardSysList;
+            }        
         }else{
           this.$message.error(message);
         }
