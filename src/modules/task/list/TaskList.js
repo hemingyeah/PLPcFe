@@ -793,6 +793,7 @@ export default {
       this.searchParams_spare = searchModel
       this.params = this.initParams(this.params.pageSize);
       this.buildColumns();
+      this._exportColumns()
       this.createPerspective({id: this.selectId})
       // 埋点
       window.TDAPP.onEvent(`pc：工单列表-${name}`);

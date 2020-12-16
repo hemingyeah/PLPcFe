@@ -52,7 +52,7 @@
                           <span
                             class="task-list-dropdown-item"
                             @click="checkOther(item)"
-                            >{{ item.name }}</span
+                          >{{ item.name }}</span
                           >
                           <div class="task-list-dropdown-icon">
                             <el-tooltip content="查看筛选条件" placement="top">
@@ -270,12 +270,7 @@
                     'task-c2': item.id === filterId,
                   }"
                 >
-                  <el-tooltip
-                    content="当前已选择 当前超时、曾超时、当前暂停、曾暂停、位置错误 为异常工单"
-                    placement="top"
-                  >
-                    <span> {{ `异常工单(${filterData.exception || 0})` }}</span>
-                  </el-tooltip>
+                  {{ `已完成(${filterData.finished || 0})` }}
                 </div>
                 <!-- 异常工单 -->
                 <div
@@ -295,7 +290,12 @@
                     'task-c2': item.id === filterId,
                   }"
                 >
-                  {{ `异常工单(${filterData.exception || 0})` }}
+                  <el-tooltip
+                    content="当前已选择 当前超时、曾超时、当前暂停、曾暂停、位置错误 为异常工单"
+                    placement="top"
+                  >
+                    <span> {{ `异常工单(${filterData.exception || 0})` }}</span>
+                  </el-tooltip>
                 </div>
                 <!-- 未完成工单 -->
                 <div
@@ -438,7 +438,7 @@
             type="primary"
             @event="advancedSearch"
             native-type="submit"
-            >搜索</base-button
+          >搜索</base-button
           >
         </div>
       </task-search-panel>
@@ -468,7 +468,7 @@
             type="primary"
             native-type="submit"
             @event="saveView"
-            >保存视图</base-button
+          >保存视图</base-button
           >
         </div>
       </task-view-panel>
@@ -589,7 +589,7 @@
                 <el-dropdown-item
                   v-if="
                     exportPermissionTaskEdit ||
-                    exportPermissionTaskBatchDispatch
+                      exportPermissionTaskBatchDispatch
                   "
                 >
                   <div @click="reallotBatch">工单转派</div>
@@ -619,7 +619,7 @@
           </span>
           条
           <span class="task-c2 task-pointer" @click="toggleSelection"
-            >清空</span
+          >清空</span
           >
         </div>
         <!-- start content 列表表格 -->
@@ -700,7 +700,7 @@
                       class="task-state-block task-state-block-overtime task-font12"
                       v-if="
                         scope.row.overTime &&
-                        new Date().getTime() >
+                          new Date().getTime() >
                           new Date(scope.row.overTime).getTime()
                       "
                     >
@@ -718,7 +718,7 @@
                     >
                       {{
                         scope.row["customerEntity"] &&
-                        scope.row["customerEntity"].name
+                          scope.row["customerEntity"].name
                       }}
                     </div>
                   </template>
@@ -779,9 +779,9 @@
                   <template v-else-if="column.field === 'product'">
                     {{
                       scope.row.products &&
-                      scope.row.products
-                        .map((product) => product.name)
-                        .join(", ")
+                        scope.row.products
+                          .map((product) => product.name)
+                          .join(", ")
                     }}
                   </template>
 
@@ -789,8 +789,8 @@
                   <template
                     v-else-if="
                       column.field === 'createUserName' ||
-                      column.field === 'executorName' ||
-                      column.field === 'allotName'
+                        column.field === 'executorName' ||
+                        column.field === 'allotName'
                     "
                   >
                     <template v-if="permissionTaskView">
@@ -823,9 +823,9 @@
                   <template v-else-if="column.field === 'synergies'">
                     {{
                       scope.row[column.field] &&
-                      scope.row[column.field]
-                        .map((synergie) => synergie.displayName)
-                        .join(", ")
+                        scope.row[column.field]
+                          .map((synergie) => synergie.displayName)
+                          .join(", ")
                     }}
                   </template>
 
@@ -870,7 +870,7 @@
                     >
                       {{
                         scope.row[column.field] &&
-                        taskStateEnum.getName(scope.row[column.field])
+                          taskStateEnum.getName(scope.row[column.field])
                       }}
                     </div>
                   </template>
@@ -891,12 +891,12 @@
                   <template
                     v-else-if="
                       column.formType === 'user' &&
-                      scope.row.attribute[column.field]
+                        scope.row.attribute[column.field]
                     "
                   >
                     {{
                       scope.row.attribute[column.field].displayName ||
-                      scope.row.attribute[column.field].name
+                        scope.row.attribute[column.field].name
                     }}
                   </template>
 
@@ -947,8 +947,8 @@
                   <template
                     v-else-if="
                       column.field === 'paymentMethod' &&
-                      initData.paymentConfig &&
-                      initData.paymentConfig.version === 1
+                        initData.paymentConfig &&
+                        initData.paymentConfig.version === 1
                     "
                   >
                     {{
@@ -959,7 +959,7 @@
                     <template
                       v-if="
                         scope.row.attribute &&
-                        Array.isArray(scope.row.attribute[column.field])
+                          Array.isArray(scope.row.attribute[column.field])
                       "
                     >
                       {{ scope.row.attribute[column.field].join(",") }}
