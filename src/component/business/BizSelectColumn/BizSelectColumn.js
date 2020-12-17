@@ -2,7 +2,6 @@ import './BizSelectColumn.scss'
 
 import BizSelectColumnSort from './BizSelectColumnSort'
 
-// import guideCompoment from '@src/component/guide/guide';
 
 
 const { TASK_GUIDE_SELECT_COLUMN } = require('@src/component/guide/taskV2Store');
@@ -552,7 +551,6 @@ const BizSelectColumn = {
   },
   components: {
     [BizSelectColumnSort.name]: BizSelectColumnSort,
-    // [guideCompoment.name]:guideCompoment
   }
 }
 
