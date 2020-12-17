@@ -71,12 +71,15 @@ export default {
   },
   data(){
     return{
-      newValue: this.value,
-      selectType:this.field.setting.selectType || 1
+      newValue: this.value
     }
 
   },
   computed: {
+    selectType() {
+      let setting = this.field.setting || {};
+      return setting.selectType || 1;
+    },
     isMulti(){
       let setting = this.field.setting || {};
       return setting.isMulti;

@@ -1,3 +1,4 @@
+
 <template>
   <div class="form-date">
     <el-date-picker
@@ -8,7 +9,7 @@
       clearable
       :placeholder="placeholder"
       :value-format="dateObj.format"
-      :value="field.returnData?value[field.returnData]:value"
+      :value="field.returnData?_value[field.returnData]:_value"
       :format="dateObj.format"
       @input="choose"
     />
@@ -32,6 +33,16 @@ export default {
   },
   computed: {
     /** 
+     * @description 初始化日期格式
+    */
+    _value() {
+      if ( !this.value ) return '';
+      let { defaultValueConfig, dateType} = this.field.setting || {};
+      let newDate = fmt_data_time(new Date(this.value), dateType || 'yyyy-MM-dd');
+      this.choose(newDate);
+      return newDate
+    },
+    /** 
      * @description 匹配日期格式
      * 若设置了日期格式返回匹配数据
      * 否择返回默认设置，兼容老数据
@@ -41,18 +52,6 @@ export default {
       if(dateTypeObj && JSON.stringify(dateTypeObj) !== '{}') return dateTypeObj;
       return { type:'date', format: 'yyyy-MM-dd' }  
     }
-  },
-  mounted() {
-    let { defaultValueConfig, dateType} = this.field.setting || {};
-    let { isCurrentDate } = defaultValueConfig || {};
-
-    // 日期 若设置默认值，将系统时间设为默认值
-    if( JSON.stringify(defaultValueConfig) !== '{}' && isCurrentDate == 1){
-      let defaultValue = fmt_data_time(new Date(), dateType);
-      if(!this.value){
-        this.choose(defaultValue);
-      }    
-    }   
   },
   methods: {
     choose(newValue) {

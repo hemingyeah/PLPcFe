@@ -57,7 +57,7 @@ export default {
     * @description 计算公式
     */
     formula() {
-      return this.field.setting.formula || [];
+      return this.field.setting?.formula || [];
     },
     formulaText() {
       return this.formula.map(item => item.name).join('');
