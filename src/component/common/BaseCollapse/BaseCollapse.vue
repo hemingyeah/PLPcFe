@@ -1,45 +1,41 @@
 <template>
   <div class="base-collapse" @scroll="$emit('scroll', $event)">
-    <div :class="['base-collapse-left', {'active': collapse == 'left'}]" :style="`flex:${leftSize}`"></div>
-    <slot name="left"></slot>
+    <div :class="['base-collapse-left', {'active': collapse == 'left'}]" >
+      <slot name="left"></slot>
 
-    <!-- start 折叠按钮 -->
-    <div class="base-collapse-btn" v-if="showCollapse">
-      <el-tooltip content="收起" placement="left">
-        <div
-          class="base-collapse-btn-left"
-          v-show="collapse != 'left'"
-          @click="expand('left')"
-        >
-          <i class="iconfont icon-mianbanjiantou"></i>
-        </div>
-      </el-tooltip>
-      <el-tooltip content="展开" placement="right">
-        <div
-          class="base-collapse-btn-right"
-          v-show="collapse != 'right'"
-          @click="expand('right')"
-        >
-          <i class="iconfont icon-mianbanjiantou"></i>
-        </div>
-      </el-tooltip>
+      <!-- start 折叠按钮 -->
+      <div class="base-collapse-btn" v-if="showCollapse">
+        <el-tooltip content="收起" placement="left">
+          <div
+            class="base-collapse-btn-left"
+            v-show="collapse != 'left'"
+            @click="expand('left')"
+          >
+            <i class="iconfont icon-mianbanjiantou"></i>
+          </div>
+        </el-tooltip>
+        <el-tooltip content="展开" placement="right">
+          <div
+            class="base-collapse-btn-right"
+            v-show="collapse != 'right'"
+            @click="expand('right')"
+          >
+            <i class="iconfont icon-mianbanjiantou"></i>
+          </div>
+        </el-tooltip>
+      </div>
+      <!-- end 折叠按钮 -->
     </div>
-    <!-- end 折叠按钮 -->
-  </div>
 
-  <<<<<<< HEAD
-  <div :class="['base-collapse-right', {'active': collapse == 'right'}]">
-    =======
     <div
       :class="['base-collapse-right', { active: collapse == 'right' }]"
       :style="`flex:${rightSize}`"
       v-if="showCollapse"
     >
-      >>>>>>> productV2
       <slot name="right"></slot>
     </div>
   </div>
-</div></template>
+</template>
 
 <script>
 export default {
