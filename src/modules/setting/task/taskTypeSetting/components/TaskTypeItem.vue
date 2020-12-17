@@ -1,5 +1,5 @@
 <template>
-    <el-card class="task-type" :body-style="{padding: '0px', height: '100%'}" shadow="hover">
+    <el-card class="task-type" :body-style="{padding: '0px', height: '100%'}" shadow="never">
         <el-row class="task-type-main" type="flex" justify="space-between">
             <el-row type="flex">
                 <i class="task-type-color" :style="{'background-color': taskType.config.color}"></i>
@@ -11,7 +11,7 @@
                         <p>
                             可用团队: 
                             <span class="pointer" @click="chooseTeam">{{taskType.tags | formatTeamName}} </span>
-                            <i class="iconfont icon-bianji1 pointer" @click="chooseTeam"></i>
+                            <i class="iconfont icon-edit-square pointer" @click="chooseTeam"></i>
                         </p>
                         <p>
                             最近更新: {{taskType.updateName}}  {{taskType.createTime}}
@@ -27,10 +27,10 @@
         </el-row>
         <el-row class="task-type-opearte" type="flex">
             <div class="task-type-opearte-del" @click="delTaskType">
-                <i class="iconfont icon-shanchu-copy">删除</i>
+                <i class="iconfont icon-delete">删除</i>
             </div>
             <div class="task-type-opearte-modify" @click="modifyTaskType">
-                <i class="iconfont icon-bianji1">编辑</i>
+                <i class="iconfont icon-edit-square">编辑</i>
             </div>
         </el-row>
         <!-- 选择团队弹窗 -->
@@ -161,6 +161,10 @@ export default {
     height: 159px;
     background: #FFFFFF;
     border-radius: 4px;
+    box-shadow: 0px 4px 10px 0px rgba(0, 0, 0, 0.04);   
+    &:hover{
+        box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.12);
+    }
     .task-type-main{
         display: flex;
         height: calc(100% - 32px);
@@ -216,6 +220,9 @@ export default {
             color: #999999;
             i{
                 font-size: 12px;
+                &::before{
+                    margin-right: 8px;
+                }
             }
         }
         .task-type-opearte-del{

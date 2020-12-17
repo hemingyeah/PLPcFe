@@ -298,12 +298,19 @@ export default {
          * 注: 因element-ui checkbox组件不支持对象数组, 故需要这样处理
          */
         convertArrayObjectToKey(arr, objKey) {
+            if(!Array.isArray(arr)) {
+                return [];
+            }
             return arr.map(item => item[objKey]);
         },
         /**
          * 将字符串数组转化成对象数组
          */
         convertArrayKeyToObject(arr, objKey, options) {
+            if(!Array.isArray(arr)) {
+                return [];
+            }
+            
             return options.filter(item => arr.includes(item[objKey]));
         },
         /**
@@ -318,11 +325,14 @@ export default {
                 this.taskTypeConfig = res.data;
 
                 let {tenantFields,customerFields,taskFields,receiptFields,cardFields,attachmentFields} = res.data[this.type];
-                this.tenantFields = tenantFields;
-                this.customerFields = customerFields;
-                this.taskFields = taskFields;
-                this.receiptFields = receiptFields;
-                
+                cardFields = cardFields ||[];
+                attachmentFields = attachmentFields || [];
+
+                this.tenantFields = tenantFields ||[];
+                this.customerFields = customerFields ||[];
+                this.taskFields = taskFields ||[];
+                this.receiptFields = receiptFields ||[];
+
                 cardFields.forEach(item => {
                     this.cardFields[item.cardId] = item.fields;
                 })
@@ -377,7 +387,7 @@ export default {
                     this.receiptFieldList = res;
                 }
             } catch (err) {
-                console.error('fetch Tasktype => err', err);
+                console.error('fetch TaskTypeFields => err', err);
             }
         },
         /**
@@ -386,7 +396,7 @@ export default {
         async fetchTaskCardDetailList() {
             try {
                 let res = await TaskApi.getTaskCardDetailList({typeId: this.typeId});
-                this.cardDetailList = res;
+                this.cardDetailList = res || [];
                 res.map(item => {
                     this.$set(this.cardFields, item.cardId,[]);
                 })

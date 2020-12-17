@@ -144,6 +144,7 @@ export default {
   background: #F5F5F5;
   .task-manage-main{
     flex: 1;
+    min-width: 730px;
     margin-left: 13px;
     .task-manage-header{
       display: flex;
@@ -172,6 +173,7 @@ export default {
     .task-type-list{
       display: flex;
       flex-flow: wrap;
+      width: calc(100% + 12px);
       min-height: 300px;
       .task-type-item{
         margin: 0 12px 12px 0;

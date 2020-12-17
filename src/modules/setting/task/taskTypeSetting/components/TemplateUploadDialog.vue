@@ -1,205 +1,217 @@
 <template>
-
-  <base-modal
-      :title=" uploadTemplateType == 'report' ? '设置服务报告自定义模板' : '设置打印自定义模板'"
-      describe="使用前，请阅读使用说明" width="700px" class="form-select-setting-modal"
-      @cancel="cancel"
-      :show.sync="isShow" :mask-closeable="false">
-
-
-    <span slot="describe" class="describe-text" @click="describeClick">使用前，请阅读使用说明</span>
-
-
-
-    <div class="upload-content">
-      <div class="upload-content-line">
-        <p class="upload-content-desc">1、下载此工单类型的标识对应表</p>
-        <button type="button" class="btn setting-btn-primary" @click="downloadTemplate">下载</button>
-      </div>
-      <div class="upload-content-line">
-        <p class="upload-content-desc">2、上传打印模板</p>
-        <base-upload @input="input" :value="value" :fileType="fileType" :isShowOperateContent="isShowOperateContent"></base-upload>
-      </div>
-      <p class="note-text">注：上传的模板仅支持[xlsx]格式的文件</p>
-    </div>
-
-    <template slot="footer">
-      <button type="button" class="btn setting-btn-primary" @click="close">关闭</button>
-    </template>
+    <base-modal
+        width="448px"
+        :title="`自定义${typeName}模板`"
+        @cancel="close"
+        :show.sync="isShow"
+        :mask-closeable="false">
+        <div class="template-upload-modal">
+            <p class="template-upload-help-info">
+                使用前，请先阅读
+                <a target="_blank" href="https://www.yuque.com/shb/help/custom_report">使用说明</a>
+            </p>
+            <div class="template-upload-content">
+                <el-steps direction="vertical">
+                    <el-step status="process">
+                        <el-row type="flex" justify="space-between" slot="description">
+                            <p>下载此工单类型的标识对应表</p>
+                            <div>
+                                <a :href="templateUrl">下载</a>
+                            </div>
+                        </el-row>
+                    </el-step>
+                    <el-step status="process">
+                        <template slot="description">
+                            <p>上传{{typeName}}模板</p>
+                            <el-upload
+                                ref="upload"
+                                class="upload-template"
+                                accept=".xlsx,.xls"
+                                action=""
+                                :file-list="fileList"
+                                :on-remove="removeFile"
+                                :before-upload="beforeUpload">
+                                <el-button size="small" type="primary" :disabled="pending">点击上传</el-button>
+                                <div slot="tip" class="template-upload-tip">*仅支持[xlsx]格式的文件</div>
+                            </el-upload>
+                        </template>
+                    </el-step>
+                </el-steps>
+            </div>
+        </div>
+        
+        <template slot="footer">
+            <el-button @click="close">取消</el-button>
+            <el-button type="primary" :disabled="pending" :loading="pending" @click="submit">确定</el-button>
+        </template>
   </base-modal>
-
 </template>
 
 <script>
-import {getTaskTemplate,savePrintTemplate,saveReportTemplate} from "@src/api/TaskApi.ts";
-import platform from "@src/platform";
+// api
+import * as TaskApi from '@src/api/TaskApi.ts';
+// util
+import Uploader from '@src/util/uploader';
+import Platform from "@src/platform";
+
 export default {
-  name: "TemplateUploadDialog",
-  props: {
-    id : {
-      type : String,
-      default: ""
+    name: "template-upload-dialog",
+    props: {
+        visiable: {
+            type: Boolean,
+            default: false
+        },
+        type: {
+            type: String,
+            default: ''
+        },
+        typeId: {
+            type: String,
+            default: ''
+        },
+        templates: {
+            type: Array,
+            default: () => []
+        }
     },
-    isShowUploadModal: {
-      type: Boolean,
-      default: false,
+    data() {
+        return {
+            pending: false,
+            isShow: false,
+
+            fileResult: {},
+        }
     },
-    uploadTemplateType : {
-      type : String,
-      default: ""
+    computed: {
+        typeName() {
+            return this.type === 'report' ? '服务报告' : '打印';
+        },
+        templateUrl() {
+            return `/setting/taskType/getTemplateDic?typeId=${this.typeId}`;
+        },
+        fileList() {
+            return this.templates.map(item => {
+                return {
+                    name: item.filename || item.name || item.fileName,
+                    url: item.url
+                }
+            })
+        }
     },
-    reportSetting: {
-      type: Object,
-      default: {},
-    },
-    printSetting : {
-      type : Object,
-      default: {}
+    watch: {
+        visiable(val) {
+            this.isShow = val;
+        }
+    }, 
+    methods: {
+        close() {
+            this.$emit('update:visiable', false);
+        },
+        removeFile() {
+            this.fileResult = {};
+            this.$emit('update:templates', []);
+        },
+        /**
+         * 文件上传
+         */
+        beforeUpload(file) {
+            const isLt1M = file.size / 1024 / 1024 < 1;
+
+            if (!isLt1M) {
+                this.$message.error('不支持大于1M的模板');
+                return false;
+            }
+
+            Uploader.upload(file, '/files/upload').then((result) => {
+                if (result.status != 0) {
+                    this.$message({
+                        message: `${result.message}`,
+                        duration: 1500,
+                        type: 'error',
+                    });
+
+                    return false;
+                }
+
+                this.fileResult = result.data;
+                this.$emit('update:templates', [result.data]);
+            }).catch(err => {
+                console.error(err);
+            })
+            
+
+            return false;
+        },
+        /**
+         * 保存模板
+         */
+        async submit(){
+            let params = {
+                typeId: this.typeId,
+                templates: this.templates.map(item => {
+                    return {
+                        id: item.id,
+                        filename: item.filename || item.fileName,
+                        url: item.url || item.ossUrl,
+                        fileSize: item.fileSize || item.fileSizeStr
+                    }
+                })
+            };
+            
+            let fetchFn = this.type === 'report' ? TaskApi.saveReportTemplate : TaskApi.savePrintTemplate;
+            try {
+                this.pending = true;
+                let res = await fetchFn(params);
+                if(res.status === 0) {
+                    this.$notify.success('设置成功');
+                    this.close();
+                }
+            } catch (err) {
+                console.error(err);
+            } finally{
+                this.pending = false;
+            }
+            
+        }
     }
-  },
-  data() {
-    return {
-      isShow : false,
-      value : [],
-      isShowOperateContent : true,
-      fileType : "xlsx"
-    }
-  },
-  methods : {
-    cancel(res) {
-      console.log("cancal")
-      this.$emit("hideModal")
-      //将后台拿到的数据全部清空
-
-    },
-    close() {
-      console.log("点击下方关闭按钮");
-      this.cancel();
-    },
-    input(newValue) {
-      console.log("baseupload的input事件")
-      console.log(newValue)
-      console.log("uploadTemplateType")
-      console.log(this.uploadTemplateType)
-      if(newValue.length) {
-        this.uploadTemplate(newValue);
-      }else{
-        this.deleteTemplate(newValue);
-      }
-      // let oldValue = null;
-      // this.$emit('update', {newValue, oldValue, field: this.field});
-      // this.$emit('input', newValue);
-    },
-    async downloadTemplate() {
-      console.log("下载模板")
-      console.log(this.id);
-      // getTaskTemplate({typeId:this.id}).then(res => {
-      //   console.log("----")
-      //   console.log(res)
-      // });
-
-      let a = document.createElement("a");
-      a.href = `/setting/taskType/getTemplateDic?typeId=${this.id}`;
-      a.click();
-
-    },
-    uploadTemplate(newValue) {
-      let _size = (newValue.size/1024).toFixed(2) + "KB";
-      let p_templates = [
-        {id:newValue.id,filename:newValue.fileName,url:newValue.ossUrl,fileSize:_size}
-      ];
-
-      let _obj = {
-        typeId:this.id,
-        p_templates
-      }
-
-      this.didUpload(_obj);
-    },
-    deleteTemplate() {
-      let _obj = {typeId:this.id};
-      this.didUpload(_obj);
-    },
-    async didUpload(_obj) {
-      let result;
-      if(this.uploadTemplateType == "report") {
-        result = await saveReportTemplate(_obj);
-      }else if(this.uploadTemplateType == "print") {
-        result = await savePrintTemplate(_obj);
-      }
-      if(result.status == 1){
-        platform.alert(result.message);
-      }
-    },
-    describeClick() {
-      window.open('https://www.yuque.com/shb/help/custom_report')
-    },
-  },
-  watch : {
-    isShowUploadModal(newVal,oldVal) {
-      this.isShow = newVal;
-    },
-    uploadTemplateType(newVal,oldVal) {
-      console.log()
-      // console.log("watch uploadTemplateType")
-      // console.log(newVal)
-      // console.log(this.reportSetting)
-      if(newVal == "report") {
-        console.log("报告模板")
-        console.log(this.reportSetting)
-        this.value = (this.reportSetting.hasOwnProperty("templates") && this.reportSetting.templates) ?
-            this.reportSetting.templates : [];
-      }else if(newVal == "print"){
-        console.log("打印模板111112221122")
-        console.log(this.printSetting)
-        this.value = (this.printSetting.hasOwnProperty("templates") && this.printSetting.templates) ?
-            this.printSetting.templates : [];
-      }
-      console.log(this.value);
-    },
-    reportSetting(newVal,oldVal) {
-      console.log("reportSetting")
-      console.log(newVal)
-    },
-    printSetting(newVal,oldVal) {
-      console.log("printSetting")
-      console.log(newVal)
-    },
-    value(newVal,oldVal) {
-      console.log("value")
-      console.log(newVal)
-      if(newVal.length) {
-        this.isShowOperateContent = false;
-      }else{
-        this.isShowOperateContent = true;
-      }
-    }
-  },
 }
 </script>
+<style lang="scss" scoped>
+.template-upload-modal{
+    min-height: 240px;
+    padding:  20px 60px 20px 20px;
+    font-size: 14px;
+    .template-upload-help-info{
+        color: #666666;
+    }
 
-<style scoped>
-.upload-content{
-  padding: 20px;
+    .template-upload-content{
+        color: #000000;
+        p, a{
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+        .template-upload-tip{
+            margin-top: 8px;
+            font-size: 12px;
+            color: #999999;
+        }
+        .upload-template{
+            width: 334px;
+        }
+    }
+
+    a{
+        color: $color-primary;
+        &:hover{
+            text-decoration: underline;
+        }
+    }
 }
-.upload-content-line{
-  display: flex;
-  align-items: flex-end;
-  margin-bottom: 10px;
+
+/** element-ui style */
+/deep/.el-step__description{
+    padding-right: 0;
 }
-.upload-content-desc{
-  margin-right: 20px;
-  font-size: 14px;
-  color: #333333;
-}
-.note-text{
-  font-size: 13px;
-  color: #ff0000;
-}
-.describe-text{
-  margin-left: 10px;
-  cursor: pointer;
-  color: #3c8dbc;
-  font-size: 10px;
-}
+
 </style>

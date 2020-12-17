@@ -26,7 +26,8 @@
                             <el-button 
                                 :type="radio === 1 ? 'primary': 'default'" 
                                 :disabled="radio === 0" 
-                                plain 
+                                plain
+                                @click="importPresonTemplate('report')"
                                 size="small">
                                 设置
                             </el-button>
@@ -66,6 +67,7 @@
                                 :type="radio === 1 ? 'primary': 'default'" 
                                 :disabled="radio === 0" 
                                 plain 
+                                @click="importPresonTemplate('print')"
                                 size="small">
                                 设置
                             </el-button>
@@ -147,6 +149,9 @@
 
         <!-- 系统模板设置字段弹窗 -->
         <system-template-dialog :visiable.sync="isShowSystemModal" :type="templateType" :typeId="typeId"/>
+        <!-- 导入模板设置弹窗 -->
+        <template-upload-dialog :visiable.sync="isShowTemplateUploadModal" :type="templateType" :typeId="typeId" :templates.sync="templates">
+        </template-upload-dialog>
     </div>
 </template>
 
@@ -161,7 +166,7 @@ export default {
     name: 'other-setting-panel',
     data() {
         return {
-            typeId: '83dbe928-e8d2-495b-99b5-25541067ba4d',
+            typeId: '41f136b6-0159-4257-8e77-dcfcee278f9c',
 
             radio: '',
             cameraForm : {
@@ -173,10 +178,20 @@ export default {
                 exceptionRange : "",
                 exceptionFlagFlows : []
             },
+            // todo_zr
+            templates: [
+                {
+                    fileSize: "3.54KB",
+                    filename: "2020-09-28计划任务数据 (1)-李超-2020-12-17.xlsx",
+                    id: "0826c04a-e42d-433a-a099-8ffc7a0bb3e3",
+                    url: "https://she-dev.oss-cn-hangzhou.aliyuncs.com/acs/newfiles/7416b42a-25cc-11e7-a500-00163e12f748/202012/78125110-0c10-47ad-9b09-012873ace143.xlsx"
+                }
+            ],
 
             isShowSystemModal : false,
             templateType: 'service',
             isShowUploadModal : false,
+            isShowTemplateUploadModal: false,
         }
     },
     computed: {
@@ -203,15 +218,20 @@ export default {
         },
     },
     methods: {
+        importPresonTemplate(type) {
+            this.templateType = type;
+            this.isShowTemplateUploadModal = true;
+        },
         openTemplateDialog(type) {
             this.templateType = type;
             this.isShowSystemModal = true;
-        }
+        },
     },
     mounted() {
     },
     components: {
-        [SystemTemplateDialog.name]: SystemTemplateDialog
+        [SystemTemplateDialog.name]: SystemTemplateDialog,
+        [TemplateUploadDialog.name]: TemplateUploadDialog
     }
 }
 </script>

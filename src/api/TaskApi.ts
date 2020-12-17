@@ -937,7 +937,7 @@ export function search(params: TaskSearchListModel): Promise<getTaskSearchListRe
  * @param {String} params.typeId - 配置id
  */
 export function savePrintTemplate(params: {} | undefined) {
-  return http.post("/setting/taskType/savePrintTemplates", params, false);
+  return http.post("/setting/taskType/savePrintTemplates", params, false, { headers: { indices: true }});
 }
 
 /**
@@ -946,7 +946,7 @@ export function savePrintTemplate(params: {} | undefined) {
  * @param {String} params.typeId - 配置id
  */
 export function saveReportTemplate(params: {} | undefined) {
-  return http.post("/setting/taskType/saveReportTemplates", params, false);
+  return http.post("/setting/taskType/saveReportTemplates", params, false, { headers: { indices: true } });
 }
 
 /**

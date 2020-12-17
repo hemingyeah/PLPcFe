@@ -20,7 +20,8 @@
             <el-row class="trade-list" type="flex" justify="space-between">
                 <el-row class="trade-item pointer apply" type="flex" v-for="item in industryItems" :key="item.taskTypeId" @click.native="openFormsetTab(item.taskTypeId)">
                     <div class="trade-item-left" :style="{'background-color': getColor(item.taskTypeName)}">
-                        <i :class="['iconfont', getIcon(item.taskTypeName)]"></i>
+                        <i :class="['iconfont', getIcon(item.taskTypeName)]">
+                        </i>
                     </div>
                     <div class="trade-item-main">
                         <el-row type="flex">
@@ -205,6 +206,15 @@ export default {
             background: #FFFFFF;
             box-shadow: 0px 4px 12px 0px rgba(0, 0, 0, 0.1);
             border-radius: 4px;
+            .trade-item-left{
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                i{
+                    font-size: 24px;
+                    color: #FFFFFF;
+                }
+            }
             &:hover{
                 box-shadow: none;
                 border: 2px solid #13C2C2;
