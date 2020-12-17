@@ -66,7 +66,7 @@ const RuleMap = {
 // 远程验证字段是否重复方法
 let repeatRemoteValidate = (mode, field, value, id, changeStatus, resolve, isSample = true, formBuilderComponent = {}) => {
   
-  const remoteFunc = (value) => {
+  const remoteFunc = (value, resolve) => {
     let api = fieldValidateMap[mode];
     let params = { fieldName: field.fieldName, fieldValue: value, id };
     
@@ -94,10 +94,10 @@ let repeatRemoteValidate = (mode, field, value, id, changeStatus, resolve, isSam
       })
     }
     
-    validateFunc(value)
+    validateFunc(value, resolve)
     
   } else {
-    remoteFunc(value)
+    remoteFunc(value, resolve)
   }
 
 }
@@ -224,7 +224,7 @@ function date(value, field = {}) {
   return new Promise(resolve => {
     let setting = field.setting || {};
     let dateType = setting.dateType || 'yyyy-MM-dd';
-    if (field.isNull === 1) return resolve(null);
+    
     if (!value || !value.toString().length) return resolve(`请选择${field.displayName}`);
     let REG_TYPE = DATE_REG;
     if( dateType == 'yyyy-MM-dd HH:mm:ss'){
@@ -237,6 +237,8 @@ function date(value, field = {}) {
       REG_TYPE = DATE_YY_REG;
     }
     if (!REG_TYPE.test(value)) return resolve('请输入正确格式的日期');
+    
+    if (field.isNull === 1) return resolve(null);
     resolve(null);
   });
 }

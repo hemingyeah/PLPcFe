@@ -3,6 +3,7 @@ import { Vue, Component, Prop } from 'vue-property-decorator'
 import { CreateElement } from 'vue'
 /* entity */
 import Customer from '@model/entity/Customer'
+import TaskAddress from '@model/entity/TaskAddress'
 import CustomerAddress from '@model/entity/CustomerAddress'
 /* enum */
 import ComponentNameEnum from '@model/enum/ComponentNameEnum'
@@ -41,18 +42,27 @@ export default class TaskAllotMap extends Vue {
     return this.TaskAllotModalComponent.customer || {}
   }
   
-  /* 客户地址 */
-  private get customerAddress(): CustomerAddress {
-    return this.customer.customerAddress || new CustomerAddress()
+  /* 工单 */
+  private get task(): any {
+    // 默认是获取的工单派单组件的，如需自定义 需要自己写
+    return this.TaskAllotModalComponent.task || {}
+  }
+  
+  /**
+   * @description 工单客户地址地址 
+   * 工单新建后地址信息在taddress里面，新建的信息在address里面
+  */
+  get taskAddress(): TaskAddress {
+    return new TaskAddress(this.task.taddress || this.task.address || {})
   }
   
   /** 
    * @description 构建客户地址标记
   */
   private buildCusomterAddressMarker(): void {
-    let { validAddress } = this.customerAddress
+    let { validAddress } = this.taskAddress
     if (!validAddress) {
-      return Log.warn('customerAddress.validAddress is false', this.buildCusomterAddressMarker.name)
+      return Log.warn('taskAddress.validAddress is false', this.buildCusomterAddressMarker.name)
     }
     
     // 添加自定义点标记
@@ -90,16 +100,17 @@ export default class TaskAllotMap extends Vue {
    * @description 构建客户地址标记内容
   */
   private buildCustomerAddressMapMarkerInfo(): string {
-    let { lmName, lmPhone, customerAddress, name } = this.customer
-    customerAddress = new CustomerAddress(customerAddress)
+    let { tlmName = '', tlmPhone = '' } = this.task
+    let { name = '', id = ''} = this.task?.customer
+    let { taskAddress } = this
     
     return (
       `
         <div class="map-info-window-content">
-          <div class="customer-name">${ name }</div>
-          <p><label>联系人：</label>${ lmName }</p>
-          <p><label>电话：</label>${ lmPhone }</p>
-          <p><label>地址：</label>${ customerAddress?.toString() }</p>
+          <div class="customer-name" onclick="openCustomerViewFunc('${id}')">${ name }</div>
+          <p><label>联系人：</label>${ tlmName }</p>
+          <p><label>电话：</label>${ tlmPhone }</p>
+          <p><label>地址：</label>${ taskAddress?.toString() }</p>
           <div class="info-window-arrow"></div>
         </div>
       `
@@ -110,14 +121,14 @@ export default class TaskAllotMap extends Vue {
    * @description 获取地图中心
   */
   private getMapCenter(): Array<number> {
-    let { customerAddress } = this
-    let { adLatitude, adLongitude } = customerAddress
+    let { taskAddress } = this
+    let { latitude, longitude } = taskAddress
     let center = []
     
     // 是否为有效地址
-    if(customerAddress.validAddress){
-      center = [Number(adLongitude), Number(adLatitude)]
-    } else{
+    if (taskAddress.validAddress) {
+      center = [Number(longitude), Number(latitude)]
+    } else {
       // 高德地图不支持国外地址解析，那就手动设置为大首都北京吧
       center = [116.397428, 39.90923]
     }

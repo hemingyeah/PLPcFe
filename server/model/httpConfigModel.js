@@ -1,5 +1,5 @@
 const { isNotLocalEnv } = require('./proxyConfigModel');
-const http = require('http');
+const http = require('http')
 const https = require(isNotLocalEnv ? 'https' : 'http');
 // 默认配置
 const DEFAULT_OPIONS = {

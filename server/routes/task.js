@@ -64,7 +64,7 @@ router.get('/task/view/:id', async ctx => {
 
 async function taskEditContent(ctx) {
   // 临时：需要新旧工单编辑页面切换现在的代码和下面的注释代码
-  taskEditAllotContent(ctx)
+  await taskEditAllotContent(ctx)
   // let modConfig = modules['task.edit'];
   // let script = ['/task.edit.js'];
 
@@ -78,7 +78,7 @@ async function taskEditContent(ctx) {
 async function taskEditAllotContent(ctx) {
   let modConfig = modules['task.edit.allot'];
   let script = ['/task.edit.allot.js'];
-
+  
   let { url, headers} = ctx.request;
   let result = await HttpClient.request(url, 'get', null, { headers });
   let body = result.body;
