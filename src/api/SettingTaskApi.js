@@ -103,3 +103,23 @@ export const getCardSysList =  (params = {}) => {
 
 
 /* ------------- end 附加组件设置 ---------------- */
+
+/* ------------- start 工单类型组件设置 ---------------- */
+
+/**
+ * @description 保存排序结果
+ * @param {Object} params -- 参数对象
+ */
+export const saveTaskCardOrder =  (params = {}) => {
+  return http.post('/setting/saveTaskCardOrder', params,true)
+}
+
+/**
+ * @description 删除组件
+ * @param {Object} params -- 参数对象
+ */
+export const deleteTaskCard =  (params = {}) => {
+  return http.post('/setting/taskType/deleteCard', params)
+}
+
+/* ------------- end 工单类型组件设置 ---------------- */

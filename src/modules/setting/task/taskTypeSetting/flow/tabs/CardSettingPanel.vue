@@ -1,5 +1,6 @@
 <template>
   <div class="card-setting-container">
+    <!--start 新建附加组件 -->
     <div class="card-setting-heard">
       <div class="card-setting-title">
         <p>附加组件设置</p>
@@ -16,8 +17,8 @@
         <el-tooltip placement="top" popper-class="form-displaymode-setting-tooltip" >
           <div slot="content">
             <template>
-              <div class="form-displaymode-setting-item">使用规则：设置每个附加组件在什么节点前必须完成填写，以及在什么状态时可以进行编辑</div>
-              <div class="form-displaymode-setting-item">使用权限：默认可以查看到工单的用户都可以使用附加组件，如果只希望某些角色能查看修改，请修改下面的权限</div>
+              <div class="form-displaymode-setting-item"><span>・</span>使用规则：可以控制每个附加组件在什么节点前必填，以及在什么状态时可以被编辑；可以通过【配置使用规则】功能查看配置详情或修改</div>
+              <div class="form-displaymode-setting-item"><span>・</span>使用权限：可以控制哪些角色能查看及修改附加组件；默认能看到工单的用户都可以使用附加组件，可以通过【配置使用权限】功能查看详情或修改</div>
               <div class="form-displaymode-setting-item">类型：可以添加多次还是只能添加一次，由附加组件属性决定</div>
             </template>
           </div>
@@ -25,19 +26,135 @@
         </el-tooltip>
       </p>
     </div>
+    <!--end 新建附加组件 -->
+
+    <!--start 附加组件列表 -->
+    <div class="card-setting-list">
+      <draggable
+        v-model="taskCardList"
+        v-bind="dragOptions"
+        tag="div"
+        @change="updateTaskCardOrder"
+      >
+        <transition-group
+          class="task-card-list"
+          type="transition"
+          name="flip-list">
+          <task-card-item
+            class="task-card-item"
+            v-for="(item, idx) in taskCardList"
+            :key="item.id"
+            :taskCard="taskCardList[idx]"
+            @updateAttr="obj => {
+              updateTaskCard(item, obj)
+            }">
+          </task-card-item>
+        </transition-group>
+      </draggable>
+    </div>
+    <!--end 附加组件列表 -->
   </div>
 </template>
 <script>
+import draggable from 'vuedraggable';
+// utils
+import { parse } from '@src/util/querystring';
+/**  api */
+import * as TaskApi from '@src/api/TaskApi.ts';
+import * as SettingTaskApi from "@src/api/SettingTaskApi";
+/** component */
+import TaskCardItem from '../../components/TaskCardItem';
+
 export default {
   name: "card-setting-panel",
   data() {
-    return {};
+    return {
+      taskTypeId: "",
+      taskCardList: [],
+    };
+  },
+  computed: {
+    dragOptions() {
+      return {
+        animation: 0,
+        group: "description",
+        disabled: false,
+        ghostClass: "ghost"
+      };
+    }
+  },
+  mounted() {
+    let query = parse(window.location.search) || {};
+    this.taskTypeId = query.taskTypeId;
+    this.fetchTasktype();
+
   },
   methods: {
     addTaskCard() {
 
     },
+    updateTaskCard(taskType, updateObj) {
+      for (const key in updateObj) {
+        if (updateObj.hasOwnProperty(key)) {
+          taskType[key] = updateObj[key];
+        }
+      }
+    },
+    /** 
+    * @description 工单类型附加组件排序
+    * order重新排序
+    */
+    updateTaskCardOrder(data){
+      this.taskCardList.forEach((item, idx) => {
+        item.order = idx +1;
+      })
+      let cardSetting = {};
+      cardSetting.cardInfo = this.taskCardList
+      this.sortCard(cardSetting)
+    },
+    /** 
+    * @description 排序
+    */
+    sortCard(cardSetting) {
+      let params = {
+          id: this.taskTypeId,
+          cardSetting: cardSetting
+      }
+      SettingTaskApi.saveTaskCardOrder(params).then(res=>{
+        const { status, message, result } = res;
+        if(status == 0){
+        }else{
+          this.$message.error(message);
+        }
+      }).catch(error=>{
+        console.log(error)
+      })
+    },
+    /**
+     * 获取工单设置的除组件外的其他信息
+     */
+    async fetchTasktype() {
+        try {
+            let params = {
+                id: this.taskTypeId
+            };
+            const { status, message, data} = await TaskApi.getTaskType(params);
+            if( status == 0 ){
+              if(JSON.stringify(data.cardSetting) !=='{}' && data.cardSetting.cardInfo){
+                this.taskCardList = data.cardSetting.cardInfo
+              }
+            }
+            
+            
+        } catch (err) {
+            console.error('fetch Tasktype => err', err);
+        }
+    },
   },
+  components: {
+    [TaskCardItem.name]: TaskCardItem,
+    draggable
+  }
 };
 </script>
 <style lang="scss" scoped>
@@ -65,7 +182,29 @@ export default {
       font-size: 12px;
       color: #666666;
       line-height: 20px;
+      .el-tooltip{
+        font-size: 12px;
+      }
     }
   }
+  .card-setting-list{
+    margin: 12px;
+    .task-card-list{
+      display: flex;
+      flex-flow: wrap;
+      min-height: 300px;
+      .task-card-item{
+        margin: 0 12px 12px 0;
+      }
+    }
+  }
+}
+// transtion
+.flip-list-move {
+  transition: transform 0.5s;
+}
+.ghost {
+  opacity: 0.5;
+  background: #c8ebfb;
 }
 </style>
