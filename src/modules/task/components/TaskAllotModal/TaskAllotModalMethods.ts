@@ -326,8 +326,8 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
         
         this.customer = Object.freeze(result.data || {})
         
-        // @ts-ignore
-        this.$refs?.TaskAllotExcutorComponent.outsideFetchUsers()
+        // 查询用户数据
+        this.TaskAllotExcutorComponent?.outsideFetchUsers()
         
       }).catch(err => {
         console.error(err)
@@ -627,6 +627,7 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
     try {
       
       await this.fetchStateColor()
+      // TODO: 去除异步获取客户信息
       await this.fetchCustomer()
       // 非转派时获取客户负责人带入协同人
       !this.isReAllot && await this.fetchSynergyUserWithCustomerManager()
@@ -695,7 +696,7 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
   public async outsideShow() {
     // 等待状态
     this.pending = true
-    this.toggleTaskAllotExecutorComponentPending(true)
+    this.toggleTaskAllotExecutorComponentPending(false)
     // 初始化派单类型
     this.allotType = TaskAllotTypeEnum.Person
     // 匹配负责人显示
@@ -924,8 +925,7 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
    * @description 切换负责人组件状态
   */
   public toggleTaskAllotExecutorComponentPending(pending: boolean = false) {
-    // @ts-ignore
-    this.$refs.TaskAllotExcutorComponent?.outsideSetPending(pending)
+    this.TaskAllotExcutorComponent?.outsideSetPending(pending)
   }
   
   /** 

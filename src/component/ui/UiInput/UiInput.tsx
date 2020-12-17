@@ -1,6 +1,9 @@
+/* enum */
+import EventNameEnum from '@model/enum/EventNameEnum'
+/* vue */
 import VC from '@model/VC'
 import { CreateElement } from 'vue'
-import { Component } from 'vue-property-decorator'
+import { Component, Emit, Prop } from 'vue-property-decorator'
 /* scss */
 import '@src/component/ui/UiInput/UiInput.scss'
 
@@ -9,9 +12,18 @@ import '@src/component/ui/UiInput/UiInput.scss'
 })
 class UiInput extends VC<{}> {
   
+  /* 点击事件 */
+  @Prop() readonly click: Function | undefined
+  
+  @Emit(EventNameEnum.Click)
+  private clickHandler(event: MouseEvent) {
+    this.click && this.click()
+    return event
+  }
+  
   render(h: CreateElement) {
     return (
-      <div class='ui-input-block'>
+      <div class='ui-input-block' onClick={(event: MouseEvent) => this.clickHandler(event)}>
         {this.$slots.default}
         <i class='el-select__caret el-input__icon el-icon-arrow-up'></i>
       </div>

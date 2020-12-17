@@ -5,3 +5,14 @@
   height: 100%;
   width: 100%;
 }
+.task-allot-user-content {
+  .base-panel {
+    box-shadow: none;
+    position: absolute;
+    top: 161px;
+    bottom: 53px;
+  }
+  .base-panel-title {
+    display: none;
+  }
+}

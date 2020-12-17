@@ -27,6 +27,8 @@ import { openTabForUserView } from '@src/util/business/openTab'
 import { fmt_display_text, fmt_number_to_fixed } from '@src/filter/fmt'
 import { isArray } from '@src/util/type'
 import { stringArrayIntersection } from '@src/util/array'
+import { parseObject } from '@src/util/parse'
+import { isString } from 'lodash'
 
 enum UserCardEmitEventEnum {
   // 关闭事件
@@ -35,6 +37,11 @@ enum UserCardEmitEventEnum {
   SetExecutor = 'setExecutor',
   // 设置协同人事件
   SetSynergy = 'setSynergy'
+}
+
+enum UserCardRadioEnum {
+  Executor = 'executor',
+  Synergy = 'synergy'
 }
 
 @Component({ name: ComponentNameEnum.UserCard })
@@ -54,6 +61,8 @@ export default class UserCard extends Vue {
   
   // 用户是否在客户团队内
   private isUserInCustomerTag: boolean = false
+  // 负责人/协同人 单选
+  private radio: UserCardRadioEnum | null = null
   // 等待状态
   private pending: boolean = false
   // 时间
@@ -161,7 +170,7 @@ export default class UserCard extends Vue {
           Platform.alert(data.message)
         }
         
-        this.userCardInfo = data.result
+        this.userCardInfo = parseObject(data.result)
         this.matchUserInCustomerTags()
       })
       .catch((error) => {
@@ -185,7 +194,7 @@ export default class UserCard extends Vue {
     return this.getUserInfoData(value, '小时')
   }
   
-  private getUserInfoTashRate(value: string | null): string | number {
+  private getUserInfoTaskRate(value: string | null): string | number {
     if (value !== null) { value = value.substr(0, value.length - 1) }
     return this.getUserInfoData(value, '%')
   }
@@ -210,10 +219,84 @@ export default class UserCard extends Vue {
   }
   
   /** 
+   * @description 选择负责人/协同人 变化事件
+  */
+  private onRadioChangedHandler(value: UserCardRadioEnum) {
+    let isExecutor = value === UserCardRadioEnum.Executor
+    isExecutor ? this.setExecutorUser() : this.setSynergyUser()
+    this.radio = value
+  }
+  
+  /** 
    * @description 打开用户详情tab
   */
   private openUserViewTab(): void {
     openTabForUserView(this.userId, { from: 'task' })
+  }
+  
+  /** 
+   * @description 渲染用户卡片标签列表
+  */
+  private renderUserCardLabels() {
+    return (
+      <div class='user-card-header-content-labels'>
+        { !this.userCardInfo.isManager && this.renderUserCardLabel('主管', 'manager') }
+        { !this.userCardInfo.isDistance && this.renderUserCardLabel('近') }
+        { !this.userCardInfo.isPrecent && this.renderUserCardLabel('好评') }
+      </div>
+    )
+  }
+  
+  /** 
+   * @description 渲染用户卡片标签
+  */
+  private renderUserCardLabel(label: string, className: string = ''): VNode {
+    const baseClassName = 'user-card-label'
+    const classNames = [baseClassName, `${baseClassName}-${className}`]
+    
+    return (
+      <div class={classNames}>{label}</div>
+    )
+  }
+  
+  /** 
+   * @description 渲染用户卡片团队列表
+  */
+  private renderUserCardTeams() {
+    const departmentText = this.userCardInfo.department.join(', ') 
+    
+    return (
+      <div class='user-card-header-content-team'>
+        {
+          this.isUserInCustomerTag && (
+            <el-tooltip content='客户的服务团队' placement='top'>
+              <i class='iconfont icon-favorfill'></i>
+            </el-tooltip>
+          )
+        }
+        { 
+          <el-tooltip content={departmentText} placement='top'>
+            <span>{departmentText}</span>
+          </el-tooltip>
+        }
+      </div>
+    )
+  }
+  
+  /** 
+   * @description 渲染用户卡片位置
+  */
+  private renderUserCardLocation() {
+    let userAttribute = this.userCardInfo?.user?.attribute || {}
+    // 最后登录时间
+    let lastLoginTime = DateUtil.getTimeDiffStr(userAttribute?.lastLocateTime)
+    
+    return (
+      <div class='user-card-header-content-location'>
+        <i class='iconfont icon-fdn-location'></i>
+        { lastLoginTime && `(${lastLoginTime}前)` }
+      </div>
+    )
   }
   
   /** 
@@ -244,44 +327,43 @@ export default class UserCard extends Vue {
     let rangeAccept = this.getUserInfoUsedTime(this.userCardInfo.rangeAccept)
     // 平均工作用时
     let rangeWork = this.getUserInfoUsedTime(this.userCardInfo.rangeWork)
-
+    // 平均响应用时dom
+    let rangeAcceptDom = (
+      <el-tooltip content={rangeAccept} placement='top'>
+        <span>{rangeAccept}</span>
+      </el-tooltip>
+    )
+    // 平均工作用时dom
+    let rangeWorkDom = (
+      <el-tooltip content={rangeWork} placement='top'>
+        <span>{rangeWork}</span>
+      </el-tooltip>
+    )
+    
     return (
       <div class='user-card-detail'>
         <div class='user-card-detail-row'>
-          <div class='user-card-detail-row-item'>
-            未完成工单量: {fmt_display_text(this.userCardInfo.unfinished, '个')}
-          </div>
-          <div class='user-card-detail-row-item'>
-            已完成工单量: {fmt_display_text(this.userCardInfo.finished, '个')}
-          </div>
+          {this.renderUserCardDetailChunk('未完成工单量', fmt_display_text(this.userCardInfo.unfinished, '个'))}
+          {this.renderUserCardDetailChunk('已完成工单量', fmt_display_text(this.userCardInfo.finished, '个'))}
+          {this.renderUserCardDetailChunk('平均工作用时', rangeWorkDom)}
         </div>
         <div class='user-card-detail-row'>
-          <div class='user-card-detail-row-item'>
-            平均响应用时: 
-            <el-tooltip content={rangeAccept} placement='top'>
-              <span>{rangeAccept}</span>
-            </el-tooltip>
-          </div>
-          <div class='user-card-detail-row-item'>
-            平均工作用时: 
-            <el-tooltip content={rangeWork} placement='top'>
-              <span>{rangeWork}</span>
-            </el-tooltip>
-          </div>
+          {this.renderUserCardDetailChunk('拒单率', this.getUserInfoTaskRate(this.userCardInfo.refuse))}
+          {this.renderUserCardDetailChunk('转派率', this.getUserInfoTaskRate(this.userCardInfo.allot))}
+          {this.renderUserCardDetailChunk('好评率', this.getUserInfoTaskRate(this.userCardInfo.degree))}
         </div>
-        <div class='user-card-detail-row'>
-          <div class='user-card-detail-row-item'>
-            拒单率: {this.getUserInfoTashRate(this.userCardInfo.refuse)}
-          </div>
-          <div class='user-card-detail-row-item'>
-            转派率: {this.getUserInfoTashRate(this.userCardInfo.allot)}
-          </div>
-        </div>
-        <div class='user-card-detail-row'>
-          <div class='user-card-detail-row-item'>
-            好评率: {this.getUserInfoTashRate(this.userCardInfo.degree)}
-          </div>
-        </div>
+      </div>
+    )
+  }
+  
+  /** 
+   * @description 渲染用户信息详情
+  */
+  private renderUserCardDetailChunk(label: string, value: string | number | null | VNode): VNode {
+    return (
+      <div class='user-card-detail-chunk'>
+        <div class='user-card-detail-chunk-content'>{value}</div>
+        <div class='user-card-detail-chunk-label'>{label}</div>
       </div>
     )
   }
@@ -304,54 +386,45 @@ export default class UserCard extends Vue {
               <img src={this.user?.head || DefaultHead} />
             </div>
             <div class='user-card-header-content'>
+              
               <div class='user-card-header-content-top'>
-                
-                <div class='user-card-header-content-top-left'>
-                  <div class='user-card-header-content-name' onClick={() => this.openUserViewTab()}>
-                    {this?.user?.displayName}
-                    { this.showCustomerManagerIcon && (
-                      <el-tooltip content='客户负责人' placement='top'>
-                        <i class='iconfont icon-huangguan'></i>
-                      </el-tooltip>
-                    )}
-                  </div>
-                  
-                  <div class='user-card-header-content-state'>
-                    <span class='user-state-round' style={{
-                      backgroundColor: this.stateColorMap && this.stateColorMap[this.user?.state || '']
-                    }}>
-                    </span>
-                    <span>{this.user?.state}</span>
-                    <span>{this.user?.cellPhone}</span>
-                  </div>
+                <div class='user-card-header-content-name' onClick={() => this.openUserViewTab()}>
+                  {this?.user?.displayName}
+                  { this.showCustomerManagerIcon && (
+                    <el-tooltip content='客户负责人' placement='top'>
+                      <i class='iconfont icon-huangguan'></i>
+                    </el-tooltip>
+                  )}
                 </div>
-                
-                <div class='user-card-header-button-group'>
-                  <base-button class='excutor-button' type='ghost' onEvent={this.setExecutorUser}>设为负责人</base-button>
-                  {
-                    this.showSynergyButton
-                    && <base-button class='synergy-button' type='ghost' onEvent={this.setSynergyUser}>设为协同人</base-button>
-                  }
+                <div class='user-card-header-content-state'>
+                  <span class='user-state-round' style={{
+                    backgroundColor: this.stateColorMap && this.stateColorMap[this.user?.state || '']
+                  }}>
+                  </span>
+                  <span>{this.user?.state}</span>
+                  <span>{this.user?.cellPhone}</span>
                 </div>
-                
+                { this.renderUserCardLabels() }  
               </div>
               
-              <div class='user-card-header-content-team'>
-                {
-                  this.isUserInCustomerTag && (
-                    <el-tooltip content='客户的服务团队' placement='top'>
-                      <i class='iconfont icon-favorfill'></i>
-                    </el-tooltip>
-                  )
-                }
-                { this.userCardInfo.department.join(', ') }
-              </div>
+              {this.renderUserCardTeams()}
+              {this.renderUserCardLocation()}
               
             </div>
           </div>
           {this.renderUserCardTime()}
           {this.renderUserCardDetail()}
           
+          <div class='user-card-footer'>
+              <el-radio-group value={this.radio} onInput={(value: UserCardRadioEnum) => this.onRadioChangedHandler(value)}>
+                <el-radio label={UserCardRadioEnum.Executor}>设为负责人</el-radio>
+                {
+                  this.showSynergyButton && (
+                    <el-radio label={UserCardRadioEnum.Synergy}>设为协同人</el-radio> 
+                  )
+                }
+              </el-radio-group>
+          </div>
       </div>
     )
   }

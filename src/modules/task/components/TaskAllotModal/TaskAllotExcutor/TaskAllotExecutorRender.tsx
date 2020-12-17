@@ -1,3 +1,5 @@
+/* components */
+import UiInput from '@src/component/ui/UiInput/UiInput.tsx'
 /* entity */
 import TaskAllotUserInfo from '@model/entity/TaskAllotUserInfo'
 import Customer from '@model/entity/Customer'
@@ -17,7 +19,7 @@ class TaskAllotExecutorRender extends TaskAllotExecutorMethods {
   /** 
    * @description 渲染 按团队选人
   */
-  public renderChooseUserByTeam() {
+  public renderTeamUserSelect() {
     const scopedSlots = {
       option: (props: any) => {
         return (
@@ -37,7 +39,7 @@ class TaskAllotExecutorRender extends TaskAllotExecutorMethods {
         onInput={(value: any[]) => this.handlerTeamUsersChange(value)}
         collapsed
         multiple
-        placeholder='员工'
+        placeholder='请输入查询'
         remoteMethod={(params: any) => this.fetchTeamUsers(params)}
         scopedSlots={scopedSlots}
       >
@@ -48,7 +50,7 @@ class TaskAllotExecutorRender extends TaskAllotExecutorMethods {
   /** 
    * @description 渲染 按部门选人
   */
-  public renderChooseUserByDept() {
+  public renderDepartmentUserSelect() {
     let isUsersEmpty = this.selectDeptUsers.length <= 0
     
     return (
@@ -101,12 +103,47 @@ class TaskAllotExecutorRender extends TaskAllotExecutorMethods {
   }
   
   /**
+   * @description 渲染协同人
+  */
+  public renderSysnergySelect(): VNode {
+    // 删除协同人事件
+    const sysnergyUserCloseHandler = (sysenergyUser: LoginUser) => {
+      this.synergyUserList.splice(
+        this.synergyUserList.findIndex((user: LoginUser) => user.userId === sysenergyUser.userId),
+        1
+      )
+    }
+    
+    return (
+      <div class='task-allot-sysnergy-select' onClick={() => this.chooseSynergyUser()}>
+        <UiInput>
+          {
+            this.synergyUserList.map((synergyUser: LoginUser, index: number) => {
+              return (
+                <el-tag
+                  key={synergyUser.userId} 
+                  closable 
+                  disable-transitions={true}
+                  type='info' 
+                  onClose={(synergyUser: LoginUser) => sysnergyUserCloseHandler(synergyUser)}
+                >
+                  {synergyUser.displayName}
+                </el-tag>
+              )
+            })
+          }
+        </UiInput>
+      </div>
+    )
+  }
+  
+  /**
    * @description 渲染选择团队
   */
   public renderTeamSelect() {    
     return (
       <biz-team-select
-        placeholder='服务团队'
+        placeholder='请输入查询'
         value={this.selectTeams} 
         fetchFunc={(params: TaskTagListSearchModel) => this.fetchTagList(params)} 
         onInput={(value: Tag[]) => this.handlerTeamChange(value)} 
@@ -134,9 +171,9 @@ class TaskAllotExecutorRender extends TaskAllotExecutorMethods {
     return (
       <div class='task-allot-executor-header'>
         { this.isAllotByTag && this.renderTaskAllotExecutorHeaderRow('服务团队：', this.renderTeamSelect()) }
-        { this.isAllotByTag && this.renderTaskAllotExecutorHeaderRow('负责人：', this.renderTeamSelect()) }
-        { !this.isAllotByTag && this.renderTaskAllotExecutorHeaderRow('负责人：', this.renderTeamSelect()) }
-        { this.isShowSynergy && this.renderTaskAllotExecutorHeaderRow('协同人：', this.renderTeamSelect()) }
+        { this.isAllotByTag && this.renderTaskAllotExecutorHeaderRow('负责人：', this.renderTeamUserSelect()) }
+        { !this.isAllotByTag && this.renderTaskAllotExecutorHeaderRow('负责人：', this.renderDepartmentUserSelect()) }
+        { this.isShowSynergy && this.renderTaskAllotExecutorHeaderRow('协同人：', this.renderSysnergySelect()) }
       </div>
     )
   }

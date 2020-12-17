@@ -6,6 +6,7 @@ import TaskAllotExecutorComputed from '@src/modules/task/components/TaskAllotMod
 import { TaskAllotTypeModeEnum } from '@src/modules/task/components/TaskAllotModal/TaskAllotModalModel'
 import ComponentNameEnum from '@model/enum/ComponentNameEnum'
 import HookEnum from '@model/enum/HookEnum'
+import EelementTableSortOrderEnum from '@model/enum/ElementTableSortOrderEnum'
 /* entity */
 import Tag from '@model/entity/Tag/Tag'
 import LoginUser from '@model/entity/LoginUser/LoginUser'
@@ -29,10 +30,12 @@ import {
 /* util */
 import * as _ from 'lodash'
 import Log from '@src/util/log.ts'
-import { isString, isObject, isArray } from '@src/util/type'
+import { isArray } from '@src/util/type'
 import Platform from '@src/util/platform'
+import { objectArrayIntersection } from '@src/util/array'
 /* vue */
 import { Watch } from 'vue-property-decorator'
+import { parseObject } from '@src/util/parse'
 
 /* 加载的组件 */
 const LoadComponentMap: { [x: string]: string } = {
@@ -56,35 +59,6 @@ const OrderMap: { [x: number]: boolean } = {
   [AllotSortedEnum.TaskAcceptTimeByMonth]: true,
   [AllotSortedEnum.FinishTaskByMonth]: false
 }
-
-/** 
- * @description 解析对象
- * -- 临时写的
-*/
-function parseObject(value: any): any {
-  // 是否为数组
-  if (isArray(value)) return value.map((item: any) => parseObject(item))
-  // 是否字符串
-  if (isString(value)) {
-    try {
-      return JSON.parse(value)
-    } catch (error) {
-      return value
-    }
-  }
-  // 是否是对象
-  if (!isObject(value)) return value
-  
-  let newValue: any = {}
-  
-  for(let key in value) {
-    let item = value[key]
-    newValue[key] = parseObject(item)
-  }
-  
-  return newValue
-}
-
 
 class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
   
@@ -155,6 +129,19 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
     }
     
     return params
+  }
+  
+  /** 
+   * @description 构建搜索团队列表参数
+  */
+  public buildSearchTagParams() {
+    return {
+      pageSize: 0,
+      pageNum: 1,
+      keyword: '',
+      onlyParent: true,
+      customerId: this.customer?.id || ''
+    }
   }
   
   /** 
@@ -300,7 +287,7 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
    * -- 内部调用的
   */
   public fetchUsers(): Promise<PageInfo<getTaskAllotUserInfoResult> | null | any> {
-    if (this.pending) return Promise.resolve([])
+    if (this.pending) return Promise.resolve({})
     
     Log.succ(Log.Start, this.fetchUsers.name)
     
@@ -320,7 +307,8 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
           
           Log.succ(Log.End, this.fetchUsers.name)
           
-          return data?.result || null
+          data.result = data?.result || []      
+          return data.result
           
         })
         .catch(err => {
@@ -350,6 +338,7 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
    * @description 获取位置参数
   */
   public getParamDistance(): number[] | null {
+    // 米
     let m = 1000
     
     try {
@@ -424,6 +413,32 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
     this.initialize()
   }
   
+  /** 
+   * @description 排序变化
+  */
+  public handlerTableSortChanged(option: { prop?: any, order?: any } = {}) {
+    Log.succ(Log.Start, this.handlerTableSortChanged.name)
+    
+    const { prop, order } = option
+    
+    if (!order) {
+      this.orderDetail = {}
+      this.selectSortord = null
+      return this.initialize()
+    }
+    
+    let isDescending: boolean = order === EelementTableSortOrderEnum.DESC
+    
+    let orderDetail = {
+      order: !isDescending,
+      code: SortedMap[prop],
+    }
+    
+    this.orderDetail = orderDetail
+    this.selectSortord = null
+    this.initialize()
+  }
+  
   /**
    * @description 初始化 获取用户列表并且初始化地图
   */
@@ -433,7 +448,7 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
     // 清空用户列表数据
     this.isMapMode
       ? this.mapUserPage = new Page({ pageNum: 0 })
-      : this.tableUserPage = new Page({ pageNum: 0 })
+      : this.tableUserPage = new Page({ pageNum: 0, pageSize: 20 })
     // TODO: 
     // this.changePending && this.changePending(true)
     
@@ -476,14 +491,49 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
     }
   }
   
+  /** 
+   * @description 匹配服务团队
+  */
+  public async matchTags(): Promise<void> {
+    try {
+      if (!this.isAllotByTag && !this.allotByExclusiveTag) return
+      
+      let searchTagParams = this.buildSearchTagParams()
+      let result: any = await this.fetchTagList(searchTagParams) || {}
+      // 团队列表
+      let tagList: Tag[] = result.list || []
+      // 客户团队列表
+      let customerTags: Tag[] = this.customer?.tags || []
+      let tags: Tag[] = []
+      
+      // 按客户服务团队派单 取可见团队
+      if (this.allotByExclusiveTag) {
+        tags = tagList
+      }
+      // 按服务团队派单 取可见团队和客户团队的交集
+      else if (this.isAllotByTag) {
+        tags = objectArrayIntersection<Tag, Tag>(customerTags, tagList)
+      }
+      
+      this.customerTags = tags.slice()
+      
+      Log.info(this.customerTags.slice(), 'customerTags', this.matchTags.name)
+      
+    } catch (error) {
+      Log.error(error, this.matchTags.name)
+    }
+  }
+  
   /**
    * @description 获取团队用户
    * -- 支持外部调用的
   */
-  public outsideFetchUsers() {
-    Log.succ(Log.End, `TaskAllotExcutor -> ${this.outsideFetchUsers.name}`)
-    // @ts-ignore
-    this.$refs?.TaskAllotUserTableComponent.outsideFetchUsers()
+  public async outsideFetchUsers() {
+    Log.succ(Log.Start, `TaskAllotExcutor -> ${this.outsideFetchUsers.name}`)
+    // 匹配团队
+    await this.matchTags()
+    // 初始化
+    this.initialize()
   }
   
   /**
@@ -494,14 +544,6 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
     let excutorUser = isSelected ? user : null
     this.isShowUserCard = isSelected
     this.selectedExcutorUser = excutorUser
-  }
-  
-  /**
-   * @description 获取团队用户
-   * -- 支持外部调用的
-  */
-  public outsideSetCustomerTags(tags: Tag[]) {
-    this.customerTags = tags
   }
   
   /**
@@ -521,12 +563,20 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
     this.pending = pending
   }
   
+  /**
+   * @description 排序变化事件
+   * -- 支持外部调用的
+  */
+  public outsideSortChangedHandler(option: { prop?: any, order?: any } = {}) {
+    Log.succ(Log.Start, this.outsideSortChangedHandler.name)
+    this.handlerTableSortChanged(option)
+  }
+  
   /** 
    * @description 还原地图标记
   */
   private restoreUserMarkerIcon() {
-    // @ts-ignore
-    this.$refs.TaskAllotUserTableComponent?.outsideRestoreUserMarkerIcon()
+    this.TaskAllotUserTableComponent?.outsideRestoreUserMarkerIcon()
   }
   
   /**
@@ -551,8 +601,10 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
       
       Log.succ(Log.Start, this.tableUserPageHandler.name)
       
-      // 合并数据
+      // 合并page数据
       this.tableUserPage.merge(result)
+      // 设置人员列表数据
+      this.TaskAllotUserTableComponent?.outsideSetUserPage(result.list)
       // 是否禁用加载更多
       this.isDisableLoadmore = !(result?.hasNextPage === true)
       // 解绑滚动事件

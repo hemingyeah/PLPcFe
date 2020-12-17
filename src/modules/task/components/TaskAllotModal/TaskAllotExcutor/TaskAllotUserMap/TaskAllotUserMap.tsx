@@ -1,10 +1,13 @@
 /* components */
 import TaskAllotMap from '@src/modules/task/components/TaskAllotModal/TaskAllotMap/TaskAllotMap.tsx'
+import UserCard from '@src/modules/task/components/TaskAllotModal/UserCard/UserCard.tsx'
 /* entity */
 import TaskAllotUserInfo from '@model/entity/TaskAllotUserInfo'
 import LoginUser from '@model/entity/LoginUser/LoginUser'
+import Tag from '@model/entity/Tag/Tag'
 /* enum */
 import ComponentNameEnum from '@model/enum/ComponentNameEnum'
+import EventNameEnum from '@model/enum/EventNameEnum'
 /* image */
 // @ts-ignore
 import DefaultHead from '@src/assets/img/avatar.png'
@@ -14,36 +17,84 @@ import Page from '@model/Page'
 import '@src/modules/task/components/TaskAllotModal/TaskAllotExcutor/TaskAllotUserMap/TaskAllotUserMap.scss'
 /* vue */
 import VC from '@model/VC'
-import { Component } from 'vue-property-decorator'
+import { Component, Emit, Prop } from 'vue-property-decorator'
 import { CreateElement } from 'vue'
 /* util */
 import Log from '@src/util/log.ts'
+/* types */
+import StateColorMap from '@model/types/StateColor'
 
 declare let AMap: any
+
+enum TaskAllotUserMapEventEmitEnum {
+  ExecutorChange = 'executorChange'
+}
 
 @Component({ 
   name: ComponentNameEnum.TaskAllotUserMap,
   components: {
-    TaskAllotMap
+    TaskAllotMap,
+    UserCard
   }
 })
 export default class TaskAllotUserMap extends VC {
   
+  /* 客户团队列表 */
+  @Prop() readonly customerTags: Tag[] | undefined
+  /* 是否显示协同人 */
+  @Prop() readonly isShowSynergy: boolean | undefined
+  /* 是否为客户负责人 */
+  @Prop() readonly isCustomerManager: boolean | undefined
+  /* 工作状态颜色数组 */
+  @Prop() readonly stateColorMap: StateColorMap | undefined
+  /* 选择的负责人信息 */
+  @Prop() readonly selectedExcutorUser: TaskAllotUserInfo | null = null
+  
   /* 地图对象 */
   private AMap: any = AMap
+  /* 是否显示人员卡片信息 */
+  private isShowUserCard: boolean = false
   /* 地图的id */
   private mapId: string = 'TaskAllotUserMapContainer'
+  /* 最后一次点击的标记头像 */
+  public lastClickedUserMarker: { marker: any, data: TaskAllotUserInfo | null } = { marker: null, data: null }
   /* 用户page */
   public userPage: Page =  new Page({ pageNum: 0 })
   /* 用户标记列表 */
   public userMarkers: any[] = []
   
+  /* 客户团队名称列表 */
+  get customerTagNames(): string[] {
+    return this.customerTags ? this.customerTags.map(tag => tag.tagName || '') : []
+  }
+  
+  /* 负责人选中变化事件 */
+  @Emit(TaskAllotUserMapEventEmitEnum.ExecutorChange)
+  private selectedExcutorUserChangedHandler(user: TaskAllotUserInfo): TaskAllotUserInfo {
+    return user
+  }
+  
   /** 
-   * @description 构建标记
+   * @description 添加用户标记点击事件
   */
-  private buildMarkers(): void {
-    // 构建人员标记列表
-    this.buildUserMarkers()
+  public bindUserMarkerClickEvent(userMarker: any) {
+    userMarker.on(EventNameEnum.Click, (event: any) => {
+      /* 如果存在之前标记点击数据 则还原标记 */
+      this.lastClickedUserMarker.marker && this.restoreUserMarkerIcon()
+      /* 获取用户信息 */
+      let user: TaskAllotUserInfo = event.target.getExtData()
+      /* 构建大号头像 */
+      event.target.setIcon(this.buildUserMarkerIcon(AMap, user, true))
+      /* 保存点击标记信息 */
+      this.lastClickedUserMarker = {
+        marker: event.target,
+        data: user
+      }
+      // 更新选中人员
+      this.selectedExcutorUserChangedHandler(user)
+      // 显示人员卡片
+      this.isShowUserCard = true
+    })
   }
   
   /** 
@@ -74,6 +125,8 @@ export default class TaskAllotUserMap extends VC {
       })
       // // 添加标记
       this.userMarkers.push(userMarker)
+      // 绑定点击事件
+      this.bindUserMarkerClickEvent(userMarker)
     })
   }
   
@@ -83,7 +136,7 @@ export default class TaskAllotUserMap extends VC {
    * @param {TaskAllotUserInfo} user 用户信息
    * @param {Boolean} isLarge 是否是更大的标记
   */
-  public buildUserMarkerIcon(aMap: any, user: TaskAllotUserInfo, isLarge: boolean = false) {
+  private buildUserMarkerIcon(aMap: any, user: TaskAllotUserInfo, isLarge: boolean = false) {
     let size = isLarge ? new aMap.Size(52, 52) : new aMap.Size(42, 42)
     
     return (
@@ -93,6 +146,23 @@ export default class TaskAllotUserMap extends VC {
         imageSize: size
       })
     )
+  }
+  
+  /** 
+   * @description 关闭用户卡片
+  */
+  private closeUserCard() {
+    this.isShowUserCard = false
+    this.restoreUserMarkerIcon()
+  }
+  
+  /** 
+   * @description 构建标记
+   * -- 支持外部调用的
+  */
+  public outdieBuildMarkers(): void {
+    // 构建人员标记列表
+    this.buildUserMarkers()
   }
   
   /**
@@ -117,16 +187,44 @@ export default class TaskAllotUserMap extends VC {
     this.AMap = AMap
   }
   
+  /** 
+   * @description 还原地图标记
+   * TODO: 
+  */
+  private restoreUserMarkerIcon() {
+    // 
+  }
   
   render(h: CreateElement) {
+    const basePanelAttrs = {
+      on: {
+        'update:show': (show: boolean) => {
+          this.isShowUserCard = show
+        }
+      }
+    }
+    
     return (
       <div class={ComponentNameEnum.TaskAllotUserMap}>
         <task-allot-map 
           ref='TaskAllotUserMap'
           idName={this.mapId}
-          handlerCustomFunc={() => this.buildMarkers()} 
+          handlerCustomFunc={() => this.outdieBuildMarkers()} 
           setMapFunc={(AMap: any) => this.outsideSetMap(AMap)}
         />
+        <div class='task-allot-user-content'>
+          <base-panel width='470px' show={this.isShowUserCard} {...basePanelAttrs}>
+            <user-card
+              customerTagNames={this.customerTagNames}
+              emitEventComponentName={ComponentNameEnum.TaskAllotExcutor}
+              stateColorMap={this.stateColorMap}
+              showSynergyButton={this.isShowSynergy}
+              showCustomerManagerIcon={this.isCustomerManager}
+              userId={this.selectedExcutorUser?.userId}
+              onClose={() => this.closeUserCard()}
+            /> 
+          </base-panel>
+        </div>
       </div>
     )
   }

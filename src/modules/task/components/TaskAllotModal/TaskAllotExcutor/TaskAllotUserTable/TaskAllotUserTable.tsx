@@ -42,7 +42,7 @@ export default class TaskAllotUserTable extends TaskAllotUserTableRender {
         <div class='task-allot-user-table-block'>
           <el-table
             border
-            data={this.userPage.list}
+            data={this.taskAllotUserList}
             header-row-class-name='base-table-header-v3'
             row-class-name='base-table-row-v3'
             ref='TaskAllotUserTable'

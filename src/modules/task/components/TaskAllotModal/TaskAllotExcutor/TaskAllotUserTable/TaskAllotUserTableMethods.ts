@@ -705,28 +705,8 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
    * @description 排序变化
   */
   public handlerTableSortChanged(option: { prop?: any, order?: any } = {}) {
-    const { prop, order } = option
-    
-    if (!order) {
-      this.orderDetail = {}
-      // this.selectSortord = this.backupSelectSorted
-      return this.initialize()
-    }
-    
-    let isDescending: boolean = order === EelementTableSortOrderEnum.DESC
-    
-    let orderDetail = {
-      order: !isDescending,
-      code: SortedMap[prop],
-    }
-    
-    // if (this.backupSelectSorted == null) {
-    //   this.backupSelectSorted = this.selectSortord
-    // }
-    
-    // this.orderDetail = orderDetail
-    // this.selectSortord = null
-    this.initialize()
+    Log.succ(Log.Start, this.handlerTableSortChanged.name)
+    this.sortChangeFunc && this.sortChangeFunc(option)
   }
   
   /**
@@ -849,7 +829,6 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
   }
   
   /** 
-   * @deprecated
    * @description 匹配服务团队
   */
   public async matchTags(): Promise<void> {
@@ -909,6 +888,14 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
   */
   public outsideUpwardClearExcutorUser() {
     this.handlerExcutorCheckedChange(false, this.selectExecutorUser)
+  }
+  
+  /** 
+   * @description 设置工单指派人员列表信息
+   * -- 支持向上的外部调用的方法
+  */
+  public outsideSetUserPage(userList: TaskAllotUserInfo[]) {
+    this.taskAllotUserList = userList
   }
   
   /**

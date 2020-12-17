@@ -10,9 +10,9 @@ import { findComponentUpward } from '@src/util/assist'
 
 class TaskAllotExecutorComputed extends TaskAllotExecutorData {
   
-  /* 是否允许修改协同人 */
-  get allowModifySynergyUser(): boolean {
-    return Boolean(this.TaskAllotModalComponent?.allowModifySynergyUser)
+  /* 是否是按服务团队派单 */
+  get allotByExclusiveTag() {
+    return this.taskConfig?.allotByExclusiveTag === true
   }
   
   /* 客户团队名称列表 */

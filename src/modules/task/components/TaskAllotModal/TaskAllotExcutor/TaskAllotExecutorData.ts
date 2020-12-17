@@ -67,7 +67,7 @@ class TaskAllotExecutorData extends TaskAllotExecutorProps {
   /* 选择的负责人信息 */
   public selectedExcutorUser: TaskAllotUserInfo | null = null
   /* 当前选择的排序方式 */
-  public selectSortord: number = AllotSortedEnum.FinishTaskByMonth
+  public selectSortord: number | null = AllotSortedEnum.FinishTaskByMonth
   /* 当前选择的团队 */
   public selectTeams: Tag[] = []
   /* 当前选择的团队人员列表 */

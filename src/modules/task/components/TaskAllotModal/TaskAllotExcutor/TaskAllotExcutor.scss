@@ -95,6 +95,16 @@
     &:last-child {
       margin-right: 0;
     }
+    .task-allot-sysnergy-select {
+      cursor: pointer;
+      flex: 1;
+      .ui-input-block {
+        width: 100%;
+        .el-tag {
+          margin-right: 8px;
+        }
+      }
+    }
   }
 }
 /* new new */

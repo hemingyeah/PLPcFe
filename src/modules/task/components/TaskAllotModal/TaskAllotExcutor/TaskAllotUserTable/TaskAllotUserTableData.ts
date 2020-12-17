@@ -25,6 +25,8 @@ import { Prop } from 'vue-property-decorator'
 class TaskAllotUserTableData extends TaskAllotUserTableComponents {
   /* 改变等待状态的方法 */
   @Prop() readonly changePending: Function | undefined
+  /* 排序变化方法 */
+  @Prop() readonly sortChangeFunc: Function | undefined
   
   /* 地图对象 */
   public AMap: any = null
@@ -114,7 +116,11 @@ class TaskAllotUserTableData extends TaskAllotUserTableComponents {
     { label: '今日接单量低到高',  value: AllotSortedEnum.ExecutorTaskByMonth },
     { label: '好评优先',  value: AllotSortedEnum.TaskDegreePercentByMonth },
   ]
-  public tableSortLabel: AllotSortedEnum | null = null 
+  /* 表格排序 标签 */
+  public tableSortLabel: AllotSortedEnum | null = null
+  /* 工单指派人员列表 */
+  public taskAllotUserList: TaskAllotUserInfo[] = []
+
 }
 
 export default TaskAllotUserTableData
