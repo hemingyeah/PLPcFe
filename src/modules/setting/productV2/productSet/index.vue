@@ -42,12 +42,16 @@
       </div>
     </div>
 
-    <div class="flex-x box-12 bg-w mar-btm-10">
+    <div class="flex-x box-12 bg-w">
       <div class="flex-1">
         <div class="font-w-600">产品二维码管理</div>
         <div class="font-12 mar-top-5">生成并管理二维码</div>
       </div>
       <el-button type="primary" @click="openQrcodeList">前往</el-button>
+    </div>
+
+    <div class="flex-x box-12 bg-w mar-btm-10">
+      <el-button type="primary" @click="goSuperqrcodeSet">修改产品二维码设置</el-button>
     </div>
 
     <div class="flex-x box-12 bg-w" v-if="qrcodeEnabled">
@@ -518,6 +522,15 @@ export default {
     this.productConfig();
   },
   methods: {
+    // 修改产品二维码设置
+    goSuperqrcodeSet(){
+      this.$platform.openTab({
+        id: 'superqrcodeSet',
+        title: "超级二维码",
+        close: true,
+        url: '/superQrcode'
+      });
+    },
     // 获取开关状态
     async productConfig(){
       let res=await productConfig();
@@ -763,7 +776,11 @@ export default {
         flow,
       };
       let res = await saveFunc(params);
-      if (res.status !== 0) {
+      if(res.status===0){
+        if(flow==='qrcodeEnabled' && state && this.list.length===0){
+          this.queryAllRules();
+        }
+      }else{
         this.$platform.alert(res.message);
       }
     },
