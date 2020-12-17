@@ -8,7 +8,7 @@
     "url": "git@code.aliyun.com:publink/shb-pc-fe.git"
   },
   "scripts": {
-    "dev": "node script/dev-script.js",
+    "dev": "node --max_old_space_size=5000 script/dev-script.js",
     "serve": "node --max_old_space_size=4096 script/development.js",
     "build:new": "cnpm install & node script/production.js",
     "build:cloud": "node script/production.js",
