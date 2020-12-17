@@ -106,7 +106,7 @@ export default {
   },
   mounted() {
     this.initCard();
-    this.initCardSysList()
+    this.initCardSysList();
   },
   methods: {
     switchTab(tab){

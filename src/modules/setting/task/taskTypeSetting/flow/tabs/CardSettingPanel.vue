@@ -1,5 +1,5 @@
 <template>
-  <div class="card-setting-container">
+  <div class="card-setting-container" v-loading="loading">
     <!--start 新建附加组件 -->
     <div class="card-setting-heard">
       <div class="card-setting-title">
@@ -29,7 +29,7 @@
     <!--end 新建附加组件 -->
 
     <!--start 附加组件列表 -->
-    <div class="card-setting-list">
+    <div class="card-setting-list" v-if="taskCardList.length > 0">
       <draggable
         v-model="taskCardList"
         v-bind="dragOptions"
@@ -45,6 +45,8 @@
             v-for="(item, idx) in taskCardList"
             :key="item.id"
             :taskCard="taskCardList[idx]"
+            :taskTypeId="taskTypeId"
+            @deleteCard="onDeleteCard"
             @updateAttr="obj => {
               updateTaskCard(item, obj)
             }">
@@ -53,6 +55,13 @@
       </draggable>
     </div>
     <!--end 附加组件列表 -->
+
+      <!-- start 无数据 -->
+    <no-data-view-new
+      v-else
+      notice-msg="暂无附加组件"
+    ></no-data-view-new>
+    <!-- end 无数据 -->
   </div>
 </template>
 <script>
@@ -64,11 +73,13 @@ import * as TaskApi from '@src/api/TaskApi.ts';
 import * as SettingTaskApi from "@src/api/SettingTaskApi";
 /** component */
 import TaskCardItem from '../../components/TaskCardItem';
+import NoDataViewNew from '@src/component/common/NoDataViewNew';
 
 export default {
   name: "card-setting-panel",
   data() {
     return {
+      loading: true,
       taskTypeId: "",
       taskCardList: [],
     };
@@ -100,10 +111,12 @@ export default {
         }
       }
     },
-    /** 
-    * @description 工单类型附加组件排序
-    * order重新排序
-    */
+    //删除组件更新列表数据
+    onDeleteCard() {
+      this.fetchTasktype();
+    },
+
+    //工单类型附加组件排序 order重新排序
     updateTaskCardOrder(data){
       this.taskCardList.forEach((item, idx) => {
         item.order = idx +1;
@@ -112,9 +125,8 @@ export default {
       cardSetting.cardInfo = this.taskCardList
       this.sortCard(cardSetting)
     },
-    /** 
-    * @description 排序
-    */
+    
+    //排序 
     sortCard(cardSetting) {
       let params = {
           id: this.taskTypeId,
@@ -135,24 +147,22 @@ export default {
      */
     async fetchTasktype() {
         try {
-            let params = {
-                id: this.taskTypeId
-            };
-            const { status, message, data} = await TaskApi.getTaskType(params);
+            const { status, message, data } = await TaskApi.getTaskType({ id: this.taskTypeId});
+            this.loading = false;
             if( status == 0 ){
               if(JSON.stringify(data.cardSetting) !=='{}' && data.cardSetting.cardInfo){
-                this.taskCardList = data.cardSetting.cardInfo
+                this.taskCardList = data.cardSetting.cardInfo;
               }
-            }
-            
-            
+            }     
         } catch (err) {
             console.error('fetch Tasktype => err', err);
+            this.loading = false;
         }
     },
   },
   components: {
     [TaskCardItem.name]: TaskCardItem,
+    [NoDataViewNew.name]: NoDataViewNew,
     draggable
   }
 };

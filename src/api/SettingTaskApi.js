@@ -111,7 +111,7 @@ export const getCardSysList =  (params = {}) => {
  * @param {Object} params -- 参数对象
  */
 export const saveTaskCardOrder =  (params = {}) => {
-  return http.post('/setting/saveTaskCardOrder', params,true)
+  return http.post('/setting/saveTaskCardOrder', params)
 }
 
 /**
@@ -119,7 +119,7 @@ export const saveTaskCardOrder =  (params = {}) => {
  * @param {Object} params -- 参数对象
  */
 export const deleteTaskCard =  (params = {}) => {
-  return http.post('/setting/taskType/deleteCard', params)
+  return http.post('/setting/taskType/deleteCard', params,false)
 }
 
 /* ------------- end 工单类型组件设置 ---------------- */

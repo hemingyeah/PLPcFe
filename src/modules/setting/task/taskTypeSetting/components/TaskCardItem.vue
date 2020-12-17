@@ -9,10 +9,11 @@
                     <el-row class="task-card-others">
                         <p>
                             使用规则： 
-                            <span class="pointer" @click="chooseTeam">已设置 </span>
-                            <i class="iconfont icon-bianji1 pointer" @click="chooseTeam"></i>
+                            <span class="pointer" v-if="taskCard.notNullFlow || (taskCard.stateCanEdit && taskCard.stateCanEdit.length>0)">已设置 </span>
+                            <span class="pointer" v-else>未设置 </span>
+                            <i class="iconfont icon-bianji1 pointer" @click="onSetRules"></i>
                         </p>
-                        <p @click="chooseTeam">
+                        <p @click="onSetRules">
                             使用权限：
                             <span class="pointer see-role">查看角色权限 </span>
                             <i class="iconfont icon-bianji1 pointer"></i>
@@ -26,26 +27,26 @@
             <i class="iconfont icon-tuozhuaipaixu drag-icon"></i>
         </el-row>
         <el-row class="task-card-opearte" type="flex">
-            <div class="task-card-opearte-del" @click="deltaskCard">
+            <div class="task-card-opearte-del" @click="delTaskCard">
                 <i class="iconfont icon-shanchu-copy"> 删除</i>
             </div>
         </el-row>
-        <!-- 选择团队弹窗 -->
-        <choose-team-dialog
+        <!-- start 设置使用规则 -->
+        <use-rules-dialog
             :id="taskCard.id"
-            :visiable.sync="isShowChooseTeamModal"
-            :value="taskCard.tags"
+            :visiable.sync="isShowRulesModal"
             @update="updateTeamList"/>
+        <!-- end 设置使用规则 -->
     </el-card>
 </template>
 
 <script>
 import _ from "lodash";
 /** api */
-import * as SettingApi from "@src/api/SettingApi";
+import * as SettingTaskApi from "@src/api/SettingTaskApi";
 
 /** component */
-import ChooseTeamDialog from '../components/ChooseTeamDialog.vue';
+import UseRulesDialog from '../components/TaskCard/UseRulesDialog.vue';
 
 export default {
     name: 'task-card-item',
@@ -54,71 +55,44 @@ export default {
             type: Object,
             default: () => {}
         },
-        typeNum: {   // 已经开启的数量
-            type: Number,
-            default: 0
-        },
-        maxTypeNum: {
-            type: Number,
-            default: 0
-        },
+        taskTypeId: {
+            type: String,
+        }
     },
     data() {
         return {
-            isShowChooseTeamModal: false  // 选择可用团队弹窗
-        }
-    },
-    filters: {
-        formatTeamName(tagIds) {
-            // return tagIds.length === 0 ? '全部团队' : tagIds[0];
+            isShowRulesModal: false  // 选择可用团队弹窗
         }
     },
     methods: {
-        switchEnabled: _.throttle(function(value) {
-            if(value === 1 && this.typeNum >= this.maxTypeNum) {
-                return this.$message.warning(`最多只能同时存在${this.maxTypeNum}种工单类型`);
-            }
-
-            if(value === 0 && this.typeNum <= 1) {
-                return this.$message.warning(`无法禁用全部工单类型`);
-            }
-
-            let params = {
-                id: this.taskCard.id,
-                enabled: value
-            }
-            SettingApi.taskCardEnable(params).then(res => {
-                this.taskCard.enabled = value;
-            }).catch(err => {
-                console.log("taskCard enabled => err", err);
-            });
-        }, 300),
-        chooseTeam() {
-            this.isShowChooseTeamModal = true;
-        },
-        deltaskCard() {
-            if(this.typeNum <= 1) {
-                return this.$message.warning(`无法删除全部工单类型`);
-            }
-            this.$confirm('确认删除该工单类型？删除后将无法恢复', '提示', {
+        //删除组件
+        delTaskCard() {
+            this.$confirm('确认删除该组件？删除后将无法恢复', '提示', {
                 confirmButtonText: '确定',
                 cancelButtonText: '取消',
-                type: 'error',
+                type: 'warning',
             }).then(() => {
-                let params = {
-                    typeId: this.taskCard.id
+                const params = {
+                    typeId: this.taskTypeId,
+                    cardId: this.taskCard.id
                 }
-
-                SettingApi.deltaskCard(params).then(res => {
-                    this.$platform.notification({
-                        title: "删除成功",
-                        type: "success",
-                    });
-                    this.$emit("update");
-                }).catch(err => {
-                    console.log("delete taskCard => err", err);
-                });
+                SettingTaskApi.deleteTaskCard(params).then(res=>{
+                    const { status, message, data } = res;
+                    if(status == 0){
+                        this.$message.success('删除成功');
+                        this.$emit('deleteCard')
+                        
+                    }else{
+                        this.$message.error(message);
+                    }
+                }).catch(error=>{
+                    console.log(error)
+                })
             });
+        },
+        //设置使用规则
+        onSetRules() {
+            this.isShowRulesModal = true;
         },
         /**
          * 更新taskCard
@@ -136,7 +110,7 @@ export default {
         }
     },
     components: {
-        [ChooseTeamDialog.name]: ChooseTeamDialog,
+        [UseRulesDialog.name]: UseRulesDialog,
     }
 }
 </script>
