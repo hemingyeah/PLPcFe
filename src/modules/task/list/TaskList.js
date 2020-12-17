@@ -295,7 +295,10 @@ export default {
 
     // 
     if (localStorage.getItem('task_list')) {
-      this.params.pageSize = JSON.parse(localStorage.getItem('task_list')).pageSize
+      if (JSON.parse(localStorage.getItem('task_list')).columnStatus && !Array.isArray(JSON.parse(localStorage.getItem('task_list')).columnStatus)) {
+        localStorage.clear()
+      }
+      // this.params.pageSize = JSON.parse(localStorage.getItem('task_list')).pageSize
     }
 
     const that = this
