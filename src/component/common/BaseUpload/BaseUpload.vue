@@ -143,7 +143,7 @@ export default {
           platform.alert(message)
         }
 
-        if(success && Array.isArray(success) && success.length > 0 && this.isWaterMark){
+        if(success && Array.isArray(success) && success.length > 0 ){
           // 判断是否需要加水印
           for(let i = 0; i < success.length; i ++) {
             let file = success[i];
@@ -159,10 +159,10 @@ export default {
               }
             }
           }
-
-          let value = this.value.concat(success);
-          this.$emit("input", value);
+          
         }
+        let value = this.value.concat(success);
+        this.$emit("input", value);
 
       })
         .catch(err => console.error(err))

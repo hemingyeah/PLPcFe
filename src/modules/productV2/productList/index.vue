@@ -218,11 +218,11 @@
                   </template>
                 </sample-tooltip>
               </template>
-              <template v-else-if="column.field === 'customer'">
+              <template v-else-if="column.field === 'customer' && scope.row.customer">
                 <a href=""
                    class="view-detail-btn"
                    @click.stop.prevent="createCustomerTab(scope.row.customer.id)">
-                  {{ scope.row.customerName }}
+                  {{ scope.row.customer.name }}
                 </a>
               </template>
               <template v-else-if="column.field === 'productTemplate'">

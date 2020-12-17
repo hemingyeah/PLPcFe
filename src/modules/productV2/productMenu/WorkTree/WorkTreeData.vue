@@ -90,8 +90,9 @@
                 :on-preview="handlePictureCardPreview"
                 :before-upload="onBeforeUploadImage"
                 :http-request="UploadImagePic"
-                :file-list="productMenuValue.productPic"
+                :file-list="productPicList"
                 :on-exceed="onExceedPic"
+                :on-remove="onRemovePic"
                 multiple
                 :limit="5"
               >
@@ -111,8 +112,9 @@
                 :on-preview="handlePictureCardPreview"
                 :before-upload="onBeforeUploadImage"
                 :http-request="UploadImageThu"
-                :file-list="productMenuValue.thumbnail"
+                :file-list="thumbnailList"
                 :on-exceed="onExceedThu"
+                :on-remove="onRemoveThu"
                 :limit="1"
               >
                 <i class="el-icon-plus"></i>
@@ -236,10 +238,13 @@ export default {
       fileList: [],
       fields: [],
       productMenuValue: this.initProductMenuValue(),
+      
       flashPartType: false,
       flashProductType: false,
       fieldIds: [],
       btnLoading: false,
+      productPicList:[],
+      thumbnailList:[],
     };
   },
   components: {
@@ -345,6 +350,12 @@ export default {
       // this.fileList.push(file);
       return isMP4 && isLt10M;
     },
+    onRemovePic(o, a){
+      this.$set(this.productMenuValue, "productPic", this.productMenuValue.productPic.filter(item=>item.uid == o.uid));
+    },
+    onRemoveThu(o, a){
+      this.$set(this.productMenuValue, "thumbnail", this.productMenuValue.thumbnail.filter(item=>item.uid == o.uid));
+    },
     UploadImagePic(param) {
       Uploader.upload(param.file, "/files/upload")
         .then((result) => {
@@ -359,6 +370,7 @@ export default {
 
           let file = result.data;
           let item = {
+            uid:param.file.uid,
             id: file.id,
             filename: file.fileName,
             // 如果后端返回url,必须使用。如果后端不返回，需要拼接
@@ -390,6 +402,7 @@ export default {
 
           let file = result.data;
           let item = {
+            uid:param.file.uid,
             id: file.id,
             filename: file.fileName,
             // 如果后端返回url,必须使用。如果后端不返回，需要拼接
@@ -508,6 +521,8 @@ export default {
         if (res.code == 0) {
           res.result.catalogInfo.productVideo = res.result.catalogInfo.productVideo || [];
           res.result.catalogInfo.productPic = res.result.catalogInfo.productPic || [];
+          this.thumbnailList = res.result.catalogInfo.thumbnail || [];
+          this.productPicList = res.result.catalogInfo.productPic || [];
           res.result.catalogInfo.productExplain = res.result.catalogInfo.productExplain || [];
           res.result.catalogInfo.thumbnail = res.result.catalogInfo.thumbnail || [];
           res.result.catalogInfo = {...res.result.catalogInfo, ...res.result.catalogInfo.attribute}
