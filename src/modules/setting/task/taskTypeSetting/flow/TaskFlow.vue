@@ -56,6 +56,7 @@ import { parse } from '@src/util/querystring';
 // components
 import FlowSettingPanel from './tabs/FlowSettingPanel';
 import OtherSettingPanel from './tabs/OtherSettingPanel';
+import CardSettingPanel from './tabs/CardSettingPanel';
 
 const TASK_TYPE_COLOR = ['#737F7C','#266FFF','#5255FF','#8552FF','#BC52FF','#FF52D4','#FF9526','#6ECF40','#00B8D5','#0BA194']
 
@@ -98,7 +99,7 @@ export default {
         },
         {
           stepName: '组件设置',
-          compName: ''
+          compName: 'card-setting-panel'
         },
       ]
     }
@@ -115,7 +116,8 @@ export default {
   },
   components: {
     [FlowSettingPanel.name]: FlowSettingPanel,
-    [OtherSettingPanel.name]: OtherSettingPanel
+    [OtherSettingPanel.name]: OtherSettingPanel,
+    [CardSettingPanel.name]: CardSettingPanel,
   },
 }
 </script>
