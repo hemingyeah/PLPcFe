@@ -388,7 +388,7 @@
             <div class="list" :style="typeHeight">
               <div class="list-item task-flex task-ai">
                 <div
-                  v-for="item in abnormalData.taskCustomExceptionNodeList"
+                  v-for="item in taskCustomExceptionNodeList"
                   :key="item.englishName"
                   @click="checkAbnormal(item)"
                   :class="{ 'task-c2': exceptionNodes === item.englishName }"

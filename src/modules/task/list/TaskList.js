@@ -149,6 +149,7 @@ export default {
       isGuide:false,
       abnormalData: {},
       abnormals: AbnormalList,
+      taskCustomExceptionNodeList: [{englishName: '', exceptionName: '全部异常'}],
       exceptionNodes: '', // 选择异常
     };
   },
@@ -340,6 +341,7 @@ export default {
     /**异常选择 */
     checkAbnormal({englishName}){
       this.exceptionNodes = englishName
+      this.search()
     },
     /**获取用户开启的配置节点 以及工单搜索范围 和 异常原因字段值 */
     async getTurnOnTaskExceptionNodeInfo() {
@@ -347,7 +349,8 @@ export default {
       if(success) {
         this.abnormalData = result
         this.abnormalData['hoverText'] = result.taskCustomExceptionNodeList.map(item => {return item.exceptionName}).join(',')
-        
+        this.taskCustomExceptionNodeList = [...this.taskCustomExceptionNodeList, ...result.taskCustomExceptionNodeList]
+
         const {taskExceptionReasonList} = result
         this.abnormals = this.abnormals.map((item, index) => {
           item.setting['isMulti'] = false
@@ -358,12 +361,6 @@ export default {
           })
           return item
         })
-
-        console.log(this.abnormals)
-
-        // if (title === 'exception') {
-        //   this.seoSetList = [...this.seoSetList, ...this.abnormals]
-        // }
       }
 
     },
@@ -826,10 +823,8 @@ export default {
       this.searchParams = searchModel
       this.searchParams_spare = searchModel
       this.params = this.initParams(this.params.pageSize);
-
-      if (title === 'exception') {
-        this.seoSetList = [...this.seoSetList, ...this.abnormals]
-      }
+      this.exceptionNodes = ''
+      this.seoSet()
 
 
 
@@ -1766,6 +1761,9 @@ export default {
         }
       }
       this.seoSetList = [...taskFields.filter(item => { return item.isSystem === 1 && item.displayName !== '工单编号' && item.formType !== 'attachment'}).map(item => {if (item.fieldName === 'planTime'){item.formType = 'date'; item.isNull = 1} return item}), ...linkman_list, ...address_list, ...product_list, ...Inquire]
+      if (this.selectColumnState === 'exception') {
+        this.seoSetList = [...this.seoSetList, ...this.abnormals]
+      }
     },
     /**
      * @description 初始化page
@@ -2051,13 +2049,24 @@ export default {
       }
       this.search(this.searchParams, bool);
     },
+    /*异常搜索字段 */
+    abnormalParams() {
+      if (this.selectColumnState === 'exception') {
+        let params = {
+          exceptionNodes: this.exceptionNodes ? [this.exceptionNodes] : this.taskCustomExceptionNodeList.filter(item => {return item.englishName}).map(item => {return item.englishName}),
+          isException: 1,
+          exceptionStates: this.abnormalData.taskExceptionRange.map(item => {return item.taskExceptionRangeName})
+        }
+        return params
+      }
+      return {}
+    },
     /**
      * @description 搜索
      * @return {Promise}
      */
     search(searchModel = '', bool = true, searchBool) {
       const params = this.buildSearchParams();
-      console.log('搜索条件', params)
       let resetParamBool = bool
       if (!searchBool) {
         this.loading = true;
@@ -2328,6 +2337,7 @@ export default {
           payTypes: params.paymentMethods,
           searchTagIds: params.tags && params.tags.map(({ id }) => id),
           systemConditions: customizeSys,
+          ...this.abnormalParams(),
           // eventNo: params.eventNo,
         };
         // 工单搜索分类型
@@ -2393,7 +2403,7 @@ export default {
 
         searchModel.templateId = this.currentTaskType.id;
 
-        this.searchParams = { ...searchModel };
+        this.searchParams = { ...searchModel, ...this.abnormalParams() };
       }
 
       if (!searchBool) {

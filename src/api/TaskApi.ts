@@ -1307,5 +1307,12 @@ export function getTaskPoolList(params: TaskPoolSearchModel): Promise<getTaskSea
   return http.post(`${ElASTICSEARCH}/outside/es/task/taskPool`, params)
 }
 
+/**
+ * @description 获取用户开启的配置节点 以及工单搜索范围 和 异常原因字段值
+ */
+export function getTurnOnTaskExceptionNodeInfo(params = {}) {
+  return http.get('/outside/pc/setting/getTurnOnTaskExceptionNodeInfo', params)
+}
+
 
 /* -------------  end  新工单api ---------------- */
