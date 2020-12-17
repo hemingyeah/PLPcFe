@@ -39,11 +39,11 @@
 
 <script>
 export default {
-  name: 'base-collapse',
+  name: "base-collapse",
   props: {
     direction: {
       type: String,
-      default: '',
+      default: "",
     },
     showCollapse: {
       type: Boolean,
@@ -69,14 +69,14 @@ export default {
      */
     expand(direction) {
       // 折叠过，则恢复
-      if (this.collapse) return (this.collapse = '');
+      if (this.collapse) return (this.collapse = "");
 
       this.collapse = direction;
     },
   },
   watch: {
     collapse(newValue) {
-      this.$emit('update:direction', newValue);
+      this.$emit("update:direction", newValue);
     },
   },
 };
@@ -103,6 +103,7 @@ export default {
 
     &.active {
       max-width: 128px;
+      flex: 0!important;
     }
   }
 
