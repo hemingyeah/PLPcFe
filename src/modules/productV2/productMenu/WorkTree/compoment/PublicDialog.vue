@@ -1,0 +1,337 @@
+<!--  -->
+<template>
+  <div>
+    <!--  -->
+    <el-dialog
+      :title="dialogData[dialogType].title"
+      :visible.sync="visible"
+      width="600px"
+      :close-on-click-modal="false"
+    >
+      <div class="add-menu-dialog-box">
+        <template
+          v-if="
+            dialogType == 'addMenu' ||
+              dialogType == 'addMenuChild' ||
+              dialogType == 'renameMenuChild'
+          "
+        >
+          <el-form
+            :model="ruleForm"
+            :rules="rules"
+            ref="ruleForm"
+            label-width="100px"
+            class="demo-ruleForm"
+            status-icon
+          >
+            <el-form-item label="类型名称" prop="name">
+            <el-input v-model="ruleForm.name" maxlength="30"></el-input> </el-form-item
+          ></el-form>
+        </template>
+        <template v-else>
+          <div class="flex-x copy-el-form-item">
+            <div class="lable-100">
+              {{
+                dialogType == 'linkPart'
+                  ? '备件'
+                  : dialogType == 'linkWiki'
+                    ? '知识库'
+                    : '类型'
+              }}：
+            </div>
+            <el-select
+              class="flex-1 pos-r"
+              popper-class="max-w-488"
+              v-model="nowChooseArr"
+              multiple
+              :multiple-limit="dialogType == 'cloneMenu' ? 1 : 0"
+              filterable
+              remote
+              collapse-tags
+              clearable
+              placeholder="请输入关键词"
+              :remote-method="lenovoselectSearchData"
+              :loading="selectLoading"
+            >
+              <el-option
+                v-for="item in (dialogData[dialogType] && dialogData[dialogType].options)"
+                :key="item.id"
+                :label="dialogType == 'linkWiki' ? item.title : dialogType== 'cloneMenu'? item.pathName : item.name"
+                :value="item.id"
+              >
+                <div class="flex-x overHideCon-1">
+                  <template v-if="dialogType == 'linkPart'">
+                    <div>{{ item.name }}</div>
+                  </template>
+                  <template v-if="dialogType == 'linkWiki'">
+                    <div>{{ item.title }}</div>
+                  </template>
+                  <template v-if="dialogType == 'cloneMenu'">
+                    <div>{{ item.pathName }}</div>
+                  </template>
+                </div>
+              </el-option>
+            </el-select>
+            <!-- <com-lenovoselect
+              :search-data="lenovoselectSearchData"
+              :default-item="false"
+              ref="comLenovoselect"
+              :choose-show-key="dialogType == 'linkPart' ? 'name' : 'title'"
+              list-key="id"
+              :com-ruturn-data="nowChooseArr"
+              @dataUpdate="dataUpdate()('nowChooseArr')"
+            >
+              <template
+                slot="select"
+                slot-scope="slotProps"
+                v-if="slotProps.slotData"
+              >
+                <div
+                  v-for="(item, index) in slotProps.slotData.list"
+                  :key="index"
+                  class="flex-x"
+                  :class="
+                    slotProps.slotNowDataIndex[item.id] > -1
+                      ? 'checked-item'
+                      : ''
+                  "
+                  @click.prevent="slotClick(item, 'comLenovoselect')"
+                >
+                  <div>{{ item.name }}</div>
+                </div>
+              </template>
+            </com-lenovoselect> -->
+          </div>
+        </template>
+        <template v-if="dialogType == 'linkWiki'"> </template>
+      </div>
+      <div slot="footer">
+        <el-button @click="visible = false">取 消</el-button>
+        <el-button type="primary" :loading="btnLoading" @click="confirm"
+        >确认</el-button
+        >
+      </div>
+    </el-dialog>
+    <!--  -->
+  </div>
+</template>
+
+<script>
+import {
+  getPageCloneData,
+  getPagePart,
+  getPageWiki,
+} from "@src/api/ProductV2Api";
+import _ from "lodash";
+export default {
+  name: "public-dialog",
+  props: {
+    visibleProp: {
+      type: Boolean,
+    },
+    dialogType: {
+      type: String,
+      default: "addMenu",
+    },
+    initData: {
+      type: Object,
+    },
+  },
+  data() {
+    return {
+      dialogData: {
+        addMenu: {
+          title: "添加产品类型",
+        },
+        addMenuChild: {
+          title: "添加产品类型",
+        },
+        cloneMenu: {
+          title: "选择需要复制的产品类型",
+          http: getPageCloneData,
+          options: [],
+        },
+        renameMenuChild: {
+          title: "重命名",
+        },
+        linkPart: {
+          title: "关联备件",
+          http: getPagePart,
+          options: [],
+        },
+        linkWiki: {
+          title: "关联知识库",
+          http: getPageWiki,
+          options: [],
+        },
+      },
+      nowChooseArr: [],
+      selectedSparepart: [],
+      ruleForm: {
+        name: "",
+      },
+      rules: {
+        name: [
+          { required: true, message: "请输入类型名称", trigger: "blur" },
+          { min: 1, max: 30, message: "最多30个字符", trigger: "change" },
+        ],
+      },
+      selectLoading: false,
+      btnLoading: false,
+    };
+  },
+  computed: {
+    visible: {
+      get() {
+        return this.visibleProp;
+      },
+      set(val) {
+        this.$emit("changeVisibleProp", val);
+      },
+    },
+  },
+  watch: {
+    visible(newVal, oldVal) {
+      if (newVal == false) {
+        if (
+          this.dialogType == "addMenu"
+          || this.dialogType == "renameMenuChild"
+          || this.dialogType == "addMenuChild"
+        )
+          this.$refs["ruleForm"].resetFields();
+        this.nowChooseArr = [];
+        this.btnLoading = false;
+      }
+    },
+    initData(newVal, oldVal) {
+      if (this.dialogType == "renameMenuChild")
+        this.$set(this.ruleForm, "name", newVal.name);
+    },
+  },
+  methods: {
+    confirm() {
+      if (
+        this.dialogType == "addMenu"
+        || this.dialogType == "addMenuChild"
+        || this.dialogType == "renameMenuChild"
+      ) {
+        this.$refs["ruleForm"].validate((valid) => {
+          if (valid) this.$emit("confirm", { catalogName: this.ruleForm.name });
+        });
+      } else if (
+        this.dialogType == "linkPart"
+        || this.dialogType == "linkWiki"
+        || this.dialogType == "cloneMenu"
+      ) {
+        this.$emit("confirm", { nowChooseArr: this.nowChooseArr });
+      }
+    },
+    dataUpdate(e, key) {
+      this[key] = e;
+    },
+    calculateClass(e, t) {
+      let str = "";
+      if (e.slotNowData) {
+        for (let index = 0; index < e.slotNowData.length; index++) {
+          const element = e.slotNowData[index];
+          if (element.orderId === t.orderId) {
+            str = "checked-item";
+          }
+        }
+      }
+      return str;
+    },
+    slotClick(e, ref) {
+      this.$refs[ref].chooseItem(e);
+    },
+    lenovoselectSearchData: _.debounce(function(e) {
+      this.selectLoading = true;
+      this.dialogData[this.dialogType]
+        .http({
+          keyWord: e,
+          pageSize: 50,
+          pageNum: 1,
+        })
+        .then((res) => {
+          if (!res) {
+            return;
+          }
+          this.dialogData[this.dialogType].options = res.result.list;
+        })
+        .catch((err) => {})
+        .finally(() => {
+          this.selectLoading = false;
+        });
+    }, 800),
+    /**
+     * @description 搜索备件
+     */
+    searchPart(params) {
+      // params has three properties include keyword、pageSize、pageNum.
+      const pms = params || {};
+      pms.repertoryId = this.repertoryId || "";
+      pms.with_OOS = false;
+      pms.keyWord = pms.keyword;
+      return this.$http
+        .get("/task/spare/list", pms)
+        .then((res) => {
+          if (!res || !res.list) return;
+          res.list = res.list.map((template) =>
+            Object.freeze({
+              label: template.name,
+              value: template.id,
+              ...template,
+            })
+          );
+          return res;
+        })
+        .catch((e) => console.error(e));
+    },
+    /**
+     * @description 选择备件
+     */
+    updatePart(value) {
+      let newValue = value[0];
+
+      for (let key in this.sparepart) {
+        if (key == "salePrice") {
+          this.sparepart.salePrice = newValue.salePrice.toFixed(2);
+        } else if (key == "number") {
+          this.sparepart.number = newValue.availableNum > 1 ? 1 : newValue.availableNum;
+        } else {
+          this.sparepart[key] = newValue[key];
+        }
+      }
+    },
+    changeBtnLoading(e){
+      this.btnLoading = e
+    }
+  },
+};
+</script>
+<style lang="scss" scoped>
+.add-menu-dialog-box {
+  padding: 12px 12px 0 0;
+}
+.lable-100 {
+  width: 100px;
+  padding-left: 20px;
+}
+.copy-el-form-item {
+  margin-bottom: 18px;
+}
+.checked-item {
+  background: $color-primary;
+}
+</style>
+<style lang="scss">
+.el-dialog__body {
+  border-top: 1px solid rgba(0, 0, 0, 0.09);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.09);
+  padding: 0;
+}
+
+.el-select-dropdown__item {
+  height: auto;
+}
+</style>

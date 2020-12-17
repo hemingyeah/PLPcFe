@@ -1,5 +1,5 @@
-import { genPlaceholder} from '../util'
-import { findComponentUpward } from '@src/util/assist'
+import { genPlaceholder} from "../util"
+import { findComponentUpward } from "@src/util/assist";
 
 const FormMixin = {
   props: {
@@ -33,7 +33,7 @@ const FormMixin = {
       )
     },
     formBuilderComponent() {
-      return findComponentUpward(this, 'form-builder')
+      return findComponentUpward(this, "form-builder")
     }
   },
   watch: {
@@ -43,7 +43,7 @@ const FormMixin = {
     value:{
       deep: true,
       handler() {
-        this.$el.dispatchEvent(new CustomEvent('form.validate', {bubbles: true}));
+        this.$el.dispatchEvent(new CustomEvent("form.validate", {bubbles: true}));
       }
     }
   },
@@ -51,7 +51,7 @@ const FormMixin = {
     addFieldEvent() {
       // 触发注册事件，用于注册字段到外层 FormItem 组件，和 FormBuilder 组件
       let params = {value: this.getValue, fieldName: this.field.fieldName, field: this.field};
-      let event = new CustomEvent('form.add.field', {detail: params, bubbles: true})
+      let event = new CustomEvent("form.add.field", {detail: params, bubbles: true})
       this.$nextTick(() => this.$el.dispatchEvent(event));
     },
     /** 获取当前组件的值，验证用 */
@@ -68,8 +68,8 @@ const FormMixin = {
       // 远程验证事件处理
       this.remoteValidateHandler()
       
-      this.$emit('update', {newValue, oldValue, field: this.field});
-      this.$emit('input', newValue);
+      this.$emit("update", {newValue, oldValue, field: this.field});
+      this.$emit("input", newValue);
     },
     remoteValidateHandler() {
       if (!this.formBuilderComponent) return
@@ -92,7 +92,7 @@ const FormMixin = {
   destroyed(){
     // 注册解绑事件，用于解绑组件
     let params = {fieldName: this.field.fieldName}
-    let event = new CustomEvent('form.remove.field', {detail: params, bubbles: true})
+    let event = new CustomEvent("form.remove.field", {detail: params, bubbles: true})
     this.$el.dispatchEvent(event);
   }
 };

@@ -56,7 +56,9 @@ const RuleMap = {
   planTime,
   formula,
   cascader,
-  'related_task': relatedTask
+  'related_task': relatedTask,
+  'related_wiki': relatedTask,
+  'related_part': relatedTask,
 };
 
 // 远程验证字段是否重复方法

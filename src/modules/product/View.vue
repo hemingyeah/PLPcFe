@@ -475,7 +475,7 @@ export default {
       let res = await getProductFields({isFromSetting: false});
       this.dynamicProductFields = res.data || [];
     } catch (error) {
-      console.error('product-view fetch product fields error',error);
+      console.error('product-view fetch product fields error', error);
     }
     this.updateProductNameStyle();
     this.createCode();

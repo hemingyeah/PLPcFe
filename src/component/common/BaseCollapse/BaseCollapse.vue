@@ -1,68 +1,90 @@
 <template>
   <div class="base-collapse" @scroll="$emit('scroll', $event)">
-    <div :class="['base-collapse-left', {'active': collapse == 'left'}]">
-      <slot name="left"></slot>
+    <div :class="['base-collapse-left', {'active': collapse == 'left'}]" :style="`flex:${leftSize}`"></div>
+    <slot name="left"></slot>
 
-      <!-- start 折叠按钮 -->
-      <div class="base-collapse-btn" v-if="showCollapse">
-        <el-tooltip content="收起" placement="left">
-          <div class="base-collapse-btn-left" v-show="collapse != 'left'" @click="expand('left')">
-            <i class="iconfont icon-mianbanjiantou"></i>
-          </div>
-        </el-tooltip>
-        <el-tooltip content="展开" placement="right">
-          <div class="base-collapse-btn-right" v-show="collapse != 'right'" @click="expand('right')">
-            <i class="iconfont icon-mianbanjiantou"></i>
-          </div>
-        </el-tooltip>
-      </div>
-      <!-- end 折叠按钮 -->
+    <!-- start 折叠按钮 -->
+    <div class="base-collapse-btn" v-if="showCollapse">
+      <el-tooltip content="收起" placement="left">
+        <div
+          class="base-collapse-btn-left"
+          v-show="collapse != 'left'"
+          @click="expand('left')"
+        >
+          <i class="iconfont icon-mianbanjiantou"></i>
+        </div>
+      </el-tooltip>
+      <el-tooltip content="展开" placement="right">
+        <div
+          class="base-collapse-btn-right"
+          v-show="collapse != 'right'"
+          @click="expand('right')"
+        >
+          <i class="iconfont icon-mianbanjiantou"></i>
+        </div>
+      </el-tooltip>
     </div>
+    <!-- end 折叠按钮 -->
+  </div>
 
-    <div :class="['base-collapse-right', {'active': collapse == 'right'}]">
+  <<<<<<< HEAD
+  <div :class="['base-collapse-right', {'active': collapse == 'right'}]">
+    =======
+    <div
+      :class="['base-collapse-right', { active: collapse == 'right' }]"
+      :style="`flex:${rightSize}`"
+      v-if="showCollapse"
+    >
+      >>>>>>> productV2
       <slot name="right"></slot>
     </div>
   </div>
-</template>
+</div></template>
 
 <script>
-
 export default {
   name: 'base-collapse',
   props: {
     direction: {
       type: String,
-      default: ''
+      default: '',
     },
     showCollapse: {
       type: Boolean,
-      default: true
-    }
+      default: true,
+    },
+    leftSize: {
+      type: Number,
+      default: 1,
+    },
+    rightSize: {
+      type: Number,
+      default: 1,
+    },
   },
-  data(){
+  data() {
     return {
-      collapse: this.direction
-    }
+      collapse: this.direction,
+    };
   },
   methods: {
-    /** 
-    * @description 折叠
-    */
+    /**
+     * @description 折叠
+     */
     expand(direction) {
       // 折叠过，则恢复
-      if (this.collapse) return this.collapse = '';
+      if (this.collapse) return (this.collapse = '');
 
       this.collapse = direction;
-    }
+    },
   },
   watch: {
     collapse(newValue) {
       this.$emit('update:direction', newValue);
-    }
-  }
-}
+    },
+  },
+};
 </script>
-
 
 <style lang="scss">
 .base-collapse {
@@ -74,7 +96,6 @@ export default {
 
   &-left,
   &-right {
-    flex: 1;
     max-width: 100%;
     min-width: 128px;
     height: 100%;
