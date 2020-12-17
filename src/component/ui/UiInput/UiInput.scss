@@ -30,5 +30,8 @@
     transition: all .3s;
     transform: rotateZ(180deg);
     pointer-events: none;
+    &.is-reverse {
+      transform: rotateZ(0deg);
+    }
   }
 }

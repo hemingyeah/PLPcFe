@@ -297,6 +297,7 @@
     margin-right: 12px;
     padding: 3px 12px;
     transition: all 0.25s ease;
+    user-select: none;
     &-active {
       background-color: $color-primary;
       color: #fff;

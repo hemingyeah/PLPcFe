@@ -153,10 +153,18 @@
   }
   &-mode {
     margin-left: 24px;
+    .el-radio-button__inner {
+      &:hover {
+        color: $color-warning;
+      }
+    }
     .is-active {
       .el-radio-button__inner {
         border-color: $color-warning;
         background-color: $color-warning;
+        &:hover {
+          color: #fff;
+        }
       }
     }
   }

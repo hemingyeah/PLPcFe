@@ -60,7 +60,7 @@ export default class AllotRuleModal extends AllotRuleModalRender {
         
         <div slot='footer' class='dialog-footer'>
           <el-button onClick={() => this.close()}>
-            取 消
+            关 闭
           </el-button>
           {this.renderConfirmButton()}
         </div>

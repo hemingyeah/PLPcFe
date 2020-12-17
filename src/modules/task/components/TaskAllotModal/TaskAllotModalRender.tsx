@@ -10,23 +10,6 @@ import { TaskAllotTypeModeEnum } from '@src/modules/task/components/TaskAllotMod
 import { VNode } from 'vue'
 
 class TaskAllotModalRender extends TaskAllotModalMethods {
-  /** 
-   * @description 渲染负责人
-  */
-  public renderExcutor(): VNode | null {
-    if (this.allotType !== TaskAllotTypeEnum.Person) return null
-    
-    return (
-      <div class='task-allot-executor'>
-        <span class='task-allot-nav-title'>负责人</span>
-        {
-          this.executorUser
-          ? <user-button user={this.executorUser} userDeleteFunc={(user: LoginUser) => this.deleteExcutorUser(user)} />
-          : <div class='task-allot-executor-placeholder'>请在右侧选择</div>
-        }
-      </div>
-    )
-  }
   
   /** 
    * @description 渲染工单派单头部派单选择
@@ -45,6 +28,7 @@ class TaskAllotModalRender extends TaskAllotModalMethods {
    * @description 渲染转派说明
   */
   public renderReAllotReason(): VNode | null {
+    // 转派时渲染 转派说明
     if (!this.isReAllot) return null
     
     return (
@@ -156,8 +140,12 @@ class TaskAllotModalRender extends TaskAllotModalMethods {
    * @description 渲染工单派单头部派单模式
   */
   public renderTaskAllotHeaderMode(): VNode | null {
+    // 是否开启按地图派单
     const isTaskAllotByMap: boolean = this.taskConfig.taskAllotByMap === true
-    if (!isTaskAllotByMap) return null
+    // 是否是派单到负责人
+    const isAllotExecutor: boolean = this.allotType === TaskAllotTypeEnum.Person
+    // 未开启按地图派单 或 非派单到负责人时不渲染
+    if (!isTaskAllotByMap || !isAllotExecutor) return null
     
     return (
       <div class='task-allot-modal-header-mode'>

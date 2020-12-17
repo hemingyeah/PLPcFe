@@ -14,6 +14,8 @@ class UiInput extends VC<{}> {
   
   /* 点击事件 */
   @Prop() readonly click: Function | undefined
+  /* 展开切换 */
+  @Prop() readonly toggle: boolean | undefined
   
   @Emit(EventNameEnum.Click)
   private clickHandler(event: MouseEvent) {
@@ -22,10 +24,12 @@ class UiInput extends VC<{}> {
   }
   
   render(h: CreateElement) {
+    const iconClassNames = ['el-select__caret el-input__icon el-icon-arrow-up', this.toggle && 'is-reverse']
+    
     return (
       <div class='ui-input-block' onClick={(event: MouseEvent) => this.clickHandler(event)}>
         {this.$slots.default}
-        <i class='el-select__caret el-input__icon el-icon-arrow-up'></i>
+        <i class={iconClassNames}></i>
       </div>
     )
   }

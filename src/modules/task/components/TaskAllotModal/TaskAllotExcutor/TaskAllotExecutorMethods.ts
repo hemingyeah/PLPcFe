@@ -64,6 +64,15 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
   
   @Watch('mode')
   onModeChangedHandler(newValue: string) {
+    // 地图模式 且 地图用户列表为空 且 第一次加载 则初始化
+    if (
+      this.isMapMode 
+      && this.mapUserPage.list.length <= 0 
+      && !this.isShowTaskAllotUserMapComponent
+    ) {
+      this.initialize()
+    }
+    // 添加到已加载的组件列表
     this.loadedComponents.push(LoadComponentMap[newValue])
   }
   

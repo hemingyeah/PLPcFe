@@ -542,17 +542,6 @@ export default class TaskAllotPool extends Vue {
   render(h: CreateElement) {
     return (
       <div class={ComponentNameEnum.TaskAllotPool}>
-        <task-allot-map 
-          ref='TaskAllotMap' 
-          idName={this.mapId} 
-          handlerCustomFunc={(amap: any) => this.buildMarkers(amap)} 
-        />
-        <task-allot-pool-notification
-          checked={this.notificationCheckd} 
-          checkedChangeFunc={(value: TaskPoolNotificationTypeEnum[]) => this.onNotificationCheckedChanged(value)}
-          slotDefault={this.renderNotificationAddUser}
-        >
-        </task-allot-pool-notification>
         <task-allot-pool-info
           hideCustomerTagInfo={!this.isPoolByTag}
           stateColorMap={this.stateColorMap}
@@ -568,6 +557,17 @@ export default class TaskAllotPool extends Vue {
           onSubscriptionChange={(value: boolean) => this.handlerTaskPoolInfoSubscriptionChanged(value)}
           onAuthChange={(value: boolean) => this.handlerTaskPoolInfoAuthChanged(value)}
         />
+        <task-allot-map 
+          ref='TaskAllotMap' 
+          idName={this.mapId} 
+          handlerCustomFunc={(amap: any) => this.buildMarkers(amap)} 
+        />
+        <task-allot-pool-notification
+          checked={this.notificationCheckd} 
+          checkedChangeFunc={(value: TaskPoolNotificationTypeEnum[]) => this.onNotificationCheckedChanged(value)}
+          slotDefault={this.renderNotificationAddUser}
+        >
+        </task-allot-pool-notification>
       </div>
     )
   }
