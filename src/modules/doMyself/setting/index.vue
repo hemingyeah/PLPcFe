@@ -649,6 +649,8 @@ export default {
       if (this.nowSettingDataId == id) {
         return;
       }
+
+
       this.nowSettingDataId = id;
       if (id > 0) {
         let res_ = this.findNowSetData(this.nowSettingDataId).item;
@@ -661,6 +663,8 @@ export default {
     },
     changeThis(item) {
       let data_ = this.findNowSetData(item.id).item;
+
+
 
       let nowSettingData = {
         id: item.item.cmpId,
@@ -705,11 +709,11 @@ export default {
       let data_ = _.cloneDeep(this.dataList[index].data);
       data_.splice(e.indexs, 1);
       this.$set(this.dataList[index], 'data', data_);
-      this.nowSettingDataId = -1;
+        if(data_.length < 1) this.chooseNowSet(this.dataList[0])
+      })
     },
     cancelInfoData() {
       return;
-      this.nowSettingDataId = -1;
     },
     changeFullscreenLoading(e) {
       if (this.fullscreenLoading === e) return;
