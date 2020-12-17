@@ -528,7 +528,7 @@ export default {
         id: 'superqrcodeSet',
         title: "超级二维码",
         close: true,
-        url: '/superQrcode'
+        url: '/setting/superQrcode'
       });
     },
     // 获取开关状态
