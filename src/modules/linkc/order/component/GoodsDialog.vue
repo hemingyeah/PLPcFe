@@ -30,7 +30,7 @@
             <el-input v-model="formData.deliveryCompany" placeholder="请输入"></el-input>
           </el-form-item>
           <el-form-item prop="trackingNum">
-            <div>添加物流信息：</div>
+            <div>添加物流单号：</div>
             <el-input v-model="formData.trackingNum" placeholder="请输入"></el-input>
           </el-form-item>
         </el-form>
@@ -70,7 +70,7 @@ export default {
           { required: true, message: "请输入物流公司", trigger: "blur" },
         ],
         trackingNum: [
-          { required: true, message: "请输入物流信息", trigger: "blur" },
+          { required: true, message: "请输入物流单号", trigger: "blur" },
         ],
       },
     };
