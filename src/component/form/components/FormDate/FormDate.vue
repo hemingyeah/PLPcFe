@@ -38,7 +38,7 @@ export default {
     _value() {
       if ( !this.value ) return '';
       let { defaultValueConfig, dateType} = this.field.setting || {};
-      let newDate = fmt_data_time(new Date(this.value), dateType);
+      let newDate = fmt_data_time(new Date(this.value), dateType || "yyyy-MM-dd");
       this.choose(newDate);
       return newDate
     },

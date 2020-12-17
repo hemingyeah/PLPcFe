@@ -221,7 +221,6 @@ function date(value, field = {}) {
     let setting = field.setting || {};
     let dateType = setting.dateType || 'yyyy-MM-dd';
     
-    if (!value || !value.toString().length) return resolve(`请选择${field.displayName}`);
     let REG_TYPE = DATE_REG;
     if( dateType == 'yyyy-MM-dd HH:mm:ss'){
       REG_TYPE = DATE_SS_REG;
@@ -232,9 +231,12 @@ function date(value, field = {}) {
     if( dateType == 'yyyy-MM'){
       REG_TYPE = DATE_YY_REG;
     }
-    if (!REG_TYPE.test(value)) return resolve('请输入正确格式的日期');
+    
+    if (value && !REG_TYPE.test(value)) return resolve('请输入正确格式的日期');
     
     if (field.isNull === 1) return resolve(null);
+    if (!value || !value.toString().length) return resolve(`请选择${field.displayName}`);
+
     resolve(null);
   });
 }
