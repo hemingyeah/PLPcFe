@@ -97,7 +97,7 @@ const ElementUI = {
     Vue.use(Row);
     Vue.use(OptionGroup);
     Vue.use(Message.name, Message);
-    Vue.use(Col.name, Col);
+    Vue.use(Col);
     
     Vue.component(Autocomplete.name, Autocomplete);
     Vue.component(CollapseTransition.name, CollapseTransition);

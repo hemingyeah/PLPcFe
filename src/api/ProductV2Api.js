@@ -6,6 +6,51 @@ let headUrl2 = "/api/elasticsearch/outside/es"
 
 /** ------------ start 规则 ----------------------- */
 /**
+ * 获取开关状态
+ * @param params
+ * @returns {*}
+ */
+function productConfig(){
+  return http.get('/setting/product/productConfig');
+}
+
+/**
+ * 获取规则信息
+ * @param params
+ * @returns {*}
+ */
+function queryRuleInfo(params){
+  return http.get(`${ruleHeader}/outside/superCode/rule/queryRuleInfo`,params);
+}
+
+/**
+ * 获取字段
+ * @param params
+ * @returns {*}
+ */
+function queryApplyOptions(params){
+  return http.get(`${ruleHeader}/outside/superCode/rule/queryApplyOptions`,params);
+}
+
+/**
+ * 新建规则
+ * @param params
+ * @returns {*}
+ */
+function addDistributeRule(params){
+  return http.post(`${ruleHeader}/outside/superCode/rule/addDistributeRule`,params);
+}
+
+/**
+ * 获制定人员
+ * @param params
+ * @returns {*}
+ */
+function queryCSByCondition(params){
+  return http.get(`${ruleHeader}/outside/superCode/rule/queryCSByCondition`,params);
+}
+
+/**
  * 获取规则列表
  * @param params
  * @returns {*}
@@ -32,7 +77,7 @@ function moveRule(params){
 }
 
 /**
- * 启用/禁用规则
+ * 启用/禁用规则，编辑规则
  * @param params
  * @returns {*}
  */
@@ -407,5 +452,10 @@ export {
   removeDistributeRule,
   moveRule,
   modifyDistributeRule,
-  saveFunc
+  saveFunc,
+  queryCSByCondition,
+  addDistributeRule,
+  queryApplyOptions,
+  queryRuleInfo,
+  productConfig,
 };
