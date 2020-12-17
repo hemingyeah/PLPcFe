@@ -658,6 +658,7 @@ export default {
         if(!result) return 
         this.statisticalData = result;
         this.tabs = this.buildTabs();
+        localStorage.setItem('product_remind_count',result.remindQuantity);
       })
         .catch(err => console.error(err))
     },

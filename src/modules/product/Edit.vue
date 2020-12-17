@@ -130,6 +130,9 @@ export default {
               }  
             }
           });
+          if(this.action!=='create'){
+            params.attribute.remindCount=localStorage.getItem('product_remind_count') || 0;
+          }
           this.pending = true;
           this.loadingPage = true;
           let fn = this.action === 'create' ? createProduct : updateProduct;
