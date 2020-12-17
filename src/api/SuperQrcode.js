@@ -1,7 +1,7 @@
 import http from '@src/util/HttpUtil';
 
 // const prefix='http://30.40.63.238:10016';   // 杨灵本地
-const prefix='';
+const prefix='/api/linkc';
 
 // 获取目录
 export function queryProductCatalogs(params={}){
