@@ -1,4 +1,13 @@
 import { getRootWindow } from '@src/util/dom'
+// @ts-ignore
+import appConfig from 'app.config'
+
+/** 
+ * @description 是否为开发环境
+*/
+function isDevelopmentEnv() {
+  return appConfig.env.indexOf('prod') < 0
+}
 
 function logStyle (message: string = '', color: string = '') {
   try {
@@ -41,6 +50,9 @@ function logTable(data: any[], message?: string, functionName?: string) {
 }
 
 function isShowLog(): boolean {
+  // 忽略开发环境
+  if (isDevelopmentEnv()) return true
+  
   try {
     const RootWindow = getRootWindow(window)
     // @ts-ignore
