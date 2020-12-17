@@ -17,7 +17,7 @@
       <div class="tour-content">
         <div class="flex-x tour-content-head">
           <i
-            @click.prevent="stopStep(), (showGuide = false)"
+            @click.prevent="stopStep().then(()=>{showGuide = false})"
             class="iconfont icon-fe-close"
           ></i>
         </div>
@@ -35,14 +35,14 @@
       <div
         v-if="haveStep && nowStep > 0 && nowStep < totalStep"
         class="btns"
-        @click.prevent="nextStep(nowStep), (showGuide = false)"
+        @click.prevent="nextStep(nowStep).then(()=>{showGuide = false})"
       >
         下一步
       </div>
       <div
         v-if="onlyOne"
         class="btns"
-        @click.prevent="finishBtnFn(), (showGuide = false)"
+        @click.prevent="finishBtnFn().then(()=>{showGuide = false})"
       >
         {{ finishBtn }}
       </div>
@@ -86,6 +86,7 @@ export default {
   background: #fff;
   min-width: 240px;
   max-width: 350px;
+  max-height: 400px;
   .tour-arrow {
     position: absolute;
     left: 0;

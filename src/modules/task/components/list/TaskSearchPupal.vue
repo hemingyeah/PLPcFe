@@ -24,7 +24,7 @@
         <el-checkbox :label="item.fieldName" v-for="(item, index) in systemList" :key="index" class="wh150">{{item.displayName}}</el-checkbox>
       </el-checkbox-group>
       <template v-if="guideSearchPupal">
-        <guide-compoment
+        
           :content="'①选中 ②保存，设置立刻生效'"
           :only-one="true"
           :have-step="false"

@@ -100,7 +100,7 @@ import TaskInquire from "./TaskInquire";
 
 import guideCompoment from "@src/component/guide/guide";
 
-let guideCompoments = Vue.extend(guideCompoment);
+let GuideCompoments = Vue.extend(guideCompoment);
 
 /* utils */
 import _ from "lodash";
@@ -1009,54 +1009,8 @@ export default {
       });
       this.taskInquireList = selfFields.slice();
     },
-    createGuide(id, obj = {}) {
-      new guideCompoments({
-        data() {
-          return {};
-        },
-        propsData: {
-          ...obj,
-          stopStep: this.stopStep,
-          finishBtnFn: this.finishBtnFn,
-        },
-        methods: {
-          previousStep: this.previousStep,
-          nextStep: this.nextStep,
-        },
-      }).$mount(`#${id}`);
-    },
-    previousStep(e) {
-      this.createGuide("v-task-step-6", {
-        content:
-          "高级搜索的“空白”，由您来填充。通过“设置”功能，定制您专属的“常用查询条件”",
-        haveStep: true,
-        nowStep: 1,
-        totalStep: 2,
-        id: "v-task-step-6",
-        gStyle: "left:30px",
-        onlyOne: true,
-        finishBtn: "OK",
-      });
-    },
-    nextStep(e) {
-      this.createGuide("v-task-step-7", {
-        content:
-          "工单表单中所有可被搜索的字段都隐藏在这儿，当您需要用某些条件查询时，也可以在这里搜索",
-        haveStep: true,
-        nowStep: 2,
-        totalStep: 2,
-        gStyle: "top:35px",
-        id: "v-task-step-7",
-        arrowStyle: "left:-140px",
-        onlyOne: true,
-        finishBtn: "OK",
-      });
-    },
-    stopStep() {
-      storageSet(TASK_GUIDE_SEARCH_MODEL, "2");
-    },
-    finishBtnFn() {
-      this.stopStep();
+    createGuide( arr = []) {
+      this.$Guide(arr, 0, TASK_GUIDE_SEARCH_MODEL).create()
     },
   },
   components: {

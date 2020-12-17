@@ -19,7 +19,11 @@ import 'quill/dist/quill.core.css'
 import 'quill/dist/quill.snow.css'
 import 'quill/dist/quill.bubble.css'
 
+import domGuide from '@src/common/Guide'
+
+
+
 Vue.prototype.$appConfig = appConfig;
 Vue.prototype.$platform = platform;
-
+Vue.prototype.$Guide = domGuide;
 export default Vue;
