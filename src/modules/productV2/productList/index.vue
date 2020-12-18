@@ -1851,6 +1851,9 @@ body {
 }
 
 // table
+.el-table{
+  border:none;
+}
 .product-list-container .product-table {
   padding: 10px;
 

@@ -29,7 +29,7 @@
           <div class="flex-1 flex-x" :style="`padding-left:${deepCount * 8}px`">
             <i
               v-if="el.tasks.length > 0"
-              class="iconfont icon-icon_arrow arrow-right"
+              class="iconfont icon-icon_arrow arrow-right font-16"
               :class="{ 'arrow-down': el.showList }"
               @click.stop="showRootList(index)"
             ></i>
@@ -62,10 +62,10 @@
                   删除
                 </div>
               </div>
-              <i slot="reference" class="iconfont icon-setting cur-point"></i>
+              <i slot="reference" class="iconfont icon-setting cur-point "></i>
             </el-popover>
 
-            <i class="iconfont icon-tuozhuaipaixu handle can-move"></i>
+            <i class="iconfont icon-tuozhuaipaixu handle can-move mar-l-8"></i>
           </div>
         </div>
 
@@ -288,6 +288,7 @@ ul {
     height: 40px;
     overflow: hidden;
     transition: all 0.8s;
+    
   }
   .dragArea-root-show {
     height: auto;
@@ -308,6 +309,9 @@ ul {
   .tasks-item {
     position: relative;
     padding-left: 10px;
+    &:hover{
+      background: #E6FFFB;
+    }
     &:active {
       background: #e6fffb;
     }
@@ -330,11 +334,11 @@ ul {
       top: 0;
       display: flex;
       align-items: center;
-      background: #fff;
+      background: #E6FFFB;
     }
   }
   .tasks-item-check {
-    background: $color-primary;
+    color: $color-primary;
   }
   .can-move {
     cursor: move;

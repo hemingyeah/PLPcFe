@@ -330,7 +330,9 @@ export default {
     reflash() {
       this.searchModel.pageSize = 10;
       this.searchModel.pageNum = 1;
-      this.search();
+      if(this.id){
+        this.search();
+      }
     },
     // 新页面打开通知公告详情
     openFrame(id) {

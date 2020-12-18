@@ -1,15 +1,16 @@
 <!--  -->
 <template>
-  <el-dialog
+  <base-modal title="复制产品信息" :show.sync="visible" width="500px" class="batch-editing-customer-dialog">
+    <!-- <el-dialog
     title="复制产品信息"
     :visible.sync="visible"
     width="600px"
     :close-on-click-modal="false"
-  >
+  > -->
     <div class="add-menu-dialog-box">
       <div class="flex-x copy-el-form-item">
         <div class="lable-100">
-          产品
+          产品：
         </div>
         <el-select
           class="flex-1 pos-r"
@@ -42,14 +43,15 @@
       >确认</el-button
       >
     </div>
-  </el-dialog>
+  <!-- </el-dialog> -->
+  </base-modal>
 </template>
 
 <script>
-import _ from 'lodash';
-import { searchProduct } from '@src/api/ProductV2Api';
+import _ from "lodash";
+import { searchProduct } from "@src/api/ProductV2Api";
 export default {
-  name: 'clone-product-dialog',
+  name: "clone-product-dialog",
   props: {
     visibleProp: {
       type: Boolean,
@@ -61,13 +63,13 @@ export default {
         return this.visibleProp;
       },
       set(val) {
-        this.$emit('changeVisibleProp', val);
+        this.$emit("changeVisibleProp", val);
       },
     },
   },
   data() {
     return {
-      nowChooseData: '',
+      nowChooseData: "",
       btnLoading: false,
       selectLoading: false,
       options: [],
@@ -76,7 +78,7 @@ export default {
   watch:{
     visible(newVal, oldVal) {
       if (newVal == false) {
-        this.nowChooseData = '';
+        this.nowChooseData = "";
       }
     },
   },
@@ -103,7 +105,7 @@ export default {
       this.btnLoading = e;
     },
     confirm() {
-      this.$emit('confirm', { nowChooseData: this.nowChooseData });
+      this.$emit("confirm", { nowChooseData: this.nowChooseData });
     },
   },
 };
@@ -113,8 +115,7 @@ export default {
   padding: 12px 12px 0 0;
 }
 .lable-100 {
-  width: 100px;
-  padding-left: 20px;
+  width: 50px;
 }
 .copy-el-form-item {
   margin-bottom: 18px;
@@ -133,4 +134,39 @@ export default {
 .el-select-dropdown__item {
   height: auto;
 }
+
+.batch-editing-customer-dialog {
+
+    .base-modal-body {
+      padding: 10px 30px 0;
+    }
+
+    .form-name, .form-item label {
+      width: 70px;
+      padding: 0;
+      line-height: 32px;
+    }
+
+    .el-select {
+      width: 100%;
+    }
+
+    .item {
+      display: flex;
+      justify-content: space-between;
+      line-height: 32px;
+      div {
+        flex-grow: 1;
+        .el-select {
+          width: 100%;
+        }
+      }
+    }
+
+    .dialog-footer {
+      display: flex;
+      justify-content: flex-end;
+    }
+
+  }
 </style>

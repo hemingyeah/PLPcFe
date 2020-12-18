@@ -2,12 +2,14 @@
 <template>
   <div>
     <!--  -->
-    <el-dialog
-      :title="dialogData[dialogType].title"
-      :visible.sync="visible"
-      width="600px"
-      :close-on-click-modal="false"
-    >
+
+    <base-modal :title="dialogData[dialogType].title" :show.sync="visible" width="500px" class="batch-editing-customer-dialog">
+      <!-- <el-dialog
+        :title="dialogData[dialogType].title"
+        :visible.sync="visible"
+        width="600px"
+        :close-on-click-modal="false"
+      > -->
       <div class="add-menu-dialog-box">
         <template
           v-if="
@@ -22,6 +24,7 @@
             ref="ruleForm"
             label-width="100px"
             class="demo-ruleForm"
+            label-position="right"
             status-icon
           >
             <el-form-item label="类型名称" prop="name">
@@ -111,8 +114,9 @@
         >确认</el-button
         >
       </div>
-    </el-dialog>
-    <!--  -->
+    <!-- </el-dialog> -->
+    </el-dialog></base-modal>
+  <!--  -->
   </div>
 </template>
 
@@ -314,8 +318,7 @@ export default {
   padding: 12px 12px 0 0;
 }
 .lable-100 {
-  width: 100px;
-  padding-left: 20px;
+  width: 50px;
 }
 .copy-el-form-item {
   margin-bottom: 18px;
@@ -334,4 +337,39 @@ export default {
 .el-select-dropdown__item {
   height: auto;
 }
+
+.batch-editing-customer-dialog {
+
+    .base-modal-body {
+      padding: 10px 30px 0;
+    }
+
+    .form-name, .form-item label {
+      width: 70px;
+      padding: 0;
+      line-height: 32px;
+    }
+
+    .el-select {
+      width: 100%;
+    }
+
+    .item {
+      display: flex;
+      justify-content: space-between;
+      line-height: 32px;
+      div {
+        flex-grow: 1;
+        .el-select {
+          width: 100%;
+        }
+      }
+    }
+
+    .dialog-footer {
+      display: flex;
+      justify-content: flex-end;
+    }
+
+  }
 </style>

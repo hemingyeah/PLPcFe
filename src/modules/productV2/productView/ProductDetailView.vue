@@ -20,7 +20,7 @@
               <div class="mar-l-30 flex-x" v-if="allowCreateTask">
                 <el-dropdown trigger="click" >
                   <el-button type="primary"
-                  ><i class="iconfont icon-add1"></i>工单</el-button
+                  ><i class="iconfont icon-add2"></i>工单</el-button
                   >
 
                   <el-dropdown-menu slot="dropdown">
@@ -34,7 +34,7 @@
               <div class="mar-l-8 flex-x" v-if="allowCreateEvent">
                 <el-dropdown trigger="click" >
                   <el-button type="primary"
-                  ><i class="iconfont icon-add1"></i>事件</el-button
+                  ><i class="iconfont icon-add2"></i>事件</el-button
                   >
                   <el-dropdown-menu slot="dropdown">
                     <el-dropdown-item v-for="event in eventTypes" :key="event.id">
@@ -50,7 +50,7 @@
                   v-if="allowCreatePlanTask && isShowPlanTask"
                 >
                   <el-button type="primary"
-                  ><i class="iconfont icon-add1"></i>计划任务</el-button
+                  ><i class="iconfont icon-add2"></i>计划任务</el-button
                   >
 
                   <el-dropdown-menu slot="dropdown">
@@ -68,7 +68,7 @@
               </div>
               <div class="mar-l-8 flex-x" v-if="!product.qrcodeId">
                 <el-button type="primary" @click="openPublicDialog('linkQrcode')"
-                ><i class="iconfont icon-add1"></i>关联二维码</el-button
+                ><i class="iconfont icon-add2"></i>关联二维码</el-button
                 >
               </div>
             </div>
@@ -80,7 +80,7 @@
                 placement="top"
               >
                 <i
-                  class="iconfont icon-qrcode cur-point"
+                  class="iconfont icon-qrcode cur-point font-18"
                   @click="leftActiveTab='qrcode-view'"
                 ></i>
               </el-tooltip>
@@ -90,7 +90,7 @@
                 placement="top"
               >
                 <i
-                  class="iconfont icon-bell cur-point"
+                  class="iconfont icon-bell cur-point font-18"
                   @click="openRemindDialog('remind')"
                 ></i>
               </el-tooltip>
@@ -101,7 +101,7 @@
                 placement="top"
               >
                 <i
-                  class="iconfont icon-delete cur-point"
+                  class="iconfont icon-delete cur-point font-18"
                   @click="deleteProduct"
                 ></i>
               </el-tooltip>
@@ -111,7 +111,7 @@
                 placement="top"
               >
                 <i
-                  class="iconfont icon-edit-square cur-point"
+                  class="iconfont icon-edit-square cur-point font-18"
                   @click="editProduct"
                 ></i>
               </el-tooltip>
