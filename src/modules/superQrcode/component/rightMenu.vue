@@ -345,6 +345,10 @@ export default {
         if(this.ruleForm.candidate){
           this.userList=this.ruleForm.candidate.info.map(item=>item.userName);
         }
+        const distributeCondition=this.ruleForm.distributeCondition;
+        if(distributeCondition.apply==='product' && distributeCondition.fieldName==='type'){
+          distributeCondition.option=distributeCondition.pathName;
+        }
       }else{
         this.$message({
           message:res.msg,

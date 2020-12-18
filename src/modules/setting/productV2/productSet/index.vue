@@ -209,6 +209,26 @@
             <el-form-item prop="option">
               <el-select
                 style="width: calc(100% - 25px)"
+                v-if="form.apply==='product' && form.fieldName==='type'"
+                v-model="form.option"
+                size="mini"
+                :popper-append-to-body="false"
+                filterable
+                remote
+                :remote-method="queryCatalogsByPage"
+                :loading='loading'
+                popper-class="select-popper"
+              >
+                <el-option
+                  v-for="item in catalogList"
+                  :key="item.id"
+                  :label='item.pathName'
+                  :value='item.id'
+                ></el-option>
+              </el-select>
+              <el-select
+                style="width: calc(100% - 25px)"
+                v-else
                 v-model="form.option"
                 size="mini"
                 :popper-append-to-body="false"
@@ -326,6 +346,7 @@
 </template>
 
 <script>
+import _ from 'lodash';
 import { getRootWindow } from "@src/util/dom";
 import {
   queryAllRules,
@@ -338,6 +359,7 @@ import {
   queryApplyOptions,
   queryRuleInfo,
   productConfig,
+  queryCatalogsByPage
 } from "@src/api/ProductV2Api";
 
 export default {
@@ -373,6 +395,7 @@ export default {
       allOptions: [],
       options: [],
       list: [],
+      catalogList:[],
       userList: [],
       provinceList: [
         "北京市",
@@ -599,7 +622,28 @@ export default {
     fieldChange(val){
       this.form.option='';
       this.options=this.allOptions.find(item=>item.fieldName==val).setting.dataSource;
+      if(val==='type' && this.form.apply==='product'){
+        this.queryCatalogsByPage();
+      }
     },
+    // 获取产品类型字段
+    queryCatalogsByPage:_.debounce(function(keyWord=''){
+      const params={
+        tenantId:this.tenantId,
+        pageNum:1,
+        pageSize:10,
+        keyWord
+      }
+      this.loading = true;
+      queryCatalogsByPage(params).then(res=>{
+        this.loading=false;
+        if(res.code==='200'){
+          this.catalogList=res.data.list;
+        }else{
+          this.$platform.alert(res.msg);
+        }
+      })
+    },300),
     // 保存
     submitForm() {
       this.$refs.form.validate((valid) => {
@@ -751,8 +795,8 @@ export default {
         level: "",
       };
     },
-    // 获取制定人员
-    async getUserList(keywords = "") {
+    // 获取指定人员
+    getUserList:_.debounce(function(keywords = ""){
       this.loading = true;
       var params = {
         tenantId: this.tenantId,
@@ -761,16 +805,17 @@ export default {
         searchType: this.form.selectUserType,
         keywords,
       };
-      let res = await queryCSByCondition(params);
-      this.loading = false;
-      if (res.code === "200") {
-        if (res.data && res.data.list) {
-          this.userList = res.data.list;
+      queryCSByCondition(params).then(res=>{
+        this.loading = false;
+        if (res.code === "200") {
+          if (res.data && res.data.list) {
+            this.userList = res.data.list;
+          }
+        } else {
+          this.$platform.alert(res.msg);
         }
-      } else {
-        this.$platform.alert(res.msg);
-      }
-    },
+      })
+    },300),
     // 启用/禁用 功能设置
     async saveFunc(state, flow) {
       const params = {
@@ -876,6 +921,12 @@ export default {
         this.form.fieldName=result.distributeCondition.fieldName || '';
         this.form.equals=isNaN(result.distributeCondition.equals)?1:result.distributeCondition.equals;
         this.form.option=result.distributeCondition.option || '';
+        if(this.form.apply==='product' && this.form.fieldName==='type'){
+          this.catalogList=[{
+            id:this.form.option,
+            pathName:result.distributeCondition.pathName
+          }];
+        }
 
         this.getFields();
         this.dialogVisible=true;
@@ -929,5 +980,10 @@ export default {
 }
 .mar-top-5 {
   margin-top: 5px;
+}
+.select-popper{
+  overflow: hidden;
+  text-overflow : ellipsis;
+  white-space : nowrap;
 }
 </style>
