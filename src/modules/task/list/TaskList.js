@@ -338,6 +338,44 @@ export default {
       // storageSet(TASK_GUIDE_DROPDOWN_MENU, '1')
     },
     previousStep() {},
+
+    abnormalLabel(type) {
+      const list = this.abnormalData.taskCustomExceptionNodeList.map(item => {return item.exceptionName})
+      if (list.indexOf(type) !== -1) return true
+      return false
+    },
+    abnormalHover(item) {
+      const {overTime, isPaused, oncePaused, onceOverTime, state, onceRefused, onceReallot, onceRollback, positionException} = item
+      const s = new Date().getTime()
+      const e = new Date(overTime).getTime()
+      
+      let value = []
+      // 超时
+      if(overTime && this.abnormalLabel('超时') && s > e) {
+        value.push('超时')
+      } else if (isPaused && this.abnormalLabel('暂停')) {
+        value.push('暂停')
+      } else if (oncePaused && this.abnormalLabel('曾暂停')) {
+        value.push('曾暂停')
+      } else if (onceOverTime && this.abnormalLabel('曾超时')) {
+        value.push('曾超时')
+      } else if (state === 'refused' && this.abnormalLabel('拒绝')) {
+        value.push('拒绝')
+      } else if (onceRefused && this.abnormalLabel('曾拒绝')) {
+        value.push('曾拒绝')
+      } else if (onceReallot && this.abnormalLabel('转派')) {
+        value.push('转派')
+      } else if (onceRollback && this.abnormalLabel('回退')) {
+        value.push('回退')
+      } else if (state === 'offed' && this.abnormalLabel('取消')) {
+        value.push('取消')
+      } else if (positionException && this.abnormalLabel('位置异常')) {
+        value.push('位置异常')
+      }
+
+      return value
+
+    },
     /**异常选择 */
     checkAbnormal({englishName}){
       this.exceptionNodes = englishName
@@ -1081,9 +1119,9 @@ export default {
       let taskListFields = this.filterTaskListFields();
       let fields = taskListFields.concat(this.taskTypeFilterFields);
 
-      if (this.selectColumnState === 'exception') {
-        fields = fields.concat(AbnormalList)
-      }
+      // if (this.selectColumnState === 'exception') {
+      fields = fields.concat(AbnormalList)
+      // }
 
       if (Array.isArray(columnStatus) && columnStatus.length > 0) {
         fields = this.buildSortFields(fields, localColumns)
@@ -1141,7 +1179,7 @@ export default {
             minWidth = 125;
           }
           if (field.fieldName === 'taskNo') {
-            field.width = 216
+            field.width = 280
           }
           return {
             ...field,
@@ -1761,9 +1799,9 @@ export default {
         }
       }
       this.seoSetList = [...taskFields.filter(item => { return item.isSystem === 1 && item.displayName !== '工单编号' && item.formType !== 'attachment'}).map(item => {if (item.fieldName === 'planTime'){item.formType = 'date'; item.isNull = 1} return item}), ...linkman_list, ...address_list, ...product_list, ...Inquire]
-      if (this.selectColumnState === 'exception') {
-        this.seoSetList = [...this.seoSetList, ...this.abnormals]
-      }
+      // if (this.selectColumnState === 'exception') {
+      this.seoSetList = [...this.seoSetList, ...this.abnormals]
+      // }
     },
     /**
      * @description 初始化page
@@ -2052,10 +2090,14 @@ export default {
     /*异常搜索字段 */
     abnormalParams() {
       if (this.selectColumnState === 'exception') {
+        let exceptionStates = []
+        this.abnormalData.taskExceptionRange.forEach(item => {
+          exceptionStates = [...exceptionStates, ...item.taskExceptionRangeValue]
+        })
         let params = {
           exceptionNodes: this.exceptionNodes ? [this.exceptionNodes] : this.taskCustomExceptionNodeList.filter(item => {return item.englishName}).map(item => {return item.englishName}),
           isException: 1,
-          exceptionStates: this.abnormalData.taskExceptionRange.map(item => {return item.taskExceptionRangeName})
+          exceptionStates
         }
         return params
       }
@@ -2122,6 +2164,17 @@ export default {
         } else {
           conditions = params.conditions || []
         }
+
+        //异常字段
+        const seoAbnormal = this.abnormals
+        let esTaskExceptionEntities = []
+        seoAbnormal.forEach(item => {
+          for(let key in params) {
+            if (item.fieldName === key && params[key]) {
+              esTaskExceptionEntities.push({action: item.englishName, exceptionName:params[key]})
+            }
+          }
+        })
 
         // 创建时间
         const createTimeStart = this._time(params.createTime, 0);
@@ -2337,6 +2390,7 @@ export default {
           payTypes: params.paymentMethods,
           searchTagIds: params.tags && params.tags.map(({ id }) => id),
           systemConditions: customizeSys,
+          esTaskExceptionEntities,
           ...this.abnormalParams(),
           // eventNo: params.eventNo,
         };
@@ -2619,6 +2673,7 @@ export default {
           }
         }
       })
+      taskSelfFields = [...taskSelfFields, ...AbnormalList]
       taskSelfFields.map(item => {
         item.label = item.displayName
         item.export = true
@@ -2638,7 +2693,7 @@ export default {
       });
 
       // 系统信息
-      let sysList = this.selectColumnState === 'exception' ? [...allExport, ...AbnormalList] : allExport
+      let sysList = allExport
 
       this.exportColumns = [
         {

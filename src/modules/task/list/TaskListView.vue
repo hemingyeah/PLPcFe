@@ -681,18 +681,26 @@
                     >
                       审批中
                     </span>
-                    <!-- 暂停中 -->
+                    <!-- 超时 -->
                     <span
                       class="task-state-block task-state-block-overtime task-font12"
-                      v-if="
-                        scope.row.overTime &&
-                          new Date().getTime() >
-                          new Date(scope.row.overTime).getTime()
-                      "
+                      :class="{'task-state-block-approve': v === '转派' || v === '回退', 'task-state-block-ff': v === '曾暂停' || v === '曾超时' || v === '曾拒绝'}"
+                      v-for="(v, i) in abnormalHover(scope.row)"
+                      :key="i"
+                      v-show="i < 2"
                     >
-                      超时
+                      {{v}}
                     </span>
-                  </div>
+
+                    <!-- 暂停 -->
+
+                    <el-tooltip
+                      v-if="abnormalHover(scope.row).length > 3"
+                      :content="abnormalHover(scope.row)"
+                      placement="top"
+                    >
+                      <span class="task-ml4">...</span>
+                  </el-tooltip></div>
 
                   <!-- 客户  TODO: 客户查看权限 -->
                   <template v-else-if="column.field === 'customer'">
@@ -958,7 +966,7 @@
                   </template>
 
                   <template v-else>
-                    {{ scope.row[column.field] }}
+                    {{ Array.isArray(scope.row[column.field]) ? scope.row[column.field].join(',') : scope.row[column.field] }}
                   </template>
                 </template>
               </el-table-column>

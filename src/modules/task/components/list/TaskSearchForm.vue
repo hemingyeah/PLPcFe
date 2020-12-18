@@ -1,7 +1,7 @@
 <script>
 /* api */
 import * as TaskApi from '@src/api/TaskApi.ts';
-import * as CustomerApi from '@src/api/CustomerApi.ts';
+import * as CustomerApi from '@src/api/CustomerApi';
 
 /* utils */
 import _ from 'lodash';
@@ -55,7 +55,7 @@ export default {
   },
   methods: {
     buildForm() {
-      // if (Object.keys(this.form).length === this.fields.length) return;
+      if (Object.keys(this.form).length === this.fields.length) return;
       this.initFormVal();
     },
     createUserInput(event, isTags) {
@@ -116,6 +116,10 @@ export default {
 
       if (MultiFieldNames.indexOf(field.fieldName) > -1) {
         f.setting.isMulti = true;
+      }
+
+      if (field.formType === 'select' && !field.isSystem) {
+        f.setting.isMulti = false;
       }
 
       let childComp = null;
@@ -224,7 +228,6 @@ export default {
         customer: this.customer,
         product: this.product,
       };
-      console.log(data)
       return data;
     },
     searchCustomer(params) {
@@ -271,12 +274,7 @@ export default {
       if (action === 'dist') {
         return (this.form.area = event);
       }
-
       const f = event.field;
-
-      if (f.englishName){
-        this.form['esTaskExceptionEntities'] = [{action: f.englishName, exceptionName: event.newValue}]
-      }
       this.form[f.fieldName] = event.newValue;
     },
   },

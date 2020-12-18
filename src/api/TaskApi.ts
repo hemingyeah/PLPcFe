@@ -1314,5 +1314,13 @@ export function getTurnOnTaskExceptionNodeInfo(params = {}) {
   return http.get('/outside/pc/setting/getTurnOnTaskExceptionNodeInfo', params)
 }
 
+/**
+ * @description 获取工单异常原因
+ */
+
+export function obtainReasonByTaskStatus(params: number) {
+  return http.get(`/outside/pc/setting/obtainReasonByTaskStatus/${params}`)
+}
+
 
 /* -------------  end  新工单api ---------------- */

@@ -273,7 +273,7 @@
         <div class="task-detail-view-panel">
           <div class="task-flex task-ai">
             <span class="task-cef task-font16 task-detail-view-panel-icon">*</span><span>回退原因：</span>
-            <el-select v-model="checkBack" placeholder="请选择" class="task-w70">
+            <el-select v-model="checkBack" placeholder="请选择回退原因" class="task-w70">
               <el-option
                 v-for="item in backList"
                 :key="item"
@@ -282,11 +282,11 @@
               >
               </el-option>
             </el-select>
-            <span class="task-font12 task-c13 task-ml12">去配置原因</span>
+            <span class="task-font12 task-c13 task-ml12 task-pointer" v-if="systemAdmin" @click="jump()">去配置原因</span>
           </div>
           <!--  -->
           <div class="task-flex task-mt12">
-             <div class="task-font14">详细原因：</div>
+            <div class="task-font14">详细原因：</div>
             <textarea v-model="backDialog.reason" placeholder="请输入回退说明[最多500字][必填]" rows="3" maxlength="500" />
           </div>
         </div>
@@ -304,7 +304,7 @@
         <div class="task-detail-view-panel">
           <div class="task-flex task-ai">
             <span class="task-cef task-font16 task-detail-view-panel-icon">*</span><span>暂停原因：</span>
-            <el-select v-model="checkBack" placeholder="请选择" class="task-w70">
+            <el-select v-model="checkBack" placeholder="请选择暂停原因" class="task-w70">
               <el-option
                 v-for="item in backList"
                 :key="item"
@@ -313,12 +313,12 @@
               >
               </el-option>
             </el-select>
-            <span class="task-font12 task-c13 task-ml12">去配置原因</span>
+            <span class="task-font12 task-c13 task-ml12 task-pointer" v-if="systemAdmin" @click="jump()">去配置原因</span>
           </div>
           <!--  -->
           <div class="task-flex task-mt12">
-             <div class="task-font14">详细原因：</div>
-             <textarea v-model="pauseDialog.reason" placeholder="请输入暂停原因[最多500字]" rows="3" maxlength="500" />
+            <div class="task-font14">详细原因：</div>
+            <textarea v-model="pauseDialog.reason" placeholder="请输入暂停原因[最多500字]" rows="3" maxlength="500" />
           </div>
         </div>
       </div>
@@ -335,7 +335,7 @@
         <div class="task-detail-view-panel">
           <div class="task-flex task-ai">
             <span class="task-cef task-font16 task-detail-view-panel-icon">*</span><span>拒绝原因：</span>
-            <el-select v-model="checkBack" placeholder="请选择" class="task-w70">
+            <el-select v-model="checkBack" placeholder="请选择拒绝原因" class="task-w70">
               <el-option
                 v-for="item in backList"
                 :key="item"
@@ -344,11 +344,11 @@
               >
               </el-option>
             </el-select>
-            <span class="task-font12 task-c13 task-ml12">去配置原因</span>
+            <span class="task-font12 task-c13 task-ml12 task-pointer" v-if="systemAdmin" @click="jump()">去配置原因</span>
           </div>
           <!--  -->
           <div class="task-flex task-mt12">
-             <div class="task-font14">详细原因：</div>
+            <div class="task-font14">详细原因：</div>
             <textarea v-model="refuseDialog.reason" placeholder="请输入拒绝说明[最多500字][必填]" rows="3" maxlength="500" />
           </div>
         </div>
@@ -361,7 +361,7 @@
     <!-- end 拒绝工单弹窗 -->
 
     <!-- start 取消工单弹窗 -->
-    <cancel-task-dialog ref="cancelTaskDialog" :task-id="task.id" @proposeApprove="proposeApprove" />
+    <cancel-task-dialog ref="cancelTaskDialog" :task-id="task.id" @proposeApprove="proposeApprove" :back-list="backList" :system-admin="systemAdmin" />
     <!-- end 取消工单弹窗 -->
 
     <!-- start 计划时间弹窗 -->
@@ -391,6 +391,8 @@
       :task="task" 
       :login-user="initData.loginUser"
       :is-re-allot="allowRedeployTask"
+      :back-list="backList" 
+      :system-admin="systemAdmin"
     />
     <!-- end 分配弹窗 -->
     

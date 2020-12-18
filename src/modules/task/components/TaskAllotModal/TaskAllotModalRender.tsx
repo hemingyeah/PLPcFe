@@ -5,6 +5,7 @@ import LoginUser from '@model/entity/LoginUser/LoginUser'
 /* methods */
 import TaskAllotModalMethods from '@src/modules/task/components/TaskAllotModal/TaskAllotModalMethods'
 import { VNode } from 'vue'
+import { divide } from 'lodash'
 
 class TaskAllotModalRender extends TaskAllotModalMethods {
   /** 
@@ -129,13 +130,12 @@ class TaskAllotModalRender extends TaskAllotModalMethods {
   */
   public renderReAllotReason(): VNode | null {
     if (!this.isReAllot) return null
-    
     return (
       <div class='task-allot-reason'>
         <span class='task-allot-nav-title'>转派说明</span>
-        <el-select value={this.transfer} placeholder="请选择" onChange={(v: string) => {this.transfer = v}}>
+        <el-select value={this.transfer} placeholder="请选择转派原因" onChange={(v: string) => {this.transfer = v}}>
           {
-            this.transferList.map(item => {
+            this.backList.map(item => {
               return (
                 <el-option
                   key={item}
@@ -146,6 +146,9 @@ class TaskAllotModalRender extends TaskAllotModalMethods {
             })
           }
         </el-select>
+        {
+          this.systemAdmin ? <div class="task-font12 task-c13 task-mt12 task-pointer" onClick={() => {window.location.href = '/setting/task/taskSet'}}>去配置原因</div> : null
+        }
         <el-input
           class="task-mt12" 
           type='textarea'

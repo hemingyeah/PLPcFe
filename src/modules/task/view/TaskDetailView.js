@@ -39,14 +39,6 @@ const ENCRYPT_FIELD_VALUE = "***";
 
 const { TASK_GUIDE_DETAIL } = require("@src/component/guide/taskV2Store");
 
-/*回退原因 */
-const backList = [
-  "操作不习惯",
-  "不怎么会用，还是喜欢用老版本",
-  "新增功能用不上",
-  "新版本有BUG，影响业务开展了",
-  "其他",
-]
 
 export default {
   name: "task-detail-view",
@@ -79,6 +71,8 @@ export default {
       timeDialog: {
         visible: false
       },
+      backList: [], //异常原因
+      systemAdmin: '', //是否 是系统管理员 判断是否可以跳转到系统页面配置
       receiptFields: [], // 自定义回执字段
       customerRelationTaskCountData: {}, // 客户关联工单数量
       hasCallCenterModule: localStorage.getItem("call_center_module") == 1,
@@ -94,7 +88,6 @@ export default {
       guideSearchModelSave: false,
       guideDropdownMenu: false,
       isGuide: false,
-      backList,
       checkBack: '',
       marTop: 197,
       // 显示详情向导
@@ -688,6 +681,9 @@ export default {
     hasAuth(keys) {
       return AuthUtil.hasAuth(this.permission, keys);
     },
+    jump() {
+      window.location.href = '/setting/task/taskSet'
+    },
     // 编辑跳转
     goEdit() {
       const id = this.task.id;
@@ -753,6 +749,13 @@ export default {
     },
     // 回退工单
     back() {
+
+      const {checkBack} = this
+      if (!checkBack) {
+        this.$platform.alert('请选择回退工单原因');
+        return
+      }
+
       let reason = this.backDialog.reason.trim();
       if (!reason) return this.$platform.alert("请填写回退说明");
 
@@ -761,7 +764,7 @@ export default {
       // 判断是完成回退还是结算回退
       const API = this.task.state == "finished" ? "rollBackTask" : "rollBackBalance";
       
-      const params = { taskId: this.task.id, reason };
+      const params = { taskId: this.task.id, reason, customReason: checkBack };
       TaskApi[API](params).then(res => {
         if (res.success) {
           let fromId = window.frameElement.getAttribute("fromid");
@@ -779,8 +782,14 @@ export default {
     // 暂停工单
     async pause() {
       if (this.pending) return;
-      this.pending = true;
 
+      const {checkBack} = this
+      if (!checkBack) {
+        this.$platform.alert('请选择暂停工单原因');
+        return
+      }
+
+      this.pending = true;
       let { reason } = this.pauseDialog;
       let taskId = this.task.id;
 
@@ -793,7 +802,7 @@ export default {
         return;
       }
 
-      TaskApi.pauseTask({ taskId, reason }).then(res => {
+      TaskApi.pauseTask({ taskId, reason, customReason: checkBack }).then(res => {
         if (res.success) {
           window.location.href = `/task/view/${this.task.id}`;
         } else {
@@ -821,6 +830,13 @@ export default {
     },
     // 拒绝工单
     async refuse() {
+
+      const {checkBack} = this
+      if (!checkBack) {
+        this.$platform.alert('请选择拒绝工单原因');
+        return
+      }
+
       let reason = this.refuseDialog.reason.trim();
       if (!reason) return this.$platform.alert("请填写拒绝原因");
 
@@ -828,7 +844,7 @@ export default {
 
       this.pending = true;
 
-      const params = { taskId: this.task.id, reason };
+      const params = { taskId: this.task.id, reason, customReason: checkBack };
       TaskApi.refuseTask(params).then(res => {
         if (res.success) {
           let fromId = window.frameElement.getAttribute("fromid");
@@ -884,6 +900,7 @@ export default {
     redeploy() {
       // 新工单新转派
       if (this.isRestructAllot) {
+        this.obtainReasonByTaskStatus(0)
         this.$refs.TaskAllotModal.outsideShow()
       } else {
         this.pending = true;
@@ -943,8 +960,12 @@ export default {
     },
     // 打开弹窗
     openDialog(action) {
+
+      this.checkBack = '' //清除拒绝原因
+
       if (action === 'cancel') {
         this.$refs.cancelTaskDialog.openDialog();
+        this.obtainReasonByTaskStatus(1)
       } else if (action === "acceptFromPool" || action === "accept" || action === "modifyPlanTime") {
         this.$refs.planTimeDialog.openDialog(action);
       } else if (action === "approve") {
@@ -952,12 +973,15 @@ export default {
       } else if (action === "pause") {
         this.pauseDialog.reason = "";
         this.pauseDialog.visible = true;
+        this.obtainReasonByTaskStatus(3)
       } else if (action === "refuse") {
         this.refuseDialog.reason = "";
         this.refuseDialog.visible = true;
+        this.obtainReasonByTaskStatus(2)
       } else if (action === "back") {
         this.backDialog.reason = "";
         this.backDialog.visible = true;
+        this.obtainReasonByTaskStatus(4)
       } else if (action === "finish") {
         this.$refs.taskReceiptEdit.openDialog();
       } else if (action === "balance") {
@@ -968,6 +992,19 @@ export default {
         this.$refs.taskFeedback.feedback();
       } else if (action === "timeAxis") {
         this.$refs.timeAxis.openDialog();
+      }
+    },
+
+    /**
+     * 
+     * @description 获取工单异常原因
+     */
+    async obtainReasonByTaskStatus(taskType) {
+      const {success, result} = await TaskApi.obtainReasonByTaskStatus(taskType)
+      if (success) {
+        const {systemAdmin, reason} = result
+        this.systemAdmin = systemAdmin
+        this.backList = reason
       }
     },
     // 发起审批
