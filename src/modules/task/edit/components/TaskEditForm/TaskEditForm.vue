@@ -157,7 +157,7 @@
           </el-tooltip>
 
           <!-- start 产品关联查询字段 -->
-          <div class="relation-product-list" v-if="value.product.length && relationProductfields.length">
+          <div class="relation-product-list" v-if="value.product && value.product.length && relationProductfields.length">
             <div class="relation-product-list-item" v-for="(product, index) in value.product" :key="product.id">
               <div class="product-name">{{ product.label }}</div>
               <div class="form-row-two-columns product-relation-field-list">

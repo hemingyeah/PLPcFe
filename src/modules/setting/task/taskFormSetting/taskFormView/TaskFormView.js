@@ -155,7 +155,7 @@ export default {
         fields.forEach((item, index) => {
           item.templateId = this.templateId;
           item.templateName = this.templateName;
-          item.tableName = 'task';
+          item.tableName = this.mode;
           item.orderId = index;
           
           // 还原工单表单的系统附件的formType
@@ -167,6 +167,16 @@ export default {
         // 表单字段格式校验
         let message = FormUtil.validate(fields);
         if(!FormUtil.notification(message, this.$createElement)) return;
+
+        // 过滤需升级为公用字段或者降为私有字段
+        let commonFields = [];
+        this.fields.filter(field => field.isPublic != field.isCommon).map(field => {
+          let { fieldName, isPublic, isCommon } = field;
+          commonFields.push({
+            fieldName,
+            isUpgrade: isPublic > isCommon
+          })
+        })
 
         this.pending = true;
 

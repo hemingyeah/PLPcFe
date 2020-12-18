@@ -8,17 +8,25 @@ import * as FormUtil from '@src/component/form/util';
 export default {
   name: 'task-receipt-form-setting-view',
   mixins: [taskFormSettingMixin],
+  props: {
+    templateId: {
+      type: String,
+      default: '3021d20b-e2a1-4740-9c68-068a88019921' // 暂时写死
+    },
+    templateName: {
+      type: String,
+      default: ''
+    }
+  },
   data() {
     return {
-      templateId: '1',
-      templateName: '默认工单',
-      tenantId: '7416b42a-25cc-11e7-a500-00163e12f748'
+      mode: 'task_receipt',
     }
   },
   async mounted(){
     try {
-      // TODO: 修改参数
-      let fields = await TaskApi.getFields({ tableName: 'task_receipt', typeId: '1' });
+      // 获取表单字段列表
+      let fields = await TaskApi.getFields({ tableName: this.mode, typeId: this.templateId });
       let sortedFields = fields.sort((a, b) => a.orderId - b.orderId);
       
       this.fields = FormUtil.toFormField(sortedFields);
@@ -29,16 +37,18 @@ export default {
     }
   },
   methods: {
-    async submit(_obj) {
+    /** 
+    * @description 提交表单字段设置
+    */
+    async submit() {
       try {
         let fields = FormUtil.toField(this.fields);
-        let index = 0;
-        fields.forEach(item => {
-          item.tableName = 'task_receipt';
-          item.orderId = index++;
-          item.tenantId = this.tenantId;
+
+        fields.forEach((item, index) => {
           item.templateId = this.templateId;
           item.templateName = this.templateName;
+          item.tableName = this.mode;
+          item.orderId = index;
         });
 
         let message = FormUtil.validate(fields);
@@ -48,28 +58,17 @@ export default {
 
         let result = await TaskApi.taskSettingSave(fields);
 
-        if(_obj.clickType) {
-          this.$refs.otherSetting.didShowSystemPanel();
-        }else{
-          if(result.status == 0){
-            this.$platform.notification({
-              type: 'success',
-              title: '成功',
-              message: '工单回执表单更新成功'
-            })
-            return window.location.reload()
-          }else{
-            this.$platform.notification({
-              type: 'error',
-              title: '工单回执表单更新失败',
-              message: result.message
-            })
-          }
-        }
+        let isSuccess = result.status == 0;
+        this.$platform.notification({
+          type: isSuccess ? 'success' : 'error',
+          title: `工单回执表单更新${isSuccess ? '成功' : '失败'}`,
+          message: isSuccess ? null : result.message
+        })
 
       } catch (error) {
         console.error(error)
       }
+
       this.pending = false;
     }
   }

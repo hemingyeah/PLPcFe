@@ -121,7 +121,6 @@ export default class FormField{
     option.isSystem = field.isSystem;
     option.isAppShow = field.isAppShow;
     option.isHidden = field.isHidden;
-    option.isCommon = field.isPublic;
 
     let setting = {};
     let defaultValue = null;
