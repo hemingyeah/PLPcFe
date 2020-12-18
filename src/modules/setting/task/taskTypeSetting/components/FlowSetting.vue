@@ -17,11 +17,19 @@
                 <!--S 审批设置 -->
                 <div class="setting-specific-approve">
                     <h2>
-                        审批设置<el-switch class="ml-12"/>
+                        审批设置
+                        <el-switch class="ml-12"/>
                     </h2>
-                    <approve-setting />
+                    <approve-setting :options="approveOptions" :approveSetting="approveSetting" @update="updateApproveUser"/>
                 </div>
                 <!--E 审批设置 -->
+
+                <!--S 转派时也审批-->
+                <h2>
+                    转派时也审批
+                    <el-switch />
+                </h2>
+                <!--E 转派时也审批-->
 
                 <!--S 超时提醒 -->
                 <div v-if="showOvertime" class="setting-specific-overtime">
@@ -200,7 +208,12 @@ export default {
             }, {
                 value: '选项2',
                 label: '双皮奶'
-            }]
+            }],
+
+            approveSetting: {}, // 流程审批设置
+
+            formList: [], // 表单人员
+            receiptList: [] // 回执表单人员
         }
     },
     computed: {
@@ -219,6 +232,67 @@ export default {
         showTaskClose() { // 展示工单关闭
             return ['close'].includes(this.type);
         },
+        approveOptions() { // 审批选项
+            let type = this.type;
+            let options = [{
+                value: 'none',
+                label: '无需审批'
+            }, {
+                value: 'leader',
+                label: '发起人主管'
+            }, {
+                value: 'users',
+                label: '指定人员'
+            }, {
+                value: 'createUser',
+                label: '工单创建人'
+            }, {
+                value: 'userAdmin',
+                label: '客户负责人'
+            }, {
+                value: 'promoter',
+                label: '由发起人选择'
+            }];
+
+            switch(type) {
+                case 'create':
+                case 'start':
+                case 'finish':
+                case 'allot':
+                    break;
+                default:
+                    options.splice(3, 0, {
+                        value: 'allotUser',
+                        label: '工单派单人'
+                    });
+                    options = [
+                        ...options,
+                        ...this.formList.map(item => {
+                            return {
+                                label: item.showName,
+                                value: item.stateTemplateId
+                            }
+                        }),
+                        ...this.receiptList.map(item => {
+                            return {
+                                label: item.showName,
+                                value: item.stateTemplateId
+                            }
+                        })
+                    ];
+                    break;
+            }
+
+            return options;
+        }
+    },
+    methods: {
+        /**
+         * 更新审批设置
+         */
+        updateApproveUser(users) {
+            this.$set(this.approveSetting, 'users', users);
+        }
     },
     components: {
         [ApproveSetting.name]: ApproveSetting
