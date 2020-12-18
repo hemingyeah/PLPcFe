@@ -516,7 +516,9 @@ export default {
   },
   created() {
     const rootWindow = getRootWindow(window);
-    this.tenantId = JSON.parse(rootWindow._init).user.tenantId;
+    const user=JSON.parse(rootWindow._init).user;
+    this.tenantId = user.tenantId;
+    this.userId=user.userId;
   },
   mounted() {
     this.productConfig();
