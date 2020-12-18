@@ -15,6 +15,15 @@ function productConfig(){
 }
 
 /**
+ * 获取产品类型
+ * @param params
+ * @returns {*}
+ */
+function queryCatalogsByPage(params){
+  return http.get(`${ruleHeader}/outside/superCode/product/queryCatalogsByPage`,params);
+}
+
+/**
  * 获取规则信息
  * @param params
  * @returns {*}
@@ -458,4 +467,5 @@ export {
   queryApplyOptions,
   queryRuleInfo,
   productConfig,
+  queryCatalogsByPage
 };
