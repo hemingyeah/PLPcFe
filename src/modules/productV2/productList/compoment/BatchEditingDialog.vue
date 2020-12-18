@@ -165,6 +165,13 @@ export default {
         })
       }
 
+      if (sf.formType === "related_catalog") {
+        tv = form[sf.fieldName].id;
+        params.mapJson = JSON.stringify({
+          [sf.fieldName]: tv,
+        })
+      }
+
       if (sf.formType === "address") {
         tv = form[sf.fieldName];
         params.mapJson = JSON.stringify({

@@ -4,7 +4,7 @@
       <template slot="left">
         <div class="draggable-box">
           <div class="flex-1 draggable-data">
-            <template v-if="treeData[0].tasks">
+            <template v-if="treeData[0].tasks.length">
               <work-tree-draggable
                 ref="workTreeDraggable"
                 :com-index="-1"
@@ -21,6 +21,10 @@
                 :sort-menu="sortMenu"
               />
             </template>
+            <div class="text-center" v-else-if="treeLoaded">
+              还未添加产品分类 <br>
+              请在左下方添加一级分类
+            </div>
           </div>
           <div class="flex-x draggable-data-btn">
             <div
@@ -85,7 +89,7 @@ export default {
   },
   data() {
     return {
-      allType: true,
+      allType: false,
       visibleProp: false,
       dialogType: "addMenu",
       treeData: [
@@ -103,6 +107,7 @@ export default {
       sortMenu: {},
       dialogInitData: {},
       fasterFindId: "",
+      treeLoaded:false
     };
   },
   components: {
@@ -226,6 +231,7 @@ export default {
     },
     getTreeData() {
       this.fullscreenLoading = true;
+      this.treeLoaded = false;
       getTreeList()
         .then((res) => {
           if (res.code == 0) {
@@ -275,6 +281,7 @@ export default {
           }
         })
         .finally(() => {
+          this.treeLoaded = true;
           this.fullscreenLoading = false;
         });
     },
@@ -445,15 +452,19 @@ export default {
 
 .work-tree-box {
   min-width: 300px;
-  height: 100vh;
+  height: 100vh;  
+  padding:10px 10px 0 10px;
   overflow: hidden;
+  position:relative;
 
   .modal-box {
+    width: 100%;
+    height: 100%;
     .draggable-box {
       display: flex;
       flex-direction: column;
       width: 100%;
-      height: 100vh;
+      height: 100%;
       overflow-x: hidden;
       .draggable-data {
         min-width: 250px;
@@ -478,7 +489,7 @@ export default {
       }
     }
     .data-box {
-      height: 100vh;
+      height: 100%;
       overflow-y: scroll;
       &::-webkit-scrollbar {
         width: 0 !important;

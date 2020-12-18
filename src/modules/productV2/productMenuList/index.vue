@@ -280,8 +280,8 @@
                     </template>
                     <div>
                       {{
-                        scope.row[column.field].length > 5
-                          ? `+${scope.row[column.field].length - 5}`
+                        scope.row[column.field].length > 1
+                          ? `+${scope.row[column.field].length - 1}`
                           : ''
                       }}
                     </div>

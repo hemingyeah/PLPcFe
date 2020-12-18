@@ -3,14 +3,14 @@
     <div class="flex-1 scroll-data">
       <template v-if="!propData.canEditConData">
         <no-data-view
-          :notice-msg="'非空类型不可以建类型详细信息'"
+          :notice-msg="'此产品类型分级不可添加内容'"
         ></no-data-view>
       </template>
       <template v-else-if="!propData.conData">
-        <no-data-view :notice-msg="'空类型下可以建类型详细信息'">
+        <no-data-view :notice-msg="'此产品类型分级可以添加内容'">
         </no-data-view>
         <div class="text-center mar-t-24">
-          <el-button @click="setMenuInfo">新建类型信息</el-button>
+          <el-button @click="setMenuInfo">添加内容</el-button>
         </div>
       </template>
       <div v-show="propData.canEditConData && propData.conData">
@@ -40,7 +40,7 @@
             </el-tooltip>
           </div>
 
-          <div class="pad-l-10 mar-b-30">
+          <div class="pad-l-10 mar-b-12">
             <div class="font-12 color-999 mar-b-10">
               *被隐藏的字段，将不会出现在这个类型信息中（系统字段不可隐藏）
             </div>
@@ -57,13 +57,14 @@
             </el-checkbox-group>
           </div>
           <template slot="product_menu_part">
-            <div class="normal-title-2">
+            <div class="normal-title-2 ">
               <div class="flex-1">关联备件</div>
               <el-button @click="showDialog('linkPart')">关联备件</el-button>
             </div>
 
             <mini-table
               :id="propData.id"
+              class="mar-b-20"
               data-type="part"
               page-type="edit"
               v-if="flashPartType"
@@ -76,6 +77,7 @@
             </div>
             <mini-table
               :id="propData.id"
+              class="mar-b-20"
               data-type="wiki"
               page-type="edit"
               v-if="flashProductType"
@@ -99,7 +101,7 @@
                 <i class="el-icon-plus"></i>
               </el-upload>
               <div class="font-12 color-999 mar-t-10">
-                最多上传5张图片，建议尺寸
+                最多上传5张图片，建议比例1:1
               </div>
             </form-item>
           </template>
@@ -120,7 +122,7 @@
                 <i class="el-icon-plus"></i>
               </el-upload>
               <div class="font-12 color-999 mar-t-10">
-                最多上传1张图片，建议尺寸
+                最多上传1张图片，建议比例1:1
               </div>
             </form-item>
           </template>
@@ -616,7 +618,6 @@ export default {
   height: 100%;
   display: flex;
   flex-direction: column;
-  border-left: 1px solid $color-border-l1;
   background: #fff;
   min-width: 630px;
   .scroll-data {
@@ -629,7 +630,8 @@ export default {
   }
   .normal-title-2 {
     @include title-class();
-    padding: 0 10px;
+    padding: 0;
+    font-weight: 400;
   }
   .normal-title-2-inside {
     @include title-class();
@@ -661,14 +663,29 @@ export default {
   text-align: start;
 }
 .upload-img {
+  margin-bottom: 12px;
   .el-upload-list__item label {
     padding: 0;
   }
   .el-upload--picture-card {
+    width: 96px;
+    height: 96px;
+    line-height: 96px;
+    &:hover{
     border-color: $color-primary;
+    }
   }
 }
 .el-checkbox {
   margin-bottom: 15px;
 }
+
+.form-item label{
+  padding: 4px 0 0 0;
+}
+
+.table-footer{
+  padding: 0;
+}
+
 </style>
