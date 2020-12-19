@@ -107,4 +107,47 @@
     }
   }
 }
-/* new new */
+
+.task-allot-executor-chunk {
+  background-color: $bg-color-l3;
+  height: 13px;
+  width: 100%;
+}
+
+.task-allot-excutor {
+  .biz-team-select-block {
+    .biz-team-select {
+      height: 32px;
+    }
+  }
+}
+
+.task-allot-user-table-header {
+  display: flex;
+  justify-content: space-between;
+  padding: 16px;
+  &-label,
+  &-select-block {
+    display: flex;
+    align-items: center;
+    & > div {
+      margin-left: 8px;
+    }
+  }
+  .task-allot-user-table-sort-label {
+    background-color: $bg-color-l3;
+    border-radius: 12px;
+    cursor: pointer;
+    display: inline-block;
+    font-size: $font-size-small;
+    margin-right: 12px;
+    padding: 3px 12px;
+    transition: all 0.25s ease;
+    user-select: none;
+    &-active {
+      background-color: $color-primary;
+      color: #fff;
+    }
+  }
+}
+/* end new */

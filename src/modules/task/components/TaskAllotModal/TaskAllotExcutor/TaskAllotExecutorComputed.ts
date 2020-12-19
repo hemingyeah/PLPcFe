@@ -1,3 +1,5 @@
+/* component */
+import TaskAllotModal from '@src/modules/task/components/TaskAllotModal/TaskAllotModal.tsx'
 /* data */
 import TaskAllotExecutorData from '@src/modules/task/components/TaskAllotModal/TaskAllotExcutor/TaskAllotExecutorData'
 /* entity */
@@ -6,13 +8,18 @@ import TaskAddress from '@model/entity/TaskAddress'
 import ComponentNameEnum from '@model/enum/ComponentNameEnum'
 import { TaskAllotTypeModeEnum } from '@src/modules/task/components/TaskAllotModal/TaskAllotModalModel'
 /* util */
-import { findComponentUpward } from '@src/util/assist'
+import { findComponentUpward, findComponentDownward } from '@src/util/assist'
 
 class TaskAllotExecutorComputed extends TaskAllotExecutorData {
   
   /* 是否是按服务团队派单 */
   get allotByExclusiveTag() {
     return this.taskConfig?.allotByExclusiveTag === true
+  }
+  
+  /* 选择列 组件 */
+  get BaseTableAdvancedSettingComponent(): any { 
+    return findComponentDownward(this, ComponentNameEnum.BaseTableAdvancedSetting)
   }
   
   /* 客户团队名称列表 */
@@ -62,7 +69,7 @@ class TaskAllotExecutorComputed extends TaskAllotExecutorData {
   }
   
   /* 工单派单组件 */
-  get TaskAllotModalComponent() {
+  get TaskAllotModalComponent(): TaskAllotModal {
     return findComponentUpward(this, ComponentNameEnum.TaskAllotModal) || {}
   }
   

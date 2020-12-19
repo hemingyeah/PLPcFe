@@ -47,13 +47,17 @@ class LoginUser {
   public cusDistance?: Number | null = null
   public superAdmin?: Number | null = null
   public isTeamLeader?: Number | null = null
-
+  
   public static Enable?: Number = 1;
   public static Disable?: Number= 0;
   public static FirstLogin?: Number = 0;
   public static NotFirstLogin?: Number = 1;
   public static SuperAdmin?: Number = 1;
   public static NotSuperAdmin?: Number= 1;
+  
+  // 以下是用于前端的
+  public label?: string = ''
+  public value?: string = ''
 }
 
 export default LoginUser;

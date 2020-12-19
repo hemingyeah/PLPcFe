@@ -3,6 +3,7 @@ import TaskAllotUserTable from '@src/modules/task/components/TaskAllotModal/Task
 import TaskAllotUserMap from '@src/modules/task/components/TaskAllotModal/TaskAllotExcutor/TaskAllotUserMap/TaskAllotUserMap.tsx'
 import UserCard from '@src/modules/task/components/TaskAllotModal/UserCard/UserCard.tsx'
 import ContactUserItem from '@src/component/common/BaseContact/ContactUserItem.vue'
+import UiInput from '@src/component/ui/UiInput/UiInput.tsx'
 /* entity */
 import TaskAllotUserInfo from '@model/entity/TaskAllotUserInfo'
 /* enum */
@@ -22,7 +23,8 @@ import TaskAllotExecutorRender from '@src/modules/task/components/TaskAllotModal
     TaskAllotUserTable,
     TaskAllotUserMap,
     UserCard,
-    ContactUserItem
+    ContactUserItem,
+    UiInput
   }
 })
 export default class TaskAllotExcutor extends TaskAllotExecutorRender {
@@ -34,6 +36,8 @@ export default class TaskAllotExcutor extends TaskAllotExecutorRender {
     return (
       <div class={ComponentNameEnum.TaskAllotExcutor} {...attrs}>
         { this.renderTaskAllotExecutorHeader() }
+        { this.renderTaskAllotExecutorBackgroundChunk() }
+        { this.renderTaskAllotUserTableHeader() }
         { 
           this.isShowTaskAllotUserTableComponent && (
             <task-allot-user-table
@@ -41,6 +45,7 @@ export default class TaskAllotExcutor extends TaskAllotExecutorRender {
               changePending={(pending: boolean) => this.outsideSetPending(pending)}
               sortChangeFunc={(option: any) => this.outsideSortChangedHandler(option)}
               style={this.modeComponents[TaskAllotTypeModeEnum.List]}
+              userPageCheckedMap={this.userPageCheckedMap}
             >
             </task-allot-user-table>
           )
@@ -61,6 +66,7 @@ export default class TaskAllotExcutor extends TaskAllotExecutorRender {
             </task-allot-user-map>
           )
         }
+        <base-table-advanced-setting onSave={(value: any) => this.saveTaskAllotTableColumn(value)} ref='BaseTableAdvancedSettingComponent' />
       </div>
     )
   

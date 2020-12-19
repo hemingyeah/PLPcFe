@@ -6,12 +6,17 @@ import TaskConfig from '@model/types/TaskConfig'
 import Tag from '@model/entity/Tag/Tag'
 import Customer from '@model/entity/Customer'
 import LoginUser from '@model/entity/LoginUser/LoginUser'
+/* interface */
+import { ElSelectOption } from '@src/modules/task/components/TaskAllotModal/TaskAllotExcutor/TaskAllotUserTable/TaskAllotUserTableInterface'
 /* model */
 import Page from '@model/Page'
 import { TaskAllotTypeModeEnum } from '@src/modules/task/components/TaskAllotModal/TaskAllotModalModel'
-import {
-  AllotLocationEnum,
-  AllotSortedEnum
+import { 
+  AllotSortedEnum, 
+  AllotLocationEnum, 
+  TaskAllotUserTableEnterpriseEditionColumns, 
+  TaskAllotUserTableStandEditionColumns,
+  AllotLabelEnum
 } from '@src/modules/task/components/TaskAllotModal/TaskAllotExcutor/TaskAllotUserTable/TaskAllotUserTableModel'
 /* props */
 import TaskAllotExecutorProps from '@src/modules/task/components/TaskAllotModal/TaskAllotExcutor/TaskAllotExecutorProps'
@@ -19,6 +24,9 @@ import TaskAllotExecutorProps from '@src/modules/task/components/TaskAllotModal/
 import { Prop } from 'vue-property-decorator'
 /* types */
 import StateColorMap from '@model/types/StateColor'
+import Column from '@model/types/Column'
+/* util */
+import { isEnterpriseEdition } from '@src/util/version'
 
 class TaskAllotExecutorData extends TaskAllotExecutorProps {
   /* 客户信息 */
@@ -40,6 +48,11 @@ class TaskAllotExecutorData extends TaskAllotExecutorProps {
   
   /* 客户团队信息 */
   public customerTags: Tag[] = []
+  /* 表格列 */
+  public columns: Column[] = (
+    // 企业版 和 标准版 有所区分 (企业版支持 车程, 驾车距离)
+    isEnterpriseEdition() ? TaskAllotUserTableEnterpriseEditionColumns : TaskAllotUserTableStandEditionColumns
+  )
   /* 是否显示人员卡片信息 */
   public isShowUserCard: boolean = false
   /* 是否禁用加载更多 */
@@ -56,6 +69,13 @@ class TaskAllotExecutorData extends TaskAllotExecutorProps {
     maxValue: null,
     isChecked: false
   }
+  /* 标签配置列表 */
+  public labelOptions: ElSelectOption[] = [
+    { label: '员工标签', value: AllotLabelEnum.Null },
+    { label: '主管', value: AllotLabelEnum.Leader },
+    { label: '距离最近', value: AllotLabelEnum.DistanceSort },
+    { label: '好评率前三', value: AllotLabelEnum.DegreeTopThree }
+  ]
   /* 地图用户page */
   public mapUserPage: Page =  new Page()
   /* 等待状态 */
@@ -66,6 +86,8 @@ class TaskAllotExecutorData extends TaskAllotExecutorProps {
   public selectUserState: string[] = []
   /* 当前选择的距离 */
   public selectLocation: number = AllotLocationEnum.All
+  /* 当前选择的标签 */
+  public selectLabel: AllotLabelEnum = AllotLabelEnum.Null
   /* 选择的负责人信息 */
   public selectedExcutorUser: TaskAllotUserInfo | null = null
   /* 当前选择的排序方式 */
@@ -82,6 +104,16 @@ class TaskAllotExecutorData extends TaskAllotExecutorProps {
   public teamUserPage: Page =  new Page()
   /* 表格用户page */
   public tableUserPage: Page =  new Page()
+  /* 表格排序筛选配置列表 */
+  public tableSortLabelOptionss: ElSelectOption[] = [
+    { label: '距离优先',  value: AllotSortedEnum.Distance },
+    { label: '今日接单量低到高',  value: AllotSortedEnum.ExecutorTaskByMonth },
+    { label: '好评优先',  value: AllotSortedEnum.TaskDegreePercentByMonth },
+  ]
+  /* 表格排序 标签 */
+  public tableSortLabel: AllotSortedEnum | null = null
+  /* 用户选择状态 */
+  public userPageCheckedMap: {[x: number]: boolean} = {}
 }
 
 export default TaskAllotExecutorData

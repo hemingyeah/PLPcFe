@@ -28,7 +28,7 @@ import { fmt_display_text, fmt_number_to_fixed } from '@src/filter/fmt'
 import { isArray } from '@src/util/type'
 import { stringArrayIntersection } from '@src/util/array'
 import { parseObject } from '@src/util/parse'
-import { isString } from 'lodash'
+import Log from '@src/util/log.ts'
 
 enum UserCardEmitEventEnum {
   // 关闭事件
@@ -155,6 +155,10 @@ export default class UserCard extends Vue {
    * @description 获取人员工单信息
   */
   private fetchUserTaskData() {
+    if (!this.userId) {
+      return Log.warn('this.userId is empty', this.fetchUserTaskData.name)
+    }
+    
     let params = {
       executorId: this.userId || '',
       startTime: DateUtil.format(this.timeRange[0], DateFormatEnum.YTD),

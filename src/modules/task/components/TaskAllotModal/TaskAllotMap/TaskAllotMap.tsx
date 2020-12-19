@@ -156,10 +156,10 @@ export default class TaskAllotMap extends Vue {
     // 构建客户地址标记
     this.buildCusomterAddressMarker()
     
-    // 自定义操作
-    this.handlerCustomFunc && this.handlerCustomFunc(this.AMap, this.AMapInfoWindow)
     // 设置地图数据
     this.setMapFunc && this.setMapFunc(this.AMap)
+    // 自定义操作
+    this.handlerCustomFunc && this.handlerCustomFunc(this.AMap, this.AMapInfoWindow)
     // Log
     Log.succ(Log.End, this.mapInit.name)
   }

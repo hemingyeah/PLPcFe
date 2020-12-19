@@ -7,6 +7,8 @@ import { TaskAllotTypeModeEnum } from '@src/modules/task/components/TaskAllotMod
 import ComponentNameEnum from '@model/enum/ComponentNameEnum'
 import HookEnum from '@model/enum/HookEnum'
 import EelementTableSortOrderEnum from '@model/enum/ElementTableSortOrderEnum'
+import StorageModuleEnum from '@model/enum/StorageModuleEnum'
+import StorageKeyEnum from '@model/enum/StorageKeyEnum'
 /* entity */
 import Tag from '@model/entity/Tag/Tag'
 import LoginUser from '@model/entity/LoginUser/LoginUser'
@@ -27,12 +29,15 @@ import {
   TaslAllotTableColumnFieldEnum,
   AllotLabelEnum
 } from '@src/modules/task/components/TaskAllotModal/TaskAllotExcutor/TaskAllotUserTable/TaskAllotUserTableModel'
+/* types */
+import Column from '@model/types/Column'
 /* util */
 import * as _ from 'lodash'
 import Log from '@src/util/log.ts'
 import { isArray } from '@src/util/type'
 import Platform from '@src/util/platform'
 import { objectArrayIntersection } from '@src/util/array'
+import { storageGet, storageSet } from '@src/util/storage.ts'
 /* vue */
 import { Watch } from 'vue-property-decorator'
 import { parseObject } from '@src/util/parse'
@@ -403,6 +408,17 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
   }
   
   /**
+   * @description 标签变化事件
+  */
+  public handlerLabelChange(value: AllotLabelEnum): void {
+    Log.succ(Log.Start, this.handlerLabelChange.name)
+    
+    this.selectLabel = value
+    // 初始化
+    this.initialize()
+}
+  
+  /**
    * @description 选择团队变化事件
   */
   public handlerTeamChange(value: Tag[]): void {
@@ -550,9 +566,24 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
    * -- 支持外部调用的
   */
   public outsideSetSelectedExcutorUser(isSelected: boolean, user: TaskAllotUserInfo) {
+    for (let key in this.userPageCheckedMap) {
+      let isChecked: boolean = isSelected && key == user?.userId
+      this.userPageCheckedMap[key] = isChecked
+    }
+    
     let excutorUser = isSelected ? user : null
     this.isShowUserCard = isSelected
     this.selectedExcutorUser = excutorUser
+    this.selectTeamUsers = (
+      isSelected 
+        ? [{
+            userId: excutorUser?.userId || '', 
+            displayName: excutorUser?.displayName || '' ,
+            value: excutorUser?.userId || '',
+            label: excutorUser?.displayName || '',
+          }]
+        : []
+    )
   }
   
   /**
@@ -561,7 +592,7 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
   */
   public outsideUpwardSetSelectedExcutorUser(isSelected: boolean, user: any) {
     this.outsideSetSelectedExcutorUser(isSelected, user)
-    this.TaskAllotModalComponent.outsideSetExcutorUser(isSelected ? user : null)
+    this.TaskAllotModalComponent?.outsideSetExcutorUser(isSelected ? user : null)
   }
   
   /**
@@ -602,6 +633,55 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
     this.initialize()
   }
   
+  /** 
+   * @description 显示高级设置 选择列
+  */
+  public showAdvancedSetting(): void {
+    this.BaseTableAdvancedSettingComponent.open(this.columns)
+  }
+  
+  /**
+   * @description 保存指派表格列
+  */
+  public saveTaskAllotTableColumn(value: { type: string, data: any[] }) {
+    let columns = value.data || []
+    let columnMap = columns.reduce(
+      (acc, col) => (acc[col.field] = col) && acc,
+      {}
+    )
+    
+    this.columns = this.columns.map((column: Column) => {
+      let newCol = columnMap[column.field || ''] || {}
+      
+      column.show = newCol.show
+      column.width = newCol.width
+      
+      return column
+    })
+    
+    const showColumns = this.simplifyTableColumsProperty(this.columns)
+    
+    this.saveDataToStorage(StorageKeyEnum.TaskAllotTableColumns, showColumns)
+  }
+
+  /* 精简列属性 */
+  public simplifyTableColumsProperty(columns: Column[]): Column[] {
+    return (
+      columns.map((column: Column) => ({
+        field: column.field,
+        show: column.show,
+        width: column.width
+      }))
+    )
+  }
+  
+  /**
+   * @description 保存数据到缓存
+  */
+  public saveDataToStorage(key: string, data: any) {
+    storageSet(key, data, StorageModuleEnum.Task)
+  }
+  
   /**
    * @description 表格用户列表处理
   */
@@ -612,6 +692,14 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
       
       // 合并page数据
       this.tableUserPage.merge(result)
+      // key : userId(string) -> value: boolean
+      this.userPageCheckedMap = (
+        this.tableUserPage.list
+          .reduce((acc: {[x: string]: boolean}, cur: LoginUser) => {
+            acc[cur.userId] = false
+            return acc
+          }, {})
+      )
       // 设置人员列表数据
       this.TaskAllotUserTableComponent?.outsideSetUserPage(result.list)
       // 是否禁用加载更多

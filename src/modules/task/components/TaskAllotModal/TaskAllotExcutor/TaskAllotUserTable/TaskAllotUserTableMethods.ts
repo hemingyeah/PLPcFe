@@ -106,7 +106,7 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
       /* 构建大号头像 */
       event.target.setIcon(this.buildUserMarkerIcon(AMap, user, true))
       /* 设置负责人信息 */
-      this.TaskAllotExcutorComponent.outsideSetSelectedExcutorUser(true, user)
+      this.TaskAllotExcutorComponent?.outsideSetSelectedExcutorUser(true, user)
       /* 保存点击标记信息 */
       this.lastClickedUserMarker = {
         marker: event.target,
@@ -513,50 +513,7 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
    * -- 内部调用的
   */
   public fetchUsers(): Promise<any> {
-    if (this.isDisableLoadmore || this.pending) return Promise.resolve()
-    
-    Log.succ(Log.Start, this.fetchUsers.name)
-    
-    this.pending = true
-    const params: TaskAllotUserSearchModel = this.buildSearchUserParams()
-    
-    return (
-      getTaskAllotUserInfo(params).then((data: getTaskAllotUserInfoResult) => {
-        let isSuccess = data.success
-        if (!isSuccess) {
-          this.isDisableLoadmore = true
-          return Platform.alert(data.message)
-        }
-        // 解析数据
-        data.result?.list ? data.result.list = parseObject(data.result.list) : null
-        // 合并数据
-        this.userPage.merge(data.result || {})
-        // key : userId(string) -> value: boolean
-        this.userPageCheckedMap = (
-          this.userPage.list
-            .reduce((acc: {[x: string]: boolean}, cur: LoginUser) => {
-              // @ts-ignore
-              acc[cur.userId] = false
-              return acc
-            }, {})
-        )
-        // 是否禁用加载更多
-        this.isDisableLoadmore = !(data?.result?.hasNextPage === true)
-        // 解绑滚动事件
-        this.unBindTableScrollEvent()
-        this.$nextTick(() => {
-          // 添加滚动事件
-          this.bindTableScrollEvent()
-        })
-        // 地图加载
-        let isUsersEmpty: boolean = this.userPage.list.length === 0
-        isUsersEmpty ? this.AMap.remove(this.userMarkers) : this.mapInit()
-        
-        Log.succ(Log.End, this.fetchUsers.name)
-      })
-      .catch(err => console.error(err))
-      .finally(() => this.pending = false)
-    )
+    return Promise.resolve()
   }
   
   /** 
@@ -721,20 +678,8 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
     this.orderDetail = {}
     // 赋值
     this.selectSortord = value
-    this.backupSelectSorted = value
     // 保存
     this.saveDataToStorage(StorageKeyEnum.TaskAllotTableSort, value)
-    // 初始化
-    this.initialize()
-  }
-  
-  /**
-   * @description 标签变化事件
-  */
-  public handlerLabelChange(value: AllotLabelEnum): void {
-    Log.succ(Log.Start, this.handlerLabelChange.name)
-    
-    this.selectLabel = value
     // 初始化
     this.initialize()
   }
@@ -743,19 +688,8 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
    * @description 设置负责人checkbox 变化
   */
   public handlerExcutorCheckedChange(checked: boolean, row: TaskAllotUserInfo): void {
-    let userId: string = row.userId || ''
-    
-    for (let key in this.userPageCheckedMap) {
-      let isChecked: boolean = checked && key == userId
-      this.userPageCheckedMap[key] = isChecked
-    }
     /* 设置负责人信息 */
-    this.selectExecutorUser = row
-    this.TaskAllotExcutorComponent.outsideUpwardSetSelectedExcutorUser(checked, row)
-    /* 地图联动 */
-    if (row.lng && row.lat) {
-      this.AMap.setZoomAndCenter(16, [row.lng, row.lat])
-    }
+    this.TaskAllotExcutorComponent?.outsideUpwardSetSelectedExcutorUser(checked, row)
   }
   
   public handlerNumberFormat(value: string): number | null {
@@ -796,36 +730,12 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
     this.changePending && this.changePending(true)
     
     this.fetchUsers()
-      .then(() => {
-        // this.mapInit()
-      })
       .catch((err: any) => {
         console.error(err)
       })
       .finally(() => {
         this.changePending && this.changePending(false)
       })
-  }
-  
-  /**
-   * @description 地图初始化事件
-  */
-  public mapInit(): void {
-    Log.succ(Log.Start, this.mapInit.name)
-    
-    this.AMap = new AMap.Map('MapContainer', {
-      resizeEnable: true,
-      center: this.getMapCenter(),
-      zoom: 10
-    })
-    
-    // 构建客户地址标记
-    this.buildCusomterAddressMarker()
-    
-    // 构建人员标记
-    this.buildUserMarkers()
-    
-    Log.succ(Log.End, this.mapInit.name)
   }
   
   /** 
@@ -853,10 +763,8 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
       }
       
       this.visibleTeams = tags
-      this.TaskAllotExcutorComponent.outsideSetCustomerTags(tags.slice())
       
       Log.info(this.visibleTeams.slice(), 'visibleTeams', this.matchTags.name)
-      Log.info(this.selectTeams.slice(), 'selectTeams', this.matchTags.name)
       
     } catch (error) {
       Log.error(error, this.matchTags.name)
@@ -880,14 +788,6 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
   */
   public outsideRestoreUserMarkerIcon() {
     this.restoreUserMarkerIcon()
-  }
-  
-  /** 
-   * @description 清除负责人信息
-   * -- 支持向上的外部调用的方法
-  */
-  public outsideUpwardClearExcutorUser() {
-    this.handlerExcutorCheckedChange(false, this.selectExecutorUser)
   }
   
   /** 
@@ -933,7 +833,6 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
    * @description 保存数据到缓存
   */
   public saveDataToStorage(key: string, data: any) {
-    // TODO: loginUser Id
     storageSet(key, data, StorageModuleEnum.Task)
   }
   

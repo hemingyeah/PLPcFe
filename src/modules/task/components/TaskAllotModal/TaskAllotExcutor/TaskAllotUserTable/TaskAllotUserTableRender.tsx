@@ -23,107 +23,6 @@ import DateUtil from '@src/util/date'
 import { VNode } from 'vue'
 
 class TaskAllotUserTableRender extends TaskAllotUserTableMethods {
-  /** 
-   * @description 渲染 按团队选人
-  */
-  public renderChooseUserByTeam() {
-    const scopedSlots = {
-      option: (props: any) => {
-        return (
-          <contact-user-item
-            key={uuid()}
-            user={props.option}
-            showUserState={true}
-            stateColor={this.userStateMap}
-            showTag={true}
-          />
-        )
-      },
-    }
-    return (
-      <biz-form-remote-select
-        value={this.selectTeamUsers}
-        onInput={(value: any[]) => this.handlerTeamUsersChange(value)}
-        collapsed
-        multiple
-        placeholder='员工'
-        remoteMethod={(params: any) => this.fetchTeamUsers(params)}
-        scopedSlots={scopedSlots}
-      >
-      </biz-form-remote-select>
-    )
-  }
-  
-  /** 
-   * @description 渲染 按部门选人
-  */
-  public renderChooseUserByDept() {
-    let isUsersEmpty = this.selectDeptUsers.length <= 0
-    
-    return (
-      <div class='task-allot-table-user'>
-        <div class='task-allot-table-user-input' onClick={() => this.chooseDepartmentUsers()}>
-        {
-          isUsersEmpty 
-          ? <span class='task-allot-table-user-input-placeholder'>员工</span>
-          : this.renderDeptUsers()
-        }
-      </div>
-      </div>
-    )
-  }
-  
-  /** 
-   * @description 渲染 部门人员
-  */
-  public renderDeptUsers() {
-    let collapse = true
-    let user = this.selectDeptUsers[0] || {}
-    
-    const AllSelectDeptUsers = (
-      this.selectDeptUsers.map((user: LoginUser) => {
-        return (
-          <el-tag key={user.userId} size='mini' disable-transitions closable type='info' onClose={() => this.debouncedRemoveDepartmentUser(user)}>
-            {user.displayName}
-          </el-tag>
-        )
-      })
-    )
-    
-    const CollapseSelectDeptUsers = (
-      <div class='task-allot-table-user-dept'>
-        <el-tag key={user.userId} size='mini' disable-transitions closable type='info' onClose={() => this.debouncedRemoveDepartmentUser(user)}>
-          {user.displayName}
-        </el-tag>
-        {
-          this.selectDeptUsers.length > 1
-          && (
-            <div class='biz-team-select-tags'>
-              <div class='biz-team-select-tag'>+{this.selectDeptUsers.length - 1}</div>
-            </div>
-          )
-        }
-      </div>
-    )
-    
-    return collapse ? CollapseSelectDeptUsers : AllSelectDeptUsers
-  }
-  
-  /**
-   * @description 渲染选择团队
-  */
-  public renderTeamSelect() {    
-    return (
-      <biz-team-select
-        placeholder='服务团队'
-        value={this.selectTeams} 
-        fetchFunc={(params: TaskTagListSearchModel) => this.fetchTagList(params)} 
-        onInput={(value: Tag[]) => this.handlerTeamChange(value)} 
-        multiple 
-        collapse 
-      />
-    )
-  }
   
   /** 
    * @description 渲染选择位置
@@ -197,56 +96,6 @@ class TaskAllotUserTableRender extends TaskAllotUserTableMethods {
           <el-button type='primary' class='location-confirm-button' onClick={() => this.handlerLocationOtherChange()}>确定</el-button>
         </div>
       </div>
-    )
-  }
-  
-  /** 
-   * @description 渲染工作状态
-  */
-  public renderWorkStateSelect() {
-    return (
-      <el-select
-        collapse-tags
-        multiple
-        placeholder="工作状态"
-        value={this.selectUserState}
-        onInput={(value: string[]) => this.handlerUserStateChange(value)}
-      > 
-        {
-          this.userStateList.map((userState: UserState) => {
-            return (
-              <el-option key={userState.key} value={userState.value} label={userState.label}>
-                <div class='task-allot-state-select-item'>
-                  <span class='user-state-round' style={{ backgroundColor: this.userStateMap && this.userStateMap[userState.label || ''] }}>
-                  </span>
-                  <span>{userState.label}</span>
-                </div>
-              </el-option>
-            )
-          })
-        }
-      </el-select>
-    )
-  }
-  
-  /** 
-   * @description 渲染智能排序方式
-  */
-  public renderSortordSelect() {
-    return (
-      <el-select
-        placeholder="智能排序"
-        value={this.selectSortord}
-        onInput={(value: number) => this.handlerSortordChange(value)}
-      > 
-        {
-          this.sortordOptions.map((sortordOption: ElSelectOption) => {
-            return (
-              <el-option key={sortordOption.value} value={sortordOption.value} label={sortordOption.label} />
-            )
-          })
-        }
-      </el-select>
     )
   }
   
@@ -372,8 +221,8 @@ class TaskAllotUserTableRender extends TaskAllotUserTableMethods {
     
     return (
       <div class='task-allot-user-table-excutor-column'>
-        <el-checkbox 
-          value={this.userPageCheckedMap[userId]}
+        <el-checkbox
+          value={this.userPageCheckedMap?.[userId]}
           onInput={(value: boolean) => this.handlerExcutorCheckedChange(value, scope.row)}
         >
         </el-checkbox>
@@ -391,79 +240,7 @@ class TaskAllotUserTableRender extends TaskAllotUserTableMethods {
       <div class='task-allot-user-table-append-block'>{ this.isDisableLoadmore ? '已加载全部结果' : '载入更多结果...' }</div>
     )
   }
-  
-  /** 
-   * @description 渲染工单指派人员表格头部
-  */
-  public renderTaskAllotUserTableHeader(): VNode {
-    return (
-      <div class='task-allot-user-table-header'>
-        {this.renderTaskAllotUserTableHeaderLabels()}
-        {this.renderTaskAllotUserTableHeaderSelectBlock()}
-      </div>
-    )
-  }
-  
-  /** 
-   * @description 渲染工单指派人员表格头部 标签列表
-  */
-  public renderTaskAllotUserTableHeaderLabels() {
-    const SortLabelChangeHandler = (value: AllotSortedEnum) => {
-      this.tableSortLabel = value === this.tableSortLabel ? null : value
-    }
-    
-    return (
-      <div class='task-allot-user-table-header-label'>
-        {
-          this.tableSortLabelOptionss.map((sortLabel: ElSelectOption) => {
-            const classNames = [
-              'task-allot-user-table-sort-label',
-              this.tableSortLabel === sortLabel.value ? 'task-allot-user-table-sort-label-active' : ''
-            ]
-            return (
-              <div class={classNames} onClick={() => SortLabelChangeHandler(sortLabel.value as AllotSortedEnum)}>
-                { sortLabel.label }
-              </div>
-            )
-          })
-        }
-      </div>
-    )
-  }
-  
-  /** 
-   * @description 渲染工单指派人员表格头部 select选择
-  */
-  public renderTaskAllotUserTableHeaderSelectBlock() {
-    return (
-      <div class='task-allot-user-table-header-select-block'>
-        { this.renderTaskAllotUserTableHeaderLabelSelect() }
-        { this.renderSelectColumn() }
-      </div>
-    )
-  }
-  
-  /** 
-   * @description 渲染工单指派人员表格头部 select选择
-  */
-  public renderTaskAllotUserTableHeaderLabelSelect() {
-    return (
-      <el-select
-        placeholder="员工标签"
-        value={this.selectLabel}
-        onInput={(value: AllotLabelEnum) => this.handlerLabelChange(value)}
-      > 
-        {
-          
-          this.labelOptions.map((labelOption: ElSelectOption) => {
-            return (
-              <el-option key={labelOption.value} value={labelOption.value} label={labelOption.label} />
-            )
-          })
-        }
-      </el-select>
-    )
-  }
+
 }
 
 export default TaskAllotUserTableRender

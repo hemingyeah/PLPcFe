@@ -38,7 +38,6 @@ export default class TaskAllotUserTable extends TaskAllotUserTableRender {
   render(h: CreateElement) {
     return (
       <div class={ComponentNameEnum.TaskAllotUserTable}>
-        {this.renderTaskAllotUserTableHeader()}
         <div class='task-allot-user-table-block'>
           <el-table
             border

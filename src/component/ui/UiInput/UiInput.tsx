@@ -14,6 +14,8 @@ class UiInput extends VC<{}> {
   
   /* 点击事件 */
   @Prop() readonly click: Function | undefined
+  /* 占位符 */
+  @Prop() readonly placeholder: string | undefined
   /* 展开切换 */
   @Prop() readonly toggle: boolean | undefined
   
@@ -28,7 +30,10 @@ class UiInput extends VC<{}> {
     
     return (
       <div class='ui-input-block' onClick={(event: MouseEvent) => this.clickHandler(event)}>
-        {this.$slots.default}
+        {
+          this.$slots.default
+          || <span class='placeholder-text'>{this.placeholder}</span>
+        }
         <i class={iconClassNames}></i>
       </div>
     )

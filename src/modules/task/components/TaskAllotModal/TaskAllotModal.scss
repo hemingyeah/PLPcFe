@@ -9,6 +9,7 @@
       flex-wrap: wrap;
       flex-flow: column;
       padding: 0 !important;
+      overflow: hidden;
     }
     & > .base-modal-header {
       background-color: #FAFAFA;
@@ -22,7 +23,7 @@
   }
   .task-allot-content {
     flex: 1;
-    overflow-y: scroll;
+    height: calc(100% - 60px);
   }
   .dialog-footer {
     display: flex;
@@ -122,7 +123,7 @@
   height: 100%;
   
   .task-allot-user-table {
-    height: 100%;
+    height: calc(100% - 0px);
     width: 100%;
     .task-allot-user-table-block {
       height: 100%;

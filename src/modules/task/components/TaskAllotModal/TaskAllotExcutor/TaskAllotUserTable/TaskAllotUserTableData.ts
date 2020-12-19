@@ -27,6 +27,8 @@ class TaskAllotUserTableData extends TaskAllotUserTableComponents {
   @Prop() readonly changePending: Function | undefined
   /* 排序变化方法 */
   @Prop() readonly sortChangeFunc: Function | undefined
+  /* 用户选择状态 */
+  @Prop() readonly userPageCheckedMap: {[x: number]: boolean} | undefined
   
   /* 地图对象 */
   public AMap: any = null
@@ -45,8 +47,6 @@ class TaskAllotUserTableData extends TaskAllotUserTableComponents {
   public orderDetail: { order: boolean, code: number } | {} = {}
   /* 等待状态 */
   public pending: boolean = false
-  /* 当前选择的负责人 */
-  public selectExecutorUser: TaskAllotUserInfo = new TaskAllotUserInfo()
   /* 当前选择的团队 */
   public selectTeams: Tag[] = []
   /* 当前选择的团队人员列表 */
@@ -59,18 +59,12 @@ class TaskAllotUserTableData extends TaskAllotUserTableComponents {
   public selectUserState: string[] = []
   /* 当前选择的排序方式 */
   public selectSortord: number = AllotSortedEnum.FinishTaskByMonth
-  /* 当前选择的标签 */
-  public selectLabel: AllotLabelEnum = AllotLabelEnum.Null
-  /* 当前选择的排序方式 备份数据 */
-  public backupSelectSorted: number | null = AllotSortedEnum.FinishTaskByMonth
   /* 表格key 随机数 */
   public tableKey: number = Math.random() * 1000 >> 2
   /* 团队用户page */
   public teamUserPage: Page =  new Page()
   /* 用户page */
   public userPage: Page =  new Page({ pageNum: 0 })
-  /* 用户选择状态 */
-  public userPageCheckedMap: {[x: number]: boolean} = {}
   /* 用户标记列表 */
   public userMarkers: any[] = []
   /* 可见的团队列表 */
@@ -94,30 +88,6 @@ class TaskAllotUserTableData extends TaskAllotUserTableComponents {
     maxValue: null,
     isChecked: false
   }
-  /* 标签配置列表 */
-  public labelOptions: ElSelectOption[] = [
-    { label: '员工标签', value: AllotLabelEnum.Null },
-    { label: '主管', value: AllotLabelEnum.Leader },
-    { label: '距离最近', value: AllotLabelEnum.DistanceSort },
-    { label: '好评率前三', value: AllotLabelEnum.DegreeTopThree }
-  ]
-  /* 排序方式列表 */
-  public sortordOptions: ElSelectOption[] = [
-    { label: '距离最近', value: AllotSortedEnum.Distance },
-    { label: '30天内好评率最高', value: AllotSortedEnum.TaskDegreePercentByMonth },
-    { label: '30天工作用时最短', value: AllotSortedEnum.TaskWorkUsedTimeByMonth },
-    { label: '30天内接单最多', value: AllotSortedEnum.ExecutorTaskByMonth },
-    { label: '30天内接单响应最快', value: AllotSortedEnum.TaskAcceptTimeByMonth },
-    { label: '30天内完成最多', value: AllotSortedEnum.FinishTaskByMonth },
-  ]
-  /* 表格排序筛选配置列表 */
-  public tableSortLabelOptionss: ElSelectOption[] = [
-    { label: '距离优先',  value: AllotSortedEnum.Distance },
-    { label: '今日接单量低到高',  value: AllotSortedEnum.ExecutorTaskByMonth },
-    { label: '好评优先',  value: AllotSortedEnum.TaskDegreePercentByMonth },
-  ]
-  /* 表格排序 标签 */
-  public tableSortLabel: AllotSortedEnum | null = null
   /* 工单指派人员列表 */
   public taskAllotUserList: TaskAllotUserInfo[] = []
 

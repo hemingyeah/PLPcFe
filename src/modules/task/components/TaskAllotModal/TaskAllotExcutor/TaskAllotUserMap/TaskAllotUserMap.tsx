@@ -17,7 +17,7 @@ import Page from '@model/Page'
 import '@src/modules/task/components/TaskAllotModal/TaskAllotExcutor/TaskAllotUserMap/TaskAllotUserMap.scss'
 /* vue */
 import VC from '@model/VC'
-import { Component, Emit, Prop } from 'vue-property-decorator'
+import { Component, Emit, Prop, Ref } from 'vue-property-decorator'
 import { CreateElement } from 'vue'
 /* util */
 import Log from '@src/util/log.ts'
@@ -38,6 +38,8 @@ enum TaskAllotUserMapEventEmitEnum {
   }
 })
 export default class TaskAllotUserMap extends VC {
+  /* 工单指派地图组件 */
+  @Ref() readonly TaskAllotMapComponent !: TaskAllotMap
   
   /* 客户团队列表 */
   @Prop() readonly customerTags: Tag[] | undefined
@@ -53,7 +55,7 @@ export default class TaskAllotUserMap extends VC {
   @Prop() readonly task: any | undefined
   
   /* 地图对象 */
-  private AMap: any = AMap
+  private AMap: any = null
   /* 是否显示人员卡片信息 */
   private isShowUserCard: boolean = false
   /* 地图的id */
@@ -178,7 +180,10 @@ export default class TaskAllotUserMap extends VC {
     }
     
     this.userPage.list = list
-    this.buildUserMarkers()
+    // 地图初始化
+    this.AMap == null && this.TaskAllotMapComponent?.outsideMapInit()
+    // 构建用户标记
+    // this.buildUserMarkers()
   }
   
   /**
@@ -209,7 +214,7 @@ export default class TaskAllotUserMap extends VC {
     return (
       <div class={ComponentNameEnum.TaskAllotUserMap}>
         <task-allot-map 
-          ref='TaskAllotUserMap'
+          ref='TaskAllotMapComponent'
           idName={this.mapId}
           handlerCustomFunc={() => this.outdieBuildMarkers()} 
           setMapFunc={(AMap: any) => this.outsideSetMap(AMap)}

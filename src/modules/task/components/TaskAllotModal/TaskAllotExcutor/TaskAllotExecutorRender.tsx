@@ -1,14 +1,19 @@
 /* components */
 import UiInput from '@src/component/ui/UiInput/UiInput.tsx'
 /* entity */
-import TaskAllotUserInfo from '@model/entity/TaskAllotUserInfo'
-import Customer from '@model/entity/Customer'
 import Tag from '@model/entity/Tag/Tag'
 import LoginUser from '@model/entity/LoginUser/LoginUser'
+/* interface */
+import { ElSelectOption } from '@src/modules/task/components/TaskAllotModal/TaskAllotExcutor/TaskAllotUserTable/TaskAllotUserTableInterface'
 /* methods */
 import TaskAllotExecutorMethods from '@src/modules/task/components/TaskAllotModal/TaskAllotExcutor/TaskAllotExecutorMethods'
 /* model */
 import { TaskTagListSearchModel } from '@model/param/in/Task'
+/* model */
+import { 
+  AllotSortedEnum, 
+  AllotLabelEnum 
+} from '@src/modules/task/components/TaskAllotModal/TaskAllotExcutor/TaskAllotUserTable/TaskAllotUserTableModel'
 /* util */
 import { uuid } from '@src/util/string'
 /* vue */
@@ -38,7 +43,6 @@ class TaskAllotExecutorRender extends TaskAllotExecutorMethods {
         value={this.selectTeamUsers}
         onInput={(value: any[]) => this.handlerTeamUsersChange(value)}
         collapsed
-        multiple
         placeholder='请输入查询'
         remoteMethod={(params: any) => this.fetchTeamUsers(params)}
         scopedSlots={scopedSlots}
@@ -116,7 +120,7 @@ class TaskAllotExecutorRender extends TaskAllotExecutorMethods {
     
     return (
       <div class='task-allot-sysnergy-select' onClick={() => this.chooseSynergyUser()}>
-        <UiInput>
+        <ui-input placeholder='请选择协同人'>
           {
             this.synergyUserList.map((synergyUser: LoginUser, index: number) => {
               return (
@@ -132,7 +136,7 @@ class TaskAllotExecutorRender extends TaskAllotExecutorMethods {
               )
             })
           }
-        </UiInput>
+        </ui-input>
       </div>
     )
   }
@@ -178,6 +182,100 @@ class TaskAllotExecutorRender extends TaskAllotExecutorMethods {
     )
   }
   
+  /** 
+   * @description 渲染工单派单头部派单选择
+  */
+  public renderTaskAllotExecutorBackgroundChunk() {
+    return (
+      <div class='task-allot-executor-chunk'></div>
+    )
+  }
+  
+  /** 
+   * @description 渲染工单指派人员表格头部
+  */
+  public renderTaskAllotUserTableHeader(): VNode {
+    return (
+      <div class='task-allot-user-table-header'>
+        {this.renderTaskAllotUserTableHeaderLabels()}
+        {this.renderTaskAllotUserTableHeaderSelectBlock()}
+      </div>
+    )
+  }
+  
+  /**
+   * @description 渲染工单指派人员表格头部 标签列表
+  */
+  public renderTaskAllotUserTableHeaderLabels() {
+    const SortLabelChangeHandler = (value: AllotSortedEnum) => {
+      this.tableSortLabel = value === this.tableSortLabel ? null : value
+    }
+    
+    return (
+      <div class='task-allot-user-table-header-label'>
+        {
+          this.tableSortLabelOptionss.map((sortLabel: ElSelectOption) => {
+            const classNames = [
+              'task-allot-user-table-sort-label',
+              this.tableSortLabel === sortLabel.value ? 'task-allot-user-table-sort-label-active' : ''
+            ]
+            return (
+              <div class={classNames} onClick={() => SortLabelChangeHandler(sortLabel.value as AllotSortedEnum)}>
+                { sortLabel.label }
+              </div>
+            )
+          })
+        }
+      </div>
+    )
+  }
+  
+  /** 
+   * @description 渲染工单指派人员表格头部 select选择
+  */
+  public renderTaskAllotUserTableHeaderSelectBlock() {
+    return (
+      <div class='task-allot-user-table-header-select-block'>
+        { this.renderTaskAllotUserTableHeaderLabelSelect() }
+        { this.renderSelectColumn() }
+      </div>
+    )
+  }
+  
+  /** 
+   * @description 渲染工单指派人员表格头部 select选择
+  */
+  public renderTaskAllotUserTableHeaderLabelSelect() {
+    return (
+      <el-select
+        placeholder="员工标签"
+        value={this.selectLabel}
+        onInput={(value: AllotLabelEnum) => this.handlerLabelChange(value)}
+      >
+        {
+          
+          this.labelOptions.map((labelOption: ElSelectOption) => {
+            return (
+              <el-option key={labelOption.value} value={labelOption.value} label={labelOption.label} />
+            )
+          })
+        }
+      </el-select>
+    )
+  }
+  
+  /** 
+   * @description 渲染选择列
+  */
+  public renderSelectColumn() {
+    return (
+      <UiInput>
+        <div class='task-allot-user-table-column' onClick={() => this.showAdvancedSetting()}>
+          <span>选择列</span>
+        </div>
+      </UiInput>
+    )
+  }
 }
 
 export default TaskAllotExecutorRender
