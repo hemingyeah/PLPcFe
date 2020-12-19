@@ -20,15 +20,6 @@ class TaskAllotExecutorComputed extends TaskAllotExecutorData {
     return this.customerTags.map(tag => tag.tagName || '')
   }
   
-  /* 当前选中的用户是客户的客户负责人，则显示专属标签（鼠标移动标签上提示“客户负责人”） */
-  get isCustomerManager(): boolean {
-    return Boolean(
-      this.selectedExcutorUser
-      && this.customer
-      && this.selectedExcutorUser.userId === this.customer.customerManager
-    )
-  }
-  
   /* 是否是按团队派单 */
   get isAllotByTag() {
     return this.taskConfig?.allotByTag === true

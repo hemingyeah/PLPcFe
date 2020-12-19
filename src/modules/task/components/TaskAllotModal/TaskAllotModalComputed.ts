@@ -50,6 +50,15 @@ class TaskAllotModalComputed extends TaskAllotModalData {
     return createUser.userId && loginUser.userId && createUser.userId == loginUser.userId
   }
   
+  /* 当前选中的用户是客户的客户负责人，则显示专属标签（鼠标移动标签上提示“客户负责人”） */
+  get isCustomerManager(): boolean {
+    return Boolean(
+      this.executorUser
+      && this.customer
+      && this.executorUser.userId === this.customer.customerManager
+    )
+  }
+  
   /** 
    * @description 是否是工单负责人
   */

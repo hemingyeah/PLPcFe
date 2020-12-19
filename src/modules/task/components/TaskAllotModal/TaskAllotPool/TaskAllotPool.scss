@@ -3,6 +3,10 @@
   width: 100%;
   
   position: relative;
+  .base-panel {
+    top: 50px;
+    bottom: 0;
+  }
 }
 .task-allot-map {
   height: 100%;
@@ -13,10 +17,17 @@
   width: 100%;
 }
 
-.task-allot-pool-notification,
-.task-allot-pool-info {
+.task-allot-pool-notification {
   background-color: #fff;
+  
+  width: 180px;
+  min-height: 140px;
   padding: 8px 12px;
+  
+  position: absolute;
+  top: 66px;
+  left: 16px;
+  
   .el-checkbox-group {
     margin-top: 8px;
   }
@@ -49,8 +60,9 @@
 .task-allot-pool-info {
   left: inherit;
   right: 16px;
-
+  
   max-height: calc(100% - 100px);
+  padding-left: 16px;
   overflow-y: scroll;
 }
 

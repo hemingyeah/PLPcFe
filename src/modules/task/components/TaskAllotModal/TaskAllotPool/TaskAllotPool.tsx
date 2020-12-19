@@ -4,6 +4,7 @@ import { getTaskPoolAuthUserList, getTaskPoolSubscriptionUserList, getCustomerTa
 import TaskAllotMap from '@src/modules/task/components/TaskAllotModal/TaskAllotMap/TaskAllotMap.tsx'
 import TaskAllotPoolNotification from '@src/modules/task/components/TaskAllotModal/TaskAllotPool/TaskAllotPoolNotification/TaskAllotPoolNotification.tsx'
 import TaskAllotPoolInfo from '@src/modules/task/components/TaskAllotModal/TaskAllotPool/TaskAllotPoolInfo/TaskAllotPoolInfo.tsx'
+import UserCard from '@src/modules/task/components/TaskAllotModal/UserCard/UserCard.tsx'
 /* enum */
 import ComponentNameEnum from '@model/enum/ComponentNameEnum'
 import EventNameEnum from '@model/enum/EventNameEnum'
@@ -14,6 +15,7 @@ import CustomerAddress from '@model/entity/CustomerAddress'
 import LoginUser from '@model/entity/LoginUser/LoginUser'
 import Tag from '@model/entity/Tag/Tag'
 import TaskPoolUser from '@model/entity/TaskPoolUser'
+import TaskAllotUserInfo from '@model/entity/TaskAllotUserInfo'
 /* enum */
 import DateFormatEnum from '@model/enum/DateFormatEnum'
 /* image */
@@ -61,14 +63,23 @@ window.openCustomerViewFunc = function openCustomerViewFunc(customerId: string) 
   components: {
     TaskAllotMap,
     TaskAllotPoolNotification,
-    TaskAllotPoolInfo
+    TaskAllotPoolInfo,
+    UserCard
   }
 })
 export default class TaskAllotPool extends Vue {
-  // 显示状态
+  /* 客户团队列表 */
+  @Prop() readonly customerTags: Tag[] | undefined
+  /* 是否显示协同人 */
+  @Prop() readonly isShowSynergy: boolean | undefined
+  /* 是否为客户负责人 */
+  @Prop() readonly isCustomerManager: boolean | undefined
+  /* 显示状态 */
   @Prop() readonly show: boolean | undefined
   /* 工作状态颜色数组 */
   @Prop() readonly stateColorMap: StateColorMap | undefined
+  /* 选择的负责人信息 */
+  @Prop() readonly selectedExcutorUser: TaskAllotUserInfo | undefined
   /* 工单信息 */
   @Prop() readonly task: any | undefined
   /* 工单设置 */
@@ -82,6 +93,8 @@ export default class TaskAllotPool extends Vue {
   private isShowMapTaskPoolSubscriptionUsers: boolean = false
   /* 是否在地图显示有权限接单用户 */
   private isShowMapTaskPoolAuthUsers: boolean = false
+  /* 是否显示人员卡片信息 */
+  private isShowUserCard: boolean = false
   /* 地图的id */
   private mapId: string = 'TaskAllotPoolMapContainer'
   /* 通知方式复选 */
@@ -115,6 +128,11 @@ export default class TaskAllotPool extends Vue {
   /* 客户地址 */
   get customerAddress(): CustomerAddress {
     return this.customer.customerAddress || new CustomerAddress()
+  }
+  
+  /* 客户团队名称列表 */
+  get customerTagNames(): string[] {
+    return this.customerTags ? this.customerTags.map(tag => tag.tagName || '') : []
   }
   
   /* 是否开启 按服务团队划分工单池 */
@@ -161,16 +179,9 @@ export default class TaskAllotPool extends Vue {
         content: `<img class='staff-header' width='42' height='42' src='${user.head || DefaultHead}' />`
       })
       
-      userMarker.on(EventNameEnum.MouseOver, (event: any) => {
-        
-        this.AMapUserInfoWindow = new AMap.InfoWindow({
-          closeWhenClickMap: true,
-          isCustom: true,
-          offset: new AMap.Pixel(0, -34),
-          content: this.buildUserMarkerInfo(event, amap)
-        })
-        
-        this.AMapUserInfoWindow.open(amap, event.target.getPosition())
+      userMarker.on(EventNameEnum.Click, (event: any) => {
+        this.isShowUserCard = true
+        console.log('Caused ~ file: TaskAllotPool.tsx ~ line 184 ~ TaskAllotPool ~ userMarker.on ~ this.isShowUserCard', this.isShowUserCard)
       })
       
     })
@@ -255,22 +266,22 @@ export default class TaskAllotPool extends Vue {
     )
   }
   
-    /**
+  /**
    * @description 构建工单信息弹窗
   */
   private buildTaskMarkerInfo(event: any) : string {
     let task: any = event?.target?.getExtData() || {}
     let {
-      customerId = '',
       customerEntity = {},
+      description = '',
       taskId,
       taskUUID,
       taskNo = '',
-      linkMan = {}, 
-      lmPhone = '', 
+      linkMan = {},
       address = {},
       planTime = '',
-      havePermissionUserCount,
+      serviceContent = '',
+      serviceType = '',
       isTimeout
     } = task
     
@@ -286,6 +297,9 @@ export default class TaskAllotPool extends Vue {
         <p><label>电话：</label>${ linkMan.phone || '' }</p>
         <p><label>地址：</label>${ fmt_address(address) || '' }</p>
         <p><label>计划时间：</label>${ formatDate(planTime, DateFormatEnum.YTMHMS) || '' }</p>
+        <p><label>服务类型：</label>${ serviceType || '' }</p>
+        <p><label>服务内容：</label>${ serviceContent || '' }</p>
+        <p><label>描述：</label>${ description || '' }</p>
         <div class="info-window-arrow"></div>
       </div>
     `
@@ -315,6 +329,13 @@ export default class TaskAllotPool extends Vue {
       .catch((err: any) => {
         console.error(err)
       })
+  }
+  
+  /** 
+   * @description 关闭用户卡片
+  */
+  private closeUserCard() {
+    this.isShowUserCard = false
   }
   
   /** 
@@ -540,6 +561,15 @@ export default class TaskAllotPool extends Vue {
   }
   
   render(h: CreateElement) {
+    const basePanelAttrs = {
+      on: {
+        'update:show': (show: boolean) => {
+        console.log('Caused ~ file: TaskAllotPool.tsx ~ line 564 ~ TaskAllotPool ~ render ~ show', show)
+          this.isShowUserCard = show
+        }
+      }
+    }
+    
     return (
       <div class={ComponentNameEnum.TaskAllotPool}>
         <task-allot-pool-info
@@ -568,6 +598,19 @@ export default class TaskAllotPool extends Vue {
           slotDefault={this.renderNotificationAddUser}
         >
         </task-allot-pool-notification>
+        <div class='task-allot-user-content'>
+          <base-panel width='470px' show={this.isShowUserCard} {...basePanelAttrs}>
+            <user-card
+              customerTagNames={this.customerTagNames}
+              emitEventComponentName={ComponentNameEnum.TaskAllotExcutor}
+              stateColorMap={this.stateColorMap}
+              showSynergyButton={this.isShowSynergy}
+              showCustomerManagerIcon={this.isCustomerManager}
+              userId={this.selectedExcutorUser?.userId}
+              onClose={() => this.closeUserCard()}
+            />
+          </base-panel>
+        </div>
       </div>
     )
   }

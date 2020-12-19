@@ -32,6 +32,8 @@ enum ComponentNameEnum {
   UserButton = 'user-button',
   // 工单流程步骤
   TaskProcessSteps = 'task-process-steps',
+  // 呼叫中心打电话
+  BizCallCenterPhone = 'biz-call-center-phone',
 }
 
 export default ComponentNameEnum

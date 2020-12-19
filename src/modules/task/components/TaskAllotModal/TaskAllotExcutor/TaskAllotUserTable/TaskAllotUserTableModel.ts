@@ -4,9 +4,18 @@ const TaskAllotUserTableCommonColumns = [
     "label": "设为负责人",
     "field": "excutor",
     "show": true,
-    "fixed": false,
+    "fixed": true,
     "width": "100px",
     "type": "column"
+  },
+  {
+    "label": "员工",
+    "field": "displayName",
+    "show": true,
+    "fixed": true,
+    "width": "150px",
+    "type": "column",
+    "disabled": true
   },
   {
     "label": "所在团队",
@@ -15,15 +24,6 @@ const TaskAllotUserTableCommonColumns = [
     "fixed": false,
     "width": "150px",
     "type": "column",
-  },
-  {
-    "label": "员工",
-    "field": "displayName",
-    "show": true,
-    "fixed": false,
-    "width": "150px",
-    "type": "column",
-    "disabled": true
   },
   {
     "label": "员工角色",

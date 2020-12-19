@@ -49,12 +49,13 @@ export default class TaskAllotExcutor extends TaskAllotExecutorRender {
           this.isMapMode && this.isShowTaskAllotUserMapComponent && (
             <task-allot-user-map
               ref='TaskAllotUserMapComponent'
+              customerTags={this.customerTags}
               isShowSynergy={this.isShowSynergy}
               isCustomerManager={this.isCustomerManager}
-              customerTags={this.customerTags}
               selectedExcutorUser={this.selectedExcutorUser}
               stateColorMap={this.stateColorMap}
               style={this.modeComponents[TaskAllotTypeModeEnum.Map]}
+              task={this.task}
               onExecutorChange={(user: TaskAllotUserInfo) => this.selectedExcutorUser = user}
             >
             </task-allot-user-map>

@@ -49,6 +49,8 @@ export default class TaskAllotUserMap extends VC {
   @Prop() readonly stateColorMap: StateColorMap | undefined
   /* 选择的负责人信息 */
   @Prop() readonly selectedExcutorUser: TaskAllotUserInfo | null = null
+  /* 工单信息 */
+  @Prop() readonly task: any | undefined
   
   /* 地图对象 */
   private AMap: any = AMap

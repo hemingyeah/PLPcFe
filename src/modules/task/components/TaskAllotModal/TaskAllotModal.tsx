@@ -66,6 +66,8 @@ export default class TaskAllotModal extends TaskAllotModalRender {
                 && (
                   <task-allot-pool 
                     ref='TaskAllotPoolComponent'
+                    isShowSynergy={this.allowModifySynergyUser}
+                    isCustomerManager={this.isCustomerManager}
                     show={this.allotType === TaskAllotTypeEnum.Pool}
                     style={this.allotContentStyle[TaskAllotTypeEnum.Pool]}
                     loginUser={this.loginUser}
