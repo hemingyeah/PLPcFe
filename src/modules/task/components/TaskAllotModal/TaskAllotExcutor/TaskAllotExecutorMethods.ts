@@ -94,7 +94,7 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
         value: {
           distance: 10,
           disabled: this.isDisableLoadmore,
-          callback: () => this.fetchUsers()
+          callback: () => this.loadmore()
         } 
       }
     )
@@ -175,7 +175,7 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
       title: '请选择人员',
       seeAllOrg: true,
       selected: this.selectDeptUsers,
-      max: 14
+      max: 1
     }
     
     // @ts-ignore
@@ -341,6 +341,7 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
         ? this.orderDetail
         : {
           code: this.selectSortord,
+          // @ts-ignore
           order: OrderMap[this.selectSortord] === undefined ? true : OrderMap[this.selectSortord]
         }
     )
@@ -438,6 +439,19 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
     this.initialize()
   }
   
+  /**
+   * @description 表格标签变化事件
+  */
+  public handlerSortLabelChange(value: AllotSortedEnum): void {
+    Log.succ(Log.Start, this.handlerSortLabelChange.name)
+    // 赋值
+    this.selectSortord = value === this.selectSortord ? AllotSortedEnum.Distance : value
+    // 清除负责人人员表格排序
+    this.TaskAllotUserTableComponent?.TaskAllotUserElTableComponent?.clearSort()
+    // 初始化
+    this.initialize()
+  }
+  
   /** 
    * @description 排序变化
   */
@@ -448,7 +462,7 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
     
     if (!order) {
       this.orderDetail = {}
-      this.selectSortord = null
+      this.selectSortord = AllotSortedEnum.Distance
       return this.initialize()
     }
     
@@ -472,11 +486,9 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
     
     // 清空用户列表数据
     this.isMapMode
-      ? this.mapUserPage = new Page({ pageNum: 0 })
+      ? this.mapUserPage = new Page({ pageNum: 0, pageSize: 0 })
       : this.tableUserPage = new Page({ pageNum: 0, pageSize: 20 })
-    // TODO: 
-    // this.changePending && this.changePending(true)
-    
+    // 抓取用户列表数据
     this.fetchUsers()
       .then((result: PageInfo<TaskAllotUserInfo | LoginUser>) => {
         if (!result) return
@@ -491,8 +503,34 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
         Log.error(err, this.fetchUsers.name)
       })
       .finally(() => {
-        // TODO: 
-        // this.changePending && this.changePending(false)
+        this.pending = false
+      })
+  }
+  
+  /** 
+   * @description 加载更多
+  */
+  public loadmore() {
+    if (this.isDisableLoadmore) {
+      return Log.warn('Caused: this.isDisableLoadmore is true', this.loadmore.name)
+    }
+    
+    Log.succ(Log.Start, this.loadmore.name)
+    
+    // 抓取用户列表数据
+    this.fetchUsers()
+      .then((result: PageInfo<TaskAllotUserInfo>) => {
+        if (!result) return
+        // 解析对象数据
+        result.list = parseObject(result.list)
+        // 用户列表处理
+        this.tableUserPageHandler(result)
+      })
+      .catch((err: any) => {
+        Log.error(err, this.fetchUsers.name)
+      })
+      .finally(() => {
+        this.pending = false
       })
   }
   
@@ -701,7 +739,7 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
           }, {})
       )
       // 设置人员列表数据
-      this.TaskAllotUserTableComponent?.outsideSetUserPage(result.list)
+      this.TaskAllotUserTableComponent?.outsideSetUserPage(this.tableUserPage.list)
       // 是否禁用加载更多
       this.isDisableLoadmore = !(result?.hasNextPage === true)
       // 解绑滚动事件

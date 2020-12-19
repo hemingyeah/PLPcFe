@@ -56,6 +56,7 @@ export default class TaskAllotModal extends TaskAllotModalRender {
                   mode={this.allotTypeMode}
                   task={this.task}
                   taskConfig={this.taskConfig}
+                  taskTypesMap={this.taskTypesMap}
                   stateColorMap={this.stateColorMap}
                   onSetExecutor={(user: LoginUser) => this.setExecutorUser(user)} 
                   onSetSynergy={(user: LoginUser) => this.setSynergyUser(user)} 
@@ -74,6 +75,7 @@ export default class TaskAllotModal extends TaskAllotModalRender {
                     task={this.task}
                     stateColorMap={this.stateColorMap}
                     taskConfig={this.taskConfig}
+                    taskTypesMap={this.taskTypesMap}
                   />
                 )
               }

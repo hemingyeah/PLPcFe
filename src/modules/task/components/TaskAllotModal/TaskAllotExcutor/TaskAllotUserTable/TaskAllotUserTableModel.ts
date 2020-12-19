@@ -172,7 +172,9 @@ export enum AllotSortedEnum {
   // 今日已完成
   FinishTaskByToday = 7,
   // 计划时间当天工单量
-  PlanTaskByToday = 8
+  PlanTaskByToday = 8,
+  // 用户接单排序
+  AcceptTaskByTodaySearch = 12
 }
 
 /* 工单指派 人员列表 距离 */

@@ -71,3 +71,6 @@ export type getTaskTagListResult = PageInfo<Tag[]>
 
 /* 工单-工单类型信息 */
 export type getTaskTypeResult = MsgModel<TaskType>
+
+/* 工单-工单类型信息 */
+export type getTaskTypesResult = Result<TaskType[]>

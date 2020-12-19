@@ -5,6 +5,7 @@ import TaskAllotUserInfo from '@model/entity/TaskAllotUserInfo'
 import TaskConfig from '@model/types/TaskConfig'
 import Tag from '@model/entity/Tag/Tag'
 import Customer from '@model/entity/Customer'
+import TaskType from '@model/entity/TaskType'
 import LoginUser from '@model/entity/LoginUser/LoginUser'
 /* interface */
 import { ElSelectOption } from '@src/modules/task/components/TaskAllotModal/TaskAllotExcutor/TaskAllotUserTable/TaskAllotUserTableInterface'
@@ -45,6 +46,8 @@ class TaskAllotExecutorData extends TaskAllotExecutorProps {
   @Prop() readonly task: any | undefined
   /* 工单设置 */
   @Prop() readonly taskConfig: TaskConfig | undefined
+  /* 工单类型列表 */
+  @Prop() readonly taskTypesMap: { [x: string]: TaskType} | undefined
   
   /* 客户团队信息 */
   public customerTags: Tag[] = []
@@ -91,7 +94,7 @@ class TaskAllotExecutorData extends TaskAllotExecutorProps {
   /* 选择的负责人信息 */
   public selectedExcutorUser: TaskAllotUserInfo | null = null
   /* 当前选择的排序方式 */
-  public selectSortord: number | null = AllotSortedEnum.FinishTaskByMonth
+  public selectSortord: number | null = AllotSortedEnum.Distance
   /* 当前选择的团队 */
   public selectTeams: Tag[] = []
   /* 当前选择的团队人员列表 */
@@ -107,7 +110,7 @@ class TaskAllotExecutorData extends TaskAllotExecutorProps {
   /* 表格排序筛选配置列表 */
   public tableSortLabelOptionss: ElSelectOption[] = [
     { label: '距离优先',  value: AllotSortedEnum.Distance },
-    { label: '今日接单量低到高',  value: AllotSortedEnum.ExecutorTaskByMonth },
+    { label: '今日接单量低到高',  value: AllotSortedEnum.AcceptTaskByTodaySearch },
     { label: '好评优先',  value: AllotSortedEnum.TaskDegreePercentByMonth },
   ]
   /* 表格排序 标签 */

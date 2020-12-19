@@ -51,6 +51,10 @@ class TaskAllotModalData extends TaskAllotModalProps {
   public taskPoolNotificationUsers: LoginUser[] = []
   /* 工单类型数据 */
   public taskType: TaskType | null = null
+  /* 工单类型列表 */
+  public taskTypes: TaskType[] = []
+  /* 工单类型列表map */
+  public taskTypesMap: { [x: string]: TaskType} = {}
 }
 
 export default TaskAllotModalData

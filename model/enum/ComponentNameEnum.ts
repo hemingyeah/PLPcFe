@@ -34,6 +34,8 @@ enum ComponentNameEnum {
   TaskProcessSteps = 'task-process-steps',
   // 呼叫中心打电话
   BizCallCenterPhone = 'biz-call-center-phone',
+  // 工单地图信息弹窗
+  TaskMapInfoWindow = 'task-map-info-window',
 }
 
 export default ComponentNameEnum

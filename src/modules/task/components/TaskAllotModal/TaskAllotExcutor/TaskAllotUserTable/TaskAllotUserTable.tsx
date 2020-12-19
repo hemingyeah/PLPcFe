@@ -44,7 +44,7 @@ export default class TaskAllotUserTable extends TaskAllotUserTableRender {
             data={this.taskAllotUserList}
             header-row-class-name='base-table-header-v3'
             row-class-name='base-table-row-v3'
-            ref='TaskAllotUserTable'
+            ref='TaskAllotUserElTableComponent'
             key={this.tableKey}
             rowKey={uuid()}
             onHeader-dragend={(newWidth: number, oldWidth: number, column: any) => this.handlerHeaderDragend(newWidth, oldWidth, column)}

@@ -10,7 +10,8 @@ import {
   getTaskAllotTaskPoolApprove, 
   getTaskType,
   taskReAllot,
-  taskReAllotTaskPool
+  taskReAllotTaskPool,
+  getTaskTypesMap
 } from '@src/api/TaskApi'
 import { getStateColorMap } from '@src/api/SettingApi'
 /* computed */
@@ -24,6 +25,7 @@ import LoginUser from '@model/entity/LoginUser/LoginUser'
 import TaskConfig from '@model/types/TaskConfig'
 import TaskApprove from '@model/entity/TaskApprove'
 import TaskAllotUserInfo from '@model/entity/TaskAllotUserInfo'
+import TaskType from '@model/entity/TaskType'
 /* interface */
 import { 
   AutoDispatchApproveParams, 
@@ -38,7 +40,7 @@ import {
 import { TaskAllotTypeModeEnum } from '@src/modules/task/components/TaskAllotModal/TaskAllotModalModel'
 import { TASK_NOT_AUTO_DISPATCH_RULE, TASK_NO_EXECUTOR_MESSAGE, TASK_NO_REALLOT_REASON_MESSAGE, TASK_REALLOT_NOT_SAME_USER_MESSAGE } from '@src/model/const/Alert'
 import { getCustomerDetailResult } from '@model/param/out/Customer'
-import { getTaskAllotApproveResult, getTaskAllotResult, getTaskAllotTaskPollApproveResult, getTaskAllotTaskPoolResult, getTaskConfigResult, getTaskTypeResult } from '@model/param/out/Task'
+import { getTaskAllotApproveResult, getTaskAllotResult, getTaskAllotTaskPollApproveResult, getTaskAllotTaskPoolResult, getTaskConfigResult, getTaskTypeResult, getTaskTypesResult } from '@model/param/out/Task'
 import { TaskPoolNotificationTypeEnum } from '@src/modules/task/components/TaskAllotModal/TaskAllotPool/TaskAllotPoolModel'
 /* types */
 import StateColorMap from '@model/types/StateColor'
@@ -302,6 +304,36 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
           userId: user.userId,
           staffId: user.staffId,
         }
+      })
+    )
+  }
+  
+  /**
+   * @description 查询所有的工单类型列表
+   */
+  public fetchTaskTypesMap() {
+    // 如果工单类型列表数据已存在则不查询
+    if (this.taskTypes.length > 0) return
+    
+    Log.succ(Log.Start, `TaskAllotModalMethods -> ${this.fetchTaskTypesMap.name}`)
+    
+    return (
+      getTaskTypesMap().then((data: getTaskTypesResult) => {
+        let isSuccess = data.success
+        if (!isSuccess) return
+        
+        this.taskTypes = data?.result || []
+        // key : 工单类型id(string) -> value: TaskType
+        this.taskTypesMap = (
+          this.taskTypes
+            .reduce((acc: {[x: string]: TaskType }, currentTaskType: TaskType) => {
+              acc[currentTaskType.templateId] = currentTaskType
+              return acc
+            }, {})
+        )
+        
+      }).catch(err => {
+        console.error(err)
       })
     )
   }
@@ -611,6 +643,7 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
   public handlerAllotTypeChange(type: TaskAllotTypeEnum) {
     this.allotType = type
     this.loadedComponents.push(LoadComponentMap[type])
+    this.fetchTaskTypesMap()
   }
   
     /** 
@@ -618,6 +651,7 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
   */
   public handlerAllotTypeModeChange(type: TaskAllotTypeModeEnum) {
     this.allotTypeMode = type
+    this.fetchTaskTypesMap()
   }
   
   /** 

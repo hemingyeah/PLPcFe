@@ -1,16 +1,5 @@
-import TaskActionEnum from '@model/enum/TaskActionEnum'
+import Field from '@model/entity/Field'
 import FlowSetting from '@model/types/FlowSetting'
-
-const create: string = TaskActionEnum.CREATE.value
-const allot: string = TaskActionEnum.ALLOT.value
-const accept: string =TaskActionEnum.ACCEPT.value
-const start: string = TaskActionEnum.START.value
-const finish: string = TaskActionEnum.FINISH.value
-const cost: string = TaskActionEnum.COST.value
-const review: string = TaskActionEnum.REVIEW.value
-const autoReview: string = TaskActionEnum.AUTOREVIEW.value
-const close: string = TaskActionEnum.CLOSE.value
-const off: string = TaskActionEnum.OFF.value
 
 interface TaskType {
   /* 工单类型 颜色  sample: rgb(115,127,124)  */
@@ -81,6 +70,11 @@ interface TaskType {
    * 新的配置信息放在这，就跟configHelper一样，以后别加一个设置就加个字段了
   */
   config?: string
+  
+  // 字段列表 移动端查询所有工单类型会返回
+  field?: Field[]
+  templateId: string
+
 }
 
 export default TaskType

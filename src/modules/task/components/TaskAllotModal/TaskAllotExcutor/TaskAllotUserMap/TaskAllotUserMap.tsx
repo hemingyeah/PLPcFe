@@ -5,6 +5,7 @@ import UserCard from '@src/modules/task/components/TaskAllotModal/UserCard/UserC
 import TaskAllotUserInfo from '@model/entity/TaskAllotUserInfo'
 import LoginUser from '@model/entity/LoginUser/LoginUser'
 import Tag from '@model/entity/Tag/Tag'
+import TaskType from '@model/entity/TaskType'
 /* enum */
 import ComponentNameEnum from '@model/enum/ComponentNameEnum'
 import EventNameEnum from '@model/enum/EventNameEnum'
@@ -53,6 +54,8 @@ export default class TaskAllotUserMap extends VC {
   @Prop() readonly selectedExcutorUser: TaskAllotUserInfo | null = null
   /* 工单信息 */
   @Prop() readonly task: any | undefined
+  /* 工单类型列表 */
+  @Prop() readonly taskTypesMap: { [x: string]: TaskType} | undefined
   
   /* 地图对象 */
   private AMap: any = null
@@ -180,10 +183,8 @@ export default class TaskAllotUserMap extends VC {
     }
     
     this.userPage.list = list
-    // 地图初始化
-    this.AMap == null && this.TaskAllotMapComponent?.outsideMapInit()
     // 构建用户标记
-    // this.buildUserMarkers()
+    this.buildUserMarkers()
   }
   
   /**

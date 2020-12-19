@@ -18,7 +18,7 @@ const ENCRYPT_FIELD_VALUE = '***'
 })
 export default class BizCallCenterPhone extends VC {
   /* 工单信息 */
-  @Prop() readonly phoneNumber: string | number | undefined
+  @Prop() readonly phone: string | number | undefined
   
   /* FIXME: 喵喵喵 */
   /** 
@@ -35,8 +35,8 @@ export default class BizCallCenterPhone extends VC {
   */
   get showCallPhone(): boolean {
     // 未加密
-    let notEncrypt = !this.isEncryptField(this.phoneNumber)
-    return Boolean(this.hasCallCenterModule && this.phoneNumber && notEncrypt)
+    let notEncrypt = !this.isEncryptField(this.phone)
+    return Boolean(this.hasCallCenterModule && this.phone && notEncrypt)
   }
   
   /** 
@@ -46,7 +46,7 @@ export default class BizCallCenterPhone extends VC {
     event.stopPropagation()
     
     try {
-      const result = await dialout({ taskType: 'task', phone: this.phoneNumber })
+      const result = await dialout({ taskType: 'task', phone: this.phone })
       // 呼出失败
       if (!result.succ) {
         return Platform.notification({
@@ -76,7 +76,7 @@ export default class BizCallCenterPhone extends VC {
     return (
       <div class={ComponentNameEnum.BizCallCenterPhone}>
         <el-tooltip content='拨打电话' placement='top'>
-          <i class='iconfont icon-dianhua2' onClick={(event: Event) => this.call(event)}></i>
+          <i class='iconfont icon-dianhua2 link-text' onClick={(event: Event) => this.call(event)}></i>
         </el-tooltip>
       </div>
     )

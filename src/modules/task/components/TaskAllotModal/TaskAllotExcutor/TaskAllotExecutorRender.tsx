@@ -59,13 +59,17 @@ class TaskAllotExecutorRender extends TaskAllotExecutorMethods {
     
     return (
       <div class='task-allot-table-user'>
-        <div class='task-allot-table-user-input' onClick={() => this.chooseDepartmentUsers()}>
-        {
-          isUsersEmpty 
-          ? <span class='task-allot-table-user-input-placeholder'>员工</span>
-          : this.renderDeptUsers()
-        }
-      </div>
+        <ui-input placeholder='请输入查询'>
+          {
+            <div onClick={() => this.chooseDepartmentUsers()}>
+              {
+                isUsersEmpty 
+                ? <span class='placeholder-text'>请输入查询</span>
+                : this.renderDeptUsers()
+              }
+            </div>
+          }
+        </ui-input>
       </div>
     )
   }
@@ -207,20 +211,16 @@ class TaskAllotExecutorRender extends TaskAllotExecutorMethods {
    * @description 渲染工单指派人员表格头部 标签列表
   */
   public renderTaskAllotUserTableHeaderLabels() {
-    const SortLabelChangeHandler = (value: AllotSortedEnum) => {
-      this.tableSortLabel = value === this.tableSortLabel ? null : value
-    }
-    
     return (
       <div class='task-allot-user-table-header-label'>
         {
           this.tableSortLabelOptionss.map((sortLabel: ElSelectOption) => {
             const classNames = [
               'task-allot-user-table-sort-label',
-              this.tableSortLabel === sortLabel.value ? 'task-allot-user-table-sort-label-active' : ''
+              this.selectSortord === sortLabel.value ? 'task-allot-user-table-sort-label-active' : ''
             ]
             return (
-              <div class={classNames} onClick={() => SortLabelChangeHandler(sortLabel.value as AllotSortedEnum)}>
+              <div class={classNames} onClick={() => this.handlerSortLabelChange(sortLabel.value as AllotSortedEnum)}>
                 { sortLabel.label }
               </div>
             )

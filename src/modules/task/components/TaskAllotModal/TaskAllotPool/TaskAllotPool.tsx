@@ -5,6 +5,7 @@ import TaskAllotMap from '@src/modules/task/components/TaskAllotModal/TaskAllotM
 import TaskAllotPoolNotification from '@src/modules/task/components/TaskAllotModal/TaskAllotPool/TaskAllotPoolNotification/TaskAllotPoolNotification.tsx'
 import TaskAllotPoolInfo from '@src/modules/task/components/TaskAllotModal/TaskAllotPool/TaskAllotPoolInfo/TaskAllotPoolInfo.tsx'
 import UserCard from '@src/modules/task/components/TaskAllotModal/UserCard/UserCard.tsx'
+import TaskMapInfoWindow from '@src/modules/task/components/TaskAllotModal/TaskMapInfoWindow/TaskMapInfoWindow.tsx'
 /* enum */
 import ComponentNameEnum from '@model/enum/ComponentNameEnum'
 import EventNameEnum from '@model/enum/EventNameEnum'
@@ -16,6 +17,7 @@ import LoginUser from '@model/entity/LoginUser/LoginUser'
 import Tag from '@model/entity/Tag/Tag'
 import TaskPoolUser from '@model/entity/TaskPoolUser'
 import TaskAllotUserInfo from '@model/entity/TaskAllotUserInfo'
+import TaskType from '@model/entity/TaskType'
 /* enum */
 import DateFormatEnum from '@model/enum/DateFormatEnum'
 /* image */
@@ -29,7 +31,7 @@ import { getCustomerTagTaskPoolCountResult, getTaskPoolAuthUsersResult, getTaskP
 import { REQUIRE_OTHER_NOTIFICATION_USER_MEESSAGE } from '@src/model/const/Alert'
 import { DepeMultiUserResult } from '@src/modules/task/components/TaskAllotModal/TaskAllotModalInterface'
 /* vue */
-import { Vue, Component, Watch, Prop } from 'vue-property-decorator'
+import { Vue, Component, Watch, Prop, Ref } from 'vue-property-decorator'
 import { CreateElement } from 'vue'
 /* sccss */
 import '@src/modules/task/components/TaskAllotModal/TaskAllotPool/TaskAllotPool.scss'
@@ -47,8 +49,6 @@ import { isBeforeTime } from '@src/util/time'
 
 declare let AMap: any
 
-const ENCRYPT_FIELD_VALUE = '***'
-
 // @ts-ignore
 window.openTaskViewFunc = function openTaskViewFunc(taskId: string) {
   openTabForTaskView(taskId)
@@ -64,10 +64,14 @@ window.openCustomerViewFunc = function openCustomerViewFunc(customerId: string) 
     TaskAllotMap,
     TaskAllotPoolNotification,
     TaskAllotPoolInfo,
-    UserCard
+    UserCard,
+    TaskMapInfoWindow
   }
 })
 export default class TaskAllotPool extends Vue {
+  
+  @Ref() readonly TaskMapInfoWindowComponent!: TaskMapInfoWindow
+  
   /* 客户团队列表 */
   @Prop() readonly customerTags: Tag[] | undefined
   /* 是否显示协同人 */
@@ -84,6 +88,8 @@ export default class TaskAllotPool extends Vue {
   @Prop() readonly task: any | undefined
   /* 工单设置 */
   @Prop() readonly taskConfig: TaskConfig | undefined
+  /* 工单类型列表 */
+  @Prop() readonly taskTypesMap: { [x: string]: TaskType} | undefined
   
   /* 地图用户信息弹窗 */
   private AMapUserInfoWindow: any = null
@@ -99,6 +105,8 @@ export default class TaskAllotPool extends Vue {
   private mapId: string = 'TaskAllotPoolMapContainer'
   /* 通知方式复选 */
   private notificationCheckd: TaskPoolNotificationTypeEnum[] = []
+  /* 当前选择地图工单 */
+  private selectedMapTask: any = {}
   /* 工单池通知自定义人员 */
   private taskPoolNotificationUsers: LoginUser[] = []
   /* 工单池统计数据信息 */
@@ -180,8 +188,9 @@ export default class TaskAllotPool extends Vue {
       })
       
       userMarker.on(EventNameEnum.Click, (event: any) => {
-        this.isShowUserCard = true
-        console.log('Caused ~ file: TaskAllotPool.tsx ~ line 184 ~ TaskAllotPool ~ userMarker.on ~ this.isShowUserCard', this.isShowUserCard)
+        this.$nextTick(() => {
+          this.isShowUserCard = true
+        })
       })
       
     })
@@ -212,11 +221,15 @@ export default class TaskAllotPool extends Vue {
       })
       
       taskMarker.on(EventNameEnum.MouseOver, (event: any) => {
+        const task: any = event.target.getExtData() || {}
+        this.selectedMapTask = task
+        
         this.AMapTaskInfoWindow = new AMap.InfoWindow({
+          autoMove: true,
           closeWhenClickMap: true,
           isCustom: true,
           offset: new AMap.Pixel(0, -34),
-          content: this.buildTaskMarkerInfo(event)
+          content: this.TaskMapInfoWindowComponent?.$el
         })
         
         this.AMapTaskInfoWindow.open(amap, event.target.getPosition())
@@ -462,13 +475,6 @@ export default class TaskAllotPool extends Vue {
   }
   
   /**
-  * @description 是否加密字段
-  */
-  private isEncryptField(value: string): boolean {
-    return value === ENCRYPT_FIELD_VALUE
-  }
-  
-  /**
    * @description 初始化 获取用户列表并且初始化地图
   */
   public initialize(): void {
@@ -564,14 +570,14 @@ export default class TaskAllotPool extends Vue {
     const basePanelAttrs = {
       on: {
         'update:show': (show: boolean) => {
-        console.log('Caused ~ file: TaskAllotPool.tsx ~ line 564 ~ TaskAllotPool ~ render ~ show', show)
-          this.isShowUserCard = show
+          // this.isShowUserCard = show
         }
       }
     }
     
     return (
       <div class={ComponentNameEnum.TaskAllotPool}>
+        
         <task-allot-pool-info
           hideCustomerTagInfo={!this.isPoolByTag}
           stateColorMap={this.stateColorMap}
@@ -587,17 +593,25 @@ export default class TaskAllotPool extends Vue {
           onSubscriptionChange={(value: boolean) => this.handlerTaskPoolInfoSubscriptionChanged(value)}
           onAuthChange={(value: boolean) => this.handlerTaskPoolInfoAuthChanged(value)}
         />
+        
         <task-allot-map 
           ref='TaskAllotMap' 
           idName={this.mapId} 
           handlerCustomFunc={(amap: any) => this.buildMarkers(amap)} 
         />
+        
         <task-allot-pool-notification
           checked={this.notificationCheckd} 
           checkedChangeFunc={(value: TaskPoolNotificationTypeEnum[]) => this.onNotificationCheckedChanged(value)}
           slotDefault={this.renderNotificationAddUser}
         >
         </task-allot-pool-notification>
+        
+        <task-map-info-window 
+          ref='TaskMapInfoWindowComponent' 
+          task={this.selectedMapTask}
+        />
+        
         <div class='task-allot-user-content'>
           <base-panel width='470px' show={this.isShowUserCard} {...basePanelAttrs}>
             <user-card
@@ -611,6 +625,7 @@ export default class TaskAllotPool extends Vue {
             />
           </base-panel>
         </div>
+        
       </div>
     )
   }

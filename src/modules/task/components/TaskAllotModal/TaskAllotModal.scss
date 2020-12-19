@@ -123,13 +123,17 @@
   height: 100%;
   
   .task-allot-user-table {
-    height: calc(100% - 0px);
+    height: calc(100% - 130px);
     width: 100%;
     .task-allot-user-table-block {
       height: 100%;
       width: 100%;
       .el-table {
         height: 100%;
+        overflow: auto;
+        .el-table__body-wrapper {
+          height: calc(100% - 50px);
+        }
       }
     }
   }
