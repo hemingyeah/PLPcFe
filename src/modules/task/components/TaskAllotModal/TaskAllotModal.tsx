@@ -50,6 +50,7 @@ export default class TaskAllotModal extends TaskAllotModalRender {
                 <task-allot-excutor
                   ref='TaskAllotExcutorComponent'
                   customer={this.customer}
+                  executor={this.executorUser}
                   isShowSynergy={this.allowModifySynergyUser}
                   isReAllot={this.isReAllot}
                   loginUser={this.loginUser}
@@ -58,8 +59,11 @@ export default class TaskAllotModal extends TaskAllotModalRender {
                   taskConfig={this.taskConfig}
                   taskTypesMap={this.taskTypesMap}
                   stateColorMap={this.stateColorMap}
+                  synergyUserList={this.synergyUserList}
+                  onDeleteSynergyUser={(user: LoginUser) => this.outsideDeleteSynergyUser(user)}
                   onSetExecutor={(user: LoginUser) => this.setExecutorUser(user)} 
-                  onSetSynergy={(user: LoginUser) => this.setSynergyUser(user)} 
+                  onSetSynergy={(user: LoginUser) => this.setSynergyUser(user)}
+                  onSetSynergys={(users: LoginUser[]) => this.outsideSetSynergyUsers(users)} 
                 />
               </div>
               {

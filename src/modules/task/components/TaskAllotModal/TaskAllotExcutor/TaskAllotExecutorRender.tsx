@@ -59,9 +59,9 @@ class TaskAllotExecutorRender extends TaskAllotExecutorMethods {
     
     return (
       <div class='task-allot-table-user'>
-        <ui-input placeholder='请输入查询'>
+        <ui-input placeholder='请输入查询' onClick={() => this.chooseDepartmentUsers()}>
           {
-            <div onClick={() => this.chooseDepartmentUsers()}>
+            <div>
               {
                 isUsersEmpty 
                 ? <span class='placeholder-text'>请输入查询</span>
@@ -114,26 +114,18 @@ class TaskAllotExecutorRender extends TaskAllotExecutorMethods {
    * @description 渲染协同人
   */
   public renderSysnergySelect(): VNode {
-    // 删除协同人事件
-    const sysnergyUserCloseHandler = (sysenergyUser: LoginUser) => {
-      this.synergyUserList.splice(
-        this.synergyUserList.findIndex((user: LoginUser) => user.userId === sysenergyUser.userId),
-        1
-      )
-    }
-    
     return (
       <div class='task-allot-sysnergy-select' onClick={() => this.chooseSynergyUser()}>
         <ui-input placeholder='请选择协同人'>
           {
-            this.synergyUserList.map((synergyUser: LoginUser, index: number) => {
+            this.synergyUserList && this.synergyUserList.map((synergyUser: LoginUser, index: number) => {
               return (
                 <el-tag
                   key={synergyUser.userId} 
                   closable 
                   disable-transitions={true}
-                  type='info' 
-                  onClose={(synergyUser: LoginUser) => sysnergyUserCloseHandler(synergyUser)}
+                  type='info'
+                  onClose={() => this.sysnergyUserCloseHandler(synergyUser)}
                 >
                   {synergyUser.displayName}
                 </el-tag>

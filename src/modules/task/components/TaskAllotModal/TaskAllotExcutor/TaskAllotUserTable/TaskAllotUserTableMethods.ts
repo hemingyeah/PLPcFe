@@ -303,25 +303,6 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
   }
   
   /** 
-   * @description 构建列
-  */
-  public async buildColumns() {
-    let localColumns = await this.getDataToStorage(StorageKeyEnum.TaskAllotTableColumns, [])
-    if (localColumns.length <= 0) return
-    
-    let columnMap = localColumns.reduce((acc: any, current: Column) => {
-      acc[current.field || ''] = current
-      return acc
-    }, {})
-    
-    this.columns = this.columns.map((column: Column) => {
-      column.show = columnMap[column.field || '']?.show || false
-      column.width = columnMap[column.field || '']?.width || undefined
-      return column
-    })
-  }
-  
-  /** 
    * @description 构建搜索团队列表参数
   */
   public buildSearchTagParams() {
@@ -644,44 +625,16 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
    * @description 表格拖动事件
   */
   public handlerHeaderDragend(newWidth: number, oldWidth: number, tableColumn: any = {}) {
-    let field: string = tableColumn.property || ''
-    let column: Column | null = null
-    
-    for (let i = 0; i < this.columns.length; i++) {
-      column = this.columns[i]
-      if (column.field === field) {
-        column.width = newWidth
-      }
-    }
-    
-    const columns = this.simplifyTableColumsProperty(this.columns)
-    this.saveDataToStorage(StorageKeyEnum.TaskAllotTableColumns, columns)
+    Log.succ(Log.Start, this.handlerHeaderDragend.name)
+    this.dragendFunc && this.dragendFunc(newWidth, oldWidth, tableColumn)
   }
   
   /** 
-   * @description 排序变化
+   * @description 选择排序方式变化事件
   */
   public handlerTableSortChanged(option: { prop?: any, order?: any } = {}) {
     Log.succ(Log.Start, this.handlerTableSortChanged.name)
     this.sortChangeFunc && this.sortChangeFunc(option)
-  }
-  
-  /**
-   * @description 选择排序方式事件
-  */
-  public handlerSortordChange(value: number): void {
-    Log.succ(Log.Start, this.handlerSortordChange.name)
-    
-    // @ts-ignore
-    // 清空表格排序
-    this.$refs.TaskAllotUserTable?.clearSort()
-    this.orderDetail = {}
-    // 赋值
-    this.selectSortord = value
-    // 保存
-    this.saveDataToStorage(StorageKeyEnum.TaskAllotTableSort, value)
-    // 初始化
-    this.initialize()
   }
   
   /** 
@@ -836,30 +789,6 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
     storageSet(key, data, StorageModuleEnum.Task)
   }
   
-  /**
-   * @description 保存指派表格列
-  */
-  public saveTaskAllotTableColumn(value: { type: string, data: any[] }) {
-    let columns = value.data || []
-    let columnMap = columns.reduce(
-      (acc, col) => (acc[col.field] = col) && acc,
-      {}
-    )
-    
-    this.columns = this.columns.map((column: Column) => {
-      let newCol = columnMap[column.field || ''] || {}
-      
-      column.show = newCol.show
-      column.width = newCol.width
-      
-      return column
-    })
-    
-    const showColumns = this.simplifyTableColumsProperty(this.columns)
-    
-    this.saveDataToStorage(StorageKeyEnum.TaskAllotTableColumns, showColumns)
-  }
-  
   /* 精简列属性 */
   public simplifyTableColumsProperty(columns: Column[]): Column[] {
     return (
@@ -871,22 +800,6 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
     )
   }
   
-  /** 
-   * @description 显示高级设置 选择列
-  */
-  public showAdvancedSetting(): void {
-    this.BaseTableAdvancedSettingComponent.open(this.columns)
-  }
-  
-  /** 
-   * @description 解绑表格滚动事件
-  */
-  public unBindTableScrollEvent() {
-    // 滚动元素
-    let scrollEl = this.getScrollTableEl()
-    // 绑定
-    Loadmore.unbind(scrollEl)
-  }
 }
 
 export default TaskAllotUserTableMethods

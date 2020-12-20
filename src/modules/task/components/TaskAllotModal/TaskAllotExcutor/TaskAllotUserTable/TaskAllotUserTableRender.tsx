@@ -1,8 +1,3 @@
-/* components */
-import UiInput from '@src/component/ui/UiInput/UiInput.tsx'
-/* entity */
-import Tag from '@model/entity/Tag/Tag'
-import LoginUser from '@model/entity/LoginUser/LoginUser'
 /* interface */
 import { ElSelectOption, UserState } from '@src/modules/task/components/TaskAllotModal/TaskAllotExcutor/TaskAllotUserTable/TaskAllotUserTableInterface'
 /* methods */
@@ -96,19 +91,6 @@ class TaskAllotUserTableRender extends TaskAllotUserTableMethods {
           <el-button type='primary' class='location-confirm-button' onClick={() => this.handlerLocationOtherChange()}>确定</el-button>
         </div>
       </div>
-    )
-  }
-  
-  /** 
-   * @description 渲染选择列
-  */
-  public renderSelectColumn() {
-    return (
-      <UiInput>
-        <div class='task-allot-user-table-column' onClick={() => this.showAdvancedSetting()}>
-          <span>选择列</span>
-        </div>
-      </UiInput>
     )
   }
   

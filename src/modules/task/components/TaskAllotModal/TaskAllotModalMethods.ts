@@ -680,7 +680,7 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
     try {
       
       await this.fetchStateColor()
-      // TODO: 去除异步获取客户信息
+      // 异步获取客户信息
       await this.fetchCustomer()
       // 非转派时获取客户负责人带入协同人
       !this.isReAllot && await this.fetchSynergyUserWithCustomerManager()
@@ -723,6 +723,7 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
    * @description 工单池通知人员信息变动
   */
   public onTaskNotificationUsersChanged(value: LoginUser[]): void {
+    Log.succ(Log.Start, this.onTaskNotificationUsersChanged.name)
     this.taskPoolNotificationUsers = value
   }
   
@@ -731,6 +732,7 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
    * -- 支持外部调用的
   */
   public outsideSetExcutorUser(user: LoginUser | TaskAllotUserInfo | null) {
+    Log.succ(Log.Start, this.outsideSetExcutorUser.name)
     this.setExecutorUser(user)
   }
   
@@ -739,9 +741,10 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
    * -- 支持外部调用的
   */
   public outsideSetMatchRule(rule: AutoDispatchListItem | null) {
+    Log.succ(Log.Start, this.outsideSetMatchRule.name)
     this.matchRule = rule
   }
-
+  
   /** 
    * @description 设置工单信息
    * -- 支持外部调用的
@@ -753,10 +756,29 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
   }
   
   /** 
+   * @description 删除协同人信息
+   * -- 支持外部调用的
+  */
+  public outsideDeleteSynergyUser(user: LoginUser) {
+    Log.succ(Log.Start, this.outsideDeleteSynergyUser.name)
+    this.deleteSynergyUser(user)
+  }
+  
+  /** 
+   * @description 设置协同人列表
+   * -- 支持外部调用的
+  */
+  public outsideSetSynergyUsers(users: LoginUser[]) {
+    Log.succ(Log.Start, this.outsideSetSynergyUsers.name)
+    this.setSynergyUsers(users)
+  }
+  
+  /** 
    * @description 显示弹窗
    * --支持外部调用的
   */
   public async outsideShow() {
+    Log.succ(Log.Start, this.outsideShow.name)
     // 等待状态
     this.pending = true
     this.toggleTaskAllotExecutorComponentPending(false)
@@ -788,6 +810,13 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
     // 判断是否已存在该用户
     const IsNotRepeat = this.synergyUserList.every(synergyUser => synergyUser.userId !== user.userId)
     IsNotRepeat && this.synergyUserList.push(user)
+  }
+  
+  /** 
+   * @description 设置协同人列表数据
+  */
+  public setSynergyUsers(users: LoginUser[]) {
+    this.synergyUserList = users
   }
   
   /** 

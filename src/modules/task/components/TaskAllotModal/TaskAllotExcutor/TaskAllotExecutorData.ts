@@ -32,6 +32,8 @@ import { isEnterpriseEdition } from '@src/util/version'
 class TaskAllotExecutorData extends TaskAllotExecutorProps {
   /* 客户信息 */
   @Prop() readonly customer: Customer | undefined
+  /* 负责人信息信息 */
+  @Prop() readonly executor: LoginUser | undefined
   /* 是否为转派 */
   @Prop() readonly isReAllot: boolean | undefined
   /* 是否显示协同人 */
@@ -42,6 +44,8 @@ class TaskAllotExecutorData extends TaskAllotExecutorProps {
   @Prop() readonly mode: TaskAllotTypeModeEnum | undefined
   /* 工作状态颜色数组 */
   @Prop() readonly stateColorMap: StateColorMap | undefined
+  /* 协同人列表 */
+  @Prop() readonly synergyUserList: LoginUser[] | undefined
   /* 工单信息 */
   @Prop() readonly task: any | undefined
   /* 工单设置 */
@@ -101,8 +105,6 @@ class TaskAllotExecutorData extends TaskAllotExecutorProps {
   public selectTeamUsers: LoginUser[] = []
   /* 当前选择的部门人员列表 */
   public selectDeptUsers: LoginUser[] = []
-  /* 协同人列表 */
-  public synergyUserList: LoginUser[] = []
   /* 团队用户page */
   public teamUserPage: Page =  new Page()
   /* 表格用户page */

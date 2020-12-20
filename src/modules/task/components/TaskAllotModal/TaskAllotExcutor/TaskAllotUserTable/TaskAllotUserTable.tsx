@@ -24,17 +24,6 @@ const TableColumnDefaultWidth = '120px'
 })
 export default class TaskAllotUserTable extends TaskAllotUserTableRender {
   
-  mounted() {
-    // 构建列
-    this.buildColumns()
-    // 还原排序方式
-    this.revertSort()
-    // 绑定事件
-    this.$nextTick(() => {
-      this.bindTableScrollEvent()
-    })
-  }
-  
   render(h: CreateElement) {
     return (
       <div class={ComponentNameEnum.TaskAllotUserTable}>
@@ -53,7 +42,7 @@ export default class TaskAllotUserTable extends TaskAllotUserTableRender {
             scopedSlots={{ append: () => this.renderTableAppendSlot() }}
           >
             {
-              this.columns.filter((column: Column) => column.show).map((column: Column) => {
+              this.columns && this.columns.filter((column: Column) => column.show).map((column: Column) => {
                 return (
                   <el-table-column
                     fixed={column.fixed}
@@ -73,7 +62,6 @@ export default class TaskAllotUserTable extends TaskAllotUserTableRender {
             <div slot='append'></div>
           </el-table>
         </div>
-        <base-table-advanced-setting onSave={(value: any) => this.saveTaskAllotTableColumn(value)} ref='BaseTableAdvancedSettingComponent' />
       </div>
     )
   }

@@ -39,7 +39,7 @@ import Platform from '@src/util/platform'
 import { objectArrayIntersection } from '@src/util/array'
 import { storageGet, storageSet } from '@src/util/storage.ts'
 /* vue */
-import { Watch } from 'vue-property-decorator'
+import { Emit, Watch } from 'vue-property-decorator'
 import { parseObject } from '@src/util/parse'
 
 /* 加载的组件 */
@@ -65,6 +65,12 @@ const OrderMap: { [x: number]: boolean } = {
   [AllotSortedEnum.FinishTaskByMonth]: false
 }
 
+enum TaskAllotExecutorEmitEventEnum {
+  DeleteSynergyUser = 'deleteSynergyUser',
+  SetSynergys = 'setSynergys',
+  SetExecutor = 'setExecutor'
+}
+
 class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
   
   @Watch('mode')
@@ -79,6 +85,41 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
     }
     // 添加到已加载的组件列表
     this.loadedComponents.push(LoadComponentMap[newValue])
+  }
+  
+  @Watch('executor', { immediate: true })
+  onExecutorChangedHandler(newValue: LoginUser | null) {
+    if (!newValue) {
+      this.selectTeamUsers = []
+      this.selectDeptUsers = []
+    } else {
+      this.selectTeamUsers = [newValue]
+      this.selectDeptUsers = [newValue]
+    }
+  }
+  
+  /**
+   * @description 协同人用户删除事件
+   */
+  @Emit(TaskAllotExecutorEmitEventEnum.DeleteSynergyUser)
+  public sysnergyUserCloseHandler(user: LoginUser): LoginUser {
+    return user
+  }
+  
+  /**
+   * @description 协同人用户列表变化事件
+   */
+  @Emit(TaskAllotExecutorEmitEventEnum.SetSynergys)
+  public synergyUserListChangedHanlder(users: LoginUser[]): LoginUser[] {
+    return users
+  }
+  
+  /**
+   * @description 负责人用户变化事件
+   */
+  @Emit(TaskAllotExecutorEmitEventEnum.SetExecutor)
+  public executorChangedHanlder(user: LoginUser | null): LoginUser | null {
+    return user
   }
   
   /** 
@@ -106,6 +147,25 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
     
   }
   
+  /** 
+   * @description 构建列
+  */
+  public async buildColumns() {
+    let localColumns = await this.getDataToStorage(StorageKeyEnum.TaskAllotTableColumns, [])
+    if (localColumns.length <= 0) return
+    
+    let columnMap = localColumns.reduce((acc: any, current: Column) => {
+      acc[current.field || ''] = current
+      return acc
+    }, {})
+    
+    this.columns = this.columns.map((column: Column) => {
+      column.show = columnMap[column.field || '']?.show || false
+      column.width = columnMap[column.field || '']?.width || undefined
+      return column
+    })
+  }
+  
   /**
    * @description 构建搜索人员参数
    * @param {Boolean} isMapMode 是否为地图模式
@@ -127,7 +187,7 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
       states: this.selectUserState,
       userIds: users.map(user => user.userId),
       // 地图模式需要此参数，可以不传code参数
-      map: isMapMode
+      // map: isMapMode
     }
     
     Log.info(this.selectTeams.slice(), this.buildSearchUserParams.name, this.buildSearchUserParams.name)
@@ -184,10 +244,12 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
         let isSuccess = result.status == 0
         if (!isSuccess) return
         
-        // 部门人员
-        this.selectDeptUsers = result?.data?.users || []
+        // 负责人
+        this.executorChangedHanlder(result?.data?.users?.[0])
         // 初始化
-        this.initialize()
+        this.$nextTick(() => {
+          this.initialize()
+        })
       })
       .catch((err: any) => {
         console.error(err)
@@ -213,7 +275,7 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
         if (!isSuccess) return
         
         // 协同人赋值
-        this.synergyUserList = result?.data?.users || []
+        this.synergyUserListChangedHanlder(result?.data?.users || [])
       })
       .catch((err: any) => {
         console.error(err)
@@ -409,6 +471,13 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
   }
   
   /**
+   * @description 从缓存获取数据
+  */
+  public async getDataToStorage(key: string, data: any) {
+    return await storageGet(key, data, StorageModuleEnum.Task)
+  }
+  
+  /**
    * @description 标签变化事件
   */
   public handlerLabelChange(value: AllotLabelEnum): void {
@@ -434,9 +503,13 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
   */
   public handlerTeamUsersChange(users: any[]): void {
     Log.succ(Log.Start, this.handlerTeamUsersChange.name)
-    
-    this.selectTeamUsers = users
-    this.initialize()
+
+    // 负责人
+    this.executorChangedHanlder(users?.[0])
+    // 初始化
+    this.$nextTick(() => {
+      this.initialize()
+    })
   }
   
   /**
@@ -478,6 +551,24 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
     this.initialize()
   }
   
+  /** 
+   * @description 表格拖动事件
+  */
+  public handlerHeaderDragend(newWidth: number, tableColumn: any = {}) {
+    let field: string = tableColumn.property || ''
+    let column: Column | null = null
+    
+    for (let i = 0; i < this.columns.length; i++) {
+      column = this.columns[i]
+      if (column.field === field) {
+        column.width = newWidth
+      }
+    }
+    
+    const columns = this.simplifyTableColumsProperty(this.columns)
+    this.saveDataToStorage(StorageKeyEnum.TaskAllotTableColumns, columns)
+  }
+  
   /**
    * @description 初始化 获取用户列表并且初始化地图
   */
@@ -486,7 +577,7 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
     
     // 清空用户列表数据
     this.isMapMode
-      ? this.mapUserPage = new Page({ pageNum: 0, pageSize: 0 })
+      ? this.mapUserPage = new Page({ pageNum: 0, pageSize: 999 })
       : this.tableUserPage = new Page({ pageNum: 0, pageSize: 20 })
     // 抓取用户列表数据
     this.fetchUsers()
@@ -629,6 +720,9 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
    * -- 支持外部调用的
   */
   public outsideUpwardSetSelectedExcutorUser(isSelected: boolean, user: any) {
+    if (isSelected) {
+      user.selfSelected = true
+    }
     this.outsideSetSelectedExcutorUser(isSelected, user)
     this.TaskAllotModalComponent?.outsideSetExcutorUser(isSelected ? user : null)
   }
@@ -639,6 +733,15 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
   */
   public outsideSetPending(pending: boolean): void {
     this.pending = pending
+  }
+  
+  /**
+   * @description 拖动变化事件
+   * -- 支持外部调用的
+  */
+  public outsideDragendHandler(newWidth: number, oldWidth: number, tableColumn: any = {}) {
+    Log.succ(Log.Start, this.outsideDragendHandler.name)
+    this.handlerHeaderDragend(newWidth, tableColumn)
   }
   
   /**
@@ -667,6 +770,8 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
           return departmentUser.userId !== user.userId
         })
     )
+    // 用户自己选择的，不需要重新加载
+    if (user.selfSelected) return 
     
     this.initialize()
   }

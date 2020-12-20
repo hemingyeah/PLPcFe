@@ -56,8 +56,12 @@ class LoginUser {
   public static NotSuperAdmin?: Number= 1;
   
   // 以下是用于前端的
+  // 标签
   public label?: string = ''
+  // 值
   public value?: string = ''
+  // 手动自己选择的
+  public selfSelected?: boolean = false
 }
 
 export default LoginUser;

@@ -50,6 +50,8 @@ export default class TaskAllotUserMap extends VC {
   @Prop() readonly isShowSynergy: boolean | undefined
   /* 是否为客户负责人 */
   @Prop() readonly isCustomerManager: boolean | undefined
+  /* 显示状态 */
+  @Prop() readonly show: boolean | undefined
   /* 工作状态颜色数组 */
   @Prop() readonly stateColorMap: StateColorMap | undefined
   /* 选择的负责人信息 */
@@ -225,17 +227,21 @@ export default class TaskAllotUserMap extends VC {
         />
         
         <div class='task-allot-user-content'>
-          <base-panel width='470px' show={this.isShowUserCard} {...basePanelAttrs}>
-            <user-card
-              customerTagNames={this.customerTagNames}
-              emitEventComponentName={ComponentNameEnum.TaskAllotExcutor}
-              stateColorMap={this.stateColorMap}
-              showSynergyButton={this.isShowSynergy}
-              showCustomerManagerIcon={this.isCustomerManager}
-              userId={this.selectedExcutorUser?.userId}
-              onClose={() => this.closeUserCard()}
-            /> 
-          </base-panel>
+          {
+            this.isShowUserCard && (
+              <base-panel width='470px' show={this.isShowUserCard} {...basePanelAttrs}>
+                <user-card
+                  customerTagNames={this.customerTagNames}
+                  emitEventComponentName={ComponentNameEnum.TaskAllotExcutor}
+                  stateColorMap={this.stateColorMap}
+                  showSynergyButton={this.isShowSynergy}
+                  showCustomerManagerIcon={this.isCustomerManager}
+                  userId={this.selectedExcutorUser?.userId}
+                  onClose={() => this.closeUserCard()}
+                /> 
+              </base-panel>
+            )
+          }
         </div>
         
       </div>

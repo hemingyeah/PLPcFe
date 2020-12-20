@@ -82,7 +82,7 @@ export default class UserCard extends Vue {
   }
   
   /**
-   * @description 设置负责人人
+   * @description 设置负责人
   */
   @Emit(UserCardEmitEventEnum.SetExecutor)
   private setExecutorUser() {

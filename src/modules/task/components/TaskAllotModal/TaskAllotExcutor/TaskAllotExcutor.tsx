@@ -29,6 +29,11 @@ import TaskAllotExecutorRender from '@src/modules/task/components/TaskAllotModal
 })
 export default class TaskAllotExcutor extends TaskAllotExecutorRender {
   
+  mounted() {
+    // 构建列
+    this.buildColumns()
+  }
+  
   render(h: CreateElement) {
     // 属性列表
     const attrs = this.getAttributes()
@@ -38,11 +43,15 @@ export default class TaskAllotExcutor extends TaskAllotExecutorRender {
         { this.renderTaskAllotExecutorHeader() }
         { this.renderTaskAllotExecutorBackgroundChunk() }
         { this.renderTaskAllotUserTableHeader() }
-        { 
+        {
           this.isShowTaskAllotUserTableComponent && (
             <task-allot-user-table
-              ref='TaskAllotUserTableComponent' 
+              ref='TaskAllotUserTableComponent'
+              columns={this.columns}
               changePending={(pending: boolean) => this.outsideSetPending(pending)}
+              dragendFunc={(newWidth: number, oldWidth: number, tableColumn: any = {}) => {
+                this.outsideDragendHandler(newWidth, oldWidth, tableColumn)
+              }}
               sortChangeFunc={(option: any) => this.outsideSortChangedHandler(option)}
               style={this.modeComponents[TaskAllotTypeModeEnum.List]}
               userPageCheckedMap={this.userPageCheckedMap}
@@ -59,6 +68,7 @@ export default class TaskAllotExcutor extends TaskAllotExecutorRender {
               isCustomerManager={this.isCustomerManager}
               selectedExcutorUser={this.selectedExcutorUser}
               stateColorMap={this.stateColorMap}
+              show={this.isMapMode}
               style={this.modeComponents[TaskAllotTypeModeEnum.Map]}
               task={this.task}
               taskTypesMap={this.taskTypesMap}

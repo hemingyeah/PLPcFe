@@ -23,8 +23,12 @@ import { isEnterpriseEdition } from '@src/util/version'
 import { Prop } from 'vue-property-decorator'
 
 class TaskAllotUserTableData extends TaskAllotUserTableComponents {
+  /* 表格列 */
+  @Prop() readonly columns: Column[] | undefined
   /* 改变等待状态的方法 */
   @Prop() readonly changePending: Function | undefined
+  /* 拖动变化方法 */
+  @Prop() readonly dragendFunc: Function | undefined
   /* 排序变化方法 */
   @Prop() readonly sortChangeFunc: Function | undefined
   /* 用户选择状态 */
@@ -34,11 +38,6 @@ class TaskAllotUserTableData extends TaskAllotUserTableComponents {
   public AMap: any = null
   /* 地图弹窗对象 */
   public AMapInfoWindow: any = null
-  /* 表格列 */
-  public columns: Column[] = (
-    // 企业版 和 标准版 有所区分 (企业版支持 车程, 驾车距离)
-    isEnterpriseEdition() ? TaskAllotUserTableEnterpriseEditionColumns : TaskAllotUserTableStandEditionColumns
-  )
   /* 是否禁用加载更多 */
   public isDisableLoadmore: boolean = false
   /* 最后一次点击的标记头像 */
