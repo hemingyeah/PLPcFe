@@ -17,7 +17,7 @@ import { Component } from 'vue-property-decorator'
 /* render */
 import TaskAllotModalRender from '@src/modules/task/components/TaskAllotModal/TaskAllotModalRender.tsx'
 /* scss */
-import './TaskAllotModal.scss'
+import '@src/modules/task/components/TaskAllotModal/TaskAllotModal.scss'
 /* type */
 import AutoDispatchListItem from '@model/types/AutoDispatchListItem'
 

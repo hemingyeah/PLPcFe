@@ -1,6 +1,7 @@
 /* components */
 import TaskAllotMap from '@src/modules/task/components/TaskAllotModal/TaskAllotMap/TaskAllotMap.tsx'
 import UserCard from '@src/modules/task/components/TaskAllotModal/UserCard/UserCard.tsx'
+import TaskMapInfoWindow from '@src/modules/task/components/TaskAllotModal/TaskMapInfoWindow/TaskMapInfoWindow.tsx'
 /* entity */
 import TaskAllotUserInfo from '@model/entity/TaskAllotUserInfo'
 import LoginUser from '@model/entity/LoginUser/LoginUser'
@@ -35,7 +36,8 @@ enum TaskAllotUserMapEventEmitEnum {
   name: ComponentNameEnum.TaskAllotUserMap,
   components: {
     TaskAllotMap,
-    UserCard
+    UserCard,
+    TaskMapInfoWindow
   }
 })
 export default class TaskAllotUserMap extends VC {
@@ -214,12 +216,14 @@ export default class TaskAllotUserMap extends VC {
     
     return (
       <div class={ComponentNameEnum.TaskAllotUserMap}>
+        
         <task-allot-map 
           ref='TaskAllotMapComponent'
           idName={this.mapId}
           handlerCustomFunc={() => this.outdieBuildMarkers()} 
           setMapFunc={(AMap: any) => this.outsideSetMap(AMap)}
         />
+        
         <div class='task-allot-user-content'>
           <base-panel width='470px' show={this.isShowUserCard} {...basePanelAttrs}>
             <user-card
@@ -233,6 +237,7 @@ export default class TaskAllotUserMap extends VC {
             /> 
           </base-panel>
         </div>
+        
       </div>
     )
   }

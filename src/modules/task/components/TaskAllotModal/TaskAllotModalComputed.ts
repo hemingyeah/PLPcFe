@@ -3,10 +3,14 @@ import AuthEnum from '@model/enum/AuthEnum'
 import TaskStateEnum from '@model/enum/TaskStateEnum'
 import TaskAllotTypeEnum from '@model/enum/TaskAllotTypeEnum'
 import ComponentNameEnum from '@model/enum/ComponentNameEnum'
+/* entity */
+import Field from '@model/entity/Field'
 /* data */
 import TaskAllotModalData from '@src/modules/task/components/TaskAllotModal/TaskAllotModalData'
 /* util */
 import { findComponentDownward } from '@src/util/assist'
+/* types */
+import TaskConfig from '@model/types/TaskConfig'
 
 class TaskAllotModalComputed extends TaskAllotModalData {
   
@@ -44,10 +48,10 @@ class TaskAllotModalComputed extends TaskAllotModalData {
   /** 
    * @description 是否是工单创建人
   */
-  get isCreator() {
+  get isCreator(): boolean {
     let loginUser = this.loginUser || {}
     let createUser = this.task?.createUser || {}
-    return createUser.userId && loginUser.userId && createUser.userId == loginUser.userId
+    return Boolean(createUser.userId && loginUser.userId && createUser.userId == loginUser.userId)
   }
   
   /* 当前选中的用户是客户的客户负责人，则显示专属标签（鼠标移动标签上提示“客户负责人”） */
@@ -99,6 +103,46 @@ class TaskAllotModalComputed extends TaskAllotModalData {
   /* 工单派单负责人表格组件 */
   get TaskAllotExcutorTableComponent(): any {
     return findComponentDownward(this, ComponentNameEnum.TaskAllotUserTable)
+  }
+  
+  /** 
+   * @description 是否是工单创建人
+   * -- 供外部获取的
+  */
+  get outsideIsCreator(): boolean {
+    return this.isCreator
+  }
+  
+  /** 
+   * @description 是否是工单负责人
+   * -- 供外部获取的
+  */
+  get outsideIsExecutor(): boolean {
+    return this.isExecutor
+  }
+  
+  /** 
+   * @description 工单字段列表
+   * -- 供外部获取的
+  */
+  get outsideFields(): Field[] {
+    return this.fields || []
+  }
+  
+  /** 
+   * @description 工单信息
+   * -- 供外部获取的
+  */
+  get outsideTask(): any {
+    return this.task
+  }
+  
+  /** 
+   * @description 工单配置
+   * -- 供外部获取的
+  */
+  get outsideTaskConfig(): TaskConfig {
+    return this.taskConfig
   }
 }
 

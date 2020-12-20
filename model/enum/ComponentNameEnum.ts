@@ -36,6 +36,8 @@ enum ComponentNameEnum {
   BizCallCenterPhone = 'biz-call-center-phone',
   // 工单地图信息弹窗
   TaskMapInfoWindow = 'task-map-info-window',
+  // 修改计划时间
+  BizModifyPlanTime = 'biz-modify-plan-time'
 }
 
 export default ComponentNameEnum

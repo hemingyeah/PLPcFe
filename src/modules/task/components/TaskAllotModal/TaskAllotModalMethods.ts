@@ -63,7 +63,9 @@ const LoadComponentMap = {
 }
 
 enum TaskAllotModalEmitEventEnum {
-  Success = 'success'
+  Success = 'success',
+  UpdateTask = 'updateTask',
+  UpdateRecords = 'updateRecords',
 }
 
 class TaskAllotModalMethods extends TaskAllotModalComputed {
@@ -80,6 +82,23 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
     PlatformUtil.closeTab(id)
     // 打开新tab
     openTabForTaskView(this.task.id)
+  }
+  
+  /** 
+   * @description 更新工单信息
+  */
+  @Emit(TaskAllotModalEmitEventEnum.UpdateTask)
+  public updateTaskHandler(task: any) {
+    Log.succ(Log.Start, this.updateTaskHandler.name)
+    return task
+  }
+  
+  /** 
+   * @description 更新工单动态
+  */
+  @Emit(TaskAllotModalEmitEventEnum.UpdateRecords)
+  public updateTaskRecordsHandler() {
+    Log.succ(Log.Start, this.updateTaskRecordsHandler.name)
   }
   
   /** 
@@ -722,6 +741,16 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
   public outsideSetMatchRule(rule: AutoDispatchListItem | null) {
     this.matchRule = rule
   }
+
+  /** 
+   * @description 设置工单信息
+   * -- 支持外部调用的
+  */
+  public outsideSetTask(task: any) {
+    Log.succ(Log.Start, this.outsideSetTask.name)
+    this.updateTaskHandler(task)
+    this.updateTaskRecordsHandler()
+  }
   
   /** 
    * @description 显示弹窗
@@ -969,6 +998,7 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
     // @ts-ignore 取消按钮的焦点
     event?.target?.parentNode?.blur()
   }
+  
 }
 
 export default TaskAllotModalMethods

@@ -1091,6 +1091,12 @@ export default {
         close: true,
         fromId
       });
+    },
+    outsideUpdateTask(task = {}) {
+      this.task = task
+    },
+    outsideUpdateRecords() {
+      this.$eventBus.$emit(TaskEventNameMappingEnum.UpdateRecord);
     }
   },
   created() {

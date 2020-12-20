@@ -69,7 +69,7 @@ window.openCustomerViewFunc = function openCustomerViewFunc(customerId: string) 
   }
 })
 export default class TaskAllotPool extends Vue {
-  
+  /* 工单地图信息弹窗组件 */
   @Ref() readonly TaskMapInfoWindowComponent!: TaskMapInfoWindow
   
   /* 客户团队列表 */
@@ -607,7 +607,7 @@ export default class TaskAllotPool extends Vue {
         >
         </task-allot-pool-notification>
         
-        <task-map-info-window 
+        <task-map-info-window
           ref='TaskMapInfoWindowComponent' 
           task={this.selectedMapTask}
         />
