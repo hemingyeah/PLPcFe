@@ -322,27 +322,24 @@
               </template>
 
               <template v-else-if="column.fieldName === 'productPic'">
-                <div class="flex-x"
-                     v-if="scope.row.productPic">
-                  <div class="flex-x goods-img-list flex-1">
-                    <template v-for="(item, index) in scope.row.productPic">
-                      <img :key="index"
-                           v-if="index <= 4"
-                           class="curs-point"
-                           :src="
-                             item.url
-                               ? `${item.url}?x-oss-process=image/resize,m_fill,h_32,w_32`
-                               : defaultImg
-                           "
-                           @click.stop="previewImg(item.url)" />
-                    </template>
-                    <div>
-                      {{
-                        scope.row[column.field].length > 5
-                          ? `+${scope.row[column.field].length - 5}`
-                          : ''
-                      }}
-                    </div>
+                <div v-if="scope.row.productPic" class="flex-x goods-img-list" style="height:100%">
+                  <template v-for="(item, index) in scope.row.productPic">
+                    <img :key="index"
+                         v-if="index <= 4"
+                         class="curs-point"
+                         :src="
+                           item.url
+                             ? `${item.url}?x-oss-process=image/resize,m_fill,h_32,w_32`
+                             : defaultImg
+                         "
+                         @click.stop="previewImg(item.url)" />
+                  </template>
+                  <div>
+                    {{
+                      scope.row[column.field].length > 5
+                        ? `+${scope.row[column.field].length - 5}`
+                        : ''
+                    }}
                   </div>
                 </div>
               </template>
@@ -922,7 +919,6 @@ export default {
     search () {
       const params = this.buildParams();
       this.loading = true;
-      
 
       return getProductV2(params)
         .then((res) => {
@@ -1401,11 +1397,11 @@ export default {
       let export_product = this.exportData(0, productExport)
 
       // 产品类型信息
-      let export_catalog = this.exportData(1, catalogExport)
+      // let export_catalog = this.exportData(1, catalogExport)
 
       params["exportOneRow"] = exportOneRow
       params["data"] = exportAll ? "" : this.selectedIds.join(",");
-      params["catalogExport"] = export_catalog.join(",");
+      // params["catalogExport"] = export_catalog.join(",");
       params["productExport"] = export_product.join(",");
 
       return params;
@@ -1414,7 +1410,8 @@ export default {
      * 导出数据
      */
     exportData (number, list = []) {
-      const export_list = this.exportColumns
+      const export_list = this.exportColumns;
+      if(!list.length) return
       if (number === 3) {
         let cardField = []
         export_list.filter((item, index) => {
@@ -1862,6 +1859,7 @@ body {
   }
 
   .goods-img-list {
+    height: 100%;
     img {
       width: 32px;
       height: 32px;

@@ -445,7 +445,6 @@ export default {
     },
     setMenuInfo() {
       this.rootDataChange("nowEditMenu", { ...this.propData, conData: 1 });
-      // this.changeTreeDetail("conData", 1);
       this.$set(this, "fieldIds", _.cloneDeep(fieldIds_))
     },
     resetForm() {
@@ -542,8 +541,8 @@ export default {
           });
         }
       });
-      // this.$set(this, 'flashPartType', false);
-      // this.$set(this, 'flashProductType', false);
+      this.$set(this, "flashPartType", false);
+      this.$set(this, "flashProductType", false);
       this.$nextTick(() => {
         this.$set(this, "flashPartType", true);
         this.$set(this, "flashProductType", true);

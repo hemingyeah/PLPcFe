@@ -7,7 +7,7 @@
           <div class="seach task-span1 task-flex task-ai guide-box">
             <div style="position: relative;"></div>
 
-            <el-input v-model="searchModel.keyword"
+            <el-input v-model="searchModel.keyWord"
                       placeholder="根据产品类型信息搜索"
                       class="task-with-input task-ml12">
             </el-input>
@@ -263,34 +263,32 @@
                 {{ scope.row.pathName }}
               </template>
               <template v-else-if="column.fieldName === 'productPic'">
-                <div class="flex-x">
-                  <div class="flex-x goods-img-list flex-1">
-                    <template v-for="(item, index) in scope.row.productPic">
-                      <img
-                        :key="index"
-                        v-if="index <= 4"
-                        class="curs-point"
-                        :src="
-                          item.url
-                            ? `${item.url}?x-oss-process=image/resize,m_fill,h_32,w_32`
-                            : defaultImg
-                        "
-                        @click.stop="previewImg(item.url)"
-                      />
-                    </template>
-                    <div>
-                      {{
-                        scope.row[column.field].length > 1
-                          ? `+${scope.row[column.field].length - 1}`
-                          : ''
-                      }}
-                    </div>
+                <div class="flex-x goods-img-list" style="height:100%">
+                  <template v-for="(item, index) in scope.row.productPic">
+                    <img
+                      :key="index"
+                      v-if="index <= 4"
+                      class="curs-point mar-r-8"
+                      :src="
+                        item.url
+                          ? `${item.url}?x-oss-process=image/resize,m_fill,h_32,w_32`
+                          : defaultImg
+                      "
+                      @click.stop="previewImg(item.url)"
+                    />
+                  </template>
+                  <div>
+                    {{
+                      scope.row[column.field].length > 1
+                        ? `+${scope.row[column.field].length - 1}`
+                        : ''
+                    }}
                   </div>
                 </div>
               </template>
               <template v-else-if="column.fieldName === 'thumbnail'">
                 <div class="flex-x">
-                  <div class="flex-x goods-img-list flex-1">
+                  <div class="flex-x goods-img-list" style="height:100%">
                     <template v-for="(item, index) in scope.row.thumbnail">
                       <img
                         :key="index"
@@ -501,7 +499,7 @@ export default {
       selectedLimit: 500,
       searchIncludeMoreConditions: false,
       searchModel: {
-        keyword: "",
+        keyWord: "",
         pageSize: 10,
         pageNum: 1,
         orderDetail: {},
@@ -800,7 +798,7 @@ export default {
     buildParams() {
       const sm = Object.assign({}, this.searchModel);
       let params = {
-        keyword: sm.keyword,
+        keyWord: sm.keyWord,
         pageSize: sm.pageSize,
         pageNum: sm.pageNum,
       };
@@ -829,7 +827,7 @@ export default {
       window.TDAPP.onEvent("pc：产品管理-重置事件");
       this.searchIncludeMoreConditions = false;
       this.searchModel = {
-        keyword: "",
+        keyWord: "",
         pageNum: 1,
         pageSize: this.page.pageSize,
         orderDetail: {},
@@ -1143,8 +1141,8 @@ export default {
         : { exportTotal: ids.length };
 
       return {
-        productChecked: checkedArr.join(","),
-        data: exportAll ? "" : ids.join(","),
+        catalogChecked: checkedArr.join(","),
+        ids: exportAll ? "" : ids.join(","),
         exportSearchModel: JSON.stringify(exportSearchModel),
       };
     },

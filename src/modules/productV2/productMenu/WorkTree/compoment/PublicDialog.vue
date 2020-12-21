@@ -55,6 +55,7 @@
               placeholder="请输入关键词"
               :remote-method="lenovoselectSearchData"
               :loading="selectLoading"
+              @focus="lenovoselectSearchData"
             >
               <el-option
                 v-for="item in (dialogData[dialogType] && dialogData[dialogType].options)"
@@ -227,6 +228,9 @@ export default {
         || this.dialogType == "linkWiki"
         || this.dialogType == "cloneMenu"
       ) {
+        if(!this.nowChooseArr.length){
+          return this.$message.error("选择内容不能为空");
+        }
         this.$emit("confirm", { nowChooseArr: this.nowChooseArr });
       }
     },
@@ -338,6 +342,20 @@ export default {
   height: auto;
 }
 
+.el-select__tags-text{
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  overflow: hidden;
+  white-space: normal;
+  word-wrap: break-word;
+  word-break: break-all;
+}
+.el-select .el-tag__close.el-icon-close {
+  position: absolute;
+  right: 2px;
+  top: 5px;
+}
 .batch-editing-customer-dialog {
 
     .base-modal-body {
