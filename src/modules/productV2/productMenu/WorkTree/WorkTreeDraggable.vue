@@ -70,6 +70,7 @@
         </div>
 
         <work-tree-draggable
+          v-if="el.tasks.length"
           :tasks="el.tasks"
           :root-data="{
             id: el.id,
