@@ -27,7 +27,7 @@ import {checkUser, deleteComponent} from '@src/api/TaskApi.ts';
 const SHOW_IS_NULL_FIELD_COMP = ["manager"];
 
 /** 创建字段预览组件 */
-function createPreviewComp(h, field){
+export function createPreviewComp(h, field){
   let currFieldId = field._id;
   let previewComp = FieldManager.findField(field.formType);
 
