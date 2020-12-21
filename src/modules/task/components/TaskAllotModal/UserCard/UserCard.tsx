@@ -6,6 +6,7 @@ import ComponentNameEnum from '@model/enum/ComponentNameEnum'
 /* entity */
 import LoginUser from '@model/entity/LoginUser/LoginUser'
 import UserCardInfo from '@model/entity/UserCardInfo'
+import TaskAddress from '@model/entity/TaskAddress'
 /* image */
 // @ts-ignore
 import DefaultHead from '@src/assets/img/avatar.png'
@@ -25,10 +26,12 @@ import DateUtil from '@src/util/date'
 import Platform from '@src/util/Platform'
 import { openTabForUserView } from '@src/util/business/openTab'
 import { fmt_display_text, fmt_number_to_fixed } from '@src/filter/fmt'
-import { isArray } from '@src/util/type'
+import { isArray, isNull } from '@src/util/type'
 import { stringArrayIntersection } from '@src/util/array'
 import { parseObject } from '@src/util/parse'
 import Log from '@src/util/log.ts'
+import { getDistance } from '@src/util/distance'
+
 
 enum UserCardEmitEventEnum {
   // 关闭事件
@@ -36,7 +39,9 @@ enum UserCardEmitEventEnum {
   // 设置负责人事件
   SetExecutor = 'setExecutor',
   // 设置协同人事件
-  SetSynergy = 'setSynergy'
+  SetSynergy = 'setSynergy',
+  // 删除协同人事件
+  DeleteSynergyUser = 'deleteSynergyUser'
 }
 
 enum UserCardRadioEnum {
@@ -56,13 +61,17 @@ export default class UserCard extends Vue {
   @Prop() readonly stateColorMap: StateColorMap | undefined
   // 是否显示 协同人按钮
   @Prop() readonly showSynergyButton: boolean | undefined
+  /* 工单信息 */
+  @Prop() readonly task: any | undefined
   // 用户id
   @Prop() readonly userId: string | undefined
   
   // 用户是否在客户团队内
   private isUserInCustomerTag: boolean = false
-  // 负责人/协同人 单选
-  private radio: UserCardRadioEnum | null = null
+  // 设为负责人是否选中
+  private isExecutorChecked: boolean = false
+  // 设为协同人是否选中
+  private isSynergyChecked: boolean = false
   // 等待状态
   private pending: boolean = false
   // 时间
@@ -85,18 +94,27 @@ export default class UserCard extends Vue {
    * @description 设置负责人
   */
   @Emit(UserCardEmitEventEnum.SetExecutor)
-  private setExecutorUser() {
-    this.dispatchEvent<LoginUser>(UserCardEmitEventEnum.SetExecutor, this.user)      
-    return this.user
+  private setExecutorUser(user: LoginUser | null = this.user): LoginUser | null {
+    this.dispatchEvent<LoginUser>(UserCardEmitEventEnum.SetExecutor, user)
+    return user
   }
   
   /**
     * @description 设置协同人
   */
   @Emit(UserCardEmitEventEnum.SetSynergy)
-  private setSynergyUser() {
-    this.dispatchEvent<LoginUser>(UserCardEmitEventEnum.SetSynergy, this.user)    
-    return this.user
+  private setSynergyUser(user: LoginUser = this.user): LoginUser {
+    this.dispatchEvent<LoginUser>(UserCardEmitEventEnum.SetSynergy, user)
+    return user
+  }
+  
+  /**
+   * @description 清除协同人
+   */
+  @Emit(UserCardEmitEventEnum.SetSynergy)
+  private deleteSynergyUser(user: LoginUser = this.user): LoginUser {
+    this.dispatchEvent<LoginUser>(UserCardEmitEventEnum.DeleteSynergyUser, user)
+    return user
   }
   
   /**
@@ -106,6 +124,34 @@ export default class UserCard extends Vue {
   private close() {
     this.dispatchEvent<boolean>(UserCardEmitEventEnum.Close, false)
     return false
+  }
+  
+  /**
+   * @description 获取用户据客户距离
+   */
+  get userToCustomerDistance(): number | null {
+    // 工单客户地址
+    let taskCustomerAddress = this.taskAddress
+    // 工单客户地址纬度
+    let taskCustomerLatitude: number | null | undefined = taskCustomerAddress?.latitude
+    // 工单客户地址经度
+    let taskCustomerLongitude: number | null | undefined = taskCustomerAddress?.longitude
+    // 用户地址纬度
+    let userLatitude: number | null | undefined = this.userCardInfo?.user?.latitude
+    // 用户地址经度
+    let userLongitude: number | null | undefined = this.userCardInfo?.user?.longitude
+    
+    return getDistance(
+      Number(taskCustomerLatitude), Number(taskCustomerLongitude), Number(userLatitude), Number(userLongitude)
+    )
+  }
+  
+  /**
+   * @description 工单客户地址地址
+   * 工单新建后地址信息在taddress里面，新建的信息在address里面
+   */
+  get taskAddress(): TaskAddress {
+    return new TaskAddress(this.task.taddress || this.task.address || {})
   }
   
   /** 
@@ -125,8 +171,10 @@ export default class UserCard extends Vue {
   /** 
    * @description 发送事件
   */
-  private dispatchEvent<T>(eventName: UserCardEmitEventEnum, data: T): void {
+  private dispatchEvent<T>(eventName: UserCardEmitEventEnum, data: T | null): void {
     if (!this.emitEventComponentName) return
+    
+    Log.succ(Log.Start, this.dispatchEvent.name)
     
     // 支持由自定义组件 发出事件
     dispatch.call(
@@ -162,7 +210,8 @@ export default class UserCard extends Vue {
     let params = {
       executorId: this.userId || '',
       startTime: DateUtil.format(this.timeRange[0], DateFormatEnum.YTD),
-      endTime: DateUtil.format(this.timeRange[1], DateFormatEnum.YTD)
+      endTime: DateUtil.format(this.timeRange[1], DateFormatEnum.YTD),
+      taskId: this.task?.id
     }
     
     this.pending = true
@@ -171,6 +220,7 @@ export default class UserCard extends Vue {
       .then((data: getTaskUserCardInfoResult) => {
         let isSuccess = data.success
         if (!isSuccess) {
+          this.pending = false
           Platform.alert(data.message)
         }
         
@@ -222,13 +272,22 @@ export default class UserCard extends Vue {
     this.isUserInCustomerTag = intersectionTags.length > 0
   }
   
-  /** 
-   * @description 选择负责人/协同人 变化事件
+  /**
+   * @description 设为负责人复选框变化
   */
-  private onRadioChangedHandler(value: UserCardRadioEnum) {
-    let isExecutor = value === UserCardRadioEnum.Executor
-    isExecutor ? this.setExecutorUser() : this.setSynergyUser()
-    this.radio = value
+  private onExecutorCheckedChanged(value: boolean) {
+    this.isExecutorChecked = value
+    // 设置负责人信息
+    this.setExecutorUser(this.isExecutorChecked ? this.user : null)
+  }
+  
+  /**
+   * @description 设为协同人复选框变化
+  */
+  private onSynergyCheckedChanged(value: boolean) {
+    this.isSynergyChecked = value
+    // 设置/清除 负责人信息
+    this.isSynergyChecked ? this.setSynergyUser() : this.deleteSynergyUser()
   }
   
   /** 
@@ -249,12 +308,15 @@ export default class UserCard extends Vue {
   /** 
    * @description 渲染用户卡片标签列表
   */
-  private renderUserCardLabels() {
+  private renderUserCardLabels(): VNode | null {
+    // 判断是否有无标签
+    if (!this.userCardInfo.isManager && !this.userCardInfo.isDistance && !this.userCardInfo.isPrecent) return null
+    
     return (
       <div class='user-card-header-content-labels'>
-        { !this.userCardInfo.isManager && this.renderUserCardLabel('主管', 'manager') }
-        { !this.userCardInfo.isDistance && this.renderUserCardLabel('近') }
-        { !this.userCardInfo.isPrecent && this.renderUserCardLabel('好评') }
+        { this.userCardInfo.isManager && this.renderUserCardLabel('主管', 'manager') }
+        { this.userCardInfo.isDistance && this.renderUserCardLabel('近') }
+        { this.userCardInfo.isPrecent && this.renderUserCardLabel('好评') }
       </div>
     )
   }
@@ -298,7 +360,10 @@ export default class UserCard extends Vue {
   /** 
    * @description 渲染用户卡片位置
   */
-  private renderUserCardLocation() {
+  private renderUserCardLocation(): VNode | null {
+    // 用户或客户没有距离不显示
+    if (isNull(this.userToCustomerDistance)) return null
+    // 用户自定义数据属性
     let userAttribute = this.userCardInfo?.user?.attribute || {}
     // 最后登录时间
     let lastLoginTime = DateUtil.getTimeDiffStr(userAttribute?.lastLocateTime)
@@ -306,6 +371,7 @@ export default class UserCard extends Vue {
     return (
       <div class='user-card-header-content-location'>
         <i class='iconfont icon-fdn-location'></i>
+        { `${this.userToCustomerDistance && this.userToCustomerDistance.toFixed(2)}KM` }
         { lastLoginTime && `(${lastLoginTime}前)` }
       </div>
     )
@@ -428,14 +494,16 @@ export default class UserCard extends Vue {
           {this.renderUserCardDetail()}
           
           <div class='user-card-footer'>
-              <el-radio-group value={this.radio} onInput={(value: UserCardRadioEnum) => this.onRadioChangedHandler(value)}>
-                <el-radio label={UserCardRadioEnum.Executor}>设为负责人</el-radio>
-                {
-                  this.showSynergyButton && (
-                    <el-radio label={UserCardRadioEnum.Synergy}>设为协同人</el-radio> 
-                  )
-                }
-              </el-radio-group>
+            <el-checkbox value={this.isExecutorChecked} onInput={(value: boolean) => this.onExecutorCheckedChanged(value)}>
+              设为负责人
+            </el-checkbox>
+            {
+              this.showSynergyButton && (
+                <el-checkbox value={this.isSynergyChecked} onInput={(value: boolean) => this.onSynergyCheckedChanged(value)}>
+                  设为协同人
+                </el-checkbox>
+              )
+            }
           </div>
       </div>
     )

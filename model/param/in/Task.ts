@@ -124,7 +124,9 @@ export interface TaskUserCardSearchModel {
   // 开始时间 示例： 2020-10-01
   startTime: string
   // 结束时间 示例： 2020-10-01
-  endTime: string
+  endTime: string,
+  // 工单id
+  taskId: string
 }
 
 /* 工单派单-获取人员列表搜索model */

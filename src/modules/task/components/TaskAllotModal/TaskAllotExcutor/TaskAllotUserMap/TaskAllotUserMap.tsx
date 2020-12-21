@@ -68,7 +68,7 @@ export default class TaskAllotUserMap extends VC {
   /* 地图的id */
   private mapId: string = 'TaskAllotUserMapContainer'
   /* 最后一次点击的标记头像 */
-  public lastClickedUserMarker: { marker: any, data: TaskAllotUserInfo | null } = { marker: null, data: null }
+  public lastClickedUserMarker: { marker: any, data: LoginUser | null } = { marker: null, data: null }
   /* 用户page */
   public userPage: Page =  new Page({ pageNum: 0 })
   /* 用户标记列表 */
@@ -81,7 +81,7 @@ export default class TaskAllotUserMap extends VC {
   
   /* 负责人选中变化事件 */
   @Emit(TaskAllotUserMapEventEmitEnum.ExecutorChange)
-  private selectedExcutorUserChangedHandler(user: TaskAllotUserInfo): TaskAllotUserInfo {
+  private selectedExcutorUserChangedHandler(user: LoginUser): LoginUser {
     return user
   }
   
@@ -93,7 +93,7 @@ export default class TaskAllotUserMap extends VC {
       /* 如果存在之前标记点击数据 则还原标记 */
       this.lastClickedUserMarker.marker && this.restoreUserMarkerIcon()
       /* 获取用户信息 */
-      let user: TaskAllotUserInfo = event.target.getExtData()
+      let user: LoginUser = event.target.getExtData()
       /* 构建大号头像 */
       event.target.setIcon(this.buildUserMarkerIcon(AMap, user, true))
       /* 保存点击标记信息 */
@@ -120,15 +120,15 @@ export default class TaskAllotUserMap extends VC {
       return Log.warn('userPage.list is empty', this.buildUserMarkers.name)
     }
     
-    userPage.list.forEach((taskAllotUser: TaskAllotUserInfo) => {
-      let user: TaskAllotUserInfo = taskAllotUser
-      let { lng, lat } = user
+    userPage.list.forEach((taskAllotUser: LoginUser) => {
+      let user: LoginUser = taskAllotUser
+      let { longitude, latitude } = user
       // 无经纬度
-      if (!lng || !lat) return
+      if (!longitude || !latitude) return
       
       // 用户标记
       let userMarker = new AMap.Marker({
-        position: [Number(lng), Number(lat)],
+        position: [Number(longitude), Number(latitude)],
         title: user.displayName,
         map: this.AMap,
         extData: taskAllotUser,
@@ -147,7 +147,7 @@ export default class TaskAllotUserMap extends VC {
    * @param {TaskAllotUserInfo} user 用户信息
    * @param {Boolean} isLarge 是否是更大的标记
   */
-  private buildUserMarkerIcon(aMap: any, user: TaskAllotUserInfo, isLarge: boolean = false) {
+  private buildUserMarkerIcon(aMap: any, user: LoginUser, isLarge: boolean = false) {
     let size = isLarge ? new aMap.Size(52, 52) : new aMap.Size(42, 42)
     
     return (
@@ -236,6 +236,7 @@ export default class TaskAllotUserMap extends VC {
                   stateColorMap={this.stateColorMap}
                   showSynergyButton={this.isShowSynergy}
                   showCustomerManagerIcon={this.isCustomerManager}
+                  task={this.task}
                   userId={this.selectedExcutorUser?.userId}
                   onClose={() => this.closeUserCard()}
                 /> 

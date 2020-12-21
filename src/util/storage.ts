@@ -77,7 +77,7 @@ export async function storageGet<T, K>(key: string, defaultValue: K, module: Sto
 */
 export async function storageSet(key: string, value: StorageSetType, module: StorageModuleEnum): Promise<any> {
   if(!key) return (
-    Log.warn('Caused: can not set storage, because not key', storageSet.name)
+    Log.warn('Caused: can not set storage, because there is no key', storageSet.name)
   )
   
   localForage.config({
@@ -86,15 +86,15 @@ export async function storageSet(key: string, value: StorageSetType, module: Sto
   
   const storageKey = getStorageKey(key)
   
-  Log.info(storageKey, `${storageSet.name} -> storageKey`)
+  Log.info(storageKey, 'storageKey', storageSet.name)
   
   try {
     await localForage.setItem(storageKey, value, (error, value) => {
       Log.error(error, 'localForage.setItem')
-      Log.info(value, 'localForage.setItem')
+      Log.info(value, 'value', 'localForage.setItem')
     })
   } catch (error) {
     localStorage.setItem(`${module}-${storageKey}`, JSON.stringify(value))
-    console.error('stroageSet -> error', error)
+    console.error('storageSet -> error', error)
   }
 }

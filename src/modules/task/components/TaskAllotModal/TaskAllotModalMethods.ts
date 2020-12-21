@@ -822,6 +822,8 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
     this.toggleTaskAllotExecutorComponentPending(false)
     // 初始化派单类型
     this.allotType = TaskAllotTypeEnum.Person
+    // 初始化视图模式
+    this.allotTypeMode = TaskAllotTypeModeEnum.List
     // 匹配负责人显示
     this.matchExcutorWithReAllot()
     // 初始化协同人显示
@@ -838,6 +840,7 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
    * @description 设为负责人
   */
   public setExecutorUser(user: LoginUser | TaskAllotUserInfo | null) {
+    console.log('user', user)
     this.executorUser = user
   }
   

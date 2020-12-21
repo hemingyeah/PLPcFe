@@ -133,12 +133,12 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
     // 绑定
     Loadmore.bind(
       scrollEl,
-      { 
+      {
         value: {
           distance: 10,
           disabled: this.isDisableLoadmore,
           callback: () => this.loadmore()
-        } 
+        }
       }
     )
     
@@ -180,7 +180,8 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
     
     let params: any = {
       order: orderDetail.order,
-      code: orderDetail.code,
+      // 地图图模式 code 为 按距离
+      code: isMapMode ? AllotSortedEnum.Distance : orderDetail.code,
       customerId: this.customer?.id || '',
       lat: this.taskAddress.latitude,
       lng: this.taskAddress.longitude,
@@ -190,11 +191,9 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
       states: this.selectUserState,
       taskId: this.task?.id,
       userIds: users.map(user => user.userId),
-      // 地图模式需要此参数，可以不传code参数
-      // map: isMapMode
+      // 地图模式需要此参数
+      map: isMapMode
     }
-    
-    LogUtil.info(this.selectTeams.slice(), this.buildSearchUserParams.name, this.buildSearchUserParams.name)
     
     // 团队数据
     if (this.selectTeams.length > 0) {
@@ -340,7 +339,7 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
     )
   }
   
-  /** 
+  /**
    * @description 获取团队列表
   */
   public fetchTagList(params: TaskTagListSearchModel) {
@@ -367,7 +366,8 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
    * -- 内部调用的
   */
   public fetchUsers(): Promise<PageInfo<getTaskAllotUserInfoResult> | null | any> {
-    if (this.pending) return Promise.resolve({})
+    // TODO: 修改
+    // if (this.pending) return Promise.resolve({})
     
     LogUtil.succ(LogUtil.Start, this.fetchUsers.name)
     
@@ -402,15 +402,24 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
    * @description 获取排序参数
   */
   public getParamOrderDetail(): { order: boolean, code: number } {
-    let orderDetail: any = (
-      Object.keys(this.orderDetail).length > 0 
-        ? this.orderDetail
-        : {
-          code: this.selectSortord,
-          // @ts-ignore
-          order: OrderMap[this.selectSortord] === undefined ? true : OrderMap[this.selectSortord]
-        }
-    )
+    let orderDetail: any = null
+    // 排序详细信息是否存在
+    if (Object.keys(this.orderDetail).length > 0) {
+      orderDetail = this.orderDetail
+    } else {
+      // @ts-ignore
+      let orderData: any = OrderMap[this.selectSortord]
+      orderDetail = {
+        code: this.selectSortord || AllotSortedEnum.Distance,
+        order: (
+          this.selectSortord == null
+            ? false
+            : orderData === undefined
+              ? true
+              : orderData
+        )
+      }
+    }
     
     return orderDetail
   }
@@ -454,8 +463,8 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
     
   }
   
-  public getAttributes() {
-    const attrs = {
+  public getAttributes(): any {
+    return {
       directives: [
         {
           name: 'loading',
@@ -463,8 +472,6 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
         }
       ]
     }
-    
-    return attrs
   }
   
   /** 
@@ -522,7 +529,7 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
   public handlerSortLabelChange(value: AllotSortedEnum): void {
     LogUtil.succ(LogUtil.Start, this.handlerSortLabelChange.name)
     // 赋值
-    this.selectSortord = value === this.selectSortord ? AllotSortedEnum.Distance : value
+    this.selectSortord = value === this.selectSortord ? null : value
     // 清除负责人人员表格排序
     this.TaskAllotUserTableComponent?.TaskAllotUserElTableComponent?.clearSort()
     // 初始化
@@ -539,18 +546,16 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
     
     if (!order) {
       this.orderDetail = {}
-      this.selectSortord = AllotSortedEnum.Distance
+      this.selectSortord = null
       return this.initialize()
     }
     
     let isDescending: boolean = order === EelementTableSortOrderEnum.DESC
     
-    let orderDetail = {
+    this.orderDetail = {
       order: !isDescending,
       code: SortedMap[prop],
     }
-    
-    this.orderDetail = orderDetail
     this.selectSortord = null
     this.initialize()
   }
@@ -569,7 +574,7 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
       }
     }
     
-    const columns = this.simplifyTableColumsProperty(this.columns)
+    const columns = this.simplifyTableColumnsProperty(this.columns)
     this.saveDataToStorage(StorageKeyEnum.TaskAllotTableColumns, columns)
   }
   
@@ -585,13 +590,11 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
       : this.tableUserPage = new Page({ pageNum: 0, pageSize: 20 })
     // 抓取用户列表数据
     this.fetchUsers()
-      .then((result: PageInfo<TaskAllotUserInfo | LoginUser>) => {
+      .then((result: PageInfo<TaskAllotUserInfo> | LoginUser[]) => {
         if (!result) return
-        // 解析对象数据 暂时弃用 JSON.parse 字符串有问题
-        // result.list = parseObject(result.list)
         // 用户列表/地图处理
         this.isMapMode 
-          ? this.mapUserPageHandler(result as PageInfo<LoginUser>) 
+          ? this.mapUserPageHandler(result as LoginUser[])
           : this.tableUserPageHandler(result as PageInfo<TaskAllotUserInfo>)
       })
       .catch((err: any) => {
@@ -616,8 +619,6 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
     this.fetchUsers()
       .then((result: PageInfo<TaskAllotUserInfo>) => {
         if (!result) return
-        // 解析对象数据 暂时弃用 JSON.parse 字符串有问题
-        // result.list = parseObject(result.list)
         // 用户列表处理
         this.tableUserPageHandler(result)
       })
@@ -631,16 +632,17 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
   
   /**
    * @description 地图用户列表处理
+   * @param {LoginUser[]} userList 用户列表
   */
-  public mapUserPageHandler(result: PageInfo<LoginUser>) {
+  public mapUserPageHandler(userList: LoginUser[]) {
     try {
       
       // log start
       LogUtil.succ(LogUtil.Start, this.mapUserPageHandler.name)
       // 合并数据
-      this.mapUserPage.merge(result)
+      this.mapUserPage.list = userList
       // 构建人员标记
-      this.TaskAllotUserMapComponent?.outsideBuildeUserMarkers(result.list)
+      this.TaskAllotUserMapComponent?.outsideBuildeUserMarkers(userList)
       // log end
       LogUtil.succ(LogUtil.End, this.mapUserPageHandler.name)
       
@@ -696,24 +698,27 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
   
   /**
    * @description 设置选择的负责人
+   * @param {Boolean} isSelected 是否选中
+   * @param {TaskAllotUserInfo} user 用户信息
    * -- 支持外部调用的
   */
   public outsideSetSelectedExcutorUser(isSelected: boolean, user: TaskAllotUserInfo) {
+    let isChecked: boolean = false
     for (let key in this.userPageCheckedMap) {
-      let isChecked: boolean = isSelected && key == user?.userId
+      isChecked = isSelected && key == user?.userId
       this.userPageCheckedMap[key] = isChecked
     }
     
-    let excutorUser = isSelected ? user : null
+    let executorUser = isSelected ? user : null
     this.isShowUserCard = isSelected
-    this.selectedExcutorUser = excutorUser
+    this.selectedExcutorUser = executorUser
     this.selectTeamUsers = (
       isSelected 
         ? [{
-            userId: excutorUser?.userId || '', 
-            displayName: excutorUser?.displayName || '' ,
-            value: excutorUser?.userId || '',
-            label: excutorUser?.displayName || '',
+            userId: executorUser?.userId || '',
+            displayName: executorUser?.displayName || '' ,
+            value: executorUser?.userId || '',
+            label: executorUser?.displayName || '',
           }]
         : []
     )
@@ -806,13 +811,13 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
       return column
     })
     
-    const showColumns = this.simplifyTableColumsProperty(this.columns)
+    const showColumns = this.simplifyTableColumnsProperty(this.columns)
     
     this.saveDataToStorage(StorageKeyEnum.TaskAllotTableColumns, showColumns)
   }
 
   /* 精简列属性 */
-  public simplifyTableColumsProperty(columns: Column[]): Column[] {
+  public simplifyTableColumnsProperty(columns: Column[]): Column[] {
     return (
       columns.map((column: Column) => ({
         field: column.field,

@@ -43,7 +43,7 @@ export type getAutoDispatchResultListResult = Result<AutoDispatchListItem[]>
 export type getTaskUserCardInfoResult = Result<UserCardInfo>
 
 /* 工单指派-获取人员列表信息 */
-export type getTaskAllotUserInfoResult = Result<PageInfo<TaskAllotUserInfo>>
+export type getTaskAllotUserInfoResult = Result<PageInfo<TaskAllotUserInfo> | LoginUser[]>
 
 /* 工单指派-指派审批信息 */
 export type getTaskAllotApproveResult = MsgModel<TaskApprove>

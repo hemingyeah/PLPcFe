@@ -52,6 +52,7 @@ export default class TaskAllotUserTable extends TaskAllotUserTableRender {
                     prop={column.field}
                     resizable={true}
                     sortable={column.sortable}
+                    showOverFlowTooltip={true}
                   >
                     { (scope: any) => this.renderTableColumnField(scope, column) }
                   </el-table-column>

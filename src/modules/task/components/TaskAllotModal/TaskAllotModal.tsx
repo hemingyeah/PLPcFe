@@ -61,9 +61,9 @@ export default class TaskAllotModal extends TaskAllotModalRender {
                   stateColorMap={this.stateColorMap}
                   synergyUserList={this.synergyUserList}
                   onDeleteSynergyUser={(user: LoginUser) => this.outsideDeleteSynergyUser(user)}
-                  onSetExecutor={(user: LoginUser) => this.setExecutorUser(user)} 
+                  onSetExecutor={(user: LoginUser) => this.setExecutorUser(user)}
                   onSetSynergy={(user: LoginUser) => this.setSynergyUser(user)}
-                  onSetSynergys={(users: LoginUser[]) => this.outsideSetSynergyUsers(users)} 
+                  onSetSynergys={(users: LoginUser[]) => this.outsideSetSynergyUsers(users)}
                 />
               </div>
               {

@@ -59,7 +59,7 @@ class TaskAllotUserTableData extends TaskAllotUserTableComponents {
   /* 当前选择的排序方式 */
   public selectSortord: number = AllotSortedEnum.FinishTaskByMonth
   /* 表格key 随机数 */
-  public tableKey: number = Math.random() * 1000 >> 2
+  public tableKey: number | string = Math.random() * 1000 >> 2
   /* 团队用户page */
   public teamUserPage: Page =  new Page()
   /* 用户page */

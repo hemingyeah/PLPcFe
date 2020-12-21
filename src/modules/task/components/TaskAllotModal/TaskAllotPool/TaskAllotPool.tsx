@@ -620,6 +620,7 @@ export default class TaskAllotPool extends Vue {
               stateColorMap={this.stateColorMap}
               showSynergyButton={this.isShowSynergy}
               showCustomerManagerIcon={this.isCustomerManager}
+              task={this.task}
               userId={this.selectedExcutorUser?.userId}
               onClose={() => this.closeUserCard()}
             />

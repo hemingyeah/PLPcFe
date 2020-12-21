@@ -198,7 +198,7 @@ class TaskAllotExecutorRender extends TaskAllotExecutorMethods {
   public renderTaskAllotUserTableHeader(): VNode {
     return (
       <div class='task-allot-user-table-header'>
-        {this.renderTaskAllotUserTableHeaderLabels()}
+        { this.renderTaskAllotUserTableHeaderLabels()}
         {this.renderTaskAllotUserTableHeaderSelectBlock()}
       </div>
     )
@@ -207,7 +207,11 @@ class TaskAllotExecutorRender extends TaskAllotExecutorMethods {
   /**
    * @description 渲染工单指派人员表格头部 标签列表
   */
-  public renderTaskAllotUserTableHeaderLabels() {
+  public renderTaskAllotUserTableHeaderLabels(): VNode {
+    if (this.isMapMode) return (
+      <div class='task-allot-user-table-header-label'></div>
+    )
+    
     return (
       <div class='task-allot-user-table-header-label'>
         {
@@ -265,6 +269,8 @@ class TaskAllotExecutorRender extends TaskAllotExecutorMethods {
    * @description 渲染选择列
   */
   public renderSelectColumn() {
+    if (this.isMapMode) return null
+    
     return (
       <UiInput>
         <div class='task-allot-user-table-column' onClick={() => this.showAdvancedSetting()}>

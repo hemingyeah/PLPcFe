@@ -113,13 +113,14 @@ class TaskStateEnum extends BaseEnum {
   */
   static getBgColor(value: string, transparency?: number): string {
     const taskStateEnum: any = TaskStateEnum;
-    let bgColor = '';
+    let bgColor: string  = ''
+    let state: TaskState
     
     for (let stateKey in taskStateEnum) {
-      let state = taskStateEnum[stateKey];
+      state = taskStateEnum[stateKey]
       if (state.value == value) {
-        bgColor = state.bgColor;
-        break;
+        bgColor = state.bgColor || ''
+        break
       }
     }
     
@@ -140,18 +141,19 @@ class TaskStateEnum extends BaseEnum {
    * @param {String} value 值
   */
   static getColor(value: string): string {
-    const taskStateEnum: any = TaskStateEnum;
+    const taskStateEnum: any = TaskStateEnum
+    let state: TaskState
     
     for (let stateKey in taskStateEnum) {
-      let state = taskStateEnum[stateKey];
+      state = taskStateEnum[stateKey]
       if (state.value == value) {
-        return state.color;
+        return state.color || ''
       }
     }
     // 错误提示
     console.warn('Caused: TaskStateEnum getColor got the value is empty')
     
-    return '';
+    return ''
   }
   
   /** 
@@ -159,12 +161,13 @@ class TaskStateEnum extends BaseEnum {
    * @param {String} value 值
   */
   static getName(value: string): string {
-    const taskStateEnum: any = TaskStateEnum;
+    const taskStateEnum: any = TaskStateEnum
+    let state: TaskState
     
     for (let stateKey in taskStateEnum) {
-      let state = taskStateEnum[stateKey];
+      state = taskStateEnum[stateKey]
       if (state.value == value) {
-        return state.name;
+        return state.name
       }
     }
     // 错误提示
@@ -178,12 +181,13 @@ class TaskStateEnum extends BaseEnum {
    * @param {String} name 名字
   */
   static getValue(name: string): string {
-    const taskStateEnum: any = TaskStateEnum;
+    const taskStateEnum: any = TaskStateEnum
+    let state: TaskState
     
     for (let stateKey in taskStateEnum) {
-      let state = taskStateEnum[stateKey];
+      state = taskStateEnum[stateKey]
       if (state.name == name) {
-        return state.value;
+        return state.value
       }
     }
     // 错误提示

@@ -19,41 +19,41 @@ class LoginUser {
   // 上次登录时间
   public lastLoginTime?: string = ''
   // 启用状态
-  public enabled?: Number | null = null
+  public enabled?: number | null = null
   // 微信id
   public weixinid?: string = ''
   public powercode?: string = ''
   public head?: string = ''
   public sex?: string = ''
   // 是否为第一次登录标记
-  public firstLogin?: Number | null = null
+  public firstLogin?: number | null = null
   // 用户的所有标签
   public tagList?: Tag[] = []
   public departments?: Department[] = []
   public roles?: Role[] = []
   public attribute?: any = {}
   public openid?: string = ''
-  public longitude?: Number | null = null
-  public latitude?: Number | null = null
-  public isDelete?: Number | null = null
+  public longitude?: number | null = null
+  public latitude?: number | null = null
+  public isDelete?: number | null = null
   public synOpenid?: string = ''
   public staffId?: string = ''
   public tenantId?: string = ''
   public mainTeamId?: string = ''
   // 未完成工单量
-  public unfinishedTask?: Number | null = null
-  public todayFinishedTask?: Number | null = null
+  public unfinishedTask?: number | null = null
+  public todayFinishedTask?: number | null = null
   public state?: string = ''
-  public cusDistance?: Number | null = null
-  public superAdmin?: Number | null = null
-  public isTeamLeader?: Number | null = null
+  public cusDistance?: number | null = null
+  public superAdmin?: number | null = null
+  public isTeamLeader?: number | null = null
   
-  public static Enable?: Number = 1;
-  public static Disable?: Number= 0;
-  public static FirstLogin?: Number = 0;
-  public static NotFirstLogin?: Number = 1;
-  public static SuperAdmin?: Number = 1;
-  public static NotSuperAdmin?: Number= 1;
+  public static Enable?: number = 1;
+  public static Disable?: number = 0;
+  public static FirstLogin?: number = 0;
+  public static NotFirstLogin?: number = 1;
+  public static SuperAdmin?: number = 1;
+  public static NotSuperAdmin?: number = 1;
   
   // 以下是用于前端的
   // 标签
