@@ -335,6 +335,7 @@ export default {
     // 绑定事件
     changeEventType(doorEventType){
       this.copyEventTypeIdList=doorEventType;
+      this.$emit('changeEventType',doorEventType);
     },
     // 查看规则详情
     async checkRule(id){

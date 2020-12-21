@@ -191,7 +191,7 @@
               </li>
             </ul>
             <div v-if="settingInfo.productVideo && settingInfo.videoOpenState" @click="changeType('video')" class="round-panel middle-panel" :class="nowOption === 'video' ? 'choose-border' : ''" @mouseenter="mouseEnter" @mouseleave="mouseLeave">
-              <span class="video-title">{{settingInfo.productVideo[0] && settingInfo.productVideo[0].title}}</span>
+              <span class="video-title">{{settingInfo.productVideo[0] && settingInfo.productVideo[0].filename}}</span>
               <i class="iconfont" v-show="videoFlagShow" :class="videoPlay?'icon-zanting':'icon-kaishi'" @click="play"></i>
               <video ref="video" @loadedmetadata="videoLoaded" :src="settingInfo.productVideo[0] && settingInfo.productVideo[0].url" style="object-fit:fill;" width="319px" height="100%">浏览器不支持video</video>
               <span class="video-time">{{videoTime}}</span>
@@ -841,6 +841,11 @@ p{
               left: 20px;
               font-size: 18px;
               color:#fff;
+              width: 150px;
+              white-space: nowrap;
+              text-overflow: ellipsis;
+              overflow: hidden;
+              word-break: break-all;
             }
             i{
               position: absolute;
