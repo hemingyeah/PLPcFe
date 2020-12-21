@@ -1,4 +1,4 @@
-import {toArray} from '@src/util/lang';
+import {toArray} from "@src/util/lang";
 
 /** 将form对象转成产品对象，用于提交表单 */
 export function packToProduct(fields, form){
@@ -7,25 +7,25 @@ export function packToProduct(fields, form){
     address: {}
   };
   let attribute = {};
-  const {customer, template, type, serialNumber, name, id, linkman, customerAddress} = form;
+  const {customer, template, type, serialNumber, name, id, linkman, customerAddress, catalogId, qrcodeId } = form;
   let tv = null;
   fields.forEach(f => {
     if (!f.isSystem) {
       attribute[f.fieldName] = form[f.fieldName];
     }
     
-    if (f.formType === 'address' && !f.isSystem) {
+    if (f.formType === "address" && !f.isSystem) {
       tv = form[f.fieldName];
-      let all = [tv.province, tv.city, tv.dist, tv.address].filter(str => !!str).join('');
+      let all = [tv.province, tv.city, tv.dist, tv.address].filter(str => !!str).join("");
 
       attribute[f.fieldName] = {
         ...tv,
       };
 
-      all ? attribute[f.fieldName]['all'] = all : '';
+      all ? attribute[f.fieldName]["all"] = all : "";
     }
   
-    if (f.formType === 'location') {
+    if (f.formType === "location") {
       attribute[f.fieldName] = {};
     }
   
@@ -39,6 +39,14 @@ export function packToProduct(fields, form){
   if (Array.isArray(template) && template.length) {
     product.templateId = template[0].value;
     product.templateName = template[0].label;
+  }
+
+  if(catalogId && catalogId.length){
+    product["catalogId"] = catalogId[0].id
+  }
+
+  if(qrcodeId){
+    product["qrcodeId"] = qrcodeId
   }
   
   if (id) {
@@ -65,7 +73,7 @@ export function packToProduct(fields, form){
 
 /** 将产品对象转成form表单，用于初始化表单 */
 export function packToForm(field, product){
-  const {id, name, serialNumber, type, templateId, templateName, customerId, customerName, address, linkman} = product;
+  const {id, name, serialNumber, type, templateId, templateName, customerId, customerName, address, linkman, catalogId } = product;
   let form = {};
   
   if (customerId) {
@@ -103,6 +111,15 @@ export function packToForm(field, product){
     }]
   } else {
     form.customerAddress = []
+  }
+
+  if(catalogId){
+    // 产品类型关联组件解析form
+    let obj = {
+      id:catalogId,
+      pathName:product.catalogPathName
+    }
+    form["catalogId"] = [obj]
   }
   
   return {

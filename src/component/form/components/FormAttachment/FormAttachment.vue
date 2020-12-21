@@ -1,14 +1,16 @@
 <template>
   <div class="form-attachment">
-    <base-upload @input="input" :isWaterMark="isWaterMark" :value="value" :for-id="`form_${field.fieldName}`" :placeholder="placeHolder"></base-upload>
+    <base-upload @input="input" :is-water-mark="isWaterMark" :value="value" :limit="field.limit || defautUploadMax" :for-id="`form_${field.fieldName}`" :placeholder="placeHolder"></base-upload>
   </div>
 </template>
 
 <script>
-import FormMixin from '@src/component/form/mixin/form';
+import FormMixin from "@src/component/form/mixin/form";
+
+import Uploader from "@src/util/uploader";
 
 export default {
-  name: 'form-attachment',
+  name: "form-attachment",
   mixins: [FormMixin],
   props: {
     value: {
@@ -18,23 +20,25 @@ export default {
   },
   data() {
     return {
-      isWaterMark: false
+      isWaterMark: false,
+      defautUploadMax:Uploader.FILE_MAX_NUM
     }
   },
   computed: {
     placeHolder() {
-      return `${!this.field.isNull ? '[必填]' : ''}${this.field.placeHolder || '点击上传文件'}`;
+      return `${!this.field.isNull ? "[必填]" : ""}${this.field.placeHolder || "点击上传文件"}`;
     }
   },
   methods: {
     input(newValue) {
       let oldValue = null;
-      this.$emit('update', {newValue, oldValue, field: this.field});
-      this.$emit('input', newValue);
+      this.$emit("update", {newValue, oldValue, field: this.field});
+      this.$emit("input", newValue);
     }
   },
   mounted() {
     let { setting } = this.field;
+    setting = setting || {};
     // 图片是否添加水印
     this.isWaterMark = !!setting.isAddWatermark;
   }
