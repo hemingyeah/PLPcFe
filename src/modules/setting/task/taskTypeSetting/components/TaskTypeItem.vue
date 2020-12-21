@@ -8,11 +8,13 @@
                         {{taskType.name}}
                     </h2>
                     <el-row class="task-type-others">
-                        <p>
-                            可用团队: 
-                            <span class="pointer" @click="chooseTeam">{{taskType.tags | formatTeamName}} </span>
+                        <el-row type="flex">
+                            <p>
+                                可用团队: 
+                                <span class="pointer" @click="chooseTeam">{{taskType.tags | formatTeamName}} </span>
+                            </p>
                             <i class="iconfont icon-edit-square pointer" @click="chooseTeam"></i>
-                        </p>
+                        </el-row>
                         <p>
                             最近更新: {{taskType.updateName}}  {{taskType.createTime}}
                         </p>
@@ -73,7 +75,7 @@ export default {
     },
     filters: {
         formatTeamName(tagIds) {
-            return tagIds.length === 0 ? '全部团队' : tagIds[0];
+            return tagIds.length === 0 ? '全部团队' : tagIds.join(',');
         }
     },
     methods: {
@@ -201,6 +203,8 @@ export default {
                 p{
                     margin-bottom: 6px;
                     font-size: 12px;
+                    @include text-ellipsis-2;
+                    word-break: break-all;
                     color: #666666;
                     &:last-child{
                         margin-bottom: 0;

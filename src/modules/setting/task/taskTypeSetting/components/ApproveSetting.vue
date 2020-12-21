@@ -1,23 +1,43 @@
 <template>
     <div class="setting-approve">
         <el-radio-group v-model="radio">
-            <el-radio :label="3">一级审批</el-radio>
-            <el-radio :label="6" class="ml-12">二级审批</el-radio>
+            <el-radio :label="1">一级审批</el-radio>
+            <el-radio :label="2" class="ml-12">二级审批</el-radio>
         </el-radio-group>
         <div class="setting-approve-people">
-            完成该节点时需要审批，审批人
-            <el-select class="w-200" v-model="approveSetting.type" placeholder="请选择">
-                <el-option
-                    v-for="item in options"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value">
-                </el-option>
-            </el-select>
-            <el-row v-if="approveSetting.type === 'users'" class="mt-12">
-                <el-input class="w-200" placeholder="请选择审批人" readonly :value="userNames" @click.native="selectApproveUser"/>
-                <el-button class="ml-12" type="primary" size="small" @click="selectApproveUser">添加审批人</el-button>
-            </el-row>
+            <template v-if="radio === 1">
+                完成该节点时需要审批，审批人
+                <el-select class="w-200" v-model="approveSetting.type" placeholder="请选择">
+                    <el-option
+                        v-for="item in options"
+                        :key="item.value"
+                        :label="item.label"
+                        :value="item.value">
+                    </el-option>
+                </el-select>
+                <el-row v-if="approveSetting.type === 'users'" class="mt-12">
+                    <el-input class="w-200" placeholder="请选择审批人" readonly :value="userNames" @click.native="selectApproveUser"/>
+                    <el-button class="ml-12" type="primary" size="small" @click="selectApproveUser">添加审批人</el-button>
+                </el-row>
+            </template>
+            <template v-else-if="radio > 1">
+                完成该节点时需要审批,
+                <span v-for="idx in radio" :key="idx">
+                    {{idx | formatNumToCN}}级审批人
+                    <el-select class="w-200" v-model="approveSetting.type" placeholder="请选择">
+                        <el-option
+                            v-for="item in options"
+                            :key="item.value"
+                            :label="item.label"
+                            :value="item.value">
+                        </el-option>
+                    </el-select>
+                    <!-- <el-row v-if="approveSetting.type === 'users'" class="mt-12"> -->
+                        <el-input v-if="approveSetting.type === 'users'" class="w-200 mt-12" placeholder="请选择审批人" readonly :value="userNames" @click.native="selectApproveUser"/>
+                        <!-- <el-button class="ml-12" type="primary" size="small" @click="selectApproveUser">添加审批人</el-button> -->
+                    <!-- </el-row> -->
+                </span>
+            </template>
         </div>
     </div>
 </template>
@@ -51,6 +71,13 @@ export default {
             return this.approveSetting.users && this.approveSetting.users.map(item => item.displayName).join(',');
         }
     },
+    filters: {
+        formatNumToCN(num) {
+            let changeNum = ['零', '一', '二', '三', '四', '五', '六', '七', '八', '九']; 
+
+            return changeNum[num];
+        }
+    },
     methods: {
         selectApproveUser() {
             let options = {
@@ -76,6 +103,7 @@ export default {
 <style lang="scss" scoped>
 .setting-approve{
     &-people{
+        margin-bottom: 12px;
         font-size: 14px;
         color: #999999;
     }
@@ -87,6 +115,10 @@ export default {
 
 .mt-12{
     margin-top: 12px;
+}
+
+.mb-12{
+    margin-bottom: 12px;
 }
 
 .w-200{

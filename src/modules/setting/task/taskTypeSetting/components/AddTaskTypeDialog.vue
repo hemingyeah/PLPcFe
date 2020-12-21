@@ -134,13 +134,15 @@ export default {
 
             switch(type) {
                 case 'blank':  // 空白模板
-                    this.$platform.openTab({
-                        id: "task_flow_setting",
-                        title: "工单流程设置",
-                        url: `/setting/task/taskFormSet?type=add`,
-                        reload: true
-                    });
-                    this.cancel();
+                    // todo_zr: 在当前页面打开
+                    // this.$platform.openTab({
+                    //     id: "task_flow_setting",
+                    //     title: "工单流程设置",
+                    //     url: `/setting/task/taskFormSet?type=add`,
+                    //     reload: true
+                    // });
+                    // this.cancel();
+                    window.location.href = '/setting/task/taskFormSet?type=add';
                     break;
                 case 'trade': // 行业模板
                     this.isShowChooseTradeDialog = true;
@@ -161,6 +163,14 @@ export default {
                     this.cancel();
                 }
             });
+        },
+        /**
+         * 创建工单 todo_zr
+         */
+        createTaskType() {
+            if(!this.typeName) return this.$message.error('请输入名称');
+            if(this.typeName.length > 20) return this.$message.error('名称不能超过20个字');
+            if(!/^[a-zA-Z0-9\u4e00-\u9fa5]+$/.test(this.typeName)) return this.$message.error('请输入中文、字母、数字');
         }
     },
     components: {

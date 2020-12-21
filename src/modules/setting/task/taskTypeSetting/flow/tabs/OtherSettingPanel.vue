@@ -129,7 +129,7 @@
                 </h2>
                 <p>
                     开启后，在以下节点时若负责人超出工单距离
-                    <el-input class="w-120" v-model="cameraForm.exceptionRange" placeholder="请输入距离"></el-input>
+                    <el-input class="w-120" v-model="cameraForm.exceptionRange" onkeyup="if(isNaN(value))execCommand('undo')" placeholder="请输入距离"></el-input>
                     公里
                 </p>
                 将在工单流程中提示位置异常

@@ -15,7 +15,7 @@
                 </div>
                 <div v-if="flowMap[key].isOpen || flowMap[key].isSystem" class="open-tag">已开启</div>
                 <div class="open-btn" @click.stop>
-                    <el-switch v-model="flowMap[key].isOpen" v-if="!flowMap[key].isSystem" />
+                    <el-switch :value="flowMap[key].isOpen" v-if="!flowMap[key].isSystem" @change="(status) => flowSwitchTaskType(key, status)"/>
                 </div>
             </el-row>
         </el-row>
@@ -27,7 +27,7 @@
                 {{flowMap[currFlow].desc}}
             </div>
             <div class="setting-flow-main-content">
-                <flow-setting  :type="currFlow" :setting="flowMap[currFlow]" :commonSetting="commonSetting" style="height: 100%"/>
+                <flow-setting :taskTypeId="taskTypeId"  :type="currFlow" :setting="flowMap[currFlow]" :commonSetting="commonSetting" style="height: 100%"/>
             </div>
         </div>
         <!--E 流程设置 -->
@@ -35,10 +35,21 @@
 </template>
 
 <script>
+import _ from "lodash";
+/** api */
+import * as SettingApi from "@src/api/SettingApi";
+/** components */
 import FlowSetting from '../../components/FlowSetting.vue';
+
 import flowMap from "../flowMap";
 export default {
     name: 'flow-setting-panel',
+    props: {
+        taskTypeId: {
+            type: String,
+            default: ''
+        }
+    },
     data() {
         return {
             currFlow: 'create',  //当前设置的流程
@@ -82,6 +93,23 @@ export default {
             }
             this.flowSetting = res;
         },
+        /**
+         * 启用或禁用工单类型
+         */
+        flowSwitchTaskType: _.throttle(async function(flowName, status) {
+            console.log(flowName, status);
+            let params = {
+                id: this.taskTypeId,
+                flowName,
+                status
+            }
+            try {
+                await SettingApi.flowSwitchTaskType(params);
+                this.flowMap[flowName].isOpen = status;
+            } catch (error) {
+                console.error(error);
+            }
+        }, 300),
         clickFlow(type) {
             this.currFlow = type;
         }

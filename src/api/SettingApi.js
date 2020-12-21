@@ -143,7 +143,37 @@ export function changeTags(params) {
   return http.post('/setting/taskType/changeTags', params, false);
 }
 
+/**
+ * 创建工单类型
+ * 
+ * @param {string} params.typeName 工单类型名称
+ * @param {string} params.templateId 模板id  
+ * @param {string} params.color 颜色
+ */
+export function createTaskType(params) {
+  return http.post('/setting/taskType/create', params, false);
+}
 
+/**
+ * 根据行业模板创建工单类型
+ * 
+ * @param {string} params.taskTypeId 行业模板id
+ * @param {string} params.taskTypeName 工单类型名称  
+ * @param {string} params.color 颜色
+ */
+export function importTaskType(params) {
+  return http.post('/setting/taskType/import', params, false);
+}
 
+/**
+ * 启用或禁用工单流程
+ * 
+ * @param {string} params.id 工单类型id  
+ * @param {boolean} params.status 状态 
+ * @param {string} params.flowName 流程 
+ */
+export function flowSwitchTaskType(params) {
+  return http.post('/setting/taskType/flowSwitch', params, false);
+}
 
 /******************** E 工单类型设置 ***************/

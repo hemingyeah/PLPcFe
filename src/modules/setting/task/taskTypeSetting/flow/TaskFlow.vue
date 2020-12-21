@@ -3,7 +3,7 @@
     <!--S 头部 -->
     <div class="setting-flow-header">
       <el-row class="setting-flow-header-left" type="flex">
-        <p class="return-btn">返回</p>
+        <p class="return-btn" @click="goBack">返回</p>
         <div>
           <el-row type="flex">
             <el-popover
@@ -46,7 +46,7 @@
     <!--E 头部 -->
 
     <!-- 设置页  --> 
-    <component :is="settingStep[currTab].compName"></component>
+    <component :is="settingStep[currTab].compName" :taskTypeId="taskTypeId"></component>
   </div>
 </template>
 
@@ -105,6 +105,9 @@ export default {
     }
   },
   methods: {
+    goBack() {
+      window.history.go(-1);
+    },
     submit() {
 
     }
