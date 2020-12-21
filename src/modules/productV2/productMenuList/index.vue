@@ -279,8 +279,8 @@
                   </template>
                   <div>
                     {{
-                      scope.row[column.field].length > 1
-                        ? `+${scope.row[column.field].length - 1}`
+                      scope.row[column.field].length > 5
+                        ? `+${scope.row[column.field].length - 5}`
                         : ''
                     }}
                   </div>
@@ -748,14 +748,10 @@ export default {
       }));
 
       if (localStorageData.columnStatus) {
-        localStorageData.columnStatus[
-          `${this.selectColumnState}`
-        ] = columnsList;
+        localStorageData.columnStatus = columnsList;
         columnsStatus = localStorageData.columnStatus;
       } else {
-        columnsStatus = {
-          [`${this.selectColumnState}`]: columnsList,
-        };
+        columnsStatus = columnsList;
       }
 
       this.saveDataToStorage("columnStatus", columnsStatus);
@@ -768,7 +764,7 @@ export default {
       try {
         fromId = window.frameElement.getAttribute("id");
       } catch (error) {
-        
+        console.warn(error, "error try catch");
       }
       this.$platform.openTab({
         id: `productV2_catalog_view_${id}`,
@@ -1210,7 +1206,7 @@ export default {
       });
     },
     getLocalStorageData() {
-      const dataStr = localStorage.getItem("productV2_product_menu_list") || "[]";
+      const dataStr = localStorage.getItem("productV2_product_menu_list") || "{}";
       return JSON.parse(dataStr);
     },
     saveDataToStorage(key, value) {
