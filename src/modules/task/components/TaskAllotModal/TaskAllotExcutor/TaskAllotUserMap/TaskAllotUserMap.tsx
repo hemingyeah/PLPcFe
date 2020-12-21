@@ -225,6 +225,7 @@ export default class TaskAllotUserMap extends VC {
         <task-allot-map 
           ref='TaskAllotMapComponent'
           idName={this.mapId}
+          taskTypesMap={this.taskTypesMap}
           handlerCustomFunc={() => this.outdieBuildMarkers()} 
           setMapFunc={(AMap: any) => this.outsideSetMap(AMap)}
         />

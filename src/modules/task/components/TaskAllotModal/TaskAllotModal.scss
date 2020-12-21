@@ -186,4 +186,18 @@
     max-width: 100% !important;
   }
 }
+
+#TaskAllotPoolMapContainer,
+#TaskAllotUserMapContainer {
+  .customer-marker {
+    /*关键帧名称*/
+    -webkit-animation-name: scaleDraw;
+    /*动画的速度曲线*/
+    -webkit-animation-timing-function: ease-in-out;
+    /*动画播放的次数*/
+    -webkit-animation-iteration-count: infinite;
+    /*动画所花费的时间*/
+    -webkit-animation-duration: 2s;
+  }
+}
 /* end new  */

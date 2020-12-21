@@ -156,5 +156,16 @@
       color: #fff;
     }
   }
+  .task-allot-no-address {
+    color: $text-color-regular;
+    i {
+      margin-right: 3px;
+    }
+  }
+}
+.task-allot-synergy-top {
+  position: absolute;
+  top: 60px;
+  left: 500px;
 }
 /* end new */

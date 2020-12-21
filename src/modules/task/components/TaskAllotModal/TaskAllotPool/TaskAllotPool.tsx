@@ -594,7 +594,8 @@ export default class TaskAllotPool extends Vue {
         
         <task-allot-map 
           ref='TaskAllotMap' 
-          idName={this.mapId} 
+          idName={this.mapId}
+          taskTypesMap={this.taskTypesMap}
           handlerCustomFunc={(amap: any) => this.buildMarkers(amap)} 
         />
         

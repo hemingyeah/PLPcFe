@@ -20,6 +20,7 @@ import { CreateElement } from 'vue'
 import VC from '@model/VC'
 /* types */
 import TaskConfig from '@model/types/TaskConfig'
+import TaskType from "@model/entity/TaskType";
 
 declare let AMap: any
 
@@ -36,6 +37,8 @@ export default class TaskAllotMap extends VC {
   
   // 地图 id
   @Prop() readonly idName: string | undefined
+  // 工单类型列表
+  @Prop() readonly taskTypesMap: { [x: string]: TaskType} | undefined
   // 自定义事件
   @Prop() readonly handlerCustomFunc: Function | undefined
   // 设置地图事件
@@ -72,6 +75,11 @@ export default class TaskAllotMap extends VC {
   private get task(): any {
     // 默认是获取的工单派单组件的，如需自定义 需要自己写
     return this.TaskAllotModalComponent.outsideTask || {}
+  }
+  
+  /* 工单 */
+  private get taskType(): TaskType {
+    return this.taskTypesMap?.[this.task?.templateId] || { id: '', templateId: '' }
   }
   
   /* 工单配置信息 */
@@ -143,7 +151,7 @@ export default class TaskAllotMap extends VC {
    * @description 构建客户地址标记内容
   */
   private buildCustomerAddressMapMarkerContent(): string {
-    return '<i class="bm-location-dot"></i><div class="map-address-title">客户地址</div>';
+    return '<div class="customer-marker"><i class="bm-location-dot"></i><div class="map-address-title">客户地址</div></div>';
   }
   
   /**
@@ -226,6 +234,7 @@ export default class TaskAllotMap extends VC {
           show={this.showMapInfoWindow}
           showModifyPlanTime={this.allowModifyPlanTime}
           task={this.task}
+          taskType={this.taskType}
         />
       </div>
     )

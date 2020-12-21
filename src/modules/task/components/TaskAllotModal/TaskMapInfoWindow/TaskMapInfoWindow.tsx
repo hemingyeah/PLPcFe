@@ -4,16 +4,18 @@ import BizModifyPlanTime from '@src/component/business/BizModifyPlanTime/BizModi
 /* enum */
 import ComponentNameEnum from '@model/enum/ComponentNameEnum'
 import DateFormatEnum from '@model/enum/DateFormatEnum'
+import {TaskFieldNameMappingEnum} from '@model/enum/FieldMappingEnum'
 /* entity */
 import Field from '@model/entity/Field'
+import TaskType from '@model/entity/TaskType'
 /* vue */
 import VC from '@model/VC'
-import { Component, Prop, Emit } from 'vue-property-decorator'
-import { CreateElement } from 'vue'
+import {Component, Emit, Prop} from 'vue-property-decorator'
+import {CreateElement} from 'vue'
 /* util */
-import { openTabForTaskView, openTabForCustomerView } from '@src/util/business/openTab'
-import { fmt_address } from '@src/filter/fmt'
-import { formatDate } from '@src/util/lang'
+import {openTabForCustomerView, openTabForTaskView} from '@src/util/business/openTab'
+import {fmt_address} from '@src/filter/fmt'
+import {formatDate} from '@src/util/lang'
 import Log from '@src/util/log.ts'
 /* scss */
 import '@src/modules/task/components/TaskAllotModal/TaskMapInfoWindow/TaskMapInfoWindow.scss'
@@ -68,10 +70,32 @@ export default class TaskMapInfoWindow extends VC {
   @Prop({ default: false }) showModifyPlanTime: boolean | undefined
   /* 工单信息 */
   @Prop() task: any | undefined
+  /* 工单信息 */
+  @Prop() taskType: TaskType | undefined
   
   /* 工单地图信息弹窗数据 */
   get taskMapInfoData(): TaskMapInfoData {
     return new TaskMapInfoData(this.task)
+  }
+  
+  /* 工单类型字段列表 */
+  get taskTypeFields(): any {
+    return this.taskType?.field || {}
+  }
+  
+  /* 是否存在服务内容字段 */
+  get isHaveServiceContentField(): boolean {
+    return this.existsField(TaskFieldNameMappingEnum.ServiceContent)
+  }
+  
+  /* 是否存在服务类型字段 */
+  get isHaveServiceTypeField(): boolean {
+    return this.existsField(TaskFieldNameMappingEnum.ServiceType)
+  }
+  
+  /* 是否存在优先级字段 */
+  get isHaveLevelField(): boolean {
+    return this.existsField(TaskFieldNameMappingEnum.Level)
   }
   
   /** 
@@ -81,6 +105,29 @@ export default class TaskMapInfoWindow extends VC {
   private planTimeChangedHandler(planTime: string) {
     Log.succ(Log.Start, `TaskMapInfoWindow -> ${this.planTimeChangedHandler.name}`)
     return planTime
+  }
+  
+  /**
+   * @description 是否存在某个字段
+   */
+  private existsField(fieldName: TaskFieldNameMappingEnum) {
+    // 是否存在
+    let isExists: boolean = false
+    try {
+      let field: any
+      for (let index in this.taskTypeFields) {
+        // 字段
+        field = this.taskTypeFields[index]
+        // 是否相等
+        isExists = field?.name === fieldName
+        if (isExists) break
+      }
+    } catch (error) {
+      isExists = false
+      Log.error(error, this.existsField.name)
+    }
+    
+    return isExists
   }
   
   render(h: CreateElement) {
@@ -134,9 +181,9 @@ export default class TaskMapInfoWindow extends VC {
               )
             }
           </p>
-          <p><label>服务类型：</label>{ serviceType || '' }</p>
-          <p><label>服务内容：</label>{ serviceContent || '' }</p>
-          <p><label>描述：</label>{ description || '' }</p>
+          { this.isHaveServiceTypeField && <p><label>服务类型：</label>{ serviceType || '' }</p> }
+          { this.isHaveServiceContentField && <p><label>服务内容：</label>{ serviceContent || '' }</p> }
+          { this.isHaveLevelField && <p><label>描述：</label>{ description || '' }</p> }
           <div class='info-window-arrow'></div>
         </div>
       </div>

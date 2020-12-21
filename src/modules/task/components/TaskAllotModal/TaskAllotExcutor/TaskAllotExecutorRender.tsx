@@ -118,24 +118,27 @@ class TaskAllotExecutorRender extends TaskAllotExecutorMethods {
   /**
    * @description 渲染协同人
   */
-  public renderSysnergySelect(): VNode {
+  public renderSysnergySelect(): VNode | null {
+    if (!this.synergyUserList || !this.synergyUserList.length) return null
+    
+    let user: any = this.synergyUserList?.[0] || {}
+    let isMoreOne = Boolean(this.synergyUserList && this.synergyUserList.length > 1)
+    let classNames: string[] = ['task-allot-sysnergy-select']
+    
     return (
-      <div class='task-allot-sysnergy-select' onClick={() => this.chooseSynergyUser()}>
+      <div class={classNames} onClick={() => this.chooseSynergyUser()}>
         <ui-input placeholder='请选择协同人'>
           {
-            this.synergyUserList && this.synergyUserList.map((synergyUser: LoginUser, index: number) => {
-              return (
-                <el-tag
-                  key={synergyUser.userId} 
-                  closable 
-                  disable-transitions={true}
-                  type='info'
-                  onClose={() => this.synergyUserCloseHandler(synergyUser)}
-                >
-                  {synergyUser.displayName}
-                </el-tag>
-              )
-            })
+            <el-tag key={user?.userId} size='mini' disable-transitions closable type='info' onClose={() => this.debouncedRemoveDepartmentUser(user)}>
+              {user?.displayName || ''}
+            </el-tag>
+          }
+          {
+            isMoreOne &&  (
+              <div class='biz-team-select-tags'>
+                <div class='biz-team-select-tag'>+{this.synergyUserList.length - 1}</div>
+              </div>
+            )
           }
         </ui-input>
       </div>
@@ -198,8 +201,8 @@ class TaskAllotExecutorRender extends TaskAllotExecutorMethods {
   public renderTaskAllotUserTableHeader(): VNode {
     return (
       <div class='task-allot-user-table-header'>
-        { this.renderTaskAllotUserTableHeaderLabels()}
-        {this.renderTaskAllotUserTableHeaderSelectBlock()}
+        { this.renderTaskAllotUserTableHeaderLabels() }
+        { this.renderTaskAllotUserTableHeaderSelectBlock() }
       </div>
     )
   }
@@ -208,9 +211,20 @@ class TaskAllotExecutorRender extends TaskAllotExecutorMethods {
    * @description 渲染工单指派人员表格头部 标签列表
   */
   public renderTaskAllotUserTableHeaderLabels(): VNode {
-    if (this.isMapMode) return (
-      <div class='task-allot-user-table-header-label'></div>
-    )
+    if (this.isMapMode) {
+      // 是否存在工单地址
+      const isHaveTaskAddress: boolean = Boolean(this.taskAddress?.latitude && this.taskAddress?.longitude)
+      return (
+        <div class='task-allot-user-table-header-label'>
+          { !isHaveTaskAddress && (
+            <div class='task-allot-no-address'>
+              <i class='iconfont icon-fdn-info'></i>
+              该工单暂无客户地址
+            </div>
+          ) }
+        </div>
+      )
+    }
     
     return (
       <div class='task-allot-user-table-header-label'>
