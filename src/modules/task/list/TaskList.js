@@ -2673,7 +2673,6 @@ export default {
           }
         }
       })
-      taskSelfFields = [...taskSelfFields, ...AbnormalList]
       taskSelfFields.map(item => {
         item.label = item.displayName
         item.export = true
@@ -2693,7 +2692,7 @@ export default {
       });
 
       // 系统信息
-      let sysList = allExport
+      let sysList = [...allExport, ...AbnormalList]
 
       this.exportColumns = [
         {
