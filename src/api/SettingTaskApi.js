@@ -122,4 +122,28 @@ export const deleteTaskCard =  (params = {}) => {
   return http.post('/setting/taskType/deleteCard', params,false)
 }
 
+/**
+ * @description 使用规则设置
+ * @param {Object} params -- 参数对象
+ */
+export const saveRulesFlow =  (params = {}) => {
+  return http.post('/setting/taskType/card/saveNotNullFlow', params)
+}
+
+/**
+ * @description 获取角色列表
+ * @param {Object} params -- 参数对象
+ */
+export function getRoleList(params) {
+  return http.get('/setting/role/list', params)
+}
+
+/**
+ * @description 保存角色列表
+ * @param {Object} params -- 参数对象
+ */
+export function saveCardAuth(params) {
+  return http.post('/setting/taskType/cardAuth', params,false)
+}
+
 /* ------------- end 工单类型组件设置 ---------------- */

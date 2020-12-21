@@ -13,13 +13,14 @@
                             <span class="pointer" v-else>未设置 </span>
                             <i class="iconfont icon-bianji1 pointer" @click="onSetRules"></i>
                         </p>
-                        <p @click="onSetRules">
+                        <p @click="onSetEditpermiss">
                             使用权限：
                             <span class="pointer see-role">查看角色权限 </span>
                             <i class="iconfont icon-bianji1 pointer"></i>
                         </p>
                         <p>
-                            添加次数: <span v-if="taskCard.inputType == 'single'">单次</span> <span v-if="taskCard.inputType == 'multiple'">多次</span>
+                            添加次数: 
+                            <span v-if="taskCard.inputType == 'single'">单次</span> <span v-if="taskCard.inputType == 'multiple'">多次</span>
                         </p>
                     </el-row>
                 </el-row >
@@ -31,10 +32,24 @@
                 <i class="iconfont icon-shanchu-copy"> 删除</i>
             </div>
         </el-row>
+
         <!-- start 设置使用规则 -->
         <use-rules-dialog
-            :id="taskCard.id"
+            :taskCard="taskCard"
+            :taskTypeId="taskTypeId"
             :visiable.sync="isShowRulesModal"
+            @onClose="onCloseRules"
+            @udateCard="udateCard"
+            @update="updateTeamList"/>
+        <!-- end 设置使用规则 -->
+
+        <!-- start 设置使用规则 -->
+        <card-editpermiss-dialog
+            :taskCard="taskCard"
+            :taskTypeId="taskTypeId"
+            :visiable.sync="isShowEditpermissModal"
+            @onClose="onCloseEditpermiss"
+            @udateCard="udateCard"
             @update="updateTeamList"/>
         <!-- end 设置使用规则 -->
     </el-card>
@@ -46,7 +61,8 @@ import _ from "lodash";
 import * as SettingTaskApi from "@src/api/SettingTaskApi";
 
 /** component */
-import UseRulesDialog from '../components/TaskCard/UseRulesDialog.vue';
+import UseRulesDialog from '../components/TaskCard/UseRulesDialog';
+import cardEditpermissDialog from '../components/TaskCard/cardEditpermissDialog';
 
 export default {
     name: 'task-card-item',
@@ -61,6 +77,7 @@ export default {
     },
     data() {
         return {
+            isShowEditpermissModal: false,
             isShowRulesModal: false  // 选择可用团队弹窗
         }
     },
@@ -94,6 +111,21 @@ export default {
         onSetRules() {
             this.isShowRulesModal = true;
         },
+        onCloseRules() {
+            this.isShowRulesModal = false;
+        },
+        udateCard() {
+            this.$emit('udateCard');
+            this.isShowRulesModal = false;
+            this.isShowEditpermissModal = false;
+        },
+        //编辑权限
+        onSetEditpermiss() {
+            this.isShowEditpermissModal = true;
+        },
+        onCloseEditpermiss() {
+            this.isShowEditpermissModal = false;
+        },
         /**
          * 更新taskCard
          */
@@ -111,6 +143,7 @@ export default {
     },
     components: {
         [UseRulesDialog.name]: UseRulesDialog,
+        [cardEditpermissDialog.name]: cardEditpermissDialog,   
     }
 }
 </script>
@@ -122,6 +155,10 @@ export default {
     height: 159px;
     background: #FFFFFF;
     border-radius: 4px;
+    box-shadow: 0px 4px 10px 0px rgba(0, 0, 0, 0.04); 
+    &:hover{
+        box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.12);
+    }
     .task-card-main{
         display: flex;
         height: calc(100% - 32px);
@@ -136,6 +173,7 @@ export default {
             justify-content: space-between;
             height: 100%;
             .task-card-name{
+                width: 300px;
                 margin-bottom: 0;
                 @include text-ellipsis-2;
                 word-break: break-all;
@@ -147,6 +185,7 @@ export default {
             .task-card-others{
                 i{
                     font-size: 12px;
+                    color: #666;
                     &:hover{
                         color: $color-primary;
                     }
@@ -155,6 +194,10 @@ export default {
                     margin-bottom: 4px;
                     font-size: 12px;
                     color: #666666;
+                    span{
+                        color: #333333;
+                        margin-right: 8px;
+                    }
                     &:last-child{
                         margin-bottom: 0;
                         margin-top: 4px;

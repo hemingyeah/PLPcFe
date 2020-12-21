@@ -14,12 +14,12 @@
       </div>
       <p class="card-setting-msg">
         附加组件是管理工单的辅助工具，您可以分类记录更新工单的信息，如需更多附加组件请在工单组件管理中添加
-        <el-tooltip placement="top" popper-class="form-displaymode-setting-tooltip" >
+        <el-tooltip placement="top" popper-class="card-display-tooltip" >
           <div slot="content">
             <template>
-              <div class="form-displaymode-setting-item"><span>・</span>使用规则：可以控制每个附加组件在什么节点前必填，以及在什么状态时可以被编辑；可以通过【配置使用规则】功能查看配置详情或修改</div>
-              <div class="form-displaymode-setting-item"><span>・</span>使用权限：可以控制哪些角色能查看及修改附加组件；默认能看到工单的用户都可以使用附加组件，可以通过【配置使用权限】功能查看详情或修改</div>
-              <div class="form-displaymode-setting-item">类型：可以添加多次还是只能添加一次，由附加组件属性决定</div>
+              <div class="card-displaymode--item">● 使用规则：可以控制每个附加组件在什么节点前必填，以及在什么状态时可以被编辑；可以通过【配置使用规则】功能查看配置详情或修改</div>
+              <div class="card-displaymode-item">● 使用权限：可以控制哪些角色能查看及修改附加组件；默认能看到工单的用户都可以使用附加组件，可以通过【配置使用权限】功能查看详情或修改</div>
+              <div class="card-displaymode-item">类型：可以添加多次还是只能添加一次，由附加组件属性决定</div>
             </template>
           </div>
           <i class="iconfont icon-question"></i>
@@ -46,7 +46,7 @@
             :key="item.id"
             :taskCard="taskCardList[idx]"
             :taskTypeId="taskTypeId"
-            @deleteCard="onDeleteCard"
+            @udateCard="udateCard"
             @updateAttr="obj => {
               updateTaskCard(item, obj)
             }">
@@ -111,8 +111,8 @@ export default {
         }
       }
     },
-    //删除组件更新列表数据
-    onDeleteCard() {
+    //更新列表数据
+    udateCard() {
       this.fetchTasktype();
     },
 
@@ -194,6 +194,7 @@ export default {
       line-height: 20px;
       .el-tooltip{
         font-size: 12px;
+        color: #999;
       }
     }
   }
@@ -209,6 +210,13 @@ export default {
     }
   }
 }
+.card-display-tooltip{
+  span{
+    width: 8px;
+    height: 8px;
+  }
+}
+
 // transtion
 .flip-list-move {
   transition: transform 0.5s;

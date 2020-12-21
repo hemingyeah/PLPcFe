@@ -37,7 +37,7 @@
         <el-row class="task-card-opearte" type="flex">
             <div class="task-card-opearte-more" >
                 <el-dropdown placement="top">
-                   <i class="icon-ziyuan iconfont">更多操作</i>
+                   <i class="icon-diandiandian iconfont">更多操作</i>
                    <el-dropdown-menu slot="dropdown">
                         <el-dropdown-item>
                             <div class="opearte_btn" @click="editRename"><i class="iconfont icon-bianji1"></i>重命名</div>
@@ -49,7 +49,7 @@
                 </el-dropdown>
             </div>
             <div class="task-card-opearte-modify" @click="modifyTaskType">
-                <i class="icon-ziyuan iconfont">编辑</i>
+                <i class="icon-edit-square iconfont">编辑</i>
             </div>
         </el-row>
         <!-- end 操作 -->
@@ -154,6 +154,10 @@ export default {
     height: 180px;
     background: #FFFFFF;
     border-radius: 4px;
+    box-shadow: 0px 4px 10px 0px rgba(0, 0, 0, 0.04); 
+    &:hover{
+        box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.12);
+    }
     .task-card-main{
         display: flex;
         height: calc(100% - 32px);
@@ -233,9 +237,12 @@ export default {
             line-height: 32px;            
             i{
                 font-size: 12px;
-                color: #999999;
+                color: #999999;  
                 &:hover{
                     color: $color-primary; 
+                }
+                &::before{
+                    margin-right: 8px;
                 }
             }
            
