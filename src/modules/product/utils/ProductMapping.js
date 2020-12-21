@@ -40,9 +40,10 @@ export function packToProduct(fields, form){
     product.templateId = template[0].value;
     product.templateName = template[0].label;
   }
+  
 
-  if(catalogId && catalogId.length){
-    product["catalogId"] = catalogId[0].id
+  if(catalogId){
+    product["catalogId"] = catalogId.id
   }
 
   if(qrcodeId){

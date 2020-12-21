@@ -326,7 +326,7 @@
                   <template v-for="(item, index) in scope.row.productPic">
                     <img :key="index"
                          v-if="index <= 4"
-                         class="curs-point"
+                         class="cur-point"
                          :src="
                            item.url
                              ? `${item.url}?x-oss-process=image/resize,m_fill,h_32,w_32`

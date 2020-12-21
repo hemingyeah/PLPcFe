@@ -170,37 +170,30 @@
           >
             <template slot-scope="scope">
               <template v-if="column.fieldName === 'pathName'">
-                <sample-tooltip :row="scope.row">
-                  <template slot="content" slot-scope="{ isContentTooltip }">
-                    <a
-                      href=""
-                      class="view-detail-btn"
-                      @click.stop.prevent="openProductMenuTab(scope.row.id)"
-                    >
-                      {{ scope.row[column.field] }}
-                    </a>
-                  </template>
-                </sample-tooltip>
+                <a
+                  href=""
+                  class="color-primary"
+                  @click.stop.prevent="openProductMenuTab(scope.row.id)"
+                >
+                  {{ scope.row[column.field] }}
+                </a>
               </template>
 
-              <template v-if="column.fieldName === 'productVideo'">
+              <template v-else-if="column.fieldName === 'productVideo'">
                 <template v-if="scope.row.productVideo.length">
-                  <sample-tooltip :row="scope.row">
-                    <template slot="content" slot-scope="{ isContentTooltip }">
-                      <a
-                        href=""
-                        class="view-detail-btn"
-                        @click.stop.prevent="
-                          previewVideo(scope.row.productVideo[0].url)
-                        "
-                      >
-                        {{
-                          scope.row.productVideo[0] &&
-                            scope.row.productVideo[0].filename
-                        }}
-                      </a>
-                    </template>
-                  </sample-tooltip>
+                  <a
+                    href=""
+                    class="color-primary"
+                    @click.stop.prevent="
+                      previewVideo(scope.row.productVideo[0].url)
+                    "
+                  >
+                    {{
+                      scope.row.productVideo[0] &&
+                        scope.row.productVideo[0].filename
+                    }}
+                  </a>
+                      
                 </template>
               </template>
 
@@ -268,7 +261,7 @@
                     <img
                       :key="index"
                       v-if="index <= 4"
-                      class="curs-point mar-r-8"
+                      class="cur-point mar-r-8"
                       :src="
                         item.url
                           ? `${item.url}?x-oss-process=image/resize,m_fill,h_32,w_32`
@@ -292,7 +285,7 @@
                     <template v-for="(item, index) in scope.row.thumbnail">
                       <img
                         :key="index"
-                        class="curs-point"
+                        class="cur-point"
                         :src="
                           item.url
                             ? `${item.url}?x-oss-process=image/resize,m_fill,h_32,w_32`
