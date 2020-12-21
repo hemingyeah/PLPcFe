@@ -200,6 +200,9 @@
               <template v-else-if="column.field === 'tags'">
                 {{ scope.row | formatTags }}
               </template>
+              <template v-else-if="column.formType === 'user' && scope.row.attribute[column.field]">
+                {{ getUserName(column, scope.row.attribute[column.field]) }}
+              </template>
               <!-- 自定义的选择类型字段显示， 与type 区别-->
               <template v-else-if="column.formType === 'cascader'">
                 {{ scope.row[column.field] | displaySelect }}

@@ -194,6 +194,7 @@ import {
   clearCatalogData,
 } from "@src/api/ProductV2Api";
 import { warn } from "vue-class-component/lib/util";
+import { log } from "mathjs";
 
 const urlKey = {
   catalogName: "catalog_name",
@@ -336,10 +337,10 @@ export default {
       return isMP4 && isLt10M;
     },
     onRemovePic (o, a) {
-      this.$set(this.productMenuValue, "productPic", this.productMenuValue.productPic.filter(item => item.uid == o.uid));
+      this.$set(this.productMenuValue, "productPic", this.productMenuValue.productPic.filter(item => item.uid != o.uid));
     },
     onRemoveThu (o, a) {
-      this.$set(this.productMenuValue, "thumbnail", this.productMenuValue.thumbnail.filter(item => item.uid == o.uid));
+      this.$set(this.productMenuValue, "thumbnail", this.productMenuValue.thumbnail.filter(item => item.uid != o.uid));
     },
     UploadImagePic (param) {
       Uploader.upload(param.file, "/files/upload")
@@ -354,6 +355,7 @@ export default {
           }
 
           let file = result.data;
+          console.log(param, "param");
           let item = {
             uid: param.file.uid,
             id: file.id,

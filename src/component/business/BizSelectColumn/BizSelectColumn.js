@@ -51,6 +51,7 @@ const BizSelectColumn = {
   methods: {
     buildSortLists(treeNode = {}) {
       let { columns } = treeNode;
+      
       let isColumnsObject = this.isColumnsObject(columns)
       let lists = columns
 
@@ -61,6 +62,7 @@ const BizSelectColumn = {
       } else {
         lists = columns.filter(column => column?.show)
       }
+      
 
       return lists
     },
@@ -202,6 +204,7 @@ const BizSelectColumn = {
      * @description 父级复选框 变化
     */
     checkboxParentChange(value, treeNode, parent) {
+      console.log(value, treeNode, parent, 123);
       treeNode.checked = value;
       // 全选
       if (value) {
@@ -219,6 +222,7 @@ const BizSelectColumn = {
     */
     columnFieldChangeWithSort(checked, field, parent) {
       let isParentRoot = parent.root
+      console.log(1);
       let sortList = this.columnSortList.slice()
 
       if (isParentRoot) {
@@ -259,6 +263,8 @@ const BizSelectColumn = {
       checked
         ? templateColumns.push(convertDisplayNameToName(field))
         : templateColumns = templateColumns.filter(item => item.fieldName != field.fieldName)
+
+      console.log(2);
       // 未找到类型
       templateIndex == -1 
         ? this.columnSortList.push({ name: parent.name, lists: [convertDisplayNameToName(field)] })
@@ -280,8 +286,9 @@ const BizSelectColumn = {
     */
     columnParentChangeWithSort(checked, treeNode, parent) {
       let isTreeNodeRoot = treeNode.root
-      let sortList = this.columnSortList.slice()
+      let sortList = _.cloneDeep(this.columnSortList)
       let isColumnsObject = this.isColumnsObject(treeNode.columns)
+      debugger
 
       // eslint-disable-next-line no-empty
       if (isTreeNodeRoot && isColumnsObject) {
@@ -311,7 +318,8 @@ const BizSelectColumn = {
           let lists = this.buildSortLists(treeNode);
           this.columnSortListFieldPush(lists, sortList)
         } else {
-          sortList = sortList.filter(item => Array.isArray(item.lists))
+          // sortList = sortList.filter(item => Array.isArray(item.lists))
+          sortList = sortList.filter(item =>!treeNode.columns.some(item_=>item_.fieldName == item.fieldName) )
         }
       }
       else {
@@ -327,6 +335,7 @@ const BizSelectColumn = {
           sortList = sortList.filter(item => item.name != treeNode.name)
         }
       }
+
       
       this.columnSortList = sortList
     },
@@ -459,7 +468,7 @@ const BizSelectColumn = {
     */
     save() {
       let columns = [];
-
+      console.log(4);
       this.columnSortList.forEach(column => {
         if (Array.isArray(column.lists)) {
           column.lists.forEach(item => {
@@ -491,6 +500,7 @@ const BizSelectColumn = {
     */
     toggleCheckedWithDown(treeNode, checked = false) {
       let isColumnsObject = this.isColumnsObject(treeNode.columns);
+      console.log(treeNode, checked);
     
       if (isColumnsObject) {
         for (let key in treeNode.columns) {

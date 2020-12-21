@@ -322,7 +322,7 @@ export default {
   padding: 12px 12px 0 0;
 }
 .lable-100 {
-  width: 50px;
+  width: 70px;
 }
 .copy-el-form-item {
   margin-bottom: 18px;
@@ -336,6 +336,10 @@ export default {
   border-top: 1px solid rgba(0, 0, 0, 0.09);
   border-bottom: 1px solid rgba(0, 0, 0, 0.09);
   padding: 0;
+}
+
+.el-select__input{
+  margin-left: 12px;
 }
 
 .el-select-dropdown__item {

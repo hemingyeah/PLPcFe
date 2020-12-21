@@ -115,7 +115,7 @@ export default {
   padding: 12px 12px 0 0;
 }
 .lable-100 {
-  width: 50px;
+  width: 70px;
 }
 .copy-el-form-item {
   margin-bottom: 18px;
