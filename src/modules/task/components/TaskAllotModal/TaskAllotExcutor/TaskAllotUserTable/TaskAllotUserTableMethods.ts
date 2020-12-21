@@ -782,13 +782,6 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
     marker.setIcon(this.buildUserMarkerIcon(AMap, data))
   }
   
-  /**
-   * @description 保存数据到缓存
-  */
-  public saveDataToStorage(key: string, data: any) {
-    storageSet(key, data, StorageModuleEnum.Task)
-  }
-  
   /* 精简列属性 */
   public simplifyTableColumsProperty(columns: Column[]): Column[] {
     return (

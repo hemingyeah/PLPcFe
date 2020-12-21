@@ -50,12 +50,12 @@ function getStorageKey(key: string): string {
   return userId ? `${userId}-${key}` : key
 }
 
-export async function storageGet<T, K>(key: string, defaultValue: K, module: StorageModuleEnum,): Promise<T | K | string | null>{
-  localForage.config({
-    storeName: module
-  })
-  
+export async function storageGet<T, K>(key: string, defaultValue: K, module: StorageModuleEnum,): Promise<T | K | string | null>{  
   try {
+    localForage.config({
+      storeName: module
+    })
+    
     let storageKey = getStorageKey(key)
     // 如果 key 不存在，getItem() 将返回 null
     let value: T | K | string | null = await localForage.getItem(storageKey)
@@ -75,9 +75,9 @@ export async function storageGet<T, K>(key: string, defaultValue: K, module: Sto
  * @description 设置存储
  *  注意此方法是异步执行的
 */
-export function storageSet(key: string, value: StorageSetType, module: StorageModuleEnum,) {
+export async function storageSet(key: string, value: StorageSetType, module: StorageModuleEnum) {
   if(!key) return (
-    console.warn('Caused: can not set storage, because not key')
+    Log.warn('Caused: can not set storage, because not key', storageSet.name)
   )
   
   localForage.config({
@@ -86,8 +86,13 @@ export function storageSet(key: string, value: StorageSetType, module: StorageMo
   
   const storageKey = getStorageKey(key)
   
+  Log.info(storageKey, `${storageSet.name} -> storageKey`)
+  
   try {
-    localForage.setItem(storageKey, value)
+    localForage.setItem(storageKey, value, (error, value) => {
+      Log.error(error, 'localForage.setItem')
+      Log.info(value, 'localForage.setItem')
+    })
   } catch (error) {
     localStorage.setItem(`${module}-${storageKey}`, JSON.stringify(value))
     console.error('stroageSet -> error', error)

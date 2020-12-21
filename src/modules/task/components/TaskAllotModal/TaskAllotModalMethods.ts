@@ -19,6 +19,8 @@ import TaskAllotModalComputed from '@src/modules/task/components/TaskAllotModal/
 /* enum */
 import TaskAllotTypeEnum from '@model/enum/TaskAllotTypeEnum'
 import ComponentNameEnum from '@model/enum/ComponentNameEnum'
+import StorageModuleEnum from '@model/enum/StorageModuleEnum'
+import StorageKeyEnum from '@model/enum/StorageKeyEnum'
 /* entity */
 import Approve from '@model/entity/Approve'
 import LoginUser from '@model/entity/LoginUser/LoginUser'
@@ -34,11 +36,18 @@ import {
   AllotExcutorParams,
   AllotTaskPoolParams,
   User,
-  ReAllotTaskPoolParams
+  ReAllotTaskPoolParams,
+  TaskAllotResult
 } from '@src/modules/task/components/TaskAllotModal/TaskAllotModalInterface'
 /* model */
 import { TaskAllotTypeModeEnum } from '@src/modules/task/components/TaskAllotModal/TaskAllotModalModel'
-import { TASK_NOT_AUTO_DISPATCH_RULE, TASK_NO_EXECUTOR_MESSAGE, TASK_NO_REALLOT_REASON_MESSAGE, TASK_REALLOT_NOT_SAME_USER_MESSAGE } from '@src/model/const/Alert'
+import { 
+  TASK_NOT_AUTO_DISPATCH_RULE, 
+  TASK_NO_EXECUTOR_MESSAGE, 
+  TASK_ALLOT_NOT_STORAGE_RESULT, 
+  TASK_NO_REALLOT_REASON_MESSAGE, 
+  TASK_REALLOT_NOT_SAME_USER_MESSAGE 
+} from '@src/model/const/Alert'
 import { getCustomerDetailResult } from '@model/param/out/Customer'
 import { getTaskAllotApproveResult, getTaskAllotResult, getTaskAllotTaskPollApproveResult, getTaskAllotTaskPoolResult, getTaskConfigResult, getTaskTypeResult, getTaskTypesResult } from '@model/param/out/Task'
 import { TaskPoolNotificationTypeEnum } from '@src/modules/task/components/TaskAllotModal/TaskAllotPool/TaskAllotPoolModel'
@@ -50,10 +59,11 @@ import Log from '@src/util/log.ts'
 import Platform from '@src/util/Platform'
 import PlatformUtil from '@src/platform'
 import { openTabForTaskView } from '@src/util/business/openTab'
+import { isArray } from '@src/util/type'
+import { storageGet, storageSet } from '@src/util/storage.ts'
+import { isEmpty } from '@src/util/object'
 /* vue */
 import { Emit } from 'vue-property-decorator'
-/* util */
-import { isArray } from '@src/util/type'
 
 /* 加载的组件 */
 const LoadComponentMap = {
@@ -76,6 +86,9 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
   */
   @Emit(TaskAllotModalEmitEventEnum.Success)
   public allotSuccess() {
+    Log.succ(Log.Start, this.allotSuccess.name)
+    // 保存派单结果到缓存
+    this.saveAllotResultToStorage()
     // @ts-ignore
     let id = window?.frameElement?.dataset?.id
     // 关闭当前tab
@@ -325,6 +338,13 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
         }
       })
     )
+  }
+  
+  /**
+   * @description 从缓存获取数据
+  */
+  public async getDataToStorage(key: string, data: any) {
+    return await storageGet(key, data, StorageModuleEnum.Task)
   }
   
   /**
@@ -832,7 +852,32 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
   */
   public showApproveDialog(data: TaskApprove) {
     // @ts-ignore
-    this.$refs.ApproveDialog && this.$refs.ApproveDialog.openDialog(data)
+    this.$refs?.ApproveDialog?.openDialog(data)
+  }
+  
+  /**
+   * @description 保存数据到缓存
+  */
+  public saveDataToStorage(key: string, data: any): void {
+    storageSet(key, data, StorageModuleEnum.Task)
+  }
+  
+  /**
+   * @description 保存派单结果到缓存
+  */
+  public saveAllotResultToStorage() {
+    Log.succ(Log.Start, this.saveAllotResultToStorage.name)
+    // 工单派单结果
+    const taskAllotResult: TaskAllotResult = {
+      // 派单方式
+      allotType: this.allotType,
+      // 负责人
+      executorUser: this.executorUser as LoginUser,
+      // 协同人列表
+      synergyUserList: this.synergyUserList
+    }
+    // 保存数据
+    this.saveDataToStorage(StorageKeyEnum.TaskAllotResult, taskAllotResult)
   }
   
   /** 
@@ -1023,9 +1068,19 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
   /** 
    * @description 使用上次派单结果
   */
-  public useLastTaskAllotResult(event: MouseEvent): void {
+  public async useLastTaskAllotResult(event: MouseEvent): Promise<void> {
     // @ts-ignore 取消按钮的焦点
     event?.target?.parentNode?.blur()
+    // 取出存储数据
+    const taskAllotResult: TaskAllotResult = await this.getDataToStorage(StorageKeyEnum.TaskAllotResult, {})
+    // 存储数据是否为空
+    if (isEmpty(taskAllotResult)) {
+      return Platform.alert(TASK_ALLOT_NOT_STORAGE_RESULT)
+    }
+    // 还原上次派单结果
+    this.executorUser = taskAllotResult.executorUser || null
+    this.allotType = taskAllotResult.allotType || TaskAllotTypeEnum.Person
+    this.synergyUserList = taskAllotResult.synergyUserList || []
   }
   
 }

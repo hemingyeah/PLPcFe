@@ -66,10 +66,10 @@ class TaskAllotModalComputed extends TaskAllotModalData {
   /** 
    * @description 是否是工单负责人
   */
-  get isExecutor() {
+  get isExecutor(): boolean {
     let loginUser = this.loginUser || {}
     let executorUser = this.task?.executor || {}
-    return executorUser.userId && loginUser.userId && executorUser.userId == loginUser.userId
+    return Boolean(executorUser.userId && loginUser.userId && executorUser.userId == loginUser.userId)
   }
   
   /** 
