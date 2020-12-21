@@ -31,6 +31,7 @@ import { stringArrayIntersection } from '@src/util/array'
 import { parseObject } from '@src/util/parse'
 import Log from '@src/util/log.ts'
 import { getDistance } from '@src/util/distance'
+import Customer from "@model/entity/Customer";
 
 
 enum UserCardEmitEventEnum {
@@ -51,12 +52,12 @@ enum UserCardRadioEnum {
 
 @Component({ name: ComponentNameEnum.UserCard })
 export default class UserCard extends Vue {
+  /* 客户信息 */
+  @Prop() readonly customer: Customer | undefined
   // 客户团队名称列表
   @Prop() readonly customerTagNames: string[] | undefined
   // 向外发布事件的 组件名字
   @Prop() readonly emitEventComponentName: string | undefined
-  // 客户负责人图标
-  @Prop() readonly showCustomerManagerIcon: boolean | undefined
   // 工作状态颜色数组
   @Prop() readonly stateColorMap: StateColorMap | undefined
   // 是否显示 协同人按钮
@@ -126,6 +127,23 @@ export default class UserCard extends Vue {
     return false
   }
   
+  /* 当前选中的用户是客户的客户负责人，则显示专属标签（鼠标移动标签上提示“客户负责人”） */
+  get isCustomerManager(): boolean {
+    return Boolean(
+      this.user
+      && this.customer
+      && this.user.userId === this.customer.customerManager
+    )
+  }
+  
+  /**
+   * @description 工单客户地址地址
+   * 工单新建后地址信息在taddress里面，新建的信息在address里面
+   */
+  get taskAddress(): TaskAddress {
+    return new TaskAddress(this.task.taddress || this.task.address || {})
+  }
+  
   /**
    * @description 获取用户据客户距离
    */
@@ -147,11 +165,13 @@ export default class UserCard extends Vue {
   }
   
   /**
-   * @description 工单客户地址地址
-   * 工单新建后地址信息在taddress里面，新建的信息在address里面
+   * @description 清除选中协同人
    */
-  get taskAddress(): TaskAddress {
-    return new TaskAddress(this.task.taddress || this.task.address || {})
+  public clearSynergyChecked(user: LoginUser) {
+    let isClear: boolean = user.userId === this.user.userId
+    if (isClear) {
+      this.isSynergyChecked = false
+    }
   }
   
   /** 
@@ -343,9 +363,11 @@ export default class UserCard extends Vue {
       <div class='user-card-header-content-team'>
         {
           this.isUserInCustomerTag && (
-            <el-tooltip content='客户的服务团队' placement='top'>
-              <i class='iconfont icon-favorfill'></i>
-            </el-tooltip>
+            <div>
+              <el-tooltip content='客户的服务团队' placement='top'>
+                <i class='iconfont icon-favorfill'></i>
+              </el-tooltip>
+            </div>
           )
         }
         { 
@@ -371,7 +393,7 @@ export default class UserCard extends Vue {
     return (
       <div class='user-card-header-content-location'>
         <i class='iconfont icon-fdn-location'></i>
-        { `${this.userToCustomerDistance && this.userToCustomerDistance.toFixed(2)}KM` }
+        { `${this.userToCustomerDistance && this.userToCustomerDistance.toFixed(2)}KM ` }
         { lastLoginTime && `(${lastLoginTime}前)` }
       </div>
     )
@@ -468,7 +490,7 @@ export default class UserCard extends Vue {
               <div class='user-card-header-content-top'>
                 <div class='user-card-header-content-name' onClick={() => this.openUserViewTab()}>
                   {this?.user?.displayName}
-                  { this.showCustomerManagerIcon && (
+                  { this.isCustomerManager && (
                     <el-tooltip content='客户负责人' placement='top'>
                       <i class='iconfont icon-huangguan'></i>
                     </el-tooltip>

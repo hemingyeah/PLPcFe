@@ -30,6 +30,7 @@ import TaskConfig from '@model/types/TaskConfig'
 import TaskApprove from '@model/entity/TaskApprove'
 import TaskAllotUserInfo from '@model/entity/TaskAllotUserInfo'
 import TaskType from '@model/entity/TaskType'
+import Tag from '@model/entity/Tag/Tag'
 /* interface */
 import { 
   AutoDispatchApproveParams, 
@@ -276,20 +277,12 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
     this.showClearTaskAllotResultButton = false
   }
   
-  /** 
-   * @description 检查自动派单审批
-  */
-  public checkApproveWithAutoDispatch(): void {
-    this.showTaskAllotModal = false
-  }
-  
-  /** 
-   * @description 删除负责人
-  */
-  public deleteExcutorUser(user: LoginUser) {
-    this.executorUser = null
-    /* 清除选择负责人表格列表 负责人信息 */
-    this.TaskAllotExcutorTableComponent?.outsideUpwardClearExcutorUser()
+  /**
+   * @description 清空人员卡片
+   */
+  public clearUserCardSynergyChecked(user: LoginUser) {
+    this.UserCardComponentWithTaskAllotExecutorMap?.clearSynergyChecked(user)
+    this.UserCardComponentWithTaskAllotPool?.clearSynergyChecked(user)
   }
   
   /** 
@@ -800,6 +793,7 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
   public outsideDeleteSynergyUser(user: LoginUser) {
     LogUtil.succ(LogUtil.Start, this.outsideDeleteSynergyUser.name)
     this.deleteSynergyUser(user)
+    this.clearUserCardSynergyChecked(user)
   }
   
   /** 
@@ -809,6 +803,15 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
   public outsideSetSynergyUsers(users: LoginUser[]) {
     LogUtil.succ(LogUtil.Start, this.outsideSetSynergyUsers.name)
     this.setSynergyUsers(users)
+  }
+  
+  /**
+   * @description 设置客户团队信息列表
+   * -- 支持外部调用的
+   */
+  public outsideSetCustomerTags(tags: Tag[]) {
+    LogUtil.succ(LogUtil.Start, this.outsideSetCustomerTags.name)
+    this.customerTags = tags
   }
   
   /** 

@@ -4,6 +4,7 @@ import LoginUser from '@model/entity/LoginUser/LoginUser'
 import TaskConfig from '@model/types/TaskConfig'
 import TaskAllotUserInfo from '@model/entity/TaskAllotUserInfo'
 import TaskType from '@model/entity/TaskType'
+import Tag from '@model/entity/Tag/Tag'
 /* enum */
 import TaskAllotTypeEnum from '@model/enum/TaskAllotTypeEnum'
 import ComponentNameEnum from '@model/enum/ComponentNameEnum'
@@ -23,6 +24,8 @@ class TaskAllotModalData extends TaskAllotModalProps {
   public allotTypeMode: TaskAllotTypeModeEnum = TaskAllotTypeModeEnum.List
   /* 客户信息 */
   public customer: Customer = {}
+  /* 客户团队信息 */
+  public customerTags: Tag[] = []
   /* 负责人 */
   public executorUser: LoginUser | TaskAllotUserInfo | null = null
   /* 是否使用匹配出的预估结果 */

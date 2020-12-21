@@ -25,6 +25,7 @@ import { CreateElement } from 'vue'
 import Log from '@src/util/log.ts'
 /* types */
 import StateColorMap from '@model/types/StateColor'
+import Customer from "@model/entity/Customer";
 
 declare let AMap: any
 
@@ -44,6 +45,8 @@ export default class TaskAllotUserMap extends VC {
   /* 工单指派地图组件 */
   @Ref() readonly TaskAllotMapComponent !: TaskAllotMap
   
+  /* 客户信息 */
+  @Prop() readonly customer: Customer | undefined
   /* 客户团队列表 */
   @Prop() readonly customerTags: Tag[] | undefined
   /* 是否显示协同人 */
@@ -231,6 +234,7 @@ export default class TaskAllotUserMap extends VC {
             this.isShowUserCard && (
               <base-panel width='470px' show={this.isShowUserCard} {...basePanelAttrs}>
                 <user-card
+                  customer={this.customer}
                   customerTagNames={this.customerTagNames}
                   emitEventComponentName={ComponentNameEnum.TaskAllotExcutor}
                   stateColorMap={this.stateColorMap}

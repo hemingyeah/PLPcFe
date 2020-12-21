@@ -38,8 +38,6 @@ class TaskAllotExecutorData extends TaskAllotExecutorProps {
   @Prop() readonly isReAllot: boolean | undefined
   /* 是否显示协同人 */
   @Prop() readonly isShowSynergy: boolean | undefined
-  /* 是否为客户负责人 */
-  @Prop() readonly isCustomerManager: boolean | undefined
   /* 派单方式 模式(列表，地图) */
   @Prop() readonly mode: TaskAllotTypeModeEnum | undefined
   /* 工作状态颜色数组 */

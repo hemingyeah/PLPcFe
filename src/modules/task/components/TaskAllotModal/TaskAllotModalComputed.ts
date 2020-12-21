@@ -1,3 +1,5 @@
+/* component */
+import UserCard from '@src/modules/task/components/TaskAllotModal/UserCard/UserCard.tsx'
 /* enum */
 import AuthEnum from '@model/enum/AuthEnum'
 import TaskStateEnum from '@model/enum/TaskStateEnum'
@@ -54,15 +56,6 @@ class TaskAllotModalComputed extends TaskAllotModalData {
     return Boolean(createUser.userId && loginUser.userId && createUser.userId == loginUser.userId)
   }
   
-  /* 当前选中的用户是客户的客户负责人，则显示专属标签（鼠标移动标签上提示“客户负责人”） */
-  get isCustomerManager(): boolean {
-    return Boolean(
-      this.executorUser
-      && this.customer
-      && this.executorUser.userId === this.customer.customerManager
-    )
-  }
-  
   /** 
    * @description 是否是工单负责人
   */
@@ -98,11 +91,6 @@ class TaskAllotModalComputed extends TaskAllotModalData {
   */
   get reallotRemarkNotNull(): boolean {
     return this.taskConfig?.reallotRemarkNotNull === true
-  }
-  
-  /* 工单派单负责人表格组件 */
-  get TaskAllotExcutorTableComponent(): any {
-    return findComponentDownward(this, ComponentNameEnum.TaskAllotUserTable)
   }
   
   /** 
@@ -143,6 +131,16 @@ class TaskAllotModalComputed extends TaskAllotModalData {
   */
   get outsideTaskConfig(): TaskConfig {
     return this.taskConfig
+  }
+  
+  /* 工单派单负责人地图 人员卡片组件 */
+  get UserCardComponentWithTaskAllotExecutorMap(): UserCard {
+    return findComponentDownward(this.TaskAllotExcutorComponent, ComponentNameEnum.UserCard)
+  }
+  
+  /* 工单派单负责人地图 人员卡片组件 */
+  get UserCardComponentWithTaskAllotPool(): UserCard {
+    return findComponentDownward(this.TaskAllotPoolComponent, ComponentNameEnum.UserCard)
   }
 }
 

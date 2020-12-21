@@ -10,6 +10,7 @@ import ComponentNameEnum from '@model/enum/ComponentNameEnum'
 import TaskAllotTypeEnum from '@model/enum/TaskAllotTypeEnum'
 /* entity */
 import LoginUser from '@model/entity/LoginUser/LoginUser'
+import Tag from '@model/entity/Tag/Tag'
 /* vue */
 import { CreateElement } from 'vue'
 /* vue */
@@ -64,6 +65,7 @@ export default class TaskAllotModal extends TaskAllotModalRender {
                   onSetExecutor={(user: LoginUser) => this.setExecutorUser(user)}
                   onSetSynergy={(user: LoginUser) => this.setSynergyUser(user)}
                   onSetSynergys={(users: LoginUser[]) => this.outsideSetSynergyUsers(users)}
+                  onSetCustomerTags={(tags: Tag[]) => this.outsideSetCustomerTags(tags)}
                 />
               </div>
               {
@@ -71,11 +73,12 @@ export default class TaskAllotModal extends TaskAllotModalRender {
                 && (
                   <task-allot-pool 
                     ref='TaskAllotPoolComponent'
+                    customer={this.customer}
+                    customerTags={this.customerTags}
+                    loginUser={this.loginUser}
                     isShowSynergy={this.allowModifySynergyUser}
-                    isCustomerManager={this.isCustomerManager}
                     show={this.allotType === TaskAllotTypeEnum.Pool}
                     style={this.allotContentStyle[TaskAllotTypeEnum.Pool]}
-                    loginUser={this.loginUser}
                     task={this.task}
                     stateColorMap={this.stateColorMap}
                     taskConfig={this.taskConfig}

@@ -70,7 +70,8 @@ const OrderMap: { [x: number]: boolean } = {
 enum TaskAllotExecutorEmitEventEnum {
   DeleteSynergyUser = 'deleteSynergyUser',
   SetSynergys = 'setSynergys',
-  SetExecutor = 'setExecutor'
+  SetExecutor = 'setExecutor',
+  SetCustomerTags = 'setCustomerTags'
 }
 
 class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
@@ -104,7 +105,7 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
    * @description 协同人用户删除事件
    */
   @Emit(TaskAllotExecutorEmitEventEnum.DeleteSynergyUser)
-  public sysnergyUserCloseHandler(user: LoginUser): LoginUser {
+  public synergyUserCloseHandler(user: LoginUser): LoginUser {
     return user
   }
   
@@ -112,7 +113,7 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
    * @description 协同人用户列表变化事件
    */
   @Emit(TaskAllotExecutorEmitEventEnum.SetSynergys)
-  public synergyUserListChangedHanlder(users: LoginUser[]): LoginUser[] {
+  public synergyUserListChangedHandler(users: LoginUser[]): LoginUser[] {
     return users
   }
   
@@ -120,8 +121,16 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
    * @description 负责人用户变化事件
    */
   @Emit(TaskAllotExecutorEmitEventEnum.SetExecutor)
-  public executorChangedHanlder(user: LoginUser | null): LoginUser | null {
+  public executorChangedHandler(user: LoginUser | null): LoginUser | null {
     return user
+  }
+  
+  /**
+   * @description 客户团队变化事件
+   */
+  @Emit(TaskAllotExecutorEmitEventEnum.SetCustomerTags)
+  public customerTagsChangedHandler(tags: Tag[]): Tag[] {
+    return tags
   }
   
   /** 
@@ -248,7 +257,7 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
         if (!isSuccess) return
         
         // 负责人
-        this.executorChangedHanlder(result?.data?.users?.[0])
+        this.executorChangedHandler(result?.data?.users?.[0])
         // 初始化
         this.$nextTick(() => {
           this.initialize()
@@ -278,7 +287,7 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
         if (!isSuccess) return
         
         // 协同人赋值
-        this.synergyUserListChangedHanlder(result?.data?.users || [])
+        this.synergyUserListChangedHandler(result?.data?.users || [])
       })
       .catch((err: any) => {
         console.error(err)
@@ -516,7 +525,7 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
     LogUtil.succ(LogUtil.Start, this.handlerTeamUsersChange.name)
 
     // 负责人
-    this.executorChangedHanlder(users?.[0])
+    this.executorChangedHandler(users?.[0])
     // 初始化
     this.$nextTick(() => {
       this.initialize()
@@ -676,6 +685,7 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
       }
       
       this.customerTags = tags.slice()
+      this.customerTagsChangedHandler(this.customerTags)
       
       LogUtil.info(this.customerTags.slice(), 'customerTags', this.matchTags.name)
       
@@ -690,10 +700,12 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
   */
   public async outsideFetchUsers() {
     LogUtil.succ(LogUtil.Start, `TaskAllotExcutor -> ${this.outsideFetchUsers.name}`)
-    // 匹配团队
-    await this.matchTags()
-    // 初始化
-    this.initialize()
+    this.$nextTick(async() => {
+      // 匹配团队
+      await this.matchTags()
+      // 初始化
+      this.initialize()
+    })
   }
   
   /**

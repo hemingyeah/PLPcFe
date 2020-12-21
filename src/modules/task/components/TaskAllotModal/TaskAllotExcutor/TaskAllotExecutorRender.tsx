@@ -130,7 +130,7 @@ class TaskAllotExecutorRender extends TaskAllotExecutorMethods {
                   closable 
                   disable-transitions={true}
                   type='info'
-                  onClose={() => this.sysnergyUserCloseHandler(synergyUser)}
+                  onClose={() => this.synergyUserCloseHandler(synergyUser)}
                 >
                   {synergyUser.displayName}
                 </el-tag>
