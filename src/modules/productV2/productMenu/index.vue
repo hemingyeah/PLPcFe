@@ -21,9 +21,11 @@
                 :sort-menu="sortMenu"
               />
             </template>
-            <div class="text-center" style="height:100%;" v-else-if="treeLoaded">
-              还未添加产品分类 <br>
-              请在左下方添加一级分类
+            <div class="flex-x jus-center" style="height:100%;" v-else-if="treeLoaded">
+              <div class="text-center">
+                还未添加产品分类 <br>
+                请在左下方添加一级分类
+              </div>
             </div>
           </div>
           <div class="flex-x draggable-data-btn">
