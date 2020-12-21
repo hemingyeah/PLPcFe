@@ -1,10 +1,9 @@
 <template>
-  <div class="work-tree-data-box">
+  <div class="work-tree-data-box"
+       v-loading="loading">
     <div class="flex-1 scroll-data">
       <template v-if="!propData.canEditConData">
-        <no-data-view
-          :notice-msg="'此产品类型分级不可添加内容'"
-        ></no-data-view>
+        <no-data-view :notice-msg="'此产品类型分级不可添加内容'"></no-data-view>
       </template>
       <template v-else-if="!propData.conData">
         <no-data-view :notice-msg="'此产品类型分级可以添加内容'">
@@ -16,26 +15,20 @@
       <div v-show="propData.canEditConData && propData.conData">
         <div class="normal-title-1">
           <div class="flex-1">编辑类型详细信息</div>
-          <el-button @click="showDialog('cloneMenu')"
-          >复制其他产品类型</el-button
-          >
+          <el-button @click="showDialog('cloneMenu')">复制其他产品类型</el-button>
         </div>
 
-        <form-builder
-          ref="form"
-          :fields="fields"
-          :value="productMenuValue"
-          mode="product_menu"
-          @update="update"
-        >
+        <form-builder ref="form"
+                      :fields="fields"
+                      :value="productMenuValue"
+                      mode="product_menu"
+                      @update="update">
           <div class="normal-title-2">
             <div>选择产品类型显示字段</div>
-            <el-tooltip
-              class="item"
-              effect="dark"
-              content="类型字段在系统管理中配置"
-              placement="bottom"
-            >
+            <el-tooltip class="item"
+                        effect="dark"
+                        content="类型字段在系统管理中配置"
+                        placement="bottom">
               <i class="iconfont icon-help color-999 mar-l-8 cur-point"></i>
             </el-tooltip>
           </div>
@@ -46,13 +39,9 @@
             </div>
             <el-checkbox-group v-model="fieldIds">
               <template v-for="item in fields">
-                <el-checkbox
-                  
-                  v-if="item.isSystem != 1"
-                  :label="item.id"
-                  :key="item.id"
-                >{{ item.displayName }}</el-checkbox
-                >
+                <el-checkbox v-if="item.isSystem != 1"
+                             :label="item.id"
+                             :key="item.id">{{ item.displayName }}</el-checkbox>
               </template>
             </el-checkbox-group>
           </div>
@@ -62,42 +51,38 @@
               <el-button @click="showDialog('linkPart')">关联备件</el-button>
             </div>
 
-            <mini-table
-              :id="propData.id"
-              class="mar-b-20"
-              data-type="part"
-              page-type="edit"
-              v-if="flashPartType"
-            />
+            <mini-table :id="propData.id"
+                        class="mar-b-20"
+                        data-type="part"
+                        page-type="edit"
+                        v-if="flashPartType" />
           </template>
           <template slot="product_menu_wiki">
             <div class="normal-title-2">
               <div class="flex-1">关联知识库</div>
               <el-button @click="showDialog('linkWiki')">关联知识库</el-button>
             </div>
-            <mini-table
-              :id="propData.id"
-              class="mar-b-20"
-              data-type="wiki"
-              page-type="edit"
-              v-if="flashProductType"
-            />
+            <mini-table :id="propData.id"
+                        class="mar-b-20"
+                        data-type="wiki"
+                        page-type="edit"
+                        v-if="flashProductType" />
           </template>
 
-          <template slot="productPic" slot-scope="{ field }">
-            <form-item class="upload-img" :label="field.displayName">
-              <el-upload
-                action="string"
-                list-type="picture-card"
-                :on-preview="handlePictureCardPreview"
-                :before-upload="onBeforeUploadImage"
-                :http-request="UploadImagePic"
-                :file-list="productPicList"
-                :on-exceed="onExceedPic"
-                :on-remove="onRemovePic"
-                multiple
-                :limit="5"
-              >
+          <template slot="productPic"
+                    slot-scope="{ field }">
+            <form-item class="upload-img"
+                       :label="field.displayName">
+              <el-upload action="string"
+                         list-type="picture-card"
+                         :on-preview="handlePictureCardPreview"
+                         :before-upload="onBeforeUploadImage"
+                         :http-request="UploadImagePic"
+                         :file-list="productPicList"
+                         :on-exceed="onExceedPic"
+                         :on-remove="onRemovePic"
+                         multiple
+                         :limit="5">
                 <i class="el-icon-plus"></i>
               </el-upload>
               <div class="font-12 color-999 mar-t-10">
@@ -106,19 +91,19 @@
             </form-item>
           </template>
 
-          <template slot="thumbnail" slot-scope="{ field }">
-            <form-item class="upload-img" :label="field.displayName">
-              <el-upload
-                action="string"
-                list-type="picture-card"
-                :on-preview="handlePictureCardPreview"
-                :before-upload="onBeforeUploadImage"
-                :http-request="UploadImageThu"
-                :file-list="thumbnailList"
-                :on-exceed="onExceedThu"
-                :on-remove="onRemoveThu"
-                :limit="1"
-              >
+          <template slot="thumbnail"
+                    slot-scope="{ field }">
+            <form-item class="upload-img"
+                       :label="field.displayName">
+              <el-upload action="string"
+                         list-type="picture-card"
+                         :on-preview="handlePictureCardPreview"
+                         :before-upload="onBeforeUploadImage"
+                         :http-request="UploadImageThu"
+                         :file-list="thumbnailList"
+                         :on-exceed="onExceedThu"
+                         :on-remove="onRemoveThu"
+                         :limit="1">
                 <i class="el-icon-plus"></i>
               </el-upload>
               <div class="font-12 color-999 mar-t-10">
@@ -127,7 +112,6 @@
             </form-item>
           </template>
 
-          
           <!-- <el-form ref="form" :model="form" label-width="110px">
 
         <el-form-item label="产品简介">
@@ -184,17 +168,15 @@
         </form-builder>
       </div>
     </div>
-    <div class="bottom-btns" v-if="propData.conData == 1">
-      <el-button type="danger" :loading="btnLoading" @click="deletInfo"
-      >删除</el-button
-      >
-      <el-button
-        class="mar-l-8"
-        type="primary"
-        :loading="btnLoading"
-        @click="submit"
-      >保存</el-button
-      >
+    <div class="bottom-btns"
+         v-if="propData.conData == 1">
+      <el-button type="danger"
+                 :loading="btnLoading"
+                 @click="deletInfo">删除</el-button>
+      <el-button class="mar-l-8"
+                 type="primary"
+                 :loading="btnLoading"
+                 @click="submit">保存</el-button>
     </div>
   </div>
 </template>
@@ -230,7 +212,7 @@ export default {
     },
   },
   inject: ["rootDataChange", "changeTreeDetail"],
-  data() {
+  data () {
     return {
       form: {
         name: "",
@@ -240,13 +222,14 @@ export default {
       fileList: [],
       fields: [],
       productMenuValue: this.initProductMenuValue(),
-      
+
       flashPartType: false,
       flashProductType: false,
       fieldIds: [],
       btnLoading: false,
-      productPicList:[],
-      thumbnailList:[],
+      productPicList: [],
+      thumbnailList: [],
+      loading: false
     };
   },
   components: {
@@ -254,7 +237,7 @@ export default {
     NoDataView,
   },
   watch: {
-    propData(newVal, oldVal) {
+    propData (newVal, oldVal) {
       this.$set(
         this.productMenuValue,
         "catalogName",
@@ -264,7 +247,7 @@ export default {
         this.reflashPage(newVal.id);
       }
     },
-    fieldIds(newVal, oldVal) {
+    fieldIds (newVal, oldVal) {
       this.fields.map((item) => {
         if (newVal.indexOf(item.id) > -1 || item.isSystem == 1) item["hideform"] = false;
         else item["hideform"] = true;
@@ -272,7 +255,7 @@ export default {
       });
     },
   },
-  mounted() {
+  mounted () {
     getProductMenuField()
       .then((res) => {
         const { code, result, message } = res;
@@ -284,11 +267,11 @@ export default {
             .map((item) => {
               if (item.fieldName == "catalogName") item["maxlength"] = 30;
               if (item.fieldName == "catalogNum") item["disabled"] = true;
-              if(item.fieldName == "productVideo") item["limit"] = 1;
+              if (item.fieldName == "productVideo") item["limit"] = 1;
               return item;
             });
-             
-          fieldIds_ = sortedFields.filter(item=>item.isSystem != 1).map((item) => {
+
+          fieldIds_ = sortedFields.filter(item => item.isSystem != 1).map((item) => {
             return item.id;
           });
           this.fields = sortedFields;
@@ -300,33 +283,33 @@ export default {
           });
         }
       })
-      .catch((error) => {});
+      .catch((error) => { });
   },
   methods: {
-    initProductMenuValue() {
+    initProductMenuValue () {
       return {
         catalogName: this.propData.name,
         productDesc: "",
         productVideo: [],
         productPic: [],
         productExplain: [],
-        thumbnail:[]
+        thumbnail: []
       };
     },
-    onExceedPic(){
+    onExceedPic () {
       this.$message.error("最多上传5张图片!");
     },
-    onExceedThu(){
+    onExceedThu () {
       this.$message.error("最多上传1张图片!");
     },
-    handlePictureCardPreview(file) {
+    handlePictureCardPreview (file) {
       this.$previewImg(file.url);
     },
-    handlePreview(file) {
+    handlePreview (file) {
       if (!file.url) return;
       this.$previewVideo(file.url);
     },
-    onBeforeUploadImage(file) {
+    onBeforeUploadImage (file) {
       const isJPG = file.type === "image/jpeg" || file.type === "image/png";
       const isLt2M = file.size / 1024 / 1024 < 2;
 
@@ -339,7 +322,7 @@ export default {
       // this.fileList.push(file);
       return isJPG && isLt2M;
     },
-    onBeforeUploadVideo(file) {
+    onBeforeUploadVideo (file) {
       const isMP4 = file.type === "video/mp4";
       const isLt10M = file.size / 1024 / 1024 < 10;
 
@@ -352,13 +335,13 @@ export default {
       // this.fileList.push(file);
       return isMP4 && isLt10M;
     },
-    onRemovePic(o, a){
-      this.$set(this.productMenuValue, "productPic", this.productMenuValue.productPic.filter(item=>item.uid == o.uid));
+    onRemovePic (o, a) {
+      this.$set(this.productMenuValue, "productPic", this.productMenuValue.productPic.filter(item => item.uid == o.uid));
     },
-    onRemoveThu(o, a){
-      this.$set(this.productMenuValue, "thumbnail", this.productMenuValue.thumbnail.filter(item=>item.uid == o.uid));
+    onRemoveThu (o, a) {
+      this.$set(this.productMenuValue, "thumbnail", this.productMenuValue.thumbnail.filter(item => item.uid == o.uid));
     },
-    UploadImagePic(param) {
+    UploadImagePic (param) {
       Uploader.upload(param.file, "/files/upload")
         .then((result) => {
           if (result.status != 0) {
@@ -372,7 +355,7 @@ export default {
 
           let file = result.data;
           let item = {
-            uid:param.file.uid,
+            uid: param.file.uid,
             id: file.id,
             filename: file.fileName,
             // 如果后端返回url,必须使用。如果后端不返回，需要拼接
@@ -388,9 +371,9 @@ export default {
         .catch((err) => {
           console.warn(err);
         })
-        .finally(() => {});
+        .finally(() => { });
     },
-    UploadImageThu(param) {
+    UploadImageThu (param) {
       Uploader.upload(param.file, "/files/upload")
         .then((result) => {
           if (result.status != 0) {
@@ -404,7 +387,7 @@ export default {
 
           let file = result.data;
           let item = {
-            uid:param.file.uid,
+            uid: param.file.uid,
             id: file.id,
             filename: file.fileName,
             // 如果后端返回url,必须使用。如果后端不返回，需要拼接
@@ -420,16 +403,16 @@ export default {
         .catch((err) => {
           console.warn(err);
         })
-        .finally(() => {});
+        .finally(() => { });
     },
-    showDialog(e) {
+    showDialog (e) {
       if (this.$parent.changeDialog) {
         this.$parent.changeDialog(e);
       } else if (this.$parent.$parent.changeDialog) {
         this.$parent.$parent.changeDialog(e);
       }
     },
-    update({ field, newValue, oldValue }) {
+    update ({ field, newValue, oldValue }) {
       let { fieldName, displayName } = field;
       if (this.$appConfig.debug) {
         console.info(
@@ -443,11 +426,11 @@ export default {
       this.$set(value, fieldName, newValue);
       this.$emit("input", value);
     },
-    setMenuInfo() {
+    setMenuInfo () {
       this.rootDataChange("nowEditMenu", { ...this.propData, conData: 1 });
       this.$set(this, "fieldIds", _.cloneDeep(fieldIds_))
     },
-    resetForm() {
+    resetForm () {
       // 清空校验结果
       setTimeout(() => {
         try {
@@ -458,10 +441,10 @@ export default {
               );
             }
           });
-        } catch (error) {}
+        } catch (error) { }
       }, 0);
     },
-    async submit() {
+    async submit () {
       const validateRes = await this.$refs.form.validate();
       if (!validateRes) return;
       this.rootDataChange("fullscreenLoading", true);
@@ -497,25 +480,26 @@ export default {
           this.btnLoading = false;
         });
     },
-    transferData(data) {
+    transferData (data) {
       // 仅用于向接口传参转换数据
       let obj = {};
       let tran_data = _.cloneDeep(this.productMenuValue);
       obj["attribute"] = {};
-      this.fields.forEach(item=>{
+      this.fields.forEach(item => {
         let key = item.fieldName;
-        if(item.isSystem){
+        if (item.isSystem) {
           obj[key] = tran_data[key]
-        }else{
-          obj["attribute"][key] = tran_data[key]  
+        } else {
+          obj["attribute"][key] = tran_data[key]
         }
       })
       obj["id"] = this.propData.id;
-      obj["fieldIds"] = fieldIds_.filter(item=>!this.fieldIds.some(ele=>ele == item));
+      obj["fieldIds"] = fieldIds_.filter(item => !this.fieldIds.some(ele => ele == item));
       return obj;
     },
-    reflashPage(id) {
+    reflashPage (id) {
       this.resetForm();
+      this.loading = true;
       getPageInfo({
         id,
       }).then((res) => {
@@ -526,12 +510,12 @@ export default {
           this.productPicList = res.result.catalogInfo.productPic || [];
           res.result.catalogInfo.productExplain = res.result.catalogInfo.productExplain || [];
           res.result.catalogInfo.thumbnail = res.result.catalogInfo.thumbnail || [];
-          res.result.catalogInfo = {...res.result.catalogInfo, ...res.result.catalogInfo.attribute}
+          res.result.catalogInfo = { ...res.result.catalogInfo, ...res.result.catalogInfo.attribute }
           this.$set(this, "productMenuValue", res.result.catalogInfo);
-          
+
           if (res.result.selectField) {
-            
-            this.$set(this, "fieldIds", fieldIds_.filter(item=>!res.result.selectField.some(ele=>ele == item)));
+
+            this.$set(this, "fieldIds", fieldIds_.filter(item => !res.result.selectField.some(ele => ele == item)));
           }
         } else {
           this.$notify.error({
@@ -540,6 +524,8 @@ export default {
             duration: 2000,
           });
         }
+      }).finally(() => {
+        this.loading = false;
       });
       this.$set(this, "flashPartType", false);
       this.$set(this, "flashProductType", false);
@@ -548,7 +534,7 @@ export default {
         this.$set(this, "flashProductType", true);
       });
     },
-    deletInfo() {
+    deletInfo () {
       this.$confirm("此操作将删除该类型所编辑的内容?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
@@ -585,9 +571,9 @@ export default {
               this.btnLoading = false;
             });
         })
-        .catch(() => {});
+        .catch(() => { });
     },
-    reflashTable(type) {
+    reflashTable (type) {
       if (type == "part") {
         this.$refs.form.$slots.product_menu_part[2].child.reflash();
         // this.$set(this, 'flashPartType', false);
@@ -670,21 +656,24 @@ export default {
     width: 96px;
     height: 96px;
     line-height: 96px;
-    &:hover{
-    border-color: $color-primary;
+    &:hover {
+      border-color: $color-primary;
     }
+  }
+  .el-upload-list__item {
+    width: 96px;
+    height: 96px;
   }
 }
 .el-checkbox {
   margin-bottom: 15px;
 }
 
-.form-item label{
+.form-item label {
   padding: 4px 0 0 0;
 }
 
-.table-footer{
+.table-footer {
   padding: 0;
 }
-
 </style>

@@ -17,11 +17,11 @@
             <div class="mar-l-28 flex-x cur-point" @click="alterData">
               <i class="iconfont icon-bianji1"></i>编辑
             </div>
-            <div class="mar-l-28 flex-x" @click="creatData">
+            <!-- <div class="mar-l-28 flex-x" @click="creatData">
               <el-button type="primary"
-              ><i class="iconfont icon-add1"></i>新建</el-button
+              ><i class="iconfont icon-add2"></i>产品</el-button
               >
-            </div>
+            </div> -->
           </div>
         </div>
       </div>
@@ -114,6 +114,18 @@
       <!-- end 附加组件 -->
     </base-collapse>
     <!-- end 工单详情折叠面板 -->
+
+
+    <!--  -->
+    <!-- <public-dialog
+      ref="publicDialog"
+      :visible-prop="visibleProp"
+      @changeVisibleProp="changeVisibleProp"
+      @confirm="dialogConfirm"
+      :dialog-type="dialogType"
+      :init-data="childData"
+    ></public-dialog> -->
+    <!--  -->
 
     <!-- tour s -->
     <v-tour
