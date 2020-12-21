@@ -311,7 +311,10 @@ const BizSelectColumn = {
           let lists = this.buildSortLists(treeNode);
           this.columnSortListFieldPush(lists, sortList)
         } else {
-          sortList = sortList.filter(item => Array.isArray(item.lists))
+          let treeNodeColumns = treeNode?.columns || []
+          sortList = sortList.filter(item => {
+            return treeNodeColumns.every(treeNodeColumn => treeNodeColumn.fieldName !== item.fieldName)
+          })
         }
       }
       else {
@@ -578,8 +581,6 @@ const BizSelectColumn = {
           <el-button type="primary" onClick={ this.save }>
             保存
           </el-button>
-          {/* <button type="button" class="btn btn-text" onClick={ this.close }>关闭</button>
-          <button type="button" class="btn btn-primary" onClick={ this.save }>保存</button> */}
         </template>
 
       </base-modal>
