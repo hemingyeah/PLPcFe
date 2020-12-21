@@ -21,7 +21,7 @@
                 :sort-menu="sortMenu"
               />
             </template>
-            <div class="text-center" v-else-if="treeLoaded">
+            <div class="text-center" style="height:100%;" v-else-if="treeLoaded">
               还未添加产品分类 <br>
               请在左下方添加一级分类
             </div>
@@ -367,7 +367,6 @@ export default {
           0,
           this.nowEditMenu.indexArr.length - 2
         );
-        console.log(element, "element")
         element[this.nowEditMenu.nowIndex][key] = val;
       } catch (error) {
         console.warn(error);

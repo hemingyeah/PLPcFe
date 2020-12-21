@@ -140,7 +140,7 @@ export default {
         canEditConData: !(this.tasks[index].tasks.length > 0),
         conData: this.tasks[index].conData,
         name: this.tasks[index].name,
-        indexArr:this.rootData.indexArr,
+        indexArr:[...this.rootData.indexArr, index],
         nowIndex:index
       });
     },
