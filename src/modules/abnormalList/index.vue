@@ -89,7 +89,7 @@
   </div>
 </template>
 <script>
-import Abnormal from "./abnormal";
+import Abnormal from './abnormal';
 export default Abnormal;
 </script>
 <style lang="scss" scoped>

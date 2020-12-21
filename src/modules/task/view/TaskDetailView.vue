@@ -214,16 +214,6 @@
             </el-tooltip>
           </div>
 
-          <div class="task-detail-step-2-box" :style="nowGuideStep == 3 ? 'width: 104px;height: 40px;background:#fff' : ''" id="v-task-detail-step-2">
-
-            <div class="task-detail-step-2" v-if="nowGuideStep == 3">
-              动态信息
-              <div style="position: relative;">
-                <div class="guide-disable-cover"></div>
-              </div>
-            </div>
-          </div>
-
           <el-tabs v-model="leftActiveTab">
             <el-tab-pane label="工单详情" name="task-view">
               <task-view :task="task" :fields="fields" :plan-time="planTime" :is-paused="isPaused" :state-text="stateText" :state-color="stateColor" :finished-state="finishedState" :customer-option="customerOption" :can-see-customer="canSeeCustomer" :allow-edit-synergy="allowEditSynergy" :allow-modify-plan-time="allowModifyPlanTime" @modifyPlanTime="openDialog('modifyPlanTime')" />
@@ -255,6 +245,16 @@
               <task-detail-card :share-data="propsForSubComponents" />
             </el-tab-pane>
           </el-tabs>
+
+          <div class="task-detail-step-2-box" :style="nowGuideStep == 3 ? 'width: 104px;height: 40px;background:#fff' : ''" id="v-task-detail-step-2">
+
+            <div class="task-detail-step-2" v-if="nowGuideStep == 3">
+              动态信息
+              <div style="position: relative;">
+                <div class="guide-disable-cover"></div>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div class="collapse-right" v-show="collapseDirection == 'right'">
@@ -575,7 +575,7 @@ export default TaskDetailView;
     .task-detail-step-2-box {
         position: absolute;
         top: 0;
-        left: 208px;
+        left: 0;
         z-index: 997;
 
         .task-detail-step-2 {

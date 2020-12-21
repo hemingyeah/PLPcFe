@@ -341,11 +341,13 @@ export default {
     previousStep() {},
 
     abnormalLabel(type) {
+      if (!this.abnormalData.length) return
       const list = this.abnormalData.taskCustomExceptionNodeList.map(item => {return item.exceptionName})
       if (list.indexOf(type) !== -1) return true
       return false
     },
     abnormalHover(item) {
+      if (!item) return
       const {overTime, isPaused, oncePaused, onceOverTime, state, onceRefused, onceReallot, onceRollback, positionException} = item
       const s = new Date().getTime()
       const e = new Date(overTime).getTime()
@@ -2090,7 +2092,7 @@ export default {
     },
     /*异常搜索字段 */
     abnormalParams() {
-      if (this.selectColumnState === 'exception') {
+      if (this.selectColumnState === 'exception' && this.abnormalData.length) {
         let exceptionStates = []
         this.abnormalData.taskExceptionRange.forEach(item => {
           exceptionStates = [...exceptionStates, ...item.taskExceptionRangeValue]
