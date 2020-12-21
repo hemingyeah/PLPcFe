@@ -81,6 +81,9 @@ export default {
           if (formType === "updateTime") {
             f.displayName = "更新时间";
           }
+          if (formType === "related_catalog") {
+            f.fieldName = "catalogId";
+          }
 
           return Object.freeze({
             ...f,
@@ -108,15 +111,6 @@ export default {
     buildSelfFields() {
       let fields = [
         {
-          displayName: "产品类型",
-          fieldName: "catalogName",
-          formType: "text",
-          export: false,
-          isNull: 1,
-          isSystem: 1,
-          orderId: -9,
-        },
-        {
           displayName: "创建人",
           fieldName: "createUserId",
           formType: "user",
@@ -143,33 +137,6 @@ export default {
           isSystem: 1,
           orderId: -2,
         },
-        // {
-        //   displayName: '有无提醒',
-        //   fieldName: 'hasRemind',
-        //   formType: 'select',
-        //   export: false,
-        //   isNull: 1,
-        //   isSystem: 1,
-        //   operator: 'between',
-        //   orderId: -3,
-        //   setting: {
-        //     isMulti: false,
-        //     dataSource: [
-        //       {
-        //         text: '全部',
-        //         value: ''
-        //       },
-        //       {
-        //         text: '有',
-        //         value: 1
-        //       },
-        //       {
-        //         text: '无',
-        //         value: 2
-        //       }
-        //     ]
-        //   }
-        // }
       ];
 
       return fields;
@@ -313,7 +280,7 @@ export default {
           params.tagId = form[fn].map(({ id }) => id).join("");
         }
 
-        if (typeof form[fn] === "string") {
+        if (typeof form[fn] === "string" || typeof form[fn] === "number") {
           params[fn === "customer" ? "customerId" : fn] = form[fn];
           continue;
         }

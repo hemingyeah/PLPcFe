@@ -1,23 +1,20 @@
 <!--  -->
 <template>
   <div id="normal-preview-video">
-    <el-dialog
-      title="视频预览"
-      :visible.sync="visible"
-      width="600px"
-      :close-on-click-modal="false"
-    >
+    <base-modal title="视频预览"
+                :show.sync="visible"
+                width="500px"
+                class="batch-editing-customer-dialog">
       <div class="preview-video-box">
-        <video
-          class="preview-video"
-          :src="url"
-          controls="controls"
-          autoplay="autoplay"
-        >
+        <video class="preview-video"
+               :src="url"
+               controls="controls"
+               autoplay="autoplay">
           您的浏览器不支持 video 标签。
         </video>
       </div>
-    </el-dialog>
+
+    </base-modal>
   </div>
 </template>
 
@@ -28,13 +25,11 @@ export default {
       type: String,
     },
   },
-  data() {
+  data () {
     return {
       visible: true,
     };
   },
-  created() {},
-  mounted() {},
 };
 </script>
 <style lang="scss" scoped>
@@ -43,6 +38,7 @@ export default {
   .preview-video {
     width: 100%;
     height: 100%;
+    max-height: 50vh;
   }
 }
 </style>

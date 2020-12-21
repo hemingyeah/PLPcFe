@@ -106,7 +106,7 @@ export default {
 
     &.active {
       max-width: 128px;
-      flex: 0!important;
+      flex: 1!important;
     }
   }
 
