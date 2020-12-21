@@ -60,7 +60,8 @@ const RuleMap = {
   formula,
   cascader,
   related_task: relatedTask,
-  description: textarea
+  description: textarea,
+  receiptAttachment: attachment
 };
 
 // 远程验证字段是否重复方法
