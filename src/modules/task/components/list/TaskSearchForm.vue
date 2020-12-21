@@ -1,7 +1,7 @@
 <script>
 /* api */
-import * as TaskApi from '@src/api/TaskApi.ts';
-import * as CustomerApi from '@src/api/CustomerApi';
+import * as TaskApi from "@src/api/TaskApi.ts";
+import * as CustomerApi from "@src/api/CustomerApi";
 
 /* utils */
 import _ from 'lodash';

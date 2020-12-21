@@ -198,9 +198,9 @@ export default {
     /*max-width: calc(100% - 110px);*/
     width: calc(100% - 110px);
     
-    input {
-      width: 100%;
-    }
+    // input {
+    //   width: 100%;
+    // }
 
     .err-msg-wrap {
       min-height: 10px;

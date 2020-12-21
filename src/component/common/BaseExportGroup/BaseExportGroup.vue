@@ -136,12 +136,14 @@ export default {
   },
   watch: {
     columns(columns) {
-      console.log(columns)
       let checkedMap = {};
       columns.forEach((column) => {
         checkedMap[column.value] = [];
       });
       this.checkedMap = checkedMap;
+    },
+    tooltip(v) {
+      localStorage.setItem('tooltip', v)
     },
   },
   computed: {
@@ -204,6 +206,9 @@ export default {
     },
     handleChange() {
       this.isCheckedAll = this.checkedLength == filterColumnsExpandLength;
+      localStorage.setItem('checkedMap', JSON.stringify(this.checkedMap))
+      localStorage.setItem('checkedGroupArr', JSON.stringify(this.checkedGroupArr))
+      localStorage.setItem('isCheckedAll', this.isCheckedAll)
     },
     handleChangeGroup(value) {
       let checkedMap = this.checkedMap;
@@ -239,12 +244,28 @@ export default {
       this.isCheckedAll = true;
       this.checkedAll();
 
+      if (localStorage.getItem('checkedMap')) {
+        this.checkedMap = JSON.parse(localStorage.getItem('checkedMap'))
+      }
+      if (localStorage.getItem('checkedGroupArr')) {
+        this.checkedGroupArr = JSON.parse(localStorage.getItem('checkedGroupArr'))
+      }
+      if (localStorage.getItem('isCheckedAll')) {
+        this.isCheckedAll = localStorage.getItem('isCheckedAll') === 'true'
+      }
+      if (localStorage.getItem('tooltip')) {
+        this.tooltip = localStorage.getItem('tooltip') === 'true'
+      }
+
       this.isDownloadNow = isDownloadNow;
 
       this.visible = true;
     },
     toggle(value) {
       this.checkedAll(value);
+      localStorage.setItem('checkedMap', JSON.stringify(this.checkedMap))
+      localStorage.setItem('checkedGroupArr', JSON.stringify(this.checkedGroupArr))
+      localStorage.setItem('isCheckedAll', this.isCheckedAll)
     },
   },
 };
