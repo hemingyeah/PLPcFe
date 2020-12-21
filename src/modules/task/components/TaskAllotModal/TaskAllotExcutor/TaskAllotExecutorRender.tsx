@@ -26,6 +26,11 @@ class TaskAllotExecutorRender extends TaskAllotExecutorMethods {
   */
   public renderTeamUserSelect() {
     const scopedSlots = {
+      label: (props: any = {}) => {
+        const teamUsers: LoginUser[] = props?.value || []
+        const teamUser: LoginUser = teamUsers[0] || {}
+        return <div>{teamUser.displayName || ''}</div>
+      },
       option: (props: any) => {
         return (
           <contact-user-item

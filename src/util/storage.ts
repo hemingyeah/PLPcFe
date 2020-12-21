@@ -75,7 +75,7 @@ export async function storageGet<T, K>(key: string, defaultValue: K, module: Sto
  * @description 设置存储
  *  注意此方法是异步执行的
 */
-export async function storageSet(key: string, value: StorageSetType, module: StorageModuleEnum) {
+export async function storageSet(key: string, value: StorageSetType, module: StorageModuleEnum): Promise<any> {
   if(!key) return (
     Log.warn('Caused: can not set storage, because not key', storageSet.name)
   )
@@ -89,7 +89,7 @@ export async function storageSet(key: string, value: StorageSetType, module: Sto
   Log.info(storageKey, `${storageSet.name} -> storageKey`)
   
   try {
-    localForage.setItem(storageKey, value, (error, value) => {
+    await localForage.setItem(storageKey, value, (error, value) => {
       Log.error(error, 'localForage.setItem')
       Log.info(value, 'localForage.setItem')
     })

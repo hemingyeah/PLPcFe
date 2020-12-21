@@ -16,7 +16,7 @@
   transition: border-color 0.2s cubic-bezier(0.645, 0.045, 0.355, 1);
   min-width: 100px;
   &:hover {
-    border-color: #13C2C2;
+    border-color: $color-primary;
   }
   .el-input__icon {
     position: absolute;

@@ -37,6 +37,8 @@ class TaskAllotModalData extends TaskAllotModalProps {
   public pending: boolean = false
   /* 转派说明 */
   public reason: string = ''
+  /* 是否显示清空派单结果 */
+  public showClearTaskAllotResultButton: boolean = false
   /* 是否显示派单弹窗 */
   public showTaskAllotModal: boolean = false
   /* 协同人列表 */

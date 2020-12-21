@@ -4,6 +4,8 @@ import { getTaskAllotUserInfo, getTaskAllotDispatchTeamUserList, getTaskDispatch
 import TaskAllotUserTableComputed from '@src/modules/task/components/TaskAllotModal/TaskAllotExcutor/TaskAllotUserTable/TaskAllotUserTableComputed'
 /* directive */
 import Loadmore from '@src/directive/loadmore'
+/* decorators */
+import Log from '@src/decorators/LogDecorators'
 /* enum */
 import EelementTableSortOrderEnum from '@model/enum/ElementTableSortOrderEnum'
 import EventNameEnum from '@model/enum/EventNameEnum'
@@ -34,7 +36,7 @@ import {
 /* util */
 import * as _ from 'lodash'
 import Platform from '@src/util/platform'
-import Log from '@src/util/log.ts'
+import LogUtil from '@src/util/log.ts'
 import { storageGet, storageSet } from '@src/util/storage.ts'
 import { isString, isObject, isArray } from '@src/util/type'
 import { openTabForCustomerView } from '@src/util/business/openTab'
@@ -194,7 +196,7 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
   public buildCusomterAddressMarker(): void {
     let { validAddress } = this.taskAddress
     if (!validAddress) {
-      return Log.warn('taskAddress.validAddress is false', this.buildCusomterAddressMarker.name)
+      return LogUtil.warn('taskAddress.validAddress is false', this.buildCusomterAddressMarker.name)
     }
     
     // 添加自定义点标记
@@ -254,7 +256,7 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
   */
   public buildUserMarkers(): void {
     if (this.userPage.list.length <= 0) {
-      return Log.warn('userPage.list is empty', this.buildUserMarkers.name)
+      return LogUtil.warn('userPage.list is empty', this.buildUserMarkers.name)
     }
     
     this.userMarkers = []
@@ -335,7 +337,7 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
       userIds: users.map(user => user.userId)
     }
     
-    Log.info(this.selectTeams.slice(), this.buildSearchUserParams.name, this.buildSearchUserParams.name)
+    LogUtil.info(this.selectTeams.slice(), this.buildSearchUserParams.name, this.buildSearchUserParams.name)
     
     // 团队数据
     if (this.selectTeams.length > 0) {
@@ -476,7 +478,7 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
     
     params.customerId = this.customer.id || ''
     
-    Log.info(params, this.fetchTagList.name, this.fetchTagList.name)
+    LogUtil.info(params, this.fetchTagList.name, this.fetchTagList.name)
     
     return (
       fetchTagListFunc(params)
@@ -501,7 +503,7 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
    * @description 获取团队人员列表
   */
   public fetchTeamUsers(selectParams: { keyword: string, pageNum: number, pageSize: number }): Promise<any> {
-    Log.succ(Log.Start, this.fetchTeamUsers.name)
+    LogUtil.succ(LogUtil.Start, this.fetchTeamUsers.name)
     
     this.teamUserPage = new Page()
     
@@ -523,7 +525,7 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
         .then((result = {}) => {
           this.teamUserPage.merge(result)
           
-          Log.succ(Log.End, this.fetchTeamUsers.name)
+          LogUtil.succ(LogUtil.End, this.fetchTeamUsers.name)
           
           result.list = result.list.map((user: LoginUser) =>
             Object.freeze({
@@ -552,7 +554,7 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
    * @description 选择团队变化事件
   */
   public handlerTeamChange(value: Tag[]): void {
-    Log.succ(Log.Start, this.handlerTeamChange.name)
+    LogUtil.succ(LogUtil.Start, this.handlerTeamChange.name)
     
     this.selectTeams = value
     this.initialize()
@@ -562,7 +564,7 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
    * @description 选择团队成员变化事件
   */
   public handlerTeamUsersChange(users: any[]): void {
-    Log.succ(Log.Start, this.handlerTeamUsersChange.name)
+    LogUtil.succ(LogUtil.Start, this.handlerTeamUsersChange.name)
     
     this.selectTeamUsers = users
     this.initialize()
@@ -572,7 +574,7 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
    * @description 选择距离变化事件
   */
   public handlerLocationChange(value: number): void {
-    Log.succ(Log.Start, this.handlerLocationChange.name)
+    LogUtil.succ(LogUtil.Start, this.handlerLocationChange.name)
     
     this.selectLocation = value
     this.initialize()
@@ -615,7 +617,7 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
    * @description 选择用户工作状态事件
   */
   public handlerUserStateChange(value: string[]): void {
-    Log.succ(Log.Start, this.handlerUserStateChange.name)
+    LogUtil.succ(LogUtil.Start, this.handlerUserStateChange.name)
     
     this.selectUserState = value
     this.initialize()
@@ -625,7 +627,7 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
    * @description 表格拖动事件
   */
   public handlerHeaderDragend(newWidth: number, oldWidth: number, tableColumn: any = {}) {
-    Log.succ(Log.Start, this.handlerHeaderDragend.name)
+    LogUtil.succ(LogUtil.Start, this.handlerHeaderDragend.name)
     this.dragendFunc && this.dragendFunc(newWidth, oldWidth, tableColumn)
   }
   
@@ -633,13 +635,14 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
    * @description 选择排序方式变化事件
   */
   public handlerTableSortChanged(option: { prop?: any, order?: any } = {}) {
-    Log.succ(Log.Start, this.handlerTableSortChanged.name)
+    LogUtil.succ(LogUtil.Start, this.handlerTableSortChanged.name)
     this.sortChangeFunc && this.sortChangeFunc(option)
   }
   
   /** 
    * @description 设置负责人checkbox 变化
   */
+  @Log()
   public handlerExcutorCheckedChange(checked: boolean, row: TaskAllotUserInfo): void {
     /* 设置负责人信息 */
     this.TaskAllotExcutorComponent?.outsideUpwardSetSelectedExcutorUser(checked, row)
@@ -676,7 +679,7 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
    * @description 初始化 获取用户列表并且初始化地图
   */
   public initialize(): void {
-    Log.succ(Log.Start, this.initialize.name)
+    LogUtil.succ(LogUtil.Start, this.initialize.name)
     
     this.userPage = new Page({ pageNum: 0 })
     this.isDisableLoadmore = false
@@ -717,10 +720,10 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
       
       this.visibleTeams = tags
       
-      Log.info(this.visibleTeams.slice(), 'visibleTeams', this.matchTags.name)
+      LogUtil.info(this.visibleTeams.slice(), 'visibleTeams', this.matchTags.name)
       
     } catch (error) {
-      Log.error(error, this.matchTags.name)
+      LogUtil.error(error, this.matchTags.name)
     }
   }
   
@@ -729,7 +732,7 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
    * -- 支持外部调用的
   */
   public async outsideFetchUsers(): Promise<void> {
-    Log.succ(Log.Start, this.outsideFetchUsers.name)
+    LogUtil.succ(LogUtil.Start, this.outsideFetchUsers.name)
     
     await this.matchTags()
     this.initialize()

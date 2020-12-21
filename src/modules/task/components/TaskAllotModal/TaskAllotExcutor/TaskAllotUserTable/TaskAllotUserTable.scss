@@ -22,11 +22,6 @@
   .contact-user-avatar-margin {
     margin-top: 0;
   }
-  .contact-user-item {
-    &:hover {
-      background-color: transparent !important;
-    }
-  }
   & > .el-select,
   .biz-form-remote-select,
   .task-allot-table-user,
@@ -154,10 +149,18 @@
 }
 
 .task-allot-user-table-column-field {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
   text-align: center;
   &-label {
     color: $color-primary;
     font-size: $font-size-base;
+  }
+  .user-label {
+    margin-left: 4px;
+    width: auto;
   }
 }
 

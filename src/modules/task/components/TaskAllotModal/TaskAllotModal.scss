@@ -34,6 +34,11 @@
   }
   .option-list {
     max-height: 400px;
+    .contact-user-item {
+      &:hover {
+        background-color: transparent !important;
+      }
+    }
   }
 }
 /* end 弹窗 */

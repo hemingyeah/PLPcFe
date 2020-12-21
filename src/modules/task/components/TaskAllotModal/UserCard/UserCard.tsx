@@ -239,6 +239,14 @@ export default class UserCard extends Vue {
   }
   
   /** 
+   * @description 渲染用户标签
+   * -- 支持外部调用的
+  */
+  public outsideRenderUserLabel(label: string, className?: string) {
+    return this.renderUserCardLabel(label, className)
+  }
+  
+  /** 
    * @description 渲染用户卡片标签列表
   */
   private renderUserCardLabels() {
@@ -255,7 +263,7 @@ export default class UserCard extends Vue {
    * @description 渲染用户卡片标签
   */
   private renderUserCardLabel(label: string, className: string = ''): VNode {
-    const baseClassName = 'user-card-label'
+    const baseClassName = 'user-label'
     const classNames = [baseClassName, `${baseClassName}-${className}`]
     
     return (

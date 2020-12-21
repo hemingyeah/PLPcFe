@@ -2,6 +2,8 @@
 import { getTaskAllotDispatchTeamUserList, getTaskDispatchTagList, getTaskRedeployTagList, getTaskAllotRedeployTeamUserList, getTaskAllotUserInfo } from '@src/api/TaskApi'
 /* computed */
 import TaskAllotExecutorComputed from '@src/modules/task/components/TaskAllotModal/TaskAllotExcutor/TaskAllotExecutorComputed'
+/* decorators */
+import Log from '@src/decorators/LogDecorators'
 /* enum */
 import { TaskAllotTypeModeEnum } from '@src/modules/task/components/TaskAllotModal/TaskAllotModalModel'
 import ComponentNameEnum from '@model/enum/ComponentNameEnum'
@@ -33,7 +35,7 @@ import {
 import Column from '@model/types/Column'
 /* util */
 import * as _ from 'lodash'
-import Log from '@src/util/log.ts'
+import LogUtil from '@src/util/log.ts'
 import { isArray } from '@src/util/type'
 import Platform from '@src/util/platform'
 import { objectArrayIntersection } from '@src/util/array'
@@ -182,15 +184,17 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
       customerId: this.customer?.id || '',
       lat: this.taskAddress.latitude,
       lng: this.taskAddress.longitude,
+      label: this.selectLabel,
       pageNum: ++page.pageNum,
       pageSize: page.pageSize,
       states: this.selectUserState,
+      taskId: this.task?.id,
       userIds: users.map(user => user.userId),
       // 地图模式需要此参数，可以不传code参数
       // map: isMapMode
     }
     
-    Log.info(this.selectTeams.slice(), this.buildSearchUserParams.name, this.buildSearchUserParams.name)
+    LogUtil.info(this.selectTeams.slice(), this.buildSearchUserParams.name, this.buildSearchUserParams.name)
     
     // 团队数据
     if (this.selectTeams.length > 0) {
@@ -296,7 +300,7 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
    * @description 获取团队人员列表
   */
   public fetchTeamUsers(selectParams: { keyword: string, pageNum: number, pageSize: number }): Promise<any> {
-    Log.succ(Log.Start, this.fetchTeamUsers.name)
+    LogUtil.succ(LogUtil.Start, this.fetchTeamUsers.name)
     
     this.teamUserPage = new Page()
     
@@ -318,7 +322,7 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
         .then((result = {}) => {
           this.teamUserPage.merge(result)
           
-          Log.succ(Log.End, this.fetchTeamUsers.name)
+          LogUtil.succ(LogUtil.End, this.fetchTeamUsers.name)
           
           result.list = result.list.map((user: LoginUser) =>
             Object.freeze({
@@ -345,7 +349,7 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
     
     params.customerId = this.customer?.id || ''
     
-    Log.info(params, this.fetchTagList.name, this.fetchTagList.name)
+    LogUtil.info(params, this.fetchTagList.name, this.fetchTagList.name)
     
     return (
       fetchTagListFunc(params)
@@ -365,12 +369,12 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
   public fetchUsers(): Promise<PageInfo<getTaskAllotUserInfoResult> | null | any> {
     if (this.pending) return Promise.resolve({})
     
-    Log.succ(Log.Start, this.fetchUsers.name)
+    LogUtil.succ(LogUtil.Start, this.fetchUsers.name)
     
     this.pending = true
     const params: TaskAllotUserSearchModel = this.buildSearchUserParams(this.isMapMode)
     
-    Log.info(params, this.fetchUsers.name)
+    LogUtil.info(params, this.fetchUsers.name)
     
     return (
       getTaskAllotUserInfo(params)
@@ -381,14 +385,14 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
             return []
           }
           
-          Log.succ(Log.End, this.fetchUsers.name)
+          LogUtil.succ(LogUtil.End, this.fetchUsers.name)
           
           data.result = data?.result || []      
           return data.result
           
         })
         .catch(err => {
-          Log.error(err, this.fetchUsers.name)
+          LogUtil.error(err, this.fetchUsers.name)
         })
         .finally(() => this.pending = false)
     )
@@ -481,7 +485,7 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
    * @description 标签变化事件
   */
   public handlerLabelChange(value: AllotLabelEnum): void {
-    Log.succ(Log.Start, this.handlerLabelChange.name)
+    LogUtil.succ(LogUtil.Start, this.handlerLabelChange.name)
     
     this.selectLabel = value
     // 初始化
@@ -492,7 +496,7 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
    * @description 选择团队变化事件
   */
   public handlerTeamChange(value: Tag[]): void {
-    Log.succ(Log.Start, this.handlerTeamChange.name)
+    LogUtil.succ(LogUtil.Start, this.handlerTeamChange.name)
     
     this.selectTeams = value
     this.initialize()
@@ -502,7 +506,7 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
    * @description 选择团队成员变化事件
   */
   public handlerTeamUsersChange(users: any[]): void {
-    Log.succ(Log.Start, this.handlerTeamUsersChange.name)
+    LogUtil.succ(LogUtil.Start, this.handlerTeamUsersChange.name)
 
     // 负责人
     this.executorChangedHanlder(users?.[0])
@@ -516,7 +520,7 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
    * @description 表格标签变化事件
   */
   public handlerSortLabelChange(value: AllotSortedEnum): void {
-    Log.succ(Log.Start, this.handlerSortLabelChange.name)
+    LogUtil.succ(LogUtil.Start, this.handlerSortLabelChange.name)
     // 赋值
     this.selectSortord = value === this.selectSortord ? AllotSortedEnum.Distance : value
     // 清除负责人人员表格排序
@@ -529,7 +533,7 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
    * @description 排序变化
   */
   public handlerTableSortChanged(option: { prop?: any, order?: any } = {}) {
-    Log.succ(Log.Start, this.handlerTableSortChanged.name)
+    LogUtil.succ(LogUtil.Start, this.handlerTableSortChanged.name)
     
     const { prop, order } = option
     
@@ -573,7 +577,7 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
    * @description 初始化 获取用户列表并且初始化地图
   */
   public initialize(): void {
-    Log.succ(Log.Start, this.initialize.name)
+    LogUtil.succ(LogUtil.Start, this.initialize.name)
     
     // 清空用户列表数据
     this.isMapMode
@@ -583,15 +587,15 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
     this.fetchUsers()
       .then((result: PageInfo<TaskAllotUserInfo | LoginUser>) => {
         if (!result) return
-        // 解析对象数据
-        result.list = parseObject(result.list)
+        // 解析对象数据 暂时弃用 JSON.parse 字符串有问题
+        // result.list = parseObject(result.list)
         // 用户列表/地图处理
         this.isMapMode 
           ? this.mapUserPageHandler(result as PageInfo<LoginUser>) 
           : this.tableUserPageHandler(result as PageInfo<TaskAllotUserInfo>)
       })
       .catch((err: any) => {
-        Log.error(err, this.fetchUsers.name)
+        LogUtil.error(err, this.fetchUsers.name)
       })
       .finally(() => {
         this.pending = false
@@ -603,22 +607,22 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
   */
   public loadmore() {
     if (this.isDisableLoadmore) {
-      return Log.warn('Caused: this.isDisableLoadmore is true', this.loadmore.name)
+      return LogUtil.warn('Caused: this.isDisableLoadmore is true', this.loadmore.name)
     }
     
-    Log.succ(Log.Start, this.loadmore.name)
+    LogUtil.succ(LogUtil.Start, this.loadmore.name)
     
     // 抓取用户列表数据
     this.fetchUsers()
       .then((result: PageInfo<TaskAllotUserInfo>) => {
         if (!result) return
-        // 解析对象数据
-        result.list = parseObject(result.list)
+        // 解析对象数据 暂时弃用 JSON.parse 字符串有问题
+        // result.list = parseObject(result.list)
         // 用户列表处理
         this.tableUserPageHandler(result)
       })
       .catch((err: any) => {
-        Log.error(err, this.fetchUsers.name)
+        LogUtil.error(err, this.fetchUsers.name)
       })
       .finally(() => {
         this.pending = false
@@ -632,16 +636,16 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
     try {
       
       // log start
-      Log.succ(Log.Start, this.mapUserPageHandler.name)
+      LogUtil.succ(LogUtil.Start, this.mapUserPageHandler.name)
       // 合并数据
       this.mapUserPage.merge(result)
       // 构建人员标记
       this.TaskAllotUserMapComponent?.outsideBuildeUserMarkers(result.list)
       // log end
-      Log.succ(Log.End, this.mapUserPageHandler.name)
+      LogUtil.succ(LogUtil.End, this.mapUserPageHandler.name)
       
     } catch (error) {
-      Log.error(error, this.mapUserPageHandler.name)
+      LogUtil.error(error, this.mapUserPageHandler.name)
     }
   }
   
@@ -671,10 +675,10 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
       
       this.customerTags = tags.slice()
       
-      Log.info(this.customerTags.slice(), 'customerTags', this.matchTags.name)
+      LogUtil.info(this.customerTags.slice(), 'customerTags', this.matchTags.name)
       
     } catch (error) {
-      Log.error(error, this.matchTags.name)
+      LogUtil.error(error, this.matchTags.name)
     }
   }
   
@@ -683,7 +687,7 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
    * -- 支持外部调用的
   */
   public async outsideFetchUsers() {
-    Log.succ(Log.Start, `TaskAllotExcutor -> ${this.outsideFetchUsers.name}`)
+    LogUtil.succ(LogUtil.Start, `TaskAllotExcutor -> ${this.outsideFetchUsers.name}`)
     // 匹配团队
     await this.matchTags()
     // 初始化
@@ -740,7 +744,7 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
    * -- 支持外部调用的
   */
   public outsideDragendHandler(newWidth: number, oldWidth: number, tableColumn: any = {}) {
-    Log.succ(Log.Start, this.outsideDragendHandler.name)
+    LogUtil.succ(LogUtil.Start, this.outsideDragendHandler.name)
     this.handlerHeaderDragend(newWidth, tableColumn)
   }
   
@@ -749,7 +753,7 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
    * -- 支持外部调用的
   */
   public outsideSortChangedHandler(option: { prop?: any, order?: any } = {}) {
-    Log.succ(Log.Start, this.outsideSortChangedHandler.name)
+    LogUtil.succ(LogUtil.Start, this.outsideSortChangedHandler.name)
     this.handlerTableSortChanged(option)
   }
   
@@ -830,8 +834,7 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
   */
   public tableUserPageHandler(result: PageInfo<TaskAllotUserInfo>) {
     try {
-      
-      Log.succ(Log.Start, this.tableUserPageHandler.name)
+      LogUtil.succ(LogUtil.Start, this.tableUserPageHandler.name)
       
       // 合并page数据
       this.tableUserPage.merge(result)
@@ -854,10 +857,10 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
         this.bindTableScrollEvent()
       })
       
-      Log.succ(Log.End, this.tableUserPageHandler.name)
+      LogUtil.succ(LogUtil.End, this.tableUserPageHandler.name)
       
     } catch (error) {
-      Log.error(error, this.tableUserPageHandler.name)
+      LogUtil.error(error, this.tableUserPageHandler.name)
     }
   }
   

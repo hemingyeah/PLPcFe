@@ -15,11 +15,22 @@ class TaskAllotModalRender extends TaskAllotModalMethods {
    * @description 渲染工单派单头部派单选择
   */
   public renderLasTasktAllotResultButton(): VNode {
+    const lastTaskAllotResultButton: VNode = (
+      <el-button type='primary' plain onClick={(event: MouseEvent) => this.useLastTaskAllotResult(event)}>
+        上一次派单结果
+      </el-button>
+    )
+    const clearTaskAllotResultButton: VNode = (
+      <el-button type='primary' plain onClick={(event: MouseEvent) => this.clearTaskAllotResult(event)}>
+        清空结果
+      </el-button>
+    )
+    
     return (
       <div class='task-allot-modal-result-button'>
-        <el-button type='primary' plain onClick={(event: MouseEvent) => this.useLastTaskAllotResult(event)}>
-          上一次派单结果
-        </el-button>
+        {
+          this.showClearTaskAllotResultButton ? clearTaskAllotResultButton : lastTaskAllotResultButton
+        }
       </div>
     )
   }

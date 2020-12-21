@@ -147,6 +147,8 @@ export interface TaskAllotUserSearchModel {
   code: number,
   lng?: number | null,
   lat?: number | null,
+  // 标签类型  0 主管  1 距离最近 2 好评率前三
+  label?: string,
   pageNum: number,
   pageSize: number
 }

@@ -130,7 +130,7 @@
   padding: 4px 0;
 }
 
-.user-card-label {
+.user-label {
   background-color: rgb(249, 129, 22);
   border-radius: 2px;
   color: #fff;
@@ -139,6 +139,7 @@
   line-height: 16px;
   width: 29px;
   margin-right: 4px;
+  padding: 0 2px;
   text-align: center;
   &-manager {
     background-color: $color-primary;

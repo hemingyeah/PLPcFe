@@ -1,14 +1,15 @@
+
+/* components */
+import UserCard from '@src/modules/task/components/TaskAllotModal/UserCard/UserCard.tsx'
 /* interface */
-import { ElSelectOption, UserState } from '@src/modules/task/components/TaskAllotModal/TaskAllotExcutor/TaskAllotUserTable/TaskAllotUserTableInterface'
+import { ElSelectOption } from '@src/modules/task/components/TaskAllotModal/TaskAllotExcutor/TaskAllotUserTable/TaskAllotUserTableInterface'
 /* methods */
 import TaskAllotUserTableMethods from '@src/modules/task/components/TaskAllotModal/TaskAllotExcutor/TaskAllotUserTable/TaskAllotUserTableMethods'
 /* model */
-import { AllotSortedEnum, TaslAllotTableColumnFieldEnum, AllotLabelEnum } from '@src/modules/task/components/TaskAllotModal/TaskAllotExcutor/TaskAllotUserTable/TaskAllotUserTableModel'
-import { TaskTagListSearchModel } from '@model/param/in/Task'
+import { TaslAllotTableColumnFieldEnum } from '@src/modules/task/components/TaskAllotModal/TaskAllotExcutor/TaskAllotUserTable/TaskAllotUserTableModel'
 /* types */
 import Column from '@model/types/Column'
 /* util */
-import { uuid } from '@src/util/string'
 import { isString } from '@src/util/type'
 import { fmt_display_text } from '@src/filter/fmt'
 import { isArray } from 'lodash'
@@ -16,6 +17,13 @@ import { convertSecondsToHourMinuteText } from '@src/util/time'
 import DateUtil from '@src/util/date'
 /* vue */
 import { VNode } from 'vue'
+
+const UserLabelMap: { [x: string]: { label: string, className: string } } = {
+  '主管': { label: '主管', className: 'manager' },
+  '满意度前三': { label: '好评', className: '' },
+  '工作效率前三': { label: '工作效率前三', className: '' },
+  '距离最近': { label: '近', className: '' }
+}
 
 class TaskAllotUserTableRender extends TaskAllotUserTableMethods {
   
@@ -185,12 +193,17 @@ class TaskAllotUserTableRender extends TaskAllotUserTableMethods {
   */
   public renderColumnWithDisplayName(scope: any) {
     let { displayName = '', label = [] } = scope.row || {}
+    let userLabelData = null
+    
     return (
       <div class='task-allot-user-table-column-field'>
         <div class='task-allot-user-table-column-field-name'>{displayName}</div>
-        <div class='task-allot-user-table-column-field-label'>
-          { label.join(', ')}
-        </div>
+        {
+          label.map((labelItem: string) => {
+            userLabelData = UserLabelMap[labelItem]
+            return this.renderUserLabel(userLabelData?.label || labelItem, userLabelData?.className)
+          })
+        }
       </div>
     )
   }
@@ -221,6 +234,14 @@ class TaskAllotUserTableRender extends TaskAllotUserTableMethods {
     return (
       <div class='task-allot-user-table-append-block'>{ this.isDisableLoadmore ? '已加载全部结果' : '载入更多结果...' }</div>
     )
+  }
+  
+  /**
+   * @description 渲染用户标签
+   */
+  public renderUserLabel(label: string, className?: string) {
+    // TODO: 此法不可取
+    return new UserCard().outsideRenderUserLabel(label, className)
   }
 
 }
