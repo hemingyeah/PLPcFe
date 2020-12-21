@@ -195,100 +195,77 @@
                   </a>
                       
                 </template>
-              </template>
+                
+                
 
-              <template v-else-if="column.field === 'tags'">
-                {{ scope.row | formatTags }}
-              </template>
-              <template v-else-if="column.formType === 'user' && scope.row.attribute[column.field]">
-                {{ getUserName(column, scope.row.attribute[column.field]) }}
-              </template>
-              <!-- 自定义的选择类型字段显示， 与type 区别-->
-              <template v-else-if="column.formType === 'cascader'">
-                {{ scope.row[column.field] | displaySelect }}
-              </template>
-              <template
-                v-else-if="column.formType === 'select' && !column.isSystem"
-              >
-                {{ scope.row.attribute[column.field] | displaySelect }}
-              </template>
-              <template v-else-if="column.field === 'updateTime'">
-                <template v-if="scope.row.latesetUpdateRecord">
-                  <el-tooltip
-                    class="item"
-                    effect="dark"
-                    :content="scope.row.latesetUpdateRecord"
-                    placement="top-start"
-                  >
+                <template v-else-if="column.field === 'tags'">
+                  {{ scope.row | formatTags }}
+                </template>
+                <template v-else-if="column.formType === 'cascader'">
+                  {{ scope.row.attribute[column.field] | displayCascader }}
+                </template>
+                <template v-else-if="column.formType === 'select' && !column.isSystem">
+                  {{scope.row.attribute[column.field] | displaySelect}} 
+                </template>
+                <template v-else-if="column.formType === 'user' && scope.row.attribute[column.field]">
+                  {{ getUserName(column, scope.row.attribute[column.field]) }}
+                </template>
+                <template v-else-if="column.formType == 'related_task'">
+                  {{ getRelatedTask(scope.row.attribute[column.field]) }}
+                </template>
+                <template v-else-if="column.field === 'updateTime'">
+                  <template v-if="scope.row.latesetUpdateRecord">
+                    <el-tooltip
+                      class="item"
+                      effect="dark"
+                      :content="scope.row.latesetUpdateRecord"
+                      placement="top-start"
+                    >
+                      <div @mouseover="showLatestUpdateRecord(scope.row)">
+                        {{ scope.row.updateTime | formatDate }}
+                      </div>
+                    </el-tooltip>
+                  </template>
+                  <template v-else>
                     <div @mouseover="showLatestUpdateRecord(scope.row)">
                       {{ scope.row.updateTime | formatDate }}
                     </div>
-                  </el-tooltip>
+                  </template>
                 </template>
-                <template v-else>
-                  <div @mouseover="showLatestUpdateRecord(scope.row)">
-                    {{ scope.row.updateTime | formatDate }}
-                  </div>
+                <template v-else-if="column.field === 'createUser'">
+                  {{ scope.row.createUser && scope.row.createUser.displayName }}
                 </template>
-              </template>
-              <template v-else-if="column.field === 'createUser'">
-                {{ scope.row.createUser && scope.row.createUser.displayName }}
-              </template>
-              <template v-else-if="column.field === 'createTime'">
-                {{ scope.row.createTime | formatDate }}
-              </template>
-              <div
-                v-else-if="
-                  column.formType === 'textarea' && column.isSystem != 1
-                "
-                v-html="buildTextarea(scope.row.attribute[column.field])"
-                @click="openOutsideLink"
-              ></div>
+                <template v-else-if="column.field === 'createTime'">
+                  {{ scope.row.createTime | formatDate }}
+                </template>
+                <div
+                  v-else-if="
+                    column.formType === 'textarea' && column.isSystem != 1
+                  "
+                  v-html="buildTextarea(scope.row.attribute[column.field])"
+                  @click="openOutsideLink"
+                ></div>
 
 
-              <template v-else-if="column.fieldName == 'address'">
-                {{ getAddress(scope.row.address) }}
-              </template>
+                <template v-else-if="column.fieldName == 'address'">
+                  {{ getAddress(scope.row.address) }}
+                </template>
               
 
-              <template v-else-if="!column.isSystem">
-                {{ scope.row.attribute && scope.row.attribute[column.field] }}
-              </template>
+                <template v-else-if="!column.isSystem">
+                  {{ scope.row.attribute && scope.row.attribute[column.field] }}
+                </template>
 
-              <template v-else-if="column.fieldName == 'catalogId'">
-                {{ scope.row.pathName }}
-              </template>
-              <template v-else-if="column.fieldName === 'productPic'">
-                <div class="flex-x goods-img-list" style="height:100%">
-                  <template v-for="(item, index) in scope.row.productPic">
-                    <img
-                      :key="index"
-                      v-if="index <= 4"
-                      class="cur-point mar-r-8"
-                      :src="
-                        item.url
-                          ? `${item.url}?x-oss-process=image/resize,m_fill,h_32,w_32`
-                          : defaultImg
-                      "
-                      @click.stop="previewImg(item.url)"
-                    />
-                  </template>
-                  <div>
-                    {{
-                      scope.row[column.field].length > 5
-                        ? `+${scope.row[column.field].length - 5}`
-                        : ''
-                    }}
-                  </div>
-                </div>
-              </template>
-              <template v-else-if="column.fieldName === 'thumbnail'">
-                <div class="flex-x">
+                <template v-else-if="column.fieldName == 'catalogId'">
+                  {{ scope.row.pathName }}
+                </template>
+                <template v-else-if="column.fieldName === 'productPic'">
                   <div class="flex-x goods-img-list" style="height:100%">
-                    <template v-for="(item, index) in scope.row.thumbnail">
+                    <template v-for="(item, index) in scope.row.productPic">
                       <img
                         :key="index"
-                        class="cur-point"
+                        v-if="index <= 4"
+                        class="cur-point mar-r-8"
                         :src="
                           item.url
                             ? `${item.url}?x-oss-process=image/resize,m_fill,h_32,w_32`
@@ -297,14 +274,42 @@
                         @click.stop="previewImg(item.url)"
                       />
                     </template>
+                    <div>
+                      {{
+                        scope.row[column.field].length > 5
+                          ? `+${scope.row[column.field].length - 5}`
+                          : ''
+                      }}
+                    </div>
                   </div>
-                </div>
+                </template>
+                <!-- <template v-else-if="column.fieldName == 'productNum'">
+                  {{ scope.row['remind'] || '' }}
+                </template> -->
+                
+                <template v-else-if="column.fieldName === 'thumbnail'">
+                  <div class="flex-x">
+                    <div class="flex-x goods-img-list" style="height:100%">
+                      <template v-for="(item, index) in scope.row.thumbnail">
+                        <img
+                          :key="index"
+                          class="cur-point"
+                          :src="
+                            item.url
+                              ? `${item.url}?x-oss-process=image/resize,m_fill,h_32,w_32`
+                              : defaultImg
+                          "
+                          @click.stop="previewImg(item.url)"
+                        />
+                      </template>
+                    </div>
+                  </div>
+                </template>
+                <template v-else>
+                  {{ scope.row[column.field] || '' }}
+                </template>
               </template>
-              <template v-else>
-                {{ scope.row[column.field] || '' }}
-              </template>
-            </template>
-          </el-table-column>
+          </template></el-table-column>
         </template>
       </el-table>
 
@@ -600,6 +605,16 @@ export default {
       }
       return null;
     },
+    displayCascader(value) {
+      if (!value) return null;
+      if (value && typeof value === "string") {
+        return value;
+      }
+      if (Array.isArray(value) && value.length) {
+        return value.join("/");
+      }
+      return null;
+    }
   },
   async mounted() {
     this.buildColumns();

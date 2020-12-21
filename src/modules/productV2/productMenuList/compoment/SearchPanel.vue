@@ -64,7 +64,7 @@ export default {
     fields() {
       let f = {};
       let fields = [...this.config.fields, ...this.selfFields]
-        .filter((f) => f.isSearch || f.isSystem)
+        .filter((f) =>(f.isSearch || f.isSystem ) && f.fieldName != "pathName" && f.fieldName != "catalogName" && f.fieldName != "catalogNum")
         .map((field) => {
           f = _.cloneDeep(field);
 
@@ -81,9 +81,6 @@ export default {
           if (formType === "updateTime") {
             f.displayName = "更新时间";
           }
-          if (formType === "related_catalog") {
-            f.fieldName = "catalogId";
-          }
 
           return Object.freeze({
             ...f,
@@ -94,7 +91,7 @@ export default {
           });
         })
         .sort((a, b) => a.orderId - b.orderId);
-
+      console.log(fields, "fields");
       return fields;
     },
     panelWidth() {

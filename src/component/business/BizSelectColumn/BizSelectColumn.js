@@ -288,7 +288,6 @@ const BizSelectColumn = {
       let isTreeNodeRoot = treeNode.root
       let sortList = _.cloneDeep(this.columnSortList)
       let isColumnsObject = this.isColumnsObject(treeNode.columns)
-      debugger
 
       // eslint-disable-next-line no-empty
       if (isTreeNodeRoot && isColumnsObject) {
