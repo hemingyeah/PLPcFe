@@ -170,37 +170,30 @@
           >
             <template slot-scope="scope">
               <template v-if="column.fieldName === 'pathName'">
-                <sample-tooltip :row="scope.row">
-                  <template slot="content" slot-scope="{ isContentTooltip }">
-                    <a
-                      href=""
-                      class="view-detail-btn"
-                      @click.stop.prevent="openProductMenuTab(scope.row.id)"
-                    >
-                      {{ scope.row[column.field] }}
-                    </a>
-                  </template>
-                </sample-tooltip>
+                <a
+                  href=""
+                  class="color-primary"
+                  @click.stop.prevent="openProductMenuTab(scope.row.id)"
+                >
+                  {{ scope.row[column.field] }}
+                </a>
               </template>
 
-              <template v-if="column.fieldName === 'productVideo'">
+              <template v-else-if="column.fieldName === 'productVideo'">
                 <template v-if="scope.row.productVideo.length">
-                  <sample-tooltip :row="scope.row">
-                    <template slot="content" slot-scope="{ isContentTooltip }">
-                      <a
-                        href=""
-                        class="view-detail-btn"
-                        @click.stop.prevent="
-                          previewVideo(scope.row.productVideo[0].url)
-                        "
-                      >
-                        {{
-                          scope.row.productVideo[0] &&
-                            scope.row.productVideo[0].filename
-                        }}
-                      </a>
-                    </template>
-                  </sample-tooltip>
+                  <div
+                    href=""
+                    class="view-detail-btn overHideCon-1"
+                    @click.stop.prevent="
+                      previewVideo(scope.row.productVideo[0].url)
+                    "
+                  >
+                    {{
+                      scope.row.productVideo[0] &&
+                        scope.row.productVideo[0].filename
+                    }}
+                  </div>
+                      
                 </template>
               </template>
 
