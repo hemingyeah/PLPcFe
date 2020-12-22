@@ -52,10 +52,16 @@ const catalogFieldFix = [
   },
   {
     displayName: "创建人",
-    fieldName: "createUserName",
+    fieldName: "createUser",
+    formType: "user",
+    // returnData: "name",  参数保留等待表单优化支持模糊查询
+    noClearable: false,
+    isNull: 1,
+    isSystem: 1,
+    orderId: -3.5,
+    placeHolder: "请输入创建人",
     export: true,
     show: true,
-    isSystem: 1,
     tableName:"catalog",
   },
   {
