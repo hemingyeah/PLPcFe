@@ -453,7 +453,7 @@ export default {
             url: file.ossUrl || file.url || `/files/get?fileId=${file.id}`,
             fileSize: file.fileSizeStr,
           };
-          this.copyForm.companyImages[index]=item;
+          this.$set(this.copyForm.companyImages,index,item);
           this.$emit('addPic',this.copyForm.companyImages);
         })
         .catch((err) => {
