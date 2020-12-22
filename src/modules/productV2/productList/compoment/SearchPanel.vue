@@ -245,8 +245,8 @@ export default {
           displayName: "创建人",
           fieldName: "createUser",
           formType: "user",
-          returnData: "name",
-          noClearable: true,
+          // returnData: "name",  参数保留等待表单优化支持模糊查询
+          noClearable: false,
           export: false,
           isNull: 1,
           isSystem: 1,
@@ -355,7 +355,13 @@ export default {
     },
 
     buildParams() {
-      const form = this.$refs.searchForm.returnData();
+      let form
+      try {
+      
+        form = this.$refs.searchForm.returnData();
+      } catch (error) {
+        console.warn(error, "error try catch");
+      }
       this.formBackup = Object.assign({}, form);
 
       const isSystemFields = this.fields.filter((f) => f.isSystem);

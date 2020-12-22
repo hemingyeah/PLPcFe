@@ -141,13 +141,6 @@ const productFieldFix = [
     tableName:"product",
   },
   {
-    displayName: "创建人",
-    fieldName: "createUser",
-    export: true,
-    isSystem: 0,
-    tableName:"product",
-  },
-  {
     displayName: "创建时间",
     fieldName: "createTime",
     export: true,
