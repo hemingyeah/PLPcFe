@@ -42,24 +42,33 @@ export default {
   computed: {
     fields() {
       let tv = null;
-      let formTypes = ["attachment", "separator", "location", "info"];
+      let formTypes = ["attachment", "separator", "location", "info", "autograph", "formula", "related_task"];
       let fieldNames = ["createUser", "createTime", "updateTime", "productTemplate", "tags", "remindCount", "qrcodeId", "linkmanName", "phone", "address"];
+      let isNotModify = ["text", "textarea", "number"];
+      let isRepeat = ["text", "textarea", "number", "phone"];
 
       let fields = (this.config.fields || [])
         .filter(f => formTypes.indexOf(f.formType) < 0 && !fieldNames.some(key => key === f.fieldName))
+        .filter(f => !(isNotModify.indexOf(f.formType) > -1 && f.setting.defaultValueConfig && !!f.setting.defaultValueConfig.isNotModify))
+        .filter(f => !(isRepeat.indexOf(f.formType) > -1 && f.setting.isRepeat == 1))
         .map(f => {
           tv = Object.assign({}, f);
 
+          if (tv.formType === "select") { 
+            if(tv.setting.selectType == 2){ 
+              tv.setting.selectType = 1
+            }          
+          }
+          
           if (tv.isSystem) {
             tv.orderId -= 100;
           }
-
+         
           // tv.isNull = 0;
           return Object.freeze(tv);
         });
 
       if (!fields || !fields.length) return [];
-
       return fields.sort((a, b) => a.orderId - b.orderId);
     },
     productTypes() {
@@ -130,17 +139,17 @@ export default {
           [sf.fieldName]: form[sf.fieldName].map(({id, tagName}) => ({id, tagName}))
         })
       }
-      if (sf.formType === "user") {
-        tv = form[sf.fieldName];
+      // if (sf.formType === 'user') {
+      //   tv = form[sf.fieldName];
 
-        params.mapJson = JSON.stringify({
-          [sf.fieldName]: {
-            userId: tv.userId,
-            displayName: tv.displayName,
-            staffId: tv.staffId
-          },
-        })
-      }
+      //   params.mapJson = JSON.stringify({
+      //     [sf.fieldName]: {
+      //       userId: tv.userId,
+      //       displayName: tv.displayName,
+      //       staffId: tv.staffId
+      //     },
+      //   })
+      // }
       if (sf.fieldName === "manager") {
         tv = form[sf.fieldName];
 
@@ -160,13 +169,6 @@ export default {
       }
       if (sf.formType === "date") {
         tv = form[sf.fieldName];
-        params.mapJson = JSON.stringify({
-          [sf.fieldName]: tv,
-        })
-      }
-
-      if (sf.formType === "related_catalog") {
-        tv = form[sf.fieldName].id;
         params.mapJson = JSON.stringify({
           [sf.fieldName]: tv,
         })

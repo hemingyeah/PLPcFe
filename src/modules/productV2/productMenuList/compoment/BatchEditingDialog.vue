@@ -49,8 +49,8 @@ export default {
 
       let fields = (this.config.fields || [])
         .filter(f => formTypes.indexOf(f.formType) < 0 && !fieldNames.some(key => key === f.fieldName))
-        .filter(f => !(isNotModify.indexOf(f.formType) > -1 && f.setting.defaultValueConfig && !!f.setting.defaultValueConfig.isNotModify))
-        .filter(f => !(isRepeat.indexOf(f.formType) > -1 && f.setting.isRepeat == 1))
+        .filter(f => !(isNotModify.indexOf(f.formType) > -1 && f.setting?.defaultValueConfig && !!f.setting.defaultValueConfig.isNotModify))
+        .filter(f => !(isRepeat.indexOf(f.formType) > -1 && f.setting?.isRepeat == 1))
         .map(f => {
           tv = Object.assign({}, f);
 

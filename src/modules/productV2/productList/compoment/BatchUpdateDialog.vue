@@ -46,15 +46,15 @@
 </template>
 
 <script>
-import Uploader from '@src/util/uploader';
-import Platform from '@src/platform';
-import * as Lang from '@src/util/lang/index.js';
+import Uploader from "@src/util/uploader";
+import Platform from "@src/platform";
+import * as Lang from "@src/util/lang/index.js";
 
 export default {
-  name: 'batch-update-dialog',
+  name: "batch-update-dialog",
   data() {
     return {
-      fileName: '',
+      fileName: "",
       pending: false,
       file: null,
       errors: [],
@@ -72,7 +72,7 @@ export default {
     },
     action: {
       type: String,
-      default: '',
+      default: "",
     },
     buildDownloadParams: {
       type: Function,
@@ -84,9 +84,9 @@ export default {
   computed: {
     exportType() {
       if (this.selectedIds.length) {
-        return 'exportSelect';
+        return "exportSelect";
       }
-      return 'exportAll';
+      return "exportAll";
     },
     selectedCount() {
       if (this.selectedIds.length) {
@@ -99,7 +99,7 @@ export default {
         return `1、您已经选择了<span>${this.selectedIds.length}</span>条数据`
       }
       // return `1、您已经选择视图全部数据<span>${this.totalItems}</span>条`
-      return '您未选择数据,';
+      return "您未选择数据,";
     },
     hasSelectedData() {
       return this.selectedIds.length > 0;
@@ -109,7 +109,7 @@ export default {
   methods: {
     closeModal() {
       this.file = null;
-      this.fileName = '';
+      this.fileName = "";
       this.errors = [];
     },
     choose(){
@@ -134,13 +134,13 @@ export default {
       // window.location.href = `/product/importCover/export?data=${encodeURI(JSON.stringify(params))}`;
       let params = this.selectedIds;
 
-      let date = Lang.formatDate(new Date(), 'YYYY-MM-DD');
+      let date = Lang.formatDate(new Date(), "YYYY-MM-DD");
       let fileName = `${date}批量更新产品数据.xlsx`;
-      let url = '/product/importCover/export';
+      let url = "/product/importCover/export";
 
-      this.$http.post(url, params, true, {responseType: 'blob'})
+      this.$http.post(url, params, true, {responseType: "blob"})
         .then(blob => {
-          let link = document.createElement('a');
+          let link = document.createElement("a");
           let url = URL.createObjectURL(blob);
           link.download = fileName;
           link.href = url;
@@ -155,13 +155,13 @@ export default {
         .catch(err => console.error(err));
     },
     downloadBlank() {
-      window.location.href = '/product/importBlankCoverExport/exportNew';
+      window.location.href = "/product/importBlankCoverExport/exportNew";
     },
     async upload(){
       try {
-        if(null == this.file || !(this.file instanceof File)) return Platform.alert('请选择要导入的文件');
+        if(null == this.file || !(this.file instanceof File)) return Platform.alert("请选择要导入的文件");
 
-        if (!await this.$platform.confirm('本操作将会批量更新数据，更新成功后将无法恢复，是否确认')) return;
+        if (!await this.$platform.confirm("本操作将会批量更新数据，更新成功后将无法恢复，是否确认")) return;
 
         this.pending = true;
         Uploader.upload(this.file, this.action, {validateStorage: false})
@@ -189,7 +189,7 @@ export default {
           })
 
       } catch (e) {
-        console.error('upload catch e', e);
+        console.error("upload catch e", e);
       }
     },
     change(event){

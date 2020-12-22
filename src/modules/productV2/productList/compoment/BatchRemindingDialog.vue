@@ -45,13 +45,13 @@
 </template>
 
 <script>
-import _ from 'lodash';
-import { getProductRemindTemplate } from '@src/api/ProductApi';
-import * as CustomerApi from '@src/api/CustomerApi'
-import {batchCreateScheduler} from '@src/api/CommonApi';
+import _ from "lodash";
+import { getProductRemindTemplate } from "@src/api/ProductApi";
+import * as CustomerApi from "@src/api/CustomerApi.ts"
+import {batchCreateScheduler} from "@src/api/CommonApi";
 
 export default {
-  name: 'batch-reminding-dialog',
+  name: "batch-reminding-dialog",
   data: () => {
     return {
       sendRoleSetting: [],
@@ -61,7 +61,7 @@ export default {
         options: [],
       },
       form: {
-        ids: '',
+        ids: "",
         isAllLm: 0,
         remindId: null,
         users: [],
@@ -85,21 +85,21 @@ export default {
     },
     remindRule() {
       const {isRepeat, period, fieldDisplayName, isAhead, hours, periodUnit, timeUnit, } = this.selectedRemind;
-      let unit = periodUnit === 'day' ? '天' : (periodUnit === 'week' ? '周' : '月');
-      let isahead = isAhead ? '前' : '后';
-      let dorh = (timeUnit == 'hour' || !timeUnit) ? '小时' : '天';
+      let unit = periodUnit === "day" ? "天" : (periodUnit === "week" ? "周" : "月");
+      let isahead = isAhead ? "前" : "后";
+      let dorh = (timeUnit == "hour" || !timeUnit) ? "小时" : "天";
 
       if (!isRepeat){
         if(fieldDisplayName){
           return `单次通知：根据${fieldDisplayName + (isahead + hours) + dorh}提醒`;
         }
-        return '无'
+        return "无"
         
       }
       if(period){
         return `重复通知：根据${fieldDisplayName + (isahead + hours) + dorh}，每${period + unit}发出提醒`;
       }
-      return '无'
+      return "无"
         
       
     },
@@ -114,14 +114,14 @@ export default {
     },
     initSelect (info) {
       this.sendRoleSetting = [];
-      if (info && info.sendToCustomerExecutor) this.sendRoleSetting.push('sendToCustomerExecutor');
+      if (info && info.sendToCustomerExecutor) this.sendRoleSetting.push("sendToCustomerExecutor");
       if (info && info.sendToCustomerTag) {
-        this.sendRoleSetting.push('sendToCustomerTag')
+        this.sendRoleSetting.push("sendToCustomerTag")
       }
     },
     reset() {
       this.form = {
-        ids: '',
+        ids: "",
         isAllLm: 0,
         remindId: null,
         users: [],
@@ -144,17 +144,17 @@ export default {
         .then(res => {
           if (!res.status) {
             this.$platform.notification({
-              title: '成功',
-              type: 'success',
-              message: '批量添加提醒成功',
+              title: "成功",
+              type: "success",
+              message: "批量添加提醒成功",
             });
             // 更新 产品列表的提醒数量
-            this.$eventBus.$emit('product_list.update_product_list_remind_count');
+            this.$eventBus.$emit("product_list.update_product_list_remind_count");
           }
           if (res.status === 1 && res.data) {
             this.$platform.notification({
-              title: '批量添加提醒失败',
-              type: 'error',
+              title: "批量添加提醒失败",
+              type: "error",
               message: (() => (<dl>
                 <dt>以下产品已存在该提醒：</dt>
                 {res.data.map(c => (<dd style="margin: 0">{c}</dd>))}
@@ -167,18 +167,18 @@ export default {
         })
         .catch(err => {
           this.$platform.notification({
-            title: '失败',
-            type: 'error',
-            message: '批量添加提醒失败',
+            title: "失败",
+            type: "error",
+            message: "批量添加提醒失败",
           });
 
           this.pending = false;
-          console.error('post to /scheduler/buildBatch err', err)
+          console.error("post to /scheduler/buildBatch err", err)
         });
     },
     buildParams() {
       let params = {
-        ids: this.selectedIds.join(','),
+        ids: this.selectedIds.join(","),
         remindId: this.form.remindId,
         sendRoleSetting: {},
       };
@@ -191,14 +191,14 @@ export default {
         params.users = [];
       }
 
-      params.sendRoleSetting.sendToCustomerExecutor = this.sendRoleSetting.indexOf('sendToCustomerExecutor') != -1;
-      params.sendRoleSetting.sendToCustomerTag = this.sendRoleSetting.indexOf('sendToCustomerTag') != -1;
+      params.sendRoleSetting.sendToCustomerExecutor = this.sendRoleSetting.indexOf("sendToCustomerExecutor") != -1;
+      params.sendRoleSetting.sendToCustomerTag = this.sendRoleSetting.indexOf("sendToCustomerTag") != -1;
 
       return params;
     },
     openBatchRemindingDialog() {
       if (!this.selectedIds.length) {
-        return this.$platform.alert('请选择需要批量提醒的产品');
+        return this.$platform.alert("请选择需要批量提醒的产品");
       }
       this.form.remindId = (this.remindTemplate[0] || {}).id;
       this.batchRemindingCustomerDialog = true;
@@ -220,14 +220,14 @@ export default {
     fetchData() {
       getProductRemindTemplate()
         .then(res => {
-          if (!res.length) return;
-          this.remindTemplate = res
+          if (!res) return;
+          this.remindTemplate = (res || [])
             .map(r => {
-              r.name += r.isDdResponse ? '（内部提醒）' : '（外部提醒）';
+              r.name += r.isDdResponse ? "（内部提醒）" : "（外部提醒）";
               return Object.freeze(r);
             });
         })
-        .catch(err => console.error('err', err));
+        .catch(err => console.error("err", err));
     },
     searchManager(params) {
       // params has three properties include keyword、pageSize、pageNum.
