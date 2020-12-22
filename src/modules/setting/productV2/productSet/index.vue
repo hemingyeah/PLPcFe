@@ -446,6 +446,8 @@ export default {
         "其他区域",
       ],
       loading: false,
+
+      chosenUser:[]
     };
   },
   computed: {
@@ -627,7 +629,7 @@ export default {
       this.form.selectUser='';
       this.userList=[];
       this.keywords='';
-      this.getUserList();
+      if(val==='user' || val==='role' || val==='tag' || val==='tagLeader') this.getUserList();
     },
     // 改变规则类型
     ruleTypeChange(val){
@@ -832,7 +834,7 @@ export default {
       };
     },
     // 获取指定人员
-    getUserList:_.debounce(function(keywords = "",refresh=true){
+    getUserList:_.debounce(function(keywords = "",refresh=true,first=false){
       this.loading = true;
       if(keywords){
         this.userKeywords=keywords;
@@ -941,31 +943,37 @@ export default {
     async editRule(id) {
       let res=await queryRuleInfo({id});
       if(res.code==='200'){
+        let form=this.form;
         this.openType='edit';
         const result=res.data;
         this.ruleId=result.id;
-        this.form.ruleName=result.ruleName;
-        this.form.ruleType=result.ruleType;
-        this.form.selectUserType=result.distributeCondition.group;
-        this.form.distributePriority=result.distributePriority;
-        this.form.level=result.level;
-        this.form.isSystem=result.isSystem;
-        if(this.form.selectUserType=='user'){
-          this.getUserList();
-          this.form.selectUsers=result.candidate.info.map(item=>item.userId);
-        }else if(this.form.selectUserType=='user' || this.form.selectUserType=='role' || this.form.selectUserType=='tag' || this.form.selectUserType=='tagLeader'){
-          this.form.selectUser=result.distributeCondition.groupId;
-          this.getUserList();
+        form.ruleName=result.ruleName;
+        form.ruleType=result.ruleType;
+        form.selectUserType=result.distributeCondition.group;
+        form.distributePriority=result.distributePriority;
+        form.level=result.level;
+        form.isSystem=result.isSystem;
+        if(form.selectUserType=='user'){
+          this.chosenUser=result.candidate.info;
+          this.chosenUser.forEach(item=>{
+            item.displayName=item.userName;
+          });
+          this.getUserList(null,true,true);
+          form.selectUsers=result.candidate.info.map(item=>item.userId);
+        }else if(form.selectUserType=='role' || form.selectUserType=='tag' || form.selectUserType=='tagLeader'){
+          this.chosenUser=[result.distributeCondition];
+          form.selectUser=result.distributeCondition.groupId;
+          this.getUserList(null,true,true);
         }
-        this.form.address=result.distributeCondition.address || [];
-        this.form.include=isNaN(result.distributeCondition.include)?1:result.distributeCondition.include;
-        this.form.apply=result.distributeCondition.apply || 'customer';
-        this.form.fieldName=result.distributeCondition.fieldName || '';
-        this.form.equals=isNaN(result.distributeCondition.equals)?1:result.distributeCondition.equals;
-        this.form.option=result.distributeCondition.option || '';
-        if(this.form.apply==='product' && this.form.fieldName==='type'){
+        form.address=result.distributeCondition.address || [];
+        form.include=isNaN(result.distributeCondition.include)?1:result.distributeCondition.include;
+        form.apply=result.distributeCondition.apply || 'customer';
+        form.fieldName=result.distributeCondition.fieldName || '';
+        form.equals=isNaN(result.distributeCondition.equals)?1:result.distributeCondition.equals;
+        form.option=result.distributeCondition.option || '';
+        if(form.apply==='product' && form.fieldName==='type'){
           this.catalogList=[{
-            id:this.form.option,
+            id:form.option,
             pathName:result.distributeCondition.pathName
           }];
         }

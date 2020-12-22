@@ -412,7 +412,7 @@ export default {
       }else{
         this.$notify.error({
           title: "网络错误",
-          message,
+          message:res.msg,
           duration: 2000,
         });
       }

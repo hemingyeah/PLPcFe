@@ -16,6 +16,7 @@
           children: 'tasks'
         }"
         @change="catalogChange"
+        @visible-change='cascaderShow'
       ></el-cascader>
       <p class="no-catalog" v-if="noCatalog">未关联目录超级二维码模板</p>
 
@@ -360,6 +361,25 @@ export default {
     }
   },
   methods: {
+    cascaderShow(val){
+      if(val){
+        this.$nextTick(()=>{
+          document.querySelector('.el-cascader-menu').addEventListener('mouseover',this.cascaderFunc);
+        })
+      }else{
+        document.querySelector('.el-cascader-menu').removeEventListener('mouseover',this.cascaderFunc);
+      }
+    },
+    cascaderFunc(e){
+      if(e.target.nodeName==='LI'){
+        const ariaOwns=e.target.getAttribute('aria-owns');
+        if(ariaOwns){
+          document.getElementById(ariaOwns).style.display='';
+        }else{
+          e.target.parentNode.nextElementSibling.style.display='none';
+        }
+      }
+    },
     // 改变事件类型模板
     changeEventType(ids){
       this.eventTypeList=this.allEventTypeList.filter(item=>ids.find(id=>item.id===id));
@@ -385,7 +405,7 @@ export default {
       }else{
         this.$notify.error({
           title: "网络错误",
-          message,
+          message:res.msg,
           duration: 2000,
         });
       }
@@ -401,7 +421,7 @@ export default {
       }else{
         this.$notify.error({
           title: "网络错误",
-          message,
+          message:res.msg,
           duration: 2000,
         });
       }
@@ -418,7 +438,7 @@ export default {
       }else{
         this.$notify.error({
           title: "网络错误",
-          message,
+          message:res.msg,
           duration: 2000,
         });
       }
@@ -497,7 +517,7 @@ export default {
       }else{
         this.$notify.error({
           title: "网络错误",
-          message,
+          message:res.msg,
           duration: 2000,
         });
       }
@@ -576,7 +596,7 @@ export default {
       }else{
         this.$notify.error({
           title: "网络错误",
-          message,
+          message:res.msg,
           duration: 2000,
         });
       }
@@ -595,7 +615,7 @@ export default {
       }else{
         this.$notify.error({
           title: "网络错误",
-          message,
+          message:res.msg,
           duration: 2000,
         });
       }
@@ -611,7 +631,7 @@ export default {
       }else{
         this.$notify.error({
           title: "网络错误",
-          message,
+          message:res.msg,
           duration: 2000,
         });
       }
