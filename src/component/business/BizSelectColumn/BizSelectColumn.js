@@ -1,15 +1,15 @@
-import "./BizSelectColumn.scss"
+import './BizSelectColumn.scss'
 
-import BizSelectColumnSort from "./BizSelectColumnSort"
+import BizSelectColumnSort from './BizSelectColumnSort'
 
 // import guideCompoment from '@src/component/guide/guide';
 
 
-const { TASK_GUIDE_SELECT_COLUMN } = require("@src/component/guide/taskV2Store");
+const { TASK_GUIDE_SELECT_COLUMN } = require('@src/component/guide/taskV2Store');
 
-import _ from "lodash"
-import { typeOf } from "@src/util/assist";
-import { storageGet, storageSet } from "@src/util/storage";
+import _ from 'lodash'
+import { typeOf } from '@src/util/assist';
+import { storageGet, storageSet } from '@src/util/storage';
 
 function convertDisplayNameToName(field = {}) {
   field.name = field.displayName
@@ -30,7 +30,7 @@ function convertColumnWithSave(field = {}) {
  * 第一版：暂时支持现在的需求，如需支持其他的，后续拓展 
 */
 const BizSelectColumn = {
-  name: "biz-select-column",
+  name: 'biz-select-column',
   props:{
     sotrageKey:{
       type:String | Number,
@@ -92,8 +92,8 @@ const BizSelectColumn = {
         
         // 是否是系统字段
         let isSystemFiled = !(column?.templateId)
-        let isProductTable = column && column.tableName == "product";
-        let isCatalogTable = column && column.tableName == "catalog";
+        let isProductTable = column && column.tableName == 'product';
+        let isCatalogTable = column && column.tableName == 'catalog';
         
         if(isProductTable || isCatalogTable){
           isSystemFiled = column?.isSystem
@@ -133,12 +133,12 @@ const BizSelectColumn = {
 
       // 字段树🌲
       let columnsTree = {
-        system: { name: "系统字段", columns: systemFieldsGroup, checked: false, root: true, toggle: true },
-        attribute: { name: "自定义字段", columns: attributeFieldsGroup, checked: false, root: true, toggle: true},
-        productSystem: { name: "产品系统字段", columns: productSystemFieldsGroup, checked: false, root: true, toggle: true },
-        productAttribute: { name: "产品自定义字段", columns: productAttributeFieldsGroup, checked: false, root: true, toggle: true},
-        catalogSystem: { name: "产品类型系统字段", columns: catalogSystemFieldsGroup, checked: false, root: true, toggle: true },
-        catalogAttribute: { name: "产品类型自定义字段", columns: catalogAttributeFieldsGroup, checked: false, root: true, toggle: true},
+        system: { name: '系统字段', columns: systemFieldsGroup, checked: false, root: true, toggle: true },
+        attribute: { name: '自定义字段', columns: attributeFieldsGroup, checked: false, root: true, toggle: true},
+        productSystem: { name: '产品系统字段', columns: productSystemFieldsGroup, checked: false, root: true, toggle: true },
+        productAttribute: { name: '产品自定义字段', columns: productAttributeFieldsGroup, checked: false, root: true, toggle: true},
+        catalogSystem: { name: '产品类型系统字段', columns: catalogSystemFieldsGroup, checked: false, root: true, toggle: true },
+        catalogAttribute: { name: '产品类型自定义字段', columns: catalogAttributeFieldsGroup, checked: false, root: true, toggle: true},
         
       }
 
@@ -317,8 +317,10 @@ const BizSelectColumn = {
           let lists = this.buildSortLists(treeNode);
           this.columnSortListFieldPush(lists, sortList)
         } else {
-          // sortList = sortList.filter(item => Array.isArray(item.lists))
-          sortList = sortList.filter(item =>!treeNode.columns.some(item_=>item_.fieldName == item.fieldName) )
+          let treeNodeColumns = treeNode?.columns || []
+          sortList = sortList.filter(item => {
+            return treeNodeColumns.every(treeNodeColumn => treeNodeColumn.fieldName !== item.fieldName)
+          })
         }
       }
       else {
@@ -383,7 +385,7 @@ const BizSelectColumn = {
      * @description 列数据 是否是 对象
     */
     isColumnsObject(columns) {
-      return typeOf(columns) === "object"
+      return typeOf(columns) === 'object'
     },
     /** 
      * @description 显示 设置窗
@@ -392,8 +394,8 @@ const BizSelectColumn = {
       this.originColumns = _.cloneDeep(columns)
       this.taskType = taskType
       this.columnTree = this.columnsDataGrouped(_.cloneDeep(columns))
-      if (storageGet(this.sotrageKey) == 1) this["guideSelectColumn"] = false;
-      else storageSet(this.sotrageKey, "1")
+      if (storageGet(this.sotrageKey) == 1) this['guideSelectColumn'] = false;
+      else storageSet(this.sotrageKey, '1')
       this.show = true
     },
     /** 
@@ -426,7 +428,7 @@ const BizSelectColumn = {
             </el-checkbox>
             {
               isRoot && (
-                <div class={["collapse-btn", isToggle ? "biz-select-column-tree-parent-active" : ""]} onClick={e => treeNode.toggle = !treeNode.toggle }>
+                <div class={['collapse-btn', isToggle ? 'biz-select-column-tree-parent-active' : '']} onClick={e => treeNode.toggle = !treeNode.toggle }>
                   <i class="iconfont icon-more"></i>
                 </div>
               )
@@ -492,7 +494,7 @@ const BizSelectColumn = {
 
       })
       this.close();
-      this.$emit("save", { type: "column", data: columns })
+      this.$emit('save', { type: 'column', data: columns })
     },
     /** 
      * @description 向下 -> 切换 是否选中
@@ -566,12 +568,12 @@ const BizSelectColumn = {
         show={ this.show } 
         onClose={ this.close }
       >
-        <div class={ `biz-select-column-body ${this.guideSelectColumn ? "out-line-dis" : ""}` }>
+        <div class={ `biz-select-column-body ${this.guideSelectColumn ? 'out-line-dis' : ''}` }>
           { this.renderTreeDom(h) }
         </div>
         <div style="position: relative;">
           {/* 新人引导 start*/}
-          <guide-compoment style={ `display : ${this.guideSelectColumn ? "inline-block" : "none"}` } content={"随心拖拽，自己配置列表的显示字段和顺序"} onlyOne={ true } haveStep={ false } finishBtn={"OK"} gStyle={"width:240px;top:100px;margin:auto;left:0;right:0;"} stopStep={ this.guide_stopStep } finishBtnFn={ this.guide_finishBtnFn }></guide-compoment>
+          <guide-compoment style={ `display : ${this.guideSelectColumn ? 'inline-block' : 'none'}` } content={'随心拖拽，自己配置列表的显示字段和顺序'} onlyOne={ true } haveStep={ false } finishBtn={'OK'} gStyle={'width:240px;top:100px;margin:auto;left:0;right:0;'} stopStep={ this.guide_stopStep } finishBtnFn={ this.guide_finishBtnFn }></guide-compoment>
           {/* 新人引导 end*/}
           <biz-select-column-sort lists={ this.columnSortList }>
             <div slot="title" class="biz-select-column-sort-title">

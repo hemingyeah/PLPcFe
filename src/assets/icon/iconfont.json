@@ -6,6 +6,139 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "18966993",
+      "name": "warning-circle-fill",
+      "font_class": "warning-circle-fill",
+      "unicode": "e6d3",
+      "unicode_decimal": 59091
+    },
+    {
+      "icon_id": "18905240",
+      "name": "add",
+      "font_class": "add2",
+      "unicode": "e6d2",
+      "unicode_decimal": 59090
+    },
+    {
+      "icon_id": "7127377",
+      "name": "对号",
+      "font_class": "duihao1",
+      "unicode": "e6e2",
+      "unicode_decimal": 59106
+    },
+    {
+      "icon_id": "5375178",
+      "name": "Satisfied",
+      "font_class": "Satisfied1",
+      "unicode": "e715",
+      "unicode_decimal": 59157
+    },
+    {
+      "icon_id": "5537282",
+      "name": "implement",
+      "font_class": "implement",
+      "unicode": "e733",
+      "unicode_decimal": 59187
+    },
+    {
+      "icon_id": "5537283",
+      "name": "furniture",
+      "font_class": "furniture",
+      "unicode": "e74b",
+      "unicode_decimal": 59211
+    },
+    {
+      "icon_id": "5537284",
+      "name": "equipment",
+      "font_class": "equipment",
+      "unicode": "e74c",
+      "unicode_decimal": 59212
+    },
+    {
+      "icon_id": "5537285",
+      "name": "inside",
+      "font_class": "inside",
+      "unicode": "e74e",
+      "unicode_decimal": 59214
+    },
+    {
+      "icon_id": "5537286",
+      "name": "maintain",
+      "font_class": "maintain",
+      "unicode": "e74f",
+      "unicode_decimal": 59215
+    },
+    {
+      "icon_id": "5537287",
+      "name": "appliance",
+      "font_class": "appliance",
+      "unicode": "e750",
+      "unicode_decimal": 59216
+    },
+    {
+      "icon_id": "5537288",
+      "name": "measure",
+      "font_class": "measure",
+      "unicode": "e751",
+      "unicode_decimal": 59217
+    },
+    {
+      "icon_id": "5537289",
+      "name": "mechanics",
+      "font_class": "mechanics",
+      "unicode": "e752",
+      "unicode_decimal": 59218
+    },
+    {
+      "icon_id": "5537290",
+      "name": "medical care",
+      "font_class": "medicalcare",
+      "unicode": "e753",
+      "unicode_decimal": 59219
+    },
+    {
+      "icon_id": "5537291",
+      "name": "refundable",
+      "font_class": "refundable",
+      "unicode": "e754",
+      "unicode_decimal": 59220
+    },
+    {
+      "icon_id": "5537292",
+      "name": "service",
+      "font_class": "service1",
+      "unicode": "e755",
+      "unicode_decimal": 59221
+    },
+    {
+      "icon_id": "5537293",
+      "name": "water",
+      "font_class": "water",
+      "unicode": "e757",
+      "unicode_decimal": 59223
+    },
+    {
+      "icon_id": "5537294",
+      "name": "train",
+      "font_class": "train",
+      "unicode": "e758",
+      "unicode_decimal": 59224
+    },
+    {
+      "icon_id": "5537295",
+      "name": "tel",
+      "font_class": "tel",
+      "unicode": "e759",
+      "unicode_decimal": 59225
+    },
+    {
+      "icon_id": "5537296",
+      "name": "work",
+      "font_class": "work",
+      "unicode": "e75a",
+      "unicode_decimal": 59226
+    },
+    {
       "icon_id": "18724448",
       "name": "描述",
       "font_class": "fdn-description",
@@ -109,20 +242,6 @@
       "font_class": "bell",
       "unicode": "e6d4",
       "unicode_decimal": 59092
-    },
-    {
-      "icon_id": "18418958",
-      "name": "添加人员",
-      "font_class": "tianjiarenyuan",
-      "unicode": "e6d3",
-      "unicode_decimal": 59091
-    },
-    {
-      "icon_id": "18418931",
-      "name": "人员加",
-      "font_class": "renyuanjia",
-      "unicode": "e6d2",
-      "unicode_decimal": 59090
     },
     {
       "icon_id": "18381319",
