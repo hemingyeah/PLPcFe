@@ -71,7 +71,8 @@ enum TaskAllotExecutorEmitEventEnum {
   DeleteSynergyUser = 'deleteSynergyUser',
   SetSynergys = 'setSynergys',
   SetExecutor = 'setExecutor',
-  SetCustomerTags = 'setCustomerTags'
+  SetCustomerTags = 'setCustomerTags',
+  SetReason = 'setReason'
 }
 
 class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
@@ -131,6 +132,14 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
   @Emit(TaskAllotExecutorEmitEventEnum.SetCustomerTags)
   public customerTagsChangedHandler(tags: Tag[]): Tag[] {
     return tags
+  }
+  
+  /**
+   * @description 转派原因变化事件
+   */
+  @Emit(TaskAllotExecutorEmitEventEnum.SetReason)
+  public reasonChangedHandler(reason: string): string {
+    return reason
   }
   
   /** 
@@ -199,7 +208,7 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
       pageSize: page.pageSize,
       states: this.selectUserState,
       taskId: this.task?.id,
-      userIds: users.map(user => user.userId),
+      userIds: users.map(user => user.userId && !user.selfSelected),
       // 地图模式需要此参数
       map: isMapMode
     }
@@ -795,6 +804,13 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
     if (user.selfSelected) return 
     
     this.initialize()
+  }
+  
+  /**
+   * @description 移除协同人
+   */
+  public removeSynergyUser(user: LoginUser) {
+    this.synergyUserCloseHandler(user)
   }
   
   /** 

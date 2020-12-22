@@ -79,6 +79,29 @@ class TaskAllotModalComputed extends TaskAllotModalData {
     return this.loadedComponents.includes(ComponentNameEnum.TaskAllotAuto)
   }
   
+  /**
+   * @description 是否显示工单池类型
+   * 1. 工单设置 -> 工单池 开启
+   * 2. 且该工单目前不在工单池中
+   * 3. 指派 或 转派并开启 转派工单池设置
+   */
+  get isShowTaskPoolType(): boolean {
+    return Boolean(
+      this.taskConfig.taskPoolOn === true
+      && !this.isTaskInTaskPool
+      && (!this.isReAllot || (this.isReAllot && this.taskConfig.reallotToPool === true))
+    )
+  }
+  
+  /**
+   * @description 是否显示自动派单类型
+   * 1. 工单设置 -> 自动派单 开启
+   * 2. 且非转派 (仅支持指派)
+   */
+  get isShowAutoDispatchType(): boolean {
+    return Boolean(this.taskConfig.autoDispatch === true && !this.isReAllot)
+  }
+  
   /** 
    * @description 当前工单是否在工单池中
   */

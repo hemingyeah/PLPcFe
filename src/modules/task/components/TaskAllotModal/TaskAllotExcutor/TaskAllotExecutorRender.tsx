@@ -45,6 +45,7 @@ class TaskAllotExecutorRender extends TaskAllotExecutorMethods {
     }
     return (
       <biz-form-remote-select
+        cleared
         value={this.selectTeamUsers}
         onInput={(value: any[]) => this.handlerTeamUsersChange(value)}
         collapsed
@@ -86,6 +87,10 @@ class TaskAllotExecutorRender extends TaskAllotExecutorMethods {
     let collapse = true
     let user = this.selectDeptUsers[0] || {}
     
+    const ClearDeptUsers = () => {
+      this.executorChangedHandler(null)
+    }
+    
     const AllSelectDeptUsers = (
       this.selectDeptUsers.map((user: LoginUser) => {
         return (
@@ -109,6 +114,11 @@ class TaskAllotExecutorRender extends TaskAllotExecutorMethods {
             </div>
           )
         }
+        {
+          <button type='button' class='biz-team-select-clear' onClick={() => ClearDeptUsers()} key='task-allot-dept-clear'>
+            <i class='iconfont icon-circle-delete'></i>
+          </button>
+        }
       </div>
     )
     
@@ -118,20 +128,26 @@ class TaskAllotExecutorRender extends TaskAllotExecutorMethods {
   /**
    * @description 渲染协同人
   */
-  public renderSysnergySelect(): VNode | null {
-    if (!this.synergyUserList || !this.synergyUserList.length) return null
-    
+  public renderSynergySelect(): VNode | null {
+    if (!this.synergyUserList) return null
+    // 是否存在协同人
+    let isHaveSynergyUser = this.synergyUserList.length > 0
+    // 需要显示的第一个协同人
     let user: any = this.synergyUserList?.[0] || {}
+    // 是否有更多的协同人 (大于1个)
     let isMoreOne = Boolean(this.synergyUserList && this.synergyUserList.length > 1)
+    // 样式类名
     let classNames: string[] = ['task-allot-sysnergy-select']
     
     return (
       <div class={classNames} onClick={() => this.chooseSynergyUser()}>
         <ui-input placeholder='请选择协同人'>
           {
-            <el-tag key={user?.userId} size='mini' disable-transitions closable type='info' onClose={() => this.debouncedRemoveDepartmentUser(user)}>
-              {user?.displayName || ''}
-            </el-tag>
+            isHaveSynergyUser && (
+              <el-tag key={user?.userId} size='mini' disable-transitions closable type='info' onClose={() => this.removeSynergyUser(user)}>
+                {user?.displayName || ''}
+              </el-tag>
+            )
           }
           {
             isMoreOne &&  (
@@ -161,6 +177,22 @@ class TaskAllotExecutorRender extends TaskAllotExecutorMethods {
     )
   }
   
+  /**
+   * @description 渲染工单派单转派原因
+   */
+  public renderTaskAllotReason(): VNode | null {
+    return (
+      <el-input
+        autocomplete="off"
+        className='task-allot-reason-input'
+        placeholder='请输入转派原因'
+        type='text'
+        value={this.reason}
+        onInput={(value: string) => this.reasonChangedHandler(value)}
+      />
+    )
+  }
+  
   public renderTaskAllotExecutorHeaderRow(label: string, node: VNode | null): VNode {
     return (
       <div class='task-allot-executor-header-row'>
@@ -181,7 +213,20 @@ class TaskAllotExecutorRender extends TaskAllotExecutorMethods {
         { this.isAllotByTag && this.renderTaskAllotExecutorHeaderRow('服务团队：', this.renderTeamSelect()) }
         { this.isAllotByTag && this.renderTaskAllotExecutorHeaderRow('负责人：', this.renderTeamUserSelect()) }
         { !this.isAllotByTag && this.renderTaskAllotExecutorHeaderRow('负责人：', this.renderDepartmentUserSelect()) }
-        { this.isShowSynergy && this.renderTaskAllotExecutorHeaderRow('协同人：', this.renderSysnergySelect()) }
+        { this.isShowSynergy && this.renderTaskAllotExecutorHeaderRow('协同人：', this.renderSynergySelect()) }
+      </div>
+    )
+  }
+  
+  /**
+   * @description 渲染工单派单转派原因行
+  */
+  public renderTaskAllotReasonRow(): VNode | null {
+    if (!this.isReAllot) return null
+    
+    return (
+      <div class='task-allot-reason-row task-allot-executor-header'>
+        { this.renderTaskAllotExecutorHeaderRow('转派原因：', this.renderTaskAllotReason()) }
       </div>
     )
   }
@@ -268,7 +313,6 @@ class TaskAllotExecutorRender extends TaskAllotExecutorMethods {
         onInput={(value: AllotLabelEnum) => this.handlerLabelChange(value)}
       >
         {
-          
           this.labelOptions.map((labelOption: ElSelectOption) => {
             return (
               <el-option key={labelOption.value} value={labelOption.value} label={labelOption.label} />

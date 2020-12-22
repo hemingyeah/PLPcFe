@@ -41,6 +41,7 @@ export default class TaskAllotExcutor extends TaskAllotExecutorRender {
     return (
       <div class={ComponentNameEnum.TaskAllotExcutor} {...attrs}>
         { this.renderTaskAllotExecutorHeader() }
+        { this.renderTaskAllotReasonRow() }
         { this.renderTaskAllotExecutorBackgroundChunk() }
         { this.renderTaskAllotUserTableHeader() }
         {

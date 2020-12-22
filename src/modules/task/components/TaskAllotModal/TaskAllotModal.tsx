@@ -56,6 +56,7 @@ export default class TaskAllotModal extends TaskAllotModalRender {
                   isReAllot={this.isReAllot}
                   loginUser={this.loginUser}
                   mode={this.allotTypeMode}
+                  reason={this.reason}
                   task={this.task}
                   taskConfig={this.taskConfig}
                   taskTypesMap={this.taskTypesMap}
@@ -66,6 +67,7 @@ export default class TaskAllotModal extends TaskAllotModalRender {
                   onSetSynergy={(user: LoginUser) => this.setSynergyUser(user)}
                   onSetSynergys={(users: LoginUser[]) => this.outsideSetSynergyUsers(users)}
                   onSetCustomerTags={(tags: Tag[]) => this.outsideSetCustomerTags(tags)}
+                  onSetReason={(value: string) => this.outsideSetReason(value)}
                 />
               </div>
               {
@@ -75,14 +77,17 @@ export default class TaskAllotModal extends TaskAllotModalRender {
                     ref='TaskAllotPoolComponent'
                     customer={this.customer}
                     customerTags={this.customerTags}
-                    loginUser={this.loginUser}
                     isShowSynergy={this.allowModifySynergyUser}
+                    isReAllot={this.isReAllot}
+                    loginUser={this.loginUser}
+                    reason={this.reason}
                     show={this.allotType === TaskAllotTypeEnum.Pool}
                     style={this.allotContentStyle[TaskAllotTypeEnum.Pool]}
-                    task={this.task}
                     stateColorMap={this.stateColorMap}
+                    task={this.task}
                     taskConfig={this.taskConfig}
                     taskTypesMap={this.taskTypesMap}
+                    onSetReason={(value: string) => this.outsideSetReason(value)}
                   />
                 )
               }

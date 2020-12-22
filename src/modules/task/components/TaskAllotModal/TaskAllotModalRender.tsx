@@ -1,3 +1,5 @@
+/* components */
+import TaskAllotExcutor from '@src/modules/task/components/TaskAllotModal/TaskAllotExcutor/TaskAllotExcutor.tsx'
 /* enum */
 import TaskAllotTypeEnum from '@model/enum/TaskAllotTypeEnum'
 /* entity */
@@ -14,7 +16,7 @@ class TaskAllotModalRender extends TaskAllotModalMethods {
   /** 
    * @description 渲染工单派单头部派单选择
   */
-  public renderLasTasktAllotResultButton(): VNode {
+  public renderLastTasktAllotResultButton(): VNode {
     const lastTaskAllotResultButton: VNode = (
       <el-button type='primary' plain onClick={(event: MouseEvent) => this.useLastTaskAllotResult(event)}>
         上一次派单结果
@@ -100,7 +102,8 @@ class TaskAllotModalRender extends TaskAllotModalMethods {
     return (
       <div class='task-allot-modal-header'>
         {this.renderTaskAllotHeaderType()}
-        {this.renderLasTasktAllotResultButton()}
+        {this.renderTaskAllotSynergy()}
+        {this.renderLastTasktAllotResultButton()}
       </div>
     )
   }
@@ -109,33 +112,21 @@ class TaskAllotModalRender extends TaskAllotModalMethods {
    * @description 渲染工单派单头部派单方式
   */
   public renderTaskAllotHeaderType(): VNode {
-    /**
-     * 是否显示工单池类型
-     * 1. 工单设置 -> 工单池 开启
-     * 2. 且该工单目前不在工单池中
-    */
-    const isShowTaskPoolType: boolean = Boolean(this.taskConfig.taskPoolOn === true && !this.isTaskInTaskPool)
-    /** 
-     * 是否显示自动派单类型
-     * 1. 工单设置 -> 自动派单 开启
-     * 2. 且非转派 (仅支持指派)
-    */
-    const isShowAutoDispatchType: boolean = Boolean(this.taskConfig.autoDispatch === true && !this.isReAllot)
     return (
       <div class='task-allot-modal-header-type'>
         <el-radio-group value={this.allotType} onInput={(value: TaskAllotTypeEnum) => this.handlerAllotTypeChange(value)}>
           <el-radio-button label={TaskAllotTypeEnum.Person}>
-            { this.isReAllot ? '转派给工单负责人' : '指派给工单负责人' }
+            { this.isReAllot ? '派单给工单负责人' : '派单给工单负责人' }
           </el-radio-button>
           {
-            isShowTaskPoolType && (
+            this.isShowTaskPoolType && (
               <el-radio-button label={TaskAllotTypeEnum.Pool}>
-                指派到工单池
+                派单到工单池
               </el-radio-button>
             )
           }
           {
-            isShowAutoDispatchType && (
+            this.isShowAutoDispatchType && (
               <el-radio-button label={TaskAllotTypeEnum.Auto}>
                 自动分配
               </el-radio-button>
@@ -170,6 +161,37 @@ class TaskAllotModalRender extends TaskAllotModalMethods {
         </el-radio-group>
       </div>
     )
+  }
+  
+  /**
+   * @description 渲染工单派单协同人
+  */
+  public renderTaskAllotSynergy(): VNode | null {
+    // 非派单到负责人时显示
+    const isAllotExecutor: boolean = this.allotType === TaskAllotTypeEnum.Person
+    if (isAllotExecutor) return null
+    
+    return (
+      <div class='task-allot-model-body-header-synergy'>
+        { this.allowModifySynergyUser && this.renderTaskAllotHeaderRow('协同人：', this.renderSynergySelect()) }
+      </div>
+    )
+  }
+  
+  /**
+   * @description 渲染工单指派头部行
+   * -- TODO: 不建议这样用
+  */
+  public renderTaskAllotHeaderRow(label: string, node: VNode | null): VNode {
+    return this.TaskAllotExcutorComponent?.renderTaskAllotExecutorHeaderRow(label, node)
+  }
+  
+  /**
+   * @description 渲染协同人
+   * -- TODO: 不建议这样用
+  */
+  public renderSynergySelect(): VNode | null {
+    return this.TaskAllotExcutorComponent?.renderSynergySelect()
   }
 }
 

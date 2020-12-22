@@ -302,7 +302,7 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
   */
   public getAttributes() {
     return {
-      class: 'task-allot-modal',
+      class: ['task-allot-modal', this.isReAllot && 'task-reallot-modal'],
       props: {
         title: '派单'
       },
@@ -730,7 +730,8 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
   public matchExcutorWithReAllot(): void {
     if (!this.isReAllot) return
     
-    let executor = this.task?.executor
+    let executor: LoginUser = this.task?.executor
+    executor ? executor.selfSelected = true : null
     this.executorUser = executor || null
   }
   
@@ -814,6 +815,15 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
     this.customerTags = tags
   }
   
+  /**
+   * @description 设置转派说明信息
+   * -- 支持外部调用的
+   */
+  public outsideSetReason(value: string) {
+    LogUtil.succ(LogUtil.Start, this.outsideSetReason.name)
+    this.reason = value
+  }
+  
   /** 
    * @description 显示弹窗
    * --支持外部调用的
@@ -843,7 +853,7 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
    * @description 设为负责人
   */
   public setExecutorUser(user: LoginUser | TaskAllotUserInfo | null) {
-    console.log('user', user)
+    LogUtil.succ(LogUtil.Start, this.setExecutorUser.name)
     this.executorUser = user
   }
   
@@ -1101,8 +1111,22 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
     if (isEmpty(taskAllotResult)) {
       return Platform.alert(TASK_ALLOT_NOT_STORAGE_RESULT)
     }
+    
     // 还原上次派单结果
-    const allotType = taskAllotResult.allotType || TaskAllotTypeEnum.Person
+    let allotType = null
+    // 显示工单池且上次派单结果为工单池
+    if (this.isShowTaskPoolType && taskAllotResult.allotType === TaskAllotTypeEnum.Pool) {
+      allotType = taskAllotResult.allotType
+    }
+    // 显示自动派单且上次派单结果为自动派单
+    else if (this.isShowAutoDispatchType && taskAllotResult.allotType === TaskAllotTypeEnum.Auto) {
+      allotType = taskAllotResult.allotType
+    }
+    // 其他为 派单给负责人
+    else {
+      allotType = TaskAllotTypeEnum.Person
+    }
+    
     this.handlerAllotTypeChange(allotType)
     this.executorUser = taskAllotResult.executorUser || null
     this.synergyUserList = taskAllotResult.synergyUserList || []

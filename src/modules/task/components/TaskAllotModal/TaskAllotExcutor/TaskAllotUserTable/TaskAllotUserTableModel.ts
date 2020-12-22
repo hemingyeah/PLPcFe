@@ -4,7 +4,7 @@ const TaskAllotUserTableCommonColumns = [
     "label": "设为负责人",
     "field": "excutor",
     "show": true,
-    "fixed": true,
+    "fixed": false,
     "width": "100px",
     "type": "column",
     "disabled": true
@@ -13,7 +13,7 @@ const TaskAllotUserTableCommonColumns = [
     "label": "员工",
     "field": "displayName",
     "show": true,
-    "fixed": true,
+    "fixed": false,
     "width": "150px",
     "type": "column",
     "disabled": true

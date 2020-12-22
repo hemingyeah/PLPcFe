@@ -40,6 +40,8 @@ class TaskAllotExecutorData extends TaskAllotExecutorProps {
   @Prop() readonly isShowSynergy: boolean | undefined
   /* 派单方式 模式(列表，地图) */
   @Prop() readonly mode: TaskAllotTypeModeEnum | undefined
+  /* 转派原因 */
+  @Prop() readonly reason: string | undefined
   /* 工作状态颜色数组 */
   @Prop() readonly stateColorMap: StateColorMap | undefined
   /* 协同人列表 */

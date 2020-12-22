@@ -200,4 +200,21 @@
     -webkit-animation-duration: 2s;
   }
 }
+
+.task-reallot-modal {
+  .task-allot-user-content {
+    .base-panel {
+      top: 278px;
+    }
+  }
+  .task-allot-pool-notification {
+    top: 126px;
+  }
+  .task-allot-user-table {
+    height: calc(100% - 180px);
+  }
+  .task-allot-map {
+    height: calc(100% - 100px);
+  }
+}
 /* end new  */

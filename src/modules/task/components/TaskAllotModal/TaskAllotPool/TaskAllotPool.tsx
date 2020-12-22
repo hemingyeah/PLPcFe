@@ -6,6 +6,7 @@ import TaskAllotPoolNotification from '@src/modules/task/components/TaskAllotMod
 import TaskAllotPoolInfo from '@src/modules/task/components/TaskAllotModal/TaskAllotPool/TaskAllotPoolInfo/TaskAllotPoolInfo.tsx'
 import UserCard from '@src/modules/task/components/TaskAllotModal/UserCard/UserCard.tsx'
 import TaskMapInfoWindow from '@src/modules/task/components/TaskAllotModal/TaskMapInfoWindow/TaskMapInfoWindow.tsx'
+import TaskAllotExcutor from '@src/modules/task/components/TaskAllotModal/TaskAllotExcutor/TaskAllotExcutor.tsx'
 /* enum */
 import ComponentNameEnum from '@model/enum/ComponentNameEnum'
 import EventNameEnum from '@model/enum/EventNameEnum'
@@ -18,8 +19,6 @@ import Tag from '@model/entity/Tag/Tag'
 import TaskPoolUser from '@model/entity/TaskPoolUser'
 import TaskAllotUserInfo from '@model/entity/TaskAllotUserInfo'
 import TaskType from '@model/entity/TaskType'
-/* enum */
-import DateFormatEnum from '@model/enum/DateFormatEnum'
 /* image */
 // @ts-ignore
 import DefaultHead from '@src/assets/img/avatar.png'
@@ -31,8 +30,9 @@ import { getCustomerTagTaskPoolCountResult, getTaskPoolAuthUsersResult, getTaskP
 import { REQUIRE_OTHER_NOTIFICATION_USER_MEESSAGE } from '@src/model/const/Alert'
 import { DepeMultiUserResult } from '@src/modules/task/components/TaskAllotModal/TaskAllotModalInterface'
 /* vue */
-import { Vue, Component, Watch, Prop, Ref } from 'vue-property-decorator'
+import { Vue, Component, Prop, Ref, Emit } from 'vue-property-decorator'
 import { CreateElement } from 'vue'
+import { VNode } from 'vue'
 /* sccss */
 import '@src/modules/task/components/TaskAllotModal/TaskAllotPool/TaskAllotPool.scss'
 /* types */
@@ -40,11 +40,10 @@ import StateColorMap from '@model/types/StateColor'
 import TaskConfig from '@model/types/TaskConfig'
 /* util */
 import Log from '@src/util/log.ts'
-import { formatDate } from '@src/util/lang'
 import Platform from '@src/util/Platform'
 import { findComponentUpward } from '@src/util/assist'
 import { openTabForTaskView, openTabForCustomerView } from '@src/util/business/openTab'
-import { fmt_address, fmt_number } from '@src/filter/fmt'
+import { fmt_number } from '@src/filter/fmt'
 import { isBeforeTime } from '@src/util/time'
 
 declare let AMap: any
@@ -56,6 +55,11 @@ window.openTaskViewFunc = function openTaskViewFunc(taskId: string) {
 // @ts-ignore
 window.openCustomerViewFunc = function openCustomerViewFunc(customerId: string) {
   openTabForCustomerView(customerId)
+}
+
+
+enum TaskAllotPoolEmitEventEnum {
+  SetReason = 'setReason'
 }
 
 @Component({ 
@@ -76,6 +80,10 @@ export default class TaskAllotPool extends Vue {
   @Prop() readonly customerTags: Tag[] | undefined
   /* 是否显示协同人 */
   @Prop() readonly isShowSynergy: boolean | undefined
+  /* 是否为转派 */
+  @Prop() readonly isReAllot: boolean | undefined
+  /* 转派原因 */
+  @Prop() readonly reason: string | undefined
   /* 显示状态 */
   @Prop() readonly show: boolean | undefined
   /* 工作状态颜色数组 */
@@ -144,6 +152,14 @@ export default class TaskAllotPool extends Vue {
   /* 是否开启 按服务团队划分工单池 */
   get isPoolByTag(): boolean {
     return this.taskConfig?.poolByTag === true
+  }
+  
+  /**
+   * @description 转派原因变化事件
+   */
+  @Emit(TaskAllotPoolEmitEventEnum.SetReason)
+  public reasonChangedHandler(reason: string): string {
+    return reason
   }
   
   /** 
@@ -234,87 +250,6 @@ export default class TaskAllotPool extends Vue {
       })
       
     })
-  }
-  
-  /**
-   * @description 构建人员信息弹窗
-  */
-  private buildUserMarkerInfo(event: any, amap: any) : string {
-    let taskAllotUser: TaskPoolUser = event?.target?.getExtData()
-    let user = taskAllotUser.user
-    
-    return (
-      `
-        <div class="task-pool-user-content">
-          <div class="task-pool-user-info">
-            <div class="task-pool-user-info-left">
-              <span class='task-pool-user-name'>${user.displayName}</span>
-              <span class='user-state-round' style="background-color: ${this.stateColorMap && this.stateColorMap[user.state || '']}">
-              </span>
-              <span class='task-pool-user-state'>
-                ${user.state || ''}
-              </span>
-            </div>
-            <div class='task-pool-user-phone'>${user.cellPhone || ''}</div>
-          </div>
-          <div class="task-pool-user-team">
-            服务团队: 
-            ${
-              Array.isArray(user.tagList) 
-              ? (
-                user.tagList.map((tag: Tag) => {
-                  return `<span>${tag.tagName || tag}</span>`
-                }).join(', ')
-              )
-              : ''
-            }
-          </div>
-          <div class="task-pool-user-count">
-            <span>未完成工单: ${taskAllotUser.unFinished || ''}</span>
-          </div>
-        </div>
-      `
-    )
-  }
-  
-  /**
-   * @description 构建工单信息弹窗
-  */
-  private buildTaskMarkerInfo(event: any) : string {
-    let task: any = event?.target?.getExtData() || {}
-    let {
-      customerEntity = {},
-      description = '',
-      taskId,
-      taskUUID,
-      taskNo = '',
-      linkMan = {},
-      address = {},
-      planTime = '',
-      serviceContent = '',
-      serviceType = '',
-      isTimeout
-    } = task
-    
-    return (
-      `
-      <div class="map-info-window-content map-task-content-window">
-        <div class="map-task-content-window-header">
-          <div class="customer-name link-text" onclick="openCustomerViewFunc('${customerEntity?.id}')">${ customerEntity?.name || '' }</div>
-          ${isTimeout ? '<div class="map-task-content-window-header-timeout">超时接单</div>' : ''}
-        </div>
-        <p><label>工单编号：</label><span class="link-text" onclick="openTaskViewFunc('${taskId || taskUUID}')">${ taskNo }</span></p>
-        <p><label>联系人：</label>${ linkMan.name || '' }</p>
-        <p><label>电话：</label>${ linkMan.phone || '' }</p>
-        <p><label>地址：</label>${ fmt_address(address) || '' }</p>
-        <p><label>计划时间：</label>${ formatDate(planTime, DateFormatEnum.YTMHMS) || '' }</p>
-        <p><label>服务类型：</label>${ serviceType || '' }</p>
-        <p><label>服务内容：</label>${ serviceContent || '' }</p>
-        <p><label>描述：</label>${ description || '' }</p>
-        <div class="info-window-arrow"></div>
-      </div>
-    `
-    )
   }
   
   /** 
@@ -560,6 +495,38 @@ export default class TaskAllotPool extends Vue {
     )
   }
   
+  /**
+   * @description 渲染工单派单转派原因
+   */
+  private renderTaskAllotReason(): VNode | null {
+    return (
+      <el-input
+        autocomplete="off"
+        className='task-allot-reason-input'
+        placeholder='请输入转派原因'
+        type='text'
+        value={this.reason}
+        onInput={(value: string) => this.reasonChangedHandler(value)}
+      />
+    )
+  }
+  
+  /**
+   * @description 渲染工单派单转派原因行
+   * -- TODO: 此法不建议
+   */
+  private renderTaskAllotReasonRow(): VNode | null {
+    if (!this.isReAllot) return null
+    
+    const taskAllotExcutor: TaskAllotExcutor = new TaskAllotExcutor()
+    
+    return (
+      <div class='task-allot-reason-row task-allot-executor-header'>
+        { taskAllotExcutor.renderTaskAllotExecutorHeaderRow('转派原因：', this.renderTaskAllotReason()) }
+      </div>
+    )
+  }
+  
   mounted() {
     this.initialize()
   }
@@ -591,6 +558,8 @@ export default class TaskAllotPool extends Vue {
           onSubscriptionChange={(value: boolean) => this.handlerTaskPoolInfoSubscriptionChanged(value)}
           onAuthChange={(value: boolean) => this.handlerTaskPoolInfoAuthChanged(value)}
         />
+        
+        { this.renderTaskAllotReasonRow() }
         
         <task-allot-map 
           ref='TaskAllotMap' 

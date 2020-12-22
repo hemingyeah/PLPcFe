@@ -168,4 +168,16 @@
   top: 60px;
   left: 500px;
 }
+.task-allot-model-body-header-synergy {
+  flex: 1;
+  padding-left: 24px;
+  .task-allot-executor-header-row {
+    display: flex;
+    justify-content: flex-start;
+    max-width: 300px;
+  }
+}
+.task-allot-modal-result-button {
+  padding-left: 24px;
+}
 /* end new */
