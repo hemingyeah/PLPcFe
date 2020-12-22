@@ -599,33 +599,19 @@ export default {
           return form;
         },
         update(event, action) {
-          console.log("update::", event, action);
+
           if (action === "tags") {
-            return (this.form.tags = event);
+            return this.$set(this.form, "tags", event);
           }
 
           if (action === "dist") {
-            return (this.form.area = event);
+            return this.$set(this.form, "area", event);
           }
           const f = event.field;
-          if (f.children && f.children.length > 0) {
-            f.children.forEach((item) => {
-              this.form[item] = "";
-            });
+          if (f.returnData){
+            event.newValue = typeof(f.returnData) == "function" ? f.returnData(event.newValue) : event.newValue[f.returnData];
           }
-          if (f.returnData) {
-            let result = typeof(f.returnData) == "function" ? f.returnData(event.newValue) : event.newValue[f.returnData];
-            this.form = {
-              ...this.form,
-              ...result,
-              [f.fieldName]: event.newValue,
-            };
-          } else {
-            this.form = {
-              ...this.form,
-              [f.fieldName]: event.newValue,
-            };
-          }
+          this.$set(this.form, f.fieldName, event.newValue);
         },
         createUserInput(event, isTags) {
           if (isTags) {
