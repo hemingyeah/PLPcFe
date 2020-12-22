@@ -146,4 +146,12 @@ export function saveCardAuth(params) {
   return http.post('/setting/taskType/cardAuth', params,false)
 }
 
+/**
+ * @description 获取已经使用的组件 
+ * @param {Object} params -- 参数对象
+ */
+export function getEnabledList(params) {
+  return http.get('/setting/task/card/getEnabledList', params)
+}
+
 /* ------------- end 工单类型组件设置 ---------------- */
