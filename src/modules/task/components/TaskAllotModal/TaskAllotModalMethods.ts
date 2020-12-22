@@ -861,6 +861,7 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
    * @description 设为协同人
   */
   public setSynergyUser(user: LoginUser) {
+    LogUtil.succ(LogUtil.Start, this.setSynergyUser.name)
     // 判断是否已存在该用户
     const IsNotRepeat = this.synergyUserList.every(synergyUser => synergyUser.userId !== user.userId)
     IsNotRepeat && this.synergyUserList.push(user)

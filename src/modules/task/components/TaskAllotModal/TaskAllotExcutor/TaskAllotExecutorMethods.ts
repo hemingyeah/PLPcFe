@@ -80,12 +80,19 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
   @Watch('mode')
   onModeChangedHandler(newValue: string) {
     // 地图模式 且 地图用户列表为空 且 第一次加载 则初始化
-    if (
-      this.isMapMode 
-      && this.mapUserPage.list.length <= 0 
+    const isInitMapData = (
+      this.isMapMode
+      && this.mapUserPage.list.length <= 0
       && !this.isShowTaskAllotUserMapComponent
-    ) {
+    )
+    // 初始化地图数据
+    if (isInitMapData) {
       this.initialize()
+    } else {
+      // 比较获取人员参数是否一致 判断是否更新
+      let isEqualsParams = this.judgeListParamsEqualsMapParams()
+      // 参数数据不一致时重新初始化
+      !isEqualsParams && this.initialize()
     }
     // 添加到已加载的组件列表
     this.loadedComponents.push(LoadComponentMap[newValue])
@@ -208,7 +215,7 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
       pageSize: page.pageSize,
       states: this.selectUserState,
       taskId: this.task?.id,
-      userIds: users.map(user => user.userId && !user.selfSelected),
+      userIds: users.filter(user => !user.selfSelected).map(user => user.userId),
       // 地图模式需要此参数
       map: isMapMode
     }
@@ -391,7 +398,11 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
     
     this.pending = true
     const params: TaskAllotUserSearchModel = this.buildSearchUserParams(this.isMapMode)
-    
+    // 备份参数数据
+    this.isMapMode
+      ? this.backupFetchUserParams.map = params
+      : this.backupFetchUserParams.list = params
+    // Log
     LogUtil.info(params, this.fetchUsers.name)
     
     return (
@@ -531,14 +542,30 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
    * @description 选择团队成员变化事件
   */
   public handlerTeamUsersChange(users: any[]): void {
+    // Log
     LogUtil.succ(LogUtil.Start, this.handlerTeamUsersChange.name)
-
-    // 负责人
+    // 下次标记初始化方法
+    const nextTickInitialize = () => {
+      this.$nextTick(() => {
+        this.initialize()
+      })
+    }
+    
+    // 如果查询人员只有单个时，清除可以刷新初始化
+    if (this.tableUserPage.list?.[0].userId == this.executor?.userId && users.length == 0) {
+      // 设置负责人信息
+      this.executorChangedHandler(users?.[0])
+      nextTickInitialize()
+      return
+    }
+  
+    // 设置负责人信息
     this.executorChangedHandler(users?.[0])
+    // 如果现在的用户不是手动选择的 则不需要重新初始化数据
+    if (this.executor?.selfSelected && users.length == 0) return
+    
     // 初始化
-    this.$nextTick(() => {
-      this.initialize()
-    })
+    nextTickInitialize()
   }
   
   /**
@@ -621,6 +648,27 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
       .finally(() => {
         this.pending = false
       })
+  }
+  
+  /**
+   * @description 判断获取人员数据参数是否一致，不一致则更新数据
+   */
+  public judgeListParamsEqualsMapParams(): boolean {
+    // 是否相等
+    let isEquals: boolean = false
+    // 列表参数
+    let listParams = this.backupFetchUserParams.list
+    // 地图参数
+    let mapParams = this.backupFetchUserParams.map
+    // 判断服务团队，负责人，协同人，员工标签，距离、工作状态的筛选结果是否相等
+    isEquals = (
+      _.isEqual(listParams?.userIds, mapParams?.userIds)
+      && _.isEqual(listParams?.tagIds, mapParams?.tagIds)
+      && _.isEqual(listParams?.label, mapParams?.label)
+      && _.isEqual(listParams?.states, mapParams?.states)
+    )
+  
+    return isEquals
   }
   
   /** 
@@ -875,7 +923,7 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
       this.userPageCheckedMap = (
         this.tableUserPage.list
           .reduce((acc: {[x: string]: boolean}, cur: LoginUser) => {
-            acc[cur.userId] = false
+            acc[cur.userId] = Boolean(this.executor?.userId === cur?.userId)
             return acc
           }, {})
       )

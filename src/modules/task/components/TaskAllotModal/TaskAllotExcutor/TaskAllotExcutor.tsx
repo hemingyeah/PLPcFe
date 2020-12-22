@@ -53,6 +53,7 @@ export default class TaskAllotExcutor extends TaskAllotExecutorRender {
               dragendFunc={(newWidth: number, oldWidth: number, tableColumn: any = {}) => {
                 this.outsideDragendHandler(newWidth, oldWidth, tableColumn)
               }}
+              isDisableLoadmore={this.isDisableLoadmore}
               sortChangeFunc={(option: any) => this.outsideSortChangedHandler(option)}
               style={this.modeComponents[TaskAllotTypeModeEnum.List]}
               userPageCheckedMap={this.userPageCheckedMap}

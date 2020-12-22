@@ -28,6 +28,7 @@ import StateColorMap from '@model/types/StateColor'
 import Column from '@model/types/Column'
 /* util */
 import { isEnterpriseEdition } from '@src/util/version'
+import {TaskAllotUserSearchModel} from "@model/param/in/Task";
 
 class TaskAllotExecutorData extends TaskAllotExecutorProps {
   /* 客户信息 */
@@ -53,6 +54,14 @@ class TaskAllotExecutorData extends TaskAllotExecutorProps {
   /* 工单类型列表 */
   @Prop() readonly taskTypesMap: { [x: string]: TaskType} | undefined
   
+  /* 备份的获取人员数据参数 */
+  public backupFetchUserParams: {
+    map: TaskAllotUserSearchModel | null,
+    list: TaskAllotUserSearchModel | null
+  } = {
+    map: null,
+    list: null
+  }
   /* 客户团队信息 */
   public customerTags: Tag[] = []
   /* 表格列 */
@@ -115,10 +124,8 @@ class TaskAllotExecutorData extends TaskAllotExecutorProps {
     { label: '今日接单量低到高',  value: AllotSortedEnum.AcceptTaskByTodaySearch },
     { label: '好评优先',  value: AllotSortedEnum.TaskDegreePercentByMonth },
   ]
-  /* 表格排序 标签 */
-  public tableSortLabel: AllotSortedEnum | null = null
   /* 用户选择状态 */
-  public userPageCheckedMap: {[x: number]: boolean} = {}
+  public userPageCheckedMap: {[x: string]: boolean} = {}
 }
 
 export default TaskAllotExecutorData

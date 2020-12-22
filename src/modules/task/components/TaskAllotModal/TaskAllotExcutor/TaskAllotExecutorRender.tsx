@@ -65,7 +65,7 @@ class TaskAllotExecutorRender extends TaskAllotExecutorMethods {
     
     return (
       <div class='task-allot-table-user'>
-        <ui-input placeholder='请输入查询' onClick={() => this.chooseDepartmentUsers()}>
+        <ui-input placeholder='请输入查询' hideIcon onClick={() => this.chooseDepartmentUsers()}>
           {
             <div>
               {
@@ -87,8 +87,17 @@ class TaskAllotExecutorRender extends TaskAllotExecutorMethods {
     let collapse = true
     let user = this.selectDeptUsers[0] || {}
     
-    const ClearDeptUsers = () => {
+    const ClearDeptUsers = (event: Event) => {
+      event.stopPropagation()
+      
       this.executorChangedHandler(null)
+      // 用户自己选择的 并且 人员列表只有当前用户时
+      if (user?.selfSelected && this.tableUserPage.list?.[0].userId == user.userId) return
+      if (user?.selfSelected) return
+      // 更新
+      this.$nextTick(() => {
+        this.initialize()
+      })
     }
     
     const AllSelectDeptUsers = (
@@ -115,7 +124,7 @@ class TaskAllotExecutorRender extends TaskAllotExecutorMethods {
           )
         }
         {
-          <button type='button' class='biz-team-select-clear' onClick={() => ClearDeptUsers()} key='task-allot-dept-clear'>
+          <button type='button' class='biz-team-select-clear' onClick={(event: Event) => ClearDeptUsers(event)} key='task-allot-dept-clear'>
             <i class='iconfont icon-circle-delete'></i>
           </button>
         }
@@ -141,7 +150,7 @@ class TaskAllotExecutorRender extends TaskAllotExecutorMethods {
     
     return (
       <div class={classNames} onClick={() => this.chooseSynergyUser()}>
-        <ui-input placeholder='请选择协同人'>
+        <ui-input hideIcon placeholder='请选择协同人'>
           {
             isHaveSynergyUser && (
               <el-tag key={user?.userId} size='mini' disable-transitions closable type='info' onClose={() => this.removeSynergyUser(user)}>
@@ -184,8 +193,8 @@ class TaskAllotExecutorRender extends TaskAllotExecutorMethods {
     return (
       <el-input
         autocomplete="off"
-        className='task-allot-reason-input'
-        placeholder='请输入转派原因'
+        class='task-allot-reason-input'
+        placeholder={`${this.reallotRemarkNotNull ? '[必填]' : '[选填]'} 转派说明`}
         type='text'
         value={this.reason}
         onInput={(value: string) => this.reasonChangedHandler(value)}

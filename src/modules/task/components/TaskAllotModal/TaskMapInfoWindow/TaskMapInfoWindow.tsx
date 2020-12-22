@@ -1,6 +1,7 @@
 /* components */
 import BizCallCenterPhone from '@src/component/business/BizCallCenterPhone/BizCallCenterPhone.tsx'
 import BizModifyPlanTime from '@src/component/business/BizModifyPlanTime/BizModifyPlanTime.tsx'
+import UiTaskState from '@src/component/ui/UiTaskState/UiTaskState.tsx'
 /* enum */
 import ComponentNameEnum from '@model/enum/ComponentNameEnum'
 import DateFormatEnum from '@model/enum/DateFormatEnum'
@@ -50,6 +51,7 @@ class TaskMapInfoData {
 }
 
 enum TaskMapInfoWindowEmitEventNameEnum {
+  Close = 'close',
   PlanTimeChange = 'planTimeChange'
 }
 
@@ -57,7 +59,8 @@ enum TaskMapInfoWindowEmitEventNameEnum {
   name: ComponentNameEnum.TaskMapInfoWindow,
   components: {
     BizCallCenterPhone,
-    BizModifyPlanTime
+    BizModifyPlanTime,
+    UiTaskState
   }
 })
 export default class TaskMapInfoWindow extends VC {
@@ -108,6 +111,14 @@ export default class TaskMapInfoWindow extends VC {
   }
   
   /**
+   * @description 关闭弹窗
+   */
+  @Emit(TaskMapInfoWindowEmitEventNameEnum.Close)
+  private closedHandler() {
+    Log.succ(Log.Start, `TaskMapInfoWindow -> ${this.closedHandler.name}`)
+  }
+  
+  /**
    * @description 是否存在某个字段
    */
   private existsField(fieldName: TaskFieldNameMappingEnum) {
@@ -153,7 +164,15 @@ export default class TaskMapInfoWindow extends VC {
             <div class='customer-name link-text' onClick={() => openTabForCustomerView(customerId)}>
               { customerName || '' }
             </div>
-            { isTimeout ? <div class='map-task-content-window-header-timeout'>超时接单</div> : '' }
+            {
+              isTimeout && (
+                <ui-task-state task={this.task}>
+                </ui-task-state>
+              )
+            }
+            <button type='button' class='task-map-info-window-close' onClick={() => this.closedHandler()}>
+              <i class='iconfont icon-fe-close'></i>
+            </button>
           </div>
           <p>
             <label>工单编号：</label>

@@ -37,7 +37,11 @@ enum ComponentNameEnum {
   // 工单地图信息弹窗
   TaskMapInfoWindow = 'task-map-info-window',
   // 修改计划时间
-  BizModifyPlanTime = 'biz-modify-plan-time'
+  BizModifyPlanTime = 'biz-modify-plan-time',
+  // UIInput
+  UiInput = 'ui-input',
+  // 工单状态
+  UiTaskState = 'ui-task-state'
 }
 
 export default ComponentNameEnum

@@ -29,6 +29,8 @@ class TaskAllotUserTableData extends TaskAllotUserTableComponents {
   @Prop() readonly changePending: Function | undefined
   /* 拖动变化方法 */
   @Prop() readonly dragendFunc: Function | undefined
+  /* 是否禁用加载更多 */
+  @Prop() readonly isDisableLoadmore: boolean | undefined
   /* 排序变化方法 */
   @Prop() readonly sortChangeFunc: Function | undefined
   /* 用户选择状态 */
@@ -38,8 +40,6 @@ class TaskAllotUserTableData extends TaskAllotUserTableComponents {
   public AMap: any = null
   /* 地图弹窗对象 */
   public AMapInfoWindow: any = null
-  /* 是否禁用加载更多 */
-  public isDisableLoadmore: boolean = false
   /* 最后一次点击的标记头像 */
   public lastClickedUserMarker: { marker: any, data: TaskAllotUserInfo | null } = { marker: null, data: null }
   /* 表格排序数据 */

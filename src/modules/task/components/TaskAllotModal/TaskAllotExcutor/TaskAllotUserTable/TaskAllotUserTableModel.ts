@@ -29,7 +29,7 @@ const TaskAllotUserTableCommonColumns = [
   {
     "label": "员工角色",
     "field": "roles",
-    "show": true,
+    "show": false,
     "fixed": false,
     "width": "150px",
     "type": "column"
@@ -76,7 +76,7 @@ const TaskAllotUserTableCommonColumns = [
 const TaskAllotUserTableStateColumn = {
   "label": "工作状态",
   "field": "state",
-  "show": true,
+  "show": false,
   "fixed": false,
   "sortable": false,
   "width": "150px",

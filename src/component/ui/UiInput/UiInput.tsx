@@ -1,5 +1,6 @@
 /* enum */
 import EventNameEnum from '@model/enum/EventNameEnum'
+import ComponentNameEnum from '@model/enum/ComponentNameEnum'
 /* vue */
 import VC from '@model/VC'
 import { CreateElement } from 'vue'
@@ -8,12 +9,14 @@ import { Component, Emit, Prop } from 'vue-property-decorator'
 import '@src/component/ui/UiInput/UiInput.scss'
 
 @Component({
-  name: 'ui-input',
+  name: ComponentNameEnum.UiInput,
 })
 class UiInput extends VC<{}> {
   
   /* 点击事件 */
   @Prop() readonly click: Function | undefined
+  /* 占位符 */
+  @Prop() readonly hideIcon: boolean | undefined
   /* 占位符 */
   @Prop() readonly placeholder: string | undefined
   /* 展开切换 */
@@ -34,7 +37,7 @@ class UiInput extends VC<{}> {
           this.$slots.default
           || <span class='placeholder-text'>{this.placeholder}</span>
         }
-        <i class={iconClassNames}></i>
+        { !this.hideIcon && <i class={iconClassNames}></i> }
       </div>
     )
   }

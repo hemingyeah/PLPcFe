@@ -97,8 +97,6 @@ export default class TaskAllotPool extends Vue {
   /* 工单类型列表 */
   @Prop() readonly taskTypesMap: { [x: string]: TaskType} | undefined
   
-  /* 地图用户信息弹窗 */
-  private AMapUserInfoWindow: any = null
   /* 工单信息弹窗 */
   private AMapTaskInfoWindow: any = null
   /* 是否在地图显示工单池订阅用户 */
@@ -113,6 +111,8 @@ export default class TaskAllotPool extends Vue {
   private notificationCheckd: TaskPoolNotificationTypeEnum[] = []
   /* 当前选择地图工单 */
   private selectedMapTask: any = {}
+  /* 当前选择地图人员 */
+  private selectedMapUser: LoginUser | null = null
   /* 工单池通知自定义人员 */
   private taskPoolNotificationUsers: LoginUser[] = []
   /* 工单池统计数据信息 */
@@ -152,6 +152,13 @@ export default class TaskAllotPool extends Vue {
   /* 是否开启 按服务团队划分工单池 */
   get isPoolByTag(): boolean {
     return this.taskConfig?.poolByTag === true
+  }
+  
+  /**
+   * @description 转派说明是否必填
+   */
+  get reallotRemarkNotNull(): boolean {
+    return this.taskConfig?.reallotRemarkNotNull === true
   }
   
   /**
@@ -197,11 +204,13 @@ export default class TaskAllotPool extends Vue {
         position: [longitude, latitude],
         title: user.displayName,
         map: amap,
-        extData: taskPoolUser,
+        extData: user,
         content: `<img class='staff-header' width='42' height='42' src='${user.head || DefaultHead}' />`
       })
       
       userMarker.on(EventNameEnum.Click, (event: any) => {
+        const user: LoginUser = event.target.getExtData() || null
+        this.selectedMapUser = user
         this.$nextTick(() => {
           this.isShowUserCard = true
         })
@@ -282,6 +291,13 @@ export default class TaskAllotPool extends Vue {
   */
   private closeUserCard() {
     this.isShowUserCard = false
+  }
+  
+  /**
+   * @description 关闭地图标记弹窗
+   */
+  private closeInfoWindowHandler() {
+    this.AMapTaskInfoWindow?.close()
   }
   
   /** 
@@ -502,8 +518,8 @@ export default class TaskAllotPool extends Vue {
     return (
       <el-input
         autocomplete="off"
-        className='task-allot-reason-input'
-        placeholder='请输入转派原因'
+        class='task-allot-reason-input'
+        placeholder={`${this.reallotRemarkNotNull ? '[必填]' : '[选填]'} 转派说明`}
         type='text'
         value={this.reason}
         onInput={(value: string) => this.reasonChangedHandler(value)}
@@ -578,21 +594,25 @@ export default class TaskAllotPool extends Vue {
         <task-map-info-window
           ref='TaskMapInfoWindowComponent' 
           task={this.selectedMapTask}
+          onClose={() => this.closeInfoWindowHandler()}
         />
         
         <div class='task-allot-user-content'>
-          <base-panel width='470px' show={this.isShowUserCard} {...basePanelAttrs}>
-            <user-card
-              customer={this.customer}
-              customerTagNames={this.customerTagNames}
-              emitEventComponentName={ComponentNameEnum.TaskAllotExcutor}
-              stateColorMap={this.stateColorMap}
-              showSynergyButton={this.isShowSynergy}
-              task={this.task}
-              userId={this.selectedExcutorUser?.userId}
-              onClose={() => this.closeUserCard()}
-            />
-          </base-panel>
+          this.isShowUserCard && (
+            <base-panel width='470px' show={this.isShowUserCard} {...basePanelAttrs}>
+              <user-card
+                customer={this.customer}
+                customerTagNames={this.customerTagNames}
+                emitEventComponentName={ComponentNameEnum.TaskAllotPool}
+                stateColorMap={this.stateColorMap}
+                showExecutorButton={false}
+                showSynergyButton={this.isShowSynergy}
+                task={this.task}
+                userId={this.selectedMapUser?.userId}
+                onClose={() => this.closeUserCard()}
+              />
+            </base-panel>
+          )
         </div>
         
       </div>

@@ -9,7 +9,7 @@
   }
 }
 .task-allot-map {
-  height: calc(100% - 50px);
+  height: calc(100% - 0px);
   width: 100%;
 }
 #TaskAllotPoolMapContainer {
@@ -63,7 +63,6 @@
   
   max-height: calc(100% - 100px);
   padding-left: 16px;
-  overflow-y: scroll;
 }
 
 .task-pool-icon {

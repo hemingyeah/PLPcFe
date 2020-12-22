@@ -87,6 +87,11 @@ export default class TaskAllotModal extends TaskAllotModalRender {
                     task={this.task}
                     taskConfig={this.taskConfig}
                     taskTypesMap={this.taskTypesMap}
+                    onDeleteSynergyUser={(user: LoginUser) => this.outsideDeleteSynergyUser(user)}
+                    onSetExecutor={(user: LoginUser) => this.setExecutorUser(user)}
+                    onSetSynergy={(user: LoginUser) => this.setSynergyUser(user)}
+                    onSetSynergys={(users: LoginUser[]) => this.outsideSetSynergyUsers(users)}
+                    onSetCustomerTags={(tags: Tag[]) => this.outsideSetCustomerTags(tags)}
                     onSetReason={(value: string) => this.outsideSetReason(value)}
                   />
                 )

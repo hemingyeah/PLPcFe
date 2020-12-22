@@ -155,6 +155,13 @@ export default class TaskAllotMap extends VC {
   }
   
   /**
+   * @description 关闭地图标记弹窗
+   */
+  private closeInfoWindowHandler() {
+    this.AMapInfoWindow?.close()
+  }
+  
+  /**
    * @description 获取地图中心
   */
   private getMapCenter(): Array<number> {
@@ -235,6 +242,7 @@ export default class TaskAllotMap extends VC {
           showModifyPlanTime={this.allowModifyPlanTime}
           task={this.task}
           taskType={this.taskType}
+          onClose={() => this.closeInfoWindowHandler()}
         />
       </div>
     )

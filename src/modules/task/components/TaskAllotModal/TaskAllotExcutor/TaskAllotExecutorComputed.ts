@@ -61,6 +61,13 @@ class TaskAllotExecutorComputed extends TaskAllotExecutorData {
   }
   
   /**
+   * @description 转派说明是否必填
+   */
+  get reallotRemarkNotNull(): boolean {
+    return this.taskConfig?.reallotRemarkNotNull === true
+  }
+  
+  /**
    * @description 工单客户地址地址 
    * 工单新建后地址信息在taddress里面，新建的信息在address里面
   */

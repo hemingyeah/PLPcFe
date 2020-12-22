@@ -60,6 +60,8 @@ export default class UserCard extends Vue {
   @Prop() readonly emitEventComponentName: string | undefined
   // 工作状态颜色数组
   @Prop() readonly stateColorMap: StateColorMap | undefined
+  // 是否显示 负责人人按钮
+  @Prop({ default: true }) readonly showExecutorButton: boolean | undefined
   // 是否显示 协同人按钮
   @Prop() readonly showSynergyButton: boolean | undefined
   /* 工单信息 */
@@ -516,9 +518,13 @@ export default class UserCard extends Vue {
           {this.renderUserCardDetail()}
           
           <div class='user-card-footer'>
-            <el-checkbox value={this.isExecutorChecked} onInput={(value: boolean) => this.onExecutorCheckedChanged(value)}>
-              设为负责人
-            </el-checkbox>
+            {
+              this.showExecutorButton && (
+                <el-checkbox value={this.isExecutorChecked} onInput={(value: boolean) => this.onExecutorCheckedChanged(value)}>
+                  设为负责人
+                </el-checkbox>
+              )
+            }
             {
               this.showSynergyButton && (
                 <el-checkbox value={this.isSynergyChecked} onInput={(value: boolean) => this.onSynergyCheckedChanged(value)}>
