@@ -218,6 +218,8 @@
                 :remote-method="queryCatalogsByPage"
                 :loading='loading'
                 popper-class="select-popper"
+                class="catalog-loadmore"
+                v-catalog-loadmore='catalogLoadmore'
               >
                 <el-option
                   v-for="item in catalogList"
@@ -395,8 +397,11 @@ export default {
         level: "",
       },
       userParams:{},
-      hasNextPage:true,
       userKeywords:'',
+      hasNextPage:true,
+      catalogParams:{},
+      catalogKeywords:'',
+      catalogHasNextPage:true,
       fields: [],
       allOptions: [],
       options: [],
@@ -555,11 +560,20 @@ export default {
       searchType: '',
       keywords:''
     }
+    this.catalogParams={
+      tenantId:this.tenantId,
+      pageNum:1,
+      pageSize:10,
+      keyWord:''
+    }
   },
   mounted() {
     this.productConfig();
   },
   methods: {
+    catalogLoadmore(){
+      if(!this.catalogHasNextPage) this.queryCatalogsByPage(null,false);
+    },
     loadmore(){
       if(!this.hasNextPage) this.getUserList(null,false);
     },
@@ -644,18 +658,23 @@ export default {
       }
     },
     // 获取产品类型字段
-    queryCatalogsByPage:_.debounce(function(keyWord=''){
-      const params={
-        tenantId:this.tenantId,
-        pageNum:1,
-        pageSize:10,
-        keyWord
+    queryCatalogsByPage:_.debounce(function(keyWord='',refresh=true){
+      if(keyWord){
+        this.catalogKeywords=keyWord;
       }
+      if(refresh){
+        this.catalogParams.pageNum=1;
+      }else{
+        this.catalogParams.pageNum++;
+      }
+      this.catalogParams.keyWord=this.catalogKeywords;
       this.loading = true;
-      queryCatalogsByPage(params).then(res=>{
+      queryCatalogsByPage(this.catalogParams).then(res=>{
         this.loading=false;
         if(res.code==='200'){
-          this.catalogList=res.data.list;
+          this.catalogHasNextPage=res.data.hasNextPage;
+          if(refresh) this.catalogList=res.data.list;
+          else this.catalogList.push(...res.data.list);
         }else{
           this.$platform.alert(res.msg);
         }
@@ -994,11 +1013,28 @@ export default {
           }
         })
       }
+    },
+    'catalog-loadmore':{
+      bind(el,binding){
+        const SELECT_DOM=el.querySelector('.catalog-loadmore .el-select-dropdown__wrap');
+        SELECT_DOM.addEventListener('scroll',()=>{
+          const condition=SELECT_DOM.scrollHeight-SELECT_DOM.scrollTop<=SELECT_DOM.clientHeight;
+          if(condition){
+            binding.value();
+          }
+        })
+      }
     }
   }
 };
 </script>
 <style lang="scss" scoped>
+.el-radio{
+  margin-right: 10px;
+}
+/deep/ .el-radio__label{
+  padding-left: 5px;
+}
 .pointer {
   cursor: pointer;
 }
