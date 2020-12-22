@@ -730,7 +730,7 @@ export default {
         distributePriority: this.form.distributePriority,
         enabled: 1,
         level: this.form.level,
-        isSystem: 0,
+        isSystem: this.form.isSystem,
       };
       if (this.openType == "add") {
         params.createUser = this.userId;
@@ -949,6 +949,7 @@ export default {
         this.form.selectUserType=result.distributeCondition.group;
         this.form.distributePriority=result.distributePriority;
         this.form.level=result.level;
+        this.form.isSystem=result.isSystem;
         if(this.form.selectUserType=='user'){
           this.getUserList();
           this.form.selectUsers=result.candidate.info.map(item=>item.userId);

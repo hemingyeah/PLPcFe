@@ -383,7 +383,11 @@ export default {
           }
         }
       }else{
-        this.$platform.alert(res.msg);
+        this.$notify.error({
+          title: "网络错误",
+          message,
+          duration: 2000,
+        });
       }
     },
     // 查询自助门户快捷入口
@@ -395,7 +399,11 @@ export default {
       if(res.code==='200'){
         this.quickInfos=res.data.quickInfos;
       }else{
-        this.$platform.alert(res.msg);
+        this.$notify.error({
+          title: "网络错误",
+          message,
+          duration: 2000,
+        });
       }
     },
     // 查询全部规则
@@ -408,7 +416,11 @@ export default {
       if(res.code==='200'){
         this.rules=res.data;
       }else{
-        this.$platform.alert(res.msg);
+        this.$notify.error({
+          title: "网络错误",
+          message,
+          duration: 2000,
+        });
       }
     },
     // 显示、隐藏产品视频
@@ -480,11 +492,14 @@ export default {
       let res=await queryProductCatalogs({tenantId:this.tenantId})
       if(res.code==='200'){
         this.catalogList=res.data;
-        // this.catalogList[2].tasks[2].conData=false;
         this.isDisabled(this.catalogList);
         this.getFirstCatalog(this.catalogList,true);
       }else{
-        this.$platform.alert(res.msg);
+        this.$notify.error({
+          title: "网络错误",
+          message,
+          duration: 2000,
+        });
       }
     },
     // 选择第一个可选目录
@@ -559,7 +574,11 @@ export default {
         this.querySettingRules();
         this.queryCompanyInfo();
       }else{
-        this.$platform.alert(res.msg);
+        this.$notify.error({
+          title: "网络错误",
+          message,
+          duration: 2000,
+        });
       }
     },
     // 查询单个目录详情
@@ -574,7 +593,11 @@ export default {
 
         this.queryEventType();
       }else{
-        this.$platform.alert(res.msg);
+        this.$notify.error({
+          title: "网络错误",
+          message,
+          duration: 2000,
+        });
       }
     },
     // 获取企业资料
@@ -586,7 +609,11 @@ export default {
       if(res.code==='200'){
         this.comData=res.data;
       }else{
-        this.$platform.alert(res.msg);
+        this.$notify.error({
+          title: "网络错误",
+          message,
+          duration: 2000,
+        });
       }
       this.initmap();
     },
