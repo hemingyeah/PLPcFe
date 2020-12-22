@@ -9,7 +9,7 @@
       clearable
       :placeholder="placeholder"
       :value-format="dateObj.format"
-      :value="field.returnData?value[field.returnData]:value"
+      :value="field.returnData?_value[field.returnData]:_value"
       :format="dateObj.format"
       @input="choose"
     />

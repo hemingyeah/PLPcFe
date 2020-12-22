@@ -1,0 +1,1264 @@
+<template>
+  <div class="setting-wrapper">
+    <div class="left-menu">
+      <h3>产品二维码配置</h3>
+      <el-cascader
+        class="catalog"
+        v-model="catalogId"
+        expand-trigger="hover"
+        filterable
+        :options="catalogList"
+        :show-all-levels="false"
+        :props="{
+          expandTrigger: 'hover',
+          value: 'id',
+          label: 'name',
+          children: 'tasks'
+        }"
+        @change="catalogChange"
+        @visible-change='cascaderShow'
+      ></el-cascader>
+      <p class="no-catalog" v-if="noCatalog">未关联目录超级二维码模板</p>
+
+      <ul class="options">
+        <li
+          v-for="(item, index) in noCatalog?options.filter(item=>item.show):options"
+          :key="index"
+          :class="getClass(item)"
+          @click="chooseOption(item)"
+        >
+          {{ item.label }}
+          <i class="el-icon-check icon_check" v-if="item.saved"></i>
+        </li>
+      </ul>
+    </div>
+
+    <div class="main">
+      <div class="setting-bg">
+        <div class="setting-data-box">
+          <div
+            class="index-wrapper"
+            v-if="nowOption === 'pic' || nowOption === 'intro' || nowOption === 'service'"
+          >
+            <div
+              v-if="
+                settingInfo.companyImages.length === 1 &&
+                !settingInfo.companyImages[0].url
+              "
+              @click="changeType('pic')"
+              class="setting-swipe setting-swipe-noimg"
+              :class="nowOption === 'pic' ? 'choose-border' : ''"
+            ></div>
+            <div
+              v-if="
+                (settingInfo.companyImages.length === 1 &&
+                settingInfo.companyImages[0].url) || (settingInfo.companyImages.length === 2 &&
+                !settingInfo.companyImages[0].url)
+              "
+              @click="changeType('pic')"
+              class="setting-swipe"
+              :class="nowOption === 'pic' ? 'choose-border' : ''"
+              :style="bgStyle(settingInfo.companyImages[0].url || settingInfo.companyImages[1].url)"
+            ></div>
+            <el-carousel
+              v-if="settingInfo.companyImages.length>2 || (settingInfo.companyImages.length===2 && settingInfo.companyImages[0].url)"
+              height="140px"
+              arrow="never"
+              :class="nowOption === 'pic' ? 'choose-border' : ''"
+            >
+              <el-carousel-item
+                v-for="item in settingInfo.companyImages[0].url
+                  ? settingInfo.companyImages
+                  : settingInfo.companyImages.slice(1)"
+                :key="item.id"
+              >
+                <img :src="item.url" class="swipe-img" @click="changeType('pic')" />
+              </el-carousel-item>
+            </el-carousel>
+
+            <h3>产品名称</h3>
+            <div class="intro" @click="changeType('intro')" :class="introClass">
+              <span>{{ settingInfo.productIntroduction }}</span>
+              <a class="intro-change" @click="showDetail = !showDetail">{{
+                showDetail ? "收起" : "展开"
+              }}</a>
+            </div>
+
+            <ul class="two-panel">
+              <li @click="changeType('contact')">
+                <img src="../../assets/img/customer_ser.png" />
+                <span>马上联系</span>
+              </li>
+              <li @click="changeType('service')">
+                <img src="../../assets/img/selfService.png" />
+                <span>自助服务</span>
+              </li>
+            </ul>
+
+            <div class="box-card">
+              <h4>某某设备管理科技有限公司</h4>
+              <p style="width: 78%" @click="changeType('comInfo')">
+                XXX设备管理科技有限公司是一家致力于生产高新技术产品的企业...
+              </p>
+              <img src="../../assets/img/myShop/logo.png" />
+              <a href="javascript:;">详情 ></a>
+            </div>
+
+            <div class="service-box" v-if="nowOption==='service'">
+              <ul>
+                <li v-for="(item,index) in eventTypeList" :key="item.id">
+                  <img :src="index | getSrc">
+                  <p>{{item.name}}</p>
+                </li>
+              </ul>
+            </div>
+
+          </div>
+
+          <div v-if="nowOption === 'contact'" class="contact-wrapper">
+            <div class="contact-top">
+              <div class="contact-info">
+                <img src="../../assets/img/cusService.png">
+                <div class="contact-info-right">
+                  <h3>胜利</h3>
+                  <p>
+                    <i class="iconfont icon-dianhua2"></i>
+                    18888888888
+                  </p>
+                  <p>
+                    <i class="iconfont icon-address"></i>
+                    浙江省杭州市余杭区文一西路未来park
+                  </p>
+                </div>
+              </div>
+
+              <ul class="contact-btns">
+                <li>
+                  <i class="iconfont icon-dianhua2"></i>
+                  <span>马上联系</span>
+                </li>
+                <li>
+                  <i class="iconfont icon-weixin"></i>
+                  <span>加我微信</span>
+                </li>
+              </ul>
+            </div>
+            <div class="contact-bottom">
+              <h3>服务星级</h3>
+              <div class="stars">
+                <i v-for="item in 5" :key="item" class="iconfont icon-favorfill"></i>
+              </div>
+            </div>
+          </div>
+
+          <!-- <ul v-if="nowOption === 'service'" class="service-wrapper">
+            <li v-for="item in quickInfos" :key="item.eventTempId">
+              <img :src="item.iconType | getSrc">
+              <p>{{item.name}}</p>
+            </li>
+          </ul> -->
+
+          <div v-if="nowOption === 'comInfo'" class="com-wrapper">
+            <img :src="(comData && comData.attribute.logoUrl) || defaultLogo">
+
+            <ul>
+              <li>
+                <span>企业名称</span>
+                <p>{{comData && comData.tenantName}}</p>
+              </li>
+              <li>
+                <span>企业地址</span>
+                <p>{{comData && comData.attribute.basicCompanyAddress}}</p>
+              </li>
+              <li>
+                <span>联系电话</span>
+                <p>
+                  {{comData && comData.adminPhone}}
+                  <i class="iconfont icon-dianhua2"></i>
+                </p>
+              </li>
+            </ul>
+
+            <div id='mapWrapper' v-if="nowOption==='comInfo'" style="height:166px;"></div>
+          </div>
+
+          <div v-if="nowOption === 'proInfo' || nowOption==='video' || nowOption==='knowledge'" class="pro-wrapper">
+            <ul @click="changeType('proInfo')" class="round-panel top-panel" :class="nowOption === 'proInfo' ? 'choose-border' : ''">
+              <li v-for="item in settingInfo.showFields.filter(s=>s.showFlag=='1')" :key="item.fieldName">
+                <p>
+                  {{item.displayName}}
+                  <span>XXX</span>
+                </p>
+              </li>
+            </ul>
+            <div v-if="settingInfo.productVideo && settingInfo.videoOpenState" @click="changeType('video')" class="round-panel middle-panel" :class="nowOption === 'video' ? 'choose-border' : ''" @mouseenter="mouseEnter" @mouseleave="mouseLeave">
+              <span class="video-title">{{settingInfo.productVideo[0] && settingInfo.productVideo[0].filename}}</span>
+              <i class="iconfont" v-show="videoFlagShow" :class="videoPlay?'icon-zanting':'icon-kaishi'" @click="play"></i>
+              <video ref="video" @loadedmetadata="videoLoaded" :src="settingInfo.productVideo[0] && settingInfo.productVideo[0].url" style="object-fit:fill;" width="319px" height="100%">浏览器不支持video</video>
+              <span class="video-time">{{videoTime}}</span>
+            </div>
+            <div v-if="!settingInfo.productVideo && settingInfo.videoOpenState" @click="changeType('video')" class="round-panel middle-panel no-video" :class="nowOption === 'video' ? 'choose-border' : ''">
+              暂无视频
+            </div>
+            <div v-if="settingInfo.knowledgeOpenState" @click="changeType('knowledge')" class="bottom-panel round-panel" :class="nowOption === 'knowledge' ? 'choose-border' : ''">
+              <div class="title">
+                <span>知识库</span>
+                <a href="javascript:;">更多 ></a>
+              </div>
+              <ul>
+                <li v-for="(item,index) in settingInfo.knowledge" :key="index">
+                  <p class="article-title">{{item.title}}</p>
+                  <span class="author">{{item.author}}</span>
+                  <p class="num">
+                    <span class="num-text">阅读</span>
+                    <span>{{item.num}}</span>
+                  </p>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div v-if="nowOption === 'part'" class="part-wrapper"></div>
+
+          <div v-if="nowOption === 'mall'" class="mall-wrapper"></div>
+        </div>
+      </div>
+    </div>
+
+    <right-menu
+      class="right-menu"
+      :nowOption='nowOption'
+      :allOptions='options'
+      :form='settingInfo'
+      :tenantId='tenantId'
+      :userId='userId'
+      :rules='rules'
+      :noCatalog='noCatalog'
+      :allEventTypeList='allEventTypeList'
+      :eventTypeIdList='eventTypeIdList'
+      @changeEventType='changeEventType'
+      @addPic='addPic'
+      @delPic='delPic'
+      @save='save'
+      @changeState='changeState'
+      v-if="rightMenuFlag"
+    ></right-menu>
+  </div>
+</template>
+
+<script>
+import rightMenu from './component/rightMenu';
+import MAP_MARKER from '../../assets/img/marker.png';
+import { getRootWindow } from '@src/util/dom';
+import { get } from 'lodash';
+import {
+  queryProductCatalogs,
+  syncCatalogInfo,
+  queryProductSetting,
+  queryCompanyInfo,
+  querySettingRules,
+  queryEventType
+} from '@src/api/SuperQrcode';
+
+let map=null;
+
+export default {
+  name: "super-qrcode",
+  data() {
+    return {
+      stopRecursion:false,    // 找到有详情目录后停止递归
+      noCatalog:false,        // 没有有详情的目录，选择默认模板
+      total:0,                // 总目录条数
+      getTotal:0,             // 获取第一条有详情目录时的条数
+      rightMenuFlag:false,
+      catalogId: [],
+      currentCatalog:null,
+      fakeCataId:[],
+      tenantId:null,
+      userId:null,
+      catalogList: [],
+      defaultLogo:require('../../assets/img/tenant_defaultLogo.jpg'),
+      options: [
+        { label: "首页配置项",show:true },
+        { label: "产品图片", type: "pic",show:true },
+        { label: "产品简介", type: "intro",show:true },
+        { label: "马上联系", type: "contact",show:true },
+        { label: "自助服务", type: "service",show:true },
+        { label: "企业资料", type: "comInfo",show:true },
+        { label: "产品配置项",show:true },
+        { label: "产品资料", type: "proInfo",show:true },
+        { label: "产品视频", type: "video",show:false },
+        { label: "关联知识库", type: "knowledge",show:false },
+        { label: "关联备件", type: "part",show:false },
+        { label: "商城配置",show:true },
+        { label: "门户商城", type: "mall",show:true },
+      ],
+      nowOption: "pic",
+
+      settingInfo:{
+        companyImages:[{}],
+        showFields:[],
+        productVideo:[],
+        knowledge:[]
+      },
+      quickInfos:[],
+      rules:[],
+
+      showDetail: false,
+
+      videoPlay:false,
+      videoFlagShow:true,
+      videoTime:'',
+
+      comData:null,
+
+      allEventTypeList:[],
+      eventTypeList:[],
+      eventTypeIdList:[]
+    };
+  },
+  computed: {
+    introClass() {
+      let clz = "";
+      if (!this.showDetail) {
+        clz = "intro-cut";
+      }
+      if (this.nowOption === "intro") {
+        clz += " choose-border";
+      }
+      return clz;
+    }
+  },
+  watch:{
+    nowOption(val){
+      if(val!=='proInfo' && val!=='video' && val!=='knowledge'){
+        this.videoPlay=false;
+      }
+      if(val==='comInfo'){
+        if(this.comData){
+          this.initmap();
+        }
+      }else{
+        map && map.destroy();
+      }
+    }
+  },
+  mounted() {
+    try{
+      const rootWindow=getRootWindow(window);
+      this.tenantId=JSON.parse(rootWindow._init).user.tenantId;
+      this.userId=JSON.parse(rootWindow._init).user.userId;
+    }catch(err){
+      this.tenantId='7416b42a-25cc-11e7-a500-00163e12f748';
+      this.userId='b9510211-d82f-11e8-b3c6-00163e304a25';
+    }
+
+    this.getCatalogList();
+  },
+  filters:{
+    getSrc(_type) {
+      return require(`../../assets/img/myShop/newIcon${_type%5}.png`);
+    }
+  },
+  methods: {
+    cascaderShow(val){
+      if(val){
+        this.$nextTick(()=>{
+          document.querySelector('.el-cascader-menu').addEventListener('mouseover',this.cascaderFunc);
+        })
+      }else{
+        document.querySelector('.el-cascader-menu').removeEventListener('mouseover',this.cascaderFunc);
+      }
+    },
+    cascaderFunc(e){
+      if(e.target.nodeName==='LI'){
+        const ariaOwns=e.target.getAttribute('aria-owns');
+        if(ariaOwns){
+          document.getElementById(ariaOwns).style.display='';
+        }else{
+          e.target.parentNode.nextElementSibling.style.display='none';
+        }
+      }
+    },
+    // 改变事件类型模板
+    changeEventType(ids){
+      this.eventTypeList=this.allEventTypeList.filter(item=>ids.find(id=>item.id===id));
+    },
+    // 查询事件类型列表
+    async queryEventType(id=''){
+      const params={
+        tenantId:this.tenantId,
+        id:id
+      }
+      let res=await queryEventType(params);
+      if(res.code==='200'){
+        if(id===''){
+          this.allEventTypeList=res.data;
+          this.queryEventType(this.settingInfo.id);
+        }else{
+          this.rightMenuFlag=true;
+          if(res.data){
+            this.eventTypeList=res.data;
+            this.eventTypeIdList=res.data.map(item=>item.id);
+          }
+        }
+      }else{
+        this.$notify.error({
+          title: "网络错误",
+          message:res.msg,
+          duration: 2000,
+        });
+      }
+    },
+    // 查询自助门户快捷入口
+    async queryQuickInfo(){
+      const params={
+        tenantId:this.tenantId
+      }
+      let res=await queryQuickInfo(params);
+      if(res.code==='200'){
+        this.quickInfos=res.data.quickInfos;
+      }else{
+        this.$notify.error({
+          title: "网络错误",
+          message:res.msg,
+          duration: 2000,
+        });
+      }
+    },
+    // 查询全部规则
+    async querySettingRules(){
+      const params={
+        tenantId:this.tenantId,
+        enabled:1
+      }
+      let res=await querySettingRules(params);
+      if(res.code==='200'){
+        this.rules=res.data;
+      }else{
+        this.$notify.error({
+          title: "网络错误",
+          message:res.msg,
+          duration: 2000,
+        });
+      }
+    },
+    // 显示、隐藏产品视频
+    changeState(val){
+      const option=this.nowOption;
+      if(option==='video'){
+        this.settingInfo.videoOpenState=val?1:0;
+      }else if(option==='knowledge'){
+        this.settingInfo.knowledgeOpenState=val?1:0;
+      }
+    },
+    // 保存成功
+    save(type){
+      switch(type){
+        case 'pic':
+          this.changeType('intro');
+          break;
+        case 'intro':
+          this.changeType('contact');
+          break;
+        case 'contact':
+          this.changeType('service');
+          break;
+        case 'service':
+          this.changeType('comInfo');
+          break;
+        case 'comInfo':
+          this.changeType('proInfo');
+          break;
+        case 'proInfo':
+          if(this.noCatalog){
+            this.changeType('mall');
+          }else{
+            this.changeType('video');
+          }
+          break;
+        case 'video':
+          this.changeType('knowledge');
+          break;
+        case 'knowledge':
+          this.changeType('part');
+          break;
+        case 'part':
+          this.changeType('mall');
+          break;
+        case 'mall':
+          this.changeType('pic');
+          break;
+        default:
+          break;
+      }
+      if(type==='contact' || type==='comInfo') return
+      let saveItem=this.options.find(item=>item.type===type);
+      saveItem.saved=true;
+    },
+    // 添加图片
+    addPic(list){
+      this.settingInfo.companyImages=list;
+    },
+    // 删除图片
+    async delPic(index){
+      const confirm = await this.$platform.confirm('确认删除？');
+      if(!confirm) return
+      
+      this.settingInfo.companyImages.splice(index,1);
+    },
+    // 获取目录
+    async getCatalogList(){
+      let res=await queryProductCatalogs({tenantId:this.tenantId})
+      if(res.code==='200'){
+        this.catalogList=res.data;
+        this.isDisabled(this.catalogList);
+        this.getFirstCatalog(this.catalogList,true);
+      }else{
+        this.$notify.error({
+          title: "网络错误",
+          message:res.msg,
+          duration: 2000,
+        });
+      }
+    },
+    // 选择第一个可选目录
+    getFirstCatalog(list,isTop=false){
+      for(let item of list){
+        this.getTotal++;
+        if(this.stopRecursion) return
+        if(isTop){
+          this.fakeCataId=[item.id];
+        }else{
+          this.fakeCataId.push(item.id);
+        }
+        if(item.tasks && item.tasks.length>0){
+          this.getFirstCatalog(item.tasks);
+        }else{
+          if(item.conData){
+            this.stopRecursion=true;
+            this.catalogId=this.fakeCataId;
+            this.currentCatalog=this.catalogId[this.catalogId.length-1];
+            return this.syncCatalogInfo();
+          }
+        }
+      }
+      if(this.getTotal===this.total){   // 递归完也没有有详情目录
+        this.noCatalog=true;
+        this.catalogId=[0];
+        this.syncCatalogInfo();
+      }
+    },
+    // 选择目录
+    catalogChange(value) {
+      if(value[value.length-1]===this.currentCatalog){
+        return
+      }
+      this.options.forEach(item=>{
+        item.saved=false;
+      });
+      this.nowOption='pic';
+      if(this.catalogId[0]===0){
+        this.noCatalog=true;
+      }else{
+        this.noCatalog=false;
+      }
+      this.currentCatalog=value[value.length-1];
+      this.rightMenuFlag=false;
+      this.syncCatalogInfo();
+    },
+    // 目录是否选择
+    isDisabled(list) {
+      list.forEach((item) => {
+        this.total++;
+        if(item.tasks && item.tasks.length===0){
+          item.disabled = !item.conData;
+          delete item.tasks;
+        }
+        if(item.tasks && item.tasks.length>0){
+          this.isDisabled(item.tasks);
+        }
+      });
+    },
+    // 选中目录后同步数据
+    async syncCatalogInfo(){
+      const params={
+        userId:this.userId,
+        tenantId:this.tenantId,
+        catalogId:this.catalogId[this.catalogId.length-1]
+      }
+      let res=await syncCatalogInfo(params);
+      if(res.code==='200'){
+        this.queryProductSetting();
+        // this.queryQuickInfo();
+        this.querySettingRules();
+        this.queryCompanyInfo();
+      }else{
+        this.$notify.error({
+          title: "网络错误",
+          message:res.msg,
+          duration: 2000,
+        });
+      }
+    },
+    // 查询单个目录详情
+    async queryProductSetting(){
+      const params={
+        catalogId:this.catalogId[this.catalogId.length-1],
+        tenantId:this.tenantId
+      }
+      let res=await queryProductSetting(params);
+      if(res.code==='200'){
+        this.settingInfo=res.data;
+
+        this.queryEventType();
+      }else{
+        this.$notify.error({
+          title: "网络错误",
+          message:res.msg,
+          duration: 2000,
+        });
+      }
+    },
+    // 获取企业资料
+    async queryCompanyInfo(){
+      const params={
+        tenantId:this.tenantId
+      }
+      let res=await queryCompanyInfo(params);
+      if(res.code==='200'){
+        this.comData=res.data;
+      }else{
+        this.$notify.error({
+          title: "网络错误",
+          message:res.msg,
+          duration: 2000,
+        });
+      }
+      this.initmap();
+    },
+    // 初始化地图
+    initmap(){
+      const dom=document.getElementById('mapWrapper');
+      if(!dom){
+        setTimeout(()=>{
+          this.initmap();
+        },500);
+        return
+      }
+      map && map.destroy();
+      let longitude = this.comData.attribute.longitude;
+      let latitude = this.comData.attribute.latitude;
+      let width = 21;
+      let height = 28.5;
+
+      map = new AMap.Map('mapWrapper', {
+        center: [longitude, latitude],
+        dragEnable: false, // 禁止滑动
+        zoom: 13
+      })
+
+      let icon = new AMap.Icon({
+        size: new AMap.Size(width, height),
+        image: MAP_MARKER,
+        imageSize: new AMap.Size(width, height)
+      })
+
+      let marker = new AMap.Marker({
+        position: [longitude, latitude],
+        icon,
+        offset: new AMap.Pixel(-(width / 2), -height)
+      })
+      map.add(marker)
+    },
+    // 鼠标进入视频容器
+    mouseEnter(){
+      this.videoFlagShow=true;
+    },
+    // 鼠标离开视频容器
+    mouseLeave(){
+      if(this.videoPlay){
+        this.videoFlagShow=false;
+      }
+    },
+    // 视频加载完成
+    videoLoaded(){
+      const duration=this.$refs.video.duration;
+      this.videoTime=this.formatTime(duration);
+      this.$refs.video.addEventListener('timeupdate',()=>{
+        this.videoTime=this.formatTime(duration-this.$refs.video.currentTime);
+      });
+      this.$refs.video.addEventListener('ended',()=>{
+        this.$refs.video.currentTime=0;
+        this.videoPlay=false;
+      });
+    },
+    // 计算视频剩余时间
+    formatTime(time){
+      const seconds=Math.floor(time%60).toString().padStart(2,'0');
+      const minutes=Math.floor(time/60).toString().padStart(2,'0');
+      return `${minutes}:${seconds}`;
+    },
+    // 播放/暂停视频
+    play(){
+      if(this.videoPlay){
+        this.$refs.video.pause();
+      }else{
+        this.$refs.video.play();
+      }
+      this.videoPlay=!this.videoPlay;
+    },
+    // 配置项的样式
+    getClass(item) {
+      if (!item.type) {
+        return "option-title";
+      } else if (item.type === this.nowOption) {
+        return "option option-now";
+      } else {
+        return "option";
+      }
+    },
+    // 改变配置项
+    changeType(type){
+      this.nowOption=type;
+    },
+    // 点击配置项
+    chooseOption(item) {
+      if (!item.type) return;
+      this.nowOption = item.type;
+    },
+    // 轮播只有一张图
+    bgStyle(url) {
+      return `background:url(${url}) no-repeat center center;background-size:100% 100%;`;
+    },
+  },
+  components:{
+    rightMenu
+  }
+};
+</script>
+
+<style lang="scss" scoped>
+::-webkit-scrollbar {
+  width: 0;
+}
+
+ul{
+  padding-left: 0;
+}
+p{
+  margin-bottom: 0;
+}
+
+.setting-wrapper {
+  .left-menu {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    background: #fff;
+    width: 220px;
+    height: calc(100% - 30px);
+    border-radius: 5px;
+    overflow: auto;
+
+    h3 {
+      padding: 12px;
+      border-bottom: 1px solid $color-border-l2;
+    }
+
+    .catalog {
+      margin-left: 5px;
+      width: 95%;
+    }
+    .no-catalog{
+      color:$text-color-secondary;
+      margin:5px 0 0 5px;
+    }
+
+    .options {
+
+      li {
+        font-size: 14px;
+        height: 20px;
+        height: 35px;
+        line-height: 35px;
+      }
+
+      .option-title {
+        font-weight: bold;
+        font-size: 15px;
+        padding-left: 10px;
+      }
+      .option {
+        padding-left: 15px;
+        cursor: pointer;
+
+        .icon_check {
+          float: right;
+          color: $color-main;
+          margin: 8px 10px 0;
+          font-size: 16px;
+        }
+      }
+      .option-now {
+        color: $color-main;
+        background: #13C2C222;
+      }
+    }
+  }
+
+  .main {
+    width: calc(100% - 550px);
+    min-width: 375px;
+    position: absolute;
+    left: 235px;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    padding: 20px 0;
+
+    .setting-bg {
+      background: url("../../assets/img/iphoneX.png") no-repeat center 0;
+      background-size: 100% 100%;
+      position: relative;
+      width: 375px;
+      min-width: 375px;
+      height: 669px;
+
+      .setting-data-box {
+        position: absolute;
+        width: 339px;
+        height: 572px;
+        top: 45px;
+        left: 18px;
+        overflow-y: auto;
+        background: $bg-color-l3;
+
+        .choose-border {
+          border: 1px solid $color-main;
+          box-sizing: border-box;
+        }
+
+        .part-wrapper{
+          height: 100%;
+          background: url('../../assets/img/beijian.png') no-repeat center center;
+          background-size: 100% 100%;
+        }
+
+        .mall-wrapper{
+          height: 100%;
+          background: url('../../assets/img/mall.png') no-repeat center center;
+          background-size: 100% 100%;
+        }
+
+        .pro-wrapper{
+          height: 100%;
+          background: linear-gradient(to bottom, $color-main 0%,$bg-color-l3 20%);
+          padding: 10px;
+
+          .round-panel{
+            background: #fff;
+            border-radius: 15px;
+            padding: 15px 10px 8px;
+          }
+          .top-panel{
+            li{
+              color:$text-color-secondary;
+              margin-bottom: 5px;
+
+              p{
+                margin-bottom: 0;
+                span{
+                  float: right;
+                  color:$text-color-primary;
+                  margin-right: 5px;
+                }
+              }              
+            }
+          }
+          .middle-panel{
+            padding: 0;
+            height: 160px;
+            overflow: hidden;
+            position: relative;
+
+            .video-title{
+              position: absolute;
+              top: 10px;
+              left: 20px;
+              font-size: 18px;
+              color:#fff;
+              width: 150px;
+              white-space: nowrap;
+              text-overflow: ellipsis;
+              overflow: hidden;
+              word-break: break-all;
+            }
+            i{
+              position: absolute;
+              top: 50%;
+              left: 50%;
+              font-size: 40px;
+              margin-left: -20px;
+              margin-top: -28px;
+              color: #00000044;
+              cursor: pointer;
+              z-index: 10;
+            }
+            .video-time{
+              color:#fff;
+              position: absolute;
+              bottom: 10px;
+              right: 10px;
+            }
+          }
+          .no-video{
+            color: $text-color-secondary;
+            text-align: center;
+            line-height: 160px;
+          }
+          .bottom-panel{
+            padding: 0;
+            overflow: hidden;
+            margin: 1rem 0;
+            .title{
+              background: #FFE9DE;
+              height: 50px;
+              line-height: 50px;
+              padding: 0 10px;
+              span{
+                font-weight: bold;
+                font-size: 16px;
+              }
+              a{
+                float: right;
+                color:$color-main;
+                &:hover{
+                  text-decoration: none;
+                }
+              }
+            }
+            ul{
+              margin-bottom: 0;
+              li{
+                padding: 10px;
+                border-bottom: 1px solid $color-border-l4;
+
+                .article-title{
+                  font-weight: bold;
+                  font-size: 16px;
+                  margin-bottom: 10px;
+
+                  overflow:hidden; 
+                  text-overflow:ellipsis;
+                  display:-webkit-box; 
+                  -webkit-box-orient:vertical;
+                  -webkit-line-clamp:2; 
+                }
+                .author{
+                  color:$text-color-secondary;
+                }
+                .num{
+                  color:$text-color-secondary;
+                  float: right;
+                  border:1px solid $color-border-l4;
+                  padding: 1px 3px;
+                  font-size: 13px;
+                  .num-text{
+                    border-right: 1px solid $color-border-l4;
+                    padding-right: 4px;
+                  }
+                }
+              }
+              li:last-child{
+                border-bottom: none;
+              }
+            }
+          }
+        }
+
+        .com-wrapper{
+          img{
+            width: 100%;
+            height: 180px;
+          }
+
+          ul{
+            background: #fff;
+
+            li{
+              height: 60px;
+              border-bottom: 1px solid $color-border-l3;
+              padding-left: 10px;
+              padding-top: 10px;
+
+              span{
+                color:$text-color-secondary;
+              }
+
+              p{
+                font-size: 15px;
+
+                i{
+                  color:$color-main;
+                  float: right;
+                  margin-right: 15px;
+                }
+              }
+            }
+            li:last-child{
+              border-bottom: none;
+            }
+          }
+        }
+
+        .service-wrapper{
+          display: flex;
+          justify-content: flex-start;
+          flex-wrap: wrap;
+          padding-top: 15px;
+
+          li{
+            width: 25%;
+            height: 80px;
+            text-align: center;
+            padding-top: 10px;
+
+            img{
+              width: 60%;
+              margin-bottom: 5px;
+            }
+
+            p{
+              font-size: 13px;
+              font-weight: bold;
+            }
+          }
+        }
+
+        .contact-wrapper {
+
+          .contact-top {
+            height: 245px;
+            background: #fff;
+            border-radius: 10px;
+            padding: 8px;
+            position: relative;
+            top: 10px;
+            margin-bottom: 25px;
+
+            .contact-info{
+              height: 160px;
+              display: flex;
+
+              img{
+                width: 100px;
+                height: 140px;
+                margin-left: 10px;
+              }
+              .contact-info-right{
+                padding: 10px 15px 0 20px;
+
+                h3{
+                  margin-bottom: 20px;
+                }
+                p{
+                  margin-bottom: 10px;
+
+                  i{
+                    font-size: 14px;
+                    color:#aaa;
+                  }
+                }
+              }
+            }
+
+            .contact-btns{
+              display: flex;
+              justify-content: space-around;
+              margin-top: 15px;
+
+              li{
+                width: 45%;
+                height: 45px;
+                line-height: 43px;
+                border:1px solid $color-main;
+                border-radius: 10px;
+                text-align: center;
+
+                i{
+                  color: $color-main;
+                }
+              }
+            }
+          }
+          .contact-bottom{
+            height: 90px;
+            border-radius: 10px;
+            background: #fff;
+            padding-top: 10px;
+
+            h3{
+              margin-left:15px;
+            }
+
+            .stars{
+              display: flex;
+              justify-content: space-around;
+
+              i{
+                font-size: 23px;
+                color:#FFAE00;
+              }
+            }
+          }
+        }
+
+        .index-wrapper {
+          background: #fff;
+          height: 100%;
+
+          .service-box{
+            position: absolute !important;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: #00000066 !important;
+
+            ul{
+              display: flex;
+              justify-content: flex-start;
+              flex-wrap: wrap;
+              background: #fff;
+              position: absolute;
+              bottom: 0;
+              padding-bottom: 10px;
+              margin-bottom: 0;
+              width: 100%;
+
+              li{
+                width: 25%;
+                height: 80px;
+                text-align: center;
+                padding-top: 10px;
+
+                img{
+                  width: 45%;
+                  margin-bottom: 5px;
+                }
+
+                p{
+                  font-size: 13px;
+                  overflow: hidden;
+                  text-overflow:ellipsis;
+                  white-space: nowrap;
+                }
+              }
+            }
+          }
+          
+          .two-panel {
+            display: flex;
+            justify-content: space-between;
+            padding: 0 15px;
+            margin-top: 20px;
+
+            li {
+              width: 48%;
+              height: 100px;
+              background: rosybrown;
+              border-radius: 10px;
+              text-align: center;
+              cursor: pointer;
+
+              img {
+                display: block;
+                margin: 15px auto;
+                width: 35px;
+              }
+            }
+            li:first-child {
+              background: #13C2C222;
+            }
+            li:last-child {
+              background: #3BA7FF22;
+            }
+          }
+
+          .box-card {
+            margin: 0 15px;
+            position: relative;
+            cursor: pointer;
+            padding: 10px;
+            border: 1px solid $color-border-l3;
+            border-radius: 10px;
+
+            img {
+              position: absolute;
+              top: 34px;
+              right: 20px;
+            }
+
+            a {
+              color: $color-main;
+              &:hover {
+                text-decoration: none;
+              }
+            }
+          }
+
+          h3 {
+            padding: 15px 0 5px 15px;
+          }
+
+          .intro {
+            line-height: 20px;
+            padding: 0 10px;
+            overflow: hidden;
+
+            .intro-change {
+              color: $color-main;
+              float: right;
+              cursor: pointer;
+            }
+          }
+          .intro-cut > span {
+            display: inline;
+            text-overflow: -o-ellipsis-lastline;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            line-clamp: 2;
+            -webkit-box-orient: vertical;
+          }
+
+          .setting-swipe {
+            height: 140px;
+          }
+          .setting-swipe-noimg {
+            background: url("../../assets/img/myShop/default.png") no-repeat
+              center center;
+            background-size: 80px 80px;
+            background-color: $bg-color-l3;
+          }
+          .swipe-img {
+            width: 100%;
+            height: 140px;
+          }
+        }
+      }
+    }
+  }
+
+  .right-menu {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    width: 300px;
+    background: #fff;
+    border-radius: 5px;
+    height: calc(100% - 30px);
+  }
+}
+</style>

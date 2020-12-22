@@ -33,6 +33,8 @@ const sparePartRouter = require('./sparePart');
 const linkcRouter = require('./linkc')
 const productV2Router = require('./productV2')
 
+const superQrcodeRouter = require('./superQrcode')
+
 router.get('/', async (ctx) => {
   let modConfig = modules['system.frame'];
   let script = ['/system.frame.js'];
@@ -116,6 +118,20 @@ router.use('/api/customer/outside/pc', (ctx) =>
   })
 );
 
+router.use('/api/linkc', (ctx) =>
+  HttpClient.proxy(ctx, {
+    host: '30.40.63.238',
+    port: 10016,
+  })
+);
+
+router.use('/setting/product/productConfig', (ctx) =>
+  HttpClient.proxy(ctx, {
+    host: '30.40.63.238',
+    port: 8080,
+  })
+);
+
 router.use('/api/elasticsearch/outside/es', (ctx) =>
   HttpClient.proxy(ctx, {
     host: '30.40.58.216',
@@ -141,6 +157,7 @@ router.use('', taskRouter.routes(), taskRouter.allowedMethods());
 router.use('', sparePartRouter.routes(), sparePartRouter.allowedMethods());
 router.use('', linkcRouter.routes(), sparePartRouter.allowedMethods());
 router.use('', productV2Router.routes(), sparePartRouter.allowedMethods());
+router.use('', superQrcodeRouter.routes(), superQrcodeRouter.allowedMethods());
 
 router.all('/*', (ctx) => {
   return HttpClient.proxy(ctx);
