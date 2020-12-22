@@ -34,7 +34,7 @@
         <el-table-column prop="description" label="说明"></el-table-column> 
          <el-table-column prop="checked" label="启用" width="100px">
           <template slot-scope="scope">
-            <el-checkbox v-model="scope.row.checked" @change="checkAll(scope.row,'canWrite')"></el-checkbox>
+            <el-checkbox v-model="scope.row.checked"></el-checkbox>
           </template>
         </el-table-column>
       </el-table>
