@@ -47,7 +47,7 @@
 <script>
 import _ from "lodash";
 import { getProductRemindTemplate } from "@src/api/ProductApi";
-import * as CustomerApi from "@src/api/CustomerApi.ts"
+import * as CustomerApi from "@src/api/CustomerApi"
 import {batchCreateScheduler} from "@src/api/CommonApi";
 
 export default {
