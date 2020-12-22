@@ -177,6 +177,10 @@
             </div>
         </div>
         <!--E 设置项 -->
+
+        <!-- 表单设置弹窗 -->
+        <task-form-setting-view ref="taskFormSetting" :template-id="taskTypeId" @success="refreshFields"></task-form-setting-view>
+        
     </el-form>
 </template>
 
@@ -187,6 +191,7 @@ import {
 
 // components
 import ApproveSetting from './ApproveSetting.vue';
+import TaskFormView from '@src/modules/setting/task/taskFormSetting/taskFormView/TaskFormView.vue';
 
 export default {
     name: 'flow-setting',
@@ -338,7 +343,7 @@ export default {
          * 打开表单编辑器
          */
         openFormDesign() {
-            console.log(this.type, this.taskTypeId);
+            this.$refs.taskFormSetting.open();
         },
         selectApproveUser() {
             let options = {
@@ -356,6 +361,9 @@ export default {
                 .catch(err => {
                     console.warn(err)
                 })
+        },
+        refreshFields(mode) {
+            console.log(mode)
         }
     },
     async mounted() {
@@ -368,7 +376,8 @@ export default {
         }
     },
     components: {
-        [ApproveSetting.name]: ApproveSetting
+        [ApproveSetting.name]: ApproveSetting,
+        [TaskFormView.name]: TaskFormView
     }
 }
 </script>

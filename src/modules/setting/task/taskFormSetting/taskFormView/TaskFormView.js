@@ -18,7 +18,7 @@ export default {
   props: {
     templateId: {
       type: String,
-      default: '07d7bd22-b277-4dbf-a147-154e88ab3136' // 暂时写死
+      default: ''
     },
     templateName: {
       type: String,
@@ -28,6 +28,7 @@ export default {
   data(){
     return {
       mode: 'task',
+      visble: false,
       relationField: {},
       relationOptions: { // 关联查询字段关联项数据
         customerFields: [],
@@ -39,33 +40,39 @@ export default {
       }
     }
   },
-  async mounted() {
-    this.$eventBus.$on('task_form_design_relation_options_set', this.openRelatedOptionsDialog);
-
-    try {
-      // 获取表单字段列表
-      let fields = await TaskApi.getFields({ tableName: this.mode, typeId: this.templateId });
-      let sortedFields = fields.sort((a, b) => a.orderId - b.orderId);
-
-      // 工单自带的 attachment 字段需要特殊处理, 提交时需要将formType还原
-      sortedFields.forEach(f => {
-        if(f.formType == 'attachment' && f.isSystem == 1) {
-          f.formType = 'taskAttachment'
-        }
-      })
-      
-      this.fields = FormUtil.toFormField(sortedFields);
-      this.init = true;
-
-      // 获取客户和产品关联字段关联项数据
-      this.getCustomerFields();
-      this.getProductFields();
-
-    } catch (error) {
-      console.log('task-form-setting-view: mounted -> error', error)
-    }
-  },
   methods: {
+    /** 
+    * @description 初始化
+    */
+   async initData() {
+      try {
+        // 获取表单字段列表
+        let fields = await TaskApi.getFields({ tableName: this.mode, typeId: this.templateId });
+        let sortedFields = fields.sort((a, b) => a.orderId - b.orderId);
+  
+        // 工单自带的 attachment 字段需要特殊处理, 提交时需要将formType还原
+        sortedFields.forEach(f => {
+          if(f.formType == 'attachment' && f.isSystem == 1) {
+            f.formType = 'taskAttachment'
+          }
+        })
+        
+        this.fields = FormUtil.toFormField(sortedFields);
+        this.init = true;
+  
+        // 获取客户和产品关联字段关联项数据
+        this.getCustomerFields();
+        this.getProductFields();
+  
+      } catch (error) {
+        console.log('task-form-setting-view: initData -> error', error);
+      }
+    },
+    open() {
+      this.init = false;
+      this.visble = true;
+      this.initData(); 
+    },
     /** 
     * @description 获取客户关联查询字段关联项数据
     */
@@ -182,12 +189,17 @@ export default {
 
         let result = await TaskApi.taskSettingSave(fields);
 
-        let isSuccess = result.status == 0;
+        let isSuccess = result.succ;
         this.$platform.notification({
           type: isSuccess ? 'success' : 'error',
-          title: `工单字段更新${isSuccess ? '成功' : '失败'}`,
+          title: `表单设置${isSuccess ? '成功' : '失败'}`,
           message: isSuccess ? null : result.message
         })
+
+        if(isSuccess) {
+          this.visble = false;
+          this.$emit('success', this.mode);
+        }
 
       } catch (error) {
         console.error(error)
@@ -229,6 +241,9 @@ export default {
         }, 0)
       }
     }
+  },
+  mounted() {
+    this.$eventBus.$on('task_form_design_relation_options_set', this.openRelatedOptionsDialog);
   },
   beforeDestroy() {
     this.$eventBus.$off('task_form_design_relation_options_set', this.openRelatedOptionsDialog);

@@ -265,7 +265,11 @@ const FormDesign = {
       // 插入前的值
       originValue: null,
       autographMax: config.AUTOGRAPH_MAX_LENGTH_MAX,
-      show:false
+      show: false,
+      // 公共字段配置弹窗
+      fieldSettingModal: false,
+      // 备份数据(用于备份公共字段)
+      backupField: {}
     }
   },
   computed: {
@@ -317,6 +321,10 @@ const FormDesign = {
     //未隐藏字段
     unHiddenFields() {
       return this.value.filter(item => item.isHidden !== 1);
+    },
+    // 当前字段是否是公用字段
+    isCommonField() {
+      return this.currField && !!this.currField.isCommon;
     }
   },
   methods: {
@@ -826,8 +834,11 @@ const FormDesign = {
       // if(null == fieldSetting) return null;
 
       return (
-        <div class="form-design-setting" key="form-design-setting">
-          {fieldSetting}
+        <div
+          class={["form-design-setting", this.isCommonField && "form-design-setting-disabled"]}
+          key="form-design-setting">
+          { this.renderFieldCommonSetting() }
+          { fieldSetting }
         </div>
       )
     },
@@ -891,6 +902,80 @@ const FormDesign = {
     */
     draggingDisable(field) {
       return this.value.findIndex(v => v.fieldName == field.fieldName) > 0;
+    },
+    /** 
+    * @description 渲染公共字段特有的设置内容
+    */
+    renderFieldCommonSetting() {
+      return this.isCommonField && (
+        <div class="common-field-setting">
+          <h4>公用字段</h4>
+          <div class="common-field-setting-btn">
+            <el-button onClick={this.cancelFieldCommonSetting}>取消“公用字段”属性</el-button>
+            <el-button type="primary" onClick={this.openFieldSettingModal}>修改控件配置</el-button>
+          </div>
+        </div>
+      )
+    },
+    /** 
+    * @description 渲染公共字段修改控件配置弹窗
+    */
+    renderFieldCommonSettingModal(h) {
+      let fieldSetting = createSettingComp.call(this, h, this.currField);
+
+      return this.fieldSettingModal && (
+        <div class="field-setting-modal">
+          <base-panel
+            show={ this.fieldSettingModal }
+            onClose={ this.closeFieldSettingModal }
+            title="修改控件配置"
+            width="350px"
+            re
+          >
+            <div class="base-panel-content">
+              <div class="form-design-warning">
+                <i class="iconfont icon-warning-circle-fill"></i>
+                <span>“公用字段”编辑后将在所有已经被运用到该字段的表单中生效，请谨慎修改！</span>
+              </div>
+              { fieldSetting }
+            </div>
+            <div class="base-panel-footer" slot="footer">
+              <el-button onClick={ this.closeFieldSettingModal }>取消</el-button>
+              <el-button type="primary" onClick={ this.saveFieldSetting }>保存</el-button>
+            </div>
+          </base-panel>
+        </div>
+      )
+    },
+    /** 
+    * @description 取消当前字段公共字段属性
+    */
+    async cancelFieldCommonSetting() {
+      let confirm = await this.$platform.confirm(`确定要取消「${this.currField.displayName}」的“公用字段”属性吗？`);
+      if(!confirm) return;
+
+      // TODO: 取消公共字段接口
+    },
+    /** 
+    * @description 打开修改控件配置弹窗
+    */
+    openFieldSettingModal() {
+      this.backupField = _.cloneDeep(this.currField);
+      this.fieldSettingModal = true;
+    },
+    /** 
+    * @description 取消修改控件配置
+    */
+    closeFieldSettingModal() {
+      this.currField = _.cloneDeep(this.backupField);
+      this.fieldSettingModal = false;
+    },
+    /** 
+    * @description 修改公共字段配置
+    */
+    saveFieldSetting() {
+      this.fieldSettingModal = false;
+      // TODO: 修改公共字段配置
     }
   },
   render(h){
@@ -931,6 +1016,7 @@ const FormDesign = {
           <div class="form-design-cover"></div>
         </div>
         { this.renderBaseModal(h) }
+        { this.renderFieldCommonSettingModal(h) }
       </div>
     );
   },

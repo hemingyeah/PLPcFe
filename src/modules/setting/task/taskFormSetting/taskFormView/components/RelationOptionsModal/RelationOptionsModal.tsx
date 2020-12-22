@@ -173,7 +173,8 @@ export default class RelationOptionsModal extends Vue {
       class: 'related-options-modal',
       props: {
         show: this.show,
-        title: '关联显示项配置'
+        title: '关联显示项配置',
+        appendToBody: true
       },
       on: {
         'update:show': (val: boolean) => {
