@@ -91,7 +91,7 @@ export default {
       this.show = newValue;
       if (newValue) {
         this.getRoleListReq();
-        this.tableData = this.rolesList();       
+        this.tableData = this.rolesList()
       }
     },
   },
@@ -120,11 +120,12 @@ export default {
     //初始化角色数据
     rolesList() {
       let rolesList = cloneDeep(this.taskCard.authInfo)
+
       rolesList.forEach((item,index)=>{
         item.canCreate = item.canCreate == undefined ? item.canWrite : item.canCreate;
         item.canDelete = item.canDelete == undefined ? item.canWrite : item.canDelete;
           if(!item.canRead){
-            this.allRoles.canCreate = false;
+            this.allRoles.canRead = false;
           }
           if(!item.canWrite){
             this.allRoles.canWrite = false;
@@ -133,11 +134,10 @@ export default {
             this.allRoles.canCreate = false;
           }
           if(!item.canDelete){
-            this.allRoles.canCreate = false;
+            this.allRoles.canDelete = false;
           }
       })
-      rolesList = [this.allRoles,...rolesList]
-      return rolesList;
+      return [this.allRoles,...rolesList];
     },
 
     onClose() {
@@ -149,39 +149,52 @@ export default {
     },
     //获取角色列表
     getRoleListReq() {
-      SettingTaskApi.getRoleList()
+      SettingTaskApi.getRoleList({pageSize:0})
         .then((res) => {
           const { status, message, list } = res;
           this.roleList = list;
+          this.mergeRoles();
+
         })
         .catch((error) => {
           console.log(error);
         });
     },
+
+    //合并权限数据
+    mergeRoles() {
+      let oldroles = cloneDeep(this.taskCard.authInfo)
+      let newRoles = []
+      for(let i = 0;i < this.roleList.length; i++){
+        let role = this.roleList[i];
+
+        let index = -1;
+        for(let j = 0; j < oldroles.length; j++){
+          if(role.id == oldroles[j].id){
+            index = j;
+            newRoles.push(oldroles[j])
+            break;
+          }
+        }
+        if(index < 0){// 存在不同相同数据 则追加
+          let obj = {
+            canCreate: false,
+            canDelete: false,
+            canRead: false,
+            canWrite: false,
+            id: role.id,
+            name: role.name
+          }    
+          newRoles.push(obj)
+        }
+      }
+      return newRoles;
+    },
     //创建附加组件
     saveCardAuth() {
       let authJson = [];
       authJson = this.tableData.filter(item=>item.id !== 'all');
-      console.log("authJson",authJson)
-
-      const params = {
-        typeId: this.taskTypeId,
-        cardId: this.taskCard.id,
-        authJson: JSON.stringify(authJson),
-      };
-      SettingTaskApi.saveCardAuth(params)
-        .then((res) => {
-          const { status, message, data } = res;
-          if (status == 0) {
-            this.$message.success("保存成功");
-            this.$emit('udateCard')
-          } else {
-            this.$message.error(message);
-          }
-        })
-        .catch((error) => {
-          console.log(error);
-        });
+      this.$emit('update',authJson)
     },
 
     //修改附加组件

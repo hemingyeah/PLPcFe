@@ -4,7 +4,9 @@
             <el-row type="flex">
                 <el-row class="task-card-content" type="flex">
                     <h2 class="task-card-name">
-                        {{taskCard.name}}
+                        <el-tooltip class="item" effect="dark" :content="taskCard.name" :disabled="taskCard.name.length<17" placement="top-start">
+                            <span>{{taskCard.name}}</span>
+                        </el-tooltip>    
                     </h2>
                     <el-row class="task-card-others">
                         <p>
@@ -40,18 +42,18 @@
             :visiable.sync="isShowRulesModal"
             @onClose="onCloseRules"
             @udateCard="udateCard"
-            @update="updateTeamList"/>
+            @update="updateRulesList"/>
         <!-- end 设置使用规则 -->
 
-        <!-- start 设置使用规则 -->
+        <!-- start 设置使用权限 -->
         <card-editpermiss-dialog
             :taskCard="taskCard"
             :taskTypeId="taskTypeId"
             :visiable.sync="isShowEditpermissModal"
             @onClose="onCloseEditpermiss"
-            @udateCard="udateCard"
-            @update="updateTeamList"/>
-        <!-- end 设置使用规则 -->
+            @udateCardRoles="udateCardRoles"
+            @update="updateRolesList"/>
+        <!-- end 设置使用权限 -->
     </el-card>
 </template>
 
@@ -62,7 +64,7 @@ import * as SettingTaskApi from "@src/api/SettingTaskApi";
 
 /** component */
 import UseRulesDialog from '../components/TaskCard/UseRulesDialog';
-import cardEditpermissDialog from '../components/TaskCard/cardEditpermissDialog';
+import CardEditpermissDialog from '../components/TaskCard/CardEditpermissDialog';
 
 export default {
     name: 'task-card-item',
@@ -117,7 +119,13 @@ export default {
         udateCard() {
             this.$emit('udateCard');
             this.isShowRulesModal = false;
+           
+        },
+        //更新卡片
+        udateCardRoles(value) {
+            this.taskCard.authInfo = value;
             this.isShowEditpermissModal = false;
+            console.log(this.taskCard)
         },
         //编辑权限
         onSetEditpermiss() {
@@ -126,24 +134,31 @@ export default {
         onCloseEditpermiss() {
             this.isShowEditpermissModal = false;
         },
-        /**
-         * 更新taskCard
-         */
+        //更新taskCard
         updatetaskCard(obj) {
             this.$emit('updateAttr', obj);
         },
-        /**
-         * 更新可用团队
-         */
-        updateTeamList(teamList){
+
+        //更新使用规则
+        updateRulesList(flow,stateCanEdit){
             this.updatetaskCard({
-                tags: teamList
+                notNullFlow: flow,
+                stateCanEdit: stateCanEdit
             });
+            this.onCloseRules();
+        },
+
+        //更新使用权限
+        updateRolesList(authInfo){
+            this.updatetaskCard({
+                authInfo: authInfo
+            });
+            this.onCloseEditpermiss();
         }
     },
     components: {
         [UseRulesDialog.name]: UseRulesDialog,
-        [cardEditpermissDialog.name]: cardEditpermissDialog,   
+        [CardEditpermissDialog.name]: CardEditpermissDialog,   
     }
 }
 </script>
@@ -175,12 +190,13 @@ export default {
             .task-card-name{
                 width: 300px;
                 margin-bottom: 0;
-                @include text-ellipsis-2;
+                @include text-ellipsis;
                 word-break: break-all;
-                padding-right: 32px;
+                padding-right: 12px;
                 font-size: 16px;
                 color: #333333;
                 line-height: 22px;
+                cursor: pointer;
             }
             .task-card-others{
                 i{

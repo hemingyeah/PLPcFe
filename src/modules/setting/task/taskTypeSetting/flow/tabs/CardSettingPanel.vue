@@ -46,7 +46,6 @@
             :key="item.id"
             :taskCard="taskCardList[idx]"
             :taskTypeId="taskTypeId"
-            @udateCard="udateCard"
             @updateAttr="obj => {
               updateTaskCard(item, obj)
             }">
@@ -56,11 +55,20 @@
     </div>
     <!--end 附加组件列表 -->
 
-      <!-- start 无数据 -->
+    <!-- start 无数据 -->
     <no-data-view-new
       v-else
       notice-msg="暂无附加组件"
     ></no-data-view-new>
+    <!-- end 无数据 -->
+
+    <!-- start 新建附加组件 -->
+    <creat-card-dialog
+      :visiable.sync="isShowCreatCardModal"
+      @onClose="onCloseCreatCard"
+      :taskCardList="taskCardList"
+      @update="update"
+    ></creat-card-dialog>
     <!-- end 无数据 -->
   </div>
 </template>
@@ -74,14 +82,18 @@ import * as SettingTaskApi from "@src/api/SettingTaskApi";
 /** component */
 import TaskCardItem from '../../components/TaskCardItem';
 import NoDataViewNew from '@src/component/common/NoDataViewNew';
+import CreatCardDialog from '../../components/TaskCard/CreatCardDialog';
+import { cloneDeep } from 'lodash';
 
 export default {
   name: "card-setting-panel",
   data() {
     return {
+      isShowCreatCardModal: false,
       loading: true,
       taskTypeId: "",
       taskCardList: [],
+      authInfo:[]
     };
   },
   computed: {
@@ -98,22 +110,70 @@ export default {
     let query = parse(window.location.search) || {};
     this.taskTypeId = query.taskTypeId;
     this.fetchTasktype();
+    this.getRoleListReq();
 
   },
   methods: {
+    //新建附件组件
     addTaskCard() {
-
+      this.isShowCreatCardModal = true;
     },
-    updateTaskCard(taskType, updateObj) {
+    onCloseCreatCard() {
+      this.isShowCreatCardModal = false;
+    },
+    updateTaskCard(cardList, updateObj) {
       for (const key in updateObj) {
         if (updateObj.hasOwnProperty(key)) {
-          taskType[key] = updateObj[key];
+          cardList[key] = updateObj[key];
         }
       }
     },
-    //更新列表数据
-    udateCard() {
-      this.fetchTasktype();
+    //获取角色列表
+    getRoleListReq() {
+      SettingTaskApi.getRoleList({pageSize:0})
+        .then((res) => {
+          const { status, message, list } = res;
+          
+          list.forEach(element => {
+            let obj = {}
+            obj.canRead = true;
+            obj.canWrite = true;
+            obj.canCreate = true;
+            obj.canDelete = true;
+            obj.id = element.id;
+            obj.name = element.name;
+            this.authInfo.push(obj)
+            
+          });  
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+    //从已添加的组件库选择
+    update(newCard) {
+      const taskCardList = cloneDeep(this.taskCardList);
+      let newTaskCard = [];
+      
+      for(let i = 0;i < newCard.length; i++){
+        let card = newCard[i];
+        
+        let index = -1;
+        for(let j = 0; j < taskCardList.length; j++){
+          if(card.id == taskCardList[j].id){
+            index = j;
+            newTaskCard.push(taskCardList[j])
+            break;
+          }
+        }
+        if(index < 0){
+         let newobj = Object.assign(card,{notNullFlow: null,stateCanEdit: null,authInfo:this.authInfo})
+          newTaskCard.push(newobj) 
+        }
+      }
+
+      this.taskCardList = newTaskCard;
+      this.onCloseCreatCard();
     },
 
     //工单类型附加组件排序 order重新排序
@@ -123,7 +183,7 @@ export default {
       })
       let cardSetting = {};
       cardSetting.cardInfo = this.taskCardList
-      this.sortCard(cardSetting)
+      // this.sortCard(cardSetting)
     },
     
     //排序 
@@ -163,6 +223,7 @@ export default {
   components: {
     [TaskCardItem.name]: TaskCardItem,
     [NoDataViewNew.name]: NoDataViewNew,
+    [CreatCardDialog.name]: CreatCardDialog,
     draggable
   }
 };

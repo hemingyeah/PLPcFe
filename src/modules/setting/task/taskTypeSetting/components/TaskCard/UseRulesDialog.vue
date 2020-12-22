@@ -124,25 +124,7 @@ export default {
 
     //创建附加组件
     saveRulesFlow() {
-      const params = {
-        typeId: this.taskTypeId,
-        cardId: this.taskCard.id,
-        flow: this.form.flow,
-        stateCanEdit: this.form.stateCanEdit,
-      };
-      SettingTaskApi.saveRulesFlow(params)
-        .then((res) => {
-          const { status, message, data } = res;
-          if (status == 0) {
-            this.$message.success("保存成功");
-            this.$emit('udateCard')
-          } else {
-            this.$message.error(message);
-          }
-        })
-        .catch((error) => {
-          console.log(error);
-        });
+      this.$emit('update',this.form.flow,this.form.stateCanEdit)
     },
 
     //修改附加组件
