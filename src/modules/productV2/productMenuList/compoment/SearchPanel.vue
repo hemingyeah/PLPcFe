@@ -39,6 +39,7 @@ import * as Utils from "@src/component/form/util";
 import { formatDate } from "@src/util/lang";
 import _ from "lodash";
 import { isEmptyStringObject } from "@src/util/function";
+import { typeOf } from "@src/util/assist";
 
 export default {
   name: "search-panel",
@@ -460,7 +461,7 @@ export default {
             });
           }
           if (f.returnData) {
-            let result = f.returnData(event.newValue);
+            let result = typeof(f.returnData) == "function" ? f.returnData(event.newValue) : event.newValue[f.returnData];
             this.form = {
               ...this.form,
               ...result,
