@@ -1,59 +1,60 @@
 /** development server @author dongls */
 
 // 当前用户的配置
-const argv = require("../../script/argv")(process.argv.slice(2));
-const user = argv.user || "dongls";
+const argv = require('../../script/argv')(process.argv.slice(2));
+const user = argv.user || 'dongls';
 const USER_CONFIG = require(`../../script/config/${user}`);
 
-const KoaRouter = require("koa-router");
-const HttpClient = require("../util/HttpClient");
-const Template = require("../util/Template");
+const KoaRouter = require('koa-router');
+const HttpClient = require('../util/HttpClient');
+const Template = require('../util/Template');
 
-const modules = require("../../modules");
+const modules = require('../../modules');
 const router = new KoaRouter();
 
-const customerRouter = require("./customer");
-const openRouter = require("./open");
-const settingRouter = require("./setting");
-const teamRouter = require("./team");
-const performanceRouter = require("./performance");
-const productRouter = require("./product");
-const approveRouter = require("./approve");
-const dataScreenRouter = require("./dataScreen");
+const customerRouter = require('./customer');
+const openRouter = require('./open');
+const settingRouter = require('./setting');
+const teamRouter = require('./team');
+const performanceRouter = require('./performance');
+const productRouter = require('./product');
+const approveRouter = require('./approve');
+const dataScreenRouter = require('./dataScreen');
 
-const repositoryRouter = require("./repository");
-const BillRouter = require("./bill");
-const jobtransferRouter = require("./jobtransfer");
-const callCenterRouter = require("./callcenter");
-const doMyselft = require("./doMyself");
-const customerContact = require("./customerContact");
-const taskRouter = require("./task");
-const sparePartRouter = require("./sparePart");
+const repositoryRouter = require('./repository');
+const BillRouter = require('./bill');
+const jobtransferRouter = require('./jobtransfer');
+const callCenterRouter = require('./callcenter');
+const doMyselft = require('./doMyself');
+const customerContact = require('./customerContact');
+const taskRouter = require('./task');
+const sparePartRouter = require('./sparePart');
 
-const linkcRouter = require("./linkc")
+const linkcRouter = require('./linkc')
+const productV2Router = require('./productV2')
 
-router.get("/", async (ctx) => {
-  let modConfig = modules["system.frame"];
-  let script = ["/system.frame.js"];
+router.get('/', async (ctx) => {
+  let modConfig = modules['system.frame'];
+  let script = ['/system.frame.js'];
   let reqHeaders = ctx.request.headers;
   let headers = {};
   let body = null;
-  let result = await HttpClient.request("/", "get", null, {
+  let result = await HttpClient.request('/', 'get', null, {
     headers: reqHeaders,
   });
   
   // 请求失败,模拟登陆
   if (!result.status) {
-    console.warn("请求失败");
+    console.warn('请求失败');
     let mockUser = USER_CONFIG.loginUser;
-    let userToken = "dev_corpId";
+    let userToken = 'dev_corpId';
     if (null != mockUser) {
       userToken = `${mockUser.userId}_${mockUser.tenantId}`;
     }
     
     let loginRes = await HttpClient.request(
       `/dd/mockLogin?code=dev_code&corpId=${userToken}`,
-      "get",
+      'get',
       null
     );
     if (loginRes.status) {
@@ -62,7 +63,7 @@ router.get("/", async (ctx) => {
       reqHeaders['cookie'] = cookie[0];
       
       // 再次请求
-      result = await HttpClient.request("/", "get", null, {
+      result = await HttpClient.request('/', 'get', null, {
         headers: reqHeaders,
       });
     } else {
@@ -80,7 +81,7 @@ router.get("/", async (ctx) => {
   
   // 返回html
   ctx.body = Template.renderWithHtml(
-    "售后宝",
+    '售后宝',
     body,
     script,
     modConfig.template
@@ -108,25 +109,40 @@ router.use('/temp', (ctx) =>
   })
 )
 
-router.use("", performanceRouter.routes());
-router.use("", customerRouter.routes(), customerRouter.allowedMethods());
-router.use("", openRouter.routes(), openRouter.allowedMethods());
-router.use("", settingRouter.routes(), settingRouter.allowedMethods());
-router.use("", teamRouter.routes(), teamRouter.allowedMethods());
-router.use("", productRouter.routes(), productRouter.allowedMethods());
-router.use("", approveRouter.routes(), productRouter.allowedMethods());
-router.use("", dataScreenRouter.routes(), dataScreenRouter.allowedMethods());
-router.use("", repositoryRouter.routes(), repositoryRouter.allowedMethods());
-router.use("", BillRouter.routes(), BillRouter.allowedMethods());
-router.use("", jobtransferRouter.routes(), jobtransferRouter.allowedMethods());
-router.use("", callCenterRouter.routes(), callCenterRouter.allowedMethods());
-router.use("", doMyselft.routes(), doMyselft.allowedMethods());
-router.use("", customerContact.routes(), customerContact.allowedMethods());
-router.use("", taskRouter.routes(), taskRouter.allowedMethods());
-router.use("", sparePartRouter.routes(), sparePartRouter.allowedMethods());
-router.use("", linkcRouter.routes(), sparePartRouter.allowedMethods());
+router.use('/api/customer/outside/pc', (ctx) =>
+  HttpClient.proxy(ctx, {
+    host: '30.40.58.216',
+    port: 10013,
+  })
+);
 
-router.all("/*", (ctx) => {
+router.use('/api/elasticsearch/outside/es', (ctx) =>
+  HttpClient.proxy(ctx, {
+    host: '30.40.58.216',
+    port: 10006,
+  })
+);
+
+router.use('', performanceRouter.routes());
+router.use('', customerRouter.routes(), customerRouter.allowedMethods());
+router.use('', openRouter.routes(), openRouter.allowedMethods());
+router.use('', settingRouter.routes(), settingRouter.allowedMethods());
+router.use('', teamRouter.routes(), teamRouter.allowedMethods());
+router.use('', productRouter.routes(), productRouter.allowedMethods());
+router.use('', approveRouter.routes(), productRouter.allowedMethods());
+router.use('', dataScreenRouter.routes(), dataScreenRouter.allowedMethods());
+router.use('', repositoryRouter.routes(), repositoryRouter.allowedMethods());
+router.use('', BillRouter.routes(), BillRouter.allowedMethods());
+router.use('', jobtransferRouter.routes(), jobtransferRouter.allowedMethods());
+router.use('', callCenterRouter.routes(), callCenterRouter.allowedMethods());
+router.use('', doMyselft.routes(), doMyselft.allowedMethods());
+router.use('', customerContact.routes(), customerContact.allowedMethods());
+router.use('', taskRouter.routes(), taskRouter.allowedMethods());
+router.use('', sparePartRouter.routes(), sparePartRouter.allowedMethods());
+router.use('', linkcRouter.routes(), sparePartRouter.allowedMethods());
+router.use('', productV2Router.routes(), sparePartRouter.allowedMethods());
+
+router.all('/*', (ctx) => {
   return HttpClient.proxy(ctx);
 });
 
