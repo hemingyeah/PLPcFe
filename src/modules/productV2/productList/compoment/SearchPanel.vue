@@ -614,7 +614,7 @@ export default {
             });
           }
           if (f.returnData) {
-            let result = f.returnData(event.newValue);
+            let result = typeof(f.returnData) == "function" ? f.returnData(event.newValue) : event.newValue[f.returnData];
             this.form = {
               ...this.form,
               ...result,
