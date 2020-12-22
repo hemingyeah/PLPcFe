@@ -287,6 +287,8 @@
                 :popper-append-to-body="false"
                 popper-class="select-popper"
                 :loading="loading"
+                class="select-loadmore"
+                v-el-select-loadmore='loadmore'
               >
                 <el-option
                   v-for="item in userList"
@@ -313,6 +315,7 @@
                 :popper-append-to-body="false"
                 popper-class="select-popper"
                 :loading="loading"
+                v-el-select-loadmore='loadmore'
               >
                 <el-option
                   v-for="item in userList"
@@ -391,6 +394,9 @@ export default {
         option: "",
         level: "",
       },
+      userParams:{},
+      hasNextPage:true,
+      userKeywords:'',
       fields: [],
       allOptions: [],
       options: [],
@@ -542,11 +548,21 @@ export default {
     const user=JSON.parse(rootWindow._init).user;
     this.tenantId = user.tenantId;
     this.userId=user.userId;
+    this.userParams={
+      tenantId: this.tenantId,
+      pageSize: 10,
+      pageNum: 1,
+      searchType: '',
+      keywords:''
+    }
   },
   mounted() {
     this.productConfig();
   },
   methods: {
+    loadmore(){
+      if(!this.hasNextPage) this.getUserList(null,false);
+    },
     // 修改产品二维码设置
     goSuperqrcodeSet(){
       this.$platform.openTab({
@@ -596,6 +612,7 @@ export default {
       this.form.selectUsers=[];
       this.form.selectUser='';
       this.userList=[];
+      this.keywords='';
       this.getUserList();
     },
     // 改变规则类型
@@ -796,20 +813,25 @@ export default {
       };
     },
     // 获取指定人员
-    getUserList:_.debounce(function(keywords = ""){
+    getUserList:_.debounce(function(keywords = "",refresh=true){
       this.loading = true;
-      var params = {
-        tenantId: this.tenantId,
-        pageSize: 10,
-        pageNum: 1,
-        searchType: this.form.selectUserType,
-        keywords,
-      };
-      queryCSByCondition(params).then(res=>{
+      if(keywords){
+        this.userKeywords=keywords;
+      }
+      if(refresh){
+        this.userParams.pageNum=1;
+      }else{
+        this.userParams.pageNum++;
+      }
+      this.userParams.searchType=this.form.selectUserType;
+      this.userParams.keywords=this.userKeywords;
+      queryCSByCondition(this.userParams).then(res=>{
         this.loading = false;
         if (res.code === "200") {
+          this.hasNextPage=res.data.hasNextPage;
           if (res.data && res.data.list) {
-            this.userList = res.data.list;
+            if(refresh) this.userList = res.data.list;
+            else this.userList.push(...res.data.list);
           }
         } else {
           this.$platform.alert(res.msg);
@@ -961,6 +983,19 @@ export default {
       });
     },
   },
+  directives:{
+    'el-select-loadmore':{
+      bind(el,binding){
+        const SELECT_DOM=el.querySelector('.select-loadmore .el-select-dropdown__wrap');
+        SELECT_DOM.addEventListener('scroll',()=>{
+          const condition=SELECT_DOM.scrollHeight-SELECT_DOM.scrollTop<=SELECT_DOM.clientHeight;
+          if(condition){
+            binding.value();
+          }
+        })
+      }
+    }
+  }
 };
 </script>
 <style lang="scss" scoped>

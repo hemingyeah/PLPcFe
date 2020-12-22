@@ -374,6 +374,9 @@ export default {
           return this.$platform.alert('小宝检测到您没有配置任何企业图片，至少需要上传一张哦');
         }
       }else if(option==='intro'){
+        if(this.copyForm.productIntroduction.length>2000){
+          return this.$platform.alert('产品简介不能超过2000字');
+        }
         params.productIntroduction=this.copyForm.productIntroduction;
       }else if(option==='service'){
         params.doorOpenState=this.doorOpenState?1:0;
@@ -450,7 +453,7 @@ export default {
             url: file.ossUrl || file.url || `/files/get?fileId=${file.id}`,
             fileSize: file.fileSizeStr,
           };
-          this.copyForm.companyImages.push(item);
+          this.copyForm.companyImages[index]=item;
           this.$emit('addPic',this.copyForm.companyImages);
         })
         .catch((err) => {
