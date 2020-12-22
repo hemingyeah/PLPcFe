@@ -7,6 +7,7 @@
       value-key="id"
       :remote-method="remoteMethod"
       @input="update"
+      :cleared="true"
       :placeholder="placeholder || '请选择产品类型'"
     >
       <div class="related-task-option" slot="option" slot-scope="{ option }">

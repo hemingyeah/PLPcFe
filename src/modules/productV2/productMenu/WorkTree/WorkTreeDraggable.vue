@@ -1,58 +1,47 @@
 <template>
-  <draggable
-    class="dragArea"
-    tag="ul"
-    :list="tasks"
-    :group="{ name: 'g1' }"
-    @add="addArr"
-    @update="arrUpdate"
-    @choose="arrChoose"
-    handle=".handle"
-    :disabled="rootData.banMoveIn"
-  >
+  <draggable class="dragArea"
+             tag="ul"
+             :list="tasks"
+             :group="{ name: 'g1' }"
+             @add="addArr"
+             @update="arrUpdate"
+             @choose="arrChoose"
+             handle=".handle"
+             :disabled="rootData.banMoveIn">
     <template v-if="tasks.length > 0">
-      <li
-        v-for="(el, index) in tasks"
-        :key="el.id"
-        class="dragArea-root"
-        :class="{ 'dragArea-root-show': el.showList }"
-        @click.stop="checkRootList(index)"
-      >
-        <div
-          class="flex-x tasks-item"
-          :class="{
-            'tasks-item-check': nowEditMenu.id && nowEditMenu.id == el.id,
-          }"
-          @mouseenter="tasksItemMove(index)"
-          @mouseleave="tasksItemLeave"
-        >
-          <div class="flex-1 flex-x" :style="`padding-left:${deepCount * 8}px`">
-            <i
-              v-if="el.tasks.length > 0"
-              class="iconfont icon-icon_arrow arrow-right font-16"
-              :class="{ 'arrow-down': el.showList }"
-              @click.stop="showRootList(index)"
-            ></i>
-            <div
-              class="overHideCon-1"
-              :class="{ 'mar-l-12': el.tasks.length <= 0 }"
-            >
+      <li v-for="(el, index) in tasks"
+          :key="el.id"
+          class="dragArea-root"
+          :class="{ 'dragArea-root-show': el.showList }"
+          @click.stop="checkRootList(index)">
+        <div class="flex-x tasks-item"
+             :class="{
+               'tasks-item-check': nowEditMenu.id && nowEditMenu.id == el.id,
+               'tasks-item-hover': nowHoverMenuShow(el)
+             }"
+             @mouseenter="tasksItemMove(index)"
+             @mouseleave="tasksItemLeave">
+          <div class="flex-1 flex-x"
+               :style="`padding-left:${deepCount * 8}px`">
+            <i v-if="el.tasks.length > 0"
+               class="iconfont icon-icon_arrow arrow-right font-16"
+               :class="{ 'arrow-down': el.showList }"
+               @click.stop="showRootList(index)"></i>
+            <div class="overHideCon-1"
+                 :class="{ 'mar-l-12': el.tasks.length <= 0 }">
               {{ el.name }}
             </div>
           </div>
-          <div
-            class="tasks-item-menu"
-            @click.stop
-            v-show="nowHoverMenuShow(el)"
-          >
-            <el-popover
-              placement="bottom"
-              width="125"
-              trigger="hover"
-              v-model="el.popoverVisible"
-            >
+          <div class="tasks-item-menu"
+               @click.stop
+               v-show="nowHoverMenuShow(el)">
+            <el-popover placement="bottom"
+                        width="125"
+                        trigger="hover"
+                        v-model="el.popoverVisible">
               <div class="item-menu-box">
-                <div @click.stop="addChildArr(index)" v-show="!el.conData">
+                <div @click.stop="addChildArr(index)"
+                     v-show="!el.conData">
                   添加子集类型
                 </div>
                 <div @click.stop="renameChildArr(index)">
@@ -62,26 +51,25 @@
                   删除
                 </div>
               </div>
-              <i slot="reference" class="iconfont icon-setting cur-point "></i>
+              <i slot="reference"
+                 class="iconfont icon-setting cur-point "></i>
             </el-popover>
 
             <i class="iconfont icon-tuozhuaipaixu handle can-move mar-l-8"></i>
           </div>
         </div>
 
-        <work-tree-draggable
-          :tasks="el.tasks"
-          :root-data="{
-            id: el.id,
-            banMoveIn: el.tasks.conData == 1 ? true : false,
-            indexArr: [...rootData.indexArr, index],
-            pathNameArr: [...rootData.pathNameArr, el.name],
-          }"
-          :now-edit-menu="nowEditMenu"
-          :now-hover-menu="nowHoverMenu"
-          :deep-count="deepCount * 1 + 1"
-          :sort-menu="sortMenu"
-        />
+        <work-tree-draggable :tasks="el.tasks"
+                             :root-data="{
+                               id: el.id,
+                               banMoveIn: el.tasks.conData == 1 ? true : false,
+                               indexArr: [...rootData.indexArr, index],
+                               pathNameArr: [...rootData.pathNameArr, el.name],
+                             }"
+                             :now-edit-menu="nowEditMenu"
+                             :now-hover-menu="nowHoverMenu"
+                             :deep-count="deepCount * 1 + 1"
+                             :sort-menu="sortMenu" />
       </li>
     </template>
   </draggable>
@@ -124,39 +112,39 @@ export default {
     draggable,
   },
   computed: {},
-  data() {
+  data () {
     return {};
   },
   name: "work-tree-draggable",
   methods: {
-    showRootList(index) {
+    showRootList (index) {
       if (this.tasks[index].tasks.length <= 0) return;
       this.tasks[index].showList = 1 - this.tasks[index].showList;
     },
-    checkRootList(index) {
-      if(this.nowEditMenu.id == this.tasks[index].id) return
+    checkRootList (index) {
+      if (this.nowEditMenu.id == this.tasks[index].id) return
       this.rootDataChange("nowEditMenu", {
         id: this.tasks[index].id,
         canEditConData: !(this.tasks[index].tasks.length > 0),
         conData: this.tasks[index].conData,
         name: this.tasks[index].name,
-        indexArr:[...this.rootData.indexArr, index],
-        nowIndex:index
+        indexArr: [...this.rootData.indexArr, index],
+        nowIndex: index
       });
     },
-    addChildArr(index) {
+    addChildArr (index) {
       let nowMenu = this.tasks[index];
       this.rootDataChange("childData", {
         id: nowMenu.id,
         pathName: nowMenu.pathName,
         indexArr: [...this.rootData.indexArr, index],
         pathNameArr: [...this.rootData.pathNameArr, nowMenu.name],
-        orderId:nowMenu.tasks.length
+        orderId: nowMenu.tasks.length
       });
       this.changeDialog("addMenuChild");
       this.tasks[index].popoverVisible = false;
     },
-    deleteNowArr(index) {
+    deleteNowArr (index) {
       this.tasks[index].popoverVisible = false;
 
       this.$confirm(
@@ -188,9 +176,9 @@ export default {
             }
           });
         })
-        .catch(() => {});
+        .catch(() => { });
     },
-    renameChildArr(index) {
+    renameChildArr (index) {
       let nowMenu = this.tasks[index];
       this.rootDataChange("childData", {
         id: nowMenu.id,
@@ -203,7 +191,7 @@ export default {
       this.changeDialog("renameMenuChild");
       this.tasks[index].popoverVisible = false;
     },
-    arrUpdate(e) {
+    arrUpdate (e) {
       let obj = {
         id: this.sortMenu.id,
         parentId: this.rootData.id,
@@ -229,7 +217,7 @@ export default {
         }
       });
     },
-    addArr(e) {
+    addArr (e) {
       let obj = {
         id: this.sortMenu.id,
         parentId: this.rootData.id,
@@ -255,16 +243,16 @@ export default {
         }
       });
     },
-    arrChoose(e) {
+    arrChoose (e) {
       this.rootDataChange("sortMenu", this.tasks[e.oldIndex]);
     },
-    tasksItemMove(e) {
+    tasksItemMove (e) {
       this.rootDataChange("nowHoverMenu", { id: this.tasks[e].id });
     },
-    tasksItemLeave(e) {
+    tasksItemLeave (e) {
       this.rootDataChange("nowHoverMenu", {});
     },
-    nowHoverMenuShow(e) {
+    nowHoverMenuShow (e) {
       return e.popoverVisible
         ? true
         : this.nowHoverMenu && this.nowHoverMenu.id == e.id;
@@ -288,7 +276,6 @@ ul {
     height: 40px;
     overflow: hidden;
     transition: all 0.8s;
-    
   }
   .dragArea-root-show {
     height: auto;
@@ -309,9 +296,9 @@ ul {
   .tasks-item {
     position: relative;
     padding-left: 10px;
-    &:hover{
-      background: #E6FFFB;
-    }
+    // &:hover{
+    //   background: #E6FFFB;
+    // }
     &:active {
       background: #e6fffb;
     }
@@ -329,16 +316,20 @@ ul {
     .tasks-item-menu {
       position: absolute;
       right: 0;
-      width: 36px;
+      min-width: 36px;
       height: 100%;
+      padding: 0 12px;
       top: 0;
       display: flex;
       align-items: center;
-      background: #E6FFFB;
+      background: #e6fffb;
     }
   }
   .tasks-item-check {
     color: $color-primary;
+  }
+  .tasks-item-hover {
+    background: #e6fffb;
   }
   .can-move {
     cursor: move;
@@ -350,10 +341,15 @@ ul {
 .item-menu-box {
   div {
     cursor: pointer;
+    padding: 10px 20px;
     &:hover {
-      background: $color-primary;
-      color: #fff;
+      background: #e5fffb;
     }
   }
+}
+</style>
+<style lang="scss">
+.el-popover {
+  padding: 6px 0;
 }
 </style>

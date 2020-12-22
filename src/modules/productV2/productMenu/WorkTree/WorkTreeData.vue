@@ -315,10 +315,10 @@ export default {
       const isLt2M = file.size / 1024 / 1024 < 2;
 
       if (!isJPG) {
-        this.$message.error("上传头像图片只能是 JPG/PNG 格式!");
+        this.$message.error("上传图片只能是 JPG/PNG 格式!");
       }
       if (!isLt2M) {
-        this.$message.error("上传头像图片大小不能超过 2MB!");
+        this.$message.error("上传图片大小不能超过 2MB!");
       }
       // this.fileList.push(file);
       return isJPG && isLt2M;
@@ -612,6 +612,7 @@ export default {
   }
   .normal-title-1 {
     @include title-class();
+    padding: 0 10px;
     font-size: 16px;
     border-bottom: 1px solid $color-border-l1;
   }

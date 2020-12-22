@@ -6,8 +6,8 @@
       <base-file-item v-for="file in value" :key="file.id" :file="file" @delete="deleteFile"></base-file-item>        
     </div>
 
-    <div class="base-upload-operation">
-      <button type="button" class="btn btn-primary base-upload-btn" @click="chooseFile" :disabled="pending" :id="forId" v-if="allowUpload">
+    <div class="base-upload-operation" v-if="allowUpload">
+      <button type="button" class="btn btn-primary base-upload-btn" @click="chooseFile" :disabled="pending" :id="forId" >
         <i class="iconfont icon-loading" v-if="pending"></i>
         <span>{{pending ? '正在上传' : '点击上传'}}</span>
       </button>

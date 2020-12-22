@@ -262,7 +262,8 @@
                        style="height:100%">
                     <template v-for="(item, index) in scope.row.thumbnail">
                       <img :key="index"
-                           class="cur-point mar-r-8"
+                           v-if="index==0"
+                           class="cur-point"
                            :src="
                              item.url
                                ? `${item.url}?x-oss-process=image/resize,m_fill,h_32,w_32`
@@ -563,30 +564,34 @@ export default {
     }
   },
   async mounted () {
-    this.buildColumns();
-
-    // 获取产品动态字段
-    try {
-      let res = await getProductMenuField();
-      this.dynamicFields = res.result || [];
-      this.buildColumns();
-    } catch (error) {
-      console.error("product-list fetch product fields error", error);
-    }
-    this.revertStorage();
-    this.search();
-
-    if (!this.viewedPermission) {
-      this.filterTeams = this.matchTags(this.teamsWithChildTag.slice());
-    }
+    this.resetPage();
 
     // [tab_spec]标准化刷新方式
-    window.__exports__refresh = this.search;
+    window.__exports__refresh = this.resetPage;
 
   },
   beforeDestroy () {
   },
   methods: {
+    async resetPage () {
+      
+
+      // 获取产品动态字段
+      try {
+        let res = await getProductMenuField();
+        this.dynamicFields = res.result || [];
+        this.buildColumns();
+      } catch (error) {
+        this.buildColumns();
+        console.error("product-list fetch product fields error", error);
+      }
+      this.revertStorage();
+      this.search();
+
+      if (!this.viewedPermission) {
+        this.filterTeams = this.matchTags(this.teamsWithChildTag.slice());
+      }
+    },
     getAddress (field) {
       return field.province + field.city + field.dist + field.address || "";
     },

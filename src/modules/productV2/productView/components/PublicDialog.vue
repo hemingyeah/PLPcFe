@@ -109,7 +109,7 @@ export default {
       this.visible = false;
     },
     bind() {
-      if (!this.nowChooseArr) return;
+      if (!this.nowChooseArr) return this.$message.error("选择内容不能为空");
 
       this.pending = true;
       if (this.dialogType == "linkQrcode") {
@@ -138,7 +138,7 @@ export default {
           if (!res) {
             return;
           }
-          this.pageObj[this.dialogType].options = res.result.list;
+          this.pageObj[this.dialogType].options = res.result.list || [];
         })
         .catch((err) => {})
         .finally(() => {

@@ -826,26 +826,9 @@ export default {
     },
   },
   async mounted () {
-    // this.buildColumns();
-
-    // 获取产品动态字段
-    try {
-      let res = await getProductFields({ isFromSetting: true });
-      this.dynamicFields = res.data || [];
-      this.buildColumns();
-      this.getSelectCount();
-    } catch (error) {
-      console.error("product-list fetch product fields error", error);
-    }
-    this.revertStorage();
-    this.search();
-
-    if (!this.viewedPermission) {
-      this.filterTeams = this.matchTags(this.teamsWithChildTag.slice());
-    }
-
+    this.resetPage()
     // [tab_spec]标准化刷新方式
-    window.__exports__refresh = this.search;
+    window.__exports__refresh = this.resetPage;
 
     this.$eventBus.$on(
       "product_list.update_product_list_remind_count",
@@ -859,6 +842,24 @@ export default {
     );
   },
   methods: {
+    async resetPage(){
+      // 获取产品动态字段
+      try {
+        let res = await getProductFields({ isFromSetting: true });
+        this.dynamicFields = res.data || [];
+        this.buildColumns();
+        this.getSelectCount();
+      } catch (error) {
+        this.buildColumns();
+        console.error("product-list fetch product fields error", error);
+      }
+      this.revertStorage();
+      this.search();
+
+      if (!this.viewedPermission) {
+        this.filterTeams = this.matchTags(this.teamsWithChildTag.slice());
+      }
+    },
     getAddress (field) {
       return (field && field.province + field.city + field.dist + field.address) || "";
     },

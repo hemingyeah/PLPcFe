@@ -58,7 +58,7 @@
       @changeVisibleProp="changeVisibleProp"
       @confirm="dialogConfirm"
       :dialog-type="dialogType"
-      :init-data="childData"
+      :init-data="nowEditMenu"
     ></public-dialog>
     <!--  -->
   </div>
@@ -195,7 +195,6 @@ export default {
         break;
       case "cloneMenu":
         if (e.nowChooseArr && e.nowChooseArr.length > 0) {
-          this.$refs.workTreeData.reflashPage(e.nowChooseArr[0]);
           cloneMenu({
             cloneId: e.nowChooseArr[0],
             catalogId: this.nowEditMenu.id,
@@ -208,6 +207,8 @@ export default {
               window.parent.flashSomePage({
                 type: "M_PRODUCT_CATALOG",
               });
+
+              this.$refs.workTreeData.reflashPage(e.nowChooseArr[0]);
               this.changeVisibleProp(false);
             } else {
               this.$notify.error({

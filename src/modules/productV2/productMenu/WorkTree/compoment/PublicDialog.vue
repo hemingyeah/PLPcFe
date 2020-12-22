@@ -4,12 +4,6 @@
     <!--  -->
 
     <base-modal :title="dialogData[dialogType].title" :show.sync="visible" width="500px" class="batch-editing-customer-dialog">
-      <!-- <el-dialog
-        :title="dialogData[dialogType].title"
-        :visible.sync="visible"
-        width="600px"
-        :close-on-click-modal="false"
-      > -->
       <div class="add-menu-dialog-box">
         <template
           v-if="
@@ -55,7 +49,6 @@
               placeholder="请输入关键词"
               :remote-method="lenovoselectSearchData"
               :loading="selectLoading"
-              @focus="lenovoselectSearchData"
             >
               <el-option
                 v-for="item in (dialogData[dialogType] && dialogData[dialogType].options)"
@@ -115,8 +108,7 @@
         >确认</el-button
         >
       </div>
-    <!-- </el-dialog> -->
-    </el-dialog></base-modal>
+    </base-modal>
   <!--  -->
   </div>
 </template>
@@ -128,6 +120,7 @@ import {
   getPageWiki,
 } from "@src/api/ProductV2Api";
 import _ from "lodash";
+import { log } from "mathjs";
 export default {
   name: "public-dialog",
   props: {
@@ -252,19 +245,23 @@ export default {
     slotClick(e, ref) {
       this.$refs[ref].chooseItem(e);
     },
-    lenovoselectSearchData: _.debounce(function(e) {
+    lenovoselectSearchData: _.debounce(function(e, type) {
+      if(!type && !e){
+        return
+      }
       this.selectLoading = true;
       this.dialogData[this.dialogType]
         .http({
           keyWord: e,
           pageSize: 50,
           pageNum: 1,
+          ...this.dialogType == "cloneMenu" ? {catalogId:this.initData.id} : {}
         })
         .then((res) => {
           if (!res) {
             return;
           }
-          this.dialogData[this.dialogType].options = res.result.list;
+          this.dialogData[this.dialogType].options = res.result.list || [];
         })
         .catch((err) => {})
         .finally(() => {
@@ -357,6 +354,7 @@ export default {
 }
 .el-select .el-tag{
 position: relative;
+padding-right: 6px;
 }
 .el-select .el-tag__close.el-icon-close {
   position: absolute;
