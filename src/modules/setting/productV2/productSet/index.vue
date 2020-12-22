@@ -732,7 +732,7 @@ export default {
         distributePriority: this.form.distributePriority,
         enabled: 1,
         level: this.form.level,
-        isSystem: this.form.isSystem,
+        isSystem: this.form.isSystem || 0,
       };
       if (this.openType == "add") {
         params.createUser = this.userId;
@@ -853,6 +853,18 @@ export default {
           if (res.data && res.data.list) {
             if(refresh) this.userList = res.data.list;
             else this.userList.push(...res.data.list);
+
+            if(first){
+              if(this.form.selectUserType==='user'){
+                this.chosenUser.forEach(item=>{
+                  const exist=this.userList.find(user=>user.userId===item.userId);
+                  if(!exist) this.userList.unshift(item);
+                });
+              }else{
+                const exist=this.userList.find(item=>item.id===this.chosenUser[0].id);
+                if(!exist) this.userList.unshift(this.chosenUser[0]);
+              }
+            }
           }
         } else {
           this.$platform.alert(res.msg);
@@ -962,6 +974,14 @@ export default {
           form.selectUsers=result.candidate.info.map(item=>item.userId);
         }else if(form.selectUserType=='role' || form.selectUserType=='tag' || form.selectUserType=='tagLeader'){
           this.chosenUser=[result.distributeCondition];
+          this.chosenUser.forEach(item=>{
+            item.id=item.groupId;
+            if(form.selectUserType=='role'){
+              item.name=item.groupName;
+            }else{
+              item.tagName=item.groupName;
+            }
+          });
           form.selectUser=result.distributeCondition.groupId;
           this.getUserList(null,true,true);
         }

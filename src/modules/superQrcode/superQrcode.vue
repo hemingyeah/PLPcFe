@@ -397,8 +397,8 @@ export default {
           this.queryEventType(this.settingInfo.id);
         }else{
           this.rightMenuFlag=true;
+          this.eventTypeList=res.data;
           if(res.data){
-            this.eventTypeList=res.data;
             this.eventTypeIdList=res.data.map(item=>item.id);
           }
         }
