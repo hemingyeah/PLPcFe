@@ -27,7 +27,7 @@
                class="iconfont icon-icon_arrow arrow-right font-16"
                :class="{ 'arrow-down': el.showList }"
                @click.stop="showRootList(index)"></i>
-            <div class="overHideCon-1"
+            <div class="overHideCon-1 catalog-item"
                  :class="{ 'mar-l-12': el.tasks.length <= 0 }">
               {{ el.name }}
             </div>
@@ -52,7 +52,8 @@
                 </div>
               </div>
               <i slot="reference"
-                 class="iconfont icon-setting cur-point "></i>
+                 class="iconfont icon-setting cur-point "
+                 :class="{'color-primary': el.popoverVisible}"></i>
             </el-popover>
 
             <i class="iconfont icon-tuozhuaipaixu handle can-move mar-l-8"></i>
@@ -296,6 +297,7 @@ ul {
   .tasks-item {
     position: relative;
     padding-left: 10px;
+    padding-right: 10px;
     // &:hover{
     //   background: #E6FFFB;
     // }
@@ -326,7 +328,9 @@ ul {
     }
   }
   .tasks-item-check {
-    color: $color-primary;
+    .catalog-item {
+      color: $color-primary;
+    }
   }
   .tasks-item-hover {
     background: #e6fffb;
