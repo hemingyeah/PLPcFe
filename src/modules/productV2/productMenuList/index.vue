@@ -1,5 +1,6 @@
 <template>
-  <div class="product-list-container" v-loading.fullscreen.lock="loading">
+  <div class="product-list-container"
+       v-loading.fullscreen.lock="loading">
     <div class="product-list-search-group-container flex-x jus-end bg-w">
       <!-- 搜索 -->
       <div class="task-list-header-seach ">
@@ -38,26 +39,18 @@
       </div>
     </div>
 
-
-
     <div class="product-list-section">
       <!--operation bar start-->
       <div class="operation-bar-container">
         <div class="top-btn-group">
-          <base-button
-            type="primary"
-            icon="icon-add"
-            @event="goToCreate"
-            v-if="createdPermission"
-          >新建</base-button
-          >
-          <base-button
-            type="ghost"
-            icon="icon-qingkongshanchu"
-            @event="deleteProducts"
-            v-if="deletePermission"
-          >删除</base-button
-          >
+          <base-button type="primary"
+                       icon="icon-add"
+                       @event="goToCreate"
+                       v-if="createdPermission">新建</base-button>
+          <base-button type="ghost"
+                       icon="icon-qingkongshanchu"
+                       @event="deleteProducts"
+                       v-if="deletePermission">删除</base-button>
         </div>
 
         <div class="action-button-grou flex-x">
@@ -70,10 +63,8 @@
           > -->
           <!-- <base-button type="plain" @event="openDialog('remind')" v-if="editedPermission === 3 && isShowCustomerRemind">批量提醒</base-button> -->
           <el-dropdown v-if="exportPermission || exportPermissionTaskEdit">
-            <div
-              class="task-ai task-flex task-font14 task-c6 task-pointer"
-              @click="trackEventHandler('moreAction')"
-            >
+            <div class="task-ai task-flex task-font14 task-c6 task-pointer"
+                 @click="trackEventHandler('moreAction')">
               <span class="task-mr4 task-ml4">更多操作</span>
               <i class="iconfont icon-triangle-down task-icon"></i>
             </div>
@@ -93,18 +84,16 @@
           <!-- 选择列 -->
           <div class="guide-box mar-l-25">
             <!-- <div class="guide-disable-cover" v-if="nowGuideStep == 2"></div> -->
-            <div
-              :class="[
-                'task-ai',
-                'task-flex',
-                'task-font14',
-                'task-c6',
-                'task-pointer',
-                'task-width103',
-              ]"
-              id="v-task-step-1"
-              @click="showAdvancedSetting"
-            >
+            <div :class="[
+                   'task-ai',
+                   'task-flex',
+                   'task-font14',
+                   'task-c6',
+                   'task-pointer',
+                   'task-width103',
+                 ]"
+                 id="v-task-step-1"
+                 @click="showAdvancedSetting">
               <span class="task-mr4 task-ml4">选择列</span>
               <i class="iconfont icon-triangle-down task-icon"></i>
             </div>
@@ -113,12 +102,10 @@
       </div>
 
       <div style="background: #fff;padding: 0 10px">
-        <base-selection-bar
-          ref="baseSelectionBar"
-          v-model="multipleSelection"
-          @toggle-selection="toggleSelection"
-          @show-panel="() => (multipleSelectionPanelShow = true)"
-        />
+        <base-selection-bar ref="baseSelectionBar"
+                            v-model="multipleSelection"
+                            @toggle-selection="toggleSelection"
+                            @show-panel="() => (multipleSelectionPanelShow = true)" />
       </div>
 
       <!-- <el-table
@@ -133,232 +120,204 @@
         ref="multipleTable"
         class="product-table"
       > -->
-      <el-table
-        stripe
-        :data="page.list"
-        :highlight-current-row="false"
-        :key="tableKey"
-        :border="true"
-        @select="handleSelection"
-        @select-all="handleSelection"
-        @sort-change="sortChange"
-        @header-dragend="headerDragend"
-        :class="['task-list-table', 'common-list-table']"
-        header-row-class-name="common-list-table-header taks-list-table-header"
-        ref="multipleTable"
-      >
-        <el-table-column
-          type="selection"
-          width="48"
-          align="center"
-          class-name="flex-x jus-center"
-        ></el-table-column>
+      <el-table stripe
+                :data="page.list"
+                :highlight-current-row="false"
+                :key="tableKey"
+                :border="true"
+                @select="handleSelection"
+                @select-all="handleSelection"
+                @sort-change="sortChange"
+                @header-dragend="headerDragend"
+                :class="['task-list-table', 'common-list-table']"
+                header-row-class-name="common-list-table-header taks-list-table-header"
+                ref="multipleTable">
+        <el-table-column type="selection"
+                         width="48"
+                         align="center"
+                         class-name="flex-x jus-center"></el-table-column>
         <template v-for="(column, index) in columns">
-          <el-table-column
-            v-if="column.show"
-            :key="`${column.field}_${index}`"
-            :label="column.label"
-            :prop="column.field"
-            :width="column.width"
-            :class-name="
-              column.field == 'name' ? 'product-name-superscript-td' : ''
-            "
-            :min-width="column.minWidth || '120px'"
-            :sortable="column.sortable"
-            :show-overflow-tooltip="column.fieldName !== 'productPic' && column.fieldName !== 'thumbnail'"
-            :align="column.align"
-          >
+          <el-table-column v-if="column.show"
+                           :key="`${column.field}_${index}`"
+                           :label="column.label"
+                           :prop="column.field"
+                           :width="column.width"
+                           :class-name="
+                             column.field == 'name' ? 'product-name-superscript-td' : ''
+                           "
+                           :min-width="column.minWidth || '120px'"
+                           :sortable="column.sortable"
+                           :show-overflow-tooltip="column.fieldName !== 'productPic' && column.fieldName !== 'thumbnail'"
+                           :align="column.align">
             <template slot-scope="scope">
               <template v-if="column.fieldName === 'pathName'">
-                <a
-                  href=""
-                  class="color-primary"
-                  @click.stop.prevent="openProductMenuTab(scope.row.id)"
-                >
+                <a href=""
+                   class="color-primary"
+                   @click.stop.prevent="openProductMenuTab(scope.row.id)">
                   {{ scope.row[column.field] }}
                 </a>
               </template>
 
               <template v-else-if="column.fieldName === 'productVideo'">
                 <template v-if="scope.row.productVideo.length">
-                  <a
-                    href=""
-                    class="color-primary"
-                    @click.stop.prevent="
-                      previewVideo(scope.row.productVideo[0].url)
-                    "
-                  >
+                  <a href=""
+                     class="color-primary"
+                     @click.stop.prevent="
+                       previewVideo(scope.row.productVideo[0].url)
+                     ">
                     {{
                       scope.row.productVideo[0] &&
                         scope.row.productVideo[0].filename
                     }}
                   </a>
-                      
-                </template>
-                
-                
 
-                <template v-else-if="column.field === 'tags'">
-                  {{ scope.row | formatTags }}
                 </template>
-                <template v-else-if="column.formType === 'cascader'">
-                  {{ scope.row.attribute[column.field] | displayCascader }}
-                </template>
-                <template v-else-if="column.formType === 'select' && !column.isSystem">
-                  {{scope.row.attribute[column.field] | displaySelect}} 
-                </template>
-                <template v-else-if="column.formType === 'user' && scope.row.attribute[column.field]">
-                  {{ getUserName(column, scope.row.attribute[column.field]) }}
-                </template>
-                <template v-else-if="column.formType == 'related_task'">
-                  {{ getRelatedTask(scope.row.attribute[column.field]) }}
-                </template>
-                <template v-else-if="column.field === 'updateTime'">
-                  <template v-if="scope.row.latesetUpdateRecord">
-                    <el-tooltip
-                      class="item"
-                      effect="dark"
-                      :content="scope.row.latesetUpdateRecord"
-                      placement="top-start"
-                    >
-                      <div @mouseover="showLatestUpdateRecord(scope.row)">
-                        {{ scope.row.updateTime | formatDate }}
-                      </div>
-                    </el-tooltip>
-                  </template>
-                  <template v-else>
+              </template>
+
+              <template v-else-if="column.field === 'tags'">
+                {{ scope.row | formatTags }}
+              </template>
+              <template v-else-if="column.formType === 'cascader'">
+                {{ scope.row.attribute[column.field] | displayCascader }}
+              </template>
+              <template v-else-if="column.formType === 'select' && !column.isSystem">
+                {{scope.row.attribute[column.field] | displaySelect}}
+              </template>
+              <template v-else-if="column.formType === 'user' && scope.row.attribute[column.field]">
+                {{ getUserName(column, scope.row.attribute[column.field]) }}
+              </template>
+              <template v-else-if="column.formType == 'related_task'">
+                {{ getRelatedTask(scope.row.attribute[column.field]) }}
+              </template>
+              <template v-else-if="column.field === 'updateTime'">
+                <template v-if="scope.row.latesetUpdateRecord">
+                  <el-tooltip class="item"
+                              effect="dark"
+                              :content="scope.row.latesetUpdateRecord"
+                              placement="top-start">
                     <div @mouseover="showLatestUpdateRecord(scope.row)">
                       {{ scope.row.updateTime | formatDate }}
                     </div>
-                  </template>
-                </template>
-                <template v-else-if="column.field === 'createUser'">
-                  {{ scope.row.createUser && scope.row.createUser.displayName }}
-                </template>
-                <template v-else-if="column.field === 'createTime'">
-                  {{ scope.row.createTime | formatDate }}
-                </template>
-                <div
-                  v-else-if="
-                    column.formType === 'textarea' && column.isSystem != 1
-                  "
-                  v-html="buildTextarea(scope.row.attribute[column.field])"
-                  @click="openOutsideLink"
-                ></div>
-
-
-                <template v-else-if="column.fieldName == 'address'">
-                  {{ getAddress(scope.row.address) }}
-                </template>
-              
-
-                <template v-else-if="!column.isSystem">
-                  {{ scope.row.attribute && scope.row.attribute[column.field] }}
-                </template>
-
-                <template v-else-if="column.fieldName == 'catalogId'">
-                  {{ scope.row.pathName }}
-                </template>
-                <template v-else-if="column.fieldName === 'productPic'">
-                  <div class="flex-x goods-img-list" style="height:100%">
-                    <template v-for="(item, index) in scope.row.productPic">
-                      <img
-                        :key="index"
-                        v-if="index <= 4"
-                        class="cur-point mar-r-8"
-                        :src="
-                          item.url
-                            ? `${item.url}?x-oss-process=image/resize,m_fill,h_32,w_32`
-                            : defaultImg
-                        "
-                        @click.stop="previewImg(item.url)"
-                      />
-                    </template>
-                    <div>
-                      {{
-                        scope.row[column.field].length > 5
-                          ? `+${scope.row[column.field].length - 5}`
-                          : ''
-                      }}
-                    </div>
-                  </div>
-                </template>
-                <!-- <template v-else-if="column.fieldName == 'productNum'">
-                  {{ scope.row['remind'] || '' }}
-                </template> -->
-                
-                <template v-else-if="column.fieldName === 'thumbnail'">
-                  <div class="flex-x">
-                    <div class="flex-x goods-img-list" style="height:100%">
-                      <template v-for="(item, index) in scope.row.thumbnail">
-                        <img
-                          :key="index"
-                          class="cur-point"
-                          :src="
-                            item.url
-                              ? `${item.url}?x-oss-process=image/resize,m_fill,h_32,w_32`
-                              : defaultImg
-                          "
-                          @click.stop="previewImg(item.url)"
-                        />
-                      </template>
-                    </div>
-                  </div>
+                  </el-tooltip>
                 </template>
                 <template v-else>
-                  {{ scope.row[column.field] || '' }}
+                  <div @mouseover="showLatestUpdateRecord(scope.row)">
+                    {{ scope.row.updateTime | formatDate }}
+                  </div>
                 </template>
               </template>
-          </template></el-table-column>
+              <template v-else-if="column.field === 'createUser'">
+                {{ scope.row.createUser && scope.row.createUser.displayName }}
+              </template>
+              <template v-else-if="column.field === 'createTime'">
+                {{ scope.row.createTime | formatDate }}
+              </template>
+              <div v-else-if="
+                     column.formType === 'textarea' && column.isSystem != 1
+                   "
+                   v-html="buildTextarea(scope.row.attribute[column.field])"
+                   @click="openOutsideLink"></div>
+
+              <template v-else-if="column.fieldName == 'address'">
+                {{ getAddress(scope.row.address) }}
+              </template>
+
+              <template v-else-if="!column.isSystem">
+                {{ scope.row.attribute && scope.row.attribute[column.field] }}
+              </template>
+
+              <template v-else-if="column.fieldName == 'catalogId'">
+                {{ scope.row.pathName }}
+              </template>
+              <template v-else-if="column.fieldName === 'productPic'">
+                <div class="flex-x goods-img-list"
+                     style="height:100%">
+                  <template v-for="(item, index) in scope.row.productPic">
+                    <img :key="index"
+                         v-if="index <= 4"
+                         class="cur-point mar-r-8"
+                         :src="
+                           item.url
+                             ? `${item.url}?x-oss-process=image/resize,m_fill,h_32,w_32`
+                             : defaultImg
+                         "
+                         @click.stop="previewImg(item.url)" />
+                  </template>
+                  <div>
+                    {{
+                      scope.row[column.field].length > 5
+                        ? `+${scope.row[column.field].length - 5}`
+                        : ''
+                    }}
+                  </div>
+                </div>
+              </template>
+              <!-- <template v-else-if="column.fieldName == 'productNum'">
+                  {{ scope.row['remind'] || '' }}
+                </template> -->
+
+              <template v-else-if="column.fieldName === 'thumbnail'">
+                <div class="flex-x">
+                  <div class="flex-x goods-img-list"
+                       style="height:100%">
+                    <template v-for="(item, index) in scope.row.thumbnail">
+                      <img :key="index"
+                           class="cur-point mar-r-8"
+                           :src="
+                             item.url
+                               ? `${item.url}?x-oss-process=image/resize,m_fill,h_32,w_32`
+                               : defaultImg
+                           "
+                           @click.stop="previewImg(item.url)" />
+                    </template>
+                  </div>
+                </div>
+              </template>
+              <template v-else>
+                {{ scope.row[column.field] || '' }}
+              </template>
+            </template>
+          </el-table-column>
         </template>
+        </el-table-column>
       </el-table>
 
       <div class="table-footer">
         <div class="list-info">
-          共<span class="level-padding">{{ page.total }}</span
-          >记录， 已选中<span
-            class="product-selected-count"
-            @click="multipleSelectionPanelShow = true"
-          >{{ multipleSelection.length }}</span
-          >条
-          <span class="product-selected-count" @click="toggleSelection()"
-          >清空</span
-          >
+          共<span class="level-padding">{{ page.total }}</span>记录， 已选中<span class="product-selected-count"
+                                                                           @click="multipleSelectionPanelShow = true">{{ multipleSelection.length }}</span>条
+          <span class="product-selected-count"
+                @click="toggleSelection()">清空</span>
         </div>
-        <el-pagination
-          class="product-table-pagination"
-          background
-          @current-change="jump"
-          @size-change="handleSizeChange"
-          :page-sizes="[10, 20, 50]"
-          :page-size="page.pageSize"
-          :current-page="page.pageNum"
-          layout="prev, pager, next, sizes, jumper"
-          :total="page.total"
-        >
+        <el-pagination class="product-table-pagination"
+                       background
+                       @current-change="jump"
+                       @size-change="handleSizeChange"
+                       :page-sizes="[10, 20, 50]"
+                       :page-size="page.pageSize"
+                       :current-page="page.pageNum"
+                       layout="prev, pager, next, sizes, jumper"
+                       :total="page.total">
         </el-pagination>
       </div>
     </div>
 
-    <base-panel
-      class="product-panel"
-      :show.sync="multipleSelectionPanelShow"
-      width="420px"
-    >
+    <base-panel class="product-panel"
+                :show.sync="multipleSelectionPanelShow"
+                width="420px">
       <h3 slot="title">
         <span>已选中类型({{ multipleSelection.length }})</span>
-        <i
-          v-if="multipleSelection.length"
-          class="iconfont icon-qingkongshanchu product-panel-btn"
-          @click="toggleSelection()"
-          title="清空已选中数据"
-          data-placement="right"
-          v-tooltip
-        ></i>
+        <i v-if="multipleSelection.length"
+           class="iconfont icon-qingkongshanchu product-panel-btn"
+           @click="toggleSelection()"
+           title="清空已选中数据"
+           data-placement="right"
+           v-tooltip></i>
       </h3>
 
       <div class="product-selected-panel">
-        <div class="product-selected-tip" v-if="!multipleSelection.length">
+        <div class="product-selected-tip"
+             v-if="!multipleSelection.length">
           <img src="@src/assets/img/no-data.png" />
           <p>暂无选中的数据，请从列表中选择。</p>
         </div>
@@ -367,19 +326,15 @@
             <div class="product-selected-row product-selected-head">
               <span class="product-selected-sn">产品类型</span>
             </div>
-            <div
-              class="product-selected-row"
-              v-for="c in multipleSelection"
-              :key="c.id"
-            >
+            <div class="product-selected-row"
+                 v-for="c in multipleSelection"
+                 :key="c.id">
               <span class="product-selected-sn overHideCon-1">{{
                 c.pathName
               }}</span>
-              <button
-                type="button"
-                class="product-selected-delete"
-                @click="removeFromSelection(c)"
-              >
+              <button type="button"
+                      class="product-selected-delete"
+                      @click="removeFromSelection(c)">
                 <i class="iconfont icon-fe-close"></i>
               </button>
             </div>
@@ -388,44 +343,34 @@
       </div>
     </base-panel>
 
-    <batch-editing-dialog
-      ref="batchEditingDialog"
-      :config="{ fields: productFields, productTypes: productTypes }"
-      :callback="search"
-      :selected-ids="selectedIds"
-    ></batch-editing-dialog>
+    <batch-editing-dialog ref="batchEditingDialog"
+                          :config="{ fields: productFields, productTypes: productTypes }"
+                          :callback="search"
+                          :selected-ids="selectedIds"></batch-editing-dialog>
 
-    <batch-reminding-dialog
-      ref="batchRemindingDialog"
-      :selected-ids="selectedIds"
-    ></batch-reminding-dialog>
+    <batch-reminding-dialog ref="batchRemindingDialog"
+                            :selected-ids="selectedIds"></batch-reminding-dialog>
 
-    <base-import
-      title="导入产品"
-      ref="importProductModal"
-      @success="baseImportSuccess(), search()"
-      action="/excels/catalog/import"
-    >
+    <base-import title="导入产品"
+                 ref="importProductModal"
+                 @success="baseImportSuccess(), search()"
+                 action="/excels/catalog/import">
       <div slot="tip">
         <div class="base-import-warn">
           <p>
-            请先下载<a href="/catalog/import/template">导入模版 </a
-            >，填写完成后再上传导入。
+            请先下载<a href="/catalog/import/template">导入模版 </a>，填写完成后再上传导入。
           </p>
           <!--<p>导入产品前，请确保产品所属客户已存在。您可以 <a href="/customer/import/getAllCustomerId">点这里</a>导出包含所有已存在客户的模板</p>-->
         </div>
       </div>
     </base-import>
 
-    <base-export
-      ref="exportPanel"
-      :columns="exportColumns"
-      :build-params="buildExportParams"
-      :validate="checkExportCount"
-      method="post"
-      action="/excels/catalog/export"
-    />
-    
+    <base-export ref="exportPanel"
+                 :columns="exportColumns"
+                 :build-params="buildExportParams"
+                 :validate="checkExportCount"
+                 method="post"
+                 action="/excels/catalog/export" />
 
     <!-- <batch-update-dialog
       ref="batchUpdateDialog"
@@ -437,21 +382,22 @@
     ></batch-update-dialog> -->
 
     <!-- start 选择列设置 -->
-    <biz-select-column ref="advanced" @save="saveColumnStatus" />
+    <biz-select-column ref="advanced"
+                       @save="saveColumnStatus" />
     <!-- <base-table-advanced-setting ref="advanced" @save="modifyColumnStatus" /> -->
 
-    <search-panel
-      :init-data="initData"
-      :config="{
-        fields: this.productFields,
-      }"
-      ref="searchPanel"
-    >
-      <div class="advanced-search-btn-group" slot="footer">
-        <base-button type="ghost" @event="resetParams">重置</base-button>
-        <base-button type="primary" @event="powerfulSearch" native-type="submit"
-        >搜索</base-button
-        >
+    <search-panel :init-data="initData"
+                  :config="{
+                    fields: this.productFields,
+                  }"
+                  ref="searchPanel">
+      <div class="advanced-search-btn-group"
+           slot="footer">
+        <base-button type="ghost"
+                     @event="resetParams">重置</base-button>
+        <base-button type="primary"
+                     @event="powerfulSearch"
+                     native-type="submit">搜索</base-button>
       </div>
     </search-panel>
   </div>
@@ -469,7 +415,7 @@ import SearchPanel from "@src/modules/productV2/productMenuList/compoment/Search
 
 import { getUpdateRecord } from "@src/api/ProductApi";
 
-import {catalogFieldFix} from "@src/modules/productV2/public.js";
+import { catalogFieldFix } from "@src/modules/productV2/public.js";
 import {
   getPageList,
   getProductMenuField,
@@ -489,7 +435,7 @@ export default {
       default: () => ({}),
     },
   },
-  data() {
+  data () {
     return {
       multipleSelectionPanelShow: false,
       page: new Page(),
@@ -515,27 +461,27 @@ export default {
     };
   },
   computed: {
-    auth() {
+    auth () {
       return (
         this.initData?.loginUser?.authorities || this.initData?.authorities
       );
     },
-    editedPermission() {
+    editedPermission () {
       return this.auth.PRODUCT_EDIT;
     },
-    createdPermission() {
+    createdPermission () {
       return this.auth.PRODUCT_CREATE;
     },
-    viewedPermission() {
+    viewedPermission () {
       return this.auth.CUSTOMER_VIEW === 3;
     },
-    deletePermission() {
+    deletePermission () {
       return this.auth.PRODUCT_EDIT === 3 && this.auth.PRODUCT_DELETE;
     },
-    exportPermission() {
+    exportPermission () {
       return this.auth.EXPORT_IN;
     },
-    productFields() {
+    productFields () {
       return this.dynamicFields
         .concat(catalogFieldFix)
         .filter(
@@ -553,16 +499,16 @@ export default {
         })
         .sort((a, b) => a.orderId - b.orderId);
     },
-    productTypes() {
+    productTypes () {
       return this.initData.productConfig.productType || [];
     },
-    panelWidth() {
+    panelWidth () {
       return `${420 * this.columnNum}px`;
     },
-    selectedIds() {
+    selectedIds () {
       return this.multipleSelection.map((p) => p.id);
     },
-    exportColumns() {
+    exportColumns () {
       return [...this.columns].map((field) => {
         if (
           ["customer", "productTemplate", "remindCount"].some(
@@ -578,24 +524,24 @@ export default {
         return field;
       });
     },
-    smsRest() {
+    smsRest () {
       return this.initData.smsRest || 0;
     },
-    isShowCustomerRemind() {
+    isShowCustomerRemind () {
       return isShowCustomerRemind();
     },
   },
   filters: {
-    formatTags({ customer }) {
+    formatTags ({ customer }) {
       if (!customer) return "";
       if (!customer.tags || !customer.tags.length) return "";
       return customer.tags.map((t) => t.tagName).join(" ");
     },
-    formatDate(val) {
+    formatDate (val) {
       if (!val) return "";
       return formatDate(val, "YYYY-MM-DD HH:mm:ss");
     },
-    displaySelect(value) {
+    displaySelect (value) {
       if (!value) return null;
       if (value && typeof value === "string") {
         return value;
@@ -605,7 +551,7 @@ export default {
       }
       return null;
     },
-    displayCascader(value) {
+    displayCascader (value) {
       if (!value) return null;
       if (value && typeof value === "string") {
         return value;
@@ -616,7 +562,7 @@ export default {
       return null;
     }
   },
-  async mounted() {
+  async mounted () {
     this.buildColumns();
 
     // 获取产品动态字段
@@ -638,19 +584,19 @@ export default {
     window.__exports__refresh = this.search;
 
   },
-  beforeDestroy() {
+  beforeDestroy () {
   },
   methods: {
-    getAddress(field) {
+    getAddress (field) {
       return field.province + field.city + field.dist + field.address || "";
     },
-    getRelatedTask(field) {
+    getRelatedTask (field) {
       return Array.isArray(field)
         ? field.map((item) => item.taskNo).join(",")
         : "";
     },
     // 处理人员显示
-    getUserName(field, value) {
+    getUserName (field, value) {
       // 多选
       if (Array.isArray(value)) {
         return value.map((i) => i.displayName || i.name).join(",");
@@ -659,27 +605,27 @@ export default {
       let user = value || {};
       return user.displayName || user.name;
     },
-    openOutsideLink(e) {
+    openOutsideLink (e) {
       let url = e.target.getAttribute("url");
       if (!url) return;
       if (!/http/gi.test(url))
         return this.$platform.alert("请确保输入的链接以http或者https开始");
       this.$platform.openLink(url);
     },
-    buildTextarea(value) {
+    buildTextarea (value) {
       return value
         ? value.replace(link_reg, (match) => {
           return `<a href="javascript:;" target="_blank" url="${match}">${match}</a>`;
         })
         : "";
     },
-    powerfulSearch() {
+    powerfulSearch () {
       this.searchModel.pageNum = 1;
       this.searchModel.moreConditions = this.$refs.searchPanel.buildParams();
 
       this.search();
     },
-    formatCustomizeAddress(ad) {
+    formatCustomizeAddress (ad) {
       if (null == ad) return "";
 
       const { province, city, dist, address } = ad;
@@ -690,7 +636,7 @@ export default {
     /**
      * @description 表头更改
      */
-    headerDragend(newWidth, oldWidth, column, event) {
+    headerDragend (newWidth, oldWidth, column, event) {
       let data = this.columns
         .map((item) => {
           if (item.displayName === column.label) {
@@ -712,7 +658,7 @@ export default {
      * @description 修改选择列设置
      * @param {Object} event 事件对象
      */
-    modifyColumnStatus(event) {
+    modifyColumnStatus (event) {
       let columns = event.data || [],
         colMap = columns.reduce(
           (acc, col) => (acc[col.field] = col) && acc,
@@ -728,7 +674,7 @@ export default {
 
       this.saveColumnStatusToStorage();
     },
-    showAdvancedSetting() {
+    showAdvancedSetting () {
       window.TDAPP.onEvent("pc：产品类型管理-选择列事件");
       this.$refs.advanced.open(this.columns);
     },
@@ -736,7 +682,7 @@ export default {
      * @description 修改选择列设置
      * @param {Object} event 事件对象
      */
-    saveColumnStatus(event) {
+    saveColumnStatus (event) {
       let columns = event.data || [];
 
       this.columns = [];
@@ -747,7 +693,7 @@ export default {
       });
     },
 
-    saveColumnStatusToStorage() {
+    saveColumnStatusToStorage () {
       const localStorageData = this.getLocalStorageData();
       let columnsStatus = null;
 
@@ -770,7 +716,7 @@ export default {
 
     // 选择列 e
 
-    openProductMenuTab(id) {
+    openProductMenuTab (id) {
       let fromId;
       try {
         fromId = window.frameElement.getAttribute("id");
@@ -785,7 +731,7 @@ export default {
         fromId
       });
     },
-    search() {
+    search () {
       const params = this.buildParams();
       this.loading = true;
 
@@ -802,7 +748,7 @@ export default {
         })
         .catch((e) => console.error("fetch product catch an error", e));
     },
-    buildParams() {
+    buildParams () {
       const sm = Object.assign({}, this.searchModel);
       let params = {
         keyWord: sm.keyWord,
@@ -826,11 +772,11 @@ export default {
 
       return params;
     },
-    jump(pageNum) {
+    jump (pageNum) {
       this.searchModel.pageNum = pageNum;
       this.search();
     },
-    resetParams() {
+    resetParams () {
       window.TDAPP.onEvent("pc：产品管理-重置事件");
       this.searchIncludeMoreConditions = false;
       this.searchModel = {
@@ -846,7 +792,7 @@ export default {
       this.$refs.searchPanel.resetParams();
       this.search();
     },
-    openDialog(action) {
+    openDialog (action) {
       // if (action === 'sendMessage') {
       //   window.TDAPP.onEvent('pc：产品管理-发送短信事件');
       //   this.$refs.messageDialog.openSendMessageDialog();
@@ -874,7 +820,7 @@ export default {
       }
     },
     // operation
-    async deleteProducts() {
+    async deleteProducts () {
       window.TDAPP.onEvent("pc：产品类型管理-删除事件");
       if (!this.multipleSelection.length) {
         return this.$platform.alert("请选择需要删除的产品类型");
@@ -910,7 +856,7 @@ export default {
       }
     },
     // 批量添加提醒成功后，更新产品的提醒数量
-    updateProductRemindCount() {
+    updateProductRemindCount () {
       let count = 0;
       this.page.list = this.page.list.map((product) => {
         count = product.attribute.remindCount || 0;
@@ -925,7 +871,7 @@ export default {
       this.matchSelected();
     },
     // table method
-    handleSelection(selection) {
+    handleSelection (selection) {
       let tv = this.selectionCompute(selection);
 
       let original = this.multipleSelection.filter((ms) =>
@@ -952,7 +898,7 @@ export default {
       this.$refs.baseSelectionBar.openTooltip();
     },
     // 计算已选择
-    selectionCompute(selection) {
+    selectionCompute (selection) {
       let tv = [];
 
       tv = this.multipleSelection.filter((ms) =>
@@ -962,7 +908,7 @@ export default {
 
       return tv;
     },
-    sortChange(option) {
+    sortChange (option) {
       try {
         const { prop, order } = option;
         if (!order) {
@@ -1003,13 +949,13 @@ export default {
         console.error("e", e);
       }
     },
-    handleSizeChange(pageSize) {
+    handleSizeChange (pageSize) {
       this.saveDataToStorage("pageSize", pageSize);
       this.searchModel.pageSize = pageSize;
       this.searchModel.pageNum = 1;
       this.search();
     },
-    toggleSelection(rows) {
+    toggleSelection (rows) {
       let isNotOnCurrentPage = false;
       let item = undefined;
       let row = undefined;
@@ -1031,7 +977,7 @@ export default {
       }
     },
 
-    removeFromSelection(c) {
+    removeFromSelection (c) {
       if (!c || !c.id) return;
 
       this.multipleSelection = this.multipleSelection.filter(
@@ -1063,7 +1009,7 @@ export default {
     //   }));
     //   this.saveDataToStorage('columnStatus', columnsStatus);
     // },
-    buildColumns() {
+    buildColumns () {
       const localStorageData = this.getLocalStorageData();
 
       let columnStatus = localStorageData.columnStatus || [];
@@ -1138,7 +1084,7 @@ export default {
         });
     },
 
-    buildExportParams(checkedArr, ids) {
+    buildExportParams (checkedArr, ids) {
       let exportAll = !ids || !ids.length;
       let exportSearchModel = exportAll
         ? {
@@ -1154,14 +1100,14 @@ export default {
       };
     },
     /** 检测导出条数 */
-    checkExportCount(ids, max) {
+    checkExportCount (ids, max) {
       let exportAll = !ids || !ids.length;
       return exportAll && this.page.total > max
         ? "为了保障响应速度，暂不支持超过5000条以上的数据导出，请您分段导出。"
         : null;
     },
 
-    exportProduct(exportAll) {
+    exportProduct (exportAll) {
       let ids = [];
       let fileName = `${formatDate(new Date(), "YYYY-MM-DD")}产品类型数据.xlsx`;
       if (!exportAll) {
@@ -1171,7 +1117,7 @@ export default {
       }
       this.$refs.exportPanel.open(ids, fileName);
     },
-    showLatestUpdateRecord(row) {
+    showLatestUpdateRecord (row) {
       if (row.latesetUpdateRecord) return;
       getUpdateRecord({
         productId: row.id,
@@ -1191,7 +1137,7 @@ export default {
         .catch((e) => console.error("e", e));
     },
 
-    createCustomerTab(productId) {
+    createCustomerTab (productId) {
       let fromId = window.frameElement.getAttribute("id");
 
       this.$platform.openTab({
@@ -1203,7 +1149,7 @@ export default {
       });
     },
 
-    goToCreate() {
+    goToCreate () {
       window.TDAPP.onEvent("pc：产品类型管理-新建事件");
       let fromId = window.frameElement.getAttribute("id");
 
@@ -1216,16 +1162,16 @@ export default {
         fromId,
       });
     },
-    getLocalStorageData() {
+    getLocalStorageData () {
       const dataStr = localStorage.getItem("productV2_product_menu_list") || "{}";
       return JSON.parse(dataStr);
     },
-    saveDataToStorage(key, value) {
+    saveDataToStorage (key, value) {
       const data = this.getLocalStorageData();
       data[key] = value;
       localStorage.setItem("productV2_product_menu_list", JSON.stringify(data));
     },
-    revertStorage() {
+    revertStorage () {
       const { pageSize, column_number } = this.getLocalStorageData();
       if (pageSize) {
         this.searchModel.pageSize = pageSize;
@@ -1233,7 +1179,7 @@ export default {
       if (column_number) this.columnNum = Number(column_number);
     },
     // 匹配选中的列
-    matchSelected() {
+    matchSelected () {
       if (!this.multipleSelection.length) return;
 
       const selected = this.page.list.filter((c) => {
@@ -1251,14 +1197,14 @@ export default {
       });
     },
     // 获取团队列表
-    getTeamList(params) {
+    getTeamList (params) {
       return this.getBizTeamList(
         params,
         this.filterTeams,
         this.viewedPermission
       );
     },
-    panelSearchAdvancedToggle() {
+    panelSearchAdvancedToggle () {
       window.TDAPP.onEvent("pc：产品类型管理-高级搜索事件");
       this.$refs.searchPanel.open();
       this.$nextTick(() => {
@@ -1270,7 +1216,7 @@ export default {
       });
     },
     // TalkingData事件埋点
-    trackEventHandler(type) {
+    trackEventHandler (type) {
       if (type === "search") {
         window.TDAPP.onEvent("pc：产品类型管理-搜索事件");
         return;
@@ -1280,18 +1226,18 @@ export default {
         return;
       }
     },
-    getRowKey(row) {
+    getRowKey (row) {
       return row.id || "";
     },
-    previewImg(url) {
+    previewImg (url) {
       this.$previewImg(url);
     },
-    baseImportSuccess() {
+    baseImportSuccess () {
       window.parent.flashSomePage({
         type: "productV2_catalog_edit",
       });
     },
-    previewVideo(e) {
+    previewVideo (e) {
       this.$previewVideo(e);
     },
   },
@@ -1619,7 +1565,7 @@ body {
     }
   }
 }
-.el-table .cell{
+.el-table .cell {
   line-height: 31px;
 }
 </style>

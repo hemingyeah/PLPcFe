@@ -355,10 +355,15 @@ export default {
   word-wrap: break-word;
   word-break: break-all;
 }
+.el-select .el-tag{
+position: relative;
+}
 .el-select .el-tag__close.el-icon-close {
   position: absolute;
-  right: 2px;
-  top: 5px;
+  right: 1px;
+  top: 0;
+  bottom: 0;
+  margin: auto;
 }
 .batch-editing-customer-dialog {
 
