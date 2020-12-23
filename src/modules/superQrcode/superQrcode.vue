@@ -374,9 +374,9 @@ export default {
       if(e.target.nodeName==='LI'){
         const ariaOwns=e.target.getAttribute('aria-owns');
         if(ariaOwns){
-          document.getElementById(ariaOwns).style.display='';
+          if(document.getElementById(ariaOwns)) document.getElementById(ariaOwns).style.display='';
         }else{
-          e.target.parentNode.nextElementSibling.style.display='none';
+          if(e.target.parentNode.nextElementSibling) e.target.parentNode.nextElementSibling.style.display='none';
         }
       }
     },
@@ -543,7 +543,7 @@ export default {
           }
         }
       }
-      if(this.getTotal===this.total){   // 递归完也没有有详情目录
+      if(this.getTotal===this.total && !this.stopRecursion){   // 递归完也没有有详情目录
         this.noCatalog=true;
         this.catalogId=[0];
         this.syncCatalogInfo();

@@ -47,7 +47,7 @@
         rows="10"
         maxlength="2000"
       ></el-input>
-      <span class="summary-text">{{copyForm.productIntroduction.length}}/2000</span>
+      <span class="summary-text">{{copyForm.productIntroduction?copyForm.productIntroduction.length:0}}/2000</span>
     </div>
 
     <div v-if="nowOption === 'contact'" class="contact-wrapper">
