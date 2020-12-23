@@ -438,6 +438,15 @@ export default {
           continue;
         }
 
+        if (tv.formType === "select" && !tv.setting.isMulti && !tv.isSystem) {
+          params.conditions.push({
+            property: fn,
+            operator: "in",
+            inValue: form[fn],
+          });
+          continue;
+        }
+
         // FIXME: 这里 form[fn] 为 字 符串的时候 error
         if (tv.formType === "datetime") {
           params.conditions.push({
@@ -743,6 +752,15 @@ export default {
           params.conditions.push({
             property: fn,
             operator: "user",
+            inValue: form[fn],
+          });
+          continue;
+        }
+
+        if (tv.formType === "select" && !tv.setting.isMulti && !tv.isSystem) {
+          params.conditions.push({
+            property: fn,
+            operator: "in",
             inValue: form[fn],
           });
           continue;

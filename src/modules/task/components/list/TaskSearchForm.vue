@@ -91,6 +91,10 @@ export default {
 
         if (MultiFieldNames.indexOf(field.fieldName) > -1) {
           tv = [];
+        } 
+        if (field.formType === 'select' && !field.isSystem && !field.setting.isMulti) {
+          tv = []
+          console.log(field)
         }
         form[field.fieldName] = this.formBackup[field.fieldName] || tv;
         this.$set(
@@ -110,6 +114,7 @@ export default {
     renderInput(h, field) {
       const f = _.cloneDeep(field);
       let comp = FormFieldMap.get(f.formType);
+      let setting;
       if (!comp || f.formType === "area") {
         return null;
       }
@@ -118,8 +123,8 @@ export default {
         f.setting.isMulti = true;
       }
 
-      if (field.formType === 'select' && !field.isSystem) {
-        f.setting.isMulti = false;
+      if (f.formType === 'select' && !f.isSystem) {
+        setting = {setting:{dataSource: f.setting.dataSource, isMulti: !f.setting.isMulti}};
       }
 
       let childComp = null;
@@ -198,7 +203,7 @@ export default {
             : comp.build,
           {
             props: {
-              field: f,
+              field: f.formType === 'select' && !f.isSystem ? {...f, ...setting} : f,
               value: this.form[f.fieldName],
               disableMap: true,
               placeholder: Utils.genPlaceholder(f),

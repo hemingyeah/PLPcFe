@@ -79,11 +79,11 @@ const MultiFieldNames = [
 ];
 
 function setFieldOperateHandler(field = {}) {
-  let { fieldName, formType, setting } = field;
+  let { fieldName, formType, setting, isSystem } = field;
 
   if (formType == 'number') {
     field.operatorOptions = OperatorSelectOptionsMap.input.slice();
-  } else if (MultiFieldNames.indexOf(fieldName) > -1) {
+  } else if (MultiFieldNames.indexOf(fieldName) > -1 || (formType == 'select' && !setting.isMulti && !isSystem) ) {
     field.operatorOptions = OperatorSelectOptionsMap.multiple.slice();
   } else if (fieldName == 'customer' || fieldName == 'product') {
     field.operatorOptions = OperatorSelectOptionsMap.select.slice();
@@ -504,6 +504,8 @@ export default {
                 city,
                 dist,
               };
+            } else if (!this.item.isSystem && !this.item.setting.isMulti && formType === 'select') {
+              this.form[fieldName] = content.split('，');
             } else {
               this.form[fieldName] = content;
             }
@@ -616,6 +618,9 @@ export default {
           if (MultiFieldNames.indexOf(this.selectedField.fieldName) > -1) {
             this.form[val] = [];
           }
+          if (this.selectedField.formType === 'select' && !this.selectedField.isSystem && !this.selectedField.setting.isMulti) {
+            this.form[val] = [];
+          }
         },
         renderSelector() {
           if (!this.fields) return null;
@@ -657,6 +662,8 @@ export default {
         renderInput(h) {
           const f = this.selectedField;
           const comp = FormFieldMap.get(f.formType);
+          let setting;
+
           if (!comp || f.formType === 'area') {
             return null;
           }
@@ -666,7 +673,7 @@ export default {
           }
 
           if (f.formType === 'select' && !f.isSystem) {
-            f.setting.isMulti = false;
+            setting = {setting:{dataSource: f.setting.dataSource, isMulti: !f.setting.isMulti}};
           }
 
           let childComp = null;
@@ -756,7 +763,7 @@ export default {
                 : comp.build,
               {
                 props: {
-                  field: f,
+                  field: f.formType === 'select' && !f.isSystem ? {...f, ...setting} : f,
                   value: this.form[f.fieldName],
                   disableMap: true,
                   placeholder: Utils.genPlaceholder(f),
