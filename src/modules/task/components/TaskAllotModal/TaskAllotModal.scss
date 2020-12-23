@@ -207,11 +207,6 @@
 }
 
 .task-reallot-modal {
-  .task-allot-user-content {
-    .base-panel {
-      top: 278px;
-    }
-  }
   .task-allot-pool {
     .task-allot-user-content {
       .base-panel {
@@ -227,6 +222,9 @@
   }
   .task-allot-map {
     height: calc(100% - 0px);
+  }
+  .task-allot-user-map {
+    height: calc(100% - 168px);
   }
 }
 /* end new  */

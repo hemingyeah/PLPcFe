@@ -1,9 +1,11 @@
 .user-card {
   height: 100%;
   width: 470px;
-  padding: 30px 40px 20px 20px;
+  padding: 30px 20px 0px 20px;
   position: relative;
   overflow-y: auto;
+  display: flex;
+  flex-flow: column;
 }
 
 .user-card-close {
@@ -101,6 +103,7 @@
 }
 
 .user-card-detail {
+  flex: 1;
   &-row {
     display: flex;
     margin-bottom: 20px;
@@ -154,12 +157,19 @@
   align-items: center;
   
   height: 40px;
-  width: 100%;
+  width: calc(100% + 40px);
   padding: 0 20px;
-  
-  position: absolute;
-  bottom: 0;
-  left: 0;
+
+  position: relative;
+  left: -20px;
+
+  .el-checkbox {
+    display: flex;
+    align-items: center;
+    height: 40px;
+    margin-bottom: 0;
+  }
+
   .el-radio-group {
     display: flex;
     justify-content: space-around;

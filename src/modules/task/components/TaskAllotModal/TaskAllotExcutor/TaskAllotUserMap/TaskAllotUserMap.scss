@@ -1,5 +1,6 @@
 .task-allot-user-map {
-  height: 100%;
+  height: calc(100% - 120px);
+  position: relative;
 }
 #TaskAllotUserMapContainer {
   height: 100%;
@@ -9,8 +10,8 @@
   .base-panel {
     box-shadow: -4px 1px 6px 0px rgba(0, 0, 0, 0.12);
     position: absolute;
-    top: 230px;
-    bottom: 53px;
+    top: 0px;
+    bottom: 0px;
 }
   .base-panel-title {
     display: none;
