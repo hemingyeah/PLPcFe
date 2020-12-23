@@ -94,8 +94,14 @@ export function taskTypeSelectConversion(taskType: any): any {
  * @returns {Tag} 新团队信息
 */
 export function teamNameConversion(team: Tag): Tag {
+  // 转换名字
   let conversionTeam = team
   conversionTeam.name = conversionTeam.name || conversionTeam.tagName || ''
+  // 转换子级
+  let children = team.children || []
+  if (children.length > 0) {
+    children = children.map(child => teamNameConversion(child))
+  }
   
   return conversionTeam
 }
