@@ -66,7 +66,7 @@
     <div v-if="nowOption === 'service'" class="common-wrapper">
       <span>是否启用自助服务模块</span>
       <div class="fright">
-        <el-switch v-model="doorOpenState" :disabled='noCatalog'></el-switch>
+        <el-switch v-model="doorOpenState"></el-switch>
         <span>{{doorOpenState?'启用':'禁用'}}</span>
       </div>
       <h4 style="margin-top:20px;">关联事件模板</h4>
@@ -120,12 +120,12 @@
     <div v-if="nowOption === 'mall'" class="common-wrapper">
       <span>是否开启门户商城</span>
       <div class="fright">
-        <el-switch v-model="shopOpenState" :disabled='noCatalog'></el-switch>
+        <el-switch v-model="shopOpenState"></el-switch>
         <span>{{shopOpenState?'启用':'禁用'}}</span>
       </div>
     </div>
 
-    <el-button @click="save" v-if="!noCatalog || nowOption==='proInfo'" type="primary" class="submit-btn">{{nowOption==='contact' || nowOption==='comInfo'?'下一步':'保存'}}</el-button>
+    <el-button @click="save" v-if="!noCatalog || nowOption==='proInfo' || nowOption==='service' || nowOption==='mall'" type="primary" class="submit-btn">{{nowOption==='contact' || nowOption==='comInfo'?'下一步':'保存'}}</el-button>
     <el-tooltip v-show="showJump" placement="bottom-start" effect="dark" :content='content'>
       <i class="iconfont icon-fdn-info jump-icon"></i>
     </el-tooltip>

@@ -18,7 +18,7 @@
         @change="catalogChange"
         @visible-change='cascaderShow'
       ></el-cascader>
-      <p class="no-catalog" v-if="noCatalog">未关联目录超级二维码模板</p>
+      <p class="no-catalog" v-if="noCatalog">未关联类型超级二维码模板</p>
 
       <ul class="options">
         <li
@@ -361,6 +361,7 @@ export default {
     }
   },
   methods: {
+    // 产品类型选择样式修改，移动到无子项时隐藏右侧弹框
     cascaderShow(val){
       if(val){
         this.$nextTick(()=>{
