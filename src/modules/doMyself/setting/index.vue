@@ -709,6 +709,7 @@ export default {
       let data_ = _.cloneDeep(this.dataList[index].data);
       data_.splice(e.indexs, 1);
       this.$set(this.dataList[index], 'data', data_);
+      
       this.$nextTick(()=>{
         if(data_.length < 1) this.chooseNowSet(this.dataList[0])
         else this.$refs.setShow[1].changeThis(data_[0]);
