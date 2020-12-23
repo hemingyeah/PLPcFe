@@ -25,6 +25,7 @@ import Page from '@model/Page'
 import { TaskAllotUserSearchModel, TaskTagListSearchModel } from '@model/param/in/Task'
 import { getTaskAllotUserInfoResult, getTaskTagListResult } from '@model/param/out/Task'
 import { MAX_SELECT_USER_COUNT } from '@src/model/const/Number'
+import { MAX_GREATER_THAN__MIN_MESSAGE, REQUIRED_MIN_MESSAGE, REQUIRED_MAX_MESSAGE } from '@src/model/const/Alert'
 import {
   AllotSortedEnum,
   AllotLocationEnum,
@@ -526,7 +527,60 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
     this.selectLabel = value
     // 初始化
     this.initialize()
-}
+  }
+  
+  /**
+   * @description 选择距离变化事件
+   */
+  public handlerLocationChange(value: number): void {
+    LogUtil.succ(LogUtil.Start, this.handlerLocationChange.name)
+    
+    this.selectLocation = value
+    this.initialize()
+  }
+  
+  /**
+   * @description 选择距离其他 事件
+   */
+  public handlerLocationOtherChange() {
+    let { minValue, maxValue } = this.locationOtherData
+    let minValueIsNull = minValue == null
+    let maxValueIsNull = maxValue == null
+    
+    // 效验
+    // @ts-ignore
+    let validated = minValueIsNull || maxValueIsNull || Boolean(maxValue > minValue)
+    this.locationOtherData.isChecked = validated
+    
+    // 最小值提示
+    if (minValueIsNull) {
+      return Platform.alert(REQUIRED_MIN_MESSAGE)
+    }
+    // 最大值提示
+    if (maxValueIsNull) {
+      return Platform.alert(REQUIRED_MAX_MESSAGE)
+    }
+    // 最大值大于最小值提示
+    if (!validated) {
+      return Platform.alert(MAX_GREATER_THAN__MIN_MESSAGE)
+    }
+    // 失焦 ，隐藏select下拉框
+    // @ts-ignore
+    this.$refs.TaskAllotTableLocaionSelect.blur()
+    this.selectLocation = Number(this.locationOptions[this.locationOptions.length - 1].value)
+    
+    this.initialize()
+  }
+  
+  /**
+   * @description 选择用户工作状态事件
+   */
+  public handlerUserStateChange(value: string[]): void {
+    LogUtil.succ(LogUtil.Start, this.handlerUserStateChange.name)
+    
+    this.selectUserState = value
+    this.initialize()
+  }
   
   /**
    * @description 选择团队变化事件
@@ -623,6 +677,33 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
     this.saveDataToStorage(StorageKeyEnum.TaskAllotTableColumns, columns)
   }
   
+  public handlerNumberFormat(value: string): number | null {
+    const NumberReg = /^(([0-9]+)|([0-9]+\.[0-9]{0,2}))$/
+    const DecimalReg = /\./
+    const DecimalLimit = 2
+    const MaxLength = 5
+    
+    // 为空或者正则效验未通过
+    if (value === '') {
+      return null
+    }
+    
+    if (NumberReg.test(value)) {
+      let number = DecimalReg.test(value) ? MaxLength + DecimalLimit  : MaxLength
+      return Number(value.substr(0, number))
+    }
+    
+    let decimalExec = DecimalReg.exec(value)
+    let poorLength = value.length - 1 - (decimalExec?.index || 0)
+    // 小数是否超上限
+    let decimalMoreLimit = decimalExec === null ? false : poorLength > DecimalLimit
+    if (decimalMoreLimit) {
+      return Number(`${value.substr(0, value.length - (poorLength - DecimalLimit))}`)
+    }
+    
+    return null
+  }
+  
   /**
    * @description 初始化 获取用户列表并且初始化地图
   */
@@ -631,7 +712,7 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
     
     // 清空用户列表数据
     this.isMapMode
-      ? this.mapUserPage = new Page({ pageNum: 0, pageSize: 999 })
+      ? this.mapUserPage = new Page({ pageNum: 0, pageSize: 0 })
       : this.tableUserPage = new Page({ pageNum: 0, pageSize: 20 })
     // 抓取用户列表数据
     this.fetchUsers()
@@ -665,6 +746,9 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
       _.isEqual(listParams?.userIds, mapParams?.userIds)
       && _.isEqual(listParams?.tagIds, mapParams?.tagIds)
       && _.isEqual(listParams?.label, mapParams?.label)
+      && _.isEqual(listParams?.states, mapParams?.states)
+      && _.isEqual(listParams?.startDistance, mapParams?.startDistance)
+      && _.isEqual(listParams?.endDistance, mapParams?.endDistance)
       && _.isEqual(listParams?.states, mapParams?.states)
     )
   

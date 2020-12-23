@@ -4,7 +4,7 @@ import UiInput from '@src/component/ui/UiInput/UiInput.tsx'
 import Tag from '@model/entity/Tag/Tag'
 import LoginUser from '@model/entity/LoginUser/LoginUser'
 /* interface */
-import { ElSelectOption } from '@src/modules/task/components/TaskAllotModal/TaskAllotExcutor/TaskAllotUserTable/TaskAllotUserTableInterface'
+import { ElSelectOption, UserState } from '@src/modules/task/components/TaskAllotModal/TaskAllotExcutor/TaskAllotUserTable/TaskAllotUserTableInterface'
 /* methods */
 import TaskAllotExecutorMethods from '@src/modules/task/components/TaskAllotModal/TaskAllotExcutor/TaskAllotExecutorMethods'
 /* model */
@@ -306,13 +306,15 @@ class TaskAllotExecutorRender extends TaskAllotExecutorMethods {
     return (
       <div class='task-allot-user-table-header-select-block'>
         { this.renderTaskAllotUserTableHeaderLabelSelect() }
+        { this.renderTaskAllotUserTableHeaderLocationSelect() }
+        { this.renderTaskAllotUserTableHeaderStateSelect() }
         { this.renderSelectColumn() }
       </div>
     )
   }
   
   /** 
-   * @description 渲染工单指派人员表格头部 select选择
+   * @description 渲染工单指派人员表格头部 标签select选择
   */
   public renderTaskAllotUserTableHeaderLabelSelect() {
     return (
@@ -325,6 +327,110 @@ class TaskAllotExecutorRender extends TaskAllotExecutorMethods {
           this.labelOptions.map((labelOption: ElSelectOption) => {
             return (
               <el-option key={labelOption.value} value={labelOption.value} label={labelOption.label} />
+            )
+          })
+        }
+      </el-select>
+    )
+  }
+  
+  /**
+   * @description 渲染工单指派人员表格头部 位置select选择
+   */
+  public renderTaskAllotUserTableHeaderLocationSelect() {
+    return (
+      <el-select
+        className='task-allot-user-table-location-select'
+        placeholder='请选择距离'
+        ref='TaskAllotTableLocaionSelect'
+        value={this.selectLocation}
+        onInput={(value: number) => this.handlerLocationChange(value)}
+      >
+        {
+          this.locationOptions.map((locationOption: ElSelectOption) => {
+            let isOtherOption = locationOption.label == '其他'
+            return (
+              <el-option
+                class={isOtherOption && 'task-allot-user-table-location-select-other'}
+                key={locationOption.value}
+                value={locationOption.value}
+                label={locationOption.label}
+                disabled={isOtherOption}
+              >
+                {
+                  isOtherOption
+                    ? this.renderLocationOtherOption()
+                    : null
+                }
+              </el-option>
+            )
+          })
+        }
+      </el-select>
+    )
+  }
+  
+  /**
+   * @description 渲染选择位置 其他选项
+  */
+  public renderLocationOtherOption() {
+    const HandlerMinValueChanged = (value: string) => { this.locationOtherData.minValue = this.handlerNumberFormat(value) }
+    const HandlerMaxValueChanged = (value: string) => { this.locationOtherData.maxValue = this.handlerNumberFormat(value) }
+    
+    return (
+      <div>
+        <span>其他</span>
+        <div>
+          <el-input
+            autocomplete="off"
+            class='location-min-input'
+            placeholder='最小值'
+            min={0}
+            max={99999}
+            type='number'
+            value={this.locationOtherData.minValue}
+            onInput={HandlerMinValueChanged}
+          />
+          —
+          <el-input
+            autocomplete="off"
+            class='location-max-input'
+            placeholder='最大值'
+            type='number'
+            min={0}
+            max={99999}
+            value={this.locationOtherData.maxValue}
+            onInput={HandlerMaxValueChanged}
+          />
+          km
+          <el-button type='primary' class='location-confirm-button' onClick={() => this.handlerLocationOtherChange()}>确定</el-button>
+        </div>
+      </div>
+    )
+  }
+  
+  /**
+   * @description 渲染工单指派人员表格头部 工作状态select选择
+   */
+  public renderTaskAllotUserTableHeaderStateSelect() {
+    return (
+      <el-select
+        collapse-tags
+        multiple
+        placeholder="工作状态"
+        value={this.selectUserState}
+        onInput={(value: string[]) => this.handlerUserStateChange(value)}
+      >
+        {
+          this.userStateList.map((userState: UserState) => {
+            return (
+              <el-option key={userState.key} value={userState.value} label={userState.label}>
+                <div class='task-allot-state-select-item'>
+                  <span class='user-state-round' style={{ backgroundColor: this.stateColorMap && this.stateColorMap[userState.label || ''] }}>
+                  </span>
+                  <span>{userState.label}</span>
+                </div>
+              </el-option>
             )
           })
         }

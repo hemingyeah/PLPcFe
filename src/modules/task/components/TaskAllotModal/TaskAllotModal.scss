@@ -212,6 +212,13 @@
       top: 278px;
     }
   }
+  .task-allot-pool {
+    .task-allot-user-content {
+      .base-panel {
+        top: 98px;
+      }
+    }
+  }
   .task-allot-pool-notification {
     top: 126px;
   }
@@ -219,7 +226,7 @@
     height: calc(100% - 175px);
   }
   .task-allot-map {
-    height: calc(100% - 96px);
+    height: calc(100% - 0px);
   }
 }
 /* end new  */

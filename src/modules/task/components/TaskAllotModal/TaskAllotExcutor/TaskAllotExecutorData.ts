@@ -92,6 +92,15 @@ class TaskAllotExecutorData extends TaskAllotExecutorProps {
     { label: '距离最近', value: AllotLabelEnum.DistanceSort },
     { label: '好评率前三', value: AllotLabelEnum.DegreeTopThree }
   ]
+  /* 距离选项列表 */
+  public locationOptions: ElSelectOption[] = [
+    { label: '距离', value: AllotLocationEnum.All },
+    { label: '5公里以内', value: AllotLocationEnum.Five },
+    { label: '10公里以内', value: AllotLocationEnum.Ten },
+    { label: '20公里以内', value: AllotLocationEnum.Twenty },
+    { label: '50公里以内', value: AllotLocationEnum.Fifty },
+    { label: '其他', value: AllotLocationEnum.Other },
+  ]
   /* 地图用户page */
   public mapUserPage: Page =  new Page()
   /* 等待状态 */

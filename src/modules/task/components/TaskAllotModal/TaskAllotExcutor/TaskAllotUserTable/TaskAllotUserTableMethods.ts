@@ -331,33 +331,6 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
     this.TaskAllotExcutorComponent?.outsideUpwardSetSelectedExcutorUser(checked, row)
   }
   
-  public handlerNumberFormat(value: string): number | null {
-    const NumberReg = /^(([0-9]+)|([0-9]+\.[0-9]{0,2}))$/
-    const DecimalReg = /\./
-    const DecimalLimit = 2
-    const MaxLength = 5
-    
-    // 为空或者正则效验未通过
-    if (value === '') {
-      return null
-    }
-    
-    if (NumberReg.test(value)) {
-      let number = DecimalReg.test(value) ? MaxLength + DecimalLimit  : MaxLength
-      return Number(value.substr(0, number))
-    }
-    
-    let decimalExec = DecimalReg.exec(value)
-    let poorLength = value.length - 1 - (decimalExec?.index || 0)
-    // 小数是否超上限
-    let decimalMoreLimit = decimalExec === null ? false : poorLength > DecimalLimit
-    if (decimalMoreLimit) {
-      return Number(`${value.substr(0, value.length - (poorLength - DecimalLimit))}`)
-    }
-    
-    return null
-  }
-  
   /**
    * @description 初始化 获取用户列表并且初始化地图
   */

@@ -7,8 +7,13 @@ import TaskAddress from '@model/entity/TaskAddress'
 /* enum */
 import ComponentNameEnum from '@model/enum/ComponentNameEnum'
 import { TaskAllotTypeModeEnum } from '@src/modules/task/components/TaskAllotModal/TaskAllotModalModel'
+/* interface */
+import { UserState } from '@src/modules/task/components/TaskAllotModal/TaskAllotExcutor/TaskAllotUserTable/TaskAllotUserTableInterface'
+/* types */
+import StateColorMap from '@model/types/StateColor'
 /* util */
 import { findComponentUpward, findComponentDownward } from '@src/util/assist'
+import { getRootWindow } from '@src/util/dom'
 
 class TaskAllotExecutorComputed extends TaskAllotExecutorData {
   
@@ -67,6 +72,22 @@ class TaskAllotExecutorComputed extends TaskAllotExecutorData {
     return this.taskConfig?.reallotRemarkNotNull === true
   }
   
+  /* 根窗口 用户状态对象 */
+  get rootWindowUserStateMap(): StateColorMap {
+    let userStateMap: StateColorMap = {}
+    
+    try {
+      let rootWindow: any = getRootWindow(window)
+      let initData: any = JSON.parse(rootWindow?._init || '{}')
+      userStateMap = initData.userStateMap
+    } catch (error) {
+      userStateMap = {}
+      console.error('TaskAllotUserTableComputed ~ rootWindowUserStateMap ~ error', error)
+    }
+    
+    return userStateMap
+  }
+  
   /**
    * @description 工单客户地址地址 
    * 工单新建后地址信息在taddress里面，新建的信息在address里面
@@ -80,10 +101,23 @@ class TaskAllotExecutorComputed extends TaskAllotExecutorData {
     return findComponentUpward(this, ComponentNameEnum.TaskAllotModal) || {}
   }
   
-  /* 工单派单组件 负责人信息 */
-  get taskAllotModalExcutorUser(): any {
-    return this.TaskAllotModalComponent?.executorUser
+  /* 用户状态 列表 */
+  get userStateList(): UserState[] {
+    let list: UserState[] = []
+    
+    for (let userStateKey in this.rootWindowUserStateMap) {
+      let userState: UserState = {
+        key: userStateKey,
+        value: userStateKey,
+        label: userStateKey,
+        color: this.stateColorMap?.[userStateKey] || ''
+      }
+      list.push(userState)
+    }
+    
+    return list
   }
+  
 }
 
 export default TaskAllotExecutorComputed
