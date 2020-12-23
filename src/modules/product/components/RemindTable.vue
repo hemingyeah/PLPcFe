@@ -43,12 +43,12 @@
 </template>
 
 <script>
-import {formatDate, } from '@src/util/lang';
-import * as CustomerApi from '@src/api/CustomerApi';
-import {deleteScheduler} from '@src/api/CommonApi';
+import {formatDate, } from "@src/util/lang";
+import * as CustomerApi from "@src/api/CustomerApi";
+import {deleteScheduler} from "@src/api/CommonApi";
 
 export default {
-  name: 'remind-table',
+  name: "remind-table",
   props: {
     shareData: {
       type: Object,
@@ -76,16 +76,16 @@ export default {
   },
   mounted() {
     this.fetchData();
-    this.$eventBus.$on('product_remind_table.update_remind_list', this.fetchData);
+    this.$eventBus.$on("product_remind_table.update_remind_list", this.fetchData);
   },
   beforeDestroy() {
-    this.$eventBus.$off('product_remind_table.update_remind_list', this.fetchData);
+    this.$eventBus.$off("product_remind_table.update_remind_list", this.fetchData);
   },
   methods: {
     sortChange({ prop, order, }) {
       this.searchModel.orderDetail = {
         column: prop,
-        sequence: order === 'ascending' ? 'ASC' : 'DESC',
+        sequence: order === "ascending" ? "ASC" : "DESC",
         isSystem: 1,
       };
       this.fetchData();
@@ -98,10 +98,10 @@ export default {
 
         await deleteScheduler(rm.id);
         this.fetchData();
-        this.$eventBus.$emit('product_view_remind_update');
-        this.$eventBus.$emit('product_info_record.update_record_list');
+        this.$eventBus.$emit("product_view_remind_update");
+        this.$eventBus.$emit("product_info_record.update_record_list");
       } catch (e) {
-        console.error('deleteRemind catch err', e);
+        console.error("deleteRemind catch err", e);
       }
     },
     jump(pN) {
@@ -112,8 +112,10 @@ export default {
       const {orderDetail, } = this.searchModel;
       const params = {
         modalId: this.productId,
-        modal: 'product',
+        modal: "product",
       };
+
+      debugger
 
       if (Object.keys(orderDetail).length) {
         params.orderDetail = orderDetail;
@@ -134,34 +136,34 @@ export default {
         })
         .catch(e => {
           this.loading = false;
-          console.error('e', e);
+          console.error("e", e);
         })
     },
     buildColumns() {
       return [{
-        label: '提醒名称',
-        field: 'remind.name',
+        label: "提醒名称",
+        field: "remind.name",
         show: true,
         tooltip: true,
         // sortable: 'custom',
       }, {
-        label: '预计发生时间',
-        field: 'remindTime',
+        label: "预计发生时间",
+        field: "remindTime",
         show: true,
         tooltip: true,
         // sortable: 'custom',
       }, {
-        label: '提醒内容',
-        field: 'remindContent',
+        label: "提醒内容",
+        field: "remindContent",
         show: true,
         tooltip: true,
         // sortable: 'custom',
       }, {
-        label: '操作',
-        field: 'action',
+        label: "操作",
+        field: "action",
         show: true,
         tooltip: false,
-        width: '80px',
+        width: "80px",
       }]
     }
   },
