@@ -42,7 +42,8 @@
     .task-type-list {
       display: flex;
       flex-flow: wrap;
-
+      width: calc(100% + 12px);
+      
       .task-type-item {
         margin: 0 12px 12px 0;
       }

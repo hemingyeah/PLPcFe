@@ -1,7 +1,7 @@
 <template>
   <base-modal
     :show.sync="show"
-    width="980px"
+    width="990px"
     class="creat-card-dialog"
     @closed="onClose"
   >
@@ -10,7 +10,7 @@
     </div>
     <div class="base-modal-content">
       <div class="base-card-heard">
-        <div class="base-card-msg"><i class="el-icon-info"></i> <span> 选择一种附加组件，来管理工单上的辅助性数据，您可以从已经使用的附加组件中选择，也可以直接在模板库中选择一个使用。</span></div>
+        <div class="base-card-msg"><i class="el-icon-warning"></i> <span> 选择一种附加组件，来管理工单上的辅助性数据，您可以从已经使用的附加组件中选择，也可以直接在模板库中选择一个使用。</span></div>
         <div class="radio-type">
           <el-radio v-model="selectRadio" label="exist">从已添加的组件库选择</el-radio>
           <el-radio v-model="selectRadio" label="stock">从模版库中选择</el-radio>
@@ -42,13 +42,13 @@
 
       <!-- start从模版库中选择-->
       <div v-if="selectRadio == 'stock'">
-        <template-library :cardSysList="cardSysList"></template-library>
+        <template-library :cardSysList="cardSysList" @saveImport="saveImport"></template-library>
       </div>
       <!-- start 从模版库中选择-->
     </div>
     <div slot="footer" class="dialog-footer">
       <el-button @click="onClose">取 消</el-button>
-      <el-button type="primary" @click="onSubmit('form')">确 定</el-button>
+      <el-button type="primary" @click="onSubmit">确 定</el-button>
     </div>
   </base-modal>
 </template>
@@ -56,8 +56,11 @@
 // api
 import * as SettingTaskApi from "@src/api/SettingTaskApi";
 import { uniqBy,cloneDeep } from 'lodash';
+//util
+import { isShowCardWorkTime } from '@src/util/version.ts'
 // components
 import templateLibrary from "./templateLibrary";
+
 export default {
   name: "creat-card-dialog",
   props: {
@@ -82,25 +85,36 @@ export default {
     };
   },
   computed: {
-
+    isShowCardWorkTime() {
+      return isShowCardWorkTime()
+    }
   },
   watch: {
     visiable(newValue) {
       this.show = newValue;
       if (newValue) {
+        this.selectRadio = 'exist';
         this.getEnabledListReq();
-        this.initCardSysList()
-       
+        this.initCardSysList();  
       }
     },
   },
   methods: {
+    saveImport(cardSelected){
+      this.$emit('updateImport',cardSelected)
+    },
     onClose() {
       this.$emit("onClose");
     },
-    onSubmit(form) {
-      //新增组件
-      this.saveCardChecked();
+    onSubmit() {
+      if(this.selectRadio == 'exist'){
+        //新增组件
+        this.saveCardChecked();
+      }else{
+        //关闭
+        this.onClose();
+      }
+     
     },
     indexMethod(index) {
       return index+1;
@@ -289,7 +303,7 @@ export default {
         border-radius: 2px;
         border: 1px solid #91D5FF;
         margin-bottom: 21px;
-        .el-icon-info{
+        .el-icon-warning{
           color: $color-primary;
           margin-left: 17px;
         }

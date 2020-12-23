@@ -10,7 +10,7 @@ export const flowRules = [{
         value: 'finish',
         label: '完成'
     }, {
-        value: 'assigned',
+        value: 'allot',
         label: '指派'
     }, {
         value: 'cost',

@@ -31,26 +31,24 @@
     <!--start 附加组件列表 -->
     <div class="card-setting-list" v-if="taskCardList.length > 0">
       <draggable
-        v-model="taskCardList"
         v-bind="dragOptions"
+        v-model="taskCardList"
         tag="div"
         @change="updateTaskCardOrder"
+        class="task-card-group"
       >
-        <transition-group
-          class="task-card-list"
-          type="transition"
-          name="flip-list">
-          <task-card-item
-            class="task-card-item"
-            v-for="(item, idx) in taskCardList"
-            :key="item.id"
-            :taskCard="taskCardList[idx]"
-            :taskTypeId="taskTypeId"
-            @updateAttr="obj => {
-              updateTaskCard(item, obj)
-            }">
-          </task-card-item>
-        </transition-group>
+        <task-card-item
+          class="task-card-item"
+          v-for="(item, idx) in taskCardList"
+          :key="item.id"
+          :index="idx"
+          :taskCard="taskCardList[idx]"
+          :taskTypeId="taskTypeId"
+          @deleteCard="deleteCard"
+          @updateAttr="obj => {
+            updateTaskCard(item, obj)
+          }">
+        </task-card-item>
       </draggable>
     </div>
     <!--end 附加组件列表 -->
@@ -68,6 +66,7 @@
       @onClose="onCloseCreatCard"
       :taskCardList="taskCardList"
       @update="update"
+      @updateImport="updateImport"
     ></creat-card-dialog>
     <!-- end 无数据 -->
   </div>
@@ -99,9 +98,7 @@ export default {
   computed: {
     dragOptions() {
       return {
-        animation: 0,
-        group: "description",
-        disabled: false,
+        animation: 380, 
         ghostClass: "ghost"
       };
     }
@@ -114,12 +111,20 @@ export default {
 
   },
   methods: {
+    //提交数据
+    submit() {
+      this.saveCard();
+    },
     //新建附件组件
     addTaskCard() {
       this.isShowCreatCardModal = true;
     },
     onCloseCreatCard() {
       this.isShowCreatCardModal = false;
+    },
+    deleteCard(index) {
+      this.taskCardList.splice(index,1);
+      this.$message.success("删除成功")
     },
     updateTaskCard(cardList, updateObj) {
       for (const key in updateObj) {
@@ -176,25 +181,39 @@ export default {
       this.onCloseCreatCard();
     },
 
+    //从模版库中选择更新数据
+    updateImport(newCard){
+      let newTaskCard = Object.assign(newCard,{notNullFlow: null,stateCanEdit: null,authInfo:this.authInfo});
+      this.taskCardList.push(newTaskCard);
+      this.onCloseCreatCard();
+    },
+
     //工单类型附加组件排序 order重新排序
     updateTaskCardOrder(data){
       this.taskCardList.forEach((item, idx) => {
         item.order = idx +1;
       })
-      let cardSetting = {};
-      cardSetting.cardInfo = this.taskCardList
-      // this.sortCard(cardSetting)
     },
-    
-    //排序 
-    sortCard(cardSetting) {
-      let params = {
-          id: this.taskTypeId,
-          cardSetting: cardSetting
+
+    //保存修改
+    saveCard() {
+       const params = {
+        taskTypeId: this.taskTypeId,
+        cardInfo: this.taskCardList
       }
-      SettingTaskApi.saveTaskCardOrder(params).then(res=>{
+      SettingTaskApi.batchSaveTaskCard(params).then(res=>{
         const { status, message, result } = res;
         if(status == 0){
+          this.$message.success('保存成功');
+          setTimeout(()=>{
+            this.$platform.openTab({
+              id: "task_flow_setting",
+              title: "工单流程设置",
+              url: `/setting/taskType/manage`,
+              reload: true,
+            });
+          },1000)
+
         }else{
           this.$message.error(message);
         }
@@ -202,6 +221,7 @@ export default {
         console.log(error)
       })
     },
+    
     /**
      * 获取工单设置的除组件外的其他信息
      */
@@ -261,7 +281,7 @@ export default {
   }
   .card-setting-list{
     margin: 12px;
-    .task-card-list{
+    .task-card-group{
       display: flex;
       flex-flow: wrap;
       min-height: 300px;

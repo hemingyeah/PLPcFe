@@ -7,25 +7,31 @@
     <!--end tabs选项 -->
 
     <!--start 组件库列表 -->
-    <div class="tabs-card-item" >
-        <el-card class="tabs-card-box" shadow="hover" v-for="carditem in cardSysList[tabIndex].list" :key="carditem.cardId" >
+    <div class="tabs-card-item" v-if="cardSysList.length>0">
+        <el-card class="tabs-card-box" shadow="hover" v-for="cardItem in cardSysList[tabIndex].list" :key="cardItem.cardId" >
             <div  class="tabs-card-li">
                 <div class="task-card-inforn"> 
-                    <h2 class="task-card-name">{{carditem.cardName}}<span class="task-card-angle">{{carditem.type}}</span></h2>                                       
-                    <p class="task-card-des">{{carditem.description}}</p>
+                    <h2 class="task-card-name">{{cardItem.cardName}}<span class="task-card-angle">{{cardItem.type}}</span></h2>                                       
+                    <p class="task-card-des">{{cardItem.description}}</p>
                 </div>
                 <div class="task-card-fields">
                     <p>包含字段：</p>
-                    <p class="fields-list">{{carditem.fields}}</p>
+                    <p class="fields-list">{{cardItem.fields}}</p>
                 </div>
                 <div class="task-card-footer">
+                  <template v-if="cardItem.type!=='工时'">
                     <el-tooltip class="item" effect="dark" content="每个工单中填写一组该数据" placement="top">
-                      <el-button type="primary" @click="importcard(carditem.cardId,'single')">添加为单次</el-button>
+                      <el-button type="primary" @click="importcard(cardItem,'single')">添加为单次</el-button>
                     </el-tooltip>
                     <el-tooltip class="item" effect="dark" content="每个工单中填写多组该数据" placement="top">
-                      <el-button type="primary" @click="importcard(carditem.cardId,'multiple')">添加为多次</el-button>
+                      <el-button type="primary" @click="importcard(cardItem,'multiple')">添加为多次</el-button>
                     </el-tooltip>
-                   
+                  </template>
+                  <template v-else>
+                    <el-tooltip class="item" effect="dark" content="每个工单中填写多组该数据" placement="top">
+                      <el-button type="primary" @click="importcard(cardItem,'multiple')">添加</el-button>
+                    </el-tooltip>
+                  </template>
                 </div>
 
             </div>
@@ -50,23 +56,36 @@ export default {
       tabIndex:0,
     };
   },
+  mounted() {
+    console.log(this.cardSysList)
+  },
   methods: {
     onTabsCard(index){
       this.tabIndex = index;
     },
     //添加为单次/多次
-    importcard(cid,inputType) {
-        SettingTaskApi.cardImport({cardId:cid,inputType:inputType}).then(res=>{
+    importcard(cardItem,inputType) {
+      console.log(cardItem)
+      SettingTaskApi.cardImport({cardId:cardItem.cardId,inputType:inputType}).then(res=>{
         const { status, message, data } = res;
         if(status==0){
-            this.$message.success('附加组件添加成功，可通过「编辑」功能更改系统默认配置');
-            location.reload()
-        }else{
-            this.$message.error(message);
-        }
-      }).catch(error=>{
+          this.$message.success('添加成功');
+          let cardSelected = {};
+          cardSelected.inputType = inputType;
+          cardSelected.name = cardItem.cardName;
+          cardSelected.specialfrom = cardItem.type=='工时' ? '工时记录' :'';
+          cardSelected.id = data;
+          console.log(444,cardSelected)
+          this.$emit('saveImport',cardSelected)
 
-      })
+
+          
+        }else{
+            this.$message.warning(message);
+        }
+    }).catch(error=>{
+
+    })
     }
   },
 };
@@ -78,12 +97,13 @@ export default {
     justify-content: flex-start;
     padding-inline-start: 0;
     li {
-      width: 108px;
+      width: 97px;
       height: 50px;
-      line-height: 50px;
-      background: #ffffff;
-      box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.08);
+      background: #FFFFFF;
+      box-shadow: 0px 2px 4px 0px rgba(0,0,0,0.08);
       border-radius: 4px;
+      border: 1px solid #F2F2F2;
+      line-height: 50px;
       list-style: none;
       font-size: 16px;
       text-align: center;
@@ -99,12 +119,20 @@ export default {
   .tabs-card-item{
     display: flex;
     flex-flow: wrap;
-    justify-content: space-between;
+    justify-content: flex-start;
+
     .tabs-card-box{
         width: 463px;
         margin-bottom: 12px;
+        margin-right: 12px;
+        box-shadow: 0px 4px 10px 0px rgba(0, 0, 0, 0.04); 
+        &:hover{
+            box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.12);
+        }
+        &:nth-child(2n) {
+            margin-right: 0;
+        }
         .task-card-inforn{
-            width: 257px;
             .task-card-name{  
                 margin-bottom: 0;
                 @include text-ellipsis;
@@ -132,7 +160,7 @@ export default {
                 color: #666666;
                 line-height: 17px;
                 margin-top: 8px;
-                height: 34px;
+                // height: 34px;
                 @include text-ellipsis-2; 
                 cursor: pointer;
                 margin-block-end: 0em;

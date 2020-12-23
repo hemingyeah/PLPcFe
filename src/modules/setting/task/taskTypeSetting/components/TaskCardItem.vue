@@ -1,5 +1,5 @@
 <template>
-    <el-card class="task-card" :body-style="{padding: '0px', height: '100%'}" shadow="hover">
+    <div class="task-card" :body-style="{padding: '0px', height: '100%'}" shadow="hover">
         <el-row class="task-card-main" type="flex" justify="space-between">
             <el-row type="flex">
                 <el-row class="task-card-content" type="flex">
@@ -41,7 +41,6 @@
             :taskTypeId="taskTypeId"
             :visiable.sync="isShowRulesModal"
             @onClose="onCloseRules"
-            @udateCard="udateCard"
             @update="updateRulesList"/>
         <!-- end 设置使用规则 -->
 
@@ -51,10 +50,9 @@
             :taskTypeId="taskTypeId"
             :visiable.sync="isShowEditpermissModal"
             @onClose="onCloseEditpermiss"
-            @udateCardRoles="udateCardRoles"
             @update="updateRolesList"/>
         <!-- end 设置使用权限 -->
-    </el-card>
+    </div>
 </template>
 
 <script>
@@ -72,6 +70,9 @@ export default {
         taskCard: {
             type: Object,
             default: () => {}
+        },
+        index: {
+            type: Number   
         },
         taskTypeId: {
             type: String,
@@ -91,22 +92,9 @@ export default {
                 cancelButtonText: '取消',
                 type: 'warning',
             }).then(() => {
-                const params = {
-                    typeId: this.taskTypeId,
-                    cardId: this.taskCard.id
-                }
-                SettingTaskApi.deleteTaskCard(params).then(res=>{
-                    const { status, message, data } = res;
-                    if(status == 0){
-                        this.$message.success('删除成功');
-                        this.$emit('deleteCard')
-                        
-                    }else{
-                        this.$message.error(message);
-                    }
-                }).catch(error=>{
-                    console.log(error)
-                })
+                console.log(this.taskCard)
+                this.$emit('deleteCard',this.index)
+
             });
         },
         //设置使用规则
@@ -115,17 +103,6 @@ export default {
         },
         onCloseRules() {
             this.isShowRulesModal = false;
-        },
-        udateCard() {
-            this.$emit('udateCard');
-            this.isShowRulesModal = false;
-           
-        },
-        //更新卡片
-        udateCardRoles(value) {
-            this.taskCard.authInfo = value;
-            this.isShowEditpermissModal = false;
-            console.log(this.taskCard)
         },
         //编辑权限
         onSetEditpermiss() {

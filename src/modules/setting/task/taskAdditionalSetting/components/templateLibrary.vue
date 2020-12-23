@@ -8,29 +8,34 @@
 
     <!--start 组件库列表 -->
     <div class="tabs-card-item" >
-        <el-card class="tabs-card-box" shadow="hover" v-for="carditem in cardSysList[tabIndex].list" :key="carditem.cardId" >
-            <div  class="tabs-card-li">
-                <div class="task-card-inforn"> 
-                    <h2 class="task-card-name">{{carditem.cardName}}<span class="task-card-angle">{{carditem.type}}</span></h2>                                       
-                    <p class="task-card-des">{{carditem.description}}</p>
-                </div>
-                <div class="task-card-fields">
-                    <p>包含字段：</p>
-                    <p class="fields-list">{{carditem.fields}}</p>
-                </div>
-                <div class="task-card-footer">
-                    <el-button type="primary" plain class="preview">预览</el-button>
-                    <el-tooltip class="item" effect="dark" content="每个工单中填写一组该数据" placement="top">
-                      <el-button type="primary" @click="importcard(carditem.cardId,'single')">添加为单次</el-button>
-                    </el-tooltip>
-                    <el-tooltip class="item" effect="dark" content="每个工单中填写多组该数据" placement="top">
-                      <el-button type="primary" @click="importcard(carditem.cardId,'multiple')">添加为多次</el-button>
-                    </el-tooltip>
-                   
-                </div>
-
+      <el-card class="tabs-card-box" v-for="cardItem in cardSysList[tabIndex].list" :key="cardItem.cardId" >
+          <div  class="tabs-card-li">
+            <div class="task-card-inforn"> 
+                <h2 class="task-card-name">{{cardItem.cardName}}<span class="task-card-angle">{{cardItem.type}}</span></h2>                                       
+                <p class="task-card-des">{{cardItem.description}}</p>
             </div>
-        </el-card>
+            <div class="task-card-fields">
+                <p>包含字段：</p>
+                <p class="fields-list">{{cardItem.fields}}</p>
+            </div>
+            <div class="task-card-footer">
+              <template v-if="cardItem.type!=='工时'">
+                <el-button type="primary" plain class="preview">预览</el-button>
+                <el-tooltip class="item" effect="dark" content="每个工单中填写一组该数据" placement="top">
+                  <el-button type="primary" @click="importcard(cardItem.cardId,'single')">添加为单次</el-button>
+                </el-tooltip>
+                <el-tooltip class="item" effect="dark" content="每个工单中填写多组该数据" placement="top">
+                  <el-button type="primary" @click="importcard(cardItem.cardId,'multiple')">添加为多次</el-button>
+                </el-tooltip>  
+              </template>   
+              <template v-else>
+                <el-tooltip class="item" effect="dark" content="每个工单中填写多组该数据" placement="top">
+                  <el-button type="primary" @click="importcard(cardItem.cardId,'multiple')">添加</el-button>
+                </el-tooltip>
+              </template>
+            </div>
+          </div>
+      </el-card>
     </div>
     <!--end  组件库列表 -->
 
@@ -61,9 +66,11 @@ export default {
         const { status, message, data } = res;
         if(status==0){
             this.$message.success('附加组件添加成功，可通过「编辑」功能更改系统默认配置');
-            location.reload()
+            setTimeout(()=>{
+              location.reload()
+            },1000)
         }else{
-            this.$message.error(message);
+            this.$message.warning(message);
         }
       }).catch(error=>{
 
@@ -104,6 +111,10 @@ export default {
         width: 530px;
         margin-right: 12px;
         margin-bottom: 12px;
+        box-shadow: 0px 4px 10px 0px rgba(0, 0, 0, 0.04); 
+        &:hover{
+            box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.12);
+        }
         .task-card-inforn{
             width: 257px;
             .task-card-name{  

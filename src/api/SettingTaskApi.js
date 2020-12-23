@@ -154,4 +154,12 @@ export function getEnabledList(params) {
   return http.get('/setting/task/card/getEnabledList', params)
 }
 
+/**
+ * @description 组件设置页批量保存 
+ * @param {Object} params -- 参数对象
+ */
+export function batchSaveTaskCard(params) {
+  return http.post('/setting/taskType/batchSaveTaskCard', params)
+}
+
 /* ------------- end 工单类型组件设置 ---------------- */
