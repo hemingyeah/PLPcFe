@@ -38,7 +38,7 @@ export default {
     },
     successCallback: {
       type: Function,
-      default: () => {
+      default() {
         window.location.href = `/task/view/${this.task.id}`
       }
     }
