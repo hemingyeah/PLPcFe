@@ -146,7 +146,7 @@ export default {
       // 取消是否需要审批
       const result = await TaskApi.offApproveCheck(this.buildParams());
       if (!result.succ && result.message == '需要审批') {
-        this.$emit('proposeApprove', result.data);
+        this.$emit('proposeApprove', {data: result.data, customReason: checkBack});
         this.visible = false;
         this.pending = false;
         return;

@@ -681,7 +681,7 @@
                     >
                       审批中
                     </span>
-                    <!-- 超时 -->
+                    <!-- 异常标签 -->
                     <span
                       class="task-state-block task-state-block-overtime task-font12"
                       :class="{'task-state-block-approve': v === '转派' || v === '回退', 'task-state-block-ff': v === '曾暂停' || v === '曾超时' || v === '曾拒绝'}"
@@ -692,7 +692,7 @@
                       {{v}}
                     </span>
 
-                    <!-- 暂停 -->
+                    
 
                     <el-tooltip
                       v-if="abnormalHover(scope.row).length > 3"

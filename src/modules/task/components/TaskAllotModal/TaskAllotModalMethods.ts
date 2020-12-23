@@ -179,6 +179,7 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
   public buildReAllotParams(): AllotExcutorParams {
     let reAllotParams = this.buildAllotExcutorParams()
     reAllotParams.reason = this.reason
+    reAllotParams.customReason = this.customReason
     
     return reAllotParams
   }
@@ -734,7 +735,7 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
   */
   public showApproveDialog(data: TaskApprove) {
     // @ts-ignore
-    this.$refs.ApproveDialog && this.$refs.ApproveDialog.openDialog(data)
+    this.$refs.ApproveDialog && this.$refs.ApproveDialog.openDialog(data, {customReason: this.customReason})
   }
   
   /** 

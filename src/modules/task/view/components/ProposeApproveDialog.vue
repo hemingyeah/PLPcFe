@@ -64,11 +64,10 @@ export default {
     }
   },
   methods: {
-    openDialog(data) {
+    openDialog(data, customReason) {
       // 重置
       this.approver = {};
       this.apprForm = { source: 'task' };
-      this.apprForm.params = data;
       this.apprForm.applyRemark = '';
       this.chooseApprover = false;
 
@@ -77,6 +76,16 @@ export default {
       } else {
         this.approversName = data.approversName;
       }
+
+      if (customReason) {
+        if (data.contentJson) {
+          data.contentJson['customReason'] = customReason.customReason
+        } else {
+          data['contentJson'] = customReason
+        }
+      }
+
+      this.apprForm.params = data;
 
       this.visible = true;
     },

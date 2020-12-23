@@ -779,6 +779,11 @@ export default {
         this.pending = false;
       })
     },
+    // 取消
+    cancelModel(item) {
+      const {data, customReason} = item
+      this.proposeApprove(data, {customReason});
+    },
     // 暂停工单
     async pause() {
       if (this.pending) return;
@@ -797,7 +802,7 @@ export default {
       const result = await TaskApi.pauseApproveCheck({ id: taskId, reason });
       if (!result.succ && result.message == "需要审批") {
         this.pauseDialog.visible = false;
-        this.proposeApprove(result.data);
+        this.proposeApprove(result.data, {customReason: checkBack});
         this.pending = false;
         return;
       }
@@ -1008,8 +1013,8 @@ export default {
       }
     },
     // 发起审批
-    proposeApprove(data) {
-      this.$refs.proposeApprove.openDialog(data);
+    proposeApprove(data, customReason = '') {
+      this.$refs.proposeApprove.openDialog(data, customReason);
     },
     changeTaskProcessState(state) {
       this.taskState = state;

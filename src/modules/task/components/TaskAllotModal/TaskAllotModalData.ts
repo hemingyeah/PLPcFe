@@ -38,7 +38,7 @@ class TaskAllotModalData extends TaskAllotModalProps {
   /* 转派选择 */
   public transferList: Array<string> = ['1','2','3']
   /* 转派选择的原因 */
-  public transfer: string = ''
+  public customReason: string = ''
   /* 是否显示派单弹窗 */
   public showTaskAllotModal: boolean = false
   /* 协同人列表 */

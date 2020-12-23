@@ -361,7 +361,7 @@
     <!-- end 拒绝工单弹窗 -->
 
     <!-- start 取消工单弹窗 -->
-    <cancel-task-dialog ref="cancelTaskDialog" :task-id="task.id" @proposeApprove="proposeApprove" :back-list="backList" :system-admin="systemAdmin" />
+    <cancel-task-dialog ref="cancelTaskDialog" :task-id="task.id" @proposeApprove="cancelModel" :back-list="backList" :system-admin="systemAdmin" />
     <!-- end 取消工单弹窗 -->
 
     <!-- start 计划时间弹窗 -->
