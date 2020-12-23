@@ -173,7 +173,7 @@
               <li>
                 <span>联系电话</span>
                 <p>
-                  {{comData && comData.adminPhone}}
+                  {{comData && comData.cellPhone}}
                   <i class="iconfont icon-dianhua2"></i>
                 </p>
               </li>
