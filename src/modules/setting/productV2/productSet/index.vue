@@ -358,7 +358,7 @@ import {
   queryAllRules,
   removeDistributeRule,
   moveRule,
-  modifyDistributeRule,
+  modifyDistributeRuleState,
   saveFunc,
   queryCSByCondition,
   addDistributeRule,
@@ -693,7 +693,7 @@ export default {
           if(this.openType=='add'){
             this.addDistributeRule(params);
           }else{
-            this.modifyDistributeRule(params);
+            this.modifyDistributeRuleState(params);
           }
         }
       });
@@ -715,9 +715,9 @@ export default {
       }
     },
     // 编辑保存
-    async modifyDistributeRule(params){
+    async modifyDistributeRuleState(params){
       this.pending=true;
-      let res=await modifyDistributeRule(params);
+      let res=await modifyDistributeRuleState(params);
       this.pending=false;
       if(res.code==200){
         this.dialogVisible=false;
@@ -899,7 +899,7 @@ export default {
         id: row.id,
         enabled: enabled ? 1 : 0,
       };
-      let res = await modifyDistributeRule(params);
+      let res = await modifyDistributeRuleState(params);
       if (res.code !== "200") {
         this.$platform.alert(res.msg);
       }
