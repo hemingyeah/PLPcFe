@@ -159,8 +159,8 @@
 // api
 import * as TaskApi from '@src/api/TaskApi.ts';
 // components 
-import SystemTemplateDialog from "../../components/SystemTemplateDialog";
-import TemplateUploadDialog from "../../components/TemplateUploadDialog";
+import SystemTemplateDialog from "../components/SystemTemplateDialog";
+import TemplateUploadDialog from "../components/TemplateUploadDialog";
 
 export default {
     name: 'other-setting-panel',

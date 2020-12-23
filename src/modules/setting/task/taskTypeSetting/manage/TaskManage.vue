@@ -46,8 +46,8 @@ import * as SettingApi from "@src/api/SettingApi";
 
 /** component */
 import TaskNavBar from '../../components/TaskNavBar.vue';
-import TaskTypeItem from '../components/TaskTypeItem.vue';
-import AddTaskTypeDialog from '../components/AddTaskTypeDialog';
+import TaskTypeItem from './components/TaskTypeItem.vue';
+import AddTaskTypeDialog from './components/AddTaskTypeDialog';
 
 export default {
   name: 'task-manage',

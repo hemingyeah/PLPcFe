@@ -50,7 +50,7 @@ import _ from "lodash";
 import * as SettingApi from "@src/api/SettingApi";
 
 /** component */
-import ChooseTeamDialog from '../components/ChooseTeamDialog.vue';
+import ChooseTeamDialog from './ChooseTeamDialog.vue';
 
 export default {
     name: 'task-type-item',

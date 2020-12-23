@@ -79,9 +79,9 @@ import { parse } from '@src/util/querystring';
 import * as TaskApi from '@src/api/TaskApi.ts';
 import * as SettingTaskApi from "@src/api/SettingTaskApi";
 /** component */
-import TaskCardItem from '../../components/TaskCardItem';
+import TaskCardItem from '../components/TaskCardItem';
 import NoDataViewNew from '@src/component/common/NoDataViewNew';
-import CreatCardDialog from '../../components/TaskCard/CreatCardDialog';
+import CreatCardDialog from '../components/TaskCard/CreatCardDialog';
 import { cloneDeep } from 'lodash';
 
 export default {

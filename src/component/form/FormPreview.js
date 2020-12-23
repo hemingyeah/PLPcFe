@@ -29,7 +29,7 @@ const FormPreview = {
     render(h) {
         return (
             <div class="form-design-main">
-                <div class="form-design-center" style="position: relative">
+                <div class="form-design-center" style="position: relative; min-height: 420px">
                     <div class='form-design-phone'>
                         <div style="pointer-events: none;margin-bottom: 40px">
                             { this.renderPreviewList(h) }

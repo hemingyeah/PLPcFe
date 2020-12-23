@@ -44,6 +44,7 @@
 </template>
 
 <script>
+import * as SettingApi from "@src/api/SettingApi";
 
 let industryNames = ['全部','设备','IT服务','家居建材','电商','机械','上门服务','公共服务','其他'];
 let iconMap = {
@@ -109,7 +110,6 @@ let iconMap = {
     }
 }
 
-import * as SettingApi from "@src/api/SettingApi";
 export default {
     name: 'choose-trade-dialog',
     props: {

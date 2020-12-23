@@ -39,7 +39,7 @@ import _ from "lodash";
 /** api */
 import * as SettingApi from "@src/api/SettingApi";
 /** components */
-import FlowSetting from '../../components/FlowSetting.vue';
+import FlowSetting from '../components/FlowSetting.vue';
 
 import flowMap from "../flowMap";
 export default {
