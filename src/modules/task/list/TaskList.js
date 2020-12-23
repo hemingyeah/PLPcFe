@@ -292,6 +292,15 @@ export default {
     }
   },
   mounted() {
+
+    // 
+    if (localStorage.getItem('task_list')) {
+      if (JSON.parse(localStorage.getItem('task_list')).columnStatus && !Array.isArray(JSON.parse(localStorage.getItem('task_list')).columnStatus)) {
+        localStorage.clear()
+      }
+      // this.params.pageSize = JSON.parse(localStorage.getItem('task_list')).pageSize
+    }
+
     const that = this
     console.log("taskView", this.initData);
     this.taskTypes = [...this.taskTypes, ...this.taskTypeList];
@@ -782,11 +791,10 @@ export default {
       this.otherText = "自定义筛选视图";
       this.selectColumnState = title;
       this.searchParams = searchModel
-      this.selectId = "all"
       this.searchParams_spare = searchModel
       this.params = this.initParams(this.params.pageSize);
-      this.search(searchModel);
       this.buildColumns();
+      this.createPerspective({id: this.selectId})
       // 埋点
       window.TDAPP.onEvent(`pc：工单列表-${name}`);
     },
@@ -815,6 +823,8 @@ export default {
           taskPool,
           finished,
           costed,
+          offed,
+          closed,
         } = res.result;
         this.filterData = {
           allocated,
@@ -831,7 +841,9 @@ export default {
             + this._number(created)
             + this._number(refused)
             + this._number(finished)
-            + this._number(costed),
+            + this._number(costed)
+            + this._number(closed)
+            + this._number(offed),
           unfinished:
             this._number(created)
             + this._number(refused)
@@ -1012,14 +1024,15 @@ export default {
         paymentConfig
       } = this.initData;
 
-      let columnStatus = [];
-      if (localStorageData.columnStatus) {
-        for (let key in localStorageData.columnStatus) {
-          if (key === this.selectColumnState) {
-            columnStatus = localStorageData.columnStatus[key];
-          }
-        }
-      }
+      let columnStatus = localStorageData.columnStatus || [];
+
+      // if (localStorageData.columnStatus) {
+      //   for (let key in localStorageData.columnStatus) {
+      //     if (key === this.selectColumnState) {
+      //       columnStatus = localStorageData.columnStatus[key];
+      //     }
+      //   }
+      // }
       let localColumns = columnStatus
         .map((i) => (typeof i == "string" ? { field: i, show: true } : i))
         .reduce((acc, col, currentIndex) => {
@@ -2775,14 +2788,10 @@ export default {
       }));
 
       if (localStorageData.columnStatus) {
-        localStorageData.columnStatus[
-          `${this.selectColumnState}`
-        ] = columnsList;
+        localStorageData.columnStatus =  columnsList;
         columnsStatus = localStorageData.columnStatus;
       } else {
-        columnsStatus = {
-          [`${this.selectColumnState}`]: columnsList,
-        };
+        columnsStatus = columnsList;
       }
 
       this.saveDataToStorage("columnStatus", columnsStatus);

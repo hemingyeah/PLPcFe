@@ -1,7 +1,7 @@
 <script>
 /* api */
 import * as TaskApi from "@src/api/TaskApi.ts";
-import * as CustomerApi from "@src/api/CustomerApi.ts";
+import * as CustomerApi from "@src/api/CustomerApi";
 
 /* utils */
 import _ from "lodash";
@@ -116,6 +116,10 @@ export default {
 
       if (MultiFieldNames.indexOf(field.fieldName) > -1) {
         f.setting.isMulti = true;
+      }
+
+      if (field.formType === 'select' && !field.isSystem) {
+        f.setting.isMulti = false;
       }
 
       let childComp = null;
