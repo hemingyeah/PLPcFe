@@ -54,7 +54,7 @@ const catalogFieldFix = [
     displayName: "创建人",
     fieldName: "createUser",
     formType: "user",
-    // returnData: "name",  参数保留等待表单优化支持模糊查询
+    returnData: "name", // 参数保留等待表单优化支持模糊查询
     noClearable: false,
     isNull: 1,
     isSystem: 1,

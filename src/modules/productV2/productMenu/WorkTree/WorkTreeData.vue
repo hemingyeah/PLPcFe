@@ -13,9 +13,20 @@
         </div>
       </template>
       <div v-show="propData.canEditConData && propData.conData">
-        <div class="normal-title-1">
+        <div class="normal-title-1 ">
           <div class="flex-1">编辑类型详细信息</div>
           <el-button @click="showDialog('cloneMenu')">复制其他产品类型</el-button>
+          <div class="flex-x mar-l-10"
+               v-if="propData.conData == 1">
+
+            <el-button class=""
+                       type="primary"
+                       :loading="btnLoading"
+                       @click="submit">保存</el-button>
+            <el-button type="danger"
+                       :loading="btnLoading"
+                       @click="deletInfo">删除</el-button>
+          </div>
         </div>
 
         <form-builder ref="form"
@@ -167,16 +178,6 @@
     </el-form> -->
         </form-builder>
       </div>
-    </div>
-    <div class="bottom-btns"
-         v-if="propData.conData == 1">
-      <el-button type="danger"
-                 :loading="btnLoading"
-                 @click="deletInfo">删除</el-button>
-      <el-button class="mar-l-8"
-                 type="primary"
-                 :loading="btnLoading"
-                 @click="submit">保存</el-button>
     </div>
   </div>
 </template>
@@ -615,6 +616,11 @@ export default {
     padding: 0 10px;
     font-size: 16px;
     border-bottom: 1px solid $color-border-l1;
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0;
+    z-index: 99;
+    background: #fff;
   }
   .normal-title-2 {
     @include title-class();
@@ -631,14 +637,14 @@ export default {
     margin-bottom: 24px;
   }
 }
-.bottom-btns {
-  height: 64px;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  padding: 0 16px;
-  border-top: 1px solid $color-border-l1;
-}
+// .bottom-btns {
+//   height: 64px;
+//   display: flex;
+//   align-items: center;
+//   justify-content: flex-end;
+//   padding: 0 16px;
+//   border-top: 1px solid $color-border-l1;
+// }
 </style>
 <style lang="scss">
 .el-form-item__label {

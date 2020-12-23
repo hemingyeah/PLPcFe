@@ -9,7 +9,7 @@
             <div style="position: relative;"></div>
 
             <el-input v-model="searchModel.keyWord"
-                      placeholder="根据产品类型信息搜索"
+                      placeholder="请输入产品类型 名称/分级/编号 进行搜索"
                       class="task-with-input task-ml12">
             </el-input>
 
@@ -1374,6 +1374,10 @@ body {
 }
 
 // table
+
+.el-table{
+  border:none;
+}
 .product-list-container .product-table {
   padding: 10px;
 

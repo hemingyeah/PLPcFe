@@ -479,7 +479,7 @@ export default {
       }
     }
     .draggable-data-btn {
-      height: 48px;
+      height: 56px;
       justify-content: space-between;
       background: #fafafa;
       padding: 0 12px;

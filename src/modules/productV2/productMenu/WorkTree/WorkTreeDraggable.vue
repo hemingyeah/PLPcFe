@@ -56,7 +56,7 @@
                  :class="{'color-primary': el.popoverVisible}"></i>
             </el-popover>
 
-            <i class="iconfont icon-tuozhuaipaixu handle can-move mar-l-8"></i>
+            <!-- <i class="iconfont icon-tuozhuaipaixu handle can-move mar-l-8"></i> -->
           </div>
         </div>
 
