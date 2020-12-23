@@ -365,7 +365,6 @@ class TaskAllotUserTableMethods extends TaskAllotUserTableComputed {
     LogUtil.succ(LogUtil.Start, this.initialize.name)
     
     this.userPage = new Page({ pageNum: 0 })
-    this.isDisableLoadmore = false
     this.changePending && this.changePending(true)
     
     this.fetchUsers()
