@@ -188,6 +188,8 @@ import Uploader from "packages/BaseUpload/uploader";
 import NoDataView from "@src/component/common/NoDataViewNew";
 import fields from "./fiedls";
 
+import * as FormUtil from "@src/component/form/util"
+
 import {
   getProductMenuField,
   getPageInfo,
@@ -514,6 +516,8 @@ export default {
           res.result.catalogInfo.productExplain = res.result.catalogInfo.productExplain || [];
           res.result.catalogInfo.thumbnail = res.result.catalogInfo.thumbnail || [];
           res.result.catalogInfo = { ...res.result.catalogInfo, ...res.result.catalogInfo.attribute }
+          // let form = util.packToForm(this.fields, {}, this.initData.customerAddress);
+          this.form = FormUtil.initialize(this.fields, res.result.catalogInfo);
           this.$set(this, "productMenuValue", res.result.catalogInfo);
 
           if (res.result.selectField) {
