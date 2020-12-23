@@ -7,6 +7,7 @@
                 class="batch-editing-customer-dialog">
       <div class="preview-video-box">
         <video class="preview-video"
+               v-if="visible"
                :src="url"
                controls="controls"
                autoplay="autoplay">

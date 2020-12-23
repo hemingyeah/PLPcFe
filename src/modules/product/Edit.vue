@@ -75,10 +75,10 @@ export default {
     try {
       // 获取产品自定义字段
       let res = await getProductFields({isFromSetting: true});
-      this.dynamicProductFields = res.data.filter(item=>{
+      this.dynamicProductFields = res.data.filter(item =>
         // 过滤新的产品类型
-        item.formType == "related_catalog"
-      }) || [];
+        item.formType != "related_catalog"
+      ) || [];
     } catch (e) {
       console.error("product-add_edit fetch product fields error", e);
     }
