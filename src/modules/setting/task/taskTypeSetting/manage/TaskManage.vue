@@ -14,26 +14,22 @@
       <draggable
         v-model="taskTypeList"
         v-bind="dragOptions"
+        class="task-type-list"
         tag="div"
         @change="updateTaskTypeOrder"
       >
-        <transition-group
-          class="task-type-list"
-          type="transition"
-          name="flip-list">
-          <task-type-item
-            class="task-type-item"
-            v-for="(item, idx) in taskTypeList"
-            :key="item.id"
-            :task-type="taskTypeList[idx]"
-            :type-num="enableTypeNum"
-            :max-type-num="maxTypeNum"
-            @update="fetchTaskTypeList"
-            @updateAttr="obj => {
-              updateTaskType(item, obj)
-            }">
-          </task-type-item>
-        </transition-group>
+        <task-type-item
+          class="task-type-item"
+          v-for="(item, idx) in taskTypeList"
+          :key="item.id"
+          :task-type="taskTypeList[idx]"
+          :type-num="enableTypeNum"
+          :max-type-num="maxTypeNum"
+          @update="fetchTaskTypeList"
+          @updateAttr="obj => {
+            updateTaskType(item, obj)
+          }">
+        </task-type-item>
       </draggable>
     </div>
 
@@ -67,9 +63,7 @@ export default {
   computed: {
     dragOptions() {
       return {
-        animation: 0,
-        group: "description",
-        disabled: false,
+        animation: 380,
         ghostClass: "ghost"
       };
     },
@@ -186,7 +180,6 @@ export default {
 .flip-list-move {
   transition: transform 0.5s;
 }
-
 .ghost {
   opacity: 0.5;
   background: #c8ebfb;

@@ -196,7 +196,7 @@ export default {
                         this.pedding = true;
                         SettingApi.importTaskType(this.form).then(res => {
                             if(res.status == 0){
-                            window.location.href = "/setting/task/taskFormSet?taskTypeId="+res.data+"&new=true";
+                                window.location.href = "/setting/task/taskFormSet?taskTypeId="+res.data+"&new=true";
                             }else{
                                 this.$message.error(res.message);
                             }
