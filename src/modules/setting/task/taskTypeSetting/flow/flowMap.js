@@ -52,7 +52,6 @@ const FLOW_MAP = {
     },
 }
 
-// todo_zr: 相关审批设置还没有定义
 // 初始化流程设置的配置
 let defaultFlowSetting = {
     isOpen: false, // 是否启用

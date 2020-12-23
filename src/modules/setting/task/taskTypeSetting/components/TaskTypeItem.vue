@@ -1,5 +1,5 @@
 <template>
-    <el-card class="task-type" :body-style="{padding: '0px', height: '100%'}" shadow="never">
+    <div class="task-type" :body-style="{padding: '0px', height: '100%'}">
         <el-row class="task-type-main" type="flex" justify="space-between">
             <el-row type="flex">
                 <i class="task-type-color" :style="{'background-color': taskType.config.color}"></i>
@@ -41,7 +41,7 @@
             :visiable.sync="isShowChooseTeamModal"
             :value="taskType.tags"
             @update="updateTeamList"/>
-    </el-card>
+    </div>
 </template>
 
 <script>
@@ -128,12 +128,7 @@ export default {
         modifyTaskType() {
             // 修改工单类型
             let taskTypeId = this.taskType.id;
-            this.$platform.openTab({
-                id: "task_flow_setting",
-                title: "工单流程设置",
-                url: `/setting/task/taskFormSet?type=eidt&taskTypeId=${taskTypeId}`,
-                reload: true,
-            });
+            window.location.href = "/setting/task/taskFormSet?taskTypeId=" + taskTypeId;
         },
         /**
          * 更新taskType

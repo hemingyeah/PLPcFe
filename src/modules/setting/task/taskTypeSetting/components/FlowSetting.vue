@@ -2,9 +2,9 @@
     <el-form class="flow-setting">
         <!--S 预览组件 -->
         <div v-if="showFormBuilder" class="flow-setting-left">
-            <form-preview :fields="fields">
+            <form-preview :fields="fields" class="flow-setting-form-preview">
                 <el-button type="primary" class="form-preview-btn" @click="openFormDesign">
-                    表单设置
+                    {{type === 'create' ? '新建' : '回执'}}表单设置
                 </el-button>
             </form-preview>
         </div>
@@ -24,7 +24,6 @@
                 <div class="setting-specific-approve">
                     <h2>
                         审批设置
-                        <el-switch class="ml-12"/>
                     </h2>
                     <approve-setting :options="approveOptions" :approveSetting="setting.approveSetting"/>
                 </div>
@@ -381,6 +380,9 @@ export default {
         background: #FFFFFF;
         margin-right: 12px;
         border-radius: 4px;
+        .flow-setting-form-preview{
+            padding-top: 10%;
+        }
         .form-preview-btn{
             position: absolute;
             bottom: 50px;

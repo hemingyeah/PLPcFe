@@ -40,7 +40,7 @@
         </div>
       </el-row>
       <div class="setting-flow-header-right">
-        <el-button plain @click="submit" :disabled="pending">保存</el-button>
+        <el-button class="header-save-btn" plain @click="submit" :disabled="pending">保存</el-button>
       </div>
     </div>
     <!--E 头部 -->
