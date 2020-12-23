@@ -190,7 +190,7 @@ function isDingTalk() {
 }
 
 // 判断是否是多端环境(企业版)
-export const isEnterprise = isMultiEnd()
+export const isEnterprise = true
 
 export default {
   isEnterprise,
