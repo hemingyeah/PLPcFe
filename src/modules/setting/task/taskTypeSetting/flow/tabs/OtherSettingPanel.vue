@@ -11,7 +11,7 @@
                 <div class="mt-8">
                     <el-radio-group v-model="radio">
                         <el-radio :label="0" class="mr-50">
-                            使用系统模
+                            使用系统模板
                             <el-button 
                                 :type="radio === 0 ? 'primary': 'default'" 
                                 :disabled="radio === 1" 
@@ -148,9 +148,9 @@
         </div>
 
         <!-- 系统模板设置字段弹窗 -->
-        <system-template-dialog :visiable.sync="isShowSystemModal" :type="templateType" :typeId="typeId"/>
+        <system-template-dialog :visiable.sync="isShowSystemModal" :type="templateType" :taskTypeId="taskTypeId"/>
         <!-- 导入模板设置弹窗 -->
-        <template-upload-dialog :visiable.sync="isShowTemplateUploadModal" :type="templateType" :typeId="typeId" :templates.sync="templates">
+        <template-upload-dialog :visiable.sync="isShowTemplateUploadModal" :type="templateType" :taskTypeId="taskTypeId" :templates.sync="templates">
         </template-upload-dialog>
     </div>
 </template>
@@ -164,10 +164,14 @@ import TemplateUploadDialog from "../../components/TemplateUploadDialog";
 
 export default {
     name: 'other-setting-panel',
+    props: {
+        taskTypeId: {
+            type: String,
+            default: ''
+        }
+    },
     data() {
         return {
-            typeId: '41f136b6-0159-4257-8e77-dcfcee278f9c',
-
             radio: '',
             cameraForm : {
                 attUploadLimitMobile : true,
@@ -226,6 +230,9 @@ export default {
             this.templateType = type;
             this.isShowSystemModal = true;
         },
+        submit() {
+            console.log('otherSetting  submit');
+        }
     },
     mounted() {
     },

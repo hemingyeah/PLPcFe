@@ -67,7 +67,25 @@ export default {
                 noticeUsers: '', // 超时提醒指定人员
 
                 allowPause: false, // 允许暂停工单开关
+                pauseApprovers: {
+                    leader: '',
+                    approvers: [],
+                    level: 0,
+                    multiApproverSetting: [{
+                        leader: '',
+                        approvers: []
+                    }]
+                },
                 allowCancel: false, // 允许取消工单开关
+                cancelApprovers: {
+                    leader: '',
+                    approvers: [],
+                    level: 0,
+                    multiApproverSetting: [{
+                        leader: '',
+                        approvers: []
+                    }]
+                },
             }
         }
     },
@@ -96,7 +114,7 @@ export default {
         /**
          * 启用或禁用工单类型
          */
-        flowSwitchTaskType: _.throttle(async function(flowName, status) {
+        flowSwitchTaskType: _.debounce(async function(flowName, status) {
             console.log(flowName, status);
             let params = {
                 id: this.taskTypeId,
@@ -112,6 +130,9 @@ export default {
         }, 300),
         clickFlow(type) {
             this.currFlow = type;
+        },
+        submit() {
+            console.log('flow-setting submit');
         }
     },
     components: {

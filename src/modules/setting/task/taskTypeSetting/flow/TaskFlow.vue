@@ -46,7 +46,9 @@
     <!--E 头部 -->
 
     <!-- 设置页  --> 
-    <component :is="settingStep[currTab].compName" :taskTypeId="taskTypeId"></component>
+    <keep-alive>
+      <component ref="comp" :is="settingStep[currTab].compName" :taskTypeId="taskTypeId"></component>
+    </keep-alive>
   </div>
 </template>
 
@@ -64,21 +66,11 @@ export default {
   name: 'setting-flow',
   data() {
     return {
-      type: 'add', // 创建类型: add 新建工单类型; edit 编辑工单类型; template 模板创建;
       taskTypeId: '',
 
       typeColor: '#737F7C',
       typeName: '修改工单类型设置',
       pending: false,
-
-      flowSetting: {
-
-      },
-
-      advancedSetting: {
-
-      },
-
 
       currTab: 0
     }
@@ -109,12 +101,13 @@ export default {
       window.history.go(-1);
     },
     submit() {
+      if(!this.$refs.comp.submit) return;
 
+      this.$refs.comp.submit();
     }
   },
   mounted() {
     let query = parse(window.location.search) || {};
-    this.type = query.type;
     this.taskTypeId = query.taskTypeId;
   },
   components: {

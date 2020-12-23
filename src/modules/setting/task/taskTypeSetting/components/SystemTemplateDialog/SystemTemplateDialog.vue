@@ -154,7 +154,7 @@ export default {
             type: String,
             default: ''
         },
-        typeId: {
+        taskTypeId: {
             type: String,
             default: ''
         }
@@ -319,9 +319,18 @@ export default {
         async fetchTasktype() {
             try {
                 let params = {
-                    id: this.typeId
+                    id: this.taskTypeId
                 };
                 let res = await TaskApi.getTaskType(params);
+
+                if(JSON.stringify(res.data.reportSetting) == "{}"){
+                    res.data.reportSetting = {"tenantFields":["name","phone","email","address","portal"],"customerFields":["name","product","address","linkman"],"taskFields":["taskNo","planTime","executor"],"receiptFields":["sparepart","service","autograph"],"attachmentFields":{}}
+                }
+
+                if(JSON.stringify(res.data.printSetting) == "{}"){
+                    res.data.printSetting = {"tenantFields":["name","phone","email","address","portal"],"customerFields":["name","product","address","linkman"],"taskFields":["taskNo","planTime","executor"],"receiptFields":["sparepart","service","autograph"],"attachmentFields":{}}
+                }
+
                 this.taskTypeConfig = res.data;
 
                 let {tenantFields,customerFields,taskFields,receiptFields,cardFields,attachmentFields} = res.data[this.type];
@@ -343,10 +352,11 @@ export default {
                 this.multipleCardInfoAttachments = this.convertArrayObjectToKey(attachmentFields.multipleCardInfoAttachments, 'fieldName');
             
             
+                // todo_zr 应该在进入流程设置的时候调用
                 if(JSON.stringify(res.data.reportSetting) == "{}"){
                     let reportSetting = {"tenantFields":["name","phone","email","address","portal"],"customerFields":["name","product","address","linkman"],"taskFields":["taskNo","planTime","executor"],"receiptFields":["sparepart","service","autograph"]}
                     let reportForm = {};
-                    reportForm.id = this.typeId;
+                    reportForm.id = this.taskTypeId;
                     reportForm.reportSetting = reportSetting;
 
 
@@ -369,7 +379,7 @@ export default {
         async getFields(tableName) {
             try {
                 let params = {
-                    typeId: this.typeId,
+                    typeId: this.taskTypeId,
                     tableName
                 };
                 let res = await TaskApi.getFields(params);
@@ -395,7 +405,7 @@ export default {
          */
         async fetchTaskCardDetailList() {
             try {
-                let res = await TaskApi.getTaskCardDetailList({typeId: this.typeId});
+                let res = await TaskApi.getTaskCardDetailList({typeId: this.taskTypeId});
                 this.cardDetailList = res || [];
                 res.map(item => {
                     this.$set(this.cardFields, item.cardId,[]);
@@ -423,7 +433,7 @@ export default {
             }
 
             let params = {
-                id: this.typeId,
+                id: this.taskTypeId,
                 [this.type]: {
                     tenantFields: this.tenantFields,
                     customerFields: this.customerFields,
@@ -462,7 +472,6 @@ export default {
     min-height: 500px;
     max-height: 700px;
     padding: 12px;
-    overflow-y: auto;
     & > div {
         font-size: 14px;
         h2{

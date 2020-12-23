@@ -26,7 +26,7 @@
                         审批设置
                         <el-switch class="ml-12"/>
                     </h2>
-                    <approve-setting :options="approveOptions" :approveSetting="approveSetting" @update="updateApproveUser"/>
+                    <approve-setting :options="approveOptions" :approveSetting="setting.approveSetting"/>
                 </div>
                 <!--E 审批设置 -->
 
@@ -165,14 +165,14 @@
                         允许工单负责人将工单状态设为暂停
                         <el-switch v-model="commonSetting.allowPause"/>
                     </h2>
-                    <approve-setting :options="stableOptions" />
+                    <approve-setting :options="stableOptions" :approveSetting="commonSetting.pauseApprovers"/>
                 </div>
                 <div class="setting-specific-form">
                     <h2>
                         允许工单在完成前被取消
                         <el-switch v-model="commonSetting.allowCancel"/>
                     </h2>
-                    <approve-setting :options="stableOptions"/>
+                    <approve-setting :options="stableOptions" :approveSetting="commonSetting.cancelApprovers"/>
                 </div>
             </div>
         </div>
@@ -257,9 +257,6 @@ export default {
         approveOptions() { // 审批选项
             let type = this.type;
             let options = [{
-                value: 'none',
-                label: '无需审批'
-            }, {
                 value: 'leader',
                 label: '发起人主管'
             }, {
@@ -309,9 +306,6 @@ export default {
         },
         stableOptions() { // 暂停/取消工单的审批选项
             return [{
-                value: 'none',
-                label: '无需审批'
-            }, {
                 value: 'leader',
                 label: '发起人主管'
             }, {
@@ -333,12 +327,6 @@ export default {
         }
     },
     methods: {
-        /**
-         * 更新审批设置
-         */
-        updateApproveUser(users) {
-            this.$set(this.approveSetting, 'users', users);
-        },
         /**
          * 打开表单编辑器
          */

@@ -1,11 +1,11 @@
 <template>
     <base-modal
-        title="新建工单类型"
+        :title="title"
         width="672px"
         @cancel="cancel"
         :show.sync="isShow"
         :mask-closeable="false">
-        <div class="add-task-type">
+        <div v-if="!clickTaskType" class="add-task-type">
             <el-row type="flex" justify="space-between">
                 <el-card
                     class="choose-type-box"
@@ -24,30 +24,47 @@
                     </div>
                 </el-card>
             </el-row>
-            <el-row v-if="clickedTaskType === 'copy'" class="choose-copy-type" type="flex" >
-                <label>工单类型</label>
-                <el-form :model="form" ref="form" :rules="rules">
-                    <el-form-item prop="taskType">
-                        <el-select v-model="form.taskType" placeholder="请选择工单类型">
-                            <el-option
-                                v-for="item in taskTypeList"
-                                :key="item.id"
-                                :label="item.name"
-                                :value="item.id">
-                            </el-option>
-                        </el-select>
-                    </el-form-item>
-                </el-form>
-            </el-row>
-            <el-button v-if="clickedTaskType === 'copy'" class="next-btn" type="primary" @click="gotoNext">下一步</el-button>
+        </div>
+        <el-form v-else :model="form" :rules="rules" ref="form" label-width="100px" class="add-task-form">
+            <el-form-item v-if="clickTaskType === 'exist'" label="工单类型" prop="templetId">
+                <el-select v-model="form.templetId" placeholder="请选择工单类型" class="w-360">
+                    <el-option
+                        v-for="item in taskTypeList"
+                        :key="item.id"
+                        :label="item.name"
+                        :value="item.id">
+                    </el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="名称" prop="typeName">
+                <el-input class="w-360" v-model="form.typeName" placeholder="显示的名称[最多20个字]"></el-input>
+            </el-form-item>
+            <el-form-item>
+                <ul class="statecolor">
+                    <li
+                        v-for="color in taskTypeColor"
+                        :key="color"
+                        @click="form.color = color"
+                        :style="{ background: color}">
+                        <i class="el-icon-check" v-if="color === form.color"></i>
+                    </li>
+                </ul>
+            </el-form-item>
+        </el-form>
+
+        <div v-if="clickTaskType" slot="footer">
+            <el-button @click="cancel">取消</el-button>
+            <el-button :loading="pedding" type="primary" @click="createTaskType">确定</el-button>
         </div>
 
         <!-- 选择行业模板弹窗 -->
-        <choose-trade-dialog :visiable.sync="isShowChooseTradeDialog"/>
+        <choose-trade-dialog :visiable.sync="isShowChooseTradeDialog" @select="selectTemplate"/>
     </base-modal>
 </template>
 
 <script>
+/** api */
+import * as SettingApi from "@src/api/SettingApi";
 // assets
 import taskTemplateBlank from "@src/assets/img/setting/task-template-blank.png";
 import taskTemplateCopy from "@src/assets/img/setting/task-template-copy.png";
@@ -56,6 +73,7 @@ import taskTemplateTrade from "@src/assets/img/setting/task-template-trade.png";
 // components
 import ChooseTradeDialog from './ChooseTradeDialog.vue';
 
+const TASK_TYPE_COLOR = ['#737F7C','#266FFF','#5255FF','#8552FF','#BC52FF','#FF52D4','#FF9526','#6ECF40','#00B8D5','#0BA194']
 export default {
     name:'add-task-type-dialog',
     props: {
@@ -68,7 +86,47 @@ export default {
             default: () => []
         }
     },
+    data() {
+        let validateTypeName = (rule, value, callback) => {
+            if (value === '') return callback(new Error('请输入密码'));
+            if(value.length > 20) callback(new Error('名称不能超过20个字'));
+            if(!/^[a-zA-Z0-9\u4e00-\u9fa5]+$/.test(value)) return callback(new Error('请输入中文、字母、数字'));
+
+            callback();
+        };
+
+        return {
+            hoverTaskType: '',
+            clickTaskType: '',
+
+            form: {
+                typeName: '',
+                taskTypeId: '',
+                templetId: '',
+                color: '#737F7C'
+            },
+            rules: {
+                taskType: [{ required: true, message: '请选择工单类型', trigger: 'blur' }],
+                typeName: [
+                    { required: true, message: '请输入工单类型名称', trigger: 'blur' },
+                    { validator: validateTypeName, trigger: 'blur' }
+                ]
+            },
+            
+            pedding: false,
+            isShow: false,
+            isShowChooseTradeDialog: false,
+        }
+    },
     computed: {
+        taskTypeColor() {
+            return TASK_TYPE_COLOR;
+        },
+        title() {
+            return this.clickTaskType ? 
+                this.taskTemplateList.find(item => item.type === this.clickTaskType).title
+                : '新建工单类型';
+        },
         taskTemplateList() {
             return [
                 {
@@ -78,36 +136,18 @@ export default {
                     bgImg: taskTemplateBlank
                 },
                 {
-                    type: 'copy',
+                    type: 'exist',
                     title: '从现有模版创建',
                     desc: '快速复制现有类型',
                     bgImg: taskTemplateCopy
                 },
                 {
-                    type: 'trade',
+                    type: 'template',
                     title: '从行业模版创建',
                     desc: '丰富的模版供您选',
                     bgImg: taskTemplateTrade
                 },
             ]
-        },
-        rules() {
-            return {
-                taskType: [{ required: true, message: '请选择工单类型', trigger: 'blur' }]
-            }
-        }
-    },
-    data() {
-        return {
-            clickedTaskType: '',
-            hoverTaskType: '',
-
-            form: {
-                taskType: '',
-            },
-            
-            isShow: false,
-            isShowChooseTradeDialog: false,
         }
     },
     watch: {
@@ -118,59 +158,71 @@ export default {
     methods: {
         enterCard(type) {
             this.hoverTaskType = type;
-            if(type !== 'copy') {
-                this.clickedTaskType = '';
-            }
         },
         getCardActive(type) {
-            return this.clickedTaskType === type || this.hoverTaskType === type;
+            return this.hoverTaskType === type;
         },
         cancel() {
-            this.taskType = '';
+            let _this = this;
             this.$emit('update:visiable', false);
+            setTimeout(() => {
+                Object.assign(this.$data, this.$options.data());
+                _this.$refs.form.resetFields();
+            }, 100)
         },
-        chooseTypeTemplate(type) {
-            this.clickedTaskType = type;
-
-            switch(type) {
-                case 'blank':  // 空白模板
-                    // todo_zr: 在当前页面打开
-                    // this.$platform.openTab({
-                    //     id: "task_flow_setting",
-                    //     title: "工单流程设置",
-                    //     url: `/setting/task/taskFormSet?type=add`,
-                    //     reload: true
-                    // });
-                    // this.cancel();
-                    window.location.href = '/setting/task/taskFormSet?type=add';
-                    break;
-                case 'trade': // 行业模板
-                    this.isShowChooseTradeDialog = true;
-                    break;
-                default: 
-                    break;
+        selectTemplate({taskTypeId, typeName}) {
+            this.clickTaskType = 'template';
+            this.form = {
+                ...this.form,
+                typeName,
+                taskTypeId
             }
         },
-        gotoNext() {
-            this.$refs.form.validate((valid) => {
-                if (valid) {
-                    this.$platform.openTab({
-                        id: "task_flow_setting",
-                        title: "工单流程设置",
-                        url: `/setting/task/taskFormSet?type=template&taskTypeId=${this.form.taskType}`,
-                        reload: true,
-                    });
-                    this.cancel();
-                }
-            });
+        chooseTypeTemplate(type) {
+            if(type === 'template') {
+                return this.isShowChooseTradeDialog = true;
+            }
+
+            this.clickTaskType = type;
         },
         /**
-         * 创建工单 todo_zr
+         * 创建工单
          */
         createTaskType() {
-            if(!this.typeName) return this.$message.error('请输入名称');
-            if(this.typeName.length > 20) return this.$message.error('名称不能超过20个字');
-            if(!/^[a-zA-Z0-9\u4e00-\u9fa5]+$/.test(this.typeName)) return this.$message.error('请输入中文、字母、数字');
+            this.$refs.form.validate(valid => {
+                if(valid) {
+                    // 从行业模板创建
+                    if(this.taskType === 'template') {
+                        this.pedding = true;
+                        SettingApi.importTaskType(this.form).then(res => {
+                            if(res.status == 0){
+                            window.location.href = "/setting/task/taskFormSet?taskTypeId="+res.data+"&new=true";
+                            }else{
+                                this.$message.error(res.message);
+                            }
+                        }).catch(err => {
+                            console.error(err);
+                        }).finally(() => {
+                            this.pedding = false;
+                        });
+                        return;
+                    }
+
+                    // 从空白模板/现有工单类型创建
+                    this.pedding = true;
+                    SettingApi.createTaskType(this.form).then(res => {
+                        if(res.status == 0){
+                            window.location.href = "/setting/task/taskFormSet?taskTypeId="+res.data+"&new=true";
+                        }else{
+                            this.$message.error(res.message);
+                        }
+                    }).catch(err => {
+                        console.error(err);
+                    }).finally(() => {
+                        this.pedding = false;
+                    });
+                }
+            })
         }
     },
     components: {
@@ -196,7 +248,6 @@ export default {
         background-size: cover;
 
         &.active{
-            box-shadow: 0px 2px 8px 0px rgba(0, 0, 0, 0.08);
             .choose-type-box-content{
                 transform: translateY(0);
                 p{
@@ -226,16 +277,32 @@ export default {
 
         }
     }
+}
 
-    .choose-copy-type{
-        padding: 20px 20px 0 20px;
-        line-height: 32px;
-        label{
-            margin-right: 36px;
+.add-task-form{
+    padding: 20px;
+    ul.statecolor{
+        padding: 0;
+        line-height: 22px;
+        li{
+            list-style: none;
+            display: inline-block;
+            cursor: pointer;
+            margin-right: 4px;
+            width: 32px;
+            height: 22px;
+            vertical-align: middle;
+            i{
+                position: relative;
+                font-weight: bold;
+                left: 9px;
+                color: #fff;
+            }
         }
     }
-    .next-btn{
-        float: right;
-    }
+}
+
+.w-360{
+    width: 360px;
 }
 </style>

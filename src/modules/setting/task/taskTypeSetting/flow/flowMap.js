@@ -7,8 +7,6 @@ const FLOW_MAP = {
         icon: 'icon-xinjian',
         isSystem: true,
         planRemindSetting: {},
-        overTimeSetting: {}
-
     },
     allot: {
         name: '指派工单',
@@ -74,6 +72,19 @@ let defaultFlowSetting = {
     autoClose: false, // 工单自动关闭开关
     closeView: false, // 关闭工单查看权限开关
     closeNoViewAuth: [], // 工单关闭后不允许查看权限
+
+
+    // 审批相关
+    approveSetting: {
+        leader: '',
+        approvers: [],
+        level: 0,
+        multiApproverSetting: [{
+            leader: '',
+            approvers: []
+        }]
+    }
+    
 }
 
 for (const key in FLOW_MAP) {

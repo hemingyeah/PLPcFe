@@ -65,7 +65,7 @@ export default {
             type: String,
             default: ''
         },
-        typeId: {
+        taskTypeId: {
             type: String,
             default: ''
         },
@@ -87,7 +87,7 @@ export default {
             return this.type === 'report' ? '服务报告' : '打印';
         },
         templateUrl() {
-            return `/setting/taskType/getTemplateDic?typeId=${this.typeId}`;
+            return `/setting/taskType/getTemplateDic?typeId=${this.taskTypeId}`;
         },
         fileList() {
             return this.templates.map(item => {
@@ -147,7 +147,7 @@ export default {
          */
         async submit(){
             let params = {
-                typeId: this.typeId,
+                typeId: this.taskTypeId,
                 templates: this.templates.map(item => {
                     return {
                         id: item.id,

@@ -79,7 +79,7 @@ export default {
         }
     },
     methods: {
-        switchEnabled: _.throttle(function(value) {
+        switchEnabled: _.debounce(function(value) {
             if(value === 1 && this.typeNum >= this.maxTypeNum) {
                 return this.$message.warning(`最多只能同时存在${this.maxTypeNum}种工单类型`);
             }

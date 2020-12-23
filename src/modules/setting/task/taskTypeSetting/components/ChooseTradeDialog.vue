@@ -18,7 +18,7 @@
                 </div>
             </el-row>
             <el-row class="trade-list" type="flex" justify="space-between">
-                <el-row class="trade-item pointer apply" type="flex" v-for="item in industryItems" :key="item.taskTypeId" @click.native="openFormsetTab(item.taskTypeId)">
+                <el-row class="trade-item pointer apply" type="flex" v-for="item in industryItems" :key="item.taskTypeId" @click.native="selectTemplate(item)">
                     <div class="trade-item-left" :style="{'background-color': getColor(item.taskTypeName)}">
                         <i :class="['iconfont', getIcon(item.taskTypeName)]">
                         </i>
@@ -45,7 +45,7 @@
 
 <script>
 
-let industryNames = ['设备','IT服务','家居建材','电商','机械','上门服务','公共服务','其他','全部'];
+let industryNames = ['全部','设备','IT服务','家居建材','电商','机械','上门服务','公共服务','其他'];
 let iconMap = {
     "机械报修工单": {
         icon: "icon-mechanics",
@@ -133,7 +133,7 @@ export default {
     },
     data() {
         return {
-            industry: "设备",
+            industry: "全部",
             whole: [],// 全部数据
             isShow: false
         }
@@ -159,13 +159,12 @@ export default {
                 console.error('fetchSysTaskTypeList => error', e);
             })
         },
-        openFormsetTab(taskTypeId) {
-            this.$platform.openTab({
-                id: "task_flow_setting",
-                title: "工单流程设置",
-                url: `/setting/task/taskFormSet?type=template&taskTypeId=${taskTypeId}`,
-                reload: true,
+        selectTemplate({taskTypeId, taskTypeName}) {
+            this.$emit('select', {
+                taskTypeId,
+                typeName: taskTypeName
             });
+            this.cancel();
         },
         cancel() {
             this.$emit('update:visiable', false);
@@ -206,6 +205,7 @@ export default {
             background: #FFFFFF;
             box-shadow: 0px 4px 12px 0px rgba(0, 0, 0, 0.1);
             border-radius: 4px;
+            border: 2px solid transparent;
             .trade-item-left{
                 display: flex;
                 justify-content: center;
@@ -252,13 +252,17 @@ export default {
                 }
                 .trade-item-tag{
                     height: 22px;
-                    border-radius: 11px;
-                    text-align: center;
-                    padding: 0 9px;
-                    margin-left: 4px;
                     line-height: 22px;
-                    color: #FFFFFF;
-                    background-color: #e8bf1d;
+                    padding: 0 8px;
+                    font-size: 12px;
+                    background: rgba(250, 140, 22, 0.2);
+                    border-radius: 11px;
+                    font-weight: 500;
+                    color: #FA8C16;
+                    border: 1px solid rgba(250, 140, 22, 0.2);
+                    text-align: center;
+                    display: inline-block;
+                    margin-left: 8px;
                 }
                 p{
                     margin:0;

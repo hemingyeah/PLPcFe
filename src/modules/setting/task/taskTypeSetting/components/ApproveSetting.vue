@@ -1,30 +1,39 @@
 <template>
     <div class="setting-approve">
-        <el-radio-group v-model="radio">
-            <el-radio :label="1">一级审批</el-radio>
+        <el-radio-group v-model="approveSetting.level">
+            <el-radio :label="0">无需审批</el-radio>
+            <el-radio :label="1" class="ml-12">一级审批</el-radio>
             <el-radio :label="2" class="ml-12">二级审批</el-radio>
         </el-radio-group>
-        <div class="setting-approve-people">
-            <template v-if="radio === 1">
-                完成该节点时需要审批，审批人
-                <el-select class="w-200" v-model="approveSetting.type" placeholder="请选择">
-                    <el-option
-                        v-for="item in options"
-                        :key="item.value"
-                        :label="item.label"
-                        :value="item.value">
-                    </el-option>
-                </el-select>
-                <el-row v-if="approveSetting.type === 'users'" class="mt-12">
-                    <el-input class="w-200" placeholder="请选择审批人" readonly :value="userNames" @click.native="selectApproveUser"/>
-                    <el-button class="ml-12" type="primary" size="small" @click="selectApproveUser">添加审批人</el-button>
-                </el-row>
+        <div v-if="approveSetting.level >= 1" class="setting-approve-people">
+            <!--S 一级审批设置 -->
+            完成该节点时需要审批，{{approveSetting.level > 1 ? '一级' : ''}}审批人
+            <el-select 
+                class="w-200"
+                :value="approveSetting.leader"
+                placeholder="请选择"
+                @change="(val) => updateApproveSetting('leader', val, 1)">
+                <el-option
+                    v-for="item in options"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value">
+                </el-option>
+            </el-select>
+            <template v-if="approveSetting.leader === 'users'" class="mt-12">
+                <el-input class="w-200" placeholder="请选择审批人" readonly :value="getApproverNames(approveSetting.approvers)" @click.native="selectApproveUser(1)"/>
+                <!-- <el-button class="ml-12" type="primary" size="small" @click="selectApproveUser(1)">添加审批人</el-button> -->
             </template>
-            <template v-else-if="radio > 1">
-                完成该节点时需要审批,
-                <span v-for="idx in radio" :key="idx">
-                    {{idx | formatNumToCN}}级审批人
-                    <el-select class="w-200" v-model="approveSetting.type" placeholder="请选择">
+            <!--E 一级审批设置 -->
+            <!--S 二级以上审批设置 -->
+            <template v-if="approveSetting.level > 1">
+                <span v-for="(setting, idx) in approveSetting.multiApproverSetting" :key="idx">
+                    {{idx + 2 | formatNumToCN}}级审批人
+                    <el-select
+                        class="w-200"
+                        :value="setting.leader"
+                        placeholder="请选择"
+                        @change="(val) => updateApproveSetting('leader', val, idx + 2)">
                         <el-option
                             v-for="item in options"
                             :key="item.value"
@@ -32,12 +41,15 @@
                             :value="item.value">
                         </el-option>
                     </el-select>
-                    <!-- <el-row v-if="approveSetting.type === 'users'" class="mt-12"> -->
-                        <el-input v-if="approveSetting.type === 'users'" class="w-200 mt-12" placeholder="请选择审批人" readonly :value="userNames" @click.native="selectApproveUser"/>
-                        <!-- <el-button class="ml-12" type="primary" size="small" @click="selectApproveUser">添加审批人</el-button> -->
-                    <!-- </el-row> -->
+                    <el-input
+                        v-if="setting.leader === 'users'"
+                        class="w-200 mt-12" placeholder="请选择审批人"
+                        readonly
+                        :value="getApproverNames(setting.approvers)"
+                        @click.native="selectApproveUser(idx + 2)" />
                 </span>
             </template>
+            <!--E 二级以上审批设置 -->
         </div>
     </div>
 </template>
@@ -54,21 +66,12 @@ export default {
             type: Object,
             default: () => {
                 return {
-                    type: '',
-                    users: []
+                    leader: '',
+                    approvers: [],
+                    level: 0,
+                    multiApproverSetting: []
                 }
             }
-        }
-    },
-    data() {
-        return {
-            radio: '',
-            value: '',
-        }
-    },
-    computed: {
-        userNames() {
-            return this.approveSetting.users && this.approveSetting.users.map(item => item.displayName).join(',');
         }
     },
     filters: {
@@ -79,20 +82,47 @@ export default {
         }
     },
     methods: {
-        selectApproveUser() {
+        getApproverNames(approvers) {
+            return approvers.map(item => item.displayName).join(',');
+        },
+        /**
+         * 更新审批设置
+         * 
+         * @param {string} key 更新的key值
+         * @param {string} value 更新值
+         * @param {number} level 更新审批的层级
+         */
+        updateApproveSetting(key, value, level) {
+            console.log(key, value, level);
+            let approveSetting = _.cloneDeep(this.approveSetting);
+
+            // 一级设置
+            if(level <= 1) {
+                this.approveSetting[key] = value;
+            }
+            // 多级设置
+            if(level > 1) {
+                this.approveSetting.multiApproverSetting[level - 2][key] = value;
+            } 
+        },
+        /**
+         * 选择指定的审批人员
+         * @param {number} level 审批的层级
+         */
+        selectApproveUser(level) {
+            let selected = level < 2 ? this.approveSetting.approvers : this.approveSetting.multiApproverSetting[level - 2].approvers;
             let options = {
                 title: '选择审批人',//[选填] 默认值为 '请选择人员'
                 max:14, //[选填]最大人数：当值小于等于0或者不填时，不对选择人数做限制，max值为1时单选，大于1时多选
-                selected: this.approveSetting.users //[选填] 已选人员 每个人员必须包括userId,displayName,staffId,head这四个属性，只有带max大于1时生效
+                selected //[选填] 已选人员 每个人员必须包括userId,displayName,staffId,head这四个属性，只有带max大于1时生效
             };
 
             this.$fast.contact.choose('dept', options)
                 .then(res => {
                     if(res.status != 0) return;
-                    console.log(res);
-                    this.$emit('update',res.data.users);
-                })
-                .catch(err => {
+                    
+                    this.updateApproveSetting('approvers', res.data.users, level);
+                }).catch(err => {
                     console.warn(err)
                 })
         }
