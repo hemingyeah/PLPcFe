@@ -154,7 +154,7 @@
                 <a href=""
                    class="color-primary"
                    @click.stop.prevent="openProductMenuTab(scope.row.id)">
-                  {{ scope.row[column.field].replace(new RegExp("/","g") ,' / ') || '' }}
+                  {{ (scope.row[column.field] && scope.row[column.field].replace(new RegExp("/","g") ,' / ')) || '' }}
                 </a>
               </template>
 

@@ -315,7 +315,7 @@
                     <a href=""
                        class="view-detail-btn"
                        @click.stop.prevent="openProductMenuTab(scope.row.catalogId)">
-                      {{ scope.row[column.field].replace(new RegExp("/","g") ,' / ') || '' }}
+                      {{ (scope.row[column.field] && scope.row[column.field].replace(new RegExp("/","g") ,' / ')) || '' }}
                     </a>
                   </template>
                 </sample-tooltip>

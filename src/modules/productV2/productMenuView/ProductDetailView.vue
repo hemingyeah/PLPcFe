@@ -7,7 +7,7 @@
         <div class="flex-x box-12-t-b">
           <div class="flex-1 flex-x">
             <div class="product-name">
-              {{dataInfo.pathName.replace(new RegExp("/","g") ,' / ') || ''}}
+              {{(dataInfo.pathNam && dataInfo.pathName.replace(new RegExp("/","g") ,' / ')) || ''}}
             </div>
           </div>
           <div class="flex-x">
