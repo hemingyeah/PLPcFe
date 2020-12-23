@@ -267,6 +267,11 @@
     & > div {
       margin-left: 8px;
     }
+    .el-input__inner {
+      &::placeholder {
+        color: $text-color-primary;
+      }
+    }
   }
   .task-allot-user-table-sort-label {
     background-color: $bg-color-l3;
