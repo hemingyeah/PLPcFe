@@ -24,11 +24,12 @@
           <div class="flex-1 flex-x"
                :style="`padding-left:${deepCount * 8}px`">
             <i v-if="el.tasks.length > 0"
-               class="iconfont icon-icon_arrow arrow-right font-16"
+               class="iconfont icon-icon_arrow arrow-right"
                :class="{ 'arrow-down': el.showList }"
                @click.stop="showRootList(index)"></i>
+
             <div class="overHideCon-1 catalog-item"
-                 :class="{ 'mar-l-12': el.tasks.length <= 0 }">
+                 :class="{ 'mar-l-16': el.tasks.length <= 0 }">
               {{ el.name }}
             </div>
           </div>
@@ -56,7 +57,7 @@
                  :class="{'color-primary': el.popoverVisible}"></i>
             </el-popover>
 
-            <!-- <i class="iconfont icon-tuozhuaipaixu handle can-move mar-l-8"></i> -->
+            <i class="iconfont icon-tuozhuaipaixu handle can-move mar-l-8"></i>
           </div>
         </div>
 
@@ -307,7 +308,7 @@ ul {
     .arrow-right {
       transition: all 0.5s;
       transform: rotateZ(0);
-      font-size: 12px;
+      font-size: 16px;
       color: #999;
       cursor: pointer;
     }
