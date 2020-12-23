@@ -90,8 +90,8 @@ function moveRule(params){
  * @param params
  * @returns {*}
  */
-function modifyDistributeRule(params){
-  return http.post(`${ruleHeader}/outside/superCode/rule/modifyDistributeRule`,params);
+function modifyDistributeRuleState(params){
+  return http.post(`${ruleHeader}/outside/superCode/rule/modifyDistributeRuleState`,params);
 }
 
 /**
@@ -460,7 +460,7 @@ export {
   queryAllRules,
   removeDistributeRule,
   moveRule,
-  modifyDistributeRule,
+  modifyDistributeRuleState,
   saveFunc,
   queryCSByCondition,
   addDistributeRule,
