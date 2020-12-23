@@ -12,7 +12,7 @@ const catalogFieldFix = [
     tableName:"catalog",
   },
   {
-    displayName: "产品视频",
+    displayName: "视频",
     fieldName: "productVideo",
     formType: "attchment",
     export: false,
@@ -22,7 +22,7 @@ const catalogFieldFix = [
     tableName:"catalog",
   },
   {
-    displayName: "产品图片",
+    displayName: "图片",
     fieldName: "productPic",
     formType: "attchment",
     export: false,
@@ -42,7 +42,7 @@ const catalogFieldFix = [
     tableName:"catalog",
   },
   {
-    displayName: "产品数量",
+    displayName: "关联产品数量",
     fieldName: "productNum",
     formType: "text",
     export: true,

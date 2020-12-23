@@ -5,7 +5,7 @@
 
     <div slot="footer" class="dialog-footer">
       <el-button @click="visible = false">取 消</el-button>
-      <el-button type="primary" @click="onSubmit" :disabled="pending">确 定</el-button>
+      <el-button type="primary" @click="onSubmit" :loading="pending">确 定</el-button>
     </div>
   </base-modal>
 </template>
@@ -89,24 +89,35 @@ export default {
       if (await this.validate()) return;
 
       const params = this.buildParams();
+      let idNumber = 0 ;
+      try {
+        idNumber = params.ids.split(",").length;
+      } catch (error) {
+        console.warn(error, "error try catch");
+      }
+      
 
       this.pending = true;
 
       editBatchProduct(params)
         .then(res => {
-          const failure = res.status;
+          setTimeout(() => {
+            
+            // es同步延迟
+            const failure = res.status;
 
-          this.pending = false;
-          this.$platform.notification({
-            type: !failure ? "success" : "error",
-            title: `批量编辑产品${!failure ? "成功" : "失败"}`,
-            message: !failure ? null : res.message
-          });
+            this.pending = false;
+            this.$platform.notification({
+              type: !failure ? "success" : "error",
+              title: `批量编辑产品${!failure ? "成功" : "失败"}`,
+              message: !failure ? null : res.message
+            });
 
-          if (failure) return;
-          this.visible = false;
-          this.reset();
-          this.callback && this.callback();
+            if (failure) return;
+            this.visible = false;
+            this.reset();
+            this.callback && this.callback();
+          }, idNumber > 20 ? 3000 : 1500);
         })
         .catch(e => console.error("e", e));
     },
