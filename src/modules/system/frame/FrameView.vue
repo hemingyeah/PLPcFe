@@ -587,7 +587,7 @@ export default {
     allowChangeTaskVersion() {
       // 企业是否开启工单灰度功能
       let isTaskGray = this.initData.isTaskGrayFunction
-      return isTaskGray && this.currentTaskListTab.id && Platform.isDingTalk();
+      return isTaskGray && this.currentTaskListTab.id;
     },
   },
   methods: {
