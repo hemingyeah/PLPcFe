@@ -37,7 +37,7 @@ import {
   TaskSearchInputPlaceholderMap
 } from "@src/modules/task/model/TaskConvertMap.ts";
 
-const TASK_LIST_KEY = 'task_list';
+const TASK_LIST_KEY = "task_list";
 const MAXCHECK = 500
 // 工单引导标识
 const { TASK_GUIDE_LIST, TASK_GUIDE_SEARCH_MODEL, TASK_GUIDE_SEARCH_MODEL_SAVE, TASK_GUIDE_DROPDOWN_MENU } = require("@src/component/guide/taskV2Store");
@@ -423,9 +423,9 @@ export default {
           };
         }
       }).filter(item => {
-          if (item) {
-            return item
-          }
+        if (item) {
+          return item
+        }
       })
       this.exportColumnList = [...this.exportColumns, ...list];
     },
@@ -443,13 +443,13 @@ export default {
         const {mySearch, viewId} = this.intercept()
 
         if (this.intercept()) {
-          this.selectId = mySearch || 'all'
+          this.selectId = mySearch || "all"
           this.filterId = viewId
           result.forEach(item => {
             if (item.id === viewId) {
               this.searchParams = item.searchModel
               this.searchParams_spare = item.searchModel
-              if (item.alias === '已指派') {
+              if (item.alias === "已指派") {
                 this.searchParams.executor = this.initData.currentUserId;
                 this.searchParams_spare = this.initData.currentUserId
               }
@@ -596,7 +596,7 @@ export default {
               success
             } = await TaskApi.deleteTask(selectedIds);
             if (success) {
-              $platform.alert('删除成功');
+              $platform.alert("删除成功");
               this.multipleSelection = []
               this.getTaskCountByState()
               this.initialize();
@@ -619,13 +619,13 @@ export default {
       this.params = this.initParams(searchModel.pageSize, searchModel.keyword);
 
       if (searchModel.createUser) {
-        this.selectId = 'create'
+        this.selectId = "create"
       } else if (searchModel.executor) {
-        this.selectId = 'execute'
+        this.selectId = "execute"
       } else if (searchModel.synergyId) {
-        this.selectId = 'synergy'
+        this.selectId = "synergy"
       } else {
-        this.selectId = 'all'
+        this.selectId = "all"
       }
 
       // this.taskTypes.forEach((item) => {
@@ -645,20 +645,20 @@ export default {
           }
         })
       } else {
-        this.currentTaskType =  {
+        this.currentTaskType = {
           name: "全部",
           id: "",
         }
       }
 
-        this.getTaskOpen(() => {
-          this.search(searchModel);
-        })
+      this.getTaskOpen(() => {
+        this.search(searchModel);
+      })
       // this.buildColumns();
 
       if (selectedCols) {
         let firsts = [], lasts = []
-        selectedCols.split(',').forEach(item => {
+        selectedCols.split(",").forEach(item => {
           this.columns.forEach(value => {
             if (item === value.fieldName) {
               firsts.push(value)
@@ -667,7 +667,7 @@ export default {
         })
 
         this.columns.forEach(value => {
-          let bool = selectedCols.split(',').some(item => {return item === value.fieldName})
+          let bool = selectedCols.split(",").some(item => {return item === value.fieldName})
           if (!bool) {
             lasts.push(value)
           }
@@ -685,7 +685,7 @@ export default {
      * 新建视图展示
      */
     creatViewPanel({ region, id, name, searchModel }, type) {
-      if (name === "已关闭工单" || name === '已取消工单') {
+      if (name === "已关闭工单" || name === "已取消工单") {
         this.$refs.viewPanel.open(type, name);
         this.showBj = true
         return 
@@ -720,7 +720,7 @@ export default {
             }
           })
         } else {
-          this.currentTaskType =  {
+          this.currentTaskType = {
             name: "全部",
             id: "",
           }
@@ -731,7 +731,7 @@ export default {
           this.showBj = true
         })
       } else {
-        let taskFields= this.seoSetList
+        let taskFields = this.seoSetList
         let taskReceiptFields = [...this.taskFields, ...this.taskReceiptFields]
         this.$refs.viewPanel.open(type, searchModel && [...searchModel.systemConditions, ...searchModel.conditions], {taskFields, taskReceiptFields});
         this.showBj = true
@@ -743,19 +743,19 @@ export default {
      */
     getTaskOpen(fn) {
       Promise.all([this.fetchTaskFields(), this.fetchTaskReceiptFields()])
-      .then((res) => {
-        this.$set(this, "taskFields", res[0] || []);
-        this.$set(this, "taskReceiptFields", res[1] || []);
+        .then((res) => {
+          this.$set(this, "taskFields", res[0] || []);
+          this.$set(this, "taskReceiptFields", res[1] || []);
 
-        this.planTimeType = res[0].filter((item) => {
-          return item.displayName === "计划时间";
-        })[0].setting.dateType;
+          this.planTimeType = res[0].filter((item) => {
+            return item.displayName === "计划时间";
+          })[0].setting.dateType;
 
-        this.buildColumns();
-        this.seoSet()
-        this._exportColumns()
-        fn(this.seoSetList, [...res[0], ...res[1]])
-      })
+          this.buildColumns();
+          this.seoSet()
+          this._exportColumns()
+          fn(this.seoSetList, [...res[0], ...res[1]])
+        })
     },
     /**
      * @description 删除视图
@@ -1087,20 +1087,20 @@ export default {
           }
 
           if (
-            ['taddress', 'templateName'].indexOf(field.fieldName) >= 0
+            ["taddress", "templateName"].indexOf(field.fieldName) >= 0
           ) {
             minWidth = 200;
           }
 
-          if (['taskNo'].indexOf(field.fieldName) !== -1) {
+          if (["taskNo"].indexOf(field.fieldName) !== -1) {
             minWidth = 250;
             sortable = "custom";
           }
-          if (field.fieldName === 'customer') {
-            sortable = 'custom';
+          if (field.fieldName === "customer") {
+            sortable = "custom";
             minWidth = 125;
           }
-          if (field.fieldName === 'taskNo') {
+          if (field.fieldName === "taskNo") {
             field.width = 216
           }
           return {
@@ -2000,7 +2000,7 @@ export default {
         this.searchParams.synergyId = initData.currentUserId;
 
         this.searchParams_spare.synergyId = initData.currentUserId;
-      break;
+        break;
       default:
         break
       }
@@ -2049,8 +2049,8 @@ export default {
         // 系统字段查询条件
         const { systemConditions = [] } = params
         systemConditions && systemConditions.forEach((item)=>{
-          if(item.value == 'API创建'){
-            item.value = '开放API'
+          if(item.value == "API创建"){
+            item.value = "开放API"
           }
         })
         // 自定义
@@ -2174,11 +2174,11 @@ export default {
           break;
         }
         let source = params.source && params.source instanceof Array && params.source.length && params.source.map((item)=>{
-                if(item=='API创建'){
-                  item='开放API'
-                }
-                return item
-              }) || [];
+          if(item == "API创建"){
+            item = "开放API"
+          }
+          return item
+        }) || [];
         // 是否审批中
         let inApprove;
         switch (params.inApprove) {
@@ -2195,7 +2195,7 @@ export default {
         let stateType = {};
         if (params.states) {
           stateType = {
-            state: '',
+            state: "",
             stateList: []
           }
         } else {
@@ -2311,8 +2311,8 @@ export default {
         if (resetParamBool) {
           this.$refs.searchPanel.resetParams();
         }
-        searchModel['page'] = params.page;
-        searchModel['pageSize'] = params.pageSize
+        searchModel["page"] = params.page;
+        searchModel["pageSize"] = params.pageSize
 
         searchModel.createTimeStart = this._time(searchModel.createTimeStart || searchModel.timeStart);
         searchModel.createTimeEnd = this._time(searchModel.createTimeEnd || searchModel.timeEnd);

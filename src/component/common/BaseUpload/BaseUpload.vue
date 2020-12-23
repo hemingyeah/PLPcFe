@@ -5,8 +5,9 @@
     <div class="base-file-list base-file__preview" >
       <base-file-item v-for="file in value" :key="file.id" :file="file" @delete="deleteFile"></base-file-item>        
     </div>
-    <div class="base-upload-operation">
-      <button type="button" class="btn btn-primary base-upload-btn" @click="chooseFile" :disabled="pending" :id="forId" v-if="allowUpload">
+
+    <div class="base-upload-operation" v-if="allowUpload">
+      <button type="button" class="btn btn-primary base-upload-btn" @click="chooseFile" :disabled="pending" :id="forId" >
         <i class="iconfont icon-loading" v-if="pending"></i>
         <span>{{pending ? '正在上传' : '点击上传'}}</span>
       </button>
@@ -87,8 +88,8 @@ export default {
     chooseFile(){
       if(!this.allowUpload) return console.warn('Caused: dont chooseFile, because of this.allowUpload is false');
       if(this.pending) return platform.alert('请等待文件上传完成');
-      if(this.value.length >= Uploader.FILE_MAX_NUM) {
-        return platform.alert(`上传文件数量不能超过${Uploader.FILE_MAX_NUM}个`);
+      if(this.value.length >= this.limit) {
+        return platform.alert(`上传文件数量不能超过${this.limit}个`);
       }
 
       this.$refs.input.value = null;
@@ -100,11 +101,11 @@ export default {
       
       let allFilesLength = this.value.length + files.length;
 
-      if(allFilesLength > Uploader.FILE_MAX_NUM) {
-        let message = `上传文件数量不能超过${Uploader.FILE_MAX_NUM}个`;
-        let max = Uploader.FILE_MAX_NUM - this.value.length;
+      if(allFilesLength > this.limit) {
+        let message = `上传文件数量不能超过${this.limit}个`;
+        let max = this.limit - this.value.length;
 
-        if(max > 0 && files.length < Uploader.FILE_MAX_NUM){
+        if(max > 0 && files.length < this.limit){
           message += `, 您还能上传${max}个文件`;
         }
 
@@ -142,7 +143,7 @@ export default {
           platform.alert(message)
         }
 
-        if(success && Array.isArray(success) && success.length > 0 && this.isWaterMark){
+        if(success && Array.isArray(success) && success.length > 0 ){
           // 判断是否需要加水印
           for(let i = 0; i < success.length; i ++) {
             let file = success[i];
@@ -158,10 +159,11 @@ export default {
               }
             }
           }
+          
         }
-
         let value = this.value.concat(success);
         this.$emit('input', value);
+
       })
         .catch(err => console.error(err))
         .then(() => this.pending = false)

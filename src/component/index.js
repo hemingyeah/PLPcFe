@@ -53,6 +53,8 @@ import BaseEditor from './common/BaseEditor'
 // 自定义组件
 import GuideCompoment from './guide'
 
+import LenovoSelect from './compomentV2/LenovoSelect'
+
 import Form from './form';
 
 const components = [
@@ -104,6 +106,7 @@ const components = [
   
   GuideCompoment,
   ...BaseFlod,
+  LenovoSelect
 ];
 
 export default {

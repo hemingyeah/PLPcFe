@@ -23,16 +23,16 @@ import {
   getProductDetail,
   createProduct,
   updateProduct
-} from '@src/api/ProductApi';
-import * as FormUtil from '@src/component/form/util';
-import ProductEditForm from './components/ProductEditForm.vue';
+} from "@src/api/ProductApi";
+import * as FormUtil from "@src/component/form/util";
+import ProductEditForm from "./components/ProductEditForm.vue";
 
-import * as util from './utils/ProductMapping';
+import * as util from "./utils/ProductMapping";
 
 
 export default {
-  name: 'product-edit',
-  inject: ['initData'],
+  name: "product-edit",
+  inject: ["initData"],
   data() {
     return {
       loadingPage: false,
@@ -48,9 +48,9 @@ export default {
     productFields() {
       return [
         {
-          displayName: '从模板中选择',
-          fieldName: 'template',
-          formType: 'select',
+          displayName: "从模板中选择",
+          fieldName: "template",
+          formType: "select",
           isSystem: 1
         },
         ...this.dynamicProductFields
@@ -68,21 +68,24 @@ export default {
       return this.initData.customer || null;
     },
     action() {
-      return this.productId ? 'edit' : 'create';
+      return this.productId ? "edit" : "create";
     }
   },
   async mounted() {
     try {
       // 获取产品自定义字段
       let res = await getProductFields({isFromSetting: true});
-      this.dynamicProductFields = res.data || [];
+      this.dynamicProductFields = res.data.filter(item=>{
+        // 过滤新的产品类型
+        item.formType == "related_catalog"
+      }) || [];
     } catch (e) {
-      console.error('product-add_edit fetch product fields error', e);
+      console.error("product-add_edit fetch product fields error", e);
     }
 
     // 初始化默认值
     let form = {};
-    if (this.action === 'edit') {
+    if (this.action === "edit") {
       // 处理编辑时数据
       this.loadingPage = true;
       let res = await getProductDetail({id: this.productId});
@@ -119,10 +122,10 @@ export default {
       this.$refs.productEditForm.validate()
         .then(valid => {
           this.submitting = false;
-          if (!valid) return Promise.reject('validate fail.');
+          if (!valid) return Promise.reject("validate fail.");
           const params = util.packToProduct(this.productFields, this.form);
           this.productFields.forEach(field =>{
-            if(field.fieldName == 'customer' && field.isSystem == 1) {
+            if(field.fieldName == "customer" && field.isSystem == 1) {
               if (!field.setting.customerOption.address) {
                 params.address = {}
               } else if (!field.setting.customerOption.linkman){
@@ -135,10 +138,10 @@ export default {
           }
           this.pending = true;
           this.loadingPage = true;
-          let fn = this.action === 'create' ? createProduct : updateProduct;
+          let fn = this.action === "create" ? createProduct : updateProduct;
           fn(params)
             .then(res => {
-              let action = this.action === 'create' ? '新建' : '更新';
+              let action = this.action === "create" ? "新建" : "更新";
 
               if (res.status) {
                 this.pending = false;
@@ -146,20 +149,20 @@ export default {
 
                 return this.$platform.notification({
                   title: `${action}产品失败`,
-                  message: res.message || '',
-                  type: 'error',
+                  message: res.message || "",
+                  type: "error",
                 })
               }
 
               this.$platform.notification({
                 title: `${action}产品成功`,
-                type: 'success',
+                type: "success",
               });
 
-              if(this.action == 'create') {
+              if(this.action == "create") {
                 this.reloadTab();
               } else {
-                let fromId = window.frameElement.getAttribute('fromid');
+                let fromId = window.frameElement.getAttribute("fromid");
                 this.$platform.refreshTab(fromId);
               }
               if (this.customer) {
@@ -181,14 +184,14 @@ export default {
         })
     },
     goBack() {
-      if(this.action == 'create') {
+      if(this.action == "create") {
         let id = window.frameElement.dataset.id;
         return this.$platform.closeTab(id);
       }
       parent.frameHistoryBack(window);
     },
     reloadTab() {
-      let fromId = window.frameElement.getAttribute('fromid');
+      let fromId = window.frameElement.getAttribute("fromid");
 
       this.$platform.refreshTab(fromId);
     },

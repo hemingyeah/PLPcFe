@@ -98,7 +98,7 @@ import TaskSearchForm from "./TaskSearchForm.vue";
 import TaskSearchPupal from "./TaskSearchPupal";
 import TaskInquire from "./TaskInquire";
 
-import guideCompoment from "@src/component/guide/guide";
+import guideCompoment from "@src/component/guide/Guide";
 
 let guideCompoments = Vue.extend(guideCompoment);
 
@@ -259,16 +259,16 @@ export default {
         repeatBool;
       for (let key in searchFormData) {
         if (
-          JSON.stringify(searchFormData[key]) !== "[]" &&
-          searchFormData[key] &&
-          key !== "backUp"
+          JSON.stringify(searchFormData[key]) !== "[]"
+          && searchFormData[key]
+          && key !== "backUp"
         ) {
           if (key !== "area") {
             inPar.push(key);
           } else {
             if (
-              JSON.stringify(searchFormData[key]) !== "{}" &&
-              searchFormData[key].province
+              JSON.stringify(searchFormData[key]) !== "{}"
+              && searchFormData[key].province
             ) {
               inPar.push("area");
             }
@@ -277,24 +277,23 @@ export default {
       }
       for (let key in this.$refs.taskInquireParams.returnData()) {
         if (
-          inPar.indexOf(key) !== -1 &&
-          this.$refs.taskInquireParams.returnData()[key] &&
-          JSON.stringify(this.$refs.taskInquireParams.returnData()[key]) !==
-            "[]" &&
-          key !== "backUp"
+          inPar.indexOf(key) !== -1
+          && this.$refs.taskInquireParams.returnData()[key]
+          && JSON.stringify(this.$refs.taskInquireParams.returnData()[key]) !== "[]"
+          && key !== "backUp"
         ) {
           if (key !== "customer" && key !== "tags" && key !== "area") {
             repeatBool = true;
           } else {
             if (
-              this.$refs.taskInquireParams.returnData()["area"] &&
-              this.$refs.taskInquireParams.returnData()["area"].province
+              this.$refs.taskInquireParams.returnData()["area"]
+              && this.$refs.taskInquireParams.returnData()["area"].province
             ) {
               repeatBool = true;
             }
             if (
-              this.$refs.taskInquireParams.returnData()["tags"] &&
-              this.$refs.taskInquireParams.returnData()["tags"].length
+              this.$refs.taskInquireParams.returnData()["tags"]
+              && this.$refs.taskInquireParams.returnData()["tags"].length
             ) {
               repeatBool = true;
             }
@@ -403,9 +402,9 @@ export default {
 
         // 空对象
         if (
-          typeof form[fn] === "object" &&
-          !Array.isArray(form[fn]) &&
-          !Object.keys(form[fn]).length
+          typeof form[fn] === "object"
+          && !Array.isArray(form[fn])
+          && !Object.keys(form[fn]).length
         ) {
           continue;
         }
@@ -495,9 +494,9 @@ export default {
 
         // 空对象
         if (
-          typeof form[fn] === "object" &&
-          !Array.isArray(form[fn]) &&
-          !Object.keys(form[fn]).length
+          typeof form[fn] === "object"
+          && !Array.isArray(form[fn])
+          && !Object.keys(form[fn]).length
         ) {
           continue;
         }
@@ -560,15 +559,15 @@ export default {
         if (tv.fieldName === "exceptionType") {
           let exceptionType;
           switch (form[fn]) {
-            case "暂停":
-              exceptionType = 1;
-              break;
-            case "超时":
-              exceptionType = 2;
-              break;
-            default:
-              exceptionType = 0;
-              break;
+          case "暂停":
+            exceptionType = 1;
+            break;
+          case "超时":
+            exceptionType = 2;
+            break;
+          default:
+            exceptionType = 0;
+            break;
           }
           params.systemConditions.push({
             property: "exceptionType",
@@ -666,8 +665,8 @@ export default {
         }
 
         if (
-          MultiFieldNames.indexOf(tv.formType) !== -1 ||
-          tv.formType === "user"
+          MultiFieldNames.indexOf(tv.formType) !== -1
+          || tv.formType === "user"
         ) {
           params.systemConditions.push({
             property: fn,
@@ -686,14 +685,12 @@ export default {
           continue;
         }
 
-        let value =
-          TaskOnceConvertMap[form[fn]] != undefined
-            ? TaskOnceConvertMap[form[fn]]
-            : form[fn];
-        value =
-          TaskApproveConvertMap[value] != undefined
-            ? TaskApproveConvertMap[value]
-            : value;
+        let value = TaskOnceConvertMap[form[fn]] != undefined
+          ? TaskOnceConvertMap[form[fn]]
+          : form[fn];
+        value = TaskApproveConvertMap[value] != undefined
+          ? TaskApproveConvertMap[value]
+          : value;
 
         params.systemConditions.push({
           property: fn,
@@ -713,9 +710,9 @@ export default {
 
         // 空对象
         if (
-          typeof form[fn] === "object" &&
-          !Array.isArray(form[fn]) &&
-          !Object.keys(form[fn]).length
+          typeof form[fn] === "object"
+          && !Array.isArray(form[fn])
+          && !Object.keys(form[fn]).length
         ) {
           continue;
         }
@@ -809,42 +806,42 @@ export default {
       let operator = "";
 
       switch (formType) {
-        case "date": {
-          operator = "between";
-          break;
+      case "date": {
+        operator = "between";
+        break;
+      }
+      case "datetime": {
+        operator = "between";
+        break;
+      }
+      case "select": {
+        if (field.setting && field.setting.isMulti) {
+          operator = "contain";
+        } else {
+          operator = "eq";
         }
-        case "datetime": {
-          operator = "between";
-          break;
-        }
-        case "select": {
-          if (field.setting && field.setting.isMulti) {
-            operator = "contain";
-          } else {
-            operator = "eq";
-          }
-          break;
-        }
-        case "user": {
-          operator = "user";
-          break;
-        }
-        case "cascader": {
-          operator = "cascader";
-          break;
-        }
-        case "address": {
-          operator = "address";
-          break;
-        }
-        case "location": {
-          operator = "location";
-          break;
-        }
-        default: {
-          operator = "like";
-          break;
-        }
+        break;
+      }
+      case "user": {
+        operator = "user";
+        break;
+      }
+      case "cascader": {
+        operator = "cascader";
+        break;
+      }
+      case "address": {
+        operator = "address";
+        break;
+      }
+      case "location": {
+        operator = "location";
+        break;
+      }
+      default: {
+        operator = "like";
+        break;
+      }
       }
       return operator;
     },
@@ -858,10 +855,10 @@ export default {
     resetParams() {
       this.formBackup = {};
       this.inquireFormBackup = {};
-      this.$refs.searchForm &&
-        this.$nextTick(this.$refs.searchForm.initFormVal);
-      this.$refs.taskInquireParams &&
-        this.$nextTick(this.$refs.taskInquireParams.initFormVal);
+      this.$refs.searchForm
+        && this.$nextTick(this.$refs.searchForm.initFormVal);
+      this.$refs.taskInquireParams
+        && this.$nextTick(this.$refs.taskInquireParams.initFormVal);
     },
     saveDataToStorage(key, value) {
       const data = this.getLocalStorageData();
