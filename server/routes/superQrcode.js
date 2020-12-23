@@ -13,7 +13,7 @@ router.get('/setting/superQrcode', async ctx => {
   let result = await HttpClient.request('/setting/superQrcode', 'get', null, { headers: reqHeaders });
   let body = result.body;
   
-  ctx.body = Template.renderWithHtml('超级二维码', body, script, modConfig.template)
+  ctx.body = Template.renderWithHtml('产品二维码配置', body, script, modConfig.template)
 })
 
 module.exports = router;

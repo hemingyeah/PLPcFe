@@ -70,17 +70,17 @@
         <el-table-column prop="ruleName" label="规则名称"></el-table-column>
         <el-table-column label="操作">
           <template slot-scope="scope">
-            <i class="el-icon-edit pointer" @click="editRule(scope.row.id)"></i>
+            <i class="iconfont icon-bianji pointer" @click="editRule(scope.row.id)"></i>
             <i
-              class="el-icon-delete pointer"
+              class="iconfont icon-qingkongshanchu-copy pointer"
               @click="deleteRule(scope.row.id, scope.row.isSystem)"
             ></i>
             <i
-              class="iconfont icon-paixuxia pointer"
+              class="iconfont icon-long-arrow-up pointer"
               @click="moveRule(scope.$index, 'top')"
             ></i>
             <i
-              class="iconfont icon-paixuxia1 pointer"
+              class="iconfont icon-long-arrow-down pointer"
               @click="moveRule(scope.$index, 'down')"
             ></i>
           </template>
@@ -583,7 +583,7 @@ export default {
     goSuperqrcodeSet(){
       this.$platform.openTab({
         id: 'superqrcodeSet',
-        title: "超级二维码",
+        title: "产品二维码配置",
         close: true,
         url: '/setting/superQrcode'
       });
@@ -1058,6 +1058,9 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
+/deep/ .el-table td{
+  color:#333;
+}
 .el-radio{
   margin-right: 10px;
 }

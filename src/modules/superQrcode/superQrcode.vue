@@ -79,7 +79,7 @@
             <h3>产品名称</h3>
             <div class="intro" @click="changeType('intro')" :class="introClass">
               <span>{{ settingInfo.productIntroduction }}</span>
-              <a class="intro-change" @click="showDetail = !showDetail">{{
+              <a v-if="!noCatalog" class="intro-change" @click="showDetail = !showDetail">{{
                 showDetail ? "收起" : "展开"
               }}</a>
             </div>
@@ -164,7 +164,7 @@
             <ul>
               <li>
                 <span>企业名称</span>
-                <p>{{comData && comData.tenantName}}</p>
+                <p>{{showCompanyName(comData)}}</p>
               </li>
               <li>
                 <span>企业地址</span>
@@ -361,6 +361,13 @@ export default {
     }
   },
   methods: {
+    // 企业名称
+    showCompanyName(comData){
+      if(comData.showNickName===1 && comData.nickName){
+        return comData.nickName
+      }
+      return comData.tenantName
+    },
     // 产品类型选择样式修改，移动到无子项时隐藏右侧弹框
     cascaderShow(val){
       if(val){
