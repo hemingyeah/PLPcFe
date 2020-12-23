@@ -1223,6 +1223,7 @@ p{
             line-height: 20px;
             padding: 0 10px;
             overflow: hidden;
+            background: #fff;
 
             .intro-change {
               color: $color-main;

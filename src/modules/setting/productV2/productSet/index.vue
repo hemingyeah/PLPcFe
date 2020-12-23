@@ -308,6 +308,7 @@
                 size="mini"
                 class="select-loadmore"
                 v-model="form.selectUsers"
+                @change="userChange"
                 multiple
                 collapse-tags
                 filterable
@@ -342,7 +343,7 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button size="small" @click="dialogVisible = false">取 消</el-button>
-        <el-button size="small" type="primary" @click="submitForm"
+        <el-button size="small" :disabled='pending' type="primary" @click="submitForm"
           >确 定</el-button
         >
       </div>
@@ -371,6 +372,7 @@ export default {
   name: "product-set",
   data() {
     return {
+      pending:false,
       tenantId: "",
       userId:'',
       fullscreenLoading: false,
@@ -447,7 +449,8 @@ export default {
       ],
       loading: false,
 
-      chosenUser:[]
+      chosenUser:[],
+      mulUsers:[]
     };
   },
   computed: {
@@ -697,7 +700,9 @@ export default {
     },
     // 新建保存
     async addDistributeRule(params){
+      this.pending=true;
       let res=await addDistributeRule(params);
+      this.pending=false;
       if(res.code==200){
         this.dialogVisible=false;
         this.queryAllRules();
@@ -711,7 +716,9 @@ export default {
     },
     // 编辑保存
     async modifyDistributeRule(params){
+      this.pending=true;
       let res=await modifyDistributeRule(params);
+      this.pending=false;
       if(res.code==200){
         this.dialogVisible=false;
         this.queryAllRules();
@@ -745,7 +752,7 @@ export default {
           params.distributeCondition = { group: "user" };
           params.candidate = { info: [] };
           this.form.selectUsers.forEach((userId) => {
-            const item = this.userList.find((u) => u.userId == userId);
+            const item = this.mulUsers.find((u) => u.userId == userId);
             params.candidate.info.push({
               userId,
               userName: item.displayName,
@@ -970,6 +977,12 @@ export default {
           this.chosenUser.forEach(item=>{
             item.displayName=item.userName;
           });
+          this.mulUsers=this.chosenUser.map(item=>{
+            return {
+              userId:item.userId,
+              displayName:item.displayName
+            }
+          });
           this.getUserList(null,true,true);
           form.selectUsers=result.candidate.info.map(item=>item.userId);
         }else if(form.selectUserType=='role' || form.selectUserType=='tag' || form.selectUserType=='tagLeader'){
@@ -1003,6 +1016,28 @@ export default {
       }else{
         this.$platform.alert(res.msg);
       }
+    },
+    // 人员列表选择
+    userChange(val){
+      let arr=[];
+      val.forEach(userId=>{
+        const nowExist=this.userList.find(item=>item.userId===userId);
+        if(nowExist){
+          arr.push({
+            userId:nowExist.userId,
+            displayName:nowExist.displayName
+          });
+        }else{
+          const oldExist=this.mulUsers.find(item=>item.userId===userId);
+          if(oldExist){
+            arr.push({
+              userId:oldExist.userId,
+              displayName:oldExist.displayName
+            });
+          }
+        }
+      });
+      this.mulUsers=arr;
     },
     // 获取所有规则
     async queryAllRules() {
