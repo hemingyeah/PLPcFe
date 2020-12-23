@@ -66,6 +66,10 @@ const TASK_SELF_FIELD_NAMES = [
 ];
 // 导出过来字段类型
 const EXPORT_FILTER_FORM_TYPE = ["attachment", "address", "autograph"];
+// 视图数据
+const Region = {
+  closeViewId: '2a53a0ff-4141-11e7-a318-00163e304a25'
+}
 
 export default {
   name: "task-list",
@@ -272,7 +276,13 @@ export default {
     },
     /* 是否显示 批量创建/生成服务报告 */
     isShowBatchCreateOrPrintReport() {
-      return this.isSystemAdmin && this.selectColumnState == TaskStateEnum.FINISHED.value
+      return (
+        this.isSystemAdmin 
+        && (
+          this.selectColumnState == TaskStateEnum.FINISHED.value
+          || this.region?.viewId == Region.closeViewId
+        )
+      )
     }
   },
   filters: {
