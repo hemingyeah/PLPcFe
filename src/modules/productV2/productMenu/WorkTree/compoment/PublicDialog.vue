@@ -398,3 +398,9 @@ padding-right: 6px;
 
   }
 </style>
+
+<style lang="scss">
+.el-select-dropdown__empty {
+  display: block !important;
+}
+</style>

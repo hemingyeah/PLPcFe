@@ -1,51 +1,47 @@
 <template>
-  <base-modal
-    :title="pageObj[dialogType] && pageObj[dialogType].title"
-    :show.sync="visible"
-    width="400px"
-    class="base-import-modal"
-  >
-    <div class="form-view-row" style="padding: 0">
+  <base-modal :title="pageObj[dialogType] && pageObj[dialogType].title"
+              :show.sync="visible"
+              width="400px"
+              class="base-import-modal">
+    <div class="form-view-row"
+         style="padding: 0">
       <label style="line-height: 32px">{{
         pageObj[dialogType] && pageObj[dialogType].lable
       }}</label>
       <div class="form-view-row-content flex-x">
-        <el-select
-          class="flex-1 pos-r"
-          popper-class="max-w-488"
-          v-model="nowChooseArr"
-          filterable
-          remote
-          collapse-tags
-          clearable
-          placeholder="请输入关键词"
-          :remote-method="lenovoselectSearchData"
-          :loading="selectLoading"
-        >
-          <el-option
-            v-for="item in pageObj[dialogType] && pageObj[dialogType].options"
-            :key="item.id"
-            :label="dialogType == 'linkQrcode' ? item.qrcodeId : item.pathName"
-            :value="dialogType == 'linkQrcode' ? item.qrcodeId : item.id"
-          >
+        <el-select class="flex-1 pos-r"
+                   popper-class="max-w-488"
+                   v-model="nowChooseArr"
+                   filterable
+                   remote
+                   collapse-tags
+                   clearable
+                   placeholder="请输入关键词"
+                   :remote-method="lenovoselectSearchData"
+                   :loading="selectLoading">
+          <el-option v-for="item in pageObj[dialogType] && pageObj[dialogType].options"
+                     :key="item.id"
+                     :label="dialogType == 'linkQrcode' ? item.qrcodeId : item.pathName"
+                     :value="dialogType == 'linkQrcode' ? item.qrcodeId : item.id">
             <div class="flex-x overHideCon-1">
-              <template v-if="dialogType == 'linkQrcode'"
-              ><div>{{ item.qrcodeId }}</div></template
-              >
-              <template v-else
-              ><div>{{ item.pathName }}</div></template
-              >
+              <template v-if="dialogType == 'linkQrcode'">
+                <div>{{ item.qrcodeId }}</div>
+              </template>
+              <template v-else>
+                <div>{{ item.pathName }}</div>
+              </template>
             </div>
           </el-option>
         </el-select>
       </div>
     </div>
 
-    <div class="dialog-footer" style="margin-top: 15px;">
+    <div class="dialog-footer"
+         style="margin-top: 15px;">
       <el-button @click="visible = false">取 消</el-button>
-      <el-button type="primary" @click="bind" :loading="pending"
-      >关联</el-button
-      >
+      <el-button type="primary"
+                 @click="bind"
+                 :loading="pending">关联</el-button>
     </div>
   </base-modal>
 </template>
@@ -70,14 +66,14 @@ export default {
     },
   },
   watch: {
-    visible(newVal, oldVal) {
+    visible (newVal, oldVal) {
       if (!newVal) {
         this.nowChooseArr = "";
         this.pending = false;
       }
     },
   },
-  data() {
+  data () {
     return {
       visible: false,
       pending: false,
@@ -102,13 +98,13 @@ export default {
     };
   },
   methods: {
-    open() {
+    open () {
       this.visible = true;
     },
-    close() {
+    close () {
       this.visible = false;
     },
-    bind() {
+    bind () {
       if (!this.nowChooseArr) return this.$message.error("选择内容不能为空");
 
       this.pending = true;
@@ -118,15 +114,15 @@ export default {
         this.$emit("dialogBind", { catalogId: this.nowChooseArr });
       }
     },
-    reset() {
+    reset () {
       this.visible = false;
       this.nowChooseArr = "";
     },
-    changeLoading(e) {
+    changeLoading (e) {
       this.pending = e;
     },
 
-    lenovoselectSearchData: _.debounce(function(e) {
+    lenovoselectSearchData: _.debounce(function (e) {
       this.selectLoading = true;
       this.pageObj[this.dialogType]
         .http({
@@ -140,7 +136,7 @@ export default {
           }
           this.pageObj[this.dialogType].options = res.result.list || [];
         })
-        .catch((err) => {})
+        .catch((err) => { })
         .finally(() => {
           this.selectLoading = false;
         });
@@ -162,5 +158,9 @@ export default {
 .dialog-footer {
   display: flex;
   justify-content: flex-end;
+}
+
+.el-select-dropdown__empty {
+  display: block !important;
 }
 </style>
