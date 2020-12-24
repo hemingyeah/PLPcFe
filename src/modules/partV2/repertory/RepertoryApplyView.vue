@@ -851,7 +851,7 @@
           v-if="partDealData.data.state === 'suspending' || partDealData.data.state === 'dealing'"
         >
           <!-- tenantType=0 钉钉端  -->
-          <div class="ding-btn" v-if="!tenantType && partDealData.data.cancel" @click="dingMessage">
+          <div class="ding-btn" v-if="isDingDingDesktop && partDealData.data.cancel" @click="dingMessage">
             <i class="iconfont icon-Ding"></i>
             DING
           </div>
@@ -1123,6 +1123,7 @@ import {
   approveBatchByApproveNos
 } from '@src/api/SparePart';
 import StorageUtil from '@src/util/storageUtil';
+import Platform from '@src/util/Platform'
 
 let allPerson = [];
 
@@ -1294,6 +1295,9 @@ export default {
           { value: '入库', label: '入库', key: '1' },
           { value: '调拨', label: '调拨', key: '2' }
         ];
+    },
+    isDingDingDesktop() {
+      return Platform.isDingDingDesktop()
     }
   },
   watch: {
