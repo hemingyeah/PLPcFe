@@ -327,7 +327,7 @@ export default {
         case 'service':
           return '请前往门户设置去配置';
         case 'comInfo':
-          return '请前往门户设置去配置';
+          return '请前往【系统管理 -- 公司信息配置】中配置企业资料';
         default:
           return ''
       }
