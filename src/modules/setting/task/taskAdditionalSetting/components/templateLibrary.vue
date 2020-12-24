@@ -20,7 +20,7 @@
             </div>
             <div class="task-card-footer">
               <template v-if="cardItem.type!=='工时'">
-                <el-button type="primary" plain class="preview">预览</el-button>
+                <el-button type="primary" class="preview">预览</el-button>
                 <el-tooltip class="item" effect="dark" content="每个工单中填写一组该数据" placement="top">
                   <el-button type="primary" @click="importcard(cardItem.cardId,'single')">添加为单次</el-button>
                 </el-tooltip>
@@ -170,11 +170,10 @@ export default {
             display: flex;
             justify-content: flex-end;
             .preview{
-              &:hover{
-                  background: #e7f9f9;
-                  border-color: #a1e7e7;
-                  color: #13C2C2;
-              }
+              background: #e7f9f9;
+              border-color: #a1e7e7;
+              color: #13C2C2;
+
             }
         }
 

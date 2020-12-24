@@ -63,6 +63,13 @@ router.get('/setting/task/cardManage', async ctx => {
   ctx.body = Template.renderWithHtml('附加组件设置', body, script, modConfig.template)
 });
 
+router.get('/setting/serviceStation/card/view', async ctx => {
+  let modConfig = modules['setting.task.addcard_fields'];
+  let script = ['/setting.task.addcard_fields.js'];
+  
+  ctx.body = Template.renderWithData('附加组件表单设置', {}, script, modConfig.template)
+});
+
 router.get('/setting/serviceStation/partShop', async ctx => {
   let script = ['/system.mall.index.js'];
   let modConfig = modules['system.mall.index'];

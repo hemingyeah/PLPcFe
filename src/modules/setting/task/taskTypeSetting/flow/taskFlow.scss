@@ -1,6 +1,9 @@
 .setting-flow{
+    min-width: 1200px;
     .setting-flow-header{
-        position: relative;
+        z-index: 999;
+        position: sticky;
+        top: 0;
         display: flex;
         justify-content: space-between;
         width: 100%;

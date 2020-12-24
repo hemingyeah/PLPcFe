@@ -36,6 +36,7 @@ ul,.task-nav-bar{
   min-width: 194px;
   height: 100%;
   padding: 26px 38px;
+  margin-bottom: 0;
   background: #FFFFFF;
   border-radius: 4px;
   list-style: none;

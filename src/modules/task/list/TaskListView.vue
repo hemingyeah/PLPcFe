@@ -862,17 +862,17 @@
                           Array.isArray(scope.row.attribute[column.field])
                       "
                     >
-                      {{ scope.row.attribute[column.field].join(",") }}
+                      {{ scope.row.attribute[column.field].join(",") | fmt_form_field(column.formType, column.fieldName, scope.row.attribute) }}
                     </template>
                     <template v-else>
                       {{
-                        scope.row.attribute && scope.row.attribute[column.field]
+                        scope.row.attribute && scope.row.attribute[column.field] | fmt_form_field(column.formType, column.fieldName, scope.row.attribute)
                       }}
                     </template>
                   </template>
 
                   <template v-else>
-                    {{ scope.row[column.field] }}
+                    {{ scope.row[column.field] | fmt_form_field(column.formType, column.fieldName, scope.row.attribute)}}
                   </template>
                 </template>
               </el-table-column>

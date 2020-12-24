@@ -100,7 +100,21 @@ export const getCardSysList =  (params = {}) => {
   return http.post('/setting/card/getSysList', params)
 }
 
+/**
+ * @description 获取附加组件表单
+ * @param {Object} 
+ */
+export const getAddCardFields =  (params = {}) => {
+  return http.get('/setting/task/cardField/list', params)
+}
 
+/**
+ * @description 创建取附加组件表单
+ * @param {Object} 
+ */
+export const taskCardFieldsSave =  (params = {}) => {
+  return http.post('/setting/task/cardField/create', params,false)
+}
 
 /* ------------- end 附加组件设置 ---------------- */
 

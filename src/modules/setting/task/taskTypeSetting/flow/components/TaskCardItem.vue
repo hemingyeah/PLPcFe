@@ -3,10 +3,13 @@
         <el-row class="task-card-main" type="flex" justify="space-between">
             <el-row type="flex">
                 <el-row class="task-card-content" type="flex">
-                    <h2 class="task-card-name">
-                        <el-tooltip class="item" effect="dark" :content="taskCard.name" :disabled="taskCard.name.length<17" placement="top-start">
-                            <span>{{taskCard.name}}</span>
+                    <h2 class="task-card-title">
+                        <el-tooltip class="item" effect="dark" :content="taskCard.name" :disabled="disabledState" placement="top">
+                            <span :class="['task-card-name',taskCard.enabled == 0 && 'task-card-enabled']">{{taskCard.name}}</span>
                         </el-tooltip>    
+                        <el-tooltip class="item" effect="dark" content="可在附加组件设置中开启" placement="top">
+                            <span class="task-card-disable" v-if="taskCard.enabled == 0">已禁用</span>
+                        </el-tooltip>
                     </h2>
                     <el-row class="task-card-others">
                         <p>
@@ -76,6 +79,11 @@ export default {
         },
         taskTypeId: {
             type: String,
+        }
+    },
+    computed: {
+        disabledState(){
+            return this.taskCard.name.length < 19 && this.taskCard.enabled != 0 || (this.taskCard.name.length < 15 && this.taskCard.enabled == 0)
         }
     },
     data() {
@@ -164,17 +172,41 @@ export default {
             flex-direction: column;
             justify-content: space-between;
             height: 100%;
-            .task-card-name{
-                width: 300px;
-                margin-bottom: 0;
-                @include text-ellipsis;
-                word-break: break-all;
-                padding-right: 12px;
-                font-size: 16px;
-                color: #333333;
-                line-height: 22px;
-                cursor: pointer;
+            .task-card-title{
+                display: flex;
+                justify-content: flex-start;
+                .task-card-name{
+                    display: inline-block;
+                    max-width: 300px;
+                    margin-bottom: 0;
+                    @include text-ellipsis;
+                    word-break: break-all;
+                    padding-right: 12px;
+                    font-size: 16px;
+                    color: #333333;
+                    line-height: 22px;
+                    cursor: pointer;
+                }
+                .task-card-enabled{        
+                    max-width: 230px;
+                    padding-right: 0px;
+                    margin-right: 12px;          
+                }
+                .task-card-disable{
+                    width: 54px;
+                    height: 22px;
+                    line-height: 22px;
+                    font-size: 12px;
+                    font-weight: 500;
+                    text-align: center;
+                    color: #999999;
+                    background: rgba(153, 153, 153, 0.2);
+                    border-radius: 12px;
+                    border: 1px solid rgba(191, 191, 191, 0.2);
+                    cursor: pointer;
+                }
             }
+
             .task-card-others{
                 i{
                     font-size: 12px;
