@@ -56,6 +56,7 @@ import Platform from "@src/platform";
 
 export default {
     name: "template-upload-dialog",
+    inject: ['taskFlowData'],
     props: {
         visiable: {
             type: Boolean,
@@ -68,10 +69,6 @@ export default {
         taskTypeId: {
             type: String,
             default: ''
-        },
-        templates: {
-            type: Array,
-            default: () => []
         }
     },
     data() {
@@ -79,12 +76,13 @@ export default {
             pending: false,
             isShow: false,
 
+            templates: [],
             fileResult: {},
         }
     },
     computed: {
         typeName() {
-            return this.type === 'report' ? '服务报告' : '打印';
+            return this.type === 'reportSetting' ? '服务报告' : '打印';
         },
         templateUrl() {
             return `/setting/taskType/getTemplateDic?typeId=${this.taskTypeId}`;
@@ -101,6 +99,7 @@ export default {
     watch: {
         visiable(val) {
             this.isShow = val;
+            this.templates = this.taskFlowData.taskTypeConfig[this.type].templates || [];
         }
     }, 
     methods: {
@@ -109,7 +108,7 @@ export default {
         },
         removeFile() {
             this.fileResult = {};
-            this.$emit('update:templates', []);
+            this.templates = []
         },
         /**
          * 文件上传
@@ -134,7 +133,7 @@ export default {
                 }
 
                 this.fileResult = result.data;
-                this.$emit('update:templates', [result.data]);
+                this.templates = [result.data];
             }).catch(err => {
                 console.error(err);
             })
@@ -158,11 +157,12 @@ export default {
                 })
             };
             
-            let fetchFn = this.type === 'report' ? TaskApi.saveReportTemplate : TaskApi.savePrintTemplate;
+            let fetchFn = this.type === 'reportSetting' ? TaskApi.saveReportTemplate : TaskApi.savePrintTemplate;
             try {
                 this.pending = true;
                 let res = await fetchFn(params);
                 if(res.status === 0) {
+                    this.taskFlowData.taskTypeConfig[this.type].templates = this.templates;
                     this.$notify.success('设置成功');
                     this.close();
                 }

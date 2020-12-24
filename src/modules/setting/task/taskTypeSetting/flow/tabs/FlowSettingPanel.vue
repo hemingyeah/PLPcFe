@@ -144,12 +144,12 @@ export default {
 <style lang="scss" scoped>
 .setting-flow-container{
     width: 100%;
-    height: calc(100vh - 48px);
+    min-height: calc(100vh - 48px);
     padding: 16px 12px 24px 12px;
     background: #F5F5F5;
     .setting-flow-axis{
         width: 298px;
-        height: 100%;
+        min-height: 100%;
         padding: 20px;
         background: #FFFFFF;
         border-radius: 4px;
@@ -215,7 +215,7 @@ export default {
     .setting-flow-main{
         flex: 1;
         width: 100%;
-        height: 100%;
+        min-height: 100%;
         padding-left: 12px;
         &-title{
             width: 100%;
