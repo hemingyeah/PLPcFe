@@ -34,28 +34,30 @@
                       :value="productMenuValue"
                       mode="product_menu"
                       @update="update">
-          <div class="normal-title-2">
-            <div>选择产品类型显示字段</div>
-            <el-tooltip class="item"
-                        effect="dark"
-                        content="类型字段在系统管理中配置"
-                        placement="bottom">
-              <i class="iconfont icon-help color-999 mar-l-8 cur-point"></i>
-            </el-tooltip>
-          </div>
-
-          <div class="pad-l-10 mar-b-12">
-            <div class="font-12 color-999 mar-b-10">
-              *被隐藏的字段，将不会出现在这个类型信息中（系统字段不可隐藏）
+          <template v-if="haveAttribute">
+            <div class="normal-title-2">
+              <div>选择产品类型显示字段</div>
+              <el-tooltip class="item"
+                          effect="dark"
+                          content="类型字段在系统管理中配置"
+                          placement="bottom">
+                <i class="iconfont icon-help color-999 mar-l-8 cur-point"></i>
+              </el-tooltip>
             </div>
-            <el-checkbox-group v-model="fieldIds">
-              <template v-for="item in fields">
-                <el-checkbox v-if="item.isSystem != 1"
-                             :label="item.id"
-                             :key="item.id">{{ item.displayName }}</el-checkbox>
-              </template>
-            </el-checkbox-group>
-          </div>
+
+            <div class="pad-l-10 mar-b-12">
+              <div class="font-12 color-999 mar-b-10">
+                *被隐藏的字段，将不会出现在这个类型信息中（系统字段不可隐藏）
+              </div>
+              <el-checkbox-group v-model="fieldIds">
+                <template v-for="item in fields">
+                  <el-checkbox v-if="item.isSystem != 1"
+                               :label="item.id"
+                               :key="item.id">{{ item.displayName }}</el-checkbox>
+                </template>
+              </el-checkbox-group>
+            </div>
+          </template>
           <template slot="product_menu_part">
             <div class="normal-title-2 ">
               <div class="flex-1">关联备件</div>
@@ -83,6 +85,7 @@
           <template slot="productPic"
                     slot-scope="{ field }">
             <form-item class="upload-img"
+                       :class="{'hide_box':productMenuValue.productPic.length==5}"
                        :label="field.displayName">
               <el-upload action="string"
                          list-type="picture-card"
@@ -104,8 +107,9 @@
 
           <template slot="thumbnail"
                     slot-scope="{ field }">
-            <form-item class="upload-img"
-                       :label="field.displayName">
+            <form-item 
+              :class="['upload-img',productMenuValue.thumbnail.length==1? 'hide_box': '']"
+              :label="field.displayName">
               <el-upload action="string"
                          list-type="picture-card"
                          :on-preview="handlePictureCardPreview"
@@ -233,7 +237,8 @@ export default {
       btnLoading: false,
       productPicList: [],
       thumbnailList: [],
-      loading: false
+      loading: false,
+      haveAttribute: false
     };
   },
   components: {
@@ -263,12 +268,14 @@ export default {
     getProductMenuField()
       .then((res) => {
         const { code, result, message } = res;
+        this.haveAttribute = false;
         if (code == 0) {
           const fields = result || [];
           let arr = [];
           const sortedFields = fields
             .sort((a, b) => a.orderId - b.orderId)
             .map((item) => {
+              if (item.isSystem != 1) this.haveAttribute = true;
               if (item.fieldName == "catalogName") item["maxlength"] = 30;
               if (item.fieldName == "catalogNum") item["disabled"] = true;
               if (item.fieldName == "productVideo") item["limit"] = 1;
@@ -688,5 +695,9 @@ export default {
 
 .table-footer {
   padding: 0;
+}
+
+.hide_box .el-upload--picture-card {
+  display: none;
 }
 </style>

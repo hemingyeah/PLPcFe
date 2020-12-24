@@ -115,8 +115,6 @@ export default {
         modal: 'product',
       };
 
-      debugger
-
       if (Object.keys(orderDetail).length) {
         params.orderDetail = orderDetail;
       }
