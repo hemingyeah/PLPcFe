@@ -583,6 +583,8 @@ export default {
         .then((res) => {
           if (!res) return;
           this.newestProduct = res;
+          
+
           this.dataInfo = res;
 
           if (this.newestProduct.qrcodeId) {

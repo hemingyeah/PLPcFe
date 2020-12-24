@@ -10,9 +10,11 @@
             </div>
             <div class="flex-x mar-t-8" v-if="dataInfo && dataInfo.catalogId">
               产品类型:
-              <div class="flex-1 over-x-s color-primary  mar-l-8" style="white-space: nowrap;" >
-                <span @click="openProductMenuTab(dataInfo.catalogId)" class="cur-point">{{(dataInfo.catalogPathName && dataInfo.catalogPathName.replace(new RegExp("/","g") ,' / ')) || ''}}</span>  
-              </div>
+              <el-tooltip class="item" effect="dark" :content="dataInfo.catalogPathName" placement="bottom">
+                <div class="flex-1 over-x-s color-primary  mar-l-8" style="white-space: nowrap;" >
+                  <span @click="openProductMenuTab(dataInfo.catalogId)" class="cur-point overHideCon-1">{{dataInfo.catalogPathName}}</span>  
+                </div>
+              </el-tooltip>
             </div>
           </div>
           <div class="flex-x ">

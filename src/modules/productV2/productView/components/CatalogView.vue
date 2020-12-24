@@ -139,7 +139,7 @@ export default {
               });
             }
             this.changeDataInfo({
-              catalogPathName: res.result.catalogInfo.pathName,
+              catalogPathName: res.result.catalogInfo.pathName.replace(new RegExp("/", "g"), " / ") || ""
             });
             this.$set(this, "dataInfo", res.result.catalogInfo);
           } else {
