@@ -108,20 +108,8 @@
             <template v-if="column.field === 'name'">
               <a href="" class="view-detail-btn" @click.stop.prevent="goProductTemplateView(scope.row.id)">{{scope.row[column.field]}}</a>
             </template>
-            <template v-else-if="column.formType === 'select'">
-              {{ scope.row[column.field] | displaySelect }}
-            </template>
-            <template v-else-if="column.formType === 'user' && scope.row.attribute[column.field]">
-              {{ getUserName(column, scope.row.attribute[column.field]) }}
-            </template>
-            <template v-else-if="column.formType === 'cascader' && scope.row.attribute[column.field]">
-              {{ scope.row.attribute[column.field] | displayCascader }}
-            </template>
             <template v-else-if="column.formType === 'location'">
               {{ scope.row.attribute[column.field] && scope.row.attribute[column.field].address}}
-            </template>
-            <template v-else-if="column.formType == 'related_task'">
-              {{ getRelatedTask(scope.row.attribute[column.field]) }}
             </template>
             <template v-else-if="column.formType === 'address'">
               {{ scope.row.attribute[column.field] && scope.row.attribute[column.field].all}}
@@ -137,7 +125,7 @@
             </div>
 
             <template v-else>
-              {{scope.row[column.field]}}
+              {{scope.row[column.field] | fmt_form_field(column.formType, column.fieldName, scope.row.attribute)}}
             </template>
           </template>
         </el-table-column>
@@ -390,26 +378,6 @@ export default {
     },
   },
   filters: {
-    displaySelect(value) {
-      if (!value) return null;
-      if (value && typeof value === 'string') {
-        return value;
-      }
-      if (Array.isArray(value) && value.length) {
-        return value.join('，');
-      }
-      return null;
-    },
-    displayCascader(value) {
-      if (!value) return null;
-      if (value && typeof value === 'string') {
-        return value;
-      }
-      if (Array.isArray(value) && value.length) {
-        return value.join('/');
-      }
-      return null;
-    },
     formatDate(val) {
       if (!val) return '';
       return formatDate(val, 'YYYY-MM-DD HH:mm:ss')
@@ -436,9 +404,6 @@ export default {
     window.__exports__refresh = this.search;
   },
   methods: {
-    getRelatedTask(field) {
-      return Array.isArray(field) ? field.map(item => item.taskNo).join(',') : '';
-    },
     showAdvancedSetting(){
       window.TDAPP.onEvent('pc：产品管理-选择列事件');
 
@@ -1087,16 +1052,6 @@ export default {
     getRowKey(row) {
       return row.id
     },
-    // 处理人员显示
-    getUserName(field, value) {
-      // 多选
-      if(Array.isArray(value)) {
-        return value.map(i => i.displayName || i.name).join(',');
-      }
-      
-      let user = value || {};
-      return user.displayName || user.name;
-    }
   },
   components: {
     [DialogBatchEditProductTemplate.name]: DialogBatchEditProductTemplate,

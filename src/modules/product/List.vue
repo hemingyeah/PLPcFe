@@ -113,13 +113,6 @@
             <template v-else-if="column.field === 'tags'">
               {{scope.row | formatTags}}
             </template>
-            <!-- 自定义的选择类型字段显示， 与type 区别-->
-            <template v-else-if="column.formType === 'cascader'">
-              {{ scope.row.attribute[column.field] | displayCascader }}
-            </template>
-            <template v-else-if="column.formType === 'select' && !column.isSystem">
-              {{scope.row.attribute[column.field] | displaySelect}} 
-            </template>
             <template v-else-if="column.field === 'updateTime'">
               <template v-if="scope.row.latesetUpdateRecord">
                 <el-tooltip class="item" effect="dark" :content="scope.row.latesetUpdateRecord" placement="top">
@@ -137,14 +130,8 @@
             <template v-else-if="column.formType === 'address'">
               {{formatCustomizeAddress(scope.row.attribute[column.field])}}
             </template>
-            <template v-else-if="column.formType === 'user' && scope.row.attribute[column.field]">
-              {{ getUserName(column, scope.row.attribute[column.field]) }}
-            </template>
             <template v-else-if="column.formType === 'location'">
               {{ scope.row.attribute[column.field] && scope.row.attribute[column.field].address}}
-            </template>
-            <template v-else-if="column.formType == 'related_task'">
-              {{ getRelatedTask(scope.row.attribute[column.field]) }}
             </template>
             <template v-else-if="column.field === 'createUser'">
               {{ scope.row.createUser && scope.row.createUser.displayName }}
@@ -168,11 +155,11 @@
             </template>
 
             <template v-else-if="!column.isSystem">
-              {{scope.row.attribute[column.field]}}
+              {{scope.row.attribute[column.field] | fmt_form_field(column.formType, column.fieldName, scope.row.attribute)}}
             </template>
 
             <template v-else>
-              {{scope.row[column.field]}}
+              {{scope.row[column.field] | fmt_form_field(column.formType, column.fieldName, scope.row.attribute)}}
             </template>
           </template>
         </el-table-column>
@@ -576,28 +563,7 @@ export default {
     formatDate(val) {
       if (!val) return '';
       return formatDate(val, 'YYYY-MM-DD HH:mm:ss')
-    },
-    displaySelect(value) {
-      if (!value) return null;
-      if (value && typeof value === 'string') {
-        return value;
-      }
-      if (Array.isArray(value) && value.length) {
-        return value.join('，');
-      }
-      return null;
-    },
-    displayCascader(value) {
-      if (!value) return null;
-      if (value && typeof value === 'string') {
-        return value;
-      }
-      if (Array.isArray(value) && value.length) {
-        return value.join('/');
-      }
-      return null;
     }
-
   },
   async mounted() {
     this.buildColumns();
@@ -628,19 +594,6 @@ export default {
   methods: {
     getAddress(field) {
       return field.province + field.city + field.dist + field.address || ''
-    },
-    getRelatedTask(field) {
-      return Array.isArray(field) ? field.map(item => item.taskNo).join(',') : '';
-    },
-    // 处理人员显示
-    getUserName(field, value) {
-      // 多选
-      if(Array.isArray(value)) {
-        return value.map(i => i.displayName || i.name).join(',');
-      }
-      
-      let user = value || {};
-      return user.displayName || user.name;
     },
     openOutsideLink(e) {
       let url = e.target.getAttribute('url');
