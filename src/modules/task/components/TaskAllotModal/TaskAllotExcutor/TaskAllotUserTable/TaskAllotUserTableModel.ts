@@ -4,7 +4,7 @@ const TaskAllotUserTableCommonColumns = [
     "label": "设为负责人",
     "field": "excutor",
     "show": true,
-    "fixed": false,
+    "fixed": true,
     "width": "100px",
     "type": "column",
     "disabled": true
@@ -13,26 +13,10 @@ const TaskAllotUserTableCommonColumns = [
     "label": "员工",
     "field": "displayName",
     "show": true,
-    "fixed": false,
+    "fixed": true,
     "width": "150px",
     "type": "column",
     "disabled": true
-  },
-  {
-    "label": "所在团队",
-    "field": "tags",
-    "show": true,
-    "fixed": false,
-    "width": "150px",
-    "type": "column",
-  },
-  {
-    "label": "员工角色",
-    "field": "roles",
-    "show": false,
-    "fixed": false,
-    "width": "150px",
-    "type": "column"
   },
   {
     "label": "未完成工单",
@@ -55,7 +39,7 @@ const TaskAllotUserTableCommonColumns = [
   {
     "label": "计划时间当天工单量",
     "field": "plan",
-    "show": true,
+    "show": false,
     "fixed": false,
     "sortable": 'custom',
     "width": "180px",
@@ -64,7 +48,7 @@ const TaskAllotUserTableCommonColumns = [
   {
     "label": "好评率",
     "field": "degree",
-    "show": true,
+    "show": false,
     "fixed": false,
     "sortable": 'custom',
     "width": "150px",
@@ -94,6 +78,25 @@ const TaskAllotUserTableLineLocationColumn = {
   "type": "column"
 }
 
+const TaskAllotUserTableLastColumns = [
+  {
+    "label": "员工角色",
+    "field": "roles",
+    "show": false,
+    "fixed": false,
+    "width": "250px",
+    "type": "column"
+  },
+  {
+    "label": "所在团队",
+    "field": "tags",
+    "show": true,
+    "fixed": false,
+    "width": "250px",
+    "type": "column",
+  }
+]
+
 /* 工单指派 企业版支持列 */
 export const TaskAllotUserTableEnterpriseEditionColumns = [
   ...TaskAllotUserTableCommonColumns,
@@ -116,17 +119,19 @@ export const TaskAllotUserTableEnterpriseEditionColumns = [
     "width": "150px",
     "type": "column"
   },
-  TaskAllotUserTableStateColumn
+  TaskAllotUserTableStateColumn,
+  ...TaskAllotUserTableLastColumns
 ]
 
 /* 工单指派 标准版 vip版 支持列 */
 export const TaskAllotUserTableStandEditionColumns = [
   ...TaskAllotUserTableCommonColumns,
   TaskAllotUserTableLineLocationColumn,
-  TaskAllotUserTableStateColumn
+  TaskAllotUserTableStateColumn,
+  ...TaskAllotUserTableLastColumns
 ]
 
-export enum TaslAllotTableColumnFieldEnum {
+export enum TaskAllotTableColumnFieldEnum {
   // 负责人
   Excutor = 'excutor',
   // 所在团队

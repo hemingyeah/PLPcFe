@@ -29,7 +29,7 @@ import { MAX_GREATER_THAN__MIN_MESSAGE, REQUIRED_MIN_MESSAGE, REQUIRED_MAX_MESSA
 import {
   AllotSortedEnum,
   AllotLocationEnum,
-  TaslAllotTableColumnFieldEnum,
+  TaskAllotTableColumnFieldEnum,
   AllotLabelEnum
 } from '@src/modules/task/components/TaskAllotModal/TaskAllotExcutor/TaskAllotUserTable/TaskAllotUserTableModel'
 /* types */
@@ -52,11 +52,11 @@ const LoadComponentMap: { [x: string]: string } = {
 }
 
 const SortedMap: { [x: string]: number } = {
-  [TaslAllotTableColumnFieldEnum.Ufinish]: AllotSortedEnum.UnfinishedTask,
-  [TaslAllotTableColumnFieldEnum.Finish]: AllotSortedEnum.FinishTaskByToday,
-  [TaslAllotTableColumnFieldEnum.Plan]: AllotSortedEnum.PlanTaskByToday,
-  [TaslAllotTableColumnFieldEnum.Degree]: AllotSortedEnum.TaskDegreePercentByMonth,
-  [TaslAllotTableColumnFieldEnum.LineDistance]: AllotSortedEnum.Distance
+  [TaskAllotTableColumnFieldEnum.Ufinish]: AllotSortedEnum.UnfinishedTask,
+  [TaskAllotTableColumnFieldEnum.Finish]: AllotSortedEnum.FinishTaskByToday,
+  [TaskAllotTableColumnFieldEnum.Plan]: AllotSortedEnum.PlanTaskByToday,
+  [TaskAllotTableColumnFieldEnum.Degree]: AllotSortedEnum.TaskDegreePercentByMonth,
+  [TaskAllotTableColumnFieldEnum.LineDistance]: AllotSortedEnum.Distance
 }
 
 const OrderMap: { [x: number]: boolean } = {
@@ -442,11 +442,7 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
       orderDetail = {
         code: this.selectSortord || AllotSortedEnum.Distance,
         order: (
-          this.selectSortord == null
-            ? false
-            : orderData === undefined
-              ? true
-              : orderData
+          this.selectSortord == null || orderData === undefined ? true : orderData
         )
       }
     }

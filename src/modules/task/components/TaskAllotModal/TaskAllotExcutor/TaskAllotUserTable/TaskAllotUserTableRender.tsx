@@ -6,7 +6,7 @@ import { ElSelectOption } from '@src/modules/task/components/TaskAllotModal/Task
 /* methods */
 import TaskAllotUserTableMethods from '@src/modules/task/components/TaskAllotModal/TaskAllotExcutor/TaskAllotUserTable/TaskAllotUserTableMethods'
 /* model */
-import { TaslAllotTableColumnFieldEnum } from '@src/modules/task/components/TaskAllotModal/TaskAllotExcutor/TaskAllotUserTable/TaskAllotUserTableModel'
+import { TaskAllotTableColumnFieldEnum } from '@src/modules/task/components/TaskAllotModal/TaskAllotExcutor/TaskAllotUserTable/TaskAllotUserTableModel'
 /* types */
 import Column from '@model/types/Column'
 /* util */
@@ -34,17 +34,17 @@ class TaskAllotUserTableRender extends TaskAllotUserTableMethods {
     let value = column.field ? scope.row[column.field] : ''
     
     // 负责人
-    if (column.field === TaslAllotTableColumnFieldEnum.Excutor) return this.renderColumnWithExcutor(scope)
+    if (column.field === TaskAllotTableColumnFieldEnum.Excutor) return this.renderColumnWithExcutor(scope)
     // 人员名称
-    if (column.field === TaslAllotTableColumnFieldEnum.DisplayName) return this.renderColumnWithDisplayName(scope)
+    if (column.field === TaskAllotTableColumnFieldEnum.DisplayName) return this.renderColumnWithDisplayName(scope)
     // 工作状态
-    if (column.field === TaslAllotTableColumnFieldEnum.State) return this.renderColumnWithState(value)
+    if (column.field === TaskAllotTableColumnFieldEnum.State) return this.renderColumnWithState(value)
     // 距离
-    if (column.field === TaslAllotTableColumnFieldEnum.LineDistance) return this.renderColumnWithLineDistance(value, scope.row)
+    if (column.field === TaskAllotTableColumnFieldEnum.LineDistance) return this.renderColumnWithLineDistance(value, scope.row)
     // 驾车距离
-    if (column.field === TaslAllotTableColumnFieldEnum.Distance) return this.renderColumnWithDistance(value, scope.row)
+    if (column.field === TaskAllotTableColumnFieldEnum.Distance) return this.renderColumnWithDistance(value, scope.row)
     // 驾车时间
-    if (column.field === TaslAllotTableColumnFieldEnum.Duration) return this.renderColumnWithLineDuration(value)
+    if (column.field === TaskAllotTableColumnFieldEnum.Duration) return this.renderColumnWithLineDuration(value)
     // 数组类型
     let isStringArray = Array.isArray(value) && value.every(item => isString(item))
     if (isStringArray) return this.renderColumnWithStringArray(value)
