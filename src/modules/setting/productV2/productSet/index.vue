@@ -358,14 +358,15 @@ import {
   queryAllRules,
   removeDistributeRule,
   moveRule,
-  modifyDistributeRuleState,
+  modifyDistributeRule,
   saveFunc,
   queryCSByCondition,
   addDistributeRule,
   queryApplyOptions,
   queryRuleInfo,
   productConfig,
-  queryCatalogsByPage
+  queryCatalogsByPage,
+  modifyDistributeRuleState
 } from "@src/api/ProductV2Api";
 
 export default {
@@ -693,7 +694,7 @@ export default {
           if(this.openType=='add'){
             this.addDistributeRule(params);
           }else{
-            this.modifyDistributeRuleState(params);
+            this.modifyDistributeRule(params);
           }
         }
       });
@@ -715,9 +716,9 @@ export default {
       }
     },
     // 编辑保存
-    async modifyDistributeRuleState(params){
+    async modifyDistributeRule(params){
       this.pending=true;
-      let res=await modifyDistributeRuleState(params);
+      let res=await modifyDistributeRule(params);
       this.pending=false;
       if(res.code==200){
         this.dialogVisible=false;

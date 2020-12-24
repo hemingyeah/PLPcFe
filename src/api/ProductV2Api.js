@@ -86,7 +86,16 @@ function moveRule(params){
 }
 
 /**
- * 启用/禁用规则，编辑规则
+ * 编辑规则
+ * @param params
+ * @returns {*}
+ */
+function modifyDistributeRule(params){
+  return http.post(`${ruleHeader}/outside/superCode/rule/modifyDistributeRule`,params);
+}
+
+/**
+ * 启用/禁用规则
  * @param params
  * @returns {*}
  */
@@ -460,12 +469,13 @@ export {
   queryAllRules,
   removeDistributeRule,
   moveRule,
-  modifyDistributeRuleState,
+  modifyDistributeRule,
   saveFunc,
   queryCSByCondition,
   addDistributeRule,
   queryApplyOptions,
   queryRuleInfo,
   productConfig,
-  queryCatalogsByPage
+  queryCatalogsByPage,
+  modifyDistributeRuleState
 };
