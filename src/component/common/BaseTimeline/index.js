@@ -44,7 +44,9 @@ const BaseTimeline = {
               : <div class="base-timeline-head"></div>
           }
           <div class="base-timeline-main">
-            <div class="base-timeline-content">{content}</div>
+            <div class="base-timeline-content">{
+              item.action === '自定义异常' ? <div>{`工单由于【${item.centent.action}】导致了工单异常`}</div> : content
+            }</div>
             <p class="base-timeline-time">{ this.getTime(item) }</p>
           </div>
         </div>
