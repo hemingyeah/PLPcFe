@@ -273,7 +273,7 @@ export default {
           const fields = result || [];
           let arr = [];
           const sortedFields = fields
-            .sort((a, b) => a.orderId - b.orderId)
+            .sort((a, b) => a.orderId - b.orderId).filter(item=>item.fieldName != "catalogName")
             .map((item) => {
               if (item.isSystem != 1) this.haveAttribute = true;
               if (item.fieldName == "catalogName") item["maxlength"] = 30;
