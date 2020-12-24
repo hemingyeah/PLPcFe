@@ -110,7 +110,7 @@ export default {
       let fields = [
         {
           displayName: "创建人",
-          fieldName: "createUserId",
+          fieldName: "createUser",
           formType: "user",
           returnData:"name",
           noClearable: true,
