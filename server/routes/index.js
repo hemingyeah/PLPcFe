@@ -91,19 +91,19 @@ router.get("/", async (ctx) => {
  * @description 示例：
  * router 里面不推荐写自定义的路由, 写路由也不要提交，仅供个人使用
 */
-router.use('/temp', (ctx) =>
+router.use('/outside/pc/task', (ctx) =>
   HttpClient.proxy(ctx, {
     // 是否强制使用当前配置
     force: true,
     // http协议，非 http 则为 https
     httpProtocol: 'http',
     // 主机地址
-    host: '127.0.0.1',
+    host: '30.40.56.177',
     // 端口
-    port: 10006,
+    port: 10012,
     // 头信息
     headers: {
-      cookie: 'VIPPUBLINKJSESSIONID=a644d918-3065-4760-b2a4-a47d50230230',
+      cookie: 'VIPPUBLINKJSESSIONID=7813064e-1d5d-4afc-8109-8f938b9f2bbb',
     },
   })
 )

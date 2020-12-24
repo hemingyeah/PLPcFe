@@ -29,6 +29,7 @@
           v-for="(item, idx) in cardList"
           :key="item.id"
           :card.sync="cardList[idx]"
+          @update="updateCardname"
         ></task-card-item>
       </div>
       <!-- end 已添加附加组件 -->
@@ -38,7 +39,13 @@
         <template-library :cardSysList="cardSysList"></template-library>
       </div>
       <!-- end 从模版库添加 -->
-
+      
+      <!-- start 无数据 -->
+      <no-data-view-new   
+        v-if="isShowNoData"
+        notice-msg="暂无附加组件"
+      ></no-data-view-new>
+      <!-- end 无数据 -->
     </div>
     <!-- end 附加组件设置 -->
 
@@ -57,6 +64,7 @@ import TaskNavBar from "../../components/TaskNavBar";
 import TaskCardItem from "../components/TaskCardItem";
 import EditCardnameDialog from "../components/EditCardnameDialog";
 import templateLibrary from "../components/templateLibrary";
+import NoDataViewNew from '@src/component/common/NoDataViewNew';
 import { forEach } from 'lodash';
 
 export default {
@@ -102,6 +110,9 @@ export default {
   computed: {
     isShowCardWorkTime() {
       return isShowCardWorkTime()
+    },
+    isShowNoData() {
+      return (this.activeTab == 'task-added' && this.cardList.length == 0) || (this.activeTab == 'task-import' && this.cardSysList.length == 0);
     }
   },
   mounted() {
@@ -118,6 +129,10 @@ export default {
         this.initCardSysList()
       }
     },
+    //更新列表数据
+    updateCardname() {
+      this.initCard();
+    },
     //新建组件
     addTaskCard(){
       this.$refs.batchCardnameDialog.openDialog();
@@ -125,9 +140,9 @@ export default {
     //获取附加组件列表
     initCard() {
       SettingTaskApi.getAllCardList().then(res=>{
-        const { status, message, result } = res;
-        if(status == 0){
-          // this.cardList = result    
+        const { code, message, result } = res;
+        if(code == 0){
+          // this.cardList = result  
         }else{
           this.$message.error(message);
         }
@@ -204,6 +219,7 @@ export default {
     [TaskNavBar.name]: TaskNavBar,
     [TaskCardItem.name]: TaskCardItem,
     [EditCardnameDialog.name]: EditCardnameDialog,
+    [NoDataViewNew.name]: NoDataViewNew,
     [templateLibrary.name]: templateLibrary   
   },
 };

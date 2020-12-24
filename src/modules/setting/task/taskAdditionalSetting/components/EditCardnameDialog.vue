@@ -107,7 +107,7 @@ export default {
         if (valid) {
           if(this.form.id){
             //修改组件
-            this.onUpdateCardReq();
+            this.onUpdateCardReq(form);
           }else{
             //新增组件
             this.onCreatCardReq();
@@ -150,17 +150,19 @@ export default {
     },
 
     //修改附加组件
-    onUpdateCardReq() {
+    onUpdateCardReq(form) {
       const params = {
-        description: this.form.description,
+        description: this.htmlEscape(this.form.description),
         id: this.form.id,
         name: this.form.name,
       }
       SettingTaskApi.onUpdateCard(params).then(res=>{
           const { status, message, data } = res;
           if(status == 0){
-              this.$message.success('修改成功');
-              location.reload()
+            this.$message.success('修改成功');
+            this.$emit('editCardSubmit');
+
+            this.onClose(form);
           }else{
               this.$message.error(message);
           }
@@ -174,13 +176,21 @@ export default {
       SettingTaskApi.getCardInfo({id:this.form.id}).then(res=>{
         const { status, message, data } = res;
         if( status == 0 ){
+          data.description = this.htmlUnEscape(data.description)
           this.form = data;
         }
-      }).catch(error=>{
-
-      })
-
+      }).catch(error=>{})
     },
+    
+    //防止XSS的恶意脚本攻击
+    htmlEscape(value){
+      return value.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    },
+    htmlUnEscape(value){
+      if(!value) return '';
+      return value.replace( /&lt;/g, "<").replace(/&gt;/g, ">");
+    }
+
   },
 };
 </script>

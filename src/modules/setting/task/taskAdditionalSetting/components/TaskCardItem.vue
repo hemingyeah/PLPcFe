@@ -55,7 +55,7 @@
         <!-- end 操作 -->
 
         <!-- 添加编辑附加组件 -->
-        <edit-cardname-dialog  :id="card.id" ref="batchCardnameDialog"></edit-cardname-dialog>
+        <edit-cardname-dialog  :id="card.id" ref="batchCardnameDialog" @editCardSubmit="editCardSubmit"></edit-cardname-dialog>
 
         <!-- 统计 -->
         <statistical-dialog :card="card" ref="statisteDialog" ></statistical-dialog>
@@ -80,6 +80,9 @@ export default {
     mounted() {
     },
     methods: {
+        editCardSubmit() {
+            this.$emit('update');
+        },
         //删除组件
         delTaskCard() {
             this.$confirm('组件删除后，所有使用该组件的信息将被删除，且不能恢复，确认是否删除？', '提示', {
