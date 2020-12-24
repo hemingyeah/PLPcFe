@@ -462,7 +462,7 @@
 </template>
 
 <script>
-import ProductDetailView from "./ProductDetailView";
+import ProductDetailView from './ProductDetailView';
 export default ProductDetailView;
 </script>
 
