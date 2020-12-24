@@ -273,7 +273,7 @@ export default {
           const fields = result || [];
           let arr = [];
           const sortedFields = fields
-            .sort((a, b) => a.orderId - b.orderId).filter(item=>item.fieldName != "catalogName")
+            .sort((a, b) => a.orderId - b.orderId).filter(item=>item.fieldName != 'catalogName')
             .map((item) => {
               if (item.isSystem != 1) this.haveAttribute = true;
               if (item.fieldName == 'catalogName') item['maxlength'] = 30;
@@ -408,7 +408,7 @@ export default {
           };
           // param.file['ossUrl'] = item.url;
           this.$set(this.productMenuValue, 'thumbnail', [
-            ...this.productMenuValue.productPic,
+            ...this.productMenuValue.thumbnail,
             item,
           ]);
         })
