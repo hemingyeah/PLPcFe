@@ -821,7 +821,6 @@ export default {
     // 新建打开窗口
     addRule() {
       this.getUserList("");
-      this.getFields();
       this.dialogVisible = true;
       this.openType = "add";
       this.form = {
@@ -839,6 +838,7 @@ export default {
         option: "",
         level: "",
       };
+      this.getFields();
     },
     // 获取指定人员
     getUserList:_.debounce(function(keywords = "",refresh=true,first=false){
