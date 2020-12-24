@@ -129,10 +129,18 @@ export default {
         name: this.form.name,
       }
       SettingTaskApi.onCreatCard(params).then(res=>{
-          const { status, message, data } = res;
-          if(status == 0){
-              this.$message.success('创建成功');
-              location.reload()
+        const { status, message, data } = res;
+        if(status == 0){
+            this.$message.success('创建成功');
+            setTimeout(()=>{
+              let cardId = data;
+              this.$platform.openTab({
+                  id: "task_card_setting",
+                  title: "附加组件表单设置",
+                  url: `/setting/serviceStation/card/view?cardId=${cardId}`,
+                  reload: true,
+              });
+            },1000)
           }else{
               this.$message.error(message);
           }

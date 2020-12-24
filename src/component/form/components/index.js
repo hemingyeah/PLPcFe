@@ -128,6 +128,9 @@ const MODE_MANAGER = {
   product: {
     include: [...COMMON_FIELDS]
   },
+  task_card: {
+    include: [...COMMON_FIELDS]
+  },
   task: {
     include: [
       ...COMMON_FIELDS,

@@ -48,7 +48,7 @@
                     </el-dropdown-menu>
                 </el-dropdown>
             </div>
-            <div class="task-card-opearte-modify" @click="modifyTaskType">
+            <div class="task-card-opearte-modify" @click="modifyTaskForm">
                 <i class="icon-edit-square iconfont">编辑</i>
             </div>
         </el-row>
@@ -126,6 +126,17 @@ export default {
                 id: "task_flow_setting",
                 title: "工单流程设置",
                 url: `/setting/task/taskFormSet?taskTypeId=${taskTypeId}`,
+                reload: true,
+            });
+        },
+
+        //TODO:编辑表单
+        modifyTaskForm() {
+            let cardId = this.card.id;
+            this.$platform.openTab({
+                id: "task_card_setting",
+                title: "附加组件表单设置",
+                url: `/setting/serviceStation/card/view?cardId=${cardId}`,
                 reload: true,
             });
         },

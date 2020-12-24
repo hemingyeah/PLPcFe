@@ -23,6 +23,9 @@ module.exports = {
   'setting.task.receipt_fields': {
     entry: './src/modules/setting/task/taskFormSetting/taskReceiptFormView/index.js',
   },
+  'setting.task.addcard_fields': {
+    entry: './src/modules/setting/task/taskFormSetting/taskAddcardFormView/index.js',
+  },
   'system.mall.index' : {
     entry: "./src/modules/system/mall/index.js"
   }
