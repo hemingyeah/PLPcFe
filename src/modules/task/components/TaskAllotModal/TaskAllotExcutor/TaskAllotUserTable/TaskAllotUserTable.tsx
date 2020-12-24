@@ -31,6 +31,7 @@ export default class TaskAllotUserTable extends TaskAllotUserTableRender {
           <el-table
             border
             data={this.taskAllotUserList}
+            height={this.tableHeight}
             header-row-class-name='base-table-header-v3'
             row-class-name='base-table-row-v3'
             ref='TaskAllotUserElTableComponent'

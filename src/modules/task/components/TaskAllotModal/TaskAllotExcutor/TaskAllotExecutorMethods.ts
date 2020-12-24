@@ -247,6 +247,17 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
     }
   }
   
+  /**
+   * @description 计算表格高度
+   */
+  public computedTableHeight() {
+    // 窗口高度
+    let windowHeight = window.innerHeight || document.body.clientHeight
+    // 其他元素高度
+    let otherElHeight = 386 + (this.isReAllot ? 48 : 0)
+    this.tableHeight = windowHeight - otherElHeight
+  }
+  
   /** 
    * @description 关闭用户卡片
   */

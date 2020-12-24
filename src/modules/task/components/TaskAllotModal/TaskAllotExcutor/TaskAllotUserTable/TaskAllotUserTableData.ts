@@ -33,6 +33,8 @@ class TaskAllotUserTableData extends TaskAllotUserTableComponents {
   @Prop() readonly isDisableLoadmore: boolean | undefined
   /* 排序变化方法 */
   @Prop() readonly sortChangeFunc: Function | undefined
+  /* 表格高度 */
+  @Prop() readonly tableHeight: string | undefined
   /* 用户选择状态 */
   @Prop() readonly userPageCheckedMap: {[x: number]: boolean} | undefined
   

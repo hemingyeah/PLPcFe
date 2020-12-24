@@ -29,6 +29,11 @@ import TaskAllotExecutorRender from '@src/modules/task/components/TaskAllotModal
 })
 export default class TaskAllotExcutor extends TaskAllotExecutorRender {
   
+  created() {
+    // 计算表格高度
+    this.computedTableHeight()
+  }
+  
   mounted() {
     // 构建列
     this.buildColumns()
@@ -56,6 +61,7 @@ export default class TaskAllotExcutor extends TaskAllotExecutorRender {
               isDisableLoadmore={this.isDisableLoadmore}
               sortChangeFunc={(option: any) => this.outsideSortChangedHandler(option)}
               style={this.modeComponents[TaskAllotTypeModeEnum.List]}
+              tableHeight={this.tableHeight}
               userPageCheckedMap={this.userPageCheckedMap}
             >
             </task-allot-user-table>

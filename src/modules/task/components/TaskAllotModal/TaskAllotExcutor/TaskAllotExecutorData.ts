@@ -127,6 +127,8 @@ class TaskAllotExecutorData extends TaskAllotExecutorProps {
   public teamUserPage: Page =  new Page()
   /* 表格用户page */
   public tableUserPage: Page =  new Page()
+  /* 表格高度 */
+  public tableHeight: number | null = null
   /* 表格排序筛选配置列表 */
   public tableSortLabelOptionss: ElSelectOption[] = [
     { label: '距离优先',  value: AllotSortedEnum.Distance },
