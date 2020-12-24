@@ -64,7 +64,7 @@
   </div>
 </template>
 <script>
-import _ from "lodash";
+import _, { result } from "lodash";
 
 import workTreeDraggable from "@src/modules/productV2/productMenu/WorkTree/workTreeDraggable";
 import WorkTreeData from "@src/modules/productV2/productMenu/WorkTree/WorkTreeData";
@@ -333,6 +333,7 @@ export default {
               );
               // console.log(element, this.childData, 'renameMenu');
               element[this.childData.nowIndex].name = res.result.name;
+              if(this.nowEditMenu.id == res.result.id) this.nowEditMenu.name = res.result.name;
             }
             this.changeVisibleProp(false);
           } else {

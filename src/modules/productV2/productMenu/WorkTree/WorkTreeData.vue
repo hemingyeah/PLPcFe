@@ -13,8 +13,8 @@
         </div>
       </template>
       <div v-show="propData.canEditConData && propData.conData">
-        <div class="normal-title-1 ">
-          <div class="flex-1">编辑类型详细信息</div>
+        <div class="work-data-title flex-x">
+          <div class="flex-1 mar-r-24">{{propData.name}}</div>
           <el-button @click="showDialog('cloneMenu')">复制其他产品类型</el-button>
           <div class="flex-x mar-l-10"
                v-if="propData.conData == 1">
@@ -273,7 +273,7 @@ export default {
           const fields = result || [];
           let arr = [];
           const sortedFields = fields
-            .sort((a, b) => a.orderId - b.orderId)
+            .sort((a, b) => a.orderId - b.orderId).filter(item=>item.fieldName != "catalogName")
             .map((item) => {
               if (item.isSystem != 1) this.haveAttribute = true;
               if (item.fieldName == 'catalogName') item['maxlength'] = 30;
@@ -621,6 +621,17 @@ export default {
   min-width: 630px;
   .scroll-data {
     overflow-y: scroll;
+  }
+  .work-data-title{
+    padding: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    border-bottom: 1px solid $color-border-l1;
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0;
+    z-index: 99;
+    background: #fff;
   }
   .normal-title-1 {
     @include title-class();

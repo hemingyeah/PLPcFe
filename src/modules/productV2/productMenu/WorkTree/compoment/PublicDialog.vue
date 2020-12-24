@@ -199,11 +199,14 @@ export default {
           this.$refs["ruleForm"].resetFields();
         this.nowChooseArr = [];
         this.btnLoading = false;
+
+      
+      }else {
+       
+        this.$nextTick(()=>{
+          if (this.dialogType == "renameMenuChild")this.$set(this.ruleForm, "name", this.initData.name);
+        })
       }
-    },
-    initData(newVal, oldVal) {
-      if (this.dialogType == "renameMenuChild")
-        this.$set(this.ruleForm, "name", newVal.name);
     },
   },
   methods: {
@@ -397,4 +400,10 @@ padding-right: 6px;
     }
 
   }
+</style>
+
+<style lang="scss">
+.el-select-dropdown__empty {
+  display: block !important;
+}
 </style>
