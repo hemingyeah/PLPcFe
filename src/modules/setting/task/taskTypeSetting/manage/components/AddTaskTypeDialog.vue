@@ -73,7 +73,19 @@ import taskTemplateTrade from "@src/assets/img/setting/task-template-trade.png";
 // components
 import ChooseTradeDialog from './ChooseTradeDialog.vue';
 
-const TASK_TYPE_COLOR = ['#737F7C','#266FFF','#5255FF','#8552FF','#BC52FF','#FF52D4','#FF9526','#6ECF40','#00B8D5','#0BA194']
+const TASK_TYPE_COLOR = [
+    'rgb(115,127,124)',
+    'rgb(38,111,255)',
+    'rgb(82,85,255)',
+    'rgb(133,82,255)',
+    'rgb(188,82,255)',
+    'rgb(255,82,212)',
+    'rgb(255,149,38)',
+    'rgb(110,207,64)',
+    'rgb(0,184,213)',
+    'rgb(11,161,148)'
+];
+
 export default {
     name:'add-task-type-dialog',
     props: {
@@ -103,7 +115,7 @@ export default {
                 typeName: '',
                 taskTypeId: '',
                 templetId: '',
-                color: '#737F7C'
+                color: 'rgb(115,127,124)'
             },
             rules: {
                 taskType: [{ required: true, message: '请选择工单类型', trigger: 'blur' }],

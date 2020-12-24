@@ -176,4 +176,17 @@ export function flowSwitchTaskType(params) {
   return http.post('/setting/taskType/flowSwitch', params, false);
 }
 
+/**
+ * 高级设置页保存
+ * 
+ * @param {string} params.templateId 工单类型id
+ * @param {string} params.saveOptionFormList 设置服务报告和打印功能	  
+ * @param {string} params.typeConfigForms 水印设置和位置异常提示设置	
+ */
+export function advancedSetting(params) {
+  return http.post('/setting/taskType/advancedSetting', params);
+}
+
+
+
 /******************** E 工单类型设置 ***************/
