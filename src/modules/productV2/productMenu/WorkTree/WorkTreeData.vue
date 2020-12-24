@@ -85,7 +85,7 @@
           <template slot="productPic"
                     slot-scope="{ field }">
             <form-item class="upload-img"
-                       :class="{'hide_box':productMenuValue.productPic.length==5}"
+                       :class="{'hide_box':productMenuValue.productPic.length>=5}"
                        :label="field.displayName">
               <el-upload action="string"
                          list-type="picture-card"
@@ -108,7 +108,7 @@
           <template slot="thumbnail"
                     slot-scope="{ field }">
             <form-item 
-              :class="['upload-img',productMenuValue.thumbnail.length==1? 'hide_box': '']"
+              :class="['upload-img',productMenuValue.thumbnail.length>=1? 'hide_box': '']"
               :label="field.displayName">
               <el-upload action="string"
                          list-type="picture-card"
