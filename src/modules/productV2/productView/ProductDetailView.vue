@@ -10,7 +10,7 @@
             </div>
             <div class="flex-x mar-t-8" v-if="dataInfo && dataInfo.catalogId">
               产品类型:
-              <el-tooltip class="item" effect="dark" :content="dataInfo.catalogPathName" placement="bottom">
+              <el-tooltip class="item" effect="dark" :content="dataInfo.catalogPathName" placement="bottom-start">
                 <div class="flex-1 over-x-s color-primary  mar-l-8" style="white-space: nowrap;" >
                   <span @click="openProductMenuTab(dataInfo.catalogId)" class="cur-point overHideCon-1">{{dataInfo.catalogPathName}}</span>  
                 </div>

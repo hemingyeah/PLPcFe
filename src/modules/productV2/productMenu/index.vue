@@ -217,7 +217,11 @@ export default {
                 duration: 2000,
               });
             }
+          }).finally(()=>{
+            this.$refs.publicDialog.changeBtnLoading(false);
           });
+        }else{
+          this.$refs.publicDialog.changeBtnLoading(false);
         }
         break;
       default:
