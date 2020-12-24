@@ -408,7 +408,7 @@ export default {
           };
           // param.file['ossUrl'] = item.url;
           this.$set(this.productMenuValue, "thumbnail", [
-            ...this.productMenuValue.productPic,
+            ...this.productMenuValue.thumbnail,
             item,
           ]);
         })
