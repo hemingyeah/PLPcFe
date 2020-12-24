@@ -376,6 +376,11 @@ export default {
         </div>
       )
     },
+    /* 自定义异常 */
+    abnormalRender(record = {}) {
+      let { content } = record;
+      return (<div>{`工单由于【${content.action}】导致了工单异常`}</div>)
+    },
     /* 渲染添加备注 */
     renderActionRemarkDom(h, record = {}) {
       let { userName, showInOwn, toCustomer, cusNotice, content, attachments } = record;
@@ -732,6 +737,7 @@ export default {
       if (action == '电话日志') return this.renderPhoneLogDom(record)
       if (action == '支付') return this.renderTaskPaymentDom(record)
       if (action == '审核转交') return this.renderTaskApproveTransferDom(record)
+      if (action === '自定义异常') return this.abnormalRender(record)
 
       const { isGoBack, synergy, updateType, updateContent } = content;
 
