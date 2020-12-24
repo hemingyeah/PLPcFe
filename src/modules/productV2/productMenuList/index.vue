@@ -9,7 +9,7 @@
             <div style="position: relative;"></div>
 
             <el-input v-model="searchModel.keyWord"
-                      placeholder="请输入产品类型 名称/分级/编号 进行搜索"
+                      placeholder="请输入名称/分级/编号进行搜索"
                       class="task-with-input task-ml12">
             </el-input>
 
