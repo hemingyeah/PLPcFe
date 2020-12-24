@@ -166,9 +166,9 @@ export default {
     }
     .task-type-list{
       display: flex;
-      flex-flow: wrap;
+      flex-wrap: wrap;
+      align-content: flex-start;
       width: calc(100% + 12px);
-      min-height: 300px;
       .task-type-item{
         margin: 0 12px 12px 0;
       }

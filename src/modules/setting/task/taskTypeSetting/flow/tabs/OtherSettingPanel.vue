@@ -268,7 +268,7 @@ export default {
 <style lang="scss" scoped>
 .other-setting-panel{
     width: 100%;
-    height: calc(100vh - 48px);
+    min-height: calc(100vh - 48px);
     padding: 16px 12px 24px 12px;
     background: #F5F5F5;
     .other-setting-main{
