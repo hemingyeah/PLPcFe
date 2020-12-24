@@ -93,6 +93,17 @@ export function getFields(params: {} | undefined) {
 }
 
 /**
+ * @description 获取工单表单数据
+ * @param {Object} params-- params
+ * @param {String} params.typeId -- 工单类型id
+ * @param {String} params.tableName -- task:工单表单字段 task_receipt:工单回执表单字段
+ * @param {String} params.isFromSetting -- 用于设置页全部显示，不用于设置页，则通过可见性和隐藏性来过滤字段
+ */
+export function getAllFields(params: {} | undefined) {
+  return http.get('/setting/taskType/getAllFields', params);
+}
+
+/**
  * @description 查询客户产品关联字段
  * @param {Object} params -- 参数对象
  * @param {String} params.module -- 模块 customer/product
@@ -708,6 +719,24 @@ export function getPaymentDetail(params: {} | undefined) {
  */
 export function taskSettingSave(params: {} | undefined) {
   return http.post("/setting/taskType/field/save", params);
+}
+
+/**
+ * 将私有字段升级为公共字段/将公共字段降级为私有字段
+ * @param {Object} params - 参数对象
+ * @param {String} params.templateId - 工单类型id
+ * @param {Array} params.commonFieldFormList - 需升降的公共字段数组
+ */
+export function setCommonFields(params: {} | undefined) {
+  return http.post(`${fixedPrefixTaskPath}/outside/pc/task/setCommonFields`, params);
+}
+
+/**
+ * 更新公共字段设置
+ * @param {Object} params - 字段对象
+ */
+export function updateCommonField(params: {} | undefined) {
+  return http.post(`${fixedPrefixTaskPath}/outside/pc/task/updateCommonField`, params);
 }
 
 /**

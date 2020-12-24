@@ -166,10 +166,6 @@
                   <a href="javascript:;" @click="goProductSetting">产品字段设置</a>
                   <a href="javascript:;" @click="goCustomerContact">客户联系人</a>
                   <a href="javascript:;" @click="goDoMyself">自助门户设置</a> -->
-                  <a href="javascript:;" @click="goTaskSetting">工单表单设置</a>
-                  <a href="javascript:;" @click="goTaskReceiptSetting"
-                    >工单回执表单设置</a
-                  >
                   <a href="javascript:;" @click="goCreateTask">新建工单</a>
                   <a href="javascript:;" @click="goCreateTaskForCallcenter"
                     >新建工单呼叫中心</a
@@ -915,22 +911,6 @@ export default {
         id: "do_myself",
         title: "消息中心",
         url: "/setting/doMyself/wxSet",
-        reload: true,
-      });
-    },
-    goTaskSetting() {
-      platform.openTab({
-        id: "task_fields_setting",
-        title: "工单表单设置",
-        url: "/setting/task/field/task",
-        reload: true,
-      });
-    },
-    goTaskReceiptSetting() {
-      platform.openTab({
-        id: "task_receipt_fields_setting",
-        title: "工单回执表单设置",
-        url: "/setting/task/field/taskReceipt",
         reload: true,
       });
     },

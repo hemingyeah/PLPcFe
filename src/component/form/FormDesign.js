@@ -954,7 +954,7 @@ const FormDesign = {
       let confirm = await this.$platform.confirm(`确定要取消「${this.currField.displayName}」的“公用字段”属性吗？`);
       if(!confirm) return;
 
-      // TODO: 取消公共字段接口
+      this.$emit('cancelPublicFieldSetting', this.currField);
     },
     /** 
     * @description 打开修改控件配置弹窗
@@ -973,9 +973,11 @@ const FormDesign = {
     /** 
     * @description 修改公共字段配置
     */
-    saveFieldSetting() {
-      this.fieldSettingModal = false;
-      // TODO: 修改公共字段配置
+    async saveFieldSetting() {
+      let confirm = await this.$platform.confirm(`“公用字段”编辑后将在所有已经被运用到该字段的表单中生效，请谨慎修改！`);
+      if(!confirm) return;
+
+      this.$emit('updatePublicFieldSetting', this.currField);
     }
   },
   render(h){

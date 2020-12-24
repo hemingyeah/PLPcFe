@@ -1,5 +1,6 @@
 /* mixin */
-import taskFormSettingMixin from './../common/taskFormSettingMixin';
+import fieldMixin from '@src/mixins/fieldMixin';
+import FormDesignMixin from '@src/mixins/formDesign';
 /* api */
 import * as TaskApi from '@src/api/TaskApi.ts';
 import * as CustomerApi from '@src/api/CustomerApi';
@@ -12,24 +13,36 @@ import RelationOptionsModal from './components/RelationOptionsModal/RelationOpti
 // 关联字段禁用的类型
 const RELATION_DISABLE_FIELDS = ['attachment', 'autograph', 'separator', 'info'];
 
+// 模块名映射
+const MODE_NAME_MAP = {
+  task: '工单表单',
+  task_receipt: '回执表单'
+}
+
 export default {
-  name: 'task-form-setting-view',
-  mixins: [taskFormSettingMixin],
+  name: 'task-form-setting-modal',
+  mixins: [fieldMixin, FormDesignMixin],
   props: {
+    mode: {
+      type: String,
+      default: 'task'
+    },
     templateId: {
       type: String,
       default: ''
     },
     templateName: {
       type: String,
-      default: ''
+      default: '千悦表单'
     }
   },
   data(){
     return {
-      mode: 'task',
+      init: false,
+      pending: false,
       visble: false,
-      relationField: {},
+      fields: [], // 表单字段
+      relationField: {}, // 关联项字段
       relationOptions: { // 关联查询字段关联项数据
         customerFields: [],
         productFields: []
@@ -40,14 +53,26 @@ export default {
       }
     }
   },
+  computed: {
+    // 模块名
+    modeName() {
+      return MODE_NAME_MAP[this.mode];
+    }
+  },
   methods: {
-    /** 
-    * @description 初始化
-    */
-   async initData() {
+    // 打开表单设置弹窗
+    open() {
+      this.init = false;
+      this.visble = true;
+      this.initData();
+    },
+    // 初始化表单字段
+    async initData() {
       try {
+        this.pending = true;
+
         // 获取表单字段列表
-        let fields = await TaskApi.getFields({ tableName: this.mode, typeId: this.templateId });
+        let fields = await TaskApi.getAllFields({ tableName: this.mode, typeId: this.templateId, isFromSetting: true });
         let sortedFields = fields.sort((a, b) => a.orderId - b.orderId);
   
         // 工单自带的 attachment 字段需要特殊处理, 提交时需要将formType还原
@@ -60,18 +85,116 @@ export default {
         this.fields = FormUtil.toFormField(sortedFields);
         this.init = true;
   
-        // 获取客户和产品关联字段关联项数据
-        this.getCustomerFields();
-        this.getProductFields();
-  
       } catch (error) {
         console.log('task-form-setting-view: initData -> error', error);
       }
+
+      this.pending = false;
     },
-    open() {
-      this.init = false;
-      this.visble = true;
-      this.initData(); 
+    // 将字段转换成后端可接收的字段
+    packToField(origin) {
+      let fields = FormUtil.toField(origin);
+
+      fields.forEach((field, index) => {
+        field.templateId = this.templateId;
+        field.templateName = this.templateName;
+        field.tableName = this.mode;
+        field.orderId = index;
+        
+        // 还原工单表单的系统附件的formType
+        if(field.formType == 'taskAttachment' && field.isSystem) {
+          field.formType = 'attachment';
+        }
+
+        // 是否升级为公共字段
+        field.isUpgrade = field.isPublic > field.isCommon ? 1: 0;
+        // 是否是拖拽进来的公共字段
+        field.isDragCommon = 0; // TODO:暂时写死
+      })
+
+      return fields;
+    },
+    /** 
+    * @description 提交表单字段设置
+    */
+    async submit() {
+      try {
+        let fields = this.packToField(this.fields);
+        
+        // 表单字段格式校验
+        let message = FormUtil.validate(fields);
+        if(!FormUtil.notification(message, this.$createElement)) return;
+
+        this.pending = true;
+
+        let result = await TaskApi.taskSettingSave(fields);
+
+        let isSuccess = result.succ;
+        this.$platform.notification({
+          type: isSuccess ? 'success' : 'error',
+          title: `${this.modeName}字段更新${isSuccess ? '成功' : '失败'}`,
+          message: isSuccess ? null : result.message
+        })
+
+        if(isSuccess) {
+          this.visble = false;
+          this.$emit('success');
+        }
+
+      } catch (error) {
+        console.error(error)
+      }
+
+      this.pending = false;
+    },
+    // 公共字段降级为私有字段
+    transformPrivateField(field) {
+      this.pending = true;
+
+      const params = {
+        templateId: this.templateId,
+        commonFieldFormList: [{
+          fieldName: field.fieldName,
+          isUpgrade: false
+        }]
+      }
+
+      TaskApi.setCommonFields(params).then(res => {
+        if (res.success) {
+          // 更新字段的公共字段属性
+          field.isCommon = field.isPublic = 0;
+
+          this.$platform.notification({
+            title: '取消成功',
+            type: 'success'
+          })
+        } else {
+          this.$platform.alert(res.message);
+        }
+      })
+      .finally(() => {
+        this.pending = false;
+      })
+      .catch(err => console.warn(err));
+    },
+    // 修改公共字段配置
+    updatePublicFieldSetting(field) {
+      let fields = this.packToField([field]);
+
+      TaskApi.updateCommonField(fields[0]).then(res => {
+        if (res.success) {
+          // 关闭修改控件配置弹窗
+          this.$refs.formDesign.fieldSettingModal = false;
+
+          this.$platform.notification({
+            title: '修改成功',
+            type: 'success'
+          })
+        } else {
+          this.$platform.alert(res.message);
+        }
+      })
+      .catch(err => console.warn(err));
     },
     /** 
     * @description 获取客户关联查询字段关联项数据
@@ -153,61 +276,6 @@ export default {
         .catch(err => console.warn(err));
     },
     /** 
-    * @description 提交表单字段设置
-    */
-    async submit() {
-      try {
-        let fields = FormUtil.toField(this.fields);
-
-        fields.forEach((item, index) => {
-          item.templateId = this.templateId;
-          item.templateName = this.templateName;
-          item.tableName = this.mode;
-          item.orderId = index;
-          
-          // 还原工单表单的系统附件的formType
-          if(item.formType == 'taskAttachment' && item.isSystem) {
-            item.formType = 'attachment';
-          }
-        })
-        
-        // 表单字段格式校验
-        let message = FormUtil.validate(fields);
-        if(!FormUtil.notification(message, this.$createElement)) return;
-
-        // 过滤需升级为公用字段或者降为私有字段
-        let commonFields = [];
-        this.fields.filter(field => field.isPublic != field.isCommon).map(field => {
-          let { fieldName, isPublic, isCommon } = field;
-          commonFields.push({
-            fieldName,
-            isUpgrade: isPublic > isCommon
-          })
-        })
-
-        this.pending = true;
-
-        let result = await TaskApi.taskSettingSave(fields);
-
-        let isSuccess = result.succ;
-        this.$platform.notification({
-          type: isSuccess ? 'success' : 'error',
-          title: `表单设置${isSuccess ? '成功' : '失败'}`,
-          message: isSuccess ? null : result.message
-        })
-
-        if(isSuccess) {
-          this.visble = false;
-          this.$emit('success', this.mode);
-        }
-
-      } catch (error) {
-        console.error(error)
-      }
-
-      this.pending = false;
-    },
-    /** 
     * @description 打开关联项设置弹窗
     * 从左侧基础控件拖入客户关联字段或者产品关联字段时打开弹窗
     */
@@ -244,6 +312,10 @@ export default {
   },
   mounted() {
     this.$eventBus.$on('task_form_design_relation_options_set', this.openRelatedOptionsDialog);
+
+    // 获取客户和产品关联字段关联项数据
+    this.getCustomerFields();
+    this.getProductFields();
   },
   beforeDestroy() {
     this.$eventBus.$off('task_form_design_relation_options_set', this.openRelatedOptionsDialog);

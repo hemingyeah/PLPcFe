@@ -2,20 +2,22 @@
   <base-modal
     class="form-builder-modal"
     :show.sync="visble"
+    v-loading.lock="pending"
   >
     <template slot="title">
-      <div class="form-builder-title">表单设置 > 新建表单设置</div>
+      <div class="form-builder-title">表单设置 > {{ modeName }}设置</div>
       <el-button class="form-builder-save-btn" plain @click="submit" :disabled="pending">保存</el-button>
     </template>
 
     <!-- start 表单设计器 -->
     <form-design
-      v-loading.lock="pending"
       ref="formDesign"
       v-if="init"
       v-model="fields"
       :mode="mode"
       :relation-field-options="relationOptions"
+      @cancelPublicFieldSetting="transformPrivateField"
+      @updatePublicFieldSetting="updatePublicFieldSetting"
     ></form-design>
     <!-- end 表单设计器 -->
 
@@ -29,10 +31,10 @@
 </template>
 
 <script>
-import TaskFormView from './TaskFormView';
-export default TaskFormView;
+import taskFormSettingModal from './taskFormSettingModal';
+export default taskFormSettingModal;
 </script>
 
 <style lang="scss">
-@import './TaskFormView.scss';
+@import './taskFormSettingModal.scss';
 </style>

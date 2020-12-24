@@ -25,6 +25,7 @@ export default class Field{
 
     this.isHidden = options.isHidden || 0;
     this.isCommon = options.isCommon || 0;
+    this.isPublic = options.isPublic || 0;
 
     // 客户、产品的字段id
     this.fieldId = options.id;

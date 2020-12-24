@@ -178,7 +178,7 @@
         <!--E 设置项 -->
 
         <!-- 表单设置弹窗 -->
-        <task-form-setting-view ref="taskFormSetting" :template-id="taskTypeId" @success="refreshFields"></task-form-setting-view>
+        <task-form-setting-modal ref="taskFormSetting" :mode="mode" :template-id="taskTypeId" @success="refreshFields"></task-form-setting-modal>
         
     </el-form>
 </template>
@@ -190,7 +190,7 @@ import {
 
 // components
 import ApproveSetting from './ApproveSetting.vue';
-import TaskFormView from '@src/modules/setting/task/taskFormSetting/taskFormView/TaskFormView.vue';
+import taskFormSettingModal from '@src/modules/setting/task/taskFormSettingModal/taskFormSettingModal.vue';
 
 export default {
     name: 'flow-setting',
@@ -323,6 +323,9 @@ export default {
                 value: 'promoter',
                 label: '由发起人选择'
             }];
+        },
+        mode() {
+            return this.type == 'finish' ? 'task_receipt' : 'task'
         }
     },
     methods: {
@@ -349,8 +352,8 @@ export default {
                     console.warn(err)
                 })
         },
-        refreshFields(mode) {
-            console.log(mode)
+        refreshFields() {
+            console.log(this.mode)
         }
     },
     async mounted() {
@@ -364,7 +367,7 @@ export default {
     },
     components: {
         [ApproveSetting.name]: ApproveSetting,
-        [TaskFormView.name]: TaskFormView
+        [taskFormSettingModal.name]: taskFormSettingModal
     }
 }
 </script>

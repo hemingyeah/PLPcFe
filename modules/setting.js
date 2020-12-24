@@ -8,9 +8,6 @@ module.exports = {
   'setting.performance.rule': {
     entry: './src/modules/setting/performance/index.js'
   },
-  'setting.task.fields': {
-    entry: './src/modules/setting/task/taskFormSetting/taskFormView/index.js'
-  },
   'setting.task.manage': {
     entry: './src/modules/setting/task/taskTypeSetting/manage/index.js'
   },
@@ -19,9 +16,6 @@ module.exports = {
   },
   'setting.task.additional': {
     entry: './src/modules/setting/task/taskAdditionalSetting/manage/index.js'
-  },
-  'setting.task.receipt_fields': {
-    entry: './src/modules/setting/task/taskFormSetting/taskReceiptFormView/index.js',
   },
   'system.mall.index' : {
     entry: "./src/modules/system/mall/index.js"

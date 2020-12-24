@@ -72,7 +72,8 @@ export default class FormField{
     this.isHidden = typeof params.isHidden == 'number' ? params.isHidden : 0; 
     // 工单专属字段：是否是公用字段 1 - 是，0 - 否
     this.isCommon = typeof params.isCommon == 'number' ? params.isCommon : 0;
-    this.isPublic = this.isCommon; // 因为是公用字段需隐藏公用字段设置，所以需要增加个isPublic，而不能直接用isCommon
+    // 公用字段: 1.设为公用字段设置 2.需判断是否是升级为公用字段而非拖拽进来的公共字段 而不能直接用isCommon
+    this.isPublic = this.isCommon;
 
     // formType 为select时需要补全一下字段
     let {options, isMulti, dependencies} = fillPropForSelect(params)
@@ -121,6 +122,8 @@ export default class FormField{
     option.isSystem = field.isSystem;
     option.isAppShow = field.isAppShow;
     option.isHidden = field.isHidden;
+    option.isCommon = field.isCommon;
+    option.isPublic = field.isPublic;
 
     let setting = {};
     let defaultValue = null;
