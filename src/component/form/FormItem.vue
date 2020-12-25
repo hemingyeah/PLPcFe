@@ -1,5 +1,5 @@
 <template>
-  <div class="form-item" :class="{err: errMessage}" v-show="!hideform">
+  <div class="form-item" :class="{err: errMessage}">
     <label :for="forId">{{label}} <span class="form-item-required" v-if="showRequired">*</span></label>
     <div class="form-item-control">
       <slot></slot>
@@ -12,12 +12,12 @@
 </template>
 
 <script>
-import Validator from '@src/util/validator';
-import { findComponentUpward } from '@src/util/assist'
-import _ from 'lodash'
+import Validator from "@src/util/validator";
+import { findComponentUpward } from "@src/util/assist"
+import _ from "lodash"
 
 export default {
-  name: 'form-item',
+  name: "form-item",
   props: {
     label: String,
     validation: {
@@ -40,15 +40,11 @@ export default {
       type: Boolean,
       default: undefined
     },
-    hideform: {
-      type: Boolean,
-      default: false
-    }
   },
   data() {
     return {
       field: {},
-      errMessage: '',
+      errMessage: "",
       valueFn: null, // function 用于获取注册字段的值
       status: false, // true 代表正在验证
       showErr: false
@@ -64,16 +60,16 @@ export default {
       return this.isRequired && !this.disabled;
     },
     forId(){
-      if(!this.field.fieldName) return '';
+      if(!this.field.fieldName) return "";
       return `form_${this.field.fieldName}`;
     },
     formBuilderComponent() {
-      return findComponentUpward(this, 'form-builder')
+      return findComponentUpward(this, "form-builder")
     },
     /** 是否需要验证 */
     needValidation(){
       let validation = this.validation;
-      return (typeof validation == 'boolean' && validation) || typeof validation == 'function'
+      return (typeof validation == "boolean" && validation) || typeof validation == "function"
     },
     disabled() {
       let field = this.field;
@@ -87,9 +83,9 @@ export default {
      * @param {Boolean} isSample 是否是简单模式 (简单模式的概念是单个字段的单个验证)
     */
     validate(isSample = true) {
-      if (typeof this.valueFn != 'function' || !this.needValidate) return true;
+      if (typeof this.valueFn != "function" || !this.needValidate) return true;
       
-      this.errMessage = '';
+      this.errMessage = "";
       this.status = false;
       
       let value = this.valueFn();
@@ -98,7 +94,7 @@ export default {
       return Validator.validate(value, this.field, formBuilderComponent.value, formBuilderComponent.mode, this.changeStatus, isSample, formBuilderComponent)
         .then(res => {
           let validator = this.getValidator();
-          return res == null && typeof validator == 'function' 
+          return res == null && typeof validator == "function" 
             ? validator(value, this.field, this.changeStatus)
             : res;
         })
@@ -106,8 +102,8 @@ export default {
           return this.errMessage = res
         })
         .catch(err => {
-          if(!err.message.startsWith('Request cancelled:')){
-            console.error('validate err', err)
+          if(!err.message.startsWith("Request cancelled:")){
+            console.error("validate err", err)
           }
         });
     },
@@ -135,7 +131,7 @@ export default {
       let rootEl = this.findRootEl()
       if(null != rootEl) {
         let params = event.detail;
-        let e = new CustomEvent('form.remove.field', {detail: params, bubbles: true})
+        let e = new CustomEvent("form.remove.field", {detail: params, bubbles: true})
         rootEl.dispatchEvent(e);
       }
       this.valueFn = null;
@@ -144,24 +140,24 @@ export default {
       this.status = !!value;
     },
     resetValidationStatus() {
-      this.errMessage = '';
+      this.errMessage = "";
     },
     getValidator(){
-      if(typeof this.validation == 'function') return this.validation;
+      if(typeof this.validation == "function") return this.validation;
       return this.field.validator;
     }
   },
   mounted() {
-    this.$el.addEventListener('form.add.field', this.addFieldHandler);
-    this.$el.addEventListener('form.validate', this.validateHandler);
-    this.$el.addEventListener('form.clear.validate', this.resetValidationStatus);
-    this.$el.addEventListener('form.remove.field', this.removeFieldHandler);
+    this.$el.addEventListener("form.add.field", this.addFieldHandler);
+    this.$el.addEventListener("form.validate", this.validateHandler);
+    this.$el.addEventListener("form.clear.validate", this.resetValidationStatus);
+    this.$el.addEventListener("form.remove.field", this.removeFieldHandler);
   },
   destroyed() {
-    this.$el.removeEventListener('form.validate', this.validateHandler)
-    this.$el.removeEventListener('form.clear.validate', this.resetValidationStatus)
-    this.$el.removeEventListener('form.add.field', this.addFieldHandler);
-    this.$el.removeEventListener('form.remove.field', this.removeFieldHandler)
+    this.$el.removeEventListener("form.validate", this.validateHandler)
+    this.$el.removeEventListener("form.clear.validate", this.resetValidationStatus)
+    this.$el.removeEventListener("form.add.field", this.addFieldHandler);
+    this.$el.removeEventListener("form.remove.field", this.removeFieldHandler)
   }
 }
 </script>

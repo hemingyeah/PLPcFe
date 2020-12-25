@@ -132,9 +132,9 @@ export default {
             res.result.catalogInfo.productExplain = res.result.catalogInfo.productExplain || [];
             if (res.result.selectField.length) {
               this.fields.map((item) => {
-                if (res.result.selectField.indexOf(item.id) > -1)
-                  item["hideform"] = true;
-                else item["hideform"] = false;
+                if ((!item.isSystem && res.result.selectField.some(item_=>item_ == item.id)))
+                  item["isHidden"] = true;
+                else item["isHidden"] = false;
                 return item;
               });
             }

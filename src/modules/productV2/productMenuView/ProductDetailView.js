@@ -325,9 +325,9 @@ export default {
             let fields = res_.result || [];
             if (res.result.selectField.length) {
               fields = fields.map((item) => {
-                if (res.result.selectField.indexOf(item.id) > -1)
-                  item["hideform"] = true;
-                else item["hideform"] = false;
+                if ((!item.isSystem && res.result.selectField.some(item_=>item_ == item.id)) || item.fieldName == "product_menu_part" || item.fieldName == "product_menu_wiki")
+                  item["isHidden"] = true;
+                else item["isHidden"] = false;
                 return item;
               })
             }
