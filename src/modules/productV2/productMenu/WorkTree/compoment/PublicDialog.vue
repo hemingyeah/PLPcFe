@@ -118,18 +118,18 @@ import {
   getPageCloneData,
   getPagePart,
   getPageWiki,
-} from "@src/api/ProductV2Api";
-import _ from "lodash";
-import { log } from "mathjs";
+} from '@src/api/ProductV2Api';
+import _ from 'lodash';
+import { log } from 'mathjs';
 export default {
-  name: "public-dialog",
+  name: 'public-dialog',
   props: {
     visibleProp: {
       type: Boolean,
     },
     dialogType: {
       type: String,
-      default: "addMenu",
+      default: 'addMenu',
     },
     initData: {
       type: Object,
@@ -139,26 +139,26 @@ export default {
     return {
       dialogData: {
         addMenu: {
-          title: "添加产品类型",
+          title: '添加产品类型',
         },
         addMenuChild: {
-          title: "添加产品类型",
+          title: '添加产品类型',
         },
         cloneMenu: {
-          title: "选择需要复制的产品类型",
+          title: '选择需要复制的产品类型',
           http: getPageCloneData,
           options: [],
         },
         renameMenuChild: {
-          title: "重命名",
+          title: '重命名',
         },
         linkPart: {
-          title: "关联备件",
+          title: '关联备件',
           http: getPagePart,
           options: [],
         },
         linkWiki: {
-          title: "关联知识库",
+          title: '关联知识库',
           http: getPageWiki,
           options: [],
         },
@@ -166,12 +166,12 @@ export default {
       nowChooseArr: [],
       selectedSparepart: [],
       ruleForm: {
-        name: "",
+        name: '',
       },
       rules: {
         name: [
-          { required: true, message: "请输入类型名称", trigger: "blur" },
-          { min: 1, max: 30, message: "最多30个字符", trigger: "change" },
+          { required: true, message: '请输入类型名称', trigger: 'blur' },
+          { min: 1, max: 30, message: '最多30个字符', trigger: 'change' },
         ],
       },
       selectLoading: false,
@@ -184,7 +184,7 @@ export default {
         return this.visibleProp;
       },
       set(val) {
-        this.$emit("changeVisibleProp", val);
+        this.$emit('changeVisibleProp', val);
       },
     },
   },
@@ -192,11 +192,11 @@ export default {
     visible(newVal, oldVal) {
       if (newVal == false) {
         if (
-          this.dialogType == "addMenu"
-          || this.dialogType == "renameMenuChild"
-          || this.dialogType == "addMenuChild"
+          this.dialogType == 'addMenu'
+          || this.dialogType == 'renameMenuChild'
+          || this.dialogType == 'addMenuChild'
         )
-          this.$refs["ruleForm"].resetFields();
+          this.$refs['ruleForm'].resetFields();
         this.nowChooseArr = [];
         this.btnLoading = false;
 
@@ -204,7 +204,7 @@ export default {
       }else {
        
         this.$nextTick(()=>{
-          if (this.dialogType == "renameMenuChild")this.$set(this.ruleForm, "name", this.initData.name);
+          if (this.dialogType == 'renameMenuChild')this.$set(this.ruleForm, 'name', this.initData.name);
         })
       }
     },
@@ -212,34 +212,34 @@ export default {
   methods: {
     confirm() {
       if (
-        this.dialogType == "addMenu"
-        || this.dialogType == "addMenuChild"
-        || this.dialogType == "renameMenuChild"
+        this.dialogType == 'addMenu'
+        || this.dialogType == 'addMenuChild'
+        || this.dialogType == 'renameMenuChild'
       ) {
-        this.$refs["ruleForm"].validate((valid) => {
-          if (valid) this.$emit("confirm", { catalogName: this.ruleForm.name });
+        this.$refs['ruleForm'].validate((valid) => {
+          if (valid) this.$emit('confirm', { catalogName: this.ruleForm.name });
         });
       } else if (
-        this.dialogType == "linkPart"
-        || this.dialogType == "linkWiki"
-        || this.dialogType == "cloneMenu"
+        this.dialogType == 'linkPart'
+        || this.dialogType == 'linkWiki'
+        || this.dialogType == 'cloneMenu'
       ) {
         if(!this.nowChooseArr.length){
-          return this.$message.error("选择内容不能为空");
+          return this.$message.error('选择内容不能为空');
         }
-        this.$emit("confirm", { nowChooseArr: this.nowChooseArr });
+        this.$emit('confirm', { nowChooseArr: this.nowChooseArr });
       }
     },
     dataUpdate(e, key) {
       this[key] = e;
     },
     calculateClass(e, t) {
-      let str = "";
+      let str = '';
       if (e.slotNowData) {
         for (let index = 0; index < e.slotNowData.length; index++) {
           const element = e.slotNowData[index];
           if (element.orderId === t.orderId) {
-            str = "checked-item";
+            str = 'checked-item';
           }
         }
       }
@@ -258,7 +258,7 @@ export default {
           keyWord: e,
           pageSize: 50,
           pageNum: 1,
-          ...this.dialogType == "cloneMenu" ? {catalogId:this.initData.id} : {}
+          ...this.dialogType == 'cloneMenu' ? {catalogId:this.initData.id} : {}
         })
         .then((res) => {
           if (!res) {
@@ -277,11 +277,11 @@ export default {
     searchPart(params) {
       // params has three properties include keyword、pageSize、pageNum.
       const pms = params || {};
-      pms.repertoryId = this.repertoryId || "";
+      pms.repertoryId = this.repertoryId || '';
       pms.with_OOS = false;
       pms.keyWord = pms.keyword;
       return this.$http
-        .get("/task/spare/list", pms)
+        .get('/task/spare/list', pms)
         .then((res) => {
           if (!res || !res.list) return;
           res.list = res.list.map((template) =>
@@ -302,9 +302,9 @@ export default {
       let newValue = value[0];
 
       for (let key in this.sparepart) {
-        if (key == "salePrice") {
+        if (key == 'salePrice') {
           this.sparepart.salePrice = newValue.salePrice.toFixed(2);
-        } else if (key == "number") {
+        } else if (key == 'number') {
           this.sparepart.number = newValue.availableNum > 1 ? 1 : newValue.availableNum;
         } else {
           this.sparepart[key] = newValue[key];
@@ -357,14 +357,12 @@ export default {
 }
 .el-select .el-tag{
 position: relative;
-padding-right: 6px;
+display: flex;
+align-items: center;
+max-width: 60%;
 }
-.el-select .el-tag__close.el-icon-close {
-  position: absolute;
-  right: 1px;
-  top: 0;
-  bottom: 0;
-  margin: auto;
+.el-select .el-select__tags-text {
+  flex: 1;
 }
 .batch-editing-customer-dialog {
 
