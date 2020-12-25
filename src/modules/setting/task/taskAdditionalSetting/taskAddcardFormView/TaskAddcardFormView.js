@@ -8,16 +8,17 @@ import * as FormUtil from '@src/component/form/util';
 import { parse } from '@src/util/querystring'
 
 export default {
-  name: 'task-addcard-form-setting-view',
-  props: {
-  },
+  name: 'task_card_setting',
+  mixins: [fieldMixin, FormDesignMixin],
   data() {
     return {
       init: false,
-      pending: false,
+      loading: true,
+      pending:false,
       cardName:'',
       mode: 'task_card',
-      taskCardId:''
+      taskCardId:'',
+      fields:[]
     }
   },
   async mounted(){
@@ -29,11 +30,12 @@ export default {
       let sortedFields = fields.sort((a, b) => a.orderId - b.orderId);
       
       this.fields = FormUtil.toFormField(sortedFields);
-      this.init = true;
-      
+      this.loading = false;
     } catch (error) {
+      this.loading = false;
       console.log('task-card-fields-setting-view: mounted -> error', error)
     }
+    // this.getFieldsInfoReq()
   },
   methods: {
     //返回
@@ -54,7 +56,6 @@ export default {
         if(!FormUtil.notification(message, this.$createElement)) return;
 
         this.pending = true;
-        console.log("fields",fields)
         let result = await TaskApi.taskCardFieldsSave(fields);
 
         let isSuccess = result.status == 0;
