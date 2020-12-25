@@ -20,7 +20,7 @@ const MODE_NAME_MAP = {
 }
 
 export default {
-  name: 'task-form-setting-modal',
+  name: 'task-fields-setting',
   mixins: [fieldMixin, FormDesignMixin],
   props: {
     mode: {
@@ -33,7 +33,7 @@ export default {
     },
     templateName: {
       type: String,
-      default: '千悦表单'
+      default: ''
     }
   },
   data(){

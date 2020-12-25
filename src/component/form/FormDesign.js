@@ -19,6 +19,8 @@ import {
   isSelect 
 } from './util'
 import {checkUser, deleteComponent} from '@src/api/TaskApi.ts';
+/* enum */
+import TableNameEnum from '@model/enum/TableNameEnum.ts';
 
 /**
  * 展示是否必填项的字段
@@ -665,14 +667,14 @@ const FormDesign = {
     },
     /** 删除字段 */
     async deleteField(item) {
-
       let tip = item.isSystem == 0 ? '删除该字段后，之前所有相关数据都会被删除且无法恢复，请确认是否删除？' : '该字段为系统内置字段，请确认是否删除？'
       if (!await Platform.confirm(tip)) return;
-      let isNext = true;
-      // mode:task为工单设置form
-      // mode:task_receipt为回执工单设置form
 
-      if((this.mode == 'task' || this.mode == 'task_receipt') && item.id) {
+      let isNext = true;
+
+      // 取消必填时需要校验人员字段是否是审批人的模块
+      const checkUserArr = [TableNameEnum.Task, TableNameEnum.TaskReceipt, TableNameEnum.Event, TableNameEnum.EventReceipt];
+      if(checkUserArr.indexOf(this.mode) > -1 && item.id) {
         // item.id表明该字段已经在后端存储过，不是本次的新增字段
         if(item.formType == 'user') {
           // 删除的是人员，先check是否在审批流程中
@@ -681,11 +683,6 @@ const FormDesign = {
           isNext = await this.deleteFormField(item);
         }
       }
-
-      // if((this.mode == "task" || this.mode == "task_receipt")
-      //     && (item.formType == "user" && item.id)) {
-      //   isNext = await this.deleteUser(item);
-      // }
 
       if(!isNext) {
         return false;

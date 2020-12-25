@@ -31,10 +31,10 @@
 </template>
 
 <script>
-import taskFormSettingModal from './taskFormSettingModal';
-export default taskFormSettingModal;
+import TaskFieldsSetting from './TaskFieldsSetting';
+export default TaskFieldsSetting;
 </script>
 
 <style lang="scss">
-@import './taskFormSettingModal.scss';
+@import './TaskFieldsSetting.scss';
 </style>

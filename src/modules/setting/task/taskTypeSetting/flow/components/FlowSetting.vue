@@ -178,7 +178,7 @@
         <!--E 设置项 -->
 
         <!-- 表单设置弹窗 -->
-        <task-form-setting-modal ref="taskFormSetting" :mode="mode" :template-id="taskTypeId" @success="refreshFields"></task-form-setting-modal>
+        <task-fields-setting ref="taskFormSetting" :mode="mode" :template-id="taskTypeId" @success="refreshFields"></task-fields-setting>
         
     </el-form>
 </template>
@@ -190,7 +190,9 @@ import {
 
 // components
 import ApproveSetting from './ApproveSetting.vue';
-import taskFormSettingModal from '@src/modules/setting/task/taskFormSettingModal/taskFormSettingModal.vue';
+import TaskFieldsSetting from '@src/modules/setting/task/taskFieldsSetting/TaskFieldsSetting.vue';
+/* enum */
+import TableNameEnum from '@model/enum/TableNameEnum.ts';
 
 export default {
     name: 'flow-setting',
@@ -325,7 +327,7 @@ export default {
             }];
         },
         mode() {
-            return this.type == 'finish' ? 'task_receipt' : 'task'
+            return this.type == 'finish' ? TableNameEnum.TaskReceipt : TableNameEnum.Task
         }
     },
     methods: {
@@ -367,7 +369,7 @@ export default {
     },
     components: {
         [ApproveSetting.name]: ApproveSetting,
-        [taskFormSettingModal.name]: taskFormSettingModal
+        [TaskFieldsSetting.name]: TaskFieldsSetting
     }
 }
 </script>
