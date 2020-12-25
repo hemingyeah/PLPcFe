@@ -18,7 +18,7 @@ module.exports = {
     entry: './src/modules/setting/task/taskAdditionalSetting/manage/index.js'
   },
   'setting.task.addcard_fields': {
-    entry: './src/modules/setting/task/taskFormSetting/taskAddcardFormView/index.js',
+    entry: './src/modules/setting/task/taskAdditionalSetting/TaskAddcardFormView/index.js',
   },
   'system.mall.index' : {
     entry: "./src/modules/system/mall/index.js"

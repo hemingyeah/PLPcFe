@@ -29,10 +29,10 @@
 </template>
 
 <script>
-import taskAddcardFormView from "./taskAddcardFormView";
-export default taskAddcardFormView;
+import TaskAddcardFormView from "./TaskAddcardFormView";
+export default TaskAddcardFormView;
 </script>
 
 <style lang="scss">
-@import "./taskAddcardFormView.scss";
+@import "./TaskAddcardFormView.scss";
 </style>

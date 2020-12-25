@@ -1,5 +1,6 @@
 /* mixin */
-import taskFormSettingMixin from '../common/taskFormSettingMixin';
+import fieldMixin from '@src/mixins/fieldMixin';
+import FormDesignMixin from '@src/mixins/formDesign';
 /* api */
 import * as SettingTaskApi from "@src/api/SettingTaskApi";
 /* util */
@@ -7,12 +8,13 @@ import * as FormUtil from '@src/component/form/util';
 import { parse } from '@src/util/querystring'
 
 export default {
-  name: 'task-receipt-form-setting-view',
-  mixins: [taskFormSettingMixin],
+  name: 'task-addcard-form-setting-view',
   props: {
   },
   data() {
     return {
+      init: false,
+      pending: false,
       cardName:'',
       mode: 'task_card',
       taskCardId:''

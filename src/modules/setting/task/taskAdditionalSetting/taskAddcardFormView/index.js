@@ -1,6 +1,6 @@
 import Vue from '@src/common/entry';
 import http from '@src/util/http';
-import taskAddcardFormView from './taskAddcardFormView.vue';
+import TaskAddcardFormView from './TaskAddcardFormView.vue';
 Vue.prototype.$http = http;
 
 // 处理注入的参数
@@ -16,7 +16,7 @@ const app = new Vue({
   provide: {
     initData: Object.freeze(initData)
   },
-  render: h => h(taskAddcardFormView),
+  render: h => h(TaskAddcardFormView),
   el: '#app'
 });
 
