@@ -100,7 +100,7 @@
                 <i class="el-icon-plus"></i>
               </el-upload>
               <div class="font-12 color-999 mar-t-10">
-                最多上传5张图片，建议比例1:1
+                最多上传5张图片，建议比例3:2
               </div>
             </form-item>
           </template>
@@ -258,8 +258,8 @@ export default {
     },
     fieldIds (newVal, oldVal) {
       this.fields.map((item) => {
-        if (newVal.indexOf(item.id) > -1 || item.isSystem == 1) item["hideform"] = false;
-        else item["hideform"] = true;
+        if (newVal.indexOf(item.id) > -1 || item.isSystem == 1) item["isHidden"] = false;
+        else item["isHidden"] = true;
         return item;
       });
     },
