@@ -12,11 +12,11 @@ import TaskType from '@model/entity/TaskType'
 /* vue */
 import VC from '@model/VC'
 import {Component, Emit, Prop} from 'vue-property-decorator'
-import {CreateElement} from 'vue'
+import {CreateElement, VNode} from 'vue'
 /* util */
 import {openTabForCustomerView, openTabForTaskView} from '@src/util/business/openTab'
 import {fmt_address} from '@src/filter/fmt'
-import {formatDate} from '@src/util/lang'
+import {formatDate, isEmpty} from '@src/util/lang'
 import Log from '@src/util/log.ts'
 /* scss */
 import '@src/modules/task/components/TaskAllotModal/TaskMapInfoWindow/TaskMapInfoWindow.scss'
@@ -41,7 +41,7 @@ class TaskMapInfoData {
     this.customerId = data?.customer?.id || data?.customerEntity?.id || ''
     this.description = data?.description || ''
     this.isTimeout = data?.isTimeout || false
-    this.linkMan = data?.linkMan || { name: data.tlmName, phone: data.tlmPhone }
+    this.linkMan = data?.linkMan || data.linkman || { name: data.tlmName, phone: data.tlmPhone }
     this.planTime = data?.planTime || ''
     this.serviceType = data?.serviceType || ''
     this.serviceContent= data?.serviceContent || ''
@@ -141,6 +141,34 @@ export default class TaskMapInfoWindow extends VC {
     return isExists
   }
   
+  /**
+   * @description 渲染提示通用字段
+   * @param {Boolean} show 是否显示
+   * @param {String} fieldName 字段名称
+   * @param {String} value 字段值
+   */
+  private renderSystemField(show: boolean, fieldName: string, value: string): VNode | null {
+    if (!show) return null
+    
+    let isEmptyValue = isEmpty(value)
+    let valueDom = <span>{ value || '' }</span>
+    
+    return (
+      <p>
+        <label>{fieldName}：</label>
+        {
+          isEmptyValue
+            ? valueDom
+            : (
+              <el-tooltip content={value} placement='top'>
+                {valueDom}
+              </el-tooltip>
+            )
+        }
+      </p>
+    )
+  }
+  
   render(h: CreateElement) {
     const {
       customerName = '',
@@ -174,19 +202,26 @@ export default class TaskMapInfoWindow extends VC {
               <i class='iconfont icon-fe-close'></i>
             </button>
           </div>
+          {
+            taskNo && (
+              <p>
+                <label>工单编号：</label>
+                <span class='link-text' onClick={() => openTabForTaskView(taskId)}>
+                { taskNo }
+              </span>
+              </p>
+            )
+          }
           <p>
-            <label>工单编号：</label>
-            <span class='link-text' onClick={() => openTabForTaskView(taskId)}>
-              { taskNo }
-            </span>
+            <label>联系人：</label>
+            <span>{ linkMan.name || '' }</span>
           </p>
-          <p><label>联系人：</label>{ linkMan.name || '' }</p>
           <p>
             <label>电话：</label>
             { linkMan.phone || '' }
             <biz-call-center-phone phone={linkMan.phone} />
           </p>
-          <p><label>地址：</label>{ fmt_address(address) || '' }</p>
+          { this.renderSystemField(true, '地址', fmt_address(address)) }
           <p>
             <label>计划时间：</label>
             { formatDate(planTime, DateFormatEnum.YTMHMS) || '' }
@@ -200,9 +235,9 @@ export default class TaskMapInfoWindow extends VC {
               )
             }
           </p>
-          { this.isHaveServiceTypeField && <p><label>服务类型：</label>{ serviceType || '' }</p> }
-          { this.isHaveServiceContentField && <p><label>服务内容：</label>{ serviceContent || '' }</p> }
-          { this.isHaveLevelField && <p><label>描述：</label>{ description || '' }</p> }
+          { this.renderSystemField(this.isHaveServiceTypeField, '服务类型', serviceType) }
+          { this.renderSystemField(this.isHaveServiceTypeField, '服务内容', serviceContent) }
+          { this.renderSystemField(this.isHaveLevelField, '描述', description) }
           <div class='info-window-arrow'></div>
         </div>
       </div>

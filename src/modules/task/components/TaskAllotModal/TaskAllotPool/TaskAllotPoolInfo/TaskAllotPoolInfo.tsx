@@ -68,7 +68,7 @@ export default class TaskAllotPoolInfo extends Vue {
           </span>
         </div>
         {
-          this.hideCustomerTagInfo && (
+          !this.hideCustomerTagInfo && (
             <div class={`${this.className}-item`}>
               <span class={`${this.className}-item-label`}>
                 客户服务团队待接单量: 

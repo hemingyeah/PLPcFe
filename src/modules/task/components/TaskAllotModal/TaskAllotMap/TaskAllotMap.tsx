@@ -107,10 +107,9 @@ export default class TaskAllotMap extends VC {
    * 3. 工单设置允许修改计划时间
   */
   get allowModifyPlanTime() {
-    let states = [TaskStateEnum.CREATED.value]
+    let states = [TaskStateEnum.CREATED.value, TaskStateEnum.REFUSED.value]
     let { state } = this.task
-    // TODO: 权限验证更改
-    return this.isCreator && this.taskConfig.taskPlanTime && states.indexOf(state) >= 0
+    return this.taskConfig.taskPlanTime && states.indexOf(state) >= 0
   }
   
   /** 

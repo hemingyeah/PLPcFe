@@ -3,9 +3,11 @@
   top: -10000px;
   .map-info-window-content p {
     display: flex;
-    align-items: center;
-    label {
-      min-width: 40px;
+    & > label {
+      min-width: 60px;
+    }
+    & > span {
+      @include text-ellipsis-2();
     }
     i {
       margin-left: 5px;
