@@ -515,7 +515,7 @@ export default TaskDetailView;
     .task-detail-step-2-box {
         position: absolute;
         top: 0;
-        left: 208px;
+        right: -120px;
         z-index: 997;
 
         .task-detail-step-2 {

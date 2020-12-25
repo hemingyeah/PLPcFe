@@ -735,6 +735,7 @@ import Page from "@model/Page";
 import platform from "@src/platform";
 import qs from "qs";
 import url from "url";
+import Platform from '@src/util/Platform'
 let export_state, timeStart, timeEnd;
 export default {
   name: "department-view",
@@ -900,7 +901,11 @@ export default {
     },
     isShowCreateChildrenTeam() {
       return isShowCreateChildrenTeam(this.initData)
-    }
+    },
+    // 是否在钉钉环境
+    isDingTalk() {
+      return Platform.isDingTalk()
+    },
   },
   mounted() {
     this.initialize();

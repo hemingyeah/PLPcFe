@@ -197,7 +197,7 @@
                 popper-class="user-profile-menu"
                 v-model="profilePopperVisible"
               >
-                <div class="frame-user-profile" slot="reference">
+                <div class="frame-user-profile" slot="reference" id="v-step-0">
                   <a
                     class="user-avatar"
                     :href="`/mine/` + loginUser.userId"
@@ -364,7 +364,7 @@
     <!--end 切换企业 -->
 
     <!--start 提醒存在多个企业-->
-    <v-tour v-if="showTour" name="myTour" :steps="steps" :options="options">
+    <v-tour v-if="showTour" name="myTour" class='multiple-tour' :steps="steps" :options="options">
       <template slot-scope="tour">
         <transition name="fade">
           <v-step

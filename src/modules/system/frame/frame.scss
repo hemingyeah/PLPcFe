@@ -779,3 +779,8 @@ button.export-operate-btn{
     background: linear-gradient(135deg, #FF5858 0%, #F09819 100%);
   }
 }
+.multiple-tour {
+  .v-step {
+    position: fixed !important;
+  }
+}
