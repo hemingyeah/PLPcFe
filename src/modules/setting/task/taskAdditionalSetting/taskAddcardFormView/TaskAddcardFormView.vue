@@ -1,5 +1,5 @@
 <template>
-  <div class="setting-task-card" v-loading.fullscreen.lock="pending">
+  <div class="setting-task-card" v-loading="loading">
     <!-- start 头部 -->
     <div class="setting-task-card-header">
       <div class="setting-task-card-left">
@@ -22,7 +22,7 @@
 
     <!-- start 表单设计器 -->
     <div class="setting-task-design">
-      <form-design v-if="init" v-model="fields" mode="task_card"></form-design>
+      <form-design  v-model="fields" :mode="mode"></form-design>
     </div>
     <!-- end 表单设计器 -->
   </div>

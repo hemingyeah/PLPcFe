@@ -139,7 +139,7 @@ export default {
             this.$platform.openTab({
                 id: "task_card_setting",
                 title: "附加组件表单设置",
-                url: `/setting/serviceStation/card/view?cardId=${cardId}`,
+                url: `/setting/task/cardFormfields?cardId=${cardId}`,
                 reload: true,
             });
         },
