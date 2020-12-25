@@ -41,7 +41,7 @@
     </div>
     </div>
     <!-- S 搜索条件 -->
-    <el-form class="advanced-search-form" onsubmit="return false;">
+    <el-form class="advanced-search-form task-search" onsubmit="return false;">
       <task-search-form
         v-show="show"
         class="task-search-forms"
@@ -1090,6 +1090,13 @@ export default {
   transition: height 0.5s;
   .form-item {
     width: 340px !important;
+  }
+}
+.task-search{
+  .form-item-control {
+    input{
+      width: 100%;
+    }
   }
 }
 </style>
