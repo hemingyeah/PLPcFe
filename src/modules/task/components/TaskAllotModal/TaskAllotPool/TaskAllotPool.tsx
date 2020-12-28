@@ -424,7 +424,9 @@ export default class TaskAllotPool extends Vue {
   */
   private handlerTaskPoolInfoSubscriptionChanged(value: boolean): void {
     this.isShowMapTaskPoolSubscriptionUsers = value
-    this.mapInit()
+    this.$nextTick(() => {
+      this.mapInit()
+    })
   }
   
   /** 
@@ -432,7 +434,9 @@ export default class TaskAllotPool extends Vue {
   */
   private handlerTaskPoolInfoAuthChanged(value: boolean): void {
     this.isShowMapTaskPoolAuthUsers = value
-    this.mapInit()
+    this.$nextTick(() => {
+      this.mapInit()
+    })
   }
   
   /**
