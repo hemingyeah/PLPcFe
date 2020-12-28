@@ -58,6 +58,8 @@ export default class UserCard extends Vue {
   @Prop() readonly customerTagNames: string[] | undefined
   // 向外发布事件的 组件名字
   @Prop() readonly emitEventComponentName: string | undefined
+  /* 是否为转派 */
+  @Prop() readonly isReAllot: boolean | undefined
   // 工作状态颜色数组
   @Prop() readonly stateColorMap: StateColorMap | undefined
   // 是否显示 负责人人按钮
@@ -245,11 +247,12 @@ export default class UserCard extends Vue {
         let isSuccess = data.success
         if (!isSuccess) {
           this.pending = false
-          Platform.alert(data.message)
+          return Platform.alert(data.message)
         }
         
         this.userCardInfo = parseObject(data.result)
         this.matchUserInCustomerTags()
+        this.setUserCardDetailHeight()
       })
       .catch((error) => {
         console.error(error)
@@ -445,7 +448,7 @@ export default class UserCard extends Vue {
     )
     
     return (
-      <div class='user-card-detail' ref='UserCardDetailElement'>
+      <div class='user-card-detail' ref='UserCardDetailElement' style={{ minHeight: `${this.userDetailMinHeight}px` }}>
         <div class='user-card-detail-row'>
           {this.renderUserCardDetailChunk('未完成工单量', fmt_display_text(this.userCardInfo.unfinished, '个'))}
           {this.renderUserCardDetailChunk('已完成工单量', fmt_display_text(this.userCardInfo.finished, '个'))}
@@ -470,6 +473,18 @@ export default class UserCard extends Vue {
         <div class='user-card-detail-chunk-label'>{label}</div>
       </div>
     )
+  }
+  
+  /** 
+   * @description 渲染用户详情高度
+  */
+  private setUserCardDetailHeight() {
+    this.$nextTick(() => {
+      let elHeight: number = this.$el?.clientHeight
+      let teamLength: number = this.userCardInfo.department.join('').length
+      let otherEl: number = 220 - (teamLength > 25 ? 20 : 0)
+      this.userDetailMinHeight = !elHeight ? 200 : elHeight - otherEl
+    })
   }
   
   mounted() {

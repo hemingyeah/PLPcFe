@@ -621,6 +621,7 @@ export default class TaskAllotPool extends Vue {
                 customer={this.customer}
                 customerTagNames={this.customerTagNames}
                 emitEventComponentName={ComponentNameEnum.TaskAllotPool}
+                isReAllot={this.isReAllot}
                 stateColorMap={this.stateColorMap}
                 showExecutorButton={false}
                 showSynergyButton={this.isShowSynergy}
