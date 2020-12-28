@@ -613,7 +613,7 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
     }
     
     // 如果查询人员只有单个时，清除可以刷新初始化
-    if (this.tableUserPage.list?.[0].userId == this.executor?.userId && users.length == 0) {
+    if (this.tableUserPage.list?.[0]?.userId == this.executor?.userId && users.length == 0) {
       // 设置负责人信息
       this.executorChangedHandler(users?.[0])
       nextTickInitialize()
