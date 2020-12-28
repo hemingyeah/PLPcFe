@@ -10,6 +10,7 @@ import TaskAllotExcutor from '@src/modules/task/components/TaskAllotModal/TaskAl
 /* enum */
 import ComponentNameEnum from '@model/enum/ComponentNameEnum'
 import EventNameEnum from '@model/enum/EventNameEnum'
+import TaskStateEnum from '@model/enum/TaskStateEnum'
 import { TaskPoolNotificationTypeEnum } from '@src/modules/task/components/TaskAllotModal/TaskAllotPool/TaskAllotPoolModel'
 /* entity */
 import Customer from '@model/entity/Customer'
@@ -128,6 +129,17 @@ export default class TaskAllotPool extends Vue {
   private userSubscriptionPage: Page =  new Page()
   /* 有权限接单用户page */
   private userAuthPage: Page =  new Page()
+  
+  /** 
+   * @description 工单信息中计划时间是否可以修改
+   * 1. 工单状态是待指派或已拒绝
+   * 3. 工单设置允许修改计划时间
+  */
+  get allowModifyPlanTime(): boolean {
+    let states = [TaskStateEnum.CREATED.value, TaskStateEnum.REFUSED.value]
+    let { state } = this.task
+    return Boolean(this.taskConfig?.taskPlanTime === true && states.indexOf(state) >= 0)
+  }
   
   /* 工单派单组件 */
   get TaskAllotModalComponent() {
@@ -577,7 +589,7 @@ export default class TaskAllotPool extends Vue {
         
         { this.renderTaskAllotReasonRow() }
         
-        <task-allot-map 
+        <task-allot-map
           ref='TaskAllotMap' 
           idName={this.mapId}
           taskTypesMap={this.taskTypesMap}
@@ -592,7 +604,8 @@ export default class TaskAllotPool extends Vue {
         </task-allot-pool-notification>
         
         <task-map-info-window
-          ref='TaskMapInfoWindowComponent' 
+          ref='TaskMapInfoWindowComponent'
+          showModifyPlanTime={this.allowModifyPlanTime}
           task={this.selectedMapTask}
           onClose={() => this.closeInfoWindowHandler()}
         />

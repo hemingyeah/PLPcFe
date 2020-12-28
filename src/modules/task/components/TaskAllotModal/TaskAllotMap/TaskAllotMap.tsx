@@ -102,8 +102,7 @@ export default class TaskAllotMap extends VC {
   
   /** 
    * @description 工单信息中计划时间是否可以修改
-   * 1. 工单状态是待指派
-   * 2. 当前登录账户是工单负责人或者有工单编辑全部权限
+   * 1. 工单状态是待指派或已拒绝
    * 3. 工单设置允许修改计划时间
   */
   get allowModifyPlanTime() {
