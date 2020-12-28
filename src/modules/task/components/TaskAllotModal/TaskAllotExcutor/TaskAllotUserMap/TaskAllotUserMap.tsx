@@ -49,6 +49,8 @@ export default class TaskAllotUserMap extends VC {
   @Prop() readonly customer: Customer | undefined
   /* 客户团队列表 */
   @Prop() readonly customerTags: Tag[] | undefined
+  /* 是否为转派 */
+  @Prop() readonly isReAllot: boolean | undefined
   /* 是否显示协同人 */
   @Prop() readonly isShowSynergy: boolean | undefined
   /* 是否为客户负责人 */
@@ -238,6 +240,7 @@ export default class TaskAllotUserMap extends VC {
                   customer={this.customer}
                   customerTagNames={this.customerTagNames}
                   emitEventComponentName={ComponentNameEnum.TaskAllotExcutor}
+                  isReAllot={this.isReAllot}
                   stateColorMap={this.stateColorMap}
                   showSynergyButton={this.isShowSynergy}
                   showCustomerManagerIcon={this.isCustomerManager}

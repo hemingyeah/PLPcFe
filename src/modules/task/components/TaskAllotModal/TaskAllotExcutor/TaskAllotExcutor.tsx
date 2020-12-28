@@ -74,6 +74,7 @@ export default class TaskAllotExcutor extends TaskAllotExecutorRender {
               customer={this.customer}
               customerTags={this.customerTags}
               isShowSynergy={this.isShowSynergy}
+              isReAllot={this.isReAllot}
               selectedExcutorUser={this.selectedExcutorUser}
               stateColorMap={this.stateColorMap}
               show={this.isMapMode}
