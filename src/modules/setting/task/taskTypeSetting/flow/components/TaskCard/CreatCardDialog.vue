@@ -31,7 +31,9 @@
       >
         <el-table-column type="index" :index="indexMethod" label="序号"></el-table-column>
         <el-table-column prop="name" label="名称"></el-table-column>
-        <el-table-column prop="description" label="说明"></el-table-column> 
+        <el-table-column prop="description" label="说明">
+          <template slot-scope="scope">{{htmlUnEscape(scope.row.description)}}</template>
+        </el-table-column> 
          <el-table-column prop="checked" label="启用" width="100px">
           <template slot-scope="scope">
             <el-checkbox v-model="scope.row.checked"></el-checkbox>
@@ -269,6 +271,10 @@ export default {
       }).catch(error=>{
         console.log(error)
       })
+    },
+    htmlUnEscape(value){
+      if(!value) return '';
+      return value.replace( /&lt;/g, "<").replace(/&gt;/g, ">");
     }
   },
   components: {

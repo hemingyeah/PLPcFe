@@ -105,7 +105,7 @@ export const getCardSysList =  (params = {}) => {
  * @param {Object} 
  */
 export const getAddCardFields =  (params = {}) => {
-  return http.get('/setting/task/cardField/list', params)
+  return http.get('/setting/task/cardField/new/list', params)
 }
 
 /**
@@ -113,9 +113,24 @@ export const getAddCardFields =  (params = {}) => {
  * @param {Object} 
  */
 export const taskCardFieldsSave =  (params = {}) => {
-  return http.post('/setting/task/cardField/create', params,false)
+  return http.post('/setting/task/cardField/createBatch', params)
 }
 
+/**
+ * @description 查询单个附加组件的信息
+ * @param {Object} 
+ */
+export const getTaskCardName =  (params = {}) => {
+  return http.get('/setting/task/card/getOne', params)
+}
+
+/**
+ * @description 更新单个工单附加组件的信息
+ * @param {Object} 
+ */
+export const updateTaskCardName =  (params = {}) => {
+  return http.post('/setting/task/card/updateOneTaskCard', params)
+}
 /* ------------- end 附加组件设置 ---------------- */
 
 /* ------------- start 工单类型组件设置 ---------------- */

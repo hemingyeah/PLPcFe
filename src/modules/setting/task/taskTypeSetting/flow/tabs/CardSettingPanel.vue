@@ -157,27 +157,24 @@ export default {
     },
     //从已添加的组件库选择
     update(newCard) {
-      const taskCardList = cloneDeep(this.taskCardList);
-      let newTaskCard = [];
-      
-      for(let i = 0;i < newCard.length; i++){
-        let card = newCard[i];
-        
-        let index = -1;
-        for(let j = 0; j < taskCardList.length; j++){
-          if(card.id == taskCardList[j].id){
-            index = j;
-            newTaskCard.push(taskCardList[j])
-            break;
-          }
-        }
-        if(index < 0){
-         let newobj = Object.assign(card,{notNullFlow: null,stateCanEdit: null,authInfo:this.authInfo})
-          newTaskCard.push(newobj) 
-        }
-      }
-
-      this.taskCardList = newTaskCard;
+      let list = [];
+      const oldList = cloneDeep(this.taskCardList);
+      const cardIdMap = new Map();
+      newCard.forEach(item=>{
+        cardIdMap.set(item.id,item)
+      })
+      oldList.forEach(item=>{ //保留原数据
+       if(cardIdMap.has(item.id)){
+         list.push(item);
+         cardIdMap.delete(item.id)
+       } else if(item.enabled===0){ //保存已禁用列表
+         list.push(item);
+       }
+      });
+      let newList = [...cardIdMap.values()];
+      newList = newList.map(item=>Object.assign(item,{notNullFlow: null,stateCanEdit: null,authInfo:this.authInfo}))
+      list.push(...newList);
+      this.taskCardList = list;
       this.onCloseCreatCard();
     },
 

@@ -5,7 +5,7 @@
     <!-- end 导航 -->
 
     <!-- start 附加组件设置 -->
-    <div class="task-additional-right">
+    <div class="task-additional-right" v-loading="loading" >
       <div class="task-tab-header">
         <div class="task-tabs">
           <el-tabs v-model="activeTab" @tab-click="switchTab">
@@ -23,7 +23,7 @@
       </div>
       
       <!-- start 已添加附加组件 -->
-      <div class="task-type-list" v-if="activeTab=='task-added'">
+      <div class="task-type-list" v-show="activeTab=='task-added'" >
         <task-card-item
           class="task-type-item"
           v-for="(item, idx) in cardList"
@@ -35,7 +35,7 @@
       <!-- end 已添加附加组件 -->
 
       <!-- start 从模版库添加 -->
-      <div class="task-type-list" v-if="activeTab=='task-import'">
+      <div class="task-type-list" v-show="activeTab=='task-import'">
         <template-library :cardSysList="cardSysList"></template-library>
       </div>
       <!-- end 从模版库添加 -->
@@ -71,38 +71,9 @@ export default {
   name: "task-manage",
   data() {
     return {
+      loading: true,
       activeTab: "task-added",
-      cardList: [
-        {
-          id: 'b7a32503-2704-11ea-bfc9-00163e304a25',
-          name: '费用备注',
-          description: '记录备注费用信息',
-          specialfrom: null,
-          inputType: 'single',//单次single 多次multiple   
-          range:[{name:'工单类型1',id:'ee7a0934-2840-4b55-bcc4-000e6435b70c'},{name:'工单类型2',taskTypeId:'ee7a0934-2840-4b55-bcc4-000e6435b70c'}], 
-          enabled:1, //1开启 0关闭
-          config:{}
-        }, {
-          id: "ccdddc47-390b-11ea-bfc9-00163e304a25",
-          name: '单次组件一',
-          description: '费用备注费用备注费用备注费用备注费用备注超过16',
-          specialfrom: null,
-          inputType: 'single',//单次single 多次multiple
-          range:[{name:'工单类型1',id:'ee7a0934-2840-4b55-bcc4-000e6435b70c'}], 
-          enabled:1, //1开启 0关闭
-          config:{}
-        },{
-          id: "d98f1607-e20a-11ea-9929-00163e304a25",
-          name: '工时记录',
-          description: '工时记录信息',
-          specialfrom: '工时记录',
-          inputType: 'single',//单次single 多次multiple
-          range:[{name:'工单类型1',id:'ee7a0934-2840-4b55-bcc4-000e6435b70c'}], 
-          enabled:1, //1开启 0关闭
-          config:{ distanceStatis: true,autoLocation: true}
-
-        },
-      ],
+      cardList: [],
       cardSysList:[]
 
     };
@@ -141,12 +112,14 @@ export default {
     initCard() {
       SettingTaskApi.getAllCardList().then(res=>{
         const { code, message, result } = res;
+        this.loading = false;
         if(code == 0){
-          // this.cardList = result  
+          this.cardList = result ;  
         }else{
           this.$message.error(message);
         }
       }).catch(error=>{
+        this.loading = false;
         console.log(error)
       })
     },

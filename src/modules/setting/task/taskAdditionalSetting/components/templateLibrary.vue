@@ -7,7 +7,7 @@
     <!--end tabs选项 -->
 
     <!--start 组件库列表 -->
-    <div class="tabs-card-item" >
+    <div class="tabs-card-item" v-if="cardSysList.length>0">
       <el-card class="tabs-card-box" v-for="cardItem in cardSysList[tabIndex].list" :key="cardItem.cardId" >
           <div  class="tabs-card-li">
             <div class="task-card-inforn"> 

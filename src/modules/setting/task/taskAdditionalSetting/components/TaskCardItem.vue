@@ -5,7 +5,7 @@
                 <el-row class="task-card-content" type="flex">
                     <div class="task-card-inforn"> 
                         <h2 class="task-card-name"><el-tooltip class="item" effect="dark" :content="card.name" :disabled="card.name.length<13" placement="top-start"><span>{{card.name}}</span></el-tooltip></h2>                                       
-                        <p class="task-card-des">{{card.description}}</p>
+                        <p class="task-card-des">{{htmlUnEscape(card.description)}}</p>
                     </div>
                     
                     <el-row class="task-card-others">
@@ -19,7 +19,7 @@
                                     </el-dropdown-menu>
                                 </el-dropdown>
                             </template>
-                            <template v-else>
+                            <template v-if="card.range.length == 1">
                                 <span class="pointer" @click="modifyTaskType(card.range[0].id)">{{card.range[0].name}}</span>
                             </template>
                         </div>
@@ -153,6 +153,10 @@ export default {
                 ...this.card,
                 teamList
             })
+        },
+        htmlUnEscape(value){
+            if(!value) return '';
+            return value.replace( /&lt;/g, "<").replace(/&gt;/g, ">");
         }
     },
     components: {
@@ -197,7 +201,6 @@ export default {
                     margin-top: 8px;
                     height: 34px;
                     @include text-ellipsis-2; 
-                    cursor: pointer;
                     margin-block-end: 0em;
 
                 }
