@@ -22,11 +22,6 @@
   .contact-user-avatar-margin {
     margin-top: 0;
   }
-  .contact-user-item {
-    &:hover {
-      background-color: transparent !important;
-    }
-  }
   & > .el-select,
   .biz-form-remote-select,
   .task-allot-table-user,
@@ -54,13 +49,12 @@
 }
 
 .task-allot-user-table {
-  max-height: 412px;
+  // max-height: 412px;
   &-column {
     cursor: pointer;
     display: flex;
     align-items: center;
-    justify-content: space-around;
-    width: 120px;
+    width: 80px;
   }
   &-excutor-column {
     display: flex;
@@ -78,11 +72,13 @@
 }
 
 .task-allot-user-table-block {
-  max-height: 300px;
-  overflow-y: auto;
+  //overflow-y: auto;
   .el-table__body-wrapper {
-    max-height: 250px;
-    overflow-y: scroll;
+    //height: 100%;
+    //overflow-y: scroll;
+    //table {
+    //  height: 100%;
+    //}
   }
   th .cell {
     @include text-ellipsis();
@@ -105,29 +101,6 @@
   }
 }
 
-.task-allot-user-table-location-select-other {
-  height: 80px;
-  .el-input {
-    width: 90px;
-    margin: 0 10px;
-  }
-  .el-checkbox {
-    margin-left: 10px;
-  }
-  .el-checkbox__inner {
-    height: 20px;
-    width: 20px;
-    &::after {
-      height: 12px;
-      left: 6px;
-      top: 0;
-      width: 7px;
-    }
-  }
-  .location-confirm-button {
-    margin-left: 20px;
-  }
-}
 
 .task-allot-table-user-input {
   cursor: pointer;
@@ -153,10 +126,18 @@
 }
 
 .task-allot-user-table-column-field {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
   text-align: center;
   &-label {
     color: $color-primary;
     font-size: $font-size-base;
+  }
+  .user-label {
+    margin-left: 4px;
+    width: auto;
   }
 }
 
@@ -273,3 +254,39 @@
     font-size: $font-size-larger !important;
   }
 }
+
+/* start new */
+.task-allot-user-table-header {
+  display: flex;
+  justify-content: space-between;
+  padding: 16px;
+  &-label,
+  &-select-block {
+    display: flex;
+    align-items: center;
+    & > div {
+      margin-left: 8px;
+    }
+    .el-input__inner {
+      &::placeholder {
+        color: $text-color-primary;
+      }
+    }
+  }
+  .task-allot-user-table-sort-label {
+    background-color: $bg-color-l3;
+    border-radius: 12px;
+    cursor: pointer;
+    display: inline-block;
+    font-size: $font-size-small;
+    margin-right: 12px;
+    padding: 3px 12px;
+    transition: all 0.25s ease;
+    user-select: none;
+    &-active {
+      background-color: $color-primary;
+      color: #fff;
+    }
+  }
+}
+/* end new */

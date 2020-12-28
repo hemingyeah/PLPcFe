@@ -1,6 +1,8 @@
 /* vue */
 import Component from 'vue-class-component'
-import { Vue } from 'vue-property-decorator'
+import { Ref, Vue } from 'vue-property-decorator'
+/* components */
+import { Table } from 'element-ui'
 
 @Component({ 
   components: {
@@ -8,6 +10,9 @@ import { Vue } from 'vue-property-decorator'
   }
 })
 
-class TaskAllotUserTableComponents extends Vue {}
+class TaskAllotUserTableComponents extends Vue {
+  /* 工单指派人员表格组件 */
+  @Ref() TaskAllotUserElTableComponent !: Table
+}
 
 export default TaskAllotUserTableComponents

@@ -36,3 +36,6 @@ export const TASK_NO_REALLOT_REASON_MESSAGE: string = '请填写转派说明';
 export const TASK_REALLOT_NOT_SAME_USER_MESSAGE: string = '不能将工单转派给原负责人，请检查';
 // 为匹配到分配规则
 export const TASK_NOT_AUTO_DISPATCH_RULE: string = '未匹配到任何规则，请使用「重新匹配」功能刷新结果，或更换派单方式。';
+// 未找到上次派单结果
+export const TASK_ALLOT_NOT_STORAGE_RESULT: string = '未找到上次派单结果，请稍后重试。';
+
