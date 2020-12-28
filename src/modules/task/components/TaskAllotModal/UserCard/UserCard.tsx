@@ -81,6 +81,8 @@ export default class UserCard extends Vue {
   private timeRange: Date[] = []
   // 用户卡片信息
   private userCardInfo: UserCardInfo = new UserCardInfo()
+  // 用户详情最低高度
+  private userDetailMinHeight: number = 200
   
   /* 用户信息 */
   get user(): LoginUser {
@@ -443,7 +445,7 @@ export default class UserCard extends Vue {
     )
     
     return (
-      <div class='user-card-detail'>
+      <div class='user-card-detail' ref='UserCardDetailElement'>
         <div class='user-card-detail-row'>
           {this.renderUserCardDetailChunk('未完成工单量', fmt_display_text(this.userCardInfo.unfinished, '个'))}
           {this.renderUserCardDetailChunk('已完成工单量', fmt_display_text(this.userCardInfo.finished, '个'))}
@@ -483,7 +485,7 @@ export default class UserCard extends Vue {
           <div class='user-card-close' onClick={() => this.close()}>
             <i class='iconfont icon-fe-close'></i>
           </div>
-          <div class='user-card-header'>
+          <div class='user-card-header' ref='UserCardHeaderElement'>
             <div class='user-card-header-head'>
               <img src={this.user?.head || DefaultHead} />
             </div>
