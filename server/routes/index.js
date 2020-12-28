@@ -137,6 +137,13 @@ router.use('/api/elasticsearch/outside/es', (ctx) =>
     port: 10006,
   })
 );
+router.use('/files', (ctx) =>
+  HttpClient.proxy(ctx, {
+    host: '30.40.58.216',
+    port: 8083,
+  })
+);
+
 router.use('', performanceRouter.routes());
 router.use('', customerRouter.routes(), customerRouter.allowedMethods());
 router.use('', openRouter.routes(), openRouter.allowedMethods());
@@ -155,7 +162,6 @@ router.use('', taskRouter.routes(), taskRouter.allowedMethods());
 router.use('', sparePartRouter.routes(), sparePartRouter.allowedMethods());
 router.use('', linkcRouter.routes(), sparePartRouter.allowedMethods());
 router.use('', productV2Router.routes(), sparePartRouter.allowedMethods());
-router.use('', superQrcodeRouter.routes(), superQrcodeRouter.allowedMethods());
 
 router.all('/*', (ctx) => {
   return HttpClient.proxy(ctx);

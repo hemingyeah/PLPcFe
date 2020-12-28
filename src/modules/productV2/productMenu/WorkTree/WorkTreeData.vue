@@ -105,11 +105,36 @@
             </form-item>
           </template>
 
+          <template slot="productVideo"
+                    slot-scope="{ field }">
+
+            <form-item :class="['upload-video',productMenuValue.thumbnail.length>=1? 'hide_box': '']"
+                       :label="field.displayName">
+              <el-upload class="upload-demo"
+                         action="string"
+                         :on-preview="handlePreview"
+                         :http-request="UploadVideo"
+                         :before-upload="onBeforeUploadVideo"
+                         :file-list="productVideoList"
+                         :on-success="handleSuccess"
+                         :on-exceed="onExceedVideo"
+                         :on-remove="onRemoveVideo"
+                         name="filename"
+                         :limit="1">
+                <el-button size="small"
+                           type="primary">点击上传</el-button>
+                <div slot="tip"
+                     class="font-12 color-999 mar-t-10">
+                  只能上传mp4文件，且不超过50mb
+                </div>
+              </el-upload>
+            </form-item>
+          </template>
+
           <template slot="thumbnail"
                     slot-scope="{ field }">
-            <form-item 
-              :class="['upload-img',productMenuValue.thumbnail.length>=1? 'hide_box': '']"
-              :label="field.displayName">
+            <form-item :class="['upload-img',productMenuValue.thumbnail.length>=1? 'hide_box': '']"
+                       :label="field.displayName">
               <el-upload action="string"
                          list-type="picture-card"
                          :on-preview="handlePictureCardPreview"
@@ -237,6 +262,7 @@ export default {
       btnLoading: false,
       productPicList: [],
       thumbnailList: [],
+      productVideoList: [],
       loading: false,
       haveAttribute: false
     };
@@ -273,7 +299,7 @@ export default {
           const fields = result || [];
           let arr = [];
           const sortedFields = fields
-            .sort((a, b) => a.orderId - b.orderId).filter(item=>item.fieldName != 'catalogName')
+            .sort((a, b) => a.orderId - b.orderId).filter(item => item.fieldName != 'catalogName')
             .map((item) => {
               if (item.isSystem != 1) this.haveAttribute = true;
               if (item.fieldName == 'catalogName') item['maxlength'] = 30;
@@ -313,12 +339,15 @@ export default {
     onExceedThu () {
       this.$message.error('最多上传1张图片!');
     },
+    onExceedVideo () {
+      this.$message.error('最多上传1个视频!');
+    },
     handlePictureCardPreview (file) {
       this.$previewImg(file.url);
     },
     handlePreview (file) {
-      if (!file.url) return;
-      this.$previewVideo(file.url);
+      if (!file.response.url || !file.url) return;
+      this.$previewVideo(file.url || file.response.url);
     },
     onBeforeUploadImage (file) {
       const isJPG = file.type === 'image/jpeg' || file.type === 'image/png';
@@ -335,16 +364,38 @@ export default {
     },
     onBeforeUploadVideo (file) {
       const isMP4 = file.type === 'video/mp4';
-      const isLt10M = file.size / 1024 / 1024 < 10;
+      const isLt50M = file.size / 1024 / 1024 < 50;
 
       if (!isMP4) {
         this.$message.error('上传视频只能是 MP4 格式!');
       }
-      if (!isLt10M) {
-        this.$message.error('上传视频大小不能超过 10MB!');
+      if (!isLt50M) {
+        this.$message.error('上传视频大小不能超过 50MB!');
       }
       // this.fileList.push(file);
-      return isMP4 && isLt10M;
+      return isMP4 && isLt50M;
+    },
+    UploadVideo (param) {
+      return Uploader.upload(param.file, '/files/uploadVideo').then(res => {
+        if (res.status == 0) {
+          let item_ = {
+            uid: param.file.uid,
+            id: res.data.id,
+            filename: res.data.fileName,
+            name: res.data.fileName,
+            // 如果后端返回url,必须使用。如果后端不返回，需要拼接
+            url: res.data.ossUrl || res.data.url || `/files/get?fileId=${res.data.id}`,
+            fileSize: res.data.fileSizeStr,
+          }
+          return item_
+        }
+      })
+    },
+    handleSuccess (_res, _file, fileList) {
+      this.productMenuValue.productVideo = fileList.map(item=>item.response);
+    },
+    onRemoveVideo (o, a) {
+      this.$set(this.productMenuValue, 'productVideo', this.productMenuValue.productVideo.filter(item => item.uid != o.uid));
     },
     onRemovePic (o, a) {
       this.$set(this.productMenuValue, 'productPic', this.productMenuValue.productPic.filter(item => item.uid != o.uid));
@@ -365,7 +416,6 @@ export default {
           }
 
           let file = result.data;
-          console.log(param, 'param');
           let item = {
             uid: param.file.uid,
             id: file.id,
@@ -520,6 +570,7 @@ export default {
           res.result.catalogInfo.productPic = res.result.catalogInfo.productPic || [];
           this.thumbnailList = res.result.catalogInfo.thumbnail || [];
           this.productPicList = res.result.catalogInfo.productPic || [];
+          this.productVideoList = res.result.catalogInfo.productVideo || [];
           res.result.catalogInfo.productExplain = res.result.catalogInfo.productExplain || [];
           res.result.catalogInfo.thumbnail = res.result.catalogInfo.thumbnail || [];
           res.result.catalogInfo = { ...res.result.catalogInfo, ...res.result.catalogInfo.attribute }
@@ -622,7 +673,7 @@ export default {
   .scroll-data {
     overflow-y: scroll;
   }
-  .work-data-title{
+  .work-data-title {
     padding: 12px;
     font-size: 16px;
     font-weight: 600;
@@ -669,16 +720,19 @@ export default {
 // }
 </style>
 <style lang="scss">
-.el-form-item__label {
-  display: block;
-  width: 110px;
-  padding: 4px 0 0 10px;
-  line-height: 24px;
-  margin: 0;
-  flex-shrink: 0;
-  text-align: start;
-}
 .upload-img {
+  .el-form-item__label {
+    display: block;
+    width: 110px;
+    padding: 4px 0 0 10px;
+    line-height: 24px;
+    margin: 0;
+    flex-shrink: 0;
+    text-align: start;
+  }
+  .el-upload-list__item{
+    transition: none !important;
+  }
   margin-bottom: 12px;
   .el-upload-list__item label {
     padding: 0;
@@ -694,6 +748,15 @@ export default {
   .el-upload-list__item {
     width: 96px;
     height: 96px;
+  }
+}
+
+.upload-video {
+  label {
+    padding: 0 !important;
+  }
+  .el-upload-list__item{
+    transition: none !important;
   }
 }
 .el-checkbox {

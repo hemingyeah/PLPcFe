@@ -58,7 +58,8 @@
       @changeVisibleProp="changeVisibleProp"
       @confirm="dialogConfirm"
       :dialog-type="dialogType"
-      :init-data="nowEditMenu"
+      :now-edit-menu="nowEditMenu"
+      :child-data="childData"
     ></public-dialog>
     <!--  -->
   </div>
@@ -91,7 +92,7 @@ export default {
   },
   data() {
     return {
-      allType: false,
+      allType: true,
       visibleProp: false,
       dialogType: "addMenu",
       treeData: [
