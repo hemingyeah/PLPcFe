@@ -75,10 +75,10 @@
 import draggable from 'vuedraggable';
 // utils
 import { parse } from '@src/util/querystring';
-/**  api */
+// api 
 import * as TaskApi from '@src/api/TaskApi.ts';
 import * as SettingTaskApi from "@src/api/SettingTaskApi";
-/** component */
+// component 
 import TaskCardItem from '../components/TaskCardItem';
 import NoDataViewNew from '@src/component/common/NoDataViewNew';
 import CreatCardDialog from '../components/TaskCard/CreatCardDialog';
@@ -111,8 +111,30 @@ export default {
 
   },
   methods: {
-    //提交数据
-    submit() {
+    //保存数据
+    async submit() {
+      try {
+        const params = {
+          taskTypeId: this.taskTypeId,
+          cardInfo: this.taskCardList
+        }
+        let res = await SettingTaskApi.batchSaveTaskCard(params); 
+        if(res.status === 0) {
+          this.$notify.success('保存成功');
+          setTimeout(()=>{
+            this.$platform.openTab({
+              id: "task_flow_setting",
+              title: "工单流程设置",
+              url: `/setting/taskType/manage`,
+              reload: true,
+            });
+          },1000)
+        }else {
+          this.$notify.error(res.message);
+        }
+      } catch (error) {
+        console.error(error);
+      }
       this.saveCard();
     },
     //新建附件组件
@@ -190,51 +212,23 @@ export default {
       this.taskCardList.forEach((item, idx) => {
         item.order = idx +1;
       })
-    },
-
-    //保存修改
-    saveCard() {
-       const params = {
-        taskTypeId: this.taskTypeId,
-        cardInfo: this.taskCardList
-      }
-      SettingTaskApi.batchSaveTaskCard(params).then(res=>{
-        const { status, message, result } = res;
-        if(status == 0){
-          this.$message.success('保存成功');
-          setTimeout(()=>{
-            this.$platform.openTab({
-              id: "task_flow_setting",
-              title: "工单流程设置",
-              url: `/setting/taskType/manage`,
-              reload: true,
-            });
-          },1000)
-
-        }else{
-          this.$message.error(message);
-        }
-      }).catch(error=>{
-        console.log(error)
-      })
-    },
-    
+    },   
     /**
      * 获取工单设置的除组件外的其他信息
      */
     async fetchTasktype() {
-        try {
-            const { status, message, data } = await TaskApi.getTaskType({ id: this.taskTypeId});
-            this.loading = false;
-            if( status == 0 ){
-              if(JSON.stringify(data.cardSetting) !=='{}' && data.cardSetting.cardInfo){
-                this.taskCardList = data.cardSetting.cardInfo;
-              }
-            }     
-        } catch (err) {
-            console.error('fetch Tasktype => err', err);
-            this.loading = false;
-        }
+      try {
+        const { status, message, data } = await TaskApi.getTaskType({ id: this.taskTypeId});
+        this.loading = false;
+        if( status == 0 ){
+          if(JSON.stringify(data.cardSetting) !=='{}' && data.cardSetting.cardInfo){
+            this.taskCardList = data.cardSetting.cardInfo;
+          }
+        }     
+      } catch (err) {
+          console.error('fetch Tasktype => err', err);
+          this.loading = false;
+      }
     },
   },
   components: {

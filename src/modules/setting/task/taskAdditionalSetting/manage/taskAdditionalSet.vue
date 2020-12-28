@@ -61,9 +61,9 @@ import * as SettingTaskApi from "@src/api/SettingTaskApi";
 import { isShowCardWorkTime } from '@src/util/version.ts'
 // components
 import TaskNavBar from "../../components/TaskNavBar";
-import TaskCardItem from "../components/TaskCardItem";
-import EditCardnameDialog from "../components/EditCardnameDialog";
-import templateLibrary from "../components/templateLibrary";
+import TaskCardItem from "./components/TaskCardItem";
+import EditCardnameDialog from "./components/EditCardnameDialog";
+import templateLibrary from "./components/templateLibrary";
 import NoDataViewNew from '@src/component/common/NoDataViewNew';
 import { forEach } from 'lodash';
 

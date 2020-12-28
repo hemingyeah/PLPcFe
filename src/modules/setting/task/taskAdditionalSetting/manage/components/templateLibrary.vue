@@ -20,7 +20,7 @@
             </div>
             <div class="task-card-footer">
               <template v-if="cardItem.type!=='工时'">
-                <el-button type="primary" class="preview">预览</el-button>
+                <el-button type="primary" class="preview" @click="previewCard">预览</el-button>
                 <el-tooltip class="item" effect="dark" content="每个工单中填写一组该数据" placement="top">
                   <el-button type="primary" @click="importcard(cardItem.cardId,'single')">添加为单次</el-button>
                 </el-tooltip>
@@ -39,10 +39,16 @@
     </div>
     <!--end  组件库列表 -->
 
+    <!--start 预览组件 -->
+    <preview-card-dialog ref="previewDialog" ></preview-card-dialog>
+    <!--end 预览组件 -->
   </div>
 </template>
 <script>
+// api
 import * as SettingTaskApi from "@src/api/SettingTaskApi";
+// components
+import PreviewCardDialog from "./PreviewCardDialog";
 export default {
   name: 'template-library',
   props: {
@@ -75,7 +81,15 @@ export default {
       }).catch(error=>{
 
       })
+    },
+
+    //预览组件
+    previewCard() {
+      this.$refs.previewDialog.openDialog();
     }
+  },
+  components: {
+    [PreviewCardDialog.name]: PreviewCardDialog
   },
 };
 </script>
