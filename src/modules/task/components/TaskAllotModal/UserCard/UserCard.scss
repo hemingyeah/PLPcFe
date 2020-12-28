@@ -103,7 +103,7 @@
 }
 
 .user-card-detail {
-  flex: 1;
+  min-height: 120px;
   &-row {
     display: flex;
     margin-bottom: 20px;

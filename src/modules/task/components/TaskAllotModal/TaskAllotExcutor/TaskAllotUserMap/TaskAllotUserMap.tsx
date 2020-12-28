@@ -184,8 +184,10 @@ export default class TaskAllotUserMap extends VC {
    * -- 支持外部调用的
    */
   public outsideBuildeUserMarkers(list: LoginUser[]) {
+    // 清除之前的标记
+    this.AMap.remove(this.userMarkers)
+    // 数据为空
     if (list.length === 0) {
-      this.AMap.remove(this.userMarkers)
       return Log.warn('outsideBuilderMarkers list is empty', this.outsideBuildeUserMarkers.name)
     }
     
