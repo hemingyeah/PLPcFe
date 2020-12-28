@@ -292,6 +292,10 @@ export default class TaskAllotPool extends Vue {
         
         // 工单池通知人员赋值
         this.taskPoolNotificationUsers = result?.data?.users || []
+         // 判断是否选中 可以通知其他人
+        if (!this.notificationCheckd || !this.notificationCheckd.includes(TaskPoolNotificationTypeEnum.SendToOtherUser)) {
+          this.notificationCheckd.push(TaskPoolNotificationTypeEnum.SendToOtherUser)
+        }
       })
       .catch((err: any) => {
         console.error(err)
@@ -411,10 +415,6 @@ export default class TaskAllotPool extends Vue {
   }
   
   private handleAddNotificationUser() {
-    // 判断是否选中 可以通知其他人
-    if (!this.notificationCheckd || !this.notificationCheckd.includes(TaskPoolNotificationTypeEnum.SendToOtherUser)) {
-      return Platform.alert(REQUIRE_OTHER_NOTIFICATION_USER_MEESSAGE)
-    }
     // 选择工单池通知其他人
     this.chooseTaskPoolNotificationUsers()
   }
