@@ -1,6 +1,9 @@
 <template>
   <div class="wrapper">
     <h3 class="title">{{ title }}</h3>
+    <el-tooltip v-show="showJump" placement="bottom-start" effect="dark" :content='content'>
+      <i class="iconfont icon-fdn-info jump-icon"></i>
+    </el-tooltip>
     <div v-if="nowOption === 'pic'" class="pic-wrapper">
       <ul class="pic-ul">
         <li v-if="copyForm.companyImages && copyForm.companyImages[0].url">
@@ -52,7 +55,6 @@
 
     <div v-if="nowOption === 'contact'" class="contact-wrapper">
       <h4>客服分配规则</h4>
-      <i class="iconfont icon-fdn-info"></i>
       <p class="contact-explain">此规则适用于所有目录</p>
       <div style="height:calc(100% - 70px);overflow-y:auto;">
         <el-card class="box-card" v-for="item in rules" :key="item.id">
@@ -126,9 +128,9 @@
     </div>
 
     <el-button @click="save" v-if="!noCatalog || nowOption==='proInfo' || nowOption==='service' || nowOption==='mall'" type="primary" class="submit-btn">{{nowOption==='contact' || nowOption==='comInfo'?'下一步':'保存'}}</el-button>
-    <el-tooltip v-show="showJump" placement="bottom-start" effect="dark" :content='content'>
+    <!-- <el-tooltip v-show="showJump" placement="bottom-start" effect="dark" :content='content'>
       <i class="iconfont icon-fdn-info jump-icon"></i>
-    </el-tooltip>
+    </el-tooltip> -->
 
     <el-dialog title="查看分配规则" :visible.sync='ruleDialog'>
       <el-form :model='ruleForm' label-width="140px">
@@ -504,10 +506,9 @@ ul {
     left: 20px;
   }
   .jump-icon{
-    position: absolute;
-    bottom: 200px;
-    left: 20px;
-    color:$color-main;
+    float: right;
+    transform: translate(-160px,-45px);
+    color:#999;
     cursor: pointer;
     font-size: 20px;
   }
