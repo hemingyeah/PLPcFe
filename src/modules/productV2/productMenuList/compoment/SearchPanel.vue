@@ -108,18 +108,18 @@ export default {
   methods: {
     buildSelfFields() {
       let fields = [
-        {
-          displayName: "创建人",
-          fieldName: "createUser",
-          formType: "user",
-          returnData:"name",
-          noClearable: true,
-          export: false,
-          isNull: 1,
-          isSystem: 1,
-          orderId: -3.5,
-          placeHolder: "请输入创建人",
-        },
+        // {
+        //   displayName: "创建人",
+        //   fieldName: "createUser",
+        //   formType: "user",
+        //   returnData:"name",
+        //   noClearable: true,
+        //   export: false,
+        //   isNull: 1,
+        //   isSystem: 1,
+        //   orderId: -3.5,
+        //   placeHolder: "请输入创建人",
+        // },
 
         {
           displayName: "创建时间",
