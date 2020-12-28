@@ -93,7 +93,7 @@ export default {
 
       TaskApi.applyApprove(this.apprForm).then(res => {
         if (res.status == 0) {
-          this.$platform.alert('已发起审批，请等待审批结果，结果会以钉钉消息的方式通知');
+          this.$platform.alert('已发起审批，请等待审批结果');
 
           window.location.href = `/task/view/${this.taskId}`;
         } else {

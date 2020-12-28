@@ -484,7 +484,7 @@ export default {
           title: this.isAttention ? '取消关注成功' : '关注客户成功',
           message: this.isAttention
             ? '您不会再接收该客户信息动态变更的通知'
-            : '当该客户信息动态变更时，您会收到钉钉通知'
+            : '当该客户信息动态变更时，您会收到通知'
         })
 
         this.fetchAttentionUsers()

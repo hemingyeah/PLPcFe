@@ -26,7 +26,7 @@
           placement="bottom-end"
           width="300"
           trigger="hover"
-          content="开启本选项后，在选择协同人等调用钉钉通讯录时只可见自己所属服务团队的成员，管理员除外">
+          content="开启本选项后，在选择协同人等调用通讯录时只可见自己所属服务团队的成员，管理员除外">
           <i class="iconfont icon-help" slot="reference"></i>
         </el-popover>
       </div>

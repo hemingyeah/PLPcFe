@@ -10,7 +10,7 @@
         </div>
         <div v-if="!tenantType" class="saleManager-qrcode">
           <img :src="saleManagerQRCode" alt="专属客服"/>
-          <p>钉钉扫码联系专属客服</p>
+          <p>扫码联系专属客服</p>
         </div>
         <!-- <div class="saleManager-qrcode">
           <div class="saleManager-qrcode-block" ref="qrcode"></div>
