@@ -215,7 +215,7 @@ export default {
 
       let loading = this.$loading();
       try {
-        this.taskFields = await this.fetchTaskTemplateFields({ templateId, tableName: 'task' });
+        this.taskFields = await this.fetchTaskTemplateFields({ typeId: templateId, tableName: 'task', isFromSetting: false });
         this.taskValue = FormUtil.initialize(this.taskFields, {});
 
         // 表单初始化

@@ -738,7 +738,7 @@ export default {
       
     },
     /**
-     * 请求 getTaskTemplateFields and fetchTaskFields 接口
+     * 请求 getAllFields and fetchTaskFields 接口
      */
     getTaskOpen(fn) {
       Promise.all([this.fetchTaskFields(), this.fetchTaskReceiptFields()])
@@ -1052,6 +1052,7 @@ export default {
       // this.advanceds = [...advancedList, ...this.taskTypeFilterFields];
       // E 高级搜索
       let columns = fields
+        .filter(f => !['attachment','separator','info','autograph'].includes(f.formType))
         .map((field) => {
           let sortable = false;
           let minWidth = 120;
@@ -1431,10 +1432,11 @@ export default {
      */
     fetchTaskFields() {
       let params = {
-        templateId: this.currentTaskType.id || "",
+        typeId: this.currentTaskType.id || "",
         tableName: "task",
+        isFromSetting: false
       };
-      return TaskApi.getTaskTemplateFields(params).then((result) => {
+      return TaskApi.getAllFields(params).then((result) => {
         result.forEach((field) => {
           field.group = "task";
           field.label = field.displayName;
@@ -1449,10 +1451,11 @@ export default {
      */
     fetchTaskReceiptFields() {
       let params = {
-        templateId: this.currentTaskType.id || "",
+        typeId: this.currentTaskType.id || "",
         tableName: "task_receipt",
+        isFromSetting: false
       };
-      return TaskApi.getTaskTemplateFields(params).then((result) => {
+      return TaskApi.getAllFields(params).then((result) => {
         result.forEach((field) => {
           field.group = "task_receipt";
           field.label = field.displayName;

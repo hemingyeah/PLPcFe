@@ -1113,11 +1113,11 @@ export default {
       let { templateId } = this.task;
 
       let subtask = [
-        TaskApi.getAllFields({ typeId: templateId, tableName: TableNameEnum.Task, isFromSetting: true })
+        TaskApi.getAllFields({ typeId: templateId, tableName: TableNameEnum.Task, isFromSetting: false })
       ];
 
       // 显示回执时获取回执字段信息
-      if (this.allowFinishTask || this.showReceipt) subtask.push(TaskApi.getAllFields({ typeId: templateId, tableName: TableNameEnum.TaskReceipt, isFromSetting: true }));
+      if (this.allowFinishTask || this.showReceipt) subtask.push(TaskApi.getAllFields({ typeId: templateId, tableName: TableNameEnum.TaskReceipt, isFromSetting: false }));
 
       const result = await Promise.all(subtask);
 
