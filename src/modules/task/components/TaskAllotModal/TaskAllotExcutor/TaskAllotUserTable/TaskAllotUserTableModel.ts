@@ -102,7 +102,7 @@ export const TaskAllotUserTableEnterpriseEditionColumns = [
   ...TaskAllotUserTableCommonColumns,
   TaskAllotUserTableLineLocationColumn,
   {
-    "label": "距客户(km)",
+    "label": "驾车距离(km)",
     "field": "distance",
     "show": true,
     "fixed": false,
@@ -111,7 +111,7 @@ export const TaskAllotUserTableEnterpriseEditionColumns = [
     "type": "column"
   },
   {
-    "label": "距客户车程",
+    "label": "驾车时长",
     "field": "duration",
     "show": true,
     "fixed": false,
