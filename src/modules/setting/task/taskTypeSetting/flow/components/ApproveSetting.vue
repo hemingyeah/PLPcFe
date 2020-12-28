@@ -1,6 +1,6 @@
 <template>
     <div class="setting-approve">
-        <el-radio-group v-model="approveSetting.level">
+        <el-radio-group v-model="approveSetting.level" @change="switchLevel">
             <el-radio :label="0">无需审批</el-radio>
             <el-radio :label="1" class="ml-12">一级审批</el-radio>
             <el-radio :label="2" class="ml-12">二级审批</el-radio>
@@ -55,6 +55,8 @@
 </template>
 
 <script>
+import TaskApprover from "@model/types/setting/task/TaskApprover";
+
 export default {
     name: 'approve-setting',
     props: {
@@ -64,14 +66,7 @@ export default {
         },
         approveSetting: {
             type: Object,
-            default: () => {
-                return {
-                    leader: '',
-                    approvers: [],
-                    level: 0,
-                    multiApproverSetting: []
-                }
-            }
+            default: () => new TaskApprover()
         }
     },
     filters: {
@@ -82,6 +77,24 @@ export default {
         }
     },
     methods: {
+        /** 选择审批等级 */
+        switchLevel(val) {
+            let multiApproverSetting = [];
+            if(val > 1) {
+                for(let i = 0; i < val - 1; i++) {
+                    if(!this.approveSetting[i]) {
+                        multiApproverSetting.push({
+                            leader: '',
+                            approvers: []
+                        })
+                    } else{
+                        multiApproverSetting.push(this.approveSetting[i]);
+                    }
+                }
+            }
+
+            this.approveSetting.multiApproverSetting = multiApproverSetting;
+        },
         getApproverNames(approvers) {
             return approvers.map(item => item.displayName).join(',');
         },
@@ -95,15 +108,16 @@ export default {
         updateApproveSetting(key, value, level) {
             console.log(key, value, level);
             let approveSetting = _.cloneDeep(this.approveSetting);
-
             // 一级设置
             if(level <= 1) {
-                this.approveSetting[key] = value;
+                approveSetting[key] = value;
             }
             // 多级设置
             if(level > 1) {
-                this.approveSetting.multiApproverSetting[level - 2][key] = value;
-            } 
+                approveSetting.multiApproverSetting[level - 2][key] = value;
+            }
+
+            this.$emit('change', approveSetting);
         },
         /**
          * 选择指定的审批人员
@@ -113,7 +127,7 @@ export default {
             let selected = level < 2 ? this.approveSetting.approvers : this.approveSetting.multiApproverSetting[level - 2].approvers;
             let options = {
                 title: '选择审批人',//[选填] 默认值为 '请选择人员'
-                max:14, //[选填]最大人数：当值小于等于0或者不填时，不对选择人数做限制，max值为1时单选，大于1时多选
+                max: 14, //[选填]最大人数：当值小于等于0或者不填时，不对选择人数做限制，max值为1时单选，大于1时多选
                 selected //[选填] 已选人员 每个人员必须包括userId,displayName,staffId,head这四个属性，只有带max大于1时生效
             };
 

@@ -7,7 +7,6 @@
  * @param {object} attribute 存放自定义字段的对象
  */
 export const fmt_form_field = function(value, formType, fieldName, attribute) {
-    console.log(value, formType, fieldName, attribute);
     let formatVal = value;
 
     if(formType && fieldName && attribute && attribute[fieldName]) {

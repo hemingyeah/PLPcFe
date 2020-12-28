@@ -109,7 +109,7 @@ export default {
   data() {
     return {
       taskTypeId: "",
-	  taskTypeConfig: new TaskConfig(),
+	    taskTypeConfig: new TaskConfig(),
       currTab: 0,
 
       pending: false,
@@ -151,8 +151,7 @@ export default {
 
         let res = await TaskApi.getTaskType(params);
 
-		let taskTypeConfig = res.data;
-        this.taskTypeConfig = taskTypeConfig;
+        this.taskTypeConfig = Object.assign(this.taskTypeConfig, res.data);
 
         // 判断是否有设置服务报告模板
         if (JSON.stringify(res.data.reportSetting) == "{}") {
@@ -179,18 +178,18 @@ export default {
         console.error("fetch Tasktype => err", err);
       }
     },
+    /** 右上角保存按钮 */
     async submit() {
-	  if (!this.$refs.comp.submit) return;
+      if (!this.$refs.comp.submit) return;
 
-	  this.pending = true;
-	  try {
-		await this.$refs.comp.submit();
-	  } catch (error) {
-		  console.error(error);
-	  }finally {
-		  this.pending = false;
-	  }
-      
+      this.pending = true;
+        try {
+        await this.$refs.comp.submit();
+      } catch (error) {
+        console.error(error);
+      }finally {
+        this.pending = false;
+      }
     },
   },
   mounted() {
@@ -206,5 +205,4 @@ export default {
   },
 };
 </script>
-
 <style lang="scss" src="./taskFlow.scss" scoped></style>

@@ -4,7 +4,7 @@
         <div class="setting-flow-axis">
         <el-row
             class="flow-axis-step"
-            :class="[currFlow === key && 'active', (!flowMap[key].isOpen && !flowMap[key].isSystem) && 'disabled']"
+            :class="[currFlow === key && 'active', (!taskFlowData.taskTypeConfig.flowSetting[key].state && !flowMap[key].isSystem) && 'disabled']"
             v-for="key in Object.keys(flowMap)"
             :key="key"
             @click.native="clickFlow(key)">
@@ -13,9 +13,9 @@
                     <i :class="['iconfont', flowMap[key].icon]" :style="{color: key === 'close' && '#F56C6C'}"></i>
                     {{flowMap[key].name}}
                 </div>
-                <div v-if="flowMap[key].isOpen || flowMap[key].isSystem" class="open-tag">已开启</div>
+                <div v-if="taskFlowData.taskTypeConfig.flowSetting[key].state || flowMap[key].isSystem" class="open-tag">已开启</div>
                 <div class="open-btn" @click.stop>
-                    <el-switch :value="flowMap[key].isOpen" v-if="!flowMap[key].isSystem" @change="(status) => flowSwitchTaskType(key, status)"/>
+                    <el-switch v-model="taskFlowData.taskTypeConfig.flowSetting[key].state" v-if="!flowMap[key].isSystem"/>
                 </div>
             </el-row>
         </el-row>
@@ -27,7 +27,12 @@
                 {{flowMap[currFlow].desc}}
             </div>
             <div class="setting-flow-main-content">
-                <flow-setting :taskTypeId="taskTypeId"  :type="currFlow" :setting="flowMap[currFlow]" :commonSetting="commonSetting" style="height: 100%"/>
+                <flow-setting
+                    :taskTypeId="taskTypeId"
+                    :type="currFlow"
+                    :flowSetting="taskFlowData.taskTypeConfig.flowSetting[currFlow]"
+                    :taskTypeConfig="taskFlowData.taskTypeConfig"
+                    style="height: 100%"/>
             </div>
         </div>
         <!--E 流程设置 -->
@@ -44,6 +49,7 @@ import FlowSetting from '../components/FlowSetting.vue';
 import flowMap from "../flowMap";
 export default {
     name: 'flow-setting-panel',
+    inject: ['taskFlowData'],
     props: {
         taskTypeId: {
             type: String,
@@ -55,79 +61,10 @@ export default {
             currFlow: 'create',  //当前设置的流程
             open: false,
 
-            flowSetting: {},
             flowMap,
-            commonSetting: { // 流程公共设置
-                planRemindSetting:{ //计划时间提醒设置
-                    state: false,
-                    isAhead: 1,
-                    minutes: '',
-                },
-                notice: '', // 超时提醒类型
-                noticeUsers: '', // 超时提醒指定人员
-
-                allowPause: false, // 允许暂停工单开关
-                pauseApprovers: {
-                    leader: '',
-                    approvers: [],
-                    level: 0,
-                    multiApproverSetting: [{
-                        leader: '',
-                        approvers: []
-                    }]
-                },
-                allowCancel: false, // 允许取消工单开关
-                cancelApprovers: {
-                    leader: '',
-                    approvers: [],
-                    level: 0,
-                    multiApproverSetting: [{
-                        leader: '',
-                        approvers: []
-                    }]
-                },
-            }
         }
     },
     methods: {
-        fetchFlowSetting() {
-            // 获取流程设置
-            let res = {
-                "create":{
-                    "state":true,
-                    "overTime":0,
-                    "approvers":[
-
-                    ]
-                },
-                "allot":{
-                    "state":true,
-                    "overTime":0,
-                    "approvers":[
-
-                    ],
-                    "leader":"promoter"
-                }
-            }
-            this.flowSetting = res;
-        },
-        /**
-         * 启用或禁用工单类型
-         */
-        flowSwitchTaskType: _.debounce(async function(flowName, status) {
-            console.log(flowName, status);
-            let params = {
-                id: this.taskTypeId,
-                flowName,
-                status
-            }
-            try {
-                await SettingApi.flowSwitchTaskType(params);
-                this.flowMap[flowName].isOpen = status;
-            } catch (error) {
-                console.error(error);
-            }
-        }, 300),
         clickFlow(type) {
             this.currFlow = type;
         },
