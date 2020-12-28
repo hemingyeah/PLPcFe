@@ -11,6 +11,8 @@ import FormVisibleSetting from '@src/component/form/common/setting/FormVisibleSe
 import FormDisplaymodeSetting from '@src/component/form/common/setting/FormDisplaymodeSetting.vue';
 import FormDefaultValueSetting from '@src/component/form/common/setting/FormDefaultValueSetting.vue';
 import FormPublicSetting from '@src/component/form/common/setting/FormPublicSetting.vue';
+/* enum */
+import TableNameEnum from '@model/enum/TableNameEnum.ts';
 
 const SettingMixin = {
   computed: {
@@ -40,7 +42,7 @@ const SettingMixin = {
     * 2.且不是公共字段
     */
     allowPublicSet() {
-      let modeArr = ['task', 'task_receipt'];
+      let modeArr = [TableNameEnum.Task, TableNameEnum.TaskReceipt];
       return modeArr.indexOf(this.mode) > -1 && !this.field.isCommon;
     }
   },

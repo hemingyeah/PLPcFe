@@ -32,6 +32,7 @@ import TaskAllotModal from '@src/modules/task/components/TaskAllotModal/TaskAllo
 
 /* enum */
 import { TaskEventNameMappingEnum } from "@model/enum/EventNameMappingEnum.ts";
+import TableNameEnum from '@model/enum/TableNameEnum.ts';
 /* mixin */
 import tourGuide from "@src/mixins/tourGuide"
 
@@ -1112,11 +1113,11 @@ export default {
       let { templateId } = this.task;
 
       let subtask = [
-        TaskApi.getTaskTemplateFields({ templateId, tableName: "task" })
+        TaskApi.getAllFields({ typeId: templateId, tableName: TableNameEnum.Task, isFromSetting: false })
       ];
 
       // 显示回执时获取回执字段信息
-      if (this.allowFinishTask || this.showReceipt) subtask.push(TaskApi.getTaskTemplateFields({ templateId, tableName: "task_receipt" }));
+      if (this.allowFinishTask || this.showReceipt) subtask.push(TaskApi.getAllFields({ typeId: templateId, tableName: TableNameEnum.TaskReceipt, isFromSetting: false }));
 
       const result = await Promise.all(subtask);
 

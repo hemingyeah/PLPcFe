@@ -72,7 +72,13 @@
 <script>
 import SettingMixin from '@src/component/form/mixin/setting';
 import { settingProps } from '@src/component/form/components/props';
-import {checkUser, cancelUserApproval} from '@src/api/TaskApi.ts';
+/* api */
+import * as TaskApi from '@src/api/TaskApi.ts';
+/* enum */
+import TableNameEnum from '@model/enum/TableNameEnum.ts';
+
+// 取消必填时需要校验人员字段是否是审批人的模块
+const NEED_CHECK_USER_TABLE_NAME = [TableNameEnum.Task, TableNameEnum.TaskReceipt, TableNameEnum.Event, TableNameEnum.EventReceipt];
 
 export default {
   name: 'form-user-setting',
@@ -94,35 +100,36 @@ export default {
     update(value, prop, isSetting = false) {
       this.$emit('input', {value, prop, isSetting});
     },
-    async isNullUserField() {
+    /* 必填校验 */
+    isNullUserField() {
       let { id, isNull } = this.field;
-      // mode:task为工单设置form
-      if((this.mode === 'task' || this.mode === 'task_receipt')
-          && (id && isNull)) {
-        // 后端已经存在的人员字段，如果从必填变成非必填，与后端做交互
-        let result = await checkUser({id});
-        if(result.status == 0) {
-          if(result.data && result.data.show == 1) {
+
+      // 后端已经存储过的人员字段，如果从必填变成非必填，需校验该字段是否是审批人
+      if (NEED_CHECK_USER_TABLE_NAME.indexOf(this.mode) > -1 && id && isNull) {
+        TaskApi.checkUser({ id }).then(async res => {
+          if (res.succ) {
+            let { show } = res.data || {};
+
             // 是审批人
-            let confirm = await this.$platform.confirm('该人员字段已在审批流程中选择，如果取消必填，对应的审批流程将设置为“无需审批”，确定要继续吗？');
-            if(confirm) {
+            if (show == 1) {
+              let confirm = await this.$platform.confirm('该人员字段已在审批流程中选择，如果取消必填，对应的审批流程将设置为“无需审批”，确定要继续吗？');
+              if (!confirm) return this.field.isNull = 0;
+
               this.cancelFormUserAprover(id);
-            }else{
-              this.field.isNull = 0;
             }
+          } else {
+            console.log('校验审批人失败！');
           }
-        }else{
-          console.log('校验审批人失败！');
-        }
+        }).catch(err => console.warn(err));
       }
     },
-    async cancelFormUserAprover(id) {
-      // 取消该id对应的人员字段必填后，指向该人员的审批流程变为“无需审批”
-      // let result = await  http.post("/setting/fieldInfo/confirm",{ id },false);
-      let result = await cancelUserApproval({id});
-      if(result.status) {
-        this.$platform.alert(result.message);
-      }
+    /* 取消对应的人员字段必填后，指向该人员的审批流程变为“无需审批” */
+    cancelFormUserAprover(id) {
+      TaskApi.cancelUserApproval({ id }).then(res => {
+        if (!res.succ) {
+          this.$platform.alert(res.message);
+        }
+      }).catch(err => console.warn(err));
     }
   }
 }

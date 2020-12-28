@@ -44,24 +44,42 @@ export default {
   },
   computed: {
     fields() {
-      const { fields } = this.config;
-      const list = [];
-      fields.map((item) => {
-        if (
-          item.enabled &&
-          item.field != "taskNo" &&
-          item.field != "attachment" &&
-          item.field != "customer" &&
-          item.field != "relationProduct" &&
-          item.field != "relationCustomer" &&
-          item.formType !== "relationCustomer" && 
-          item.formType !== "relationProduct"
-        ) {
-          list.push(item);
-        }
-      });
-      return list;
+      let tv = null;
+      let formTypes = ['relationCustomer','relationProduct','attachment', 'separator', 'location', 'info', 'autograph', 'formula', 'related_task'];
+      let fieldNames = ['taskNo','attachment','customer', 'relationProduct', 'relationCustomer'];
+      let isNotModify = ['text', 'textarea', 'number'];
+      let isRepeat = ['text', 'textarea', 'number','phone'];
+
+      let fields = (this.config.fields || [])
+        .filter(f => f.enabled && formTypes.indexOf(f.formType) < 0 && !fieldNames.some(key => key === f.fieldName))
+        .filter(f => !(isNotModify.indexOf(f.formType) > -1 && f.setting.defaultValueConfig && !!f.setting.defaultValueConfig.isNotModify))
+        .filter(f => !(isRepeat.indexOf(f.formType) > -1 && f.setting.isRepeat == 1))
+        .map(f => {
+          tv = Object.assign({}, f);
+
+          if (tv.formType === 'select') { 
+            if(tv.setting.selectType == 2){ 
+              tv.setting.selectType = 1
+            }          
+          }
+
+          if (tv.isSystem) {
+            tv.orderId -= 100;
+          }
+
+          return Object.freeze(tv);
+        });
+
+      if (!fields || !fields.length) return [];
+      return fields.sort((a, b) => a.orderId - b.orderId);
     },
+  },
+  watch: {
+    visible(val) {
+      if(val) {
+        this.$refs.batchForm.reset();
+      }
+    }
   },
   methods: {
     open() {
@@ -87,18 +105,18 @@ export default {
           })),
         });
       }
-      if (sf.formType === "user") {
-        tv = form[sf.fieldName];
+      // if (sf.formType === "user") {
+      //   tv = form[sf.fieldName];
 
-        params.mapJson = JSON.stringify({
-          [sf.fieldName]: {
-            userId: tv.userId,
-            displayName: tv.displayName,
-            staffId: tv.staffId,
-            head: tv.head
-          },
-        });
-      }
+      //   params.mapJson = JSON.stringify({
+      //     [sf.fieldName]: {
+      //       userId: tv.userId,
+      //       displayName: tv.displayName,
+      //       staffId: tv.staffId,
+      //       head: tv.head
+      //     },
+      //   });
+      // }
       if (sf.fieldName === "manager") {
         tv = form[sf.fieldName];
 
