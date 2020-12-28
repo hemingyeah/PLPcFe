@@ -222,7 +222,7 @@ export default class TaskMapInfoWindow extends VC {
             <biz-call-center-phone phone={linkMan.phone} />
           </p>
           { this.renderSystemField(true, '地址', fmt_address(address)) }
-          <p>
+          <p class='map-task-content-window-header-plantime'>
             <label>计划时间：</label>
             { formatDate(planTime, DateFormatEnum.YTMHMS) || '' }
             {
