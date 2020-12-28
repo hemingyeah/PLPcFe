@@ -346,8 +346,14 @@ export default {
       this.$previewImg(file.url);
     },
     handlePreview (file) {
-      if (!file.response.url || !file.url) return;
-      this.$previewVideo(file.url || file.response.url);
+      console.log(file);
+      if(file.response?.url){
+        this.$previewVideo(file.response.url);
+      }
+      if (file.url ){
+        this.$previewVideo(file.url)
+      }
+      
     },
     onBeforeUploadImage (file) {
       const isJPG = file.type === "image/jpeg" || file.type === "image/png";
