@@ -165,7 +165,7 @@
         label="操作"
       >
         <template slot-scope="scope">
-          <a href class="view-detail-btn" @click.stop.prevent="dlete(scope.row)"
+          <a href class="color-danger" @click.stop.prevent="dlete(scope.row)"
           >删除</a
           >
         </template>
@@ -377,6 +377,6 @@ export default {
 </script>
 <style lang="scss" scoped>
 .table-footer {
-  margin-top: 20px;
+  margin-top: 12px;
 }
 </style>
