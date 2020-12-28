@@ -140,6 +140,84 @@ export default {
     goBack() {
       window.history.go(-1);
     },
+    /** 转化getOne接口返回的数据 */
+    convertTaskTypeConfig(taskTypeConfig) {
+      let { flowSetting, isLeader, pauseApprovers, planRemindSetting, delayBack } =  taskTypeConfig;
+
+      // 暂停工单审批设置
+      taskTypeConfig.pauseApproveSetting = { leader: isLeader, approvers: pauseApprovers }
+      
+      // 流程审批格式转化
+      Object.keys(flowSetting).forEach(key => {
+        let {state, ttid, overTime, leader, approvers, level, multiApproverSetting} = flowSetting[key];
+
+        // 旧数据处理
+        if(level === undefined) {
+          switch(leader) {
+            case undefined:
+              if(approvers && approvers.length > 0) {
+                leader = 'users';
+                level = 1;
+              }else {
+                level = 0;
+              }
+              break;
+            case 'none': 
+              level = 0
+              break;
+            default: 
+              level = 1;
+              break
+          }
+        }
+
+        leader = leader === 'none' ? '' : leader;
+        if(key === 'autoReview') {
+          // 自动回访开关
+          taskTypeConfig.autoReviewState = flowSetting[key].state;
+        }else if(key === 'off') {
+          // 取消工单设置
+          taskTypeConfig.allowCancel = flowSetting[key].state;
+          taskTypeConfig.cancelApproveSetting = { leader, approvers, level, multiApproverSetting };
+        }else if(key === 'pause') {
+          // 暂停工单设置
+          taskTypeConfig.allowPause = flowSetting[key].allowPause;
+          taskTypeConfig.pauseApproveSetting = {
+            ...taskTypeConfig.pauseApproveSetting,
+            leader,
+            approvers,
+            level,
+            multiApproverSetting
+          }
+        }else {
+          taskTypeConfig.flowSetting[key] = {
+            state,
+            ttid,
+            overTime,
+            approveSetting: {
+              leader,
+              approvers,
+              level,
+              multiApproverSetting }
+          }
+        }
+      })
+
+      // 计划提醒设置
+      taskTypeConfig.planRemindSetting = {
+        ...planRemindSetting,
+        isAhead: planRemindSetting.isAhead === undefined ? 0 : planRemindSetting.isAhead,
+      }
+
+      taskTypeConfig.delayBack = Boolean(delayBack);
+
+      // 超时提醒设置 todo_zr
+
+      delete taskTypeConfig.isLeader;
+      delete taskTypeConfig.pauseApprovers;
+
+      return taskTypeConfig;
+    },
     /**
      * 获取工单设置的除组件外的其他信息
      */
@@ -151,7 +229,8 @@ export default {
 
         let res = await TaskApi.getTaskType(params);
 
-        this.taskTypeConfig = Object.assign(this.taskTypeConfig, res.data);
+        // 转化获取到的结果
+        this.taskTypeConfig = this.convertTaskTypeConfig(Object.assign(this.taskTypeConfig, res.data));
 
         // 判断是否有设置服务报告模板
         if (JSON.stringify(res.data.reportSetting) == "{}") {

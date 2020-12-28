@@ -10,15 +10,33 @@ import Preson from "@model/types/setting/task/Preson";
 
 class TaskConfig {
     /**  工单类型id */
-    typeId: String = '';
+    id: String = '';
+
+    /**
+     * 工单类型名称
+     */
+    name: String = '';
+
+    /**
+     * 工单类型描述
+     */
+    description: String = '';
+
+    /**
+     * 标签（只用于行业模板库中的记录）
+     */
+    labels: any[] = [];
 
     /** 工单类型启用状态 */
-    state: Boolean = false;
+    enabled: Boolean = false;
 
     /**
      * 工单类型基础配置
      */
     config: BaseTaskConfig = new BaseTaskConfig();
+
+    /** 工单流程设置 */
+    flowSetting: TaskFlowSetting =  new TaskFlowSetting();
     
     /**
      * 高级设置
@@ -34,9 +52,6 @@ class TaskConfig {
      * 打印模板设置
      */
     printSetting: ReoportPrintSetting = new ReoportPrintSetting();
-
-    /** 工单流程设置 */
-    flowSetting: TaskFlowSetting =  new TaskFlowSetting();
 
     /** 短信延迟发送开关 */
     delayBack: Boolean = false;
@@ -75,6 +90,9 @@ class TaskConfig {
 
     /** 取消工单审批设置 */
     cancelApproveSetting: TaskApprover = new TaskApprover();
+
+    /** 可用团队设置 */
+    tags: any[] = [];
 }
 
 export default TaskConfig;

@@ -1,4 +1,3 @@
-
 class PhotoPositionExceptionConfig{
     /**
      * 启用拍照设置开关
@@ -39,11 +38,6 @@ class PhotoPositionExceptionConfig{
 
 class BaseTaskConfig {
     /**
-     * 工单类型名称
-     */
-    name: String ='';
-
-    /**
      * 电子签名的最大数量
      */
     autographMaxCount?: Number;
@@ -54,9 +48,14 @@ class BaseTaskConfig {
     color: String = 'rgb(115,127,124)';
 
     /**
-     * formUser ???
+     * 表单人员 (工单表单/回执表单中必填的人员字段) todo_zr: 审批下拉框需要表单人员
      */
-    formUser?: any = null;
+    formUser: any = null;
+
+    /**
+     * 工单时间必填阶段 0无 1接受 2开始  默认 1
+     */
+    taskTimeState?: any = null;
 
     /**
      * 拍照 / 位置异常设置

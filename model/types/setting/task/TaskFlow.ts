@@ -10,9 +10,6 @@ class TaskFlow extends TaskApprover{
     /** 超时提醒（小时）*/
     overTime: Number = 0;
 
-    /** 超时提醒开关 */
-    overTimeState: Boolean = false;
-
     /** 审批设置 */
     approveSetting: TaskApprover = new TaskApprover();
 }
