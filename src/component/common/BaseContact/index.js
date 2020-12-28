@@ -98,6 +98,7 @@ function team( options = {} ){
   let selectedUser = [];
   let selectedTeam = [];
   let max = options.max;
+  let from = options.from;
   let action = '/security/tag/tagComponet/getUserList';
   let selectTypes = ['universal', 'performance'];
   let selectType = 'universal';
@@ -163,6 +164,7 @@ function team( options = {} ){
         return (
           <base-contact-team 
             action={action}
+            from={from}
             dataFunc={typeof options.dataFunc == 'function' ? options.dataFunc : undefined}
             lat={options.lat}
             lng={options.lng}
