@@ -83,7 +83,7 @@ function setFieldOperateHandler(field = {}) {
 
   if (formType == 'number') {
     field.operatorOptions = OperatorSelectOptionsMap.input.slice();
-  } else if (MultiFieldNames.indexOf(fieldName) > -1 || (formType == 'select' && !setting.isMulti && !isSystem) ) {
+  } else if (MultiFieldNames.indexOf(fieldName) > -1 || (formType == 'select' && !setting.isMulti && !isSystem)) {
     field.operatorOptions = OperatorSelectOptionsMap.multiple.slice();
   } else if (fieldName == 'customer' || fieldName == 'product') {
     field.operatorOptions = OperatorSelectOptionsMap.select.slice();
@@ -241,7 +241,6 @@ export default {
         check_system_list,
         check_customize_list,
       });
-      this.list = [1];
     },
     matchOperator(field) {
       let formType = field.formType;
@@ -296,21 +295,21 @@ export default {
       this.checkSystemList = [];
       this.checkCustomizeList = [];
       this.check_list = this.check_list.filter((val, i) => {
-        return val !== v.displayName;
+        return val !== v.fieldName;
       });
 
       this.fields
         .filter((item, index) => {
           let bool = this.check_list.some((v) => {
-            return item.displayName === v;
+            return item.fieldName === v;
           });
           return bool;
         })
         .forEach((item) => {
           if (item.isSystem) {
-            this.checkSystemList.push(item.displayName);
+            this.checkSystemList.push(item.fieldName);
           } else {
-            this.checkCustomizeList.push(item.displayName);
+            this.checkCustomizeList.push(item.fieldName);
           }
         });
 
@@ -329,7 +328,7 @@ export default {
       if (item.isSystem) {
         this.checkSystemList = this.checkSystemList.map((v, i) => {
           if (index === i) {
-            v = item.displayName;
+            v = item.fieldName;
           }
           return v;
         });
@@ -338,12 +337,12 @@ export default {
             return index !== i;
           })
         ) {
-          this.checkSystemList.push(item.displayName);
+          this.checkSystemList.push(item.fieldName);
         }
       } else {
         this.checkCustomizeList = this.checkCustomizeList.map((v, i) => {
           if (index === i) {
-            v = item.displayName;
+            v = item.fieldName;
           }
           return v;
         });
@@ -352,7 +351,7 @@ export default {
             return index !== i;
           })
         ) {
-          this.checkCustomizeList.push(item.displayName);
+          this.checkCustomizeList.push(item.fieldName);
         }
       }
       this.check_system_list = new Set(this.checkSystemList);
@@ -504,7 +503,7 @@ export default {
                 city,
                 dist,
               };
-            } else if (!this.item.isSystem && !this.item.setting.isMulti && formType === 'select') {
+            } else if (!this.item.isSystem && formType === 'select' && this.item.setting && !this.item.setting.isMulti) {
               this.form[fieldName] = content.split('，');
             } else {
               this.form[fieldName] = content;
@@ -828,7 +827,7 @@ export default {
                   {this.list.length - 1 === this.index ? (
                     <div
                       class={
-                        this.selectedField.displayName
+                        this.selectedField.fieldName
                           ? 'task-font14 task-c13 task-inquire-add task-ml15 task-pointer'
                           : 'task-font14 task-c13 task-inquire-add task-pointer'
                       }

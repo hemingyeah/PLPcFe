@@ -77,7 +77,6 @@
           :search-model="region.searchModel"
           :config="customizeViewList"
           :task-nums="searchModelCN"
-          @setting="_setting"
         />
         <!-- 搜索操作按钮 -->
         <slot name="footer"></slot>
@@ -982,84 +981,13 @@ export default {
             ...JSON.parse(searchField).checkSystemList,
             ...JSON.parse(searchField).checkCustomizeList,
           ].some((v) => {
-            return v === item.displayName;
+            return v === item.fieldName;
           });
           if (!bool) {
             return item;
           }
         });
       }
-    },
-    // 设置查询条件
-    _setting({ list, check_system_list, check_customize_list }) {
-      const searchField = localStorage.getItem('task-search-field');
-      let loc;
-      [...this.config, ...this.taskTypeFilterFields].filter((value, index) => {
-        let bool = list.some((v) => {
-          return value.displayName === v;
-        });
-        if (bool) {
-          this.selfFields.push(value);
-        }
-      });
-      this.selfFields = [
-        ...new Set(
-          this.selfFields.map((item) => {
-            item = JSON.stringify(item);
-            return item;
-          })
-        ),
-      ].map((item) => {
-        item = JSON.parse(item);
-        return item;
-      });
-      // 设置查询条件的select字段
-      if (searchField) {
-        this.taskInquireList = [
-          ...this.config,
-          ...this.taskTypeFilterFields,
-        ].filter((value, index) => {
-          let bool = [
-            ...JSON.parse(searchField).checkSystemList,
-            ...JSON.parse(searchField).checkCustomizeList,
-            ...list,
-          ].some((v) => {
-            return v === value.displayName;
-          });
-          if (!bool) {
-            return value;
-          }
-        });
-        loc = {
-          list: this.selfFields,
-          checkSystemList: [
-            ...JSON.parse(searchField).checkSystemList,
-            ...check_system_list,
-          ],
-          checkCustomizeList: [
-            ...JSON.parse(searchField).checkCustomizeList,
-            ...check_customize_list,
-          ],
-        };
-      } else {
-        this.taskInquireList = [
-          ...this.config,
-          ...this.taskTypeFilterFields,
-        ].filter((value, index) => {
-          let bool = list.some((v) => {
-            return v === value.displayName;
-          });
-          if (!bool) {
-            return value;
-          }
-        });
-        loc = {
-          list: this.selfFields,
-          checkSystemList: [...check_system_list],
-          checkCustomizeList: [...check_customize_list],
-        };
-      }
-      localStorage.setItem('task-search-field', JSON.stringify(loc));
     },
     mergeTaskFields(taskAllFields = []) {
       // 临时这种用法
