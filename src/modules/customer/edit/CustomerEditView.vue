@@ -62,6 +62,10 @@ export default {
           if (f.formType === 'address' && f.isSystem) {
             f.isNull = this.initData.isAddressAllowNull ? 1 : 0
           }
+          // 客户名称长度单独处理
+          if (f.fieldName === 'name') {
+            f.maxlength = 50
+          }
           return f
         })
         .filter(f => {

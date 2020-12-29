@@ -41,3 +41,10 @@ export function isObject(object) {
 export function isFunction(func) {
   return func && typeOf(func) === 'function'
 }
+
+/** 
+ * @description 是否为 undefined
+*/
+export function isUndefined(value) {
+  return typeOf(value) === 'undefined'
+}

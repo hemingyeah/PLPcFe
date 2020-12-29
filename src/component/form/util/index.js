@@ -1,4 +1,5 @@
 import { assign } from 'lodash'
+import { isNumber } from '@src/util/type'
 import { FORM_FIELD_TEXT_MAX_LENGTH, FORM_FIELD_TEXTAREA_MAX_LENGTH } from '@src/model/const/Number.ts';
 
 import FormField from '../FormField';
@@ -20,6 +21,19 @@ const DEFAULT_PLACEHOLDER = {
   location: '请输入',
   phone: '请输入电话号码',
   code: '请通过移动端扫码或手动输入'
+}
+
+/** 
+ * @description 获取默认的占位符
+ * ! 目前特殊处理的是 maxlength 最大长度
+ * @returns {String} 占位符
+*/
+export function getDefaultPlaceholder(formType = '', maxlength) {
+  if (isNumber(maxlength)) {
+    return `最多${maxlength}字`
+  }
+  
+  return DEFAULT_PLACEHOLDER[formType] || ''
 }
 
 /** 
@@ -71,7 +85,7 @@ export function isSelect(field){
 /** 是否为日期类型 yyyy-MM-dd */
 export function isDate(field){
   let setting = field.setting;
-
+  
   return field.formType == 'date' 
     || (field.formType == 'planTime' && (setting != null && setting.dateType == 'date'));
 }
@@ -79,7 +93,7 @@ export function isDate(field){
 /** 是否为日期时间类型 yyyy-MM-dd HH:mm:ss */
 export function isDatetime(field){
   let setting = field.setting;
-
+  
   return field.formType == 'datetime' 
     || (field.formType == 'planTime' && (setting == null || setting.dateType != 'date'));
 }
@@ -103,8 +117,8 @@ export function genPlaceholder(field, defaultText = ''){
   if(isDate(field)) key = 'date';
   if(isDatetime(field)) key = 'datetime';
   if(isSelect(field) || isMultiSelect(field) || field.formType == 'cascader') key = 'select';  
-
-  return text + (DEFAULT_PLACEHOLDER[key] || '');
+  
+  return text + (getDefaultPlaceholder(key, field?.maxlength) || '');
 }
 /**
  * 初始化所有字段的初始值

@@ -3,7 +3,7 @@ import * as util from './util';
 
 function createFormField(h, field, comp){
   if(null == comp.build) return comp.build;
-
+  
   let data = {
     props: {
       field,
@@ -15,10 +15,6 @@ function createFormField(h, field, comp){
     }
   };
   
-  // if (field.formType === 'address' && !field.isSystem) {
-  //   data.props.disableMap = true;
-  // }
-
   return h(comp.build, data);
 }
 
@@ -62,8 +58,8 @@ const FormBuilder = {
     /** 注册待验证的组件 */
     addFieldHandler(event){
       event.stopPropagation();
-
-      let {fieldName, validate, field} = event.detail;
+      
+      let { fieldName, validate } = event.detail;
       if (event.detail && event.detail.field && event.detail.field.formType === 'info') {
         return;
       }
@@ -83,30 +79,30 @@ const FormBuilder = {
         if(this.$slots[fieldName]) {
           return this.$slots[fieldName];
         }
-
+        
         if(this.$scopedSlots[fieldName]) {
           return this.$scopedSlots[fieldName]({field, value: getValue(field, this)});
         }
         
         // 判读是否隐藏该字段
         if(util.isHiddenField(field, this.value, this.fields)) return null;
-
+        
         let comp = FieldManager.findField(field.formType);
         if(comp == null) {
           console.warn(`[not implement]: ${field.displayName}(${field.fieldName}): ${field.formType}. `)
           return null;
         }
-
+        
         let formField = createFormField.call(this, h, field, comp);
         if(comp.formType == 'separator' || null == formField) return formField;
         
         let formItemClass = [];
         if(field.formType == 'attachment') formItemClass.push('form-item-attachment')
-
+        
         if(field.formType === 'info') {
           return formField;
         }
-
+        
         return (
           <form-item
             label={field.displayName} class={formItemClass}
@@ -118,11 +114,11 @@ const FormBuilder = {
       .filter((vnode, index, arr) => {
         // 过滤不渲染节点
         if(null == vnode) return false;
-
+        
         let options = vnode.componentOptions || {};
         // 非分割线字段直接显示
         if(options.tag != 'form-separator') return true;
-
+        
         // 只有在下一个元素存在且不是分割线时，才显示该分割线
         // 如果该节点后面没有非分割线字段，则不显示
         for(let i = index + 1; i < arr.length; i++){
@@ -132,11 +128,11 @@ const FormBuilder = {
           let nextOptions = next.componentOptions || {};
           return nextOptions.tag != 'form-separator';
         }
-
+        
         // 默认返回false, 走到这里意味着后面的节点都是null
         return false;
       });
-
+      
     return (
       <div class="form-builder">
         {this.$slots.default}
