@@ -9,32 +9,32 @@
     <!--start 组件库列表 -->
     <div class="tabs-card-item" v-if="cardSysList.length>0">
       <el-card class="tabs-card-box" v-for="cardItem in cardSysList[tabIndex].list" :key="cardItem.cardId" >
-          <div  class="tabs-card-li">
-            <div class="task-card-inforn"> 
-                <h2 class="task-card-name">{{cardItem.cardName}}<span class="task-card-angle">{{cardItem.type}}</span></h2>                                       
-                <p class="task-card-des">{{cardItem.description}}</p>
-            </div>
-            <div class="task-card-fields">
-                <p>包含字段：</p>
-                <p class="fields-list">{{cardItem.fields}}</p>
-            </div>
-            <div class="task-card-footer">
-              <template v-if="cardItem.type!=='工时'">
-                <el-button type="primary" class="preview" @click="previewCard">预览</el-button>
-                <el-tooltip class="item" effect="dark" content="每个工单中填写一组该数据" placement="top">
-                  <el-button type="primary" @click="importcard(cardItem.cardId,'single')">添加为单次</el-button>
-                </el-tooltip>
-                <el-tooltip class="item" effect="dark" content="每个工单中填写多组该数据" placement="top">
-                  <el-button type="primary" @click="importcard(cardItem.cardId,'multiple')">添加为多次</el-button>
-                </el-tooltip>  
-              </template>   
-              <template v-else>
-                <el-tooltip class="item" effect="dark" content="每个工单中填写多组该数据" placement="top">
-                  <el-button type="primary" @click="importcard(cardItem.cardId,'multiple')">添加</el-button>
-                </el-tooltip>
-              </template>
-            </div>
+        <div class="tabs-card-li">
+          <div class="task-card-inforn"> 
+            <h2 class="task-card-name">{{cardItem.cardName}}<span class="task-card-angle">{{cardItem.type}}</span></h2>                                       
+            <p class="task-card-des">{{cardItem.description}}</p>
           </div>
+          <div class="task-card-fields">
+            <p>包含字段：</p>
+            <p class="fields-list">{{cardItem.fields}}</p>
+          </div>
+          <div class="task-card-footer">
+            <template v-if="cardItem.type!=='工时'">
+              <el-button type="primary" class="preview" @click="previewCard">预览</el-button>
+              <el-tooltip class="item" effect="dark" content="每个工单中填写一组该数据" placement="top">
+                <el-button type="primary" @click="importcard(cardItem.cardId,'single')">添加为单次</el-button>
+              </el-tooltip>
+              <el-tooltip class="item" effect="dark" content="每个工单中填写多组该数据" placement="top">
+                <el-button type="primary" @click="importcard(cardItem.cardId,'multiple')">添加为多次</el-button>
+              </el-tooltip>  
+            </template>   
+            <template v-else>
+              <el-tooltip class="item" effect="dark" content="每个工单中填写多组该数据" placement="top">
+                <el-button type="primary" @click="importcard(cardItem.cardId,'multiple')">添加</el-button>
+              </el-tooltip>
+            </template>
+          </div>
+        </div>
       </el-card>
     </div>
     <!--end  组件库列表 -->
@@ -46,9 +46,9 @@
 </template>
 <script>
 // api
-import * as SettingTaskApi from "@src/api/SettingTaskApi";
+import * as SettingTaskApi from '@src/api/SettingTaskApi';
 // components
-import PreviewCardDialog from "./PreviewCardDialog";
+import PreviewCardDialog from './PreviewCardDialog';
 export default {
   name: 'template-library',
   props: {
@@ -66,24 +66,22 @@ export default {
     onTabsCard(index){
       this.tabIndex = index;
     },
-    //添加为单次/多次
-    importcard(cid,inputType) {
-        SettingTaskApi.cardImport({cardId:cid,inputType:inputType}).then(res=>{
+    // 添加为单次/多次
+    importcard(cid, inputType) {
+      SettingTaskApi.cardImport({cardId:cid, inputType}).then(res=>{
         const { status, message, data } = res;
-        if(status==0){
-            this.$message.success('附加组件添加成功，可通过「编辑」功能更改系统默认配置');
-            setTimeout(()=>{
-              location.reload()
-            },1000)
+        if(status == 0){
+          this.$message.success('附加组件添加成功，可通过「编辑」功能更改系统默认配置');
+          setTimeout(()=>{
+            location.reload()
+          }, 1000)
         }else{
-            this.$message.warning(message);
+          this.$message.warning(message);
         }
-      }).catch(error=>{
-
-      })
+      }).catch(error=>({}))
     },
 
-    //预览组件
+    // 预览组件
     previewCard() {
       this.$refs.previewDialog.openDialog();
     }

@@ -25,12 +25,12 @@
             <el-checkbox v-model="scope.row.canRead" @change="checkAll(scope.row,'canRead')"></el-checkbox>
           </template>
         </el-table-column>
-         <el-table-column prop="canCreate" label="新增">
+        <el-table-column prop="canCreate" label="新增">
           <template slot-scope="scope">
             <el-checkbox v-model="scope.row.canCreate" @change="checkAll(scope.row,'canCreate')"></el-checkbox>
           </template>
         </el-table-column> 
-         <el-table-column prop="canWrite" label="编辑">
+        <el-table-column prop="canWrite" label="编辑">
           <template slot-scope="scope">
             <el-checkbox v-model="scope.row.canWrite" @change="checkAll(scope.row,'canWrite')"></el-checkbox>
           </template>
@@ -51,14 +51,14 @@
 </template>
 <script>
 // api
-import * as SettingTaskApi from "@src/api/SettingTaskApi";
-import { uniqBy,cloneDeep } from 'lodash';
+import * as SettingTaskApi from '@src/api/SettingTaskApi';
+import { uniqBy, cloneDeep } from 'lodash';
 export default {
-  name: "card-editpermiss-dialog",
+  name: 'card-editpermiss-dialog',
   props: {
     taskCard: {
       type: Object,
-      default: () => {},
+      default: () => ({}),
     },
     taskTypeId: {
       type: String,
@@ -77,8 +77,8 @@ export default {
         canDelete: true,
         canRead: true,
         canWrite: true,
-        id: "all",
-        name: "全部"
+        id: 'all',
+        name: '全部'
 
       }
     };
@@ -96,8 +96,8 @@ export default {
     },
   },
   methods: {
-    //角色权限全选
-    checkAll(row,type) {
+    // 角色权限全选
+    checkAll(row, type) {
       if(row.id == 'all') {
         this.tableData.forEach(item=>item[type] = row[type]) ;
       }else{
@@ -108,7 +108,7 @@ export default {
             }   
           })
         }else{
-           this.tableData.forEach(item=>{
+          this.tableData.forEach(item=>{
             if(item.id == 'all') {
               item[type] = true
             }   
@@ -117,37 +117,37 @@ export default {
       }
     },
 
-    //初始化角色数据
+    // 初始化角色数据
     rolesList() {
       let rolesList = cloneDeep(this.taskCard.authInfo)
 
-      rolesList.forEach((item,index)=>{
+      rolesList.forEach((item, index)=>{
         item.canCreate = item.canCreate == undefined ? item.canWrite : item.canCreate;
         item.canDelete = item.canDelete == undefined ? item.canWrite : item.canDelete;
-          if(!item.canRead){
-            this.allRoles.canRead = false;
-          }
-          if(!item.canWrite){
-            this.allRoles.canWrite = false;
-          }
-          if(!item.canCreate){
-            this.allRoles.canCreate = false;
-          }
-          if(!item.canDelete){
-            this.allRoles.canDelete = false;
-          }
+        if(!item.canRead){
+          this.allRoles.canRead = false;
+        }
+        if(!item.canWrite){
+          this.allRoles.canWrite = false;
+        }
+        if(!item.canCreate){
+          this.allRoles.canCreate = false;
+        }
+        if(!item.canDelete){
+          this.allRoles.canDelete = false;
+        }
       })
-      return [this.allRoles,...rolesList];
+      return [this.allRoles, ...rolesList];
     },
 
     onClose() {
-      this.$emit("onClose");
+      this.$emit('onClose');
     },
     onSubmit(form) {
-      //新增组件
+      // 新增组件
       this.saveCardAuth();
     },
-    //获取角色列表
+    // 获取角色列表
     getRoleListReq() {
       SettingTaskApi.getRoleList({pageSize:0})
         .then((res) => {
@@ -161,7 +161,7 @@ export default {
         });
     },
 
-    //合并权限数据
+    // 合并权限数据
     mergeRoles() {
       let oldroles = cloneDeep(this.taskCard.authInfo)
       let newRoles = []
@@ -190,14 +190,14 @@ export default {
       }
       return newRoles;
     },
-    //创建附加组件
+    // 创建附加组件
     saveCardAuth() {
       let authJson = [];
       authJson = this.tableData.filter(item=>item.id !== 'all');
-      this.$emit('update',authJson)
+      this.$emit('update', authJson)
     },
 
-    //修改附加组件
+    // 修改附加组件
     onUpdateCardReq() {
       const params = {
         description: this.form.description,
@@ -208,7 +208,7 @@ export default {
         .then((res) => {
           const { status, message, data } = res;
           if (status == 0) {
-            this.$message.success("修改成功");
+            this.$message.success('修改成功');
             location.reload();
           } else {
             this.$message.error(message);
@@ -219,7 +219,7 @@ export default {
         });
     },
 
-    //获取附加组件的信息
+    // 获取附加组件的信息
     getCardInfoReq() {
       SettingTaskApi.getCardInfo({ id: this.form.id })
         .then((res) => {
@@ -228,7 +228,7 @@ export default {
             this.form = data;
           }
         })
-        .catch((error) => {});
+        .catch((error) => ({}));
     },
   },
 };

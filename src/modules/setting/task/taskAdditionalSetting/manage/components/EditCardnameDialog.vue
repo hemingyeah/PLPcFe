@@ -56,20 +56,20 @@
     <div slot="footer" class="dialog-footer">
       <el-button @click="onClose('form')">取 消</el-button>
       <el-button type="primary" @click="onSubmit('form')" v-if="id"
-        >确 定</el-button
+      >确 定</el-button
       >
       <el-button type="primary" @click="onSubmit('form')" v-else
-        >下一步</el-button
+      >下一步</el-button
       >
     </div>
   </base-modal>
 </template>
 <script>
 // api
-import * as SettingTaskApi from "@src/api/SettingTaskApi";
+import * as SettingTaskApi from '@src/api/SettingTaskApi';
 
 export default {
-  name: "edit-cardname-dialog",
+  name: 'edit-cardname-dialog',
   props: {
     id:{
       type: String,
@@ -106,22 +106,22 @@ export default {
       this.$refs[form].validate((valid) => {
         if (valid) {
           if(this.form.id){
-            //修改组件
+            // 修改组件
             this.onUpdateCardReq(form);
           }else{
-            //新增组件
+            // 新增组件
             this.onCreatCardReq();
            
           }
           this.visible = false;
         } else {
-          console.log("error submit!!");
+          console.log('error submit!!');
           return false;
         }
       });
     },
     
-    //创建附加组件
+    // 创建附加组件
     onCreatCardReq() {
       const params = {
         description: this.form.description,
@@ -131,25 +131,25 @@ export default {
       SettingTaskApi.onCreatCard(params).then(res=>{
         const { status, message, data } = res;
         if(status == 0){
-            this.$message.success('创建成功');
-            setTimeout(()=>{
-              let cardId = data;
-              this.$platform.openTab({
-                  id: "task_card_setting",
-                  title: "附加组件表单设置",
-                  url: `/setting/task/cardFormfields?cardId=${cardId}`,
-                  reload: true,
-              });
-            },1000)
-          }else{
-              this.$message.error(message);
-          }
+          this.$message.success('创建成功');
+          setTimeout(()=>{
+            let cardId = data;
+            this.$platform.openTab({
+              id: 'task_card_setting',
+              title: '附加组件表单设置',
+              url: `/setting/task/cardFormfields?cardId=${cardId}`,
+              reload: true,
+            });
+          }, 1000)
+        }else{
+          this.$message.error(message);
+        }
       }).catch(error=>{
-          console.log(error)
+        console.log(error)
       })
     },
 
-    //修改附加组件
+    // 修改附加组件
     onUpdateCardReq(form) {
       const params = {
         description: this.htmlEscape(this.form.description),
@@ -157,21 +157,21 @@ export default {
         name: this.form.name,
       }
       SettingTaskApi.onUpdateCard(params).then(res=>{
-          const { status, message, data } = res;
-          if(status == 0){
-            this.$message.success('修改成功');
-            this.$emit('editCardSubmit');
+        const { status, message, data } = res;
+        if(status == 0){
+          this.$message.success('修改成功');
+          this.$emit('editCardSubmit');
 
-            this.onClose(form);
-          }else{
-              this.$message.error(message);
-          }
+          this.onClose(form);
+        }else{
+          this.$message.error(message);
+        }
       }).catch(error=>{
-          console.log(error)
+        console.log(error)
       })
     },
 
-    //获取附加组件的信息
+    // 获取附加组件的信息
     getCardInfoReq() {
       SettingTaskApi.getCardInfo({id:this.form.id}).then(res=>{
         const { status, message, data } = res;
@@ -179,16 +179,16 @@ export default {
           data.description = this.htmlUnEscape(data.description)
           this.form = data;
         }
-      }).catch(error=>{})
+      }).catch(error=>({}))
     },
     
-    //防止XSS的恶意脚本攻击
+    // 防止XSS的恶意脚本攻击
     htmlEscape(value){
-      return value.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      return value.replace(/</g, '&lt;').replace(/>/g, '&gt;');
     },
     htmlUnEscape(value){
       if(!value) return '';
-      return value.replace( /&lt;/g, "<").replace(/&gt;/g, ">");
+      return value.replace( /&lt;/g, '<').replace(/&gt;/g, '>');
     }
 
   },

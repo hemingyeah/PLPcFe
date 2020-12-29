@@ -18,7 +18,7 @@
 </template>
 <script>
 export default {
-  name: "preview-card-dialog",
+  name: 'preview-card-dialog',
   props: {
   },
   data() {

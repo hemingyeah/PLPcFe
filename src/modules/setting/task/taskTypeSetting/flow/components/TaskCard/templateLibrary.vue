@@ -8,41 +8,41 @@
 
     <!--start 组件库列表 -->
     <div class="tabs-card-item" v-if="cardSysList.length>0">
-        <el-card class="tabs-card-box" shadow="hover" v-for="cardItem in cardSysList[tabIndex].list" :key="cardItem.cardId" >
-            <div  class="tabs-card-li">
-                <div class="task-card-inforn"> 
-                    <h2 class="task-card-name">{{cardItem.cardName}}<span class="task-card-angle">{{cardItem.type}}</span></h2>                                       
-                    <p class="task-card-des">{{cardItem.description}}</p>
-                </div>
-                <div class="task-card-fields">
-                    <p>包含字段：</p>
-                    <p class="fields-list">{{cardItem.fields}}</p>
-                </div>
-                <div class="task-card-footer">
-                  <template v-if="cardItem.type!=='工时'">
-                    <el-tooltip class="item" effect="dark" content="每个工单中填写一组该数据" placement="top">
-                      <el-button type="primary" @click="importcard(cardItem,'single')">添加为单次</el-button>
-                    </el-tooltip>
-                    <el-tooltip class="item" effect="dark" content="每个工单中填写多组该数据" placement="top">
-                      <el-button type="primary" @click="importcard(cardItem,'multiple')">添加为多次</el-button>
-                    </el-tooltip>
-                  </template>
-                  <template v-else>
-                    <el-tooltip class="item" effect="dark" content="每个工单中填写多组该数据" placement="top">
-                      <el-button type="primary" @click="importcard(cardItem,'multiple')">添加</el-button>
-                    </el-tooltip>
-                  </template>
-                </div>
+      <el-card class="tabs-card-box" shadow="hover" v-for="cardItem in cardSysList[tabIndex].list" :key="cardItem.cardId" >
+        <div class="tabs-card-li">
+          <div class="task-card-inforn"> 
+            <h2 class="task-card-name">{{cardItem.cardName}}<span class="task-card-angle">{{cardItem.type}}</span></h2>                                       
+            <p class="task-card-des">{{cardItem.description}}</p>
+          </div>
+          <div class="task-card-fields">
+            <p>包含字段：</p>
+            <p class="fields-list">{{cardItem.fields}}</p>
+          </div>
+          <div class="task-card-footer">
+            <template v-if="cardItem.type!=='工时'">
+              <el-tooltip class="item" effect="dark" content="每个工单中填写一组该数据" placement="top">
+                <el-button type="primary" @click="importcard(cardItem,'single')">添加为单次</el-button>
+              </el-tooltip>
+              <el-tooltip class="item" effect="dark" content="每个工单中填写多组该数据" placement="top">
+                <el-button type="primary" @click="importcard(cardItem,'multiple')">添加为多次</el-button>
+              </el-tooltip>
+            </template>
+            <template v-else>
+              <el-tooltip class="item" effect="dark" content="每个工单中填写多组该数据" placement="top">
+                <el-button type="primary" @click="importcard(cardItem,'multiple')">添加</el-button>
+              </el-tooltip>
+            </template>
+          </div>
 
-            </div>
-        </el-card>
+        </div>
+      </el-card>
     </div>
     <!--end  组件库列表 -->
 
   </div>
 </template>
 <script>
-import * as SettingTaskApi from "@src/api/SettingTaskApi";
+import * as SettingTaskApi from '@src/api/SettingTaskApi';
 export default {
   name: 'template-library',
   props: {
@@ -56,36 +56,29 @@ export default {
       tabIndex:0,
     };
   },
-  mounted() {
-    console.log(this.cardSysList)
-  },
   methods: {
     onTabsCard(index){
       this.tabIndex = index;
     },
-    //添加为单次/多次
-    importcard(cardItem,inputType) {
-      console.log(cardItem)
-      SettingTaskApi.cardImport({cardId:cardItem.cardId,inputType:inputType}).then(res=>{
+    // 添加为单次/多次
+    importcard(cardItem, inputType) {
+      SettingTaskApi.cardImport({cardId:cardItem.cardId, inputType}).then(res=>{
         const { status, message, data } = res;
-        if(status==0){
+        if(status == 0){
           this.$message.success('添加成功');
           let cardSelected = {};
           cardSelected.inputType = inputType;
           cardSelected.name = cardItem.cardName;
-          cardSelected.specialfrom = cardItem.type=='工时' ? '工时记录' :'';
+          cardSelected.specialfrom = cardItem.type == '工时' ? '工时记录' : '';
           cardSelected.id = data;
-          console.log(444,cardSelected)
-          this.$emit('saveImport',cardSelected)
+          this.$emit('saveImport', cardSelected)
 
 
           
         }else{
-            this.$message.warning(message);
+          this.$message.warning(message);
         }
-    }).catch(error=>{
-
-    })
+      }).catch(error=>({}))
     }
   },
 };
