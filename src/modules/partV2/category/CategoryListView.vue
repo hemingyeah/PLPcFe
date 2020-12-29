@@ -120,7 +120,7 @@
           </span>
 
           <el-dropdown-menu slot="dropdown" class="dropdown-more">
-            <el-dropdown-item>
+            <el-dropdown-item v-if="!isExperienceEdition">
               <span class="dropdown-item" @click="importPart">导入</span>
             </el-dropdown-item>
             <el-dropdown-item>
@@ -129,7 +129,7 @@
             <el-dropdown-item>
               <span class="dropdown-item" @click="exportPart(true)">导出全部</span>
             </el-dropdown-item>
-            <el-dropdown-item>
+            <el-dropdown-item v-if="!isExperienceEdition">
               <span class="dropdown-item" @click="importEditPart">批量更新</span>
             </el-dropdown-item>
           </el-dropdown-menu>
@@ -306,6 +306,7 @@ import PartEditBatchForm from './form/PartEditBatchForm.vue';
 import PartImport from './components/PartImport.vue';
 
 import SampleTooltip from 'packages/SampleTooltip/SampleTooltip'
+import VersionMixin from '@src/mixins/versionMixin'
 
 const STORAGE_COLNUM_KEY = 'category_list_column';
 const STORAGE_PAGESIZE_KEY = 'category_list_pagesize';
@@ -313,6 +314,7 @@ const STORAGE_PAGESIZE_KEY = 'category_list_pagesize';
 export default {
   name: 'part-list-view',
   inject: ['initData'],
+  mixins: [VersionMixin],
   data(){
     let pageSize = StorageUtil.get(STORAGE_PAGESIZE_KEY) || 10;
     let originModel = {

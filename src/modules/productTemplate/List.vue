@@ -57,7 +57,7 @@
               <i class="iconfont icon-nav-down"></i>
             </span>
             <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item>
+              <el-dropdown-item v-if="!isExperienceEdition">
                 <div @click="openDialog('importProduct')">导入产品模板</div>
               </el-dropdown-item>
               <el-dropdown-item>
@@ -247,6 +247,7 @@ import { getProductTemplateList, productTemplateDelete } from '@src/api/ProductA
 
 import SearchPanel from './component/SearchPanel.vue';
 import DialogBatchEditProductTemplate from './component/DialogBatchEditProductTemplate.vue';
+import VersionMixin from '@src/mixins/versionMixin'
 
 /* 高级搜索面板 列数 */
 const PRODUCT_TEMPLATE_LIST_ADVANCE_SEARCH_COLUMN_NUMBER = 'product_template_list_advance_search_column_number';
@@ -261,6 +262,7 @@ const link_reg = /((((https?|ftp?):(?:\/\/)?)(?:[-;:&=\+\$]+@)?[A-Za-z0-9.-]+|(?
 
 export default {
   name: 'product-template-list-view',
+  mixins: [VersionMixin],
   props: {
     initData: {
       type: Object,

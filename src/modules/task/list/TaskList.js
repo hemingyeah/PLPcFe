@@ -26,6 +26,7 @@ import { storageGet, storageSet } from "@src/util/storage";
 import { formatDate } from "@src/util/lang";
 import { getRootWindow } from "@src/util/dom";
 import * as FormUtil from "@src/component/form/util"
+import VersionMixin from '@src/mixins/versionMixin'
 
 /* mixin */
 import tourGuide from "@src/mixins/tourGuide"
@@ -70,7 +71,7 @@ const EXPORT_FILTER_FORM_TYPE = ["attachment", "address", "autograph"];
 export default {
   name: "task-list",
   inject: ["initData"],
-  mixins: [tourGuide],
+  mixins: [tourGuide, VersionMixin],
   data() {
     return {
       selectIds, // id
