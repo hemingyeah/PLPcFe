@@ -47,3 +47,13 @@ export function queryRuleInfo(params={}){
 export function queryEventType(params={}){
   return http.get(`${prefix}/outside/superCode/product/queryEventType`,params);
 }
+
+// 获取备件
+export function queryRelParts(params={}){
+  return http.get(`${prefix}/outside/superCode/mobile/queryRelParts`,params);
+}
+
+// 获取知识库
+export function queryRelKnowledge(params={}){
+  return http.get(`${prefix}/outside/superCode/mobile/queryRelKnowledge`,params);
+}

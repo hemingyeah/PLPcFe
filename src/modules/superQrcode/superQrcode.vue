@@ -182,43 +182,69 @@
             <div id='mapWrapper' v-if="nowOption==='comInfo'" style="height:166px;"></div>
           </div>
 
-          <div v-if="nowOption === 'proInfo' || nowOption==='video' || nowOption==='knowledge'" class="pro-wrapper">
+          <div v-if="nowOption === 'proInfo' || nowOption==='video' || nowOption==='knowledge' || nowOption==='part'" class="pro-wrapper">
             <ul @click="changeType('proInfo')" class="round-panel top-panel" :class="nowOption === 'proInfo' ? 'choose-border' : ''">
               <li v-for="item in settingInfo.showFields.filter(s=>s.showFlag=='1')" :key="item.fieldName">
                 <p>
                   {{item.displayName}}
-                  <span>XXX</span>
+                  <span>“字段值”</span>
                 </p>
               </li>
             </ul>
             <div v-if="settingInfo.productVideo && settingInfo.videoOpenState" @click="changeType('video')" class="round-panel middle-panel" :class="nowOption === 'video' ? 'choose-border' : ''" @mouseenter="mouseEnter" @mouseleave="mouseLeave">
-              <span class="video-title">{{settingInfo.productVideo[0] && settingInfo.productVideo[0].filename}}</span>
-              <i class="iconfont" v-show="videoFlagShow" :class="videoPlay?'icon-zanting':'icon-kaishi'" @click="play"></i>
-              <video ref="video" @loadedmetadata="videoLoaded" :src="settingInfo.productVideo[0] && settingInfo.productVideo[0].url" style="object-fit:fill;" width="319px" height="100%">浏览器不支持video</video>
-              <span class="video-time">{{videoTime}}</span>
+              <h3 style="margin-top:5px;margin-left:5px;">{{settingInfo.productVideo[0] && settingInfo.productVideo[0].filename}}</h3>
+              <!-- <span class="video-title">{{settingInfo.productVideo[0] && settingInfo.productVideo[0].filename}}</span> -->
+              <div style="height:200px;">
+                <i class="iconfont" v-show="videoFlagShow" :class="videoPlay?'icon-zanting':'icon-kaishi'" @click="play"></i>
+                <video ref="video" @loadedmetadata="videoLoaded" :src="settingInfo.productVideo[0] && settingInfo.productVideo[0].url" style="object-fit:fill;" width="319px" height="100%">浏览器不支持video</video>
+                <span class="video-time">{{videoTime}}</span>
+              </div>
             </div>
             <div v-if="!settingInfo.productVideo && settingInfo.videoOpenState" @click="changeType('video')" class="round-panel middle-panel no-video" :class="nowOption === 'video' ? 'choose-border' : ''">
               暂无视频
+            </div>
+            <div v-if="settingInfo.partOpenState" @click="changeType('part')" class="bottom-panel round-panel" :class="nowOption === 'part' ? 'choose-border' : ''">
+              <div class="title part-title">
+                <span>关联备件</span>
+                <a href="javascript:;">更多 ></a>
+              </div>
+              <div class="part-item" v-for="item in partList" :key="item.id">
+                <div class="part-img" v-if="item.imageList && item.imageList[0]" :style="{background:`url(${item.imageList[0]}) no-repeat center center`,backgroundSize:'100% 100%'}"></div>
+                <div class="part-img part-no-img" v-else></div>
+                <div class="part-name">{{item.name}}</div>
+              </div>
             </div>
             <div v-if="settingInfo.knowledgeOpenState" @click="changeType('knowledge')" class="bottom-panel round-panel" :class="nowOption === 'knowledge' ? 'choose-border' : ''">
               <div class="title">
                 <span>知识库</span>
                 <a href="javascript:;">更多 ></a>
               </div>
-              <ul>
+              <div class="circle-item-wrapper">
+                <div class="circle-item" v-for="item in knowledgeList" :key="item.id">
+                  <span class="circle-title">{{item.title}}</span>
+                  <div class="circle-info">
+                    <span class="circle-author">{{item.createUserName}}</span>
+                    <div class="read-count">
+                      <span class="circle-read-text">阅读</span>
+                      <span class="circle-read-count">{{item.readTimes | formatNum}}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- <ul class="knowledge">
                 <li v-for="(item,index) in settingInfo.knowledge" :key="index">
                   <p class="article-title">{{item.title}}</p>
                   <span class="author">{{item.author}}</span>
                   <p class="num">
                     <span class="num-text">阅读</span>
-                    <span>{{item.num}}</span>
+                    <span>{{item.num | formatNum}}</span>
                   </p>
                 </li>
-              </ul>
+              </ul> -->
             </div>
           </div>
 
-          <div v-if="nowOption === 'part'" class="part-wrapper"></div>
+          <!-- <div v-if="nowOption === 'part'" class="part-wrapper"></div> -->
 
           <div v-if="nowOption === 'mall'" class="mall-wrapper"></div>
         </div>
@@ -257,7 +283,9 @@ import {
   queryProductSetting,
   queryCompanyInfo,
   querySettingRules,
-  queryEventType
+  queryEventType,
+  queryRelParts,
+  queryRelKnowledge
 } from '@src/api/SuperQrcode';
 
 let map=null;
@@ -314,7 +342,10 @@ export default {
 
       allEventTypeList:[],
       eventTypeList:[],
-      eventTypeIdList:[]
+      eventTypeIdList:[],
+
+      partList:[],
+      knowledgeList:[]
     };
   },
   computed: {
@@ -356,11 +387,57 @@ export default {
     this.getCatalogList();
   },
   filters:{
+    formatNum(_num) {
+      if(_num < 10000) {
+        return _num ;
+      }else{
+        return (_num / 10000).toFixed(1) + "万";
+      }
+    },
     getSrc(_type) {
       return require(`../../assets/img/myShop/newIcon${_type%5}.png`);
     }
   },
   methods: {
+    // 获取知识库
+    async queryRelKnowledge(){
+      const params={
+        tenantId:this.tenantId,
+        catalogId:this.catalogId[this.catalogId.length-1],
+        keyWord:'',
+        pageNum:1,
+        pageSize:2
+      }
+      let res=await queryRelKnowledge(params);
+      if(res.code==='200'){
+        this.knowledgeList=res.data.list;
+      }else{
+        this.$notify.error({
+          title: "网络错误",
+          message:res.data,
+          duration: 2000,
+        });
+      }
+    },
+    // 获取备件
+    async queryRelParts(){
+      const params={
+        tenantId:this.tenantId,
+        catalogId:this.catalogId[this.catalogId.length-1],
+        pageNum:1,
+        pageSize:6
+      }
+      let res=await queryRelParts(params);
+      if(res.code==='200'){
+        this.partList=res.data.list;
+      }else{
+        this.$notify.error({
+          title: "网络错误",
+          message:res.data,
+          duration: 2000,
+        });
+      }
+    },
     // 企业名称
     showCompanyName(comData){
       if(comData.showNickName===1 && comData.nickName){
@@ -458,6 +535,8 @@ export default {
         this.settingInfo.videoOpenState=val?1:0;
       }else if(option==='knowledge'){
         this.settingInfo.knowledgeOpenState=val?1:0;
+      }else if(option==='part'){
+        this.settingInfo.partOpenState=val?1:0;
       }
     },
     // 保存成功
@@ -601,6 +680,8 @@ export default {
         // this.queryQuickInfo();
         this.querySettingRules();
         this.queryCompanyInfo();
+        this.queryRelParts();
+        this.queryRelKnowledge();
       }else{
         this.$notify.error({
           title: "网络错误",
@@ -847,11 +928,11 @@ p{
           box-sizing: border-box;
         }
 
-        .part-wrapper{
-          height: 100%;
-          background: url('../../assets/img/beijian.png') no-repeat center center;
-          background-size: 100% 100%;
-        }
+        // .part-wrapper{
+        //   height: 100%;
+        //   background: url('../../assets/img/beijian.png') no-repeat center center;
+        //   background-size: 100% 100%;
+        // }
 
         .mall-wrapper{
           height: 100%;
@@ -886,7 +967,6 @@ p{
           }
           .middle-panel{
             padding: 0;
-            height: 160px;
             overflow: hidden;
             position: relative;
 
@@ -946,42 +1026,146 @@ p{
                 }
               }
             }
-            ul{
-              margin-bottom: 0;
-              li{
-                padding: 10px;
-                border-bottom: 1px solid $color-border-l4;
+            .part-title{
+              background: #D2FAEA;
+            }
+            .part-item{
+              display: inline-block;
+              width: calc(50% - 5px);
+              height: 200px;
+              margin-top: 12px;
+              background-color: #fff;
+              box-shadow: 0 2px 10px 0 hsla(0,0%,60%,.2);
+              border-radius: 10px;
+              overflow: hidden;
+              .part-img{
+                height: 150px;
+              }
+              .part-no-img{
+                background: url('../../assets/img/defProduct.png') no-repeat center center;
+                background-size: 50% 50%;
+                background-color: $bg-color-l2;
+              }
+              .part-name{
+                height: 55px;
+                font-size: 15px;
+                font-weight: bold;
+                padding: 10px 8px 3px;
+                overflow:hidden; 
+                text-overflow:ellipsis;
+                display:-webkit-box; 
+                -webkit-box-orient:vertical;
+                -webkit-line-clamp:2;
+              }
+            }
+            .part-item:nth-child(odd){
+              margin-left: 10px;
+            }
+            .circle-item-wrapper{
+              display: flex;
+              overflow-x: auto;
+              margin-top: 16px;
+              margin-bottom: 40px;
+              padding-bottom: 10px;
 
-                .article-title{
+              .circle-item{
+                width: 246px;
+                height: 118px;
+                margin-right:10px;
+                border-radius: 20px;
+                flex-shrink: 0;
+                padding: 20px 18px 0;
+                box-shadow: 0px 2px 10px 0px rgba(153, 153, 153, 0.2);
+
+                &:first-child{
+                  background: url('../../assets/img/wiki_bg_red.png') no-repeat center center;
+                  background-size: cover;
+                  margin-left: 10px;
+                }
+                &:last-child{
+                  background: url('../../assets/img/wiki_bg_green.png') no-repeat center center;
+                  background-size: cover;
+                }
+
+                .circle-title{
+                  display: inline-block;
+                  height: 42px;
+                  font-size: 15px;
                   font-weight: bold;
-                  font-size: 16px;
-                  margin-bottom: 10px;
+                  color: #051A13;
+                  line-height: 21px;
 
-                  overflow:hidden; 
-                  text-overflow:ellipsis;
-                  display:-webkit-box; 
-                  -webkit-box-orient:vertical;
-                  -webkit-line-clamp:2; 
+                  text-overflow: -o-ellipsis-lastline;
+                  overflow: hidden;
+                  text-overflow: ellipsis;
+                  display: -webkit-box;
+                  -webkit-line-clamp: 2;
+                  line-clamp: 2;
+                  -webkit-box-orient: vertical;
                 }
-                .author{
-                  color:$text-color-secondary;
-                }
-                .num{
-                  color:$text-color-secondary;
-                  float: right;
-                  border:1px solid $color-border-l4;
-                  padding: 1px 3px;
-                  font-size: 13px;
-                  .num-text{
-                    border-right: 1px solid $color-border-l4;
-                    padding-right: 4px;
+
+                .circle-info{
+                  margin-top: 20px;
+                  display: flex;
+                  flex-direction: row;
+                  justify-content: space-between;
+                  align-items: center;
+
+                  .circle-author{
+                    font-size: 13px;
+                    color: #999999;
+                  }
+                  .read-count{
+                    .circle-read-text{
+                      font-size: 12px;
+                      color: #9BA3A1;
+                    }
+                    .circle-read-count{
+                      display: inline-block;
+                      text-align: center;
+                      color: #333333;
+                      font-size: 12px;
+                    }
                   }
                 }
               }
-              li:last-child{
-                border-bottom: none;
-              }
             }
+            // .knowledge{
+            //   margin-bottom: 0;
+            //   li{
+            //     padding: 10px;
+            //     border-bottom: 1px solid $color-border-l4;
+
+            //     .article-title{
+            //       font-weight: bold;
+            //       font-size: 16px;
+            //       margin-bottom: 10px;
+
+            //       overflow:hidden; 
+            //       text-overflow:ellipsis;
+            //       display:-webkit-box; 
+            //       -webkit-box-orient:vertical;
+            //       -webkit-line-clamp:2; 
+            //     }
+            //     .author{
+            //       color:$text-color-secondary;
+            //     }
+            //     .num{
+            //       color:$text-color-secondary;
+            //       float: right;
+            //       border:1px solid $color-border-l4;
+            //       padding: 1px 3px;
+            //       font-size: 13px;
+            //       .num-text{
+            //         border-right: 1px solid $color-border-l4;
+            //         padding-right: 4px;
+            //       }
+            //     }
+            //   }
+            //   li:last-child{
+            //     border-bottom: none;
+            //   }
+            // }
           }
         }
 
@@ -1174,10 +1358,10 @@ p{
             li {
               width: 48%;
               height: 100px;
-              background: rosybrown;
               border-radius: 10px;
               text-align: center;
               cursor: pointer;
+              color:#fff;
 
               img {
                 display: block;
@@ -1186,10 +1370,12 @@ p{
               }
             }
             li:first-child {
-              background: #13C2C222;
+              background: url('../../assets/img/contact.png') no-repeat center center;
+              background-size: 100% 100%;
             }
             li:last-child {
-              background: #3BA7FF22;
+              background: url('../../assets/img/service.png') no-repeat center center;
+              background-size: 100% 100%;
             }
           }
 
@@ -1198,7 +1384,7 @@ p{
             position: relative;
             cursor: pointer;
             padding: 10px;
-            border: 1px solid $color-border-l3;
+            background: #F5F5F5;
             border-radius: 10px;
 
             img {

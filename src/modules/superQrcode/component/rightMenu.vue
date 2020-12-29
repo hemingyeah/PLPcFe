@@ -113,7 +113,7 @@
     <div v-if="nowOption === 'part'" class="common-wrapper">
       <span>是否开启关联备件</span>
       <div class="fright">
-        <el-switch v-model="partOpenState"></el-switch>
+        <el-switch v-model="partOpenState" @change="changeState"></el-switch>
         <span>{{partOpenState?'启用':'禁用'}}</span>
       </div>
       <p>对外仅展示已上架服务商城的备件</p>
