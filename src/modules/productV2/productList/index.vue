@@ -1851,6 +1851,11 @@ body {
 .el-table{
   border:none;
 }
+.el-table--small th,
+.el-table--small td {
+  height: 40px;
+  padding: 3px 0;
+}
 .product-list-container .product-table {
   padding: 10px;
 

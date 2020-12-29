@@ -210,6 +210,7 @@ export default {
               }]);
 
               this.$refs.workTreeData.reflashPage(e.nowChooseArr[0]);
+              this.changeTreeDetail("conData", 1)
               this.changeVisibleProp(false);
             } else {
               this.$notify.error({
@@ -437,6 +438,7 @@ export default {
           if (res.code == 0) {
             this.changeVisibleProp(false);
             this.$refs.workTreeData.reflashTable(type);
+            this.changeTreeDetail("conData", 1);
             window.parent.flashSomePage([{
               type: "M_PRODUCT_CATALOG",
             }]);
