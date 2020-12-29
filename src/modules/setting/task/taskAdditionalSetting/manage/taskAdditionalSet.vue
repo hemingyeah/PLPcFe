@@ -65,8 +65,6 @@ import TaskCardItem from './components/TaskCardItem';
 import EditCardnameDialog from './components/EditCardnameDialog';
 import templateLibrary from './components/templateLibrary';
 import NoDataViewNew from '@src/component/common/NoDataViewNew';
-import { forEach } from 'lodash';
-
 export default {
   name: 'task-manage',
   data() {
@@ -114,7 +112,7 @@ export default {
         const { code, message, result } = res;
         this.loading = false;
         if(code == 0){
-          this.cardList = result ;  
+          this.cardList = result;  
         }else{
           this.$message.error(message);
         }

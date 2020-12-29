@@ -55,18 +55,12 @@
             <template slot-scope="scope">
               <!-- start 自定义字段 -->
               <template v-if="scope.row.taskCardInfo.attribute[column.fieldName]">
+                <!-- start 多选 -->
                 <template v-if="isMulti(column)">
                   {{ (scope.row.taskCardInfo.attribute[column.fieldName] || []).join('，') }}
                 </template>
-                <!-- start 附件类型 -->
-                <template v-else-if="column.formType == 'attachment'">
-                  <div class="column-attachment" v-for="(file,index) in scope.row.taskCardInfo.attribute[column.fieldName]" :key="index">
-                    <el-tooltip class="item" effect="dark" :content="file.filename" placement="top">
-                      <a :href="file.url" >{{file.filename}}</a> 
-                    </el-tooltip>
-                  </div>
-                </template>
-                <!-- end 附件类型 -->
+                <!-- end 多选 -->
+
                 <template v-else>
                   {{scope.row.taskCardInfo.attribute[column.fieldName]}}
                 </template>
@@ -105,19 +99,8 @@
             :show-overflow-tooltip="column.showTooltip"
             :min-width="column.minWidth || '120px'">
             <template slot-scope="scope">
-
-              <!-- start 附件类型 -->
-              <template v-if="column.formType === 'attachment' && scope.row[column.fieldName] && scope.row[column.fieldName].length">
-                <div class="column-attachment" v-for="(file,index) in valueAtt_href(scope.row[column.fieldName])" :key="index">
-                  <el-tooltip class="item" effect="dark" :content="file.filename" placement="top">
-                    <a :href="file.url" >{{file.filename}}</a> 
-                  </el-tooltip>
-                </div>
-              </template>
-              <!-- end 附件类型 -->
-
               <!-- start 多选 -->
-              <template v-else-if="isMulti(column)">
+              <template v-if="isMulti(column)">
                 {{ (scope.row[column.fieldName] || []).join('，') }}
               </template>
               <!-- end 多选 -->
@@ -225,13 +208,14 @@ export default {
           let fields = fieldUtil.toTableFields(cardFields[0].fields, this.card.config);
           return fields.filter(field => field.enabled == 1);
         }
-        cardFields[0].fields.forEach(item=>{
-          if(item.formType == 'attachment' || item.formType == 'datetime'){
-            item.minWidth = '160' ;
+        return cardFields[0].fields.filter(i=>{
+          if(i.formType !== 'attachment'){
+            if(i.formType == 'datetime'){
+              i.minWidth = '160' ;
+            }
+            return i
           }
-        })
-        return cardFields[0].fields;
-        
+        })    
       }
     }
   },

@@ -7,7 +7,7 @@ import http from '@src/util/HttpUtil';
  * @param {Object} params -- 参数对象
  * @param {String} params.id -- 组件id
  */
-export const getAllCardList =  (params = {} ) => {
+export const getAllCardList = (params = {} ) => {
   return http.get('/outside/pc/task/getAllCardList', params)
 }
 
@@ -16,7 +16,7 @@ export const getAllCardList =  (params = {} ) => {
  * @param {Object} params -- 参数对象
  * @param {String} params.id -- 组件id
  */
-export const getCardInfo =  (params = {} ) => {
+export const getCardInfo = (params = {} ) => {
   return http.get('/setting/task/card/getOne', params)
 }
 /**
@@ -25,8 +25,8 @@ export const getCardInfo =  (params = {} ) => {
  * @param {String} params.cardId -- 组件id
  * @param {String} params.inputType -- single单次 multiple多次
  */
-export const cardImport =  (params = {}) => {
-  return http.post('/setting/task/card/import', params,false)
+export const cardImport = (params = {}) => {
+  return http.post('/setting/task/card/import', params, false)
 }
 
 /**
@@ -35,8 +35,8 @@ export const cardImport =  (params = {}) => {
  * @param {String} params.id -- 组件id
  * @param {String} params.enabled -- 1开启 0禁用
  */
-export const onCardChange =  (params = {}) => {
-  return http.post('/setting/task/card/enabled', params,false)
+export const onCardChange = (params = {}) => {
+  return http.post('/setting/task/card/enabled', params, false)
 }
 
 /**
@@ -44,8 +44,8 @@ export const onCardChange =  (params = {}) => {
  * @param {Object} params -- 参数对象
  * @param {String} params.id -- 组件id
  */
-export const onDeleteCard =  (params = {}) => {
-  return http.post('/setting/task/card/delete', params,false)
+export const onDeleteCard = (params = {}) => {
+  return http.post('/setting/task/card/delete', params, false)
 }
 
 /**
@@ -55,7 +55,7 @@ export const onDeleteCard =  (params = {}) => {
  * @param {String} params.inputType -- single单次 multiple多次
  * @param {String} params.name -- 组件名字
  */
-export const onCreatCard =  (params = {}) => {
+export const onCreatCard = (params = {}) => {
   return http.post('/setting/task/card/create', params)
 }
 
@@ -66,7 +66,7 @@ export const onCreatCard =  (params = {}) => {
  * @param {String} params.id -- 组件id
  * @param {String} params.name -- 组件名字
  */
-export const onUpdateCard =  (params = {}) => {
+export const onUpdateCard = (params = {}) => {
   return http.post('/setting/task/card/update', params)
 }
 
@@ -80,15 +80,18 @@ export const onUpdateCard =  (params = {}) => {
  * @param {String} params.timeRange -- 时间范围
  * @param {String} params.userNameStr -- 操作人
  */
-export const getCardCount =  (params = {}) => {
+export const getCardCount = (params = {}) => {
   return http.get('/setting/task/card/count', params)
 }
+// export const getCardCount = (params = {}) => {
+//   return http.get('/setting/task/newCard/count', params)
+// }
 
 /**
  * @description 获取统计fields列表
  * @param {Object} params -- 参数对象
  */
-export const getCardFields =  (params = {}) => {
+export const getCardFields = (params = {}) => {
   return http.get('/setting/task/cardManage/getFields', params)
 }
 
@@ -96,7 +99,7 @@ export const getCardFields =  (params = {}) => {
  * @description 附加组件库
  * @param {Object} 
  */
-export const getCardSysList =  (params = {}) => {
+export const getCardSysList = (params = {}) => {
   return http.post('/setting/card/getSysList', params)
 }
 
@@ -104,7 +107,7 @@ export const getCardSysList =  (params = {}) => {
  * @description 获取附加组件表单
  * @param {Object} 
  */
-export const getAddCardFields =  (params = {}) => {
+export const getAddCardFields = (params = {}) => {
   return http.get('/setting/task/cardField/new/list', params)
 }
 
@@ -112,7 +115,7 @@ export const getAddCardFields =  (params = {}) => {
  * @description 创建取附加组件表单
  * @param {Object} 
  */
-export const taskCardFieldsSave =  (params = {}) => {
+export const taskCardFieldsSave = (params = {}) => {
   return http.post('/setting/task/cardField/createBatch', params)
 }
 
@@ -120,7 +123,7 @@ export const taskCardFieldsSave =  (params = {}) => {
  * @description 查询单个附加组件的信息
  * @param {Object} 
  */
-export const getTaskCardName =  (params = {}) => {
+export const getTaskCardName = (params = {}) => {
   return http.get('/setting/task/card/getOne', params)
 }
 
@@ -128,7 +131,7 @@ export const getTaskCardName =  (params = {}) => {
  * @description 更新单个工单附加组件的信息
  * @param {Object} 
  */
-export const updateTaskCardName =  (params = {}) => {
+export const updateTaskCardName = (params = {}) => {
   return http.post('/setting/task/card/updateOneTaskCard', params)
 }
 /* ------------- end 附加组件设置 ---------------- */
@@ -139,7 +142,7 @@ export const updateTaskCardName =  (params = {}) => {
  * @description 保存排序结果
  * @param {Object} params -- 参数对象
  */
-export const saveTaskCardOrder =  (params = {}) => {
+export const saveTaskCardOrder = (params = {}) => {
   return http.post('/setting/saveTaskCardOrder', params)
 }
 
@@ -147,15 +150,15 @@ export const saveTaskCardOrder =  (params = {}) => {
  * @description 删除组件
  * @param {Object} params -- 参数对象
  */
-export const deleteTaskCard =  (params = {}) => {
-  return http.post('/setting/taskType/deleteCard', params,false)
+export const deleteTaskCard = (params = {}) => {
+  return http.post('/setting/taskType/deleteCard', params, false)
 }
 
 /**
  * @description 使用规则设置
  * @param {Object} params -- 参数对象
  */
-export const saveRulesFlow =  (params = {}) => {
+export const saveRulesFlow = (params = {}) => {
   return http.post('/setting/taskType/card/saveNotNullFlow', params)
 }
 
@@ -172,7 +175,7 @@ export function getRoleList(params) {
  * @param {Object} params -- 参数对象
  */
 export function saveCardAuth(params) {
-  return http.post('/setting/taskType/cardAuth', params,false)
+  return http.post('/setting/taskType/cardAuth', params, false)
 }
 
 /**

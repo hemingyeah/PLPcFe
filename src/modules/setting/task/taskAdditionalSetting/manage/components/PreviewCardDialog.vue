@@ -1,7 +1,7 @@
 <template>
   <base-modal
     :show.sync="visible"
-    width="420px"
+    width="500px"
     class="preview-dialog"
     @closed="onClose('form')"
   >
@@ -9,6 +9,7 @@
       <span class="el-dialog__title">预览</span>
     </div>
     <div class="base-modal-content">
+      <form-preview :fields="fields" class="flow-setting-form-preview"></form-preview>
     </div>
     <div slot="footer" class="dialog-footer">
       <el-button @click="onClose">取 消</el-button>
@@ -20,6 +21,10 @@
 export default {
   name: 'preview-card-dialog',
   props: {
+    fields: {
+      type:Array,
+      default: () => ([])
+    }
   },
   data() {
     return {
@@ -51,6 +56,12 @@ export default {
   }
   .base-modal-body {
     padding: 20px;
+    .flow-setting-form-preview{
+      height: 522px;
+      .form-design-center{
+        height: 100%;
+      }
+    }
   }
 }
 </style>

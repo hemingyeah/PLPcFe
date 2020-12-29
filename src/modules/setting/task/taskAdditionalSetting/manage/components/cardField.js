@@ -20,13 +20,6 @@ function packFields(fields, config) {
         ...field
       }, )
     }
-    // 附件
-    if (field.formType == 'attachment') {
-      newFields.push({
-        ...field,
-        minWidth: '160px',
-      })
-    }
 
     // 在开始时间，结速时间后加位置
     else if (field.formType == 'datetime') {
@@ -60,9 +53,11 @@ function packFields(fields, config) {
     else if (field.fieldName === 'usedTime') {
       field.displayName = `${field.displayName}(H)`;
     } else {
-      newFields.push(field);
+      // 过滤掉附件
+      if(field.formType !== 'attachment'){
+        newFields.push(field);
+      }
     }
-
   })
 
   return newFields;
