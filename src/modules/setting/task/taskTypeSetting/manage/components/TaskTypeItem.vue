@@ -11,7 +11,7 @@
                         <el-row type="flex">
                             <p>
                                 可用团队: 
-                                <span class="pointer" @click="chooseTeam">{{taskType.tags | formatTeamName}} </span>
+                                <span class="pointer" @click="chooseTeam">{{formatTeamName(taskType.tags)}} </span>
                             </p>
                             <i class="iconfont icon-edit-square pointer" @click="chooseTeam"></i>
                         </el-row>
@@ -67,18 +67,22 @@ export default {
             type: Number,
             default: 0
         },
+        teamList: {
+            type: Array,
+            default: () => []
+        }
     },
     data() {
         return {
             isShowChooseTeamModal: false  // 选择可用团队弹窗
         }
     },
-    filters: {
-        formatTeamName(tagIds) {
-            return tagIds.length === 0 ? '全部团队' : tagIds.join(',');
-        }
-    },
     methods: {
+        formatTeamName(tagIds) {
+            return tagIds.length === 0 ? '全部团队' : tagIds.map(tagId => {
+                return this.teamList.find(team => team.id === tagId).tagName;
+            }).join(',');
+        },
         switchEnabled: _.debounce(function(value) {
             if(value === 1 && this.typeNum >= this.maxTypeNum) {
                 return this.$message.warning(`最多只能同时存在${this.maxTypeNum}种工单类型`);
@@ -139,9 +143,9 @@ export default {
         /**
          * 更新可用团队
          */
-        updateTeamList(teamList){
+        updateTeamList(tags){
             this.updateTaskType({
-                tags: teamList
+                tags
             });
         }
     },

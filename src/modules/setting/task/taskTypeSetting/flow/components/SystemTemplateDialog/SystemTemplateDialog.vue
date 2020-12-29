@@ -350,25 +350,6 @@ export default {
                 this.receiptAttachments = this.convertArrayObjectToKey(attachmentFields.receiptAttachments, 'fieldName');
                 this.singleCardInfoAttachments = this.convertArrayObjectToKey(attachmentFields.singleCardInfoAttachments, 'fieldName');
                 this.multipleCardInfoAttachments = this.convertArrayObjectToKey(attachmentFields.multipleCardInfoAttachments, 'fieldName');
-            
-            
-                // todo_zr 应该在进入流程设置的时候调用
-                if(JSON.stringify(res.data.reportSetting) == "{}"){
-                    let reportSetting = {"tenantFields":["name","phone","email","address","portal"],"customerFields":["name","product","address","linkman"],"taskFields":["taskNo","planTime","executor"],"receiptFields":["sparepart","service","autograph"]}
-                    let reportForm = {};
-                    reportForm.id = this.taskTypeId;
-                    reportForm.reportSetting = reportSetting;
-
-
-                    try {
-                        let res = await TaskApi.saveSystemReport(reportForm);
-                        if(res.status == 0){
-                            console.log('默认回执报告设置已保存')
-                        }
-                    } catch (err) {
-                        console.error('设置默认回执报告出错 => err', err);
-                    }
-                }
             } catch (err) {
                 console.error('fetch Tasktype => err', err);
             }

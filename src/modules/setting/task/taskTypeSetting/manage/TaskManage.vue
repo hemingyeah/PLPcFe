@@ -12,6 +12,7 @@
         </div>
       </div>
       <draggable
+        v-loading="pendding"
         v-model="taskTypeList"
         v-bind="dragOptions"
         class="task-type-list"
@@ -23,6 +24,7 @@
           v-for="(item, idx) in taskTypeList"
           :key="item.id"
           :task-type="taskTypeList[idx]"
+          :team-list="teamList"
           :type-num="enableTypeNum"
           :max-type-num="maxTypeNum"
           @update="fetchTaskTypeList"
@@ -43,6 +45,7 @@ import draggable from 'vuedraggable';
 
 /** api */
 import * as SettingApi from "@src/api/SettingApi";
+import * as TeamApi from '@src/api/TeamApi';
 
 /** component */
 import TaskNavBar from '../../components/TaskNavBar.vue';
@@ -54,10 +57,11 @@ export default {
   data() {
     return {
       taskTypeList: [],
-      maxTypeNum: 10,  // todo_zr 需要接口获取
+      teamList: [],
+      maxTypeNum: 10,
 
       isAddTaskTypeModal: false,
-      pedding: false,
+      pendding: false,
     }
   },
   computed: {
@@ -81,13 +85,10 @@ export default {
     },
     /** 添加工单类型 */
     addTaskType() {
-      // 添加工单类型
-      // todo_zr: 需要校验可用工单类型数量 
       this.isAddTaskTypeModal = true;
     },
     /** 工单类型排序 */
     updateTaskTypeOrder(data) {
-      console.log(data);
       let params = {};
       this.taskTypeList.forEach((item, idx) => {
         params[item.id] = idx +1;
@@ -99,24 +100,26 @@ export default {
         console.log('updateTaskTypeOrder => err', err);
       });
     },
+    /** 获取工单类型列表 */
     fetchTaskTypeList() {
-      // 获取工单类型列表
-      // todo_zr: 当前接口只取启用的
-      this.pedding = true;
-      SettingApi.getSettingTaskTypeList().then((res) => {
-        this.pedding = false;
+      this.pendding = true;
+      SettingApi.getTaskTypeManage().then((res) => {
+        this.pendding = false;
+        let {tagListJson,taskTypeListJson,maxTypeNum} = res;
+
+        this.maxTypeNum = maxTypeNum;
+        this.teamList = tagListJson || [];
+        taskTypeListJson = taskTypeListJson || [];
+
         // 排序
-        let taskTypeList = res.list.sort((a, b) => a.orderId > b.orderId);
-        this.taskTypeList = taskTypeList.map(item => {
-          item.enabled = 1;
-          return item;
-        }) || [];
+        this.taskTypeList = taskTypeListJson.sort(
+            (a, b) => (a.orderId > b.orderId && a.enabled > b.enabled));
       }).catch(err => {
         console.error("fetch taskTypeList => error", err);
       }).finally(() => {
-        this.pedding = false;
+        this.pendding = false;
       })
-    }
+    },
   },
   mounted() {
     this.fetchTaskTypeList();
@@ -169,6 +172,8 @@ export default {
       flex-wrap: wrap;
       align-content: flex-start;
       width: calc(100% + 12px);
+      height: calc(100% - 100px);
+      overflow: auto;
       .task-type-item{
         margin: 0 12px 12px 0;
       }

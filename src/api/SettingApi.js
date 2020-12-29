@@ -203,5 +203,13 @@ export function getTaskTypeManage(params) {
   return http.get('/setting/taskType/getTaskTypeManage', params);
 }
 
+/**
+ * 获取工单表单、回执表单中必填的人员字段
+ * 
+ * @param {String} id 工单类型id 
+ */
+export function getFromUser(id) {
+  return http.get(`/setting/getFromUser/${id}`);
+}
 
 /******************** E 工单类型设置 ***************/

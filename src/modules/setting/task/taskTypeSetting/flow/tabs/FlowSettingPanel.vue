@@ -68,22 +68,63 @@ export default {
         clickFlow(type) {
             this.currFlow = type;
         },
+        /**
+         * 审批设置转化成参数
+         */
+        formatApproveSetting(setting) {
+            if(setting === undefined) return {};
+            console.log('setting',setting);
+            let approveSetting = _.cloneDeep(setting);
+            if(approveSetting.level === 0) {
+                approveSetting.leader = 'none';
+            }
+
+            return approveSetting;
+        },
         /** 将数据转化成保存需要的数据结构 */
         convertDataToParams() {
             let taskTypeConfig = _.cloneDeep(this.taskFlowData.taskTypeConfig);
-            let {id,flowSetting, delayBack,delayBackMin,planRemindSetting,notice, noticeUsers, autoReviewState, taskOverTimeModels } = taskTypeConfig;
+            let {id,flowSetting, delayBack, delayBackMin, allowPause, pauseApproveSetting,
+                planRemindSetting,notice, noticeUsers,cancelApproveSetting,
+                 autoReviewState, taskOverTimeModels } = taskTypeConfig;
+            
+            Object.keys(flowSetting).map(key => {
+                let {state, overTime, approveSetting, reallotAppr} = flowSetting[key];
+                flowSetting[key] = {
+                    state,
+                    overTime,
+                    reallotAppr,
+                    ...this.formatApproveSetting(approveSetting)
+                }
+
+                if(key === 'off') {
+                    flowSetting[key] = {
+                        ...flowSetting[key],
+                        ...cancelApproveSetting,
+                        state: taskTypeConfig.allowCancel
+                    }
+                } 
+            });
+            flowSetting.pause = {
+                state: allowPause,
+                ...pauseApproveSetting
+            }
+            delete flowSetting.autoReview;
+            
             let params = {
                 typeId: id,
                 flowSetting,
                 delayBack,
                 delayBackMin,
                 state: planRemindSetting.state,
-                minutes: Number(planRemindSetting.state), // todo
+                minutes: Number(planRemindSetting.minutes),
+                minutesType: planRemindSetting.minutesType,
                 planningTimeState: 'notice',
                 planningTimeMes: notice,
                 usersIds: noticeUsers.map(item => item.id).join(','),
-                taskOverTimeModels: taskOverTimeModels(item => {
-                    item.ids = item.reminders.join(',');
+                taskOverTimeModels: taskOverTimeModels.map(item => {
+                    item.reminders = item.reminders || [];
+                    item.ids = item.reminders.map(item => item.userId).join(',');
                     return item;
                 }),
                 autoReviewState
@@ -95,8 +136,8 @@ export default {
         async submit() {
             try {
                 let params = this.convertDataToParams();
-                console.log(params);
                 await SettingApi.saveProcess(params);
+                this.$notify.success('保存成功');
             } catch (error) {
                 console.error('sumbit saveProcess => error', error);
             }
