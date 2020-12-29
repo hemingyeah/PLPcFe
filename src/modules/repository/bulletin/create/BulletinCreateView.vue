@@ -16,6 +16,7 @@
 </template>
 
 <script>
+import * as TeamApi from '@src/api/TeamApi'
 import TextTitle from './component/TextTitle.vue'
 
 import { Message } from 'shb-element-ui';
@@ -286,13 +287,13 @@ export default {
           let num = 0;
           this.params.selectedDepts.forEach(async item => {
             let params = {
-              deptId: item.id,
+              tagId: item.id,
               pageNum: 1,
               pageSize: 50,
               sellAllOrg: false,
               keyword: '',
             }
-            let res = await http.get('/security/department/user', params);
+            let res = await TeamApi.userList(params)
             num = res.list.length + num;
           })
         }
