@@ -538,9 +538,9 @@ export default {
             } catch (error) {
               console.warn(error, "error try catch");
             }
-            window.parent.flashSomePage({
+            window.parent.flashSomePage([{
               type: "M_PRODUCT_CATALOG",
-            });
+            }]);
           }
         })
         .finally(() => {
@@ -627,9 +627,9 @@ export default {
                   message: "删除成功",
                   type: "success",
                 });
-                window.parent.flashSomePage({
+                window.parent.flashSomePage([{
                   type: "M_PRODUCT_CATALOG",
-                });
+                }]);
               } else {
                 this.$notify.error({
                   title: "网络错误",

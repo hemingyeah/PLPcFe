@@ -301,9 +301,9 @@ export default {
           }).then((res) => {
             if (res.code == 0) {
               this.reflash();
-              window.parent.flashSomePage({
+              window.parent.flashSomePage([{
                 type: "M_PRODUCT_CATALOG",
-              });
+              }]);
             } else {
               this.$notify.close();
               this.$notify.error({

@@ -1217,14 +1217,16 @@ export default {
     pushTaskListIds(id) {
       this.taskListIds.push(id);
     },
-    flashSomePage(obj = {}) {
+    flashSomePage(arr = []) {
       try {
         for (let index = 0; index < this.frameTabs.length; index++) {
-          if (this.frameTabs[index].id == obj.type) {
-            this.$platform.refreshTab(obj.type);
+          if (arr.some(item=> item.type == this.frameTabs[index].id)) {
+            this.$platform.refreshTab(this.frameTabs[index].id);
           }
         }
-      } catch (error) {}
+      } catch (error) {
+        console.warn(error, "error try catch");
+      }
     },
   },
   created() {
