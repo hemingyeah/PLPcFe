@@ -574,7 +574,7 @@ export default {
   },
   methods: {
     async resetPage () {
-      
+
 
       // 获取产品动态字段
       try {
@@ -1375,9 +1375,16 @@ body {
 
 // table
 
-.el-table{
-  border:none;
+.el-table {
+  border: none;
 }
+
+.el-table--small th,
+.el-table--small td {
+  height: 40px;
+  padding: 3px 0;
+}
+
 .product-list-container .product-table {
   padding: 10px;
 
@@ -1407,6 +1414,7 @@ body {
   td {
     color: #909399;
     font-size: 13px;
+    height: 40px;
   }
 
   .view-detail-btn {

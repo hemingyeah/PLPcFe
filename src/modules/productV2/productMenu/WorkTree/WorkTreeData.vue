@@ -43,12 +43,13 @@
                           placement="bottom">
                 <i class="iconfont icon-help color-999 mar-l-8 cur-point"></i>
               </el-tooltip>
-            </div>
 
-            <div class="pad-l-10 mar-b-12">
-              <div class="font-12 color-999 mar-b-10">
+              <div class="font-12 color-999 mar-l-8">
                 *被隐藏的字段，将不会出现在这个类型信息中（系统字段不可隐藏）
               </div>
+            </div>
+
+            <div class="mar-b-12">
               <el-checkbox-group v-model="fieldIds">
                 <template v-for="item in fields">
                   <el-checkbox v-if="item.isSystem != 1"
@@ -360,10 +361,10 @@ export default {
       const isLt2M = file.size / 1024 / 1024 < 2;
 
       if (!isJPG) {
-        this.$message.error("上传图片只能是 JPG/PNG 格式!");
+        this.$message.error("上传图片只能是 jpg/png 格式!");
       }
       if (!isLt2M) {
-        this.$message.error("上传图片大小不能超过 2MB!");
+        this.$message.error("上传图片大小不能超过 2mb!");
       }
       // this.fileList.push(file);
       return isJPG && isLt2M;
@@ -373,10 +374,10 @@ export default {
       const isLt50M = file.size / 1024 / 1024 < 50;
 
       if (!isMP4) {
-        this.$message.error("上传视频只能是 MP4 格式!");
+        this.$message.error("上传视频只能是 mp4 格式!");
       }
       if (!isLt50M) {
-        this.$message.error("上传视频大小不能超过 50MB!");
+        this.$message.error("上传视频大小不能超过 50mb!");
       }
       // this.fileList.push(file);
       return isMP4 && isLt50M;
