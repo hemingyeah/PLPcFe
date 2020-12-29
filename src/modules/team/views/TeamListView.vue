@@ -118,7 +118,7 @@
       action="/security/user/import/importWeChat">
       <div slot="tip">
         <div class="base-import-warn">
-          请先下载<a :href="`/security/user/import/weChatTemplate?tag=${serviceTelItemId}`">导入模版 </a>，填写完成后再上传导入。<br>
+          请先下载<a :href="`/security/user/import/weChatTemplate?tagId=${serviceTelItemId}`">导入模版 </a>，填写完成后再上传导入。<br>
           微信号仅用于客户联系服务人员；<br>
           如果微信号未填写，客户将无法获取服务人员微信号；<br>
           此数据为非必填项。<br>
