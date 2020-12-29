@@ -2,7 +2,7 @@
 import fieldMixin from '@src/mixins/fieldMixin';
 import FormDesignMixin from '@src/mixins/formDesign';
 /* api */
-import * as SettingTaskApi from "@src/api/SettingTaskApi";
+import * as SettingTaskApi from '@src/api/SettingTaskApi';
 /* util */
 import * as FormUtil from '@src/component/form/util';
 import { parse } from '@src/util/querystring'
@@ -22,7 +22,7 @@ export default {
       fields:[]
     }
   },
-   mounted(){
+  mounted(){
     let query = parse(window.location.search) || {};
     this.taskCardId = query.cardId;
 
@@ -34,17 +34,16 @@ export default {
     async initFieldsData() {
       try {
         // 获取表单字段列表
-        let fields = await SettingTaskApi.getAddCardFields({ cardId: this.taskCardId,isFromSetting: true });
+        let fields = await SettingTaskApi.getAddCardFields({ cardId: this.taskCardId, isFromSetting: true });
         let sortedFields = fields.sort((a, b) => a.orderId - b.orderId);
         
         this.fields = FormUtil.toFormField(sortedFields);
         this.loading = false;
       } catch (error) {
         this.loading = false;
-        console.log('task-card-fields-setting-view: mounted -> error', error)
       }
     },
-    //返回
+    // 返回
     back(){
       window.parent.frameHistoryBack(window)
     },
@@ -54,8 +53,8 @@ export default {
     async submit() {
       try {
         if(this.cardName !== this.cloneName ){
-          let res = await SettingTaskApi.updateTaskCardName({id: this.taskCardId,name: this.cardName});
-          if(res.status!==0){
+          let res = await SettingTaskApi.updateTaskCardName({id: this.taskCardId, name: this.cardName});
+          if(res.status !== 0){
             return this.$message.warning(res.message);
           }
         }
@@ -88,7 +87,7 @@ export default {
       this.pending = false;
     },
     
-    //获取组件名称
+    // 获取组件名称
     getTaskCardNameReq() {
       SettingTaskApi.getTaskCardName({id: this.taskCardId}).then(res=>{
         const { status, message, data } = res;
@@ -101,17 +100,14 @@ export default {
       })
     },
 
-    //更新组件名称
+    // 更新组件名称
     updateTaskCardName() {
-      SettingTaskApi.updateTaskCardName({id: this.taskCardId,name: this.cardName}).then(res=>{
+      SettingTaskApi.updateTaskCardName({id: this.taskCardId, name: this.cardName}).then(res=>{
         const { status, message, data } = res;
-        if(status == 0){
-        }else{
+        if(status != 0){
           this.$message.error(message);
         }
-      }).catch(error=>{
-        console.log(error)
-      })
+      }).catch(error=>({}))
     }
   }
 }

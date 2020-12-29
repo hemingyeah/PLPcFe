@@ -34,7 +34,7 @@
         <el-table-column prop="description" label="说明">
           <template slot-scope="scope">{{htmlUnEscape(scope.row.description)}}</template>
         </el-table-column> 
-         <el-table-column prop="checked" label="启用" width="100px">
+        <el-table-column prop="checked" label="启用" width="100px">
           <template slot-scope="scope">
             <el-checkbox v-model="scope.row.checked"></el-checkbox>
           </template>
@@ -44,7 +44,7 @@
 
       <!-- start从模版库中选择-->
       <div v-if="selectRadio == 'stock'">
-        <template-library :cardSysList="cardSysList" @saveImport="saveImport"></template-library>
+        <template-library :card-sys-list="cardSysList" @saveImport="saveImport"></template-library>
       </div>
       <!-- start 从模版库中选择-->
     </div>
@@ -56,15 +56,15 @@
 </template>
 <script>
 // api
-import * as SettingTaskApi from "@src/api/SettingTaskApi";
-import { uniqBy,cloneDeep } from 'lodash';
-//util
+import * as SettingTaskApi from '@src/api/SettingTaskApi';
+import { uniqBy, cloneDeep } from 'lodash';
+// util
 import { isShowCardWorkTime } from '@src/util/version.ts'
 // components
-import templateLibrary from "./templateLibrary";
+import templateLibrary from './templateLibrary';
 
 export default {
-  name: "creat-card-dialog",
+  name: 'creat-card-dialog',
   props: {
     taskCardList: {
       type: Array,
@@ -103,31 +103,31 @@ export default {
   },
   methods: {
     saveImport(cardSelected){
-      this.$emit('updateImport',cardSelected)
+      this.$emit('updateImport', cardSelected)
     },
     onClose() {
-      this.$emit("onClose");
+      this.$emit('onClose');
     },
     onSubmit() {
       if(this.selectRadio == 'exist'){
-        //新增组件
+        // 新增组件
         this.saveCardChecked();
       }else{
-        //关闭
+        // 关闭
         this.onClose();
       }
      
     },
     indexMethod(index) {
-      return index+1;
+      return index + 1;
     },
-    //获取已添加的组件库列表
+    // 获取已添加的组件库列表
     getEnabledListReq() {
       SettingTaskApi.getEnabledList()
         .then((res) => {
           const { status, message, data } = res;
           if(status == 0){
-            let cardLists =  data;
+            let cardLists = data;
             this.mergeSelect(cardLists)
           }
 
@@ -142,7 +142,7 @@ export default {
     * 存在相同数据 则checked为true 不同则checked为false
     */
     mergeSelect(cardLists) {
-        for(let i = 0;i < cardLists.length; i++){
+      for(let i = 0;i < cardLists.length; i++){
         let card = cardLists[i];
 
         let index = -1;
@@ -160,7 +160,7 @@ export default {
       this.tableCardData = cardLists;
 
     },
-    //创建附加组件
+    // 创建附加组件
     saveCardChecked() {
       let cardChecked = [];
       this.tableCardData.forEach(item=>{
@@ -169,14 +169,14 @@ export default {
           cardSelected.id = item.id;
           cardSelected.inputType = item.inputType;
           cardSelected.name = item.name;
-          cardSelected.specialfrom = item.specialfrom ? item.specialfrom :'';
+          cardSelected.specialfrom = item.specialfrom ? item.specialfrom : '';
           cardChecked.push(cardSelected)
         }
       });
-      this.$emit('update',cardChecked)
+      this.$emit('update', cardChecked)
     },
 
-    //修改附加组件
+    // 修改附加组件
     onUpdateCardReq() {
       const params = {
         description: this.form.description,
@@ -187,7 +187,7 @@ export default {
         .then((res) => {
           const { status, message, data } = res;
           if (status == 0) {
-            this.$message.success("修改成功");
+            this.$message.success('修改成功');
             location.reload();
           } else {
             this.$message.error(message);
@@ -198,7 +198,7 @@ export default {
         });
     },
 
-    //获取附加组件的信息
+    // 获取附加组件的信息
     getCardInfoReq() {
       SettingTaskApi.getCardInfo({ id: this.form.id })
         .then((res) => {
@@ -207,7 +207,7 @@ export default {
             this.form = data;
           }
         })
-        .catch((error) => {});
+        .catch((error) => ({}));
     },
     /** 
     * @description 获取组件库列表
@@ -217,54 +217,54 @@ export default {
       SettingTaskApi.getCardSysList().then(res=>{
         const { status, message, data } = res;
         if(status == 0){
-            var cardList = data || [];
+          let cardList = data || [];
           
-            if(!this.isShowCardWorkTime) {
-                cardList = cardList.filter(function(card) {
-                    return card.cardName !== '工时记录';
-                })
-            }
-            let cardSysList = [];
-            var cardAll = cardList.slice();
-            let wuliu = []
-            let zhiliang = []
-            let chanpin = []
-            let shichang = []
-            let kesu = []
-            let feiyong = []
-            let gongshi = []
-            if(cardAll&&cardAll.length>0){
-              cardAll.forEach((item=>{
-                if(item.cardName=='发货记录'||item.cardName=='退货登记'){
-                      item['type']='物流'
-                      wuliu.push(item)
-                  }else if(item.cardName=='产品故障记录'|| item.cardName=='质检登记'){
-                      item['type']='质量'
-                      zhiliang.push(item)
-                  }else if(item.cardName=='设备信息记录'|| item.cardName=='配置信息'){
-                      item['type']='产品'
-                      chanpin.push(item)
-                  }else if(item.cardName=='礼品邮寄'||item.cardName=='市场活动'||item.cardName=='访问调查'){
-                      item['type']='市场'
-                      shichang.push(item)
-                  }else if(item.cardName=='质量投诉'){
-                      item['type']='客诉'
-                      kesu.push(item)
-                  }else if(item.cardName=='费用备注'){
-                      item['type']='费用'
-                      feiyong.push(item)
-                  }else if(item.cardName=='工时记录'){
-                      item['type']='工时'
-                      gongshi.push(item)
-                  }
-              }))
-            }
-            cardSysList.push({name:'全部',list:cardAll},{name:'物流',list:wuliu},{name:'质量',list:zhiliang},{name:'产品',list:chanpin},{name:'市场',list:shichang},{name:'客诉',list:kesu},{name:'费用',list:feiyong},{name:'工时',list:gongshi})
-            if(!this.isShowCardWorkTime){
-              this.cardSysList = cardSysList.filter(item=>item.name !== '工时') 
-            }else{
-              this.cardSysList = cardSysList;
-            }        
+          if(!this.isShowCardWorkTime) {
+            cardList = cardList.filter(function(card) {
+              return card.cardName !== '工时记录';
+            })
+          }
+          let cardSysList = [];
+          let cardAll = cardList.slice();
+          let wuliu = []
+          let zhiliang = []
+          let chanpin = []
+          let shichang = []
+          let kesu = []
+          let feiyong = []
+          let gongshi = []
+          if(cardAll && cardAll.length > 0){
+            cardAll.forEach((item=>{
+              if(item.cardName == '发货记录' || item.cardName == '退货登记'){
+                item['type'] = '物流'
+                wuliu.push(item)
+              }else if(item.cardName == '产品故障记录' || item.cardName == '质检登记'){
+                item['type'] = '质量'
+                zhiliang.push(item)
+              }else if(item.cardName == '设备信息记录' || item.cardName == '配置信息'){
+                item['type'] = '产品'
+                chanpin.push(item)
+              }else if(item.cardName == '礼品邮寄' || item.cardName == '市场活动' || item.cardName == '访问调查'){
+                item['type'] = '市场'
+                shichang.push(item)
+              }else if(item.cardName == '质量投诉'){
+                item['type'] = '客诉'
+                kesu.push(item)
+              }else if(item.cardName == '费用备注'){
+                item['type'] = '费用'
+                feiyong.push(item)
+              }else if(item.cardName == '工时记录'){
+                item['type'] = '工时'
+                gongshi.push(item)
+              }
+            }))
+          }
+          cardSysList.push({name:'全部', list:cardAll}, {name:'物流', list:wuliu}, {name:'质量', list:zhiliang}, {name:'产品', list:chanpin}, {name:'市场', list:shichang}, {name:'客诉', list:kesu}, {name:'费用', list:feiyong}, {name:'工时', list:gongshi})
+          if(!this.isShowCardWorkTime){
+            this.cardSysList = cardSysList.filter(item=>item.name !== '工时') 
+          }else{
+            this.cardSysList = cardSysList;
+          }        
         }else{
           this.$message.error(message);
         }
@@ -274,7 +274,7 @@ export default {
     },
     htmlUnEscape(value){
       if(!value) return '';
-      return value.replace( /&lt;/g, "<").replace(/&gt;/g, ">");
+      return value.replace( /&lt;/g, '<').replace(/&gt;/g, '>');
     }
   },
   components: {

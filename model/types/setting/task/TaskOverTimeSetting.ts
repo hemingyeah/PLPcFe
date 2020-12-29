@@ -5,16 +5,16 @@ class TaskOverTimeSetting {
     overTimeState: String = '';
 
     /** 超时提醒时间前后设置 */
-    overTimeBeforeOrAfter: Number = 0;
+    isAhead: Number = 0;
 
     /** 超时提醒时间设置(分钟) */
-    overTime: Number = 0;
+    minutes: String = '';
 
     /** 超时提醒类型 */
-    overTimeTypeUser: Number = 0;
+    remindType: String = '';
 
     /** 提醒指定人员 */
-    overTimeUsers: Preson[] = [];
+    reminders: Preson[] = [];
     
     constructor(overTimeState?: string) {
         this.overTimeState = overTimeState || '';

@@ -15,21 +15,21 @@
         native-type="submit"
         :disabled="pending"
         @event="submit"
-        >保存</base-button
+      >保存</base-button
       >
     </div>
     <!-- end 头部 -->
 
     <!-- start 表单设计器 -->
     <div class="setting-task-design">
-      <form-design  v-model="fields" :mode="mode"></form-design>
+      <form-design v-model="fields" :mode="mode"></form-design>
     </div>
     <!-- end 表单设计器 -->
   </div>
 </template>
 
 <script>
-import TaskAddcardFormView from "./TaskAddcardFormView";
+import TaskAddcardFormView from './TaskAddcardFormView';
 export default TaskAddcardFormView;
 </script>
 

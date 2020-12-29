@@ -9,7 +9,7 @@
           icon="el-icon-plus"
           :loading="false"
           @click="addTaskCard"
-          >新建</el-button
+        >新建</el-button
         >
       </div>
       <p class="card-setting-msg">
@@ -42,12 +42,12 @@
           v-for="(item, idx) in taskCardList"
           :key="item.id"
           :index="idx"
-          :taskCard="taskCardList[idx]"
-          :taskTypeId="taskTypeId"
+          :task-card="taskCardList[idx]"
+          :task-type-id="taskTypeId"
           @deleteCard="deleteCard"
           @updateAttr="obj => {
             updateTaskCard(item, obj)
-          }">
+        }">
         </task-card-item>
       </draggable>
     </div>
@@ -64,7 +64,7 @@
     <creat-card-dialog
       :visiable.sync="isShowCreatCardModal"
       @onClose="onCloseCreatCard"
-      :taskCardList="taskCardList"
+      :task-card-list="taskCardList"
       @update="update"
       @updateImport="updateImport"
     ></creat-card-dialog>
@@ -75,22 +75,22 @@
 import draggable from 'vuedraggable';
 // utils
 import { parse } from '@src/util/querystring';
-/**  api */
+// api 
 import * as TaskApi from '@src/api/TaskApi.ts';
-import * as SettingTaskApi from "@src/api/SettingTaskApi";
-/** component */
+import * as SettingTaskApi from '@src/api/SettingTaskApi';
+// component 
 import TaskCardItem from '../components/TaskCardItem';
 import NoDataViewNew from '@src/component/common/NoDataViewNew';
 import CreatCardDialog from '../components/TaskCard/CreatCardDialog';
 import { cloneDeep } from 'lodash';
 
 export default {
-  name: "card-setting-panel",
+  name: 'card-setting-panel',
   data() {
     return {
       isShowCreatCardModal: false,
       loading: true,
-      taskTypeId: "",
+      taskTypeId: '',
       taskCardList: [],
       authInfo:[]
     };
@@ -99,7 +99,7 @@ export default {
     dragOptions() {
       return {
         animation: 380, 
-        ghostClass: "ghost"
+        ghostClass: 'ghost'
       };
     }
   },
@@ -111,11 +111,33 @@ export default {
 
   },
   methods: {
-    //提交数据
-    submit() {
+    // 保存数据
+    async submit() {
+      try {
+        const params = {
+          taskTypeId: this.taskTypeId,
+          cardInfo: this.taskCardList
+        }
+        let res = await SettingTaskApi.batchSaveTaskCard(params); 
+        if(res.status === 0) {
+          this.$notify.success('保存成功');
+          setTimeout(()=>{
+            this.$platform.openTab({
+              id: 'task_flow_setting',
+              title: '工单流程设置',
+              url: '/setting/taskType/manage',
+              reload: true,
+            });
+          }, 1000)
+        }else {
+          this.$notify.error(res.message);
+        }
+      } catch (error) {
+        console.error(error);
+      }
       this.saveCard();
     },
-    //新建附件组件
+    // 新建附件组件
     addTaskCard() {
       this.isShowCreatCardModal = true;
     },
@@ -123,8 +145,8 @@ export default {
       this.isShowCreatCardModal = false;
     },
     deleteCard(index) {
-      this.taskCardList.splice(index,1);
-      this.$message.success("删除成功")
+      this.taskCardList.splice(index, 1);
+      this.$message.success('删除成功')
     },
     updateTaskCard(cardList, updateObj) {
       for (const key in updateObj) {
@@ -133,7 +155,7 @@ export default {
         }
       }
     },
-    //获取角色列表
+    // 获取角色列表
     getRoleListReq() {
       SettingTaskApi.getRoleList({pageSize:0})
         .then((res) => {
@@ -155,86 +177,58 @@ export default {
           console.log(error);
         });
     },
-    //从已添加的组件库选择
+    // 从已添加的组件库选择
     update(newCard) {
       let list = [];
       const oldList = cloneDeep(this.taskCardList);
       const cardIdMap = new Map();
       newCard.forEach(item=>{
-        cardIdMap.set(item.id,item)
+        cardIdMap.set(item.id, item)
       })
-      oldList.forEach(item=>{ //保留原数据
-       if(cardIdMap.has(item.id)){
-         list.push(item);
-         cardIdMap.delete(item.id)
-       } else if(item.enabled===0){ //保存已禁用列表
-         list.push(item);
-       }
+      oldList.forEach(item=>{ // 保留原数据
+        if(cardIdMap.has(item.id)){
+          list.push(item);
+          cardIdMap.delete(item.id)
+        } else if(item.enabled === 0){ // 保存已禁用列表
+          list.push(item);
+        }
       });
       let newList = [...cardIdMap.values()];
-      newList = newList.map(item=>Object.assign(item,{notNullFlow: null,stateCanEdit: null,authInfo:this.authInfo}))
+      newList = newList.map(item=>Object.assign(item, {notNullFlow: null, stateCanEdit: null, authInfo:this.authInfo}))
       list.push(...newList);
       this.taskCardList = list;
       this.onCloseCreatCard();
     },
 
-    //从模版库中选择更新数据
+    // 从模版库中选择更新数据
     updateImport(newCard){
-      let newTaskCard = Object.assign(newCard,{notNullFlow: null,stateCanEdit: null,authInfo:this.authInfo});
+      let newTaskCard = Object.assign(newCard, {notNullFlow: null, stateCanEdit: null, authInfo:this.authInfo});
       this.taskCardList.push(newTaskCard);
       this.onCloseCreatCard();
     },
 
-    //工单类型附加组件排序 order重新排序
+    // 工单类型附加组件排序 order重新排序
     updateTaskCardOrder(data){
       this.taskCardList.forEach((item, idx) => {
-        item.order = idx +1;
+        item.order = idx + 1;
       })
-    },
-
-    //保存修改
-    saveCard() {
-       const params = {
-        taskTypeId: this.taskTypeId,
-        cardInfo: this.taskCardList
-      }
-      SettingTaskApi.batchSaveTaskCard(params).then(res=>{
-        const { status, message, result } = res;
-        if(status == 0){
-          this.$message.success('保存成功');
-          setTimeout(()=>{
-            this.$platform.openTab({
-              id: "task_flow_setting",
-              title: "工单流程设置",
-              url: `/setting/taskType/manage`,
-              reload: true,
-            });
-          },1000)
-
-        }else{
-          this.$message.error(message);
-        }
-      }).catch(error=>{
-        console.log(error)
-      })
-    },
-    
+    },   
     /**
      * 获取工单设置的除组件外的其他信息
      */
     async fetchTasktype() {
-        try {
-            const { status, message, data } = await TaskApi.getTaskType({ id: this.taskTypeId});
-            this.loading = false;
-            if( status == 0 ){
-              if(JSON.stringify(data.cardSetting) !=='{}' && data.cardSetting.cardInfo){
-                this.taskCardList = data.cardSetting.cardInfo;
-              }
-            }     
-        } catch (err) {
-            console.error('fetch Tasktype => err', err);
-            this.loading = false;
-        }
+      try {
+        const { status, message, data } = await TaskApi.getTaskType({ id: this.taskTypeId});
+        this.loading = false;
+        if( status == 0 ){
+          if(JSON.stringify(data.cardSetting) !== '{}' && data.cardSetting.cardInfo){
+            this.taskCardList = data.cardSetting.cardInfo;
+          }
+        }     
+      } catch (err) {
+        console.error('fetch Tasktype => err', err);
+        this.loading = false;
+      }
     },
   },
   components: {

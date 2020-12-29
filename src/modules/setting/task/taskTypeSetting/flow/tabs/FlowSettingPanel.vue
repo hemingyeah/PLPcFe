@@ -68,8 +68,38 @@ export default {
         clickFlow(type) {
             this.currFlow = type;
         },
-        submit() {
-            console.log('flow-setting submit');
+        /** 将数据转化成保存需要的数据结构 */
+        convertDataToParams() {
+            let taskTypeConfig = _.cloneDeep(this.taskFlowData.taskTypeConfig);
+            let {id,flowSetting, delayBack,delayBackMin,planRemindSetting,notice, noticeUsers, autoReviewState, taskOverTimeModels } = taskTypeConfig;
+            let params = {
+                typeId: id,
+                flowSetting,
+                delayBack,
+                delayBackMin,
+                state: planRemindSetting.state,
+                minutes: Number(planRemindSetting.state), // todo
+                planningTimeState: 'notice',
+                planningTimeMes: notice,
+                usersIds: noticeUsers.map(item => item.id).join(','),
+                taskOverTimeModels: taskOverTimeModels(item => {
+                    item.ids = item.reminders.join(',');
+                    return item;
+                }),
+                autoReviewState
+            };
+            console.log(JSON.stringify(params));
+            return params;
+        },
+        /** 保存流程设置 */
+        async submit() {
+            try {
+                let params = this.convertDataToParams();
+                console.log(params);
+                await SettingApi.saveProcess(params);
+            } catch (error) {
+                console.error('sumbit saveProcess => error', error);
+            }
         }
     },
     components: {

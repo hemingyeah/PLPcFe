@@ -177,6 +177,15 @@ export function flowSwitchTaskType(params) {
 }
 
 /**
+ * 流程设置保存
+ * 
+ * @param {string} params （yapi: http://30.40.61.216:3000/project/59/interface/api/14327）
+ */
+export function saveProcess(params) {
+  return http.post('/setting/saveProcess', params);
+}
+
+/**
  * 高级设置页保存
  * 
  * @param {string} params.templateId 工单类型id
@@ -187,6 +196,12 @@ export function advancedSetting(params) {
   return http.post('/setting/taskType/advancedSetting', params);
 }
 
+/**
+ * 获取工单类型设置列表 （包含最大可设置的工单数、所有团队列表）
+ */
+export function getTaskTypeManage(params) {
+  return http.get('/setting/taskType/getTaskTypeManage', params);
+}
 
 
 /******************** E 工单类型设置 ***************/

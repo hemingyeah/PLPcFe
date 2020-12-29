@@ -63,14 +63,14 @@
 </template>
 <script>
 // api
-import * as SettingTaskApi from "@src/api/SettingTaskApi";
+import * as SettingTaskApi from '@src/api/SettingTaskApi';
 import {flowState, flowRules, getFlowRuleOptions } from './useRules';
 export default {
-  name: "use-rules-dialog",
+  name: 'use-rules-dialog',
   props: {
     taskCard: {
       type: Object,
-      default: () => {}
+      default: () => ({})
     },
     taskTypeId:{
       type: String,
@@ -82,7 +82,7 @@ export default {
   data() {
     return {
       show: false,
-      flowRules:flowRules,
+      flowRules,
       form: {
         id: '',
         flow:'',
@@ -101,8 +101,8 @@ export default {
     visiable(newValue) {
       this.show = newValue;
       if(newValue){
-        this.form.flow = this.taskCard.notNullFlow ? this.taskCard.notNullFlow:'';
-        this.form.stateCanEdit = this.taskCard.stateCanEdit ? this.taskCard.stateCanEdit:[];
+        this.form.flow = this.taskCard.notNullFlow ? this.taskCard.notNullFlow : '';
+        this.form.stateCanEdit = this.taskCard.stateCanEdit ? this.taskCard.stateCanEdit : [];
         let option = getFlowRuleOptions(this.form.stateCanEdit);
         this.flowRules = option;
       }    
@@ -118,16 +118,16 @@ export default {
       this.$emit('onClose')   
     },
     onSubmit(form) {
-      //新增组件
+      // 新增组件
       this.saveRulesFlow();
     },
 
-    //创建附加组件
+    // 创建附加组件
     saveRulesFlow() {
-      this.$emit('update',this.form.flow,this.form.stateCanEdit)
+      this.$emit('update', this.form.flow, this.form.stateCanEdit)
     },
 
-    //修改附加组件
+    // 修改附加组件
     onUpdateCardReq() {
       const params = {
         description: this.form.description,
@@ -138,7 +138,7 @@ export default {
         .then((res) => {
           const { status, message, data } = res;
           if (status == 0) {
-            this.$message.success("修改成功");
+            this.$message.success('修改成功');
             location.reload();
           } else {
             this.$message.error(message);
@@ -149,7 +149,7 @@ export default {
         });
     },
 
-    //获取附加组件的信息
+    // 获取附加组件的信息
     getCardInfoReq() {
       SettingTaskApi.getCardInfo({ id: this.form.id })
         .then((res) => {
@@ -158,7 +158,7 @@ export default {
             this.form = data;
           }
         })
-        .catch((error) => {});
+        .catch((error) => ({}));
     },
   },
 };

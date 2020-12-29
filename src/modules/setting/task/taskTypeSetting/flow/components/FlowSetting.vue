@@ -85,7 +85,7 @@
                 <div v-if="showReview" class="setting-specific-auto-review">
                     <h2>
                         自动回访
-                        <el-switch v-model="flowSetting.autoReview"/>
+                        <el-switch v-model="taskTypeConfig.autoReviewState"/>
                     </h2>
                     <p>允许自动回访后，工单负责人完成工单后，系统自动向客户发送评价短信，获取客户评价信息</p>
                 </div>
@@ -95,11 +95,11 @@
                 <div v-if="showReview" class="setting-specific-msg-delay">
                     <h2>
                         自动回访短信延迟发送设置
-                        <el-switch v-model="flowSetting.delayBack"/>
+                        <el-switch v-model="taskTypeConfig.delayBack"/>
                     </h2>
                     <div>
                         工单负责人在完成工单后，自动回访短信延迟
-                        <el-input class="w-87" onkeyup="this.value=this.value.replace(/\D/g,'')" v-model="flowSetting.delayBackMin"></el-input>
+                        <el-input class="w-87" onkeyup="this.value=this.value.replace(/\D/g,'')" v-model="taskTypeConfig.delayBackMin"></el-input>
                         分钟后发出
                     </div>
                 </div>
@@ -174,7 +174,7 @@
                 <div class="setting-specific-form">
                     <h2>
                         允许工单负责人将工单状态设为暂停
-                        <el-switch v-model="taskTypeConfig.allowPause"/>
+                        <el-switch v-model="flowSetting.allowPause"/>
                     </h2>
                     <approve-setting :options="stableOptions" :approveSetting="taskTypeConfig.pauseApproveSetting" @change="(setting) => changeApproveSetting(setting, 'pause')"/>
                 </div>
