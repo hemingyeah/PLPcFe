@@ -89,7 +89,7 @@
 
     <!-- start 导入服务电话 -->
     <base-import
-      title="维护服务微信"
+      title="维护服务电话"
       ref="serviceTelModal"
       :is-import-now="isImportNow"
       @success="importServiceSuccess"
@@ -111,7 +111,7 @@
 
     <!-- start 导入服务微信 -->
     <base-import
-      title="维护服务电话"
+      title="维护服务微信"
       ref="serviceWxModal"
       :is-import-now="isImportNow"
       @success="importServiceSuccess"
