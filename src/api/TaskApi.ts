@@ -104,6 +104,15 @@ export function getAllFields(params: {} | undefined) {
 }
 
 /**
+ * @description 获取工单表单公共字段列表
+ * @param {Object} params-- params
+ * @param {String} params.tableName -- task:工单表单字段 task_receipt:工单回执表单字段
+ */
+export function getCommonFieldList(params: {} | undefined) {
+  return http.get(`${fixedPrefixTaskPath}/outside/pc/task/getCommonFieldList`, params);
+}
+
+/**
  * @description 查询客户产品关联字段
  * @param {Object} params -- 参数对象
  * @param {String} params.module -- 模块 customer/product
@@ -1021,6 +1030,19 @@ export function editTask(params: TaskCreateAndEditModel) {
 export function getRelatedInfo(params: {} | undefined) {
   return http.get(
     `${fixedPrefixTaskPath}/outside/pc/task/getRelatedInfo`,
+    params
+  );
+}
+
+/**
+ * @description 查询关联显示项数据
+ * @param {Object} params 参数对象
+ * @param {String} params.customerId 客户id
+ * @param {Array} params.productIds 产品id数组
+ */
+export function getRelatedInfos(params: {} | undefined) {
+  return http.post(
+    `${fixedPrefixTaskPath}/outside/pc/task/getRelatedInfos`,
     params
   );
 }

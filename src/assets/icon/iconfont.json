@@ -6,6 +6,13 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "19035006",
+      "name": "菜单-产品",
+      "font_class": "caidan-chanpin1",
+      "unicode": "e75b",
+      "unicode_decimal": 59227
+    },
+    {
       "icon_id": "18966993",
       "name": "warning-circle-fill",
       "font_class": "warning-circle-fill",
@@ -172,6 +179,13 @@
       "font_class": "fdn-serviceIterm",
       "unicode": "ec44",
       "unicode_decimal": 60484
+    },
+    {
+      "icon_id": "19114627",
+      "name": "签名",
+      "font_class": "fdn-autograph",
+      "unicode": "ec45",
+      "unicode_decimal": 60485
     },
     {
       "icon_id": "18722807",

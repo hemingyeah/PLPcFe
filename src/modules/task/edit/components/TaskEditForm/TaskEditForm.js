@@ -215,7 +215,7 @@ export default {
 
       let loading = this.$loading();
       try {
-        this.taskFields = await this.fetchTaskTemplateFields({ typeId: templateId, tableName: 'task', isFromSetting: false });
+        this.taskFields = await this.fetchTaskTemplateFields({ typeId: templateId, tableName: 'task', isFromSetting: true });
         this.taskValue = FormUtil.initialize(this.taskFields, {});
 
         // 表单初始化
@@ -519,11 +519,16 @@ export default {
     async relationFieldSelectHandler(type = TaskFieldNameMappingEnum.Customer) {
       let relationFields = this.relationFieldsFilter(type)
       if (relationFields.length <= 0) return
+
+      let productIds = [];
+      if (Array.isArray(this.value.product) && this.value.product.length) {
+        productIds = this.value.product.map(product => product.value);
+      }
       
       try {
         let params = {
           customerId: this.selectedCustomer?.value || '',
-          productId: this.selectProduct?.value || ''
+          productIds
         }
         let res = await this.fetchRelatedInfo(params);
         let isSuccess = res.success;

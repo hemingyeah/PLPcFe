@@ -7,6 +7,7 @@ import * as CustomerApi from '@src/api/CustomerApi';
 import * as ProductApi from '@src/api/ProductApi';
 /* util */
 import * as FormUtil from '@src/component/form/util';
+import _ from 'lodash';
 /* components */
 import RelationOptionsModal from './components/RelationOptionsModal/RelationOptionsModal.tsx';
 
@@ -42,6 +43,7 @@ export default {
       pending: false,
       visble: false,
       fields: [], // 表单字段
+      commonFields: [], // 公共字段
       relationField: {}, // 关联项字段
       relationOptions: { // 关联查询字段关联项数据
         customerFields: [],
@@ -60,36 +62,42 @@ export default {
     }
   },
   methods: {
+    initialize() {
+      this.pending = true;
+
+      Promise.all([
+        TaskApi.getAllFields({ tableName: this.mode, typeId: this.templateId, isFromSetting: true }),
+        TaskApi.getCommonFieldList({ tableName: this.mode })
+      ])
+        .then(res => {
+          this.fields = this.toFormField(res[0] || []);
+          this.commonFields = res[1].result || [];
+
+          this.init = true;
+        })
+        .finally(() => {
+          this.pending = false;
+        })
+        .catch(e => console.log('initialize', e));     
+    },
     // 打开表单设置弹窗
     open() {
       this.init = false;
       this.visble = true;
-      this.initData();
+      this.initialize();
     },
-    // 初始化表单字段
-    async initData() {
-      try {
-        this.pending = true;
-
-        // 获取表单字段列表
-        let fields = await TaskApi.getAllFields({ tableName: this.mode, typeId: this.templateId, isFromSetting: true });
-        let sortedFields = fields.sort((a, b) => a.orderId - b.orderId);
+    // 将后端字段转换成设计器可接受的字段
+    toFormField(fields = []) {
+      let sortedFields = fields.sort((a, b) => a.orderId - b.orderId);
   
-        // 工单自带的 attachment 字段需要特殊处理, 提交时需要将formType还原
-        sortedFields.forEach(f => {
-          if(f.formType == 'attachment' && f.isSystem == 1) {
-            f.formType = 'taskAttachment'
-          }
-        })
-        
-        this.fields = FormUtil.toFormField(sortedFields);
-        this.init = true;
-  
-      } catch (error) {
-        console.log('task-form-setting-view: initData -> error', error);
-      }
-
-      this.pending = false;
+      // 工单自带的 attachment 字段需要特殊处理, 提交时需要将formType还原
+      sortedFields.forEach(f => {
+        if(f.formType == 'attachment' && f.isSystem == 1) {
+          f.formType = 'taskAttachment'
+        }
+      })
+      
+      return FormUtil.toFormField(sortedFields);
     },
     // 将字段转换成后端可接收的字段
     packToField(origin) {
@@ -107,9 +115,10 @@ export default {
         }
 
         // 是否升级为公共字段
-        field.isUpgrade = field.isPublic > field.isCommon ? 1: 0;
-        // 是否是拖拽进来的公共字段
-        field.isDragCommon = 0; // TODO:暂时写死
+        field.isUpgrade = field.isPublic > field.isCommon ? 1 : 0;
+
+        // 新拖进来的公共字段，去掉id保存
+        if(field.isDragCommon == 1) field.fieldId = field.id = null;
       })
 
       return fields;
@@ -164,6 +173,10 @@ export default {
           // 更新字段的公共字段属性
           field.isCommon = field.isPublic = 0;
 
+          // 公共字段库删除该字段
+          let index = this.commonFields.findIndex(item => item.fieldName == field.fieldName);
+          this.commonFields.splice(index, 1);
+
           this.$platform.notification({
             title: '取消成功',
             type: 'success'
@@ -172,10 +185,10 @@ export default {
           this.$platform.alert(res.message);
         }
       })
-      .finally(() => {
-        this.pending = false;
-      })
-      .catch(err => console.warn(err));
+        .finally(() => {
+          this.pending = false;
+        })
+        .catch(err => console.warn(err));
     },
     // 修改公共字段配置
     updatePublicFieldSetting(field) {
@@ -184,7 +197,11 @@ export default {
       TaskApi.updateCommonField(fields[0]).then(res => {
         if (res.success) {
           // 关闭修改控件配置弹窗
-          this.$refs.formDesign.fieldSettingModal = false;
+          this.$refs.formDesign.fieldSettingModal.visible = false;
+
+          // 更新公共字段库该字段
+          let index = this.commonFields.findIndex(item => item.fieldName == field.fieldName);
+          this.$set(this.commonFields, index, {...field});
 
           this.$platform.notification({
             title: '修改成功',
@@ -194,7 +211,10 @@ export default {
           this.$platform.alert(res.message);
         }
       })
-      .catch(err => console.warn(err));
+        .finally(() => {
+          this.$refs.formDesign.fieldSettingModal.pending = false;
+        })
+        .catch(err => console.warn(err));
     },
     /** 
     * @description 获取客户关联查询字段关联项数据
@@ -302,10 +322,11 @@ export default {
 
         // 删除setting多余字段
         delete setting.displayName;
+        field.setting = setting;
 
         // 加延时异步是因为form-design的insertField方法更新value异步会导致选择多个关联项时只能插入一个
         setTimeout(() => {
-          this.$refs.formDesign.immediateInsert(field, null, setting);
+          this.$refs.formDesign.immediateInsert(field);
         }, 0)
       }
     }

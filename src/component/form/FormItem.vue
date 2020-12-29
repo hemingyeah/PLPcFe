@@ -186,6 +186,7 @@ export default {
       line-height: 24px;
       margin: 0;
       flex-shrink: 0;
+      word-break: break-all;
     }
 
     input::-webkit-input-placeholder, textarea::-webkit-input-placeholder {

@@ -40,6 +40,15 @@ html, body {
 
     .base-modal-body {
       overflow-y: hidden;
+      display: flex;
+
+      .task-form-design {
+        flex: 1;
+
+        .form-design-setting {
+          width: 330px;
+        }
+      }
     }
   }
 }
