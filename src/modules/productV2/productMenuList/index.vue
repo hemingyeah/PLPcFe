@@ -850,9 +850,9 @@ export default {
           title: "删除成功",
           type: "success",
         });
-        window.parent.flashSomePage({
+        window.parent.flashSomePage([{
           type: "productV2_catalog_edit",
-        });
+        }]);
         this.multipleSelection = [];
         this.search();
       } catch (e) {
@@ -1238,9 +1238,9 @@ export default {
       this.$previewImg(url);
     },
     baseImportSuccess () {
-      window.parent.flashSomePage({
+      window.parent.flashSomePage([{
         type: "productV2_catalog_edit",
-      });
+      }]);
     },
     previewVideo (e) {
       this.$previewVideo(e);

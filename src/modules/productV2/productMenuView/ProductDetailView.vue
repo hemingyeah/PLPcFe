@@ -5,12 +5,13 @@
     <div class="task-detail-header">
       <div class="header-btns">
         <div class="flex-x box-12-t-b">
+          <div class="is-delete" v-if="dataInfo.isDelete">已删除</div>
           <div class="flex-1 flex-x">
             <div class="product-name">
               {{(dataInfo.pathName && dataInfo.pathName.replace(new RegExp("/","g") ,' / ')) || ''}}
             </div>
           </div>
-          <div class="flex-x">
+          <div class="flex-x" v-if="!dataInfo.isDelete">
             <div class="mar-l-28 flex-x cur-point" @click="dleteData">
               <i class="iconfont icon-shanchu1"></i>删除
             </div>
@@ -370,5 +371,14 @@ export default ProductDetailView;
       }
     }
   }
+}
+</style>
+<style lang="scss" scoped>
+.is-delete{
+  background: $color-danger;
+  color: #fff;
+  padding: 3px 8px;
+  border-radius: 4px;
+  margin-right: 8px;
 }
 </style>

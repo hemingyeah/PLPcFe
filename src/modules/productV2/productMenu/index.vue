@@ -205,9 +205,9 @@ export default {
                 message: "复制成功",
                 type: "success",
               });
-              window.parent.flashSomePage({
+              window.parent.flashSomePage([{
                 type: "M_PRODUCT_CATALOG",
-              });
+              }]);
 
               this.$refs.workTreeData.reflashPage(e.nowChooseArr[0]);
               this.changeVisibleProp(false);
@@ -437,9 +437,9 @@ export default {
           if (res.code == 0) {
             this.changeVisibleProp(false);
             this.$refs.workTreeData.reflashTable(type);
-            window.parent.flashSomePage({
+            window.parent.flashSomePage([{
               type: "M_PRODUCT_CATALOG",
-            });
+            }]);
           } else {
             this.$notify.error({
               title: "网络错误",
