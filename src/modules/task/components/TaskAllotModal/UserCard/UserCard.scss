@@ -4,8 +4,6 @@
   padding: 30px 20px 0px 20px;
   position: relative;
   overflow-y: auto;
-  display: flex;
-  flex-flow: column;
 }
 
 .user-card-close {
@@ -22,6 +20,7 @@
 .user-card-header {
   display: flex;
   padding: 0 12px 12px 0;
+  min-height: 106px;
   &-head {
     display: flex;
     align-items: flex-start;
@@ -93,6 +92,10 @@
       flex: 1;
     }
   }
+}
+
+.user-card-time {
+  height: 40px;
 }
 
 .user-card-time,

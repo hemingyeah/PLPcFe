@@ -482,7 +482,8 @@ export default class UserCard extends Vue {
     this.$nextTick(() => {
       let elHeight: number = this.$el?.clientHeight
       let teamLength: number = this.userCardInfo.department.join('').length
-      let otherEl: number = 220 - (teamLength > 25 ? 20 : 0)
+      let isHaveLabel: boolean = Boolean(this.userCardInfo.isManager || this.userCardInfo.isDistance || this.userCardInfo.isPrecent)
+      let otherEl: number = 216 - (teamLength > 25 ? 20 : 0) + (isHaveLabel ? 24 : 0)
       this.userDetailMinHeight = !elHeight ? 200 : elHeight - otherEl
     })
   }

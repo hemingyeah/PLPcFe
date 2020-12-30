@@ -19,6 +19,13 @@ import { uuid } from '@src/util/string'
 /* vue */
 import { VNode } from 'vue/types/vnode'
 
+/* 工单指派 标签提示数据对象 */
+const TaskAllotLabelTooltipMap: { [x: string]: string } = {
+  [AllotSortedEnum.Distance]: '按员工到客户地址直线距离由近到远排序',
+  [AllotSortedEnum.AcceptTaskByTodaySearch]: '按员工接单数量从少到多排序',
+  [AllotSortedEnum.TaskDegreePercentByMonth]: '按30天内员工好评率从高到低排序'
+}
+
 class TaskAllotExecutorRender extends TaskAllotExecutorMethods {
   
   /** 
@@ -289,9 +296,11 @@ class TaskAllotExecutorRender extends TaskAllotExecutorMethods {
               this.selectSortord === sortLabel.value ? 'task-allot-user-table-sort-label-active' : ''
             ]
             return (
-              <div class={classNames} onClick={() => this.handlerSortLabelChange(sortLabel.value as AllotSortedEnum)}>
-                { sortLabel.label }
-              </div>
+              <el-tooltip content={ TaskAllotLabelTooltipMap[sortLabel.value] } placement='top'>
+                <div class={classNames} onClick={() => this.handlerSortLabelChange(sortLabel.value as AllotSortedEnum)}>
+                  { sortLabel.label }
+                </div>
+              </el-tooltip>
             )
           })
         }
