@@ -146,16 +146,16 @@ export default {
   watch:{
     showList(newV, oldV){
       if(newV == true){
-        timeInterval = setInterval(()=>{
+        timeInterval = setTimeout(()=>{
           this.selectCon = this.$refs['normalInput'].getBoundingClientRect();
         }, 100)
       }else{
-        clearInterval(timeInterval)
+        clearTimeout(timeInterval)
       }
     }
   },
   beforeDestroy(){
-    clearInterval(timeInterval)
+    clearTimeout(timeInterval)
   },
   computed: {
     optionList() {
