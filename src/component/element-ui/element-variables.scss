@@ -116,3 +116,12 @@ $--select-border-color-hover: $input-border-hover-color !default;
     color: $text-color-gray;
   }
 }
+.el-radio-button {
+  user-select: none;
+}
+.el-radio-button.is-active {
+  box-shadow: none !important;
+}
+.el-select-dropdown {
+  z-index: 100000 !important;
+}

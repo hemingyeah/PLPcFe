@@ -1,5 +1,5 @@
 /* components */
-import ContactUserItem from '@src/component/common/BaseContact/ContactUserItem.vue';
+import ContactUserItem from '@src/component/common/BaseContact/ContactUserItem.vue'
 /* enum */
 import ComponentNameEnum from '@model/enum/ComponentNameEnum'
 /* scss */
@@ -24,36 +24,17 @@ const TableColumnDefaultWidth = '120px'
 })
 export default class TaskAllotUserTable extends TaskAllotUserTableRender {
   
-  mounted() {
-    // 构建列
-    this.buildColumns()
-    // 还原排序方式
-    this.revertSort()
-    // 绑定事件
-    this.$nextTick(() => {
-      this.bindTableScrollEvent()
-    })
-  }
-  
   render(h: CreateElement) {
     return (
-      <div class='task-allot-user-table'>
-        <div class='task-allot-user-filter'>
-          {this.isAllotByTag && this.renderTeamSelect()}
-          {this.isAllotByTag && this.renderChooseUserByTeam()}
-          {!this.isAllotByTag && this.renderChooseUserByDept()}
-          {this.renderLocationSelect()}
-          {this.renderWorkStateSelect()}
-          {this.renderSortordSelect()}
-          {this.renderSelectColumn()}
-        </div>
+      <div class={ComponentNameEnum.TaskAllotUserTable}>
         <div class='task-allot-user-table-block'>
           <el-table
             border
-            data={this.userPage.list}
+            data={this.taskAllotUserList}
+            height={this.tableHeight}
             header-row-class-name='base-table-header-v3'
             row-class-name='base-table-row-v3'
-            ref='TaskAllotUserTable'
+            ref='TaskAllotUserElTableComponent'
             key={this.tableKey}
             rowKey={uuid()}
             onHeader-dragend={(newWidth: number, oldWidth: number, column: any) => this.handlerHeaderDragend(newWidth, oldWidth, column)}
@@ -62,7 +43,7 @@ export default class TaskAllotUserTable extends TaskAllotUserTableRender {
             scopedSlots={{ append: () => this.renderTableAppendSlot() }}
           >
             {
-              this.columns.filter((column: Column) => column.show).map((column: Column) => {
+              this.columns && this.columns.filter((column: Column) => column.show).map((column: Column) => {
                 return (
                   <el-table-column
                     fixed={column.fixed}
@@ -72,6 +53,7 @@ export default class TaskAllotUserTable extends TaskAllotUserTableRender {
                     prop={column.field}
                     resizable={true}
                     sortable={column.sortable}
+                    showOverFlowTooltip={true}
                   >
                     { (scope: any) => this.renderTableColumnField(scope, column) }
                   </el-table-column>
@@ -82,7 +64,6 @@ export default class TaskAllotUserTable extends TaskAllotUserTableRender {
             <div slot='append'></div>
           </el-table>
         </div>
-        <base-table-advanced-setting onSave={(value: any) => this.saveTaskAllotTableColumn(value)} ref='BaseTableAdvancedSettingComponent' />
       </div>
     )
   }

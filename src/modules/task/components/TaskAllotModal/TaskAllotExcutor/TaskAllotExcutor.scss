@@ -1,9 +1,8 @@
 /* start 地图 */
 .task-allot-map {
   display: flex;
-  #MapContainer {
+  #TaskAllotUserMapContainer {
     height: 100%;
-    // width: calc(100% - 450px);
     flex: 1;
     .staff-header {
       border-radius: 50%;
@@ -35,7 +34,7 @@
 
 // 客户信息
 .map-info-window-content {
-  width: 260px;
+  width: 300px !important;
   padding: 12px 12px 8px;
   margin-bottom: 10px;
   position: relative;
@@ -77,3 +76,137 @@
   }
 }
 /* end 客户地址地图 */
+
+/* start new */
+.task-allot-executor-header {
+  display: flex;
+  justify-content: space-between;
+  height: 48px;
+  padding: 0 16px 16px;
+  &-row {
+    display: flex;
+    flex: 1;
+    margin-right: 24px;
+    &-label {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      min-width: 70px;
+    }
+    &:last-child {
+      margin-right: 0;
+    }
+    .task-allot-sysnergy-select {
+      cursor: pointer;
+      flex: 1;
+      .ui-input-block {
+        width: 100%;
+        .el-tag {
+          margin-right: 8px;
+        }
+      }
+    }
+  }
+  .task-allot-table-user {
+    width: 100%;
+    .ui-input-block {
+      height: 32px;
+      width: 100%;
+    }
+  }
+}
+
+.task-allot-executor-chunk {
+  background-color: $bg-color-l3;
+  height: 13px;
+  width: 100%;
+}
+
+.task-allot-excutor {
+  .biz-team-select-block {
+    .biz-team-select {
+      height: 32px;
+    }
+  }
+}
+
+.task-allot-user-table-header {
+  display: flex;
+  justify-content: space-between;
+  padding: 16px;
+  &-label,
+  &-select-block {
+    display: flex;
+    align-items: center;
+    & > div {
+      margin-left: 8px;
+      max-width: 120px;
+    }
+    .el-tag {
+      max-width: 45px;
+      @include text-ellipsis();
+    }
+  }
+  .task-allot-user-table-sort-label {
+    background-color: $bg-color-l3;
+    border-radius: 12px;
+    cursor: pointer;
+    display: inline-block;
+    font-size: $font-size-small;
+    margin: 0 12px 0 0 !important;
+    padding: 3px 12px;
+    transition: all 0.25s ease;
+    user-select: none;
+    &-active {
+      background-color: $color-primary;
+      color: #fff;
+    }
+  }
+  .task-allot-no-address {
+    color: $text-color-regular;
+    i {
+      margin-right: 3px;
+    }
+  }
+}
+.task-allot-synergy-top {
+  position: absolute;
+  top: 60px;
+  left: 500px;
+}
+.task-allot-model-body-header-synergy {
+  flex: 1;
+  padding-left: 24px;
+  .task-allot-executor-header-row {
+    display: flex;
+    justify-content: flex-start;
+    max-width: 300px;
+  }
+}
+.task-allot-modal-result-button {
+  padding-left: 24px;
+}
+.task-allot-user-table-location-select-other {
+  height: 80px;
+  .el-input {
+    width: 90px;
+    margin: 0 10px;
+  }
+  .el-checkbox {
+    margin-left: 10px;
+  }
+  .el-checkbox__inner {
+    height: 20px;
+    width: 20px;
+    &::after {
+      height: 12px;
+      left: 6px;
+      top: 0;
+      width: 7px;
+    }
+  }
+  .location-confirm-button {
+    margin-left: 20px;
+  }
+}
+/* end new */

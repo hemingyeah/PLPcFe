@@ -39,7 +39,8 @@ import {
   getTaskPoolSubscriptionUsersResult,
   getCustomerTagTaskPoolCountResult,
   getTaskAllotTaskPollApproveResult,
-  getTaskTypeResult
+  getTaskTypeResult,
+  getTaskTypesResult
 } from '@model/param/out/Task'
 
 import GrayUtil from '@src/util/gray'
@@ -1305,6 +1306,13 @@ export function getCustomerTagTaskPoolCount(params: CustomerTahTaskPoolCountGetM
  */
 export function getTaskPoolList(params: TaskPoolSearchModel): Promise<getTaskSearchListResult> {
   return http.post(`${ElASTICSEARCH}/outside/es/task/taskPool`, params)
+}
+
+/**
+ * @description 查询所有工单类型
+ */
+export function getTaskTypesMap(): Promise<getTaskTypesResult> {
+  return http.get('/api/task/outside/task/list/taskTypeMap')
 }
 
 

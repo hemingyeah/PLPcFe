@@ -2,9 +2,6 @@ import './BizSelectColumn.scss'
 
 import BizSelectColumnSort from './BizSelectColumnSort'
 
-// import guideCompoment from '@src/component/guide/guide';
-
-
 const { TASK_GUIDE_SELECT_COLUMN } = require('@src/component/guide/taskV2Store');
 
 import _ from 'lodash'

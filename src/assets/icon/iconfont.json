@@ -6,6 +6,13 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "19035006",
+      "name": "菜单-产品",
+      "font_class": "caidan-chanpin1",
+      "unicode": "e75b",
+      "unicode_decimal": 59227
+    },
+    {
       "icon_id": "18966993",
       "name": "warning-circle-fill",
       "font_class": "warning-circle-fill",

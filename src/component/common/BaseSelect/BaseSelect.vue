@@ -33,7 +33,7 @@
         v-else
         :class="{'error': error, 'wrapper-is-focus': isFocus, 'clearable-layout': clearable,}"
       >
-        <slot name="label" :value="value" v-if="labelSlot"> </slot>
+        <slot name="label" :value="value" v-if="labelSlot"></slot>
         <template v-else>
           {{ value.map(tag => tag.label).join('') }}
         </template>
@@ -69,8 +69,6 @@
 <script>
 import Clickoutside from '@src/util/clickoutside';
 import Page from '@model/Page';
-/* util */
-import { uuid } from '@src/util/string'
 
 /**
  * Todo
@@ -463,6 +461,9 @@ export default {
   }
 }
 .base-select-main-content {
-
+  &:hover {
+    border-color: $color-primary;
+    cursor: pointer;
+  }
 }
 </style>

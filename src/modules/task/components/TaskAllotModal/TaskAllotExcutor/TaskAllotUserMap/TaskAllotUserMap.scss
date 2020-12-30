@@ -1,0 +1,24 @@
+.task-allot-user-map {
+  height: calc(100% - 120px);
+  position: relative;
+}
+#TaskAllotUserMapContainer {
+  height: 100%;
+  width: 100%;
+  .task-plantime-dialog {
+    .base-modal-body {
+      padding: 20px;
+    }
+  }
+}
+.task-allot-user-content {
+  .base-panel {
+    box-shadow: -4px 1px 6px 0px rgba(0, 0, 0, 0.12);
+    position: absolute;
+    top: 0px;
+    bottom: 0px;
+}
+  .base-panel-title {
+    display: none;
+  }
+}

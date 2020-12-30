@@ -329,10 +329,13 @@
     <!-- start 分配弹窗 -->
     <task-allot-modal 
       v-if="allowRedeployTask || allowAllotTask" 
-      ref="TaskAllotModal" 
+      ref="TaskAllotModal"
+      :fields="fields"
       :task="task" 
       :login-user="initData.loginUser"
       :is-re-allot="allowRedeployTask"
+      @updateTask="outsideUpdateTask"
+      @updateRecords="outsideUpdateRecords"
     />
     <!-- end 分配弹窗 -->
     

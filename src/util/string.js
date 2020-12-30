@@ -12,3 +12,7 @@ export function uuid() {
   let uuid = s.join('');
   return uuid;
 }
+
+export default {
+  uuid
+}
