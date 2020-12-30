@@ -77,6 +77,7 @@
 <script>
 // api
 import * as TaskApi from "@src/api/TaskApi.ts";
+import * as SettingApi from "@src/api/SettingApi";
 // model
 import TaskConfig from "@model/types/setting/task/TaskConfig";
 import TaskApprover from '@model/types/setting/task/TaskApprover';
@@ -282,6 +283,8 @@ export default {
         // 转化获取到的结果
         this.taskTypeConfig = this.convertTaskTypeConfig(Object.assign(this.taskTypeConfig, res.data));
 
+        // 传递给FlowSetting组件工单类型名称
+        this.$eventBus.$emit('setting_task_type_name', this.taskTypeConfig.name);
         // 判断是否有设置服务报告模板
         if (JSON.stringify(res.data.reportSetting) == "{}") {
           let reportSetting = {
@@ -307,6 +310,19 @@ export default {
         console.error("fetch Tasktype => err", err);
       }
     },
+    /** 更新工单类型颜色和名称 */
+    async updateTaskTypeNameAndColor() {
+      try {
+        let params =  {
+          id: this.taskTypeId,
+          name: this.taskTypeConfig.name,
+          color: this.taskTypeConfig.config.color
+        }
+        await SettingApi.updateTaskTypeNameAndColor(params);
+      } catch (error) {
+        console.error(error);
+      }
+    },
     /** 右上角保存按钮 */
     async submit() {
       if (!this.$refs.comp.submit) return;
@@ -314,6 +330,7 @@ export default {
       this.pending = true;
         try {
           await this.$refs.comp.submit();
+          await this.updateTaskTypeNameAndColor();
         } catch (error) {
           console.error(error);
         }finally {
