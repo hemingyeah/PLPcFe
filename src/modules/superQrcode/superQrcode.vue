@@ -430,6 +430,13 @@ export default {
       let res=await queryRelParts(params);
       if(res.code==='200'){
         this.partList=res.data.list;
+        if(Array.isArray(this.partList)){
+          this.partList.forEach(item=>{
+            if(item.imageList){
+              item.imageList=JSON.parse(item.imageList);
+            }
+          });
+        }
       }else{
         this.$notify.error({
           title: "网络错误",
