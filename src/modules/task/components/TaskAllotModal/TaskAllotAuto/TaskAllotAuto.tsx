@@ -235,7 +235,7 @@ export default class TaskAllotAuto extends Vue {
         <div>
           提交后，系统会按分配规则重新匹配，可能会出现与预估的负责人不一致的情况。您可以
           <el-checkbox value={this.isUsedResult} onInput={(value: boolean) => { this.emitUsedChange(value); }}>
-            使用预估匹配结果
+            勾选可使用预估匹配结果
           </el-checkbox>
         </div>
       </div>
