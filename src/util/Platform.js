@@ -178,7 +178,7 @@ function isDingDingDesktop() {
 */
 function isDingDingWeb() {
   let location = window.location
-  return location.hostname.endsWith('shb.ltd')
+  return location.hostname.endsWith('app.shb.ltd')
 }
 
 /** 
