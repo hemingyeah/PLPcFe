@@ -203,8 +203,8 @@
             <div v-if="!settingInfo.productVideo && settingInfo.videoOpenState" @click="changeType('video')" class="round-panel middle-panel no-video" :class="nowOption === 'video' ? 'choose-border' : ''">
               暂无视频
             </div>
-            <div v-if="settingInfo.partOpenState" @click="changeType('part')" class="bottom-panel round-panel" :class="nowOption === 'part' ? 'choose-border' : ''">
-              <div class="title part-title">
+            <div id="part" v-if="settingInfo.partOpenState" @click="changeType('part')" class="bottom-panel round-panel" :class="nowOption === 'part' ? 'choose-border' : ''">
+              <div class="title">
                 <span>关联备件</span>
                 <a href="javascript:;">更多 ></a>
               </div>
@@ -214,7 +214,7 @@
                 <div class="part-name">{{item.name}}</div>
               </div>
             </div>
-            <div v-if="settingInfo.knowledgeOpenState" @click="changeType('knowledge')" class="bottom-panel round-panel" :class="nowOption === 'knowledge' ? 'choose-border' : ''">
+            <div id="knowledge" v-if="settingInfo.knowledgeOpenState" @click="changeType('knowledge')" class="bottom-panel round-panel" :class="nowOption === 'knowledge' ? 'choose-border' : ''">
               <div class="title">
                 <span>知识库</span>
                 <a href="javascript:;">更多 ></a>
@@ -495,22 +495,6 @@ export default {
         });
       }
     },
-    // 查询自助门户快捷入口
-    async queryQuickInfo(){
-      const params={
-        tenantId:this.tenantId
-      }
-      let res=await queryQuickInfo(params);
-      if(res.code==='200'){
-        this.quickInfos=res.data.quickInfos;
-      }else{
-        this.$notify.error({
-          title: "网络错误",
-          message:res.msg,
-          duration: 2000,
-        });
-      }
-    },
     // 查询全部规则
     async querySettingRules(){
       const params={
@@ -588,11 +572,8 @@ export default {
       this.settingInfo.companyImages=list;
     },
     // 删除图片
-    async delPic(index){
-      const confirm = await this.$platform.confirm('确认删除？');
-      if(!confirm) return
-      
-      this.settingInfo.companyImages.splice(index,1);
+    delPic(index){
+      // this.settingInfo.companyImages.splice(index,1);
     },
     // 获取目录
     async getCatalogList(){
@@ -626,7 +607,7 @@ export default {
             this.stopRecursion=true;
             this.catalogId=this.fakeCataId;
             this.currentCatalog=this.catalogId[this.catalogId.length-1];
-            return this.syncCatalogInfo();
+            return this.queryCatalogInfo();
           }
         }
       }
@@ -652,7 +633,11 @@ export default {
       }
       this.currentCatalog=value[value.length-1];
       this.rightMenuFlag=false;
-      this.syncCatalogInfo();
+      if(value.length===1 && value[0]===0){
+        this.syncCatalogInfo();
+      }else{
+        this.queryCatalogInfo();
+      }
     },
     // 目录是否选择
     isDisabled(list) {
@@ -667,7 +652,7 @@ export default {
         }
       });
     },
-    // 选中目录后同步数据
+    // 选中默认目录后同步数据
     async syncCatalogInfo(){
       const params={
         userId:this.userId,
@@ -677,7 +662,6 @@ export default {
       let res=await syncCatalogInfo(params);
       if(res.code==='200'){
         this.queryProductSetting();
-        // this.queryQuickInfo();
         this.querySettingRules();
         this.queryCompanyInfo();
         this.queryRelParts();
@@ -689,6 +673,14 @@ export default {
           duration: 2000,
         });
       }
+    },
+    // 选中目录后获取数据（有目录不用同步）
+    queryCatalogInfo(){
+      this.queryProductSetting();
+      this.querySettingRules();
+      this.queryCompanyInfo();
+      this.queryRelParts();
+      this.queryRelKnowledge();
     },
     // 查询单个目录详情
     async queryProductSetting(){
@@ -815,6 +807,15 @@ export default {
     chooseOption(item) {
       if (!item.type) return;
       this.nowOption = item.type;
+      if(this.nowOption==='knowledge'){
+        this.$nextTick(()=>{
+          document.getElementById('knowledge') && document.getElementById('knowledge').scrollIntoView();
+        })
+      }else if(this.nowOption==='part'){
+        this.$nextTick(()=>{
+          document.getElementById('part') && document.getElementById('part').scrollIntoView();
+        })
+      }
     },
     // 轮播只有一张图
     bgStyle(url) {
@@ -1010,7 +1011,7 @@ p{
             overflow: hidden;
             margin: 1rem 0;
             .title{
-              background: #FFE9DE;
+              background: #f2f2f2;
               height: 50px;
               line-height: 50px;
               padding: 0 10px;
@@ -1025,9 +1026,6 @@ p{
                   text-decoration: none;
                 }
               }
-            }
-            .part-title{
-              background: #D2FAEA;
             }
             .part-item{
               display: inline-block;

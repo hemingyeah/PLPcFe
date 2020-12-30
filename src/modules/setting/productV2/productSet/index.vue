@@ -102,7 +102,7 @@
       :visible.sync="dialogVisible"
       :close-on-click-modal="false"
     >
-      <el-form :model="form" :rules="rules" label-width="140px" ref="form">
+      <el-form :model="form" label-position="left" :rules="rules" label-width="140px" ref="form">
         <el-form-item label="名称" prop="ruleName">
           <el-input
             type="text"
@@ -1094,6 +1094,9 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
+/deep/ .el-form-item--small .el-form-item__label{
+  padding-left: 6px;
+}
 /deep/ .el-table td{
   color:#333;
 }
