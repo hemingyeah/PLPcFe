@@ -11,7 +11,7 @@
         <!-- <li v-if="copyForm.companyImages && copyForm.companyImages[0] && copyForm.companyImages[0].url">
           <img :src="copyForm.companyImages[0].url" />
         </li> -->
-        <li v-if='copyForm.companyImages && copyForm.companyImages.length===0' class="noPic">默认第一张产品图</li>
+        <li v-if='!copyForm.companyImages' class="noPic">默认第一张产品图</li>
         <template v-if="copyForm.companyImages && copyForm.companyImages.length>0 && !noCatalog">
           <li v-for="(item,i) in copyForm.companyImages" :key="item.id">
             <img :src="item.url" />
@@ -236,7 +236,9 @@ export default {
   name: "right-menu",
   data() {
     return {
-      copyForm: {},
+      copyForm: {
+        companyImages:null
+      },
       doorOpenState:false,  // 是否开启自助服务
       videoOpenState:false, // 是否开启视频
       knowledgeOpenState:false, // 是否开启关联知识库
@@ -293,7 +295,7 @@ export default {
     noCatalog:Boolean
   },
   mounted() {
-    this.copyForm = Object.assign(this.form);
+    this.copyForm = Object.assign({},this.form);
 
     this.doorOpenState=this.copyForm.doorOpenState===1?true:false;
     this.videoOpenState=this.copyForm.videoOpenState===1?true:false;
@@ -376,7 +378,7 @@ export default {
       }
       if(option==='pic'){
         params.companyImages=this.copyForm.companyImages;
-        if(params.companyImages.length===1 && !params.companyImages[0].url){
+        if(!params.companyImages || params.companyImages.length===0){
           return this.$platform.alert('小宝检测到您没有配置任何企业图片，至少需要上传一张哦');
         }
       }else if(option==='intro'){
