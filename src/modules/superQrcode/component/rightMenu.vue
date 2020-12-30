@@ -1,17 +1,19 @@
 <template>
   <div class="wrapper">
-    <h3 class="title">{{ title }}</h3>
-    <el-tooltip v-show="showJump" placement="bottom-start" effect="dark" :content='content'>
-      <i class="iconfont icon-fdn-info jump-icon"></i>
-    </el-tooltip>
+    <h3 class="title">{{ title }}
+      <el-tooltip v-show="showJump" placement="bottom-start" effect="dark" :content='content'>
+        <i class="iconfont icon-fdn-info jump-icon"></i>
+      </el-tooltip>
+    </h3>
+    
     <div v-if="nowOption === 'pic'" class="pic-wrapper">
       <ul class="pic-ul">
-        <li v-if="copyForm.companyImages && copyForm.companyImages[0].url">
+        <!-- <li v-if="copyForm.companyImages && copyForm.companyImages[0] && copyForm.companyImages[0].url">
           <img :src="copyForm.companyImages[0].url" />
-        </li>
-        <li v-else class="noPic">默认第一张产品图</li>
-        <template v-if="copyForm.companyImages && copyForm.companyImages.length>1 && !noCatalog">
-          <li v-for="(item,i) in copyForm.companyImages.slice(1)" :key="item.id">
+        </li> -->
+        <li v-if='copyForm.companyImages && copyForm.companyImages.length===0' class="noPic">默认第一张产品图</li>
+        <template v-if="copyForm.companyImages && copyForm.companyImages.length>0 && !noCatalog">
+          <li v-for="(item,i) in copyForm.companyImages" :key="item.id">
             <img :src="item.url" />
             <div class="change-btns">
               <el-upload
@@ -19,11 +21,11 @@
                 action="string"
                 :show-file-list="false"
                 :before-upload="onBeforeUploadImage"
-                :http-request="(param,index)=>UploadImage(param,i+1)"
+                :http-request="(param,index)=>UploadImage(param,i)"
               >
                 <i class="iconfont icon-commit1"></i>
               </el-upload>
-              <i class="iconfont icon-qingkongshanchu" @click="deleteImg(i+1)"></i>
+              <i class="iconfont icon-qingkongshanchu" @click="deleteImg(i)"></i>
             </div>
           </li>
         </template>
@@ -133,7 +135,7 @@
     </el-tooltip> -->
 
     <el-dialog title="查看分配规则" :visible.sync='ruleDialog'>
-      <el-form :model='ruleForm' label-width="140px">
+      <el-form :model='ruleForm' label-position="left" label-width="140px">
         <el-form-item label="名称" prop="ruleName" required>
           <el-input type="text" size="mini" maxlength="10" disabled v-model="ruleForm.ruleName" placeholder="规则的名称（最多10个字）"></el-input>
         </el-form-item>
@@ -423,9 +425,14 @@ export default {
     changeState(val){
       this.$emit('changeState',val);
     },
-    deleteImg(index){
+    async deleteImg(index){
+      if(this.copyForm.companyImages.length===1){
+        return this.$platform.alert('至少保留一张产品图片');
+      }
+      const confirm = await this.$platform.confirm('确认删除？');
+      if(!confirm) return
       this.copyForm.companyImages.splice(index,1);
-      this.$emit('delPic',index+1);
+      this.$emit('delPic',index);
     },
     onBeforeUploadImage(file) {
       const isJPG = file.type === 'image/jpeg' || file.type === 'image/png';
@@ -471,6 +478,12 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+/deep/ .el-form-item--small .el-form-item__label{
+  padding-left: 6px;
+}
+/deep/ .el-checkbox__input.is-checked + .el-checkbox__label{
+  color:#333;
+}
 /deep/.el-upload{
   width: 100%;
   height: 100%;
@@ -506,8 +519,8 @@ ul {
     left: 20px;
   }
   .jump-icon{
-    float: right;
-    transform: translate(-160px,-45px);
+    margin-left: 8px;
+    font-weight: normal;
     color:#999;
     cursor: pointer;
     font-size: 20px;
@@ -603,7 +616,6 @@ ul {
       }
       p{
         margin-bottom: 0;
-        font-weight: bold;
         margin-top: 5px;
       }
     }
