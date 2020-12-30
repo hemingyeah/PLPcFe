@@ -349,6 +349,25 @@ export default class UserCard extends Vue {
   }
   
   /** 
+   * @description 渲染用户卡片人员工作状态
+  */
+  private renderUserCardState(): VNode | null {
+    // 判断是否有工作状态和电话
+    if (!this.user.state && !this.user.cellPhone) return null
+    
+    return (
+      <div class='user-card-header-content-state'>
+        <span class='user-state-round' style={{
+          backgroundColor: this.stateColorMap && this.stateColorMap[this.user?.state || '']
+        }}>
+        </span>
+        <span>{this.user?.state}</span>
+        <span>{this.user?.cellPhone}</span>
+      </div>
+    )
+  }
+  
+  /** 
    * @description 渲染用户卡片标签
   */
   private renderUserCardLabel(label: string, className: string = ''): VNode {
@@ -516,14 +535,7 @@ export default class UserCard extends Vue {
                     </el-tooltip>
                   )}
                 </div>
-                <div class='user-card-header-content-state'>
-                  <span class='user-state-round' style={{
-                    backgroundColor: this.stateColorMap && this.stateColorMap[this.user?.state || '']
-                  }}>
-                  </span>
-                  <span>{this.user?.state}</span>
-                  <span>{this.user?.cellPhone}</span>
-                </div>
+                { this.renderUserCardState() }
                 { this.renderUserCardLabels() }  
               </div>
               

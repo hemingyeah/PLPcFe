@@ -76,6 +76,8 @@ enum TaskAllotPoolEmitEventEnum {
 export default class TaskAllotPool extends Vue {
   /* 工单地图信息弹窗组件 */
   @Ref() readonly TaskMapInfoWindowComponent!: TaskMapInfoWindow
+  /* 工单池信息组件 */
+  @Ref() readonly TaskAllotPoolInfoComponent!: TaskAllotPoolInfo
   
   /* 客户团队列表 */
   @Prop() readonly customerTags: Tag[] | undefined
@@ -424,7 +426,7 @@ export default class TaskAllotPool extends Vue {
   */
   private handlerTaskPoolInfoSubscriptionChanged(value: boolean): void {
     this.isShowMapTaskPoolSubscriptionUsers = value
-    this.$nextTick(() => {
+    this.TaskAllotPoolInfoComponent?.$nextTick(() => {
       this.mapInit()
     })
   }
@@ -434,7 +436,7 @@ export default class TaskAllotPool extends Vue {
   */
   private handlerTaskPoolInfoAuthChanged(value: boolean): void {
     this.isShowMapTaskPoolAuthUsers = value
-    this.$nextTick(() => {
+    this.TaskAllotPoolInfoComponent?.$nextTick(() => {
       this.mapInit()
     })
   }
@@ -576,10 +578,11 @@ export default class TaskAllotPool extends Vue {
       <div class={ComponentNameEnum.TaskAllotPool}>
         
         <task-allot-pool-info
+          ref='TaskAllotPoolInfoComponent' 
           hideCustomerTagInfo={!this.isPoolByTag}
           stateColorMap={this.stateColorMap}
           info={this.taskPoolInfo}
-          checked={{ 
+          checked={{
             subscription: this.isShowMapTaskPoolSubscriptionUsers,
             auth: this.isShowMapTaskPoolAuthUsers
           }}
