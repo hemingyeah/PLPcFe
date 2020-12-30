@@ -4,6 +4,7 @@
     <div class="task-detail-header">
       <div class="header-btns">
         <div class="flex-x box-12-t-b">
+          <div class="is-delete" v-if="dataInfo.isDelete">已删除</div>
           <div class="flex-1 over-x-h">
             <div class="product-name overHideCon-1">
               {{ product.name }}
@@ -17,7 +18,7 @@
               </el-tooltip>
             </div>
           </div>
-          <div class="flex-x ">
+          <div class="flex-x " v-if="!dataInfo.isDelete">
             <div class="flex-x" v-if="!isDelete ">
               <div class="mar-l-30 flex-x" v-if="allowCreateTask">
                 <el-dropdown trigger="click" >
@@ -506,6 +507,13 @@ export default ProductDetailView;
 .task-detail-btn-group-point {
   z-index: 997;
   background: #fff;
+}
+.is-delete{
+  background: $color-danger;
+  color: #fff;
+  padding: 3px 8px;
+  border-radius: 4px;
+  margin-right: 8px;
 }
 </style>
 
