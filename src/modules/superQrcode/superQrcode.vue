@@ -42,34 +42,27 @@
           >
             <div
               v-if="
-                settingInfo.companyImages.length === 1 &&
-                !settingInfo.companyImages[0].url
+                !settingInfo.companyImages
               "
               @click="changeType('pic')"
               class="setting-swipe setting-swipe-noimg"
               :class="nowOption === 'pic' ? 'choose-border' : ''"
             ></div>
             <div
-              v-if="
-                (settingInfo.companyImages.length === 1 &&
-                settingInfo.companyImages[0].url) || (settingInfo.companyImages.length === 2 &&
-                !settingInfo.companyImages[0].url)
-              "
+              v-if="settingInfo.companyImages && settingInfo.companyImages.length === 1"
               @click="changeType('pic')"
               class="setting-swipe"
               :class="nowOption === 'pic' ? 'choose-border' : ''"
-              :style="bgStyle(settingInfo.companyImages[0].url || settingInfo.companyImages[1].url)"
+              :style="bgStyle(settingInfo.companyImages[0].url)"
             ></div>
             <el-carousel
-              v-if="settingInfo.companyImages.length>2 || (settingInfo.companyImages.length===2 && settingInfo.companyImages[0].url)"
+              v-if="settingInfo.companyImages && settingInfo.companyImages.length>1"
               height="140px"
               arrow="never"
               :class="nowOption === 'pic' ? 'choose-border' : ''"
             >
               <el-carousel-item
-                v-for="item in settingInfo.companyImages[0].url
-                  ? settingInfo.companyImages
-                  : settingInfo.companyImages.slice(1)"
+                v-for="item in settingInfo.companyImages"
                 :key="item.id"
               >
                 <img :src="item.url" class="swipe-img" @click="changeType('pic')" />
@@ -324,7 +317,7 @@ export default {
       nowOption: "pic",
 
       settingInfo:{
-        companyImages:[{}],
+        companyImages:null,
         showFields:[],
         productVideo:[],
         knowledge:[]
