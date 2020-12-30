@@ -52,20 +52,20 @@
 </template>
 <script>
 export default {
-  name: 'guide-compoment',
+  name: "guide-compoment",
   // eslint-disable-next-line vue/require-prop-types
   props: [
-    'totalStep',
-    'nowStep',
-    'content',
-    'haveStep',
-    'finishBtn',
-    'gStyle',
-    'onlyOne',
-    'id',
-    'arrowStyle',
-    'stopStep',
-    'finishBtnFn'
+    "totalStep",
+    "nowStep",
+    "content",
+    "haveStep",
+    "finishBtn",
+    "gStyle",
+    "onlyOne",
+    "id",
+    "arrowStyle",
+    "stopStep",
+    "finishBtnFn"
   ],
   data() {
     return {

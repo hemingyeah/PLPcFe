@@ -8,6 +8,7 @@
       :placeholder="placeholder" 
       :value="value"
       @input="input"
+      :disabled="disabled"
     >
   </div>
 </template>
@@ -29,7 +30,7 @@ export default {
     },
     nativeInputValue() {
       return this.value === null || this.value === undefined ? '' : String(this.value);
-    },
+    }
   },
   watch: {
     // native input value is set explicitly
@@ -58,7 +59,10 @@ export default {
           event.target.value = '';
         });
       }
-      
+
+      // 远程验证事件处理
+      this.remoteValidateHandler()
+
       this.$emit('update', {newValue, oldValue, field: this.field});
       this.$emit('input', newValue);
     },
@@ -95,6 +99,9 @@ export default {
   width: 100%;
   input{
     width: 100%;
+    &:disabled{
+      -webkit-text-fill-color: #b2b2b2;
+    }
   }
 }
 </style>

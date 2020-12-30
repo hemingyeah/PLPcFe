@@ -2,6 +2,8 @@ import FormNumberSetting from './FormNumberSetting.vue';
 import FormNumberPreview from './FormNumberPreview.vue';
 import FormNumber from './FormNumber.vue'
 
+import NumberSearch from './extend/NumberSearch.vue';
+
 let FormNumberField = {
   formType: 'number', // 字段类型
   name: '数字',
@@ -9,7 +11,10 @@ let FormNumberField = {
   component: {
     setting: FormNumberSetting,
     preview: FormNumberPreview,
-    build: FormNumber
+    build: FormNumber,
+    extend: {
+      'number_search': NumberSearch
+    }
   }
 };
 

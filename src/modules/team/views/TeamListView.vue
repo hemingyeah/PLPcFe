@@ -45,6 +45,9 @@
         <!-- end 按钮 -->
         <!-- start 服务电话 -->
         <div class="team-service-btn">
+          <base-button type="success" @event="openWxDialog">
+            维护服务微信
+          </base-button>
           <base-button type="primary" @event="openTelDialog">
             维护服务电话
           </base-button>
@@ -106,6 +109,24 @@
     </base-import>
     <!-- end 导入服务电话 -->
 
+    <!-- start 导入服务微信 -->
+    <base-import
+      title="维护服务微信"
+      ref="serviceWxModal"
+      :is-import-now="isImportNow"
+      @success="importServiceSuccess"
+      action="/security/user/import/importWeChat">
+      <div slot="tip">
+        <div class="base-import-warn">
+          请先下载<a :href="`/security/user/import/weChatTemplate?tagId=${serviceTelItemId}`">导入模版 </a>，填写完成后再上传导入。<br>
+          微信号仅用于客户联系服务人员；<br>
+          如果微信号未填写，客户将无法获取服务人员微信号；<br>
+          此数据为非必填项。<br>
+        </div>
+      </div>
+    </base-import>
+    <!-- end 导入服务微信 -->
+
     <!-- start 右侧选择团队弹窗 -->
     <base-panel :show.sync="multipleSelectionPanelShow" width="420px">
       <h3 slot="title">
@@ -143,16 +164,16 @@
 </template>
 
 <script>
-import _ from 'lodash';
-import qs from 'qs';
+import _ from "lodash";
+import qs from "qs";
 
-import Page from '@model/Page';
-import * as TeamApi from '@src/api/TeamApi';
-import {fmt_address} from '@src/filter/fmt';
-import { isShowCreateChildrenTeam } from '@src/util/version.ts'
+import Page from "@model/Page";
+import * as TeamApi from "@src/api/TeamApi";
+import {fmt_address} from "@src/filter/fmt";
+import { isShowCreateChildrenTeam } from "@src/util/version.ts"
 
 export default {
-  name: 'team-list-view',
+  name: "team-list-view",
   props: {
     initData: {
       type: Object,
@@ -171,7 +192,7 @@ export default {
       // TODO: 单独的model对象维护所有搜索条件
       model: this.buildModel(),
       page: new Page(),
-      serviceTelItemId: '',
+      serviceTelItemId: "",
       selectedLimit: 200
     }
   },
@@ -185,9 +206,9 @@ export default {
       let that = this;
       return [
         {
-          field: 'tagName',
-          label: '团队名称',
-          expandProp: 'children',
+          field: "tagName",
+          label: "团队名称",
+          expandProp: "children",
           width: 250,
           render(h, col, row){
             return (
@@ -200,32 +221,32 @@ export default {
           }
         },
         {
-          field: 'teamLeaders',
-          label: '团队主管',
+          field: "teamLeaders",
+          label: "团队主管",
           width: 180,
-          overflow: 'tooltip',
+          overflow: "tooltip",
           formatter(col, row){
-            return row.teamLeaders.map(i => i.displayName).join('，')
+            return row.teamLeaders.map(i => i.displayName).join("，")
           },
         },
         {
-          field: 'phone',
-          label: '电话',
+          field: "phone",
+          label: "电话",
           width: 120,
         },
         {
-          field: 'tagPlaceList',
-          label: '负责区域',
+          field: "tagPlaceList",
+          label: "负责区域",
           width: 250,
-          overflow: 'tooltip',
+          overflow: "tooltip",
           formatter(col, row){
-            return row.tagPlaceList.map(p => `${p.province}${p.city ? `-${p.city}` : ''}${p.dist ? `-${p.dist}` : ''}`).join('，\n')
+            return row.tagPlaceList.map(p => `${p.province}${p.city ? `-${p.city}` : ""}${p.dist ? `-${p.dist}` : ""}`).join("，\n")
           }
         },
         {
-          field: 'tagAddress',
-          label: '所在位置',
-          overflow: 'tooltip',
+          field: "tagAddress",
+          label: "所在位置",
+          overflow: "tooltip",
           formatter(col, row){
             return fmt_address(row.tagAddress);
           }
@@ -234,7 +255,7 @@ export default {
     },
     buildModel() {
       let model = {
-        keyword: '',
+        keyword: "",
       };
 
       return model
@@ -267,7 +288,7 @@ export default {
       this.page.pageSize = pageSize;
       this.page.list = [];
 
-      this.localStorageSet('pageSize', pageSize);
+      this.localStorageSet("pageSize", pageSize);
       this.fetchPageList();
     },
     /* 初始化 */
@@ -298,10 +319,10 @@ export default {
     /* 获取本地数据 */
     localStorageGet() {
       try {
-        const dataStr = localStorage.getItem('teamListData') || '{}'
+        const dataStr = localStorage.getItem("teamListData") || "{}"
         return JSON.parse(dataStr); 
       } catch (error) {
-        console.log('error: ', error);
+        console.log("error: ", error);
         return {}
       }
     },
@@ -310,15 +331,15 @@ export default {
       const data = this.localStorageGet();
 
       data[key] = value;
-      localStorage.setItem('teamListData', JSON.stringify(data));
+      localStorage.setItem("teamListData", JSON.stringify(data));
     },
     openTeamView(e, id){
       e.preventDefault();
-      let fromId = window.frameElement.getAttribute('id');
+      let fromId = window.frameElement.getAttribute("id");
 
       this.$platform.openTab({
         id: `team_view_${id}`,
-        title: '团队详情',
+        title: "团队详情",
         url: `/security/tag/view/${id}?noHistory=1`,
         reload: true,
         close: true,
@@ -328,12 +349,21 @@ export default {
     /* 打开服务电话弹出框 */
     openTelDialog() {
       if(this.multipleSelection.length != 1) {
-        return this.$platform.alert('请您先选择一个团队');
+        return this.$platform.alert("请您先选择一个团队");
       }
       let item = this.multipleSelection[0];
 
       this.serviceTelItemId = item.id;
       this.$refs.serviceTelModal.open();
+    },
+    openWxDialog(){
+      if(this.multipleSelection.length != 1) {
+        return this.$platform.alert("请您先选择一个团队");
+      }
+      let item = this.multipleSelection[0];
+
+      this.serviceTelItemId = item.id;
+      this.$refs.serviceWxModal.open();
     },
     /** 复原搜索参数 */
     revertSearchParams() {
@@ -355,7 +385,7 @@ export default {
           })
         }
       } catch (error) {
-        console.log('revertTableColumns error: ', error);
+        console.log("revertTableColumns error: ", error);
       }
     },
     /* 复原搜索 参数 */
@@ -440,9 +470,9 @@ export default {
     },
     /* 设置是否按 服务团队派单 */
     async setUsedAllot(setTag) {
-      let _setTag = 'dep';
+      let _setTag = "dep";
       if(setTag) {
-        _setTag = 'tag'
+        _setTag = "tag"
       }
       try {
         let params = {
@@ -458,7 +488,7 @@ export default {
           this.$platform.alert(result.message);
         }
       } catch (error) {
-        console.log('setUsedAllot error: ', error);
+        console.log("setUsedAllot error: ", error);
       }
     },
     /* 是否开启 降低组织架构 */
@@ -474,17 +504,17 @@ export default {
           this.isSeeAllOrg = state;
         }
       } catch (error) {
-        console.log('setUsedAllot error: ', error);
+        console.log("setUsedAllot error: ", error);
       }
     },
     /* 新建团队 */
     teamCreate() {
-      let fromId = window.frameElement.getAttribute('id');
+      let fromId = window.frameElement.getAttribute("id");
 
       this.$platform.openTab({
-        id: 'team_create',
-        title: '新建团队',
-        url: '/security/tag/createTag?noHistory=1',
+        id: "team_create",
+        title: "新建团队",
+        url: "/security/tag/createTag?noHistory=1",
         reload: true,
         close: true,
         fromId
@@ -492,27 +522,27 @@ export default {
     },
     /* 新建子团队 */
     teamChildCreate() {
-      window.TDAPP.onEvent('pc：访问团队管理-新建子团队');
+      window.TDAPP.onEvent("pc：访问团队管理-新建子团队");
       let len = this.multipleSelection.length;
       if(len != 1) {
-        return this.$platform.alert('请您选择一个团队');
+        return this.$platform.alert("请您选择一个团队");
       }
       let item = this.multipleSelection[0];
 
       if(!this.isParent(item)) {
-        return this.$platform.alert('请您选择一个主团队')
+        return this.$platform.alert("请您选择一个主团队")
       }
 
       let parent = {
-        action: 'create',
+        action: "create",
         pid: item.id,
         pname: item.tagName,
       }
-      let fromId = window.frameElement.getAttribute('id');
+      let fromId = window.frameElement.getAttribute("id");
       
       this.$platform.openTab({
-        id: 'team_create',
-        title: '新建子团队',
+        id: "team_create",
+        title: "新建子团队",
         url: `/security/tag/createTag?${qs.stringify(parent)}`,
         reload: true,
         close: true,
@@ -521,9 +551,9 @@ export default {
     },
     /* 删除团队 */
     async teamDelete() {
-      window.TDAPP.onEvent('pc：团队管理-删除团队事件');
+      window.TDAPP.onEvent("pc：团队管理-删除团队事件");
       if(this.multipleSelection.length <= 0) {
-        return this.$platform.alert('请您先选择至少一个团队');
+        return this.$platform.alert("请您先选择至少一个团队");
       }
       // 判断是否 删除含有主团队
       let hasParent = false;
@@ -535,10 +565,10 @@ export default {
       })
       
       if(hasParent && this.showNewTeam) {
-        confirm = await this.$platform.confirm('您删除的团队，如果包含子团队将会一并删除，是否继续？');
+        confirm = await this.$platform.confirm("您删除的团队，如果包含子团队将会一并删除，是否继续？");
         if(!confirm) return;
       } else {
-        confirm = await this.$platform.confirm('是否确定删除您所选中的团队？');
+        confirm = await this.$platform.confirm("是否确定删除您所选中的团队？");
         if (!confirm) return;
       }
 
@@ -549,8 +579,8 @@ export default {
         let result = await TeamApi.deleteTag(ids);
 
         this.$platform.notification({
-          type: result.status == 0 ? 'success' : 'error',
-          title: `团队删除${result.status == 0 ? '成功' : '失败'}`,
+          type: result.status == 0 ? "success" : "error",
+          title: `团队删除${result.status == 0 ? "成功" : "失败"}`,
           message: result.status == 0 ? null : result.message
         })
 
@@ -562,7 +592,7 @@ export default {
         }
 
       } catch (e) {
-        console.error('teamDelete catch error', e);
+        console.error("teamDelete catch error", e);
       }
     },
     /* 更新表格列宽 */
@@ -571,7 +601,7 @@ export default {
         return Object.assign(col, columns.data[index]);
       })
 
-      this.localStorageSet('columns', JSON.stringify(columns.data));
+      this.localStorageSet("columns", JSON.stringify(columns.data));
     }
   },
   mounted(){

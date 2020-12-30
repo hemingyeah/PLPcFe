@@ -3,13 +3,14 @@
     <div class="content el-select el-input el-input--small el-input--suffix" v-clickoutside="closeList">
       <div 
         class="base-select-main-content multiple-layout el-input el-input__inner" 
+        ref="normalInput"
         @click.stop="focusInput" 
         v-if="multiple"
         :class="{'error': error, 'wrapper-is-focus': isFocus, 'clearable-layout': clearable}"
       >
         
-        <el-tag size="mini" closable v-for="(tag, index) in (collapsed ? value[0] ? [value[0]] : [] : value)" :key="`${tag.value}_${index}`" @close="removeTag(tag)" disable-transitions type="info">
-          {{tag.label}}
+        <el-tag size="mini" closable v-for="tag in (collapsed ? value[0] ? [value[0]] : [] : value)" :key="getValueKey(tag)" @close="removeTag(tag)" disable-transitions type="info">
+          {{tag.label || tag[valueKey]}}
         </el-tag>
         
         <div v-if="collapsed && value.length > 1" class='base-user-select-tag'>
@@ -30,6 +31,7 @@
       <div 
         class="base-select-main-content" 
         @click.stop="focusInput" 
+        ref="normalInput"
         v-else
         :class="{'error': error, 'wrapper-is-focus': isFocus, 'clearable-layout': clearable,}"
       >
@@ -44,16 +46,17 @@
       </div>
         
       <i v-if="clearable && value.length" class="iconfont icon-minus-fill clear-btn" @click="clearValue"></i>
-        
-      <div class="list-wrapper" v-show="showList">
+
+      <div class="list-wrapper" v-show="showList" :style="selectCon ? `top:${(selectCon.top +selectCon.height +13)}px;left:${ selectCon.left}px;width:${selectCon.width}px` : ''">
         <div class="arrow"></div>
         <div class="input-container" v-if="!options.length">
           <input type="text" v-model="keyword" @input="searchByKeyword" ref="input" :placeholder="placeholder">
         </div>
         
         <ul class="option-list" v-loadmore="loadmoreOptions" ref="list">
-          
-          <li v-for="(op, index) in optionList" :key="`${op.value}_${index}`" @click="selectTag(op)" :class="{'selected': value.some(user => user.value ===op.value)}">
+         
+      
+          <li v-for="(op, index) in optionList" :key="index" @click="selectTag(op)" :class="{'selected': value.some(user => user[valueKey] ===op[valueKey])}">
             <slot name="option" :option="op" v-if="optionSlot"> </slot>
             <template v-else>{{op.label}}</template>
             <div class="checked"></div>
@@ -68,7 +71,9 @@
 
 <script>
 import Clickoutside from '@src/util/clickoutside';
+let timeInterval;
 import Page from '@model/Page';
+import _ from 'lodash';
 
 /**
  * Todo
@@ -90,6 +95,10 @@ export default {
     value: {
       type: Array,
       default: () => ([]),
+    },
+    valueKey: {
+      type: String,
+      default: 'value'
     },
     error: {
       type: Boolean,
@@ -130,8 +139,23 @@ export default {
         callback: this.loadmore,
         distance: 10,
       },
-      page: new Page()
+      page: new Page(),
+      selectCon:null
     }
+  },
+  watch:{
+    showList(newV, oldV){
+      if(newV == true){
+        timeInterval = setInterval(()=>{
+          this.selectCon = this.$refs['normalInput'].getBoundingClientRect();
+        }, 100)
+      }else{
+        clearInterval(timeInterval)
+      }
+    }
+  },
+  beforeDestroy(){
+    clearInterval(timeInterval)
   },
   computed: {
     optionList() {
@@ -159,6 +183,9 @@ export default {
     },
   },
   methods: {
+    getValueKey(op){
+      return `${op[this.valueKey]}`;
+    },
     focusInput() {
       if (this.disabled) return
       if (this.showList) return this.close()
@@ -176,7 +203,7 @@ export default {
       this.$emit('input', []);
     },
     removeTag(tag) {
-      const newVal = this.value.filter(t => t.value !== tag.value);
+      const newVal = this.value.filter(t => t[this.valueKey] !== tag[this.valueKey]);
       this.$emit('input', newVal);
     },
     selectTag(tag) {
@@ -188,10 +215,10 @@ export default {
         this.resetStatus();
 
       } else {
-        if (this.value.every(t => t.value !== tag.value)) {
+        if (this.value.every(t => t[this.valueKey] !== tag[this.valueKey])) {
           newValue.push(tag);
         } else {
-          newValue = newValue.filter(t => t.value !== tag.value);
+          newValue = newValue.filter(t => t[this.valueKey] !== tag[this.valueKey]);
         }
       }
 
@@ -224,7 +251,7 @@ export default {
         })
         .catch(err => console.error(err))
     },
-    searchByKeyword(e) {
+    searchByKeyword:_.debounce(function(e) {
       this.resetStatus(e.target.value);
       this.pending = true;
       this.search()
@@ -236,7 +263,7 @@ export default {
         .catch(e => {
           console.log('searchByKeyword catch e', e)
         });
-    },
+    }, 800),
     initList() {
       this.pending = true;
       this.showList = true;
@@ -338,7 +365,7 @@ export default {
 
     .list-wrapper {
       border-radius: 4px;
-      position: absolute;
+      position: fixed;
       left: 0;
       top: calc(100% + 13px);
       width: 100%;
@@ -465,5 +492,6 @@ export default {
     border-color: $color-primary;
     cursor: pointer;
   }
+  height: 100% !important;
 }
 </style>

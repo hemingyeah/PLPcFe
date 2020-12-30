@@ -16,13 +16,14 @@ export default class Field{
     this.isSearch = options.isSearch || 0;
     this.isAdd = options.isAdd || 1;
     this.isAppShow = options.isAppShow || 0;
-
+    
     this.placeHolder = options.placeHolder;
     this.setting = options.setting || {};
     this.defaultValue = options.defaultValue;
     this.enabled = options.enabled || 1;
     this.isDelete = options.isDelete || 0;
 
+    this.isHidden = options.isHidden || 0;
     // 客户、产品的字段id
     this.fieldId = options.id;
     this.tableChsName = options.tableChsName;

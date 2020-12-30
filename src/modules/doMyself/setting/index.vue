@@ -151,7 +151,7 @@
               >绑定微信或钉钉服务窗</a
               >
             </div>
-            <div class="flex-y code-box" v-show="setData.protalUrl">
+            <div class="flex-y al-center code-box" v-show="setData.protalUrl">
               <div
                 class="qrcode cur-point"
                 ref="qrCodeUrl"
@@ -185,7 +185,7 @@
               >
             </div>
             <div
-              class="flex-y code-box mar-l-16 i-can-scale"
+              class="flex-y al-center code-box mar-l-16 i-can-scale"
               v-show="setData.weChatQRCodeUrl"
             >
               <img
@@ -717,7 +717,6 @@ export default {
     },
     cancelInfoData() {
       return;
-      this.nowSettingDataId = -1;
     },
     changeFullscreenLoading(e) {
       if (this.fullscreenLoading === e) return;
@@ -836,9 +835,6 @@ export default {
 }
 .el-switch__label {
   font-weight: 400;
-}
-.my-shop-box {
-  min-width: 1015px;
 }
 .color-primary {
   color: $color-primary;

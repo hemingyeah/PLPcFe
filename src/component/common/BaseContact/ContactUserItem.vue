@@ -1,6 +1,7 @@
 <template>
   <div class="contact-user-item" :class="{'contact-selected': user.selected}" @click="$emit('toggle', user)">
     <div class="contact-user-wrap">
+      <div class="contact-user-delete-state" v-if="user.isDelete == 1"></div>
       <div class="contact-user-avatar" :class="showTag ? 'contact-user-avatar-margin' : ''" :style="{backgroundImage: `url(${head})`}"></div>
       <div class="contact-user-info">
         <h3>
@@ -129,6 +130,7 @@ export default {
   padding: 0 8px;
   cursor: pointer;
   transition: background-color ease .15s;
+  position: relative;
 
   &.contact-selected{
     background-color: $color-primary-hover;
@@ -224,6 +226,17 @@ export default {
   border-radius: 50%;
   background-color: #f0f0f0;
   margin: 0 2px 0 5px;
+}
+
+.contact-user-delete-state { 
+  width: 30px;
+  height: 30px;
+  background: url(../../../assets/img/leave_icon.png) no-repeat;
+  background-size: 100%;
+
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
 .contact-user-item-tagname {

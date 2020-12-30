@@ -1109,6 +1109,7 @@ export default {
 
   },
   async mounted() {
+    console.log(this.initData, 'initData')
     try {
       this.loading = true;
 

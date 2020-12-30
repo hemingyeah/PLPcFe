@@ -98,7 +98,7 @@ import TaskSearchForm from './TaskSearchForm.vue';
 import TaskSearchPupal from './TaskSearchPupal';
 import TaskInquire from './TaskInquire';
 
-import guideCompoment from '@src/component/guide/guide';
+import guideCompoment from "@src/component/guide/Guide";
 
 let guideCompoments = Vue.extend(guideCompoment);
 
@@ -259,9 +259,9 @@ export default {
         repeatBool;
       for (let key in searchFormData) {
         if (
-          JSON.stringify(searchFormData[key]) !== '[]'
+          JSON.stringify(searchFormData[key]) !== "[]"
           && searchFormData[key]
-          && key !== 'backUp'
+          && key !== "backUp"
         ) {
           if (key !== 'area') {
             inPar.push(key);
