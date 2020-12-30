@@ -415,6 +415,7 @@ class TaskAllotExecutorRender extends TaskAllotExecutorMethods {
   public renderTaskAllotUserTableHeaderStateSelect() {
     return (
       <el-select
+        class='task-allot-user-table-state-select'
         collapse-tags
         multiple
         placeholder="工作状态"
