@@ -232,7 +232,7 @@ export default {
     },
     data() {
         return {
-            takeTypeName: '', // 接口返回的工单类型名称
+            taskTypeName: '', // 接口返回的工单类型名称
 
             fields: [],
             flowMap,
@@ -454,9 +454,8 @@ export default {
         }
     },
     mounted() {
-        this.$eventBus.$on('setting_task_type_name', takeTypeName => {
-            console.log('takeTypeName', takeTypeName);
-            this.takeTypeName = takeTypeName
+        this.$eventBus.$on('setting_task_type_name', taskTypeName => {
+            this.taskTypeName = taskTypeName
         });
     },
     beforeDestroy() {
