@@ -140,7 +140,23 @@
     align-items: center;
     & > div {
       margin-left: 8px;
-      max-width: 120px;
+      max-width: 140px;
+    }
+    .task-allot-user-table-state-select {
+      .el-tag {
+        display: flex;
+        align-items: center;
+        max-width: 65px;
+        @include text-ellipsis();
+        .el-select__tags-text {
+          display: inline-block;
+          max-width: 40px;
+          @include text-ellipsis();
+        }
+        .el-tag__close.el-icon-close {
+          right: -3px;
+        }
+      }
     }
     .el-tag {
       max-width: 45px;
