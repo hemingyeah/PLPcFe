@@ -241,18 +241,6 @@ export default {
     computedWhetherAddQrcodeField() {
       this.selfFields = [
         ...this.selfFields,
-        {
-          displayName: "创建人",
-          fieldName: "createUser",
-          formType: "user",
-          returnData: "name", // 参数保留等待表单优化支持模糊查询
-          noClearable: false,
-          export: false,
-          isNull: 1,
-          isSystem: 1,
-          orderId: -3.5,
-          placeHolder: "请输入创建人",
-        },
         this.initData?.productConfig?.qrcodeEnabled
           ? {
             displayName: "是否绑定二维码",
