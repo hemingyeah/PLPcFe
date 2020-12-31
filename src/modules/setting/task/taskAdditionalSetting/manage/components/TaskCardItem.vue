@@ -136,12 +136,22 @@ export default {
     // TODO:编辑表单
     modifyTaskForm() {
       let cardId = this.card.id;
-      this.$platform.openTab({
-        id: 'task_card_setting',
-        title: '附加组件表单设置',
-        url: `/setting/task/cardFormfields?cardId=${cardId}`,
-        reload: true,
-      });
+      if(this.card.specialfrom !== '工时记录'){
+        this.$platform.openTab({
+          id: 'task_card_setting',
+          title: '附加组件表单设置',
+          url: `/setting/task/cardFormfields?cardId=${cardId}`,
+          reload: true,
+        });
+      }else{
+        this.$platform.openTab({
+          id: 'task_cardhours_setting',
+          title: '附加组件表单设置',
+          url: `/setting/task/cardHoursRecord?cardId=${cardId}`,
+          reload: true,
+        });
+      }
+    
     },
     // 查看统计
     onSee() {

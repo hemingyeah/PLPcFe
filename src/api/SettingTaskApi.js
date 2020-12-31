@@ -81,11 +81,8 @@ export const onUpdateCard = (params = {}) => {
  * @param {String} params.userNameStr -- 操作人
  */
 export const getCardCount = (params = {}) => {
-  return http.get('/setting/task/card/count', params)
+  return http.get('/setting/task/newCard/count', params)
 }
-// export const getCardCount = (params = {}) => {
-//   return http.get('/setting/task/newCard/count', params)
-// }
 
 /**
  * @description 获取统计fields列表
@@ -120,6 +117,14 @@ export const taskCardFieldsSave = (params = {}) => {
 }
 
 /**
+ * @description 删除附加组件
+ * @param {Object} 
+ */
+export const deleteCardField = (params = {}) => {
+  return http.post('/setting/task/cardField/delete', params, false)
+}
+
+/**
  * @description 查询单个附加组件的信息
  * @param {Object} 
  */
@@ -134,6 +139,23 @@ export const getTaskCardName = (params = {}) => {
 export const updateTaskCardName = (params = {}) => {
   return http.post('/setting/task/card/updateOneTaskCard', params)
 }
+
+/**
+ * @description 获取工时记录编辑配置详情
+ * @param {Object} 
+ */
+export const getCardConfig = (params = {}) => {
+  return http.post('/setting/task/card/getConfig', params, false)
+}
+
+/**
+ * @description 保存工时记录编辑配置详情
+ * @param {Object} 
+ */
+export const saveCardConfig = (params = {}) => {
+  return http.post('/setting/task/card/saveConfig', params)
+}
+
 /* ------------- end 附加组件设置 ---------------- */
 
 /* ------------- start 工单类型组件设置 ---------------- */

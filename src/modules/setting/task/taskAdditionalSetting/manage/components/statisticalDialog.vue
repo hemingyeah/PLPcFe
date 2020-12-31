@@ -230,7 +230,7 @@ export default {
     * @description 默认时间
     */
     timeRange() {
-      this.timeArrRange = [formatDate(new Date() - (29 * 24 * 60 * 60 * 1000), 'YYYY-MM-DD'), formatDate(new Date(), 'YYYY-MM-DD')];
+      this.timeArrRange = [formatDate(new Date() - (29 * 24 * 60 * 60 * 1000), 'YYYY/MM/DD'), formatDate(new Date(), 'YYYY/MM/DD')];
       this.form.timeRange = this.timeArrRange.join('-')
     },
 
@@ -271,6 +271,7 @@ export default {
     */
     openDialog() {
       this.visible = true;
+      this.timeRange();
 
       if(this.card.id) {
         this.form.cardId = this.card.id;
@@ -280,7 +281,6 @@ export default {
     },
     onClose(form) {
       this.visible = false;
-      this.timeRange();
       this.form = {
         pageNum: 1,
         pageSize: 10,

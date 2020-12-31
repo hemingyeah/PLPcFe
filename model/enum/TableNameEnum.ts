@@ -13,7 +13,9 @@ export enum TableNameEnum {
   // 客户
   Customer = 'customer',
   // 产品
-  Product = 'product'
+  Product = 'product',
+  // 附加组件
+  TaskCard = 'task_card'
 }
 
 export default TableNameEnum

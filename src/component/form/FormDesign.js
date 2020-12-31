@@ -19,6 +19,7 @@ import {
   isSelect 
 } from './util'
 import {checkUser, deleteComponent} from '@src/api/TaskApi.ts';
+import {deleteCardField} from '@src/api/SettingTaskApi';
 /* enum */
 import TableNameEnum from '@model/enum/TableNameEnum.ts';
 
@@ -673,15 +674,20 @@ const FormDesign = {
       let isNext = true;
 
       // 取消必填时需要校验人员字段是否是审批人的模块
-      const checkUserArr = [TableNameEnum.Task, TableNameEnum.TaskReceipt, TableNameEnum.Event, TableNameEnum.EventReceipt];
+      const checkUserArr = [TableNameEnum.Task, TableNameEnum.TaskReceipt, TableNameEnum.Event, TableNameEnum.EventReceipt, TableNameEnum.TaskCard];
       if(checkUserArr.indexOf(this.mode) > -1 && item.id) {
         // item.id表明该字段已经在后端存储过，不是本次的新增字段
-        if(item.formType == 'user') {
-          // 删除的是人员，先check是否在审批流程中
-          isNext = await this.deleteUser(item, this.deleteFormField);
+        if(this.mode == 'task_card') {
+          isNext = await this.deleteCardFormField(item);
         }else{
-          isNext = await this.deleteFormField(item);
+          if(item.formType == 'user') {
+            // 删除的是人员，先check是否在审批流程中
+            isNext = await this.deleteUser(item, this.deleteFormField);
+          }else{
+            isNext = await this.deleteFormField(item);
+          }
         }
+
       }
 
       if(!isNext) {
@@ -732,6 +738,16 @@ const FormDesign = {
     
     async deleteFormField(item) {
       let result = await deleteComponent({ id : item.id });
+      if(result.code) {
+        this.$platform.alert(result.message);
+        return false;
+      }
+      
+      return true;
+    },
+    // 附加组件删除表单
+    async deleteCardFormField(item) {
+      let result = await deleteCardField({ id : item.id });
       if(result.code) {
         this.$platform.alert(result.message);
         return false;
