@@ -164,6 +164,8 @@
               res_.height;
             if (bottomH < 370) {
               this.topShow = true;
+            }else{
+              this.topShow = false;
             }
             this.selectCon = res_;
           }, 100)
