@@ -77,8 +77,10 @@
 <script>
 // api
 import * as TaskApi from "@src/api/TaskApi.ts";
+import * as SettingApi from "@src/api/SettingApi";
 // model
 import TaskConfig from "@model/types/setting/task/TaskConfig";
+import TaskApprover from '@model/types/setting/task/TaskApprover';
 // utils
 import { parse } from "@src/util/querystring";
 // components
@@ -140,36 +142,74 @@ export default {
     goBack() {
       window.history.go(-1);
     },
+    /** 兼容旧审批结构 */
+    compatibleOldApprove(setting) {
+      let {leader, level, approvers} = setting;
+      if(level === undefined) {
+        switch(leader) {
+          case undefined:
+            if(approvers && approvers.length > 0) {
+              leader = 'users';
+              level = 1;
+            }else {
+              level = 0;
+            }
+            break;
+          default: 
+            level = 1;
+            break
+        }
+      }
+
+      if(leader === 'none'){
+        level = 0;
+        leader = '';
+      }
+      return {
+        ...setting,
+        leader,
+        level
+      };
+    },
     /** 转化getOne接口返回的数据 */
     convertTaskTypeConfig(taskTypeConfig) {
-      let { flowSetting, isLeader, pauseApprovers, planRemindSetting, delayBack } =  taskTypeConfig;
+      let { flowSetting, isLeader, pauseApprovers, planRemindSetting, delayBack, config, overTimeSetting } =  taskTypeConfig;
 
-      // 暂停工单审批设置
-      taskTypeConfig.pauseApproveSetting = { leader: isLeader, approvers: pauseApprovers }
+      taskTypeConfig.delayBack = delayBack === 'true' ? true : false;
+      taskTypeConfig.allowPause = Boolean(taskTypeConfig.allowPause);
+      taskTypeConfig.allowCancel = Boolean(taskTypeConfig.allowCancel);
+
+      if(isLeader == 1) {
+        isLeader = 'leader';
+      }else if(isLeader == 2) {
+        isLeader = 'none';
+      }else if(isLeader == 4) {
+        isLeader = 'createUser';
+      }else if(isLeader == 5) {
+        isLeader = 'allotUser';
+      }else if(isLeader == 6) {
+        // todo_zr
+      }else if(isLeader == 7) {
+        isLeader = 'userAdmin';
+      }else if(isLeader == 8) {
+        isLeader = 'promoter';
+      }else {
+        isLeader = 'users';
+      }
+
+      taskTypeConfig.pauseApproveSetting =  this.compatibleOldApprove({leader: isLeader, approvers: pauseApprovers, multiApproverSetting: []});
       
       // 流程审批格式转化
       Object.keys(flowSetting).forEach(key => {
-        let {state, ttid, overTime, leader, approvers, level, multiApproverSetting} = flowSetting[key];
+        let {state, ttid, overTime, leader, approvers, level, multiApproverSetting, reallotAppr} = flowSetting[key];
 
-        // 旧数据处理
-        if(level === undefined) {
-          switch(leader) {
-            case undefined:
-              if(approvers && approvers.length > 0) {
-                leader = 'users';
-                level = 1;
-              }else {
-                level = 0;
-              }
-              break;
-            case 'none': 
-              level = 0
-              break;
-            default: 
-              level = 1;
-              break
-          }
-        }
+        // 兼容旧审批格式
+        let approveSetting = this.compatibleOldApprove({
+          leader,
+          approvers,
+          level,
+          multiApproverSetting 
+        });
 
         leader = leader === 'none' ? '' : leader;
         if(key === 'autoReview') {
@@ -178,27 +218,22 @@ export default {
         }else if(key === 'off') {
           // 取消工单设置
           taskTypeConfig.allowCancel = flowSetting[key].state;
-          taskTypeConfig.cancelApproveSetting = { leader, approvers, level, multiApproverSetting };
-        }else if(key === 'pause') {
-          // 暂停工单设置
-          taskTypeConfig.allowPause = flowSetting[key].allowPause;
-          taskTypeConfig.pauseApproveSetting = {
-            ...taskTypeConfig.pauseApproveSetting,
-            leader,
-            approvers,
-            level,
-            multiApproverSetting
-          }
+          taskTypeConfig.cancelApproveSetting = approveSetting;
         }else {
           taskTypeConfig.flowSetting[key] = {
             state,
             ttid,
             overTime,
-            approveSetting: {
-              leader,
-              approvers,
-              level,
-              multiApproverSetting }
+            approveSetting,
+          }
+
+          // 转派需要审批开关
+          if(key === 'allot') {
+            this.$set(taskTypeConfig.flowSetting[key], 'reallotAppr', reallotAppr === 'none' ? false : true);
+          }
+
+          if(key === 'pause') {
+            taskTypeConfig.pauseApproveSetting = approveSetting;
           }
         }
       })
@@ -206,12 +241,28 @@ export default {
       // 计划提醒设置
       taskTypeConfig.planRemindSetting = {
         ...planRemindSetting,
-        isAhead: planRemindSetting.isAhead === undefined ? 0 : planRemindSetting.isAhead,
+        minutesType: taskTypeConfig.minutesType || 0,
       }
 
-      taskTypeConfig.delayBack = Boolean(delayBack);
-
-      // 超时提醒设置 todo_zr
+      // 兼容旧超时提醒设置
+      if(config.newOverTimeSetting === undefined || (config.newOverTimeSetting && config.newOverTimeSetting.length === 0)) {
+        taskTypeConfig.taskOverTimeModels = taskTypeConfig.taskOverTimeModels.map(item => {
+          return {
+            ...item,
+            ...overTimeSetting,
+            remindType: overTimeSetting.remindType || null,
+            reminders: overTimeSetting.reminders || []
+          }
+        })
+      }else {
+        taskTypeConfig.taskOverTimeModels = config.newOverTimeSetting.map(item => {
+          return {
+            ...item,
+            remindType: overTimeSetting.remindType || null,
+            reminders: item.reminders || []
+          }
+        })
+      }
 
       delete taskTypeConfig.isLeader;
       delete taskTypeConfig.pauseApprovers;
@@ -232,6 +283,8 @@ export default {
         // 转化获取到的结果
         this.taskTypeConfig = this.convertTaskTypeConfig(Object.assign(this.taskTypeConfig, res.data));
 
+        // 传递给FlowSetting组件工单类型名称
+        this.$eventBus.$emit('setting_task_type_name', this.taskTypeConfig.name);
         // 判断是否有设置服务报告模板
         if (JSON.stringify(res.data.reportSetting) == "{}") {
           let reportSetting = {
@@ -257,18 +310,32 @@ export default {
         console.error("fetch Tasktype => err", err);
       }
     },
+    /** 更新工单类型颜色和名称 */
+    async updateTaskTypeNameAndColor() {
+      try {
+        let params =  {
+          id: this.taskTypeId,
+          name: this.taskTypeConfig.name,
+          color: this.taskTypeConfig.config.color
+        }
+        await SettingApi.updateTaskTypeNameAndColor(params);
+      } catch (error) {
+        console.error(error);
+      }
+    },
     /** 右上角保存按钮 */
     async submit() {
       if (!this.$refs.comp.submit) return;
 
       this.pending = true;
         try {
-        await this.$refs.comp.submit();
-      } catch (error) {
-        console.error(error);
-      }finally {
-        this.pending = false;
-      }
+          await this.$refs.comp.submit();
+          await this.updateTaskTypeNameAndColor();
+        } catch (error) {
+          console.error(error);
+        }finally {
+          this.pending = false;
+        }
     },
   },
   mounted() {

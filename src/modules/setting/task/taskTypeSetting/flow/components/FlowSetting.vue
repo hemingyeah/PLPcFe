@@ -31,7 +31,7 @@
 
                 <!--S 转派时也审批-->
                 <div v-if="type === 'allot'" class="mt-8" style="margin-bottom: -18px">
-                    <el-checkbox>转派时也审批</el-checkbox>
+                    <el-checkbox v-model="flowSetting.reallotAppr">转派时也审批</el-checkbox>
                 </div>
                 <!--E 转派时也审批-->
 
@@ -47,7 +47,7 @@
                     </div>
                     <div>
                         <span>工单超时后提醒干系人（负责人、协同人、创建人）及</span>
-                        <el-select v-model="taskOverTimeModel.overTimeTypeUser" @change="updateOvertimeSetting">
+                        <el-select v-model="taskOverTimeModel.remindType" @change="updateOvertimeSetting">
                             <el-option
                                 v-for="item in options"
                                 :key="item.value"
@@ -56,15 +56,15 @@
                             </el-option>
                         </el-select>
                         <el-input
-                            v-if="taskOverTimeModel.overTimeTypeUser === null"
+                            v-if="taskOverTimeModel.remindType === null"
                             class="w-187"
                             placeholder="请选择审批人"
                             readonly
-                            :value="getApproverNames(taskOverTimeModel.overTimeUsers)"
+                            :value="getApproverNames(taskOverTimeModel.reminders)"
                             @click.native="selectApproveUser('overTime')"
                             @change="updateOvertimeSetting"/>
                         超时
-                        <el-select class="w-87" v-model="taskOverTimeModel.overTimeBeforeOrAfter" @change="updateOvertimeSetting">
+                        <el-select class="w-87" v-model="taskOverTimeModel.isAhead" @change="updateOvertimeSetting">
                             <el-option
                                 label="前"
                                 :value="1">
@@ -74,7 +74,7 @@
                                 :value="0">
                             </el-option>
                         </el-select>
-                        <el-input class="w-87" onkeyup="this.value=this.value.replace(/\D/g,'')" v-model="taskOverTimeModel.overTime" @change="updateOvertimeSetting">
+                        <el-input class="w-87" onkeyup="this.value=this.value.replace(/\D/g,'')" v-model="taskOverTimeModel.minutes" @change="updateOvertimeSetting">
                         </el-input>
                         分钟发出提醒
                     </div>
@@ -139,14 +139,14 @@
                     </h2>
                     <div class="mb-8">
                         在计划时间
-                        <el-select class="w-87" v-model="taskTypeConfig.planRemindSetting.isAhead" placeholder="请选择">
+                        <el-select class="w-87" v-model="taskTypeConfig.planRemindSetting.minutesType" placeholder="请选择">
                             <el-option
                                 label="前"
-                                :value="1">
+                                :value="0">
                             </el-option>
                             <el-option
                                 label="后"
-                                :value="0">
+                                :value="1">
                             </el-option>
                         </el-select>
                         <el-input class="w-87" onkeyup="this.value=this.value.replace(/\D/g,'')" v-model="taskTypeConfig.planRemindSetting.minutes"/>
@@ -174,7 +174,7 @@
                 <div class="setting-specific-form">
                     <h2>
                         允许工单负责人将工单状态设为暂停
-                        <el-switch v-model="flowSetting.allowPause"/>
+                        <el-switch v-model="taskTypeConfig.allowPause"/>
                     </h2>
                     <approve-setting :options="stableOptions" :approveSetting="taskTypeConfig.pauseApproveSetting" @change="(setting) => changeApproveSetting(setting, 'pause')"/>
                 </div>
@@ -198,6 +198,7 @@
 <script>
 // api
 import * as TaskApi from '@src/api/TaskApi.ts';
+import * as SettingApi from '@src/api/SettingApi.js';
 // model
 import TaskConfig from "@model/types/setting/task/TaskConfig";
 import TaskOverTimeSetting from "@model/types/setting/task/TaskOverTimeSetting";
@@ -231,6 +232,8 @@ export default {
     },
     data() {
         return {
+            taskTypeName: '', // 接口返回的工单类型名称
+
             fields: [],
             flowMap,
 
@@ -291,6 +294,15 @@ export default {
                 case 'start':
                 case 'finish':
                 case 'allot':
+                    options = [
+                        ...options,
+                        ...this.formList.map(item => {
+                            return {
+                                label: '表单人员:' + item.showName,
+                                value: item.stateTemplateId
+                            }
+                        })
+                    ];
                     break;
                 default:
                     options.splice(3, 0, {
@@ -299,15 +311,9 @@ export default {
                     });
                     options = [
                         ...options,
-                        ...this.formList.map(item => {
-                            return {
-                                label: item.showName,
-                                value: item.stateTemplateId
-                            }
-                        }),
                         ...this.receiptList.map(item => {
                             return {
-                                label: item.showName,
+                                label: '表单人员:' + item.showName,
                                 value: item.stateTemplateId
                             }
                         })
@@ -349,9 +355,25 @@ export default {
                 // 获取当前流程超时提醒设置
                 this.taskOverTimeModel = this.taskTypeConfig.taskOverTimeModels.find(item => item.overTimeState === val) || {};
             }
+        },
+        taskTypeId(id) {
+            if(id) {
+                this.getTaskFields(this.type);
+                this.fetchFromUser(this.taskTypeId);
+            }
         }
     },
     methods: {
+        /** 获取工单表单、回执表单中必填的人员字段 */
+        async fetchFromUser(id) {
+            try {
+                let res = await SettingApi.getFromUser(id);
+                this.formList = res.data.list;
+                this.receiptList = res.data.receiptList;
+            } catch (error) {
+                console.error('fetch getFromUser => error', error);
+            }
+        },
         /**
          * 获取工单表单/回执表单自定义字段
          */
@@ -400,7 +422,7 @@ export default {
         selectApproveUser(type) {
             let selected = [];
 
-            if(type === 'overTime') selected = this.taskOverTimeModel.overTimeUsers;
+            if(type === 'overTime') selected = this.taskOverTimeModel.reminders;
             if(type === 'planRemind') selected = this.taskTypeConfig.noticeUsers;
 
             let options = {
@@ -414,7 +436,7 @@ export default {
                     if(res.status != 0) return;
                     switch(type){
                         case 'overTime': // 超时审批指定人员
-                            this.taskOverTimeModel.overTimeUsers = res.data.users;
+                            this.taskOverTimeModel.reminders = res.data.users;
                             this.updateOvertimeSetting();
                             break
                         case 'planRemind': // 计划提醒指定人员
@@ -432,8 +454,12 @@ export default {
         }
     },
     mounted() {
-        console.log('this.type', this.type);
-        this.getTaskFields(this.type);
+        this.$eventBus.$on('setting_task_type_name', taskTypeName => {
+            this.taskTypeName = taskTypeName
+        });
+    },
+    beforeDestroy() {
+        this.$eventBus.$off('setting_task_type_name');
     },
     components: {
         [ApproveSetting.name]: ApproveSetting,

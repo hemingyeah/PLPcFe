@@ -12,6 +12,9 @@ class TaskFlow extends TaskApprover{
 
     /** 审批设置 */
     approveSetting: TaskApprover = new TaskApprover();
+
+    /** 转派时也审批 */
+    reallotAppr?: Boolean = false;
 }
 
 export default TaskFlow;

@@ -215,7 +215,7 @@ export default {
 
       let loading = this.$loading();
       try {
-        this.taskFields = await this.fetchTaskTemplateFields({ typeId: templateId, tableName: 'task', isFromSetting: false });
+        this.taskFields = await this.fetchTaskTemplateFields({ typeId: templateId, tableName: 'task', isFromSetting: true });
         this.taskValue = FormUtil.initialize(this.taskFields, {});
 
         // 表单初始化
@@ -508,11 +508,16 @@ export default {
     async relationFieldSelectHandler(type = TaskFieldNameMappingEnum.Customer) {
       let relationFields = this.relationFieldsFilter(type)
       if (relationFields.length <= 0) return
+
+      let productIds = [];
+      if (Array.isArray(this.value.product) && this.value.product.length) {
+        productIds = this.value.product.map(product => product.value);
+      }
       
       try {
         let params = {
           customerId: this.selectedCustomer?.value || '',
-          productId: this.selectProduct?.value || ''
+          productIds
         }
         let res = await this.fetchRelatedInfo(params);
         let isSuccess = res.success;
@@ -549,7 +554,18 @@ export default {
       relationFields.forEach(relationField => {
         fieldName = relationField?.setting?.fieldName;
         formType = relationField?.setting?.formType;
-        fieldValue = getFieldValue2string(info, fieldName, formType, customerOrPorductFields, isCustomerRelation);
+
+        if (isCustomerRelation) {
+          fieldValue = getFieldValue2string(info, fieldName, formType, customerOrPorductFields, isCustomerRelation);
+        } else {
+          fieldValue = [];
+          
+          if (Array.isArray(info)) {
+            info.map(item => {
+              fieldValue.push(getFieldValue2string(item, fieldName, formType, customerOrPorductFields, isCustomerRelation));
+            })
+          }
+        }
 
         this.update({ field: relationField, newValue: fieldValue });
       })
@@ -737,14 +753,12 @@ export default {
         }
 
         if (isOnlyOneProduct) {
-          // 产品关联字段数据
-          this.relationFieldSelectHandler(TaskFieldNameMappingEnum.Product);
           // 查询关联工单数量
           this.fetchCountForCreate({ module: TaskFieldNameMappingEnum.Product, id: product.id });
-        } else {
-          // 清空产品关联字段数据
-          this.relationFieldClear(TaskFieldNameMappingEnum.Product);
         }
+        
+        // 产品关联字段数据
+        this.relationFieldSelectHandler(TaskFieldNameMappingEnum.Product);
 
       } catch (error) {
         console.warn('task-edit-form: updateProduct -> error', error);

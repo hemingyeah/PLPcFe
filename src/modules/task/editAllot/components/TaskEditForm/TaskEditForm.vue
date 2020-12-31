@@ -1,6 +1,6 @@
 <template>
   <div v-loading.fullscreen.lock="loading">
-    <form-builder ref="form" :fields="taskFields" :value="taskValue" @update="update">
+    <form-builder ref="form" :fields="taskFormFields" :value="taskValue" @update="update">
 
       <template slot="taskNo" slot-scope="{ field, value }">
 
@@ -155,6 +155,20 @@
               {{ `${productRelevanceTaskCountData.unfinished}/${productRelevanceTaskCountData.all}` }}
             </el-button>
           </el-tooltip>
+
+          <!-- start 产品关联查询字段 -->
+          <div class="relation-product-list" v-if="value.product && value.product.length && relationProductfields.length">
+            <div class="relation-product-list-item" v-for="(product, index) in value.product" :key="product.id">
+              <div class="product-name">{{ product.label }}</div>
+              <div class="form-row-two-columns product-relation-field-list">
+                <div class="form-view-row" v-for="field in relationProductfields" :key="field.id">
+                  <label>{{ field.displayName }}</label>
+                  <div class="form-view-row-content"> {{ (value[field.fieldName] || [])[index] }} </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- end 产品关联查询字段 -->
 
         </form-item>
         <!-- end 产品 -->

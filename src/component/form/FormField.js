@@ -1,6 +1,6 @@
 import {randomString} from '@src/util/lang';
 import Field from '@model/Field';
-import { isSelect, isMultiSelect ,isCascader} from './util';
+import { isSelect, isMultiSelect, isCascader} from './util';
 import * as FormInfoConfig from './components/FormInfo/config';
 
 /** 补全formType 为select时的所需字段 */
@@ -74,6 +74,8 @@ export default class FormField{
     this.isCommon = typeof params.isCommon == 'number' ? params.isCommon : 0;
     // 公用字段: 1.设为公用字段设置 2.需判断是否是升级为公用字段而非拖拽进来的公共字段 而不能直接用isCommon
     this.isPublic = this.isCommon;
+    // 是否是拖拽进来的公共字段 0 - 不是，1 - 是
+    this.isDragCommon = typeof params.isDragCommon == 'number' ? params.isDragCommon : 0;
 
     // formType 为select时需要补全一下字段
     let {options, isMulti, dependencies} = fillPropForSelect(params)
@@ -124,6 +126,7 @@ export default class FormField{
     option.isHidden = field.isHidden;
     option.isCommon = field.isCommon;
     option.isPublic = field.isPublic;
+    option.isDragCommon = field.isDragCommon;
 
     let setting = {};
     let defaultValue = null;

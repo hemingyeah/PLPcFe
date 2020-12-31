@@ -220,9 +220,14 @@ const FormDesign = {
       type: Number,
       default: config.FORM_FIELD_MAX
     },
+    /** 公共字段 */
+    commonFields: {
+      type: Array,
+      default: () => ([])
+    },
     relationFieldOptions: { // 关联查询字段关联项数据
       type: Object,
-      default: () => {}
+      default: () => ({})
     }
   },
   data(){
@@ -269,10 +274,12 @@ const FormDesign = {
       originValue: null,
       autographMax: config.AUTOGRAPH_MAX_LENGTH_MAX,
       show: false,
-      // 公共字段配置弹窗
-      fieldSettingModal: false,
-      // 备份数据(用于备份公共字段)
-      backupField: {}
+      // 修改公共字段配置
+      fieldSettingModal: {
+        visible: false,
+        pending: false,
+        backupField: {} // 备份数据
+      }
     }
   },
   computed: {
@@ -295,19 +302,27 @@ const FormDesign = {
       
       if(groupFields.length){
         let basisObj = {};
-        basisObj.name = "基础"
+        basisObj.name = '基础控件'
         basisObj.field = groupFields;
         fieldArr.push(basisObj)
       }
       if(sysFields.length){
         let sysObj = {};
-        sysObj.name = "系统"
+        sysObj.name = '系统字段'
         sysObj.field = sysFields;
+        fieldArr.push(sysObj)
+      }
+      if(this.commonFields.length) {
+        this.commonFields.map(field => field.name = field.displayName);
+
+        let sysObj = {};
+        sysObj.name = '公共字段'
+        sysObj.field = this.commonFields;
         fieldArr.push(sysObj)
       }
       if(layoutFields.length){
         let layoutObj = {};
-        layoutObj.name = "布局"
+        layoutObj.name = '布局控件'
         layoutObj.field = layoutFields;
         fieldArr.push(layoutObj)
       }
@@ -673,9 +688,10 @@ const FormDesign = {
 
       let isNext = true;
 
-      // 取消必填时需要校验人员字段是否是审批人的模块
-      const checkUserArr = [TableNameEnum.Task, TableNameEnum.TaskReceipt, TableNameEnum.Event, TableNameEnum.EventReceipt, TableNameEnum.TaskCard];
-      if(checkUserArr.indexOf(this.mode) > -1 && item.id) {
+      // 删除字段需与后端交互的模块
+      const checkUserArr = [TableNameEnum.Task, TableNameEnum.TaskReceipt, TableNameEnum.Event, TableNameEnum.EventReceipt,TableNameEnum.TaskCard];
+      // 排除新拖进来的公共字段
+      if(checkUserArr.indexOf(this.mode) > -1 && item.id && !item.isDragCommon) {
         // item.id表明该字段已经在后端存储过，不是本次的新增字段
         if(this.mode == 'task_card') {
           isNext = await this.deleteCardFormField(item);
@@ -757,13 +773,18 @@ const FormDesign = {
     },
 
     /** 添加新字段 */
-    insertField(option = {}, value, index, setting) {
+    insertField(option = {}, value, index) {
+      // 拖进来的是公共字段
+      let isDragCommon = option.isCommon == 1;
+
       let newField = new FormField({
+        ...option,
         formType: option.formType,
         displayName: option.name,
         fieldName: option.fieldName,
         isSystem: option.isSystem,
-        setting: setting || {}
+        isDragCommon: isDragCommon ? 1 : 0,
+        setting: isDragCommon ? option.setting : {}
       });
       
       let arr = cloneDeep(value ? value : this.value);
@@ -775,7 +796,7 @@ const FormDesign = {
       return newField;
     },
     /** 立即插入字段 */
-    immediateInsert(field, event, setting) {
+    immediateInsert(field, event) {
       // 禁止拖拽
       if (this.draggingDisable(field)) return;
 
@@ -785,7 +806,7 @@ const FormDesign = {
       // 限制字段数量
       if (this.value.length >= this.max) return 
     
-      let newField = this.insertField(field, this.value, this.value.length, setting);
+      let newField = this.insertField(field, this.value, this.value.length);
       this.insertedField = newField;
     },
     scrollPreviewList(e) {
@@ -804,7 +825,7 @@ const FormDesign = {
     renderTabHeader(name){
       return (
         <div class="form-design-tabs">
-          <div class="form-design-tab">{name}控件</div>
+          <div class="form-design-tab">{name}</div>
         </div>
       );
 
@@ -827,7 +848,7 @@ const FormDesign = {
             onClick={e => this.immediateInsert(field, e)}>
             <div class="form-design-field form-design__ghost"> 
               <span class="anticon"><i class={['iconfont', `icon-fdn-${field.formType}`]}></i></span>
-              <span>{field.name}</span>
+              <span class="field-name">{field.name}</span>
             </div>
           </div>
         )
@@ -848,7 +869,7 @@ const FormDesign = {
 
       return (
         <div
-          class={["form-design-setting", this.isCommonField && "form-design-setting-disabled"]}
+          class={['form-design-setting', this.isCommonField && 'form-design-setting-disabled']}
           key="form-design-setting">
           { this.renderFieldCommonSetting() }
           { fieldSetting }
@@ -936,10 +957,10 @@ const FormDesign = {
     renderFieldCommonSettingModal(h) {
       let fieldSetting = createSettingComp.call(this, h, this.currField);
 
-      return this.fieldSettingModal && (
+      return this.fieldSettingModal.visible && (
         <div class="field-setting-modal">
           <base-panel
-            show={ this.fieldSettingModal }
+            show={ this.fieldSettingModal.visible }
             onClose={ this.closeFieldSettingModal }
             title="修改控件配置"
             width="350px"
@@ -954,7 +975,7 @@ const FormDesign = {
             </div>
             <div class="base-panel-footer" slot="footer">
               <el-button onClick={ this.closeFieldSettingModal }>取消</el-button>
-              <el-button type="primary" onClick={ this.saveFieldSetting }>保存</el-button>
+              <el-button type="primary" onClick={ this.saveFieldSetting } disabled={ this.fieldSettingModal.pending }>保存</el-button>
             </div>
           </base-panel>
         </div>
@@ -973,22 +994,24 @@ const FormDesign = {
     * @description 打开修改控件配置弹窗
     */
     openFieldSettingModal() {
-      this.backupField = _.cloneDeep(this.currField);
-      this.fieldSettingModal = true;
+      this.fieldSettingModal.backupField = cloneDeep(this.currField);
+      this.fieldSettingModal.visible = true;
     },
     /** 
     * @description 取消修改控件配置
     */
     closeFieldSettingModal() {
-      this.currField = _.cloneDeep(this.backupField);
-      this.fieldSettingModal = false;
+      this.currField = cloneDeep(this.fieldSettingModal.backupField);
+      this.fieldSettingModal.visible = false;
     },
     /** 
     * @description 修改公共字段配置
     */
     async saveFieldSetting() {
-      let confirm = await this.$platform.confirm(`“公用字段”编辑后将在所有已经被运用到该字段的表单中生效，请谨慎修改！`);
+      let confirm = await this.$platform.confirm('“公用字段”编辑后将在所有已经被运用到该字段的表单中生效，请谨慎修改！');
       if(!confirm) return;
+
+      this.fieldSettingModal.pending = true;
 
       this.$emit('updatePublicFieldSetting', this.currField);
     }
