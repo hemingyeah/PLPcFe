@@ -197,6 +197,16 @@ export function advancedSetting(params) {
 }
 
 /**
+ * 修改工单类型颜色和名称
+ * 
+ * @param {string} params.name 工单类型名称
+ * @param {string} parmas.color 工单类型颜色
+ */
+export function updateTaskTypeNameAndColor(params) {
+  return http.post('/outside/pc/task/taskType/updateTaskType', params);
+}
+
+/**
  * 获取工单类型设置列表 （包含最大可设置的工单数、所有团队列表）
  */
 export function getTaskTypeManage(params) {

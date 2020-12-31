@@ -232,6 +232,8 @@ export default {
     },
     data() {
         return {
+            taskTypeName: '', // 接口返回的工单类型名称
+
             fields: [],
             flowMap,
 
@@ -450,6 +452,14 @@ export default {
         refreshFields() {
             console.log(this.mode)
         }
+    },
+    mounted() {
+        this.$eventBus.$on('setting_task_type_name', taskTypeName => {
+            this.taskTypeName = taskTypeName
+        });
+    },
+    beforeDestroy() {
+        this.$eventBus.$off('setting_task_type_name');
     },
     components: {
         [ApproveSetting.name]: ApproveSetting,

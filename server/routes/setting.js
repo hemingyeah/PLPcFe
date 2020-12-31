@@ -73,6 +73,16 @@ router.get('/setting/task/cardFormfields', async ctx => {
   ctx.body = Template.renderWithHtml('附加组件表单设置', body, script, modConfig.template)
 });
 
+router.get('/setting/task/cardHoursRecord', async ctx => {
+  let modConfig = modules['setting.task.hoursrecord'];
+  let script = ['/setting.task.hoursrecord.js'];
+  let { url, headers } = ctx.request;
+  let result = await HttpClient.request(url, 'get', null, { headers });
+  let body = result.body;
+  
+  ctx.body = Template.renderWithHtml('工单设置', body, script, modConfig.template)
+});
+
 router.get('/setting/serviceStation/partShop', async ctx => {
   let script = ['/system.mall.index.js'];
   let modConfig = modules['system.mall.index'];

@@ -20,7 +20,10 @@ module.exports = {
   'setting.task.addcard_fields': {
     entry: './src/modules/setting/task/taskAdditionalSetting/taskAddcardFormView/index.js',
   },
+  'setting.task.hoursrecord': {
+    entry: './src/modules/setting/task/taskAdditionalSetting/taskHoursRecordView/index.js',
+  },
   'system.mall.index' : {
-    entry: "./src/modules/system/mall/index.js"
+    entry: './src/modules/system/mall/index.js'
   }
 }

@@ -1,25 +1,63 @@
 <template>
-  <base-modal title="该操作需要审批" :show.sync="visible" width="700px" class="task-need-approve-dialog">
+  <base-modal title="该操作需要审批" :show.sync="visible" width="432px" class="task-need-approve-dialog">
     <div class="base-modal-content">
-      <div class="form-item">
-        <label><span class="form-item-required" v-if="chooseApprover">*</span>审批人：</label>
-        <div class="form-item-control">
-          <form-user
-            v-if="chooseApprover"
-            :field="{ displayName: '审批人' }"
-            v-model="approver"
-            :see-all-org="true"
-            placeholder="请选择审批人"
-          />
-          <template v-else>{{approversName}}</template>
-        </div>
+      <p><span class="form-item-required" v-if="remarkRequired">*</span>审批说明：</p>
+      <textarea v-model="apprForm.applyRemark" :placeholder="remarkPlaceholder" rows="3" maxlength="500" />
+      <!--S 审批步骤 -->
+      <div class="approve-steps">
+        <el-row v-if="approveLevel === 1" type="flex">
+          <label><span class="form-item-required" v-if="remarkRequired">*</span>审批人：</label>
+          <div class="form-item-control">
+            <form-user
+              v-if="chooseApprover"
+              :field="{ displayName: '审批人' }"
+              v-model="approver"
+              :see-all-org="true"
+              placeholder="请选择审批人"
+            />
+            <template v-else>{{approversName}}</template>
+          </div>
+        </el-row>
+        <el-steps v-else direction="vertical">
+          <!-- 一级审批步骤 -->
+          <el-step title="一级审批" status="process">
+            <el-row slot="description" type="flex">
+              <div class="form-item-control">
+                <form-user
+                  v-if="chooseApprover"
+                  :field="{ displayName: '一级审批人' }"
+                  v-model="approver"
+                  :see-all-org="true"
+                  placeholder="请选择一级审批人"
+                />
+                <div v-else>
+                  <label><span class="form-item-required" v-if="remarkRequired">*</span>审批人：</label>
+                  {{approversName}}
+                </div>
+              </div>
+            </el-row>
+          </el-step>
+          <!-- 二级以上审批步骤 -->
+          <el-step title="二级审批" status="process">
+            <el-row slot="description" type="flex">
+              <div class="form-item-control">
+                <form-user
+                  v-if="multiApproverSetting.isOpt === 1"
+                  :field="{ displayName: '二级审批人' }"
+                  v-model="multiApproverSetting.approver"
+                  :see-all-org="true"
+                  placeholder="请选择二级审批人"
+                />
+                <div v-else>
+                  <label><span class="form-item-required" v-if="remarkRequired">*</span>审批人：</label>
+                  {{multiApproverSetting.approversName}}
+                </div>
+              </div>
+            </el-row>
+          </el-step>
+        </el-steps>
       </div>
-      <div class="form-item">
-        <label><span class="form-item-required" v-if="remarkRequired">*</span>审批说明：</label>
-        <div class="form-item-control">
-          <textarea v-model="apprForm.applyRemark" :placeholder="remarkPlaceholder" rows="3" maxlength="500" />
-        </div>
-      </div>
+      <!--E 审批步骤 --> 
     </div>
     <div slot="footer" class="dialog-footer">
       <el-button @click="visible = false">取 消</el-button>
@@ -55,7 +93,9 @@ export default {
       chooseApprover: false,
       apprForm: {},
       approver: {},
-      approversName: ''
+      approversName: '',
+      approveLevel: 1, // 审批等级
+      multiApproverSetting: {} // 多级审批（2级以上审批）
     }
   },
   computed: {
@@ -78,17 +118,28 @@ export default {
         this.approversName = data.approversName;
       }
 
+      this.approveLevel = data.level || 1;
+      this.multiApproverSetting = data.multiApproverSetting || {};
+      if(this.multiApproverSetting.approver === undefined) {
+        this.$set(this.multiApproverSetting, 'approver', {});
+      }
+
       this.visible = true;
     },
     submit() {
       // 审批人由发起人选择时
       if (this.chooseApprover && !this.approver.userId) return this.$platform.alert('请选择审批人');
+      if (this.multiApproverSetting.isOpt === 1 && !this.multiApproverSetting.approver.userId) return this.$platform.alert('请选择二级审批人');
 
       // 审批说明必填校验
       if (!this.apprForm.applyRemark && this.remarkRequired) return this.$platform.alert('请填写审批说明');
 
       if (this.chooseApprover) this.apprForm.params.approveId = this.approver.userId;
 
+      // 多级审批参数
+      if(this.level > 1) {
+        if (this.multiApproverSetting.isOpt === 1) this.apprForm.params.multiApproverSetting.approveId = this.multiApproverSetting.approver.userId;
+      }
       this.pending = true;
 
       TaskApi.applyApprove(this.apprForm).then(res => {
@@ -115,5 +166,16 @@ export default {
     margin-bottom: 10px;
     align-items: baseline;
   }
+}
+</style>
+
+<style lang="scss" scoped>
+.approve-steps{
+  margin-top: 20px;
+}
+
+// elemeny-ui 
+/deep/.el-step__description{
+  padding: 0;
 }
 </style>
