@@ -1,31 +1,28 @@
 <template>
   <div class="base-select-container">
     <div class="content el-select el-input el-input--small el-input--suffix" v-clickoutside="closeList">
-      <div 
-        class="base-select-main-content multiple-layout el-input el-input__inner" 
-        ref="normalInput"
-        @click.stop="focusInput" 
-        v-if="multiple"
-        :class="{'error': error, 'wrapper-is-focus': isFocus, 'clearable-layout': clearable}"
-      >
-        
-        <el-tag size="mini" closable v-for="tag in (collapsed ? value[0] ? [value[0]] : [] : value)" :key="getValueKey(tag)" @close="removeTag(tag)" disable-transitions type="info">
+      <div class="base-select-main-content multiple-layout el-input el-input__inner" ref="normalInput"
+        @click.stop="focusInput" v-if="multiple"
+        :class="{'error': error, 'wrapper-is-focus': isFocus, 'clearable-layout': clearable}">
+
+        <el-tag size="mini" closable v-for="tag in (collapsed ? value[0] ? [value[0]] : [] : value)"
+          :key="getValueKey(tag)" @close="removeTag(tag)" disable-transitions type="info">
           {{tag.label || tag[valueKey]}}
         </el-tag>
-        
+
         <div v-if="collapsed && value.length > 1" class='base-user-select-tag'>
           + {{value.length - 1}}
         </div>
         <span v-if="value.length <= 0" class="placeholder-text">
           {{ placeholder }}
         </span>
-        
+
         <span class="el-input__suffix">
           <span class="el-input__suffix-inner">
             <i class="el-select__caret el-input__icon el-icon-arrow-up" :class="showList && 'is-reverse'"></i>
           </span>
         </span>
-        
+
       </div>
       
       <div 
@@ -39,262 +36,292 @@
         <template v-else>
           {{ value.map(tag => tag.label).join('') }}
         </template>
-        
+
         <span v-if="value.length <= 0" class="placeholder-text">
           {{ placeholder }}
         </span>
       </div>
-        
+
       <i v-if="clearable && value.length" class="iconfont icon-minus-fill clear-btn" @click="clearValue"></i>
 
-      <div class="list-wrapper" v-show="showList" :style="selectCon ? `top:${(selectCon.top +selectCon.height +13)}px;left:${ selectCon.left}px;width:${selectCon.width}px` : ''">
-        <div class="arrow"></div>
-        <div class="input-container" v-if="!options.length">
-          <input type="text" v-model="keyword" @input="searchByKeyword" ref="input" :placeholder="placeholder">
-        </div>
-        
+      <div class="list-wrapper" v-show="showList"
+        :style="selectCon ? `${topShow ? `top:${(selectCon.top -254)}px;` : `top:${(selectCon.top +selectCon.height +13)}px;`}left:${ selectCon.left}px;width:${selectCon.width}px` : ''">
+
+        <template v-if="!topShow">
+          <div class="arrow"></div>
+          <div class="input-container" v-if="!options.length">
+            <input type="text" v-model="keyword" @input="searchByKeyword" ref="input" :placeholder="placeholder">
+          </div>
+        </template>
+
         <ul class="option-list" v-loadmore="loadmoreOptions" ref="list">
-         
-      
-          <li v-for="(op, index) in optionList" :key="index" @click="selectTag(op)" :class="{'selected': value.some(user => user[valueKey] ===op[valueKey])}">
+
+
+          <li v-for="(op, index) in optionList" :key="index" @click="selectTag(op)"
+            :class="{'selected': value.some(user => user[valueKey] ===op[valueKey])}">
             <slot name="option" :option="op" v-if="optionSlot"> </slot>
             <template v-else>{{op.label}}</template>
             <div class="checked"></div>
           </li>
-          
+
           <li class="list-message" v-if="message">{{message}}</li>
         </ul>
+        <template v-if="topShow">
+          <div class="input-container" v-if="!options.length">
+            <input type="text" v-model="keyword" @input="searchByKeyword" ref="input" :placeholder="placeholder">
+          </div>
+
+          <div class="arrow-bottom"></div>
+        </template>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import Clickoutside from '@src/util/clickoutside';
-let timeInterval;
-import Page from '@model/Page';
-import _ from 'lodash';
+  import Clickoutside from '@src/util/clickoutside';
+  let timeInterval;
+  import Page from '@model/Page';
+  import _ from 'lodash';
 
-/**
- * Todo
- * 1. 列表出现在上部还是下部。
- * 2. 点击空白隐藏列表。✅
- * 3. 配置 key value 的name，还是整理好列表传进来
- * 4. 关闭弹窗没有重置联系人 ✅
- * 5. 配置多选单选
- * 6. 配置可一键清空
- * 7. 配置是否远程搜索
- * 8. option的自定义
- * 9. 布局调整，搜索框和列表在一起
- * 10.
- */
-export default {
-  name: 'base-select',
-  props: {
-    remoteMethod: Function,
-    value: {
-      type: Array,
-      default: () => ([]),
-    },
-    valueKey: {
-      type: String,
-      default: 'value'
-    },
-    error: {
-      type: Boolean,
-      default: false,
-    },
-    multiple: {
-      type: Boolean,
-      default: false,
-    },
-    clearable: {
-      type: Boolean,
-    },
-    options: {
-      type: Array,
-      default: () => ([]),
-    },
-    placeholder: {
-      type: String,
-      default: ''
-    },
-    disabled: {
-      type: Boolean,
-      default: false
-    },
-    collapsed: {
-      type: Boolean,
-      default: false
-    }
-  },
-  data() {
-    return {
-      showList: false,
-      pending: false,
-      isFocus: false,
-      keyword: '',
-      loadmoreOptions: {
-        disabled: false,
-        callback: this.loadmore,
-        distance: 10,
+  /**
+   * Todo
+   * 1. 列表出现在上部还是下部。
+   * 2. 点击空白隐藏列表。✅
+   * 3. 配置 key value 的name，还是整理好列表传进来
+   * 4. 关闭弹窗没有重置联系人 ✅
+   * 5. 配置多选单选
+   * 6. 配置可一键清空
+   * 7. 配置是否远程搜索
+   * 8. option的自定义
+   * 9. 布局调整，搜索框和列表在一起
+   * 10.
+   */
+  export default {
+    name: 'base-select',
+    props: {
+      remoteMethod: Function,
+      value: {
+        type: Array,
+        default: () => ([]),
       },
-      page: new Page(),
-      selectCon:null
-    }
-  },
-  watch:{
-    showList(newV, oldV){
-      if(newV == true){
-        timeInterval = setTimeout(()=>{
-          this.selectCon = this.$refs['normalInput'].getBoundingClientRect();
-        }, 100)
-      }else{
-        clearTimeout(timeInterval)
+      valueKey: {
+        type: String,
+        default: 'value'
+      },
+      error: {
+        type: Boolean,
+        default: false,
+      },
+      multiple: {
+        type: Boolean,
+        default: false,
+      },
+      clearable: {
+        type: Boolean,
+      },
+      options: {
+        type: Array,
+        default: () => ([]),
+      },
+      placeholder: {
+        type: String,
+        default: ''
+      },
+      disabled: {
+        type: Boolean,
+        default: false
+      },
+      collapsed: {
+        type: Boolean,
+        default: false
       }
-    }
-  },
-  beforeDestroy(){
-    clearTimeout(timeInterval)
-  },
-  computed: {
-    optionList() {
-      if (this.options.length) return this.options;
-      return this.page.list;
     },
-    optionSlot() {
-      return !!this.$scopedSlots.option;
-    },
-    labelSlot() {
-      return !!this.$scopedSlots.label;
-    },
-    message() {
-      const {total, hasNextPage, } = this.page;
-      if (this.pending) {
-        return '载入更多结果......';
+    data() {
+      return {
+        showList: false,
+        pending: false,
+        isFocus: false,
+        keyword: '',
+        loadmoreOptions: {
+          disabled: false,
+          callback: this.loadmore,
+          distance: 10,
+        },
+        page: new Page(),
+        selectCon: null,
+        topShow: false
       }
-      if (!total) {
-        return '未找到结果';
-      }
-      if (!hasNextPage) {
-        return '已加载全部结果';
-      }
-      return '载入更多结果......';
     },
-  },
-  methods: {
-    getValueKey(op){
-      return `${op[this.valueKey]}`;
-    },
-    focusInput() {
-      if (this.disabled) return
-      if (this.showList) return this.close()
-      
-      this.isFocus = true
-      this.initList()
-    },
-    closeList(e) {
-      this.showList = false;
-      this.isFocus = false;
-      this.pending = true;
-      this.resetStatus('');
-    },
-    clearValue() {
-      this.$emit('input', []);
-    },
-    removeTag(tag) {
-      const newVal = this.value.filter(t => t[this.valueKey] !== tag[this.valueKey]);
-      this.$emit('input', newVal);
-    },
-    selectTag(tag) {
-      let newValue = this.value;
+    watch: {
+      showList(newV, oldV) {
+        if (newV == true) {
+          timeInterval = setInterval(() => {
 
-      if (!this.multiple) {
-        newValue = [tag];
-        this.showList = false;
-        this.resetStatus();
-
-      } else {
-        if (this.value.every(t => t[this.valueKey] !== tag[this.valueKey])) {
-          newValue.push(tag);
+          let res_ = this.$refs['normalInput'].getBoundingClientRect()
+            let bottomH = window.innerHeight -
+              res_.y -
+              res_.height;
+            if (bottomH < 370) {
+              this.topShow = true;
+            }
+            this.selectCon = res_;
+          }, 100)
         } else {
-          newValue = newValue.filter(t => t[this.valueKey] !== tag[this.valueKey]);
+          clearInterval(timeInterval)
         }
       }
-
-      this.$emit('input', newValue);
     },
-    async loadmore(){
-      this.loadmoreOptions.disabled = true;
-      this.loading = true;
+    beforeDestroy() {
+      clearInterval(timeInterval)
+    },
+    computed: {
+      optionList() {
+        if (this.options.length) return this.options;
+        return this.page.list;
+      },
+      optionSlot() {
+        return !!this.$scopedSlots.option;
+      },
+      labelSlot() {
+        return !!this.$scopedSlots.label;
+      },
+      message() {
+        const {
+          total,
+          hasNextPage,
+        } = this.page;
+        if (this.pending) {
+          return '载入更多结果......';
+        }
+        if (!total) {
+          return '未找到结果';
+        }
+        if (!hasNextPage) {
+          return '已加载全部结果';
+        }
+        return '载入更多结果......';
+      },
+    },
+    methods: {
+      getValueKey(op) {
+        return `${op[this.valueKey]}`;
+      },
+      focusInput() {
+        if (this.disabled) return
+        if (this.showList) return this.close()
 
-      try {
-        this.page.pageNum += 1;
-        const res = await this.search();
-        this.page.merge(res);
-      } catch (e) {
-        console.error('e', e);
+        this.isFocus = true
+        this.initList()
+      },
+      closeList(e) {
+        this.showList = false;
+        this.isFocus = false;
+        this.pending = true;
+        this.resetStatus('');
+      },
+      clearValue() {
+        this.$emit('input', []);
+      },
+      removeTag(tag) {
+        const newVal = this.value.filter(t => t[this.valueKey] !== tag[this.valueKey]);
+        this.$emit('input', newVal);
+      },
+      selectTag(tag) {
+        let newValue = this.value;
+
+        if (!this.multiple) {
+          newValue = [tag];
+          this.showList = false;
+          this.resetStatus();
+
+        } else {
+          if (this.value.every(t => t[this.valueKey] !== tag[this.valueKey])) {
+            newValue.push(tag);
+          } else {
+            newValue = newValue.filter(t => t[this.valueKey] !== tag[this.valueKey]);
+          }
+        }
+
+        this.$emit('input', newValue);
+      },
+      async loadmore() {
+        this.loadmoreOptions.disabled = true;
+        this.loading = true;
+
+        try {
+          this.page.pageNum += 1;
+          const res = await this.search();
+          this.page.merge(res);
+        } catch (e) {
+          console.error('e', e);
+        }
+      },
+      search() {
+        if (!this.remoteMethod) return;
+        const {
+          pageNum,
+          pageSize,
+        } = this.page;
+        return this.remoteMethod({
+            keyword: this.keyword,
+            pageNum,
+            pageSize,
+          })
+          .then(res => {
+            this.pending = false;
+            this.loadmoreOptions.disabled = res ? !res.hasNextPage : false;
+            return res;
+          })
+          .catch(err => console.error(err))
+      },
+      searchByKeyword: _.debounce(function (e) {
+        this.resetStatus(e.target.value);
+        this.pending = true;
+        this.search()
+          .then(res => {
+            if (!res || !res.list) return;
+            this.$refs.list.scrollTop = 0;
+            this.page = Page.as(res);
+          })
+          .catch(e => {
+            console.log('searchByKeyword catch e', e)
+          });
+      }, 800),
+      initList() {
+        this.pending = true;
+        this.showList = true;
+
+        this.search()
+          .then(res => {
+            if (!res || !res.list) return;
+            this.$refs.input.focus();
+
+            this.page = Page.as(res);
+          })
+          .catch(e => {
+            console.log('initList catch e', e)
+          });
+      },
+      resetStatus(keyword) {
+        this.keyword = keyword || '';
+        this.page = new Page();
+      },
+      close() {
+        this.showList = false;
       }
     },
-    search() {
-      if (!this.remoteMethod) return;
-      const {pageNum, pageSize, } = this.page;
-      return this.remoteMethod({
-        keyword: this.keyword,
-        pageNum,
-        pageSize,
-      })
-        .then(res => {
-          this.pending = false;
-          this.loadmoreOptions.disabled = res ? !res.hasNextPage : false;
-          return res;
-        })
-        .catch(err => console.error(err))
+    directives: {
+      Clickoutside
     },
-    searchByKeyword:_.debounce(function(e) {
-      this.resetStatus(e.target.value);
-      this.pending = true;
-      this.search()
-        .then(res => {
-          if (!res || !res.list) return;
-          this.$refs.list.scrollTop = 0;
-          this.page = Page.as(res);
-        })
-        .catch(e => {
-          console.log('searchByKeyword catch e', e)
-        });
-    }, 800),
-    initList() {
-      this.pending = true;
-      this.showList = true;
-
-      this.search()
-        .then(res => {
-          if (!res || !res.list) return;
-          this.$refs.input.focus();
-
-          this.page = Page.as(res);
-        })
-        .catch(e => {
-          console.log('initList catch e', e)
-        });
-    },
-    resetStatus(keyword) {
-      this.keyword = keyword || '';
-      this.page = new Page();
-    },
-    close() {
-      this.showList = false;
-    }
-  },
-  directives: { Clickoutside },
-}
+  }
 </script>
 
 <style lang="scss">
   $color-primary-light-9: mix(#fff, $color-primary, 90%) !default;
 
-  .form-item.err :not(.is-success) input, .form-item.err :not(.is-success) .base-select-main-content {
+  .form-item.err :not(.is-success) input,
+  .form-item.err :not(.is-success) .base-select-main-content {
     border-color: #f56c6c !important;
   }
 
@@ -303,6 +330,7 @@ export default {
 
     .content {
       position: relative;
+
       &:hover {
         .clear-btn {
           display: block;
@@ -369,7 +397,7 @@ export default {
       left: 0;
       top: calc(100% + 13px);
       width: 100%;
-      padding-top: 34px;
+      // padding-top: 34px;
       box-shadow: 1px 1px 8px rgba(0, 0, 0, 0.15);
       background: #fff;
       z-index: 99999;
@@ -385,12 +413,24 @@ export default {
         border-bottom: 7px solid white;
       }
 
-      .input-container {
+      .arrow-bottom {
         position: absolute;
+        width: 0;
+        height: 0;
+        bottom: -7px;
+        transform: rotateZ(180deg);
+        left: 37px;
+        border-left: 5px solid transparent;
+        border-right: 5px solid transparent;
+        border-bottom: 7px solid white;
+      }
+
+      .input-container {
+        // position: absolute;
         width: 100%;
-        top: 0;
-        left: 0;
-        padding: 0 10px;
+        // top: 0;
+        // left: 0;
+        padding: 4px 10px;
         line-height: 34px;
 
 
@@ -426,6 +466,7 @@ export default {
         padding: 0 10px;
         line-height: 34px;
         position: relative;
+
         &:hover {
           background: $color-primary-light-9;
         }
@@ -479,14 +520,17 @@ export default {
 </style>
 
 <style lang="scss">
-.base-select-container {
-  .el-select {
-    width: 100%;
+  .base-select-container {
+    .el-select {
+      width: 100%;
+    }
+
+    .el-select .el-input .el-select__caret.is-reverse {
+      transform: rotateZ(0deg);
+    }
   }
-  .el-select .el-input .el-select__caret.is-reverse {
-    transform: rotateZ(0deg);
-  }
-}
+
+  
 .base-select-main-content {
   &:hover {
     border-color: $color-primary;
