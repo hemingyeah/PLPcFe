@@ -136,7 +136,7 @@ export default {
 
       let date = Lang.formatDate(new Date(), "YYYY-MM-DD");
       let fileName = `${date}批量更新产品数据.xlsx`;
-      let url = "/product/importCover/export";
+      let url = '/product/importCover/newExport';
 
       this.$http.post(url, params, true, {responseType: "blob"})
         .then(blob => {
@@ -155,7 +155,7 @@ export default {
         .catch(err => console.error(err));
     },
     downloadBlank() {
-      window.location.href = "/product/importBlankCoverExport/exportNew";
+      window.location.href = '/product/importBlankCoverExport/exportV2';
     },
     async upload(){
       try {
