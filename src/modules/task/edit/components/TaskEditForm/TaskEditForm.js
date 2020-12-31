@@ -782,7 +782,7 @@ export default {
      * @description 效验
     */
     validate() {
-      return this.$refs.form.validate();
+      return this.$refs.form.validate(false);
     },
   },
   components: {

@@ -29,7 +29,23 @@ function fillPropForSelect(params){
     })
 
     // 没有选项，添加默认项
-    if(options.length == 0) options.push({value: '', isDefault: false},{value: '', isDefault: false},{value: '', isDefault: false});
+    if(options.length == 0) {
+      // 优先级
+      if(params.formType == 'level') {
+        options.push({value: '中', isDefault: false}, {value: '低', isDefault: false}, {value: '高', isDefault: false});
+      }
+      // 服务内容
+      else if(params.formType == 'serviceType') {
+        options.push({value: '保内免费', isDefault: false}, {value: '保内收费', isDefault: false}, {value: '保外免费', isDefault: false}, {value: '保外收费', isDefault: false});
+      }
+      // 服务类型
+      else if(params.formType == 'serviceContent') {
+        options.push({value: '安装', isDefault: false}, {value: '维修', isDefault: false}, {value: '保养', isDefault: false}, {value: '巡检', isDefault: false}, {value: '检查', isDefault: false});
+      }
+      else { 
+        options.push({value: '', isDefault: false}, {value: '', isDefault: false}, {value: '', isDefault: false});
+      }
+    }
     
   }
 
@@ -62,7 +78,7 @@ export default class FormField{
 
     // 是否允许搜索 0 - 不允许，1 - 允许
     this.isSearch = typeof params.isSearch == 'number' ? params.isSearch : 0; 
-    this.placeHolder = params.placeHolder; // 提示信息
+    this.placeHolder = params.placeHolder || ''; // 提示信息
     this.defaultValue = params.defaultValue; // 默认值
     // 是否为系统字段 0 - 非系统字段，1 - 系统字段
     this.isSystem = typeof params.isSystem == 'number' ? params.isSystem : 0;

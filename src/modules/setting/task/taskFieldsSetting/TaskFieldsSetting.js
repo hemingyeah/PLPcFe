@@ -10,14 +10,16 @@ import * as FormUtil from '@src/component/form/util';
 import _ from 'lodash';
 /* components */
 import RelationOptionsModal from './components/RelationOptionsModal/RelationOptionsModal.tsx';
+/* enum */
+import TableNameEnum from '@model/enum/TableNameEnum.ts';
 
 // 关联字段禁用的类型
 const RELATION_DISABLE_FIELDS = ['attachment', 'autograph', 'separator', 'info'];
 
 // 模块名映射
 const MODE_NAME_MAP = {
-  task: '工单表单',
-  task_receipt: '回执表单'
+  [TableNameEnum.Task]: '工单表单',
+  [TableNameEnum.TaskReceipt]: '回执表单'
 }
 
 export default {
@@ -26,7 +28,7 @@ export default {
   props: {
     mode: {
       type: String,
-      default: 'task'
+      default: TableNameEnum.Task
     },
     templateId: {
       type: String,

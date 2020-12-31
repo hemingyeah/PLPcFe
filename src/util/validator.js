@@ -3,6 +3,8 @@ import MathUtil from '@src/util/math';
 import { FORM_FIELD_TEXT_MAX_LENGTH, FORM_FIELD_TEXTAREA_MAX_LENGTH } from '@src/model/const/Number.ts';
 
 import * as FieldValidateApi from '@src/api/FieldValidateApi.ts';
+/* enum */
+import TableNameEnum from '@model/enum/TableNameEnum.ts';
 
 // 单行最大长度
 export const SINGLE_LINE_MAX_LEN = FORM_FIELD_TEXT_MAX_LENGTH;
@@ -31,7 +33,9 @@ export const LINK_REG = /(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a
 export const fieldValidateMap = {
   customer: FieldValidateApi.fieldRepeatCustomer,
   product: FieldValidateApi.fieldRepeatProduct,
-  productTemplate: FieldValidateApi.fieldRepeatProductTemplate
+  productTemplate: FieldValidateApi.fieldRepeatProductTemplate,
+  [TableNameEnum.Task]: FieldValidateApi.fieldRepeatTask,
+  [TableNameEnum.TaskReceipt]: FieldValidateApi.fieldRepeatTask
 }
 
 let remoteValidateDebounceFunc = null
@@ -65,11 +69,11 @@ const RuleMap = {
 };
 
 // 远程验证字段是否重复方法
-let repeatRemoteValidate = (mode, field, value, id, changeStatus, resolve, isSample = true, formBuilderComponent = {}) => {
+let repeatRemoteValidate = (mode, field, value, id, changeStatus, resolve, isSample = true, formBuilderComponent = {}, templateId) => {
   
   const remoteFunc = (value, resolve) => {
     let api = fieldValidateMap[mode];
-    let params = { fieldName: field.fieldName, fieldValue: value, id };
+    let params = { fieldName: field.fieldName, fieldValue: value, id, templateId, isCommon: field.isCommon};
     
     // api不存在
     if (!api) return;
@@ -77,7 +81,7 @@ let repeatRemoteValidate = (mode, field, value, id, changeStatus, resolve, isSam
     changeStatus(true);
     return api(params).then(res => {
       changeStatus(false);
-      return resolve(res.succ ? (res.data == 1 ? `${field.displayName}不允许重复` : null) : null);
+      return resolve((res.succ || res.success) ? ((res.data == 1 || res.result == 1) ? `${field.displayName}不允许重复` : null) : null);
     })
       .catch(err => console.error(err))
   }
@@ -129,7 +133,7 @@ function text(value, field = {}, origin = {}, mode, changeStatus, isSample = tru
   return new Promise((resolve, reject) => {
     validate.then((res) => {
       res === null 
-        ? repeatRemoteValidate(mode, field, value, origin.id, changeStatus, resolve, isSample, formBuilderComponent) 
+        ? repeatRemoteValidate(mode, field, value, origin.id, changeStatus, resolve, isSample, formBuilderComponent, origin.templateId) 
         : resolve(res);
     }).catch(err => {
       console.error('text validate err', err);
@@ -183,7 +187,7 @@ function textarea(value, field = {}, origin = {}, mode, changeStatus, isSample =
 
   return new Promise((resolve, reject) => {
     validate.then((res) => {
-      res === null ? repeatRemoteValidate(mode, field, value, origin.id, changeStatus, resolve, isSample, formBuilderComponent) : resolve(res);
+      res === null ? repeatRemoteValidate(mode, field, value, origin.id, changeStatus, resolve, isSample, formBuilderComponent, origin.templateId) : resolve(res);
     }).catch(err => {
       console.error('textarea validate err', err);
     })
@@ -205,7 +209,7 @@ function phone(value, field = {}, origin = {}, mode, changeStatus, isSample = tr
 
   return new Promise((resolve, reject) => {
     validate.then((res) => {
-      res === null ? repeatRemoteValidate(mode, field, value, origin.id, changeStatus, resolve, isSample, formBuilderComponent) : resolve(res);
+      res === null ? repeatRemoteValidate(mode, field, value, origin.id, changeStatus, resolve, isSample, formBuilderComponent, origin.templateId) : resolve(res);
     }).catch(err => {
       console.error('phone validate err', err);
     })
@@ -315,7 +319,7 @@ function number(value, field = {}, origin = {}, mode, changeStatus, isSample = t
   
   return new Promise((resolve, reject) => {
     validate.then((res) => {
-      res === null ? repeatRemoteValidate(mode, field, value, origin.id, changeStatus, resolve, isSample, formBuilderComponent) : resolve(res);
+      res === null ? repeatRemoteValidate(mode, field, value, origin.id, changeStatus, resolve, isSample, formBuilderComponent, origin.templateId) : resolve(res);
     }).catch(err => {
       console.error('number validate err', err);
     })

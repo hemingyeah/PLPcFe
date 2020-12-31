@@ -1,6 +1,6 @@
 <template>
   <div v-loading.fullscreen.lock="loading">
-    <form-builder ref="form" :fields="taskFormFields" :value="taskValue" @update="update">
+    <form-builder ref="form" :fields="taskFormFields" :value="taskValue" mode="task" @update="update">
 
       <template slot="taskNo" slot-scope="{ field, value }">
 

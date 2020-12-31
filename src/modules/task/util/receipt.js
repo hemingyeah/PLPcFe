@@ -182,6 +182,7 @@ export function packToForm(fields, data) {
 
   return {
     id: task.id,
+    templateId: task.templateId,
     disExpense,
     ...task.attribute
   };

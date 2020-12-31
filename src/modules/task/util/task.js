@@ -102,6 +102,7 @@ export function packToForm(fields, data){
     id: data.id,
     taskNo: data.taskNo,
     templateName: data.templateName,
+    templateId: data.templateId,
     ...data.attribute
   };
 
