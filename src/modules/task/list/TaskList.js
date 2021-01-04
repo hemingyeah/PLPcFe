@@ -11,7 +11,6 @@ import BatchEditingCustomerDialog from './components/BatchEditingCustomerDialog.
 import TaskTransfer from './components/TaskTransfer.vue';
 import TaskMap from './components/TaskMap.vue';
 import TaskView from './components/TaskView.vue'
-// import guideCompoment from "@src/component/guide/guide";
 import TaskViewPane from '@src/modules/task/components/list/TaskViewPanel.vue';
 
 /** model */
@@ -349,18 +348,6 @@ export default {
     },
     stopStep() {
       this.nowGuideStep = 5;
-    },
-    guideSearchModelSave_stopStep() {
-      this['guideSearchModelSave'] = false;
-    },
-    guideSearchModelSave_finishBtnFn() {
-      this.guideSearchModelSave_stopStep();
-    },
-    guideDropdownMenu_stopStep() {
-      this['guideDropdownMenu'] = false;
-    },
-    guideDropdownMenu_finishBtnFn() {
-      this.guideDropdownMenu_stopStep();
     },
     /**
      * 获取附件
@@ -1894,7 +1881,7 @@ export default {
           form.setAttribute('novalidate', true);
         }
         if (!storageGet(TASK_GUIDE_SEARCH_MODEL) || storageGet(TASK_GUIDE_SEARCH_MODEL) * 1 < 2) {
-          this.$refs.searchPanel.createGuide('v-task-step-6', {
+          this.$refs.searchPanel.createGuide([{
             content: '高级搜索的“空白”，由您来填充。通过“设置”功能，定制您专属的“常用查询条件',
             haveStep: true,
             nowStep: 1,
@@ -1903,7 +1890,18 @@ export default {
             gStyle: 'left:30px',
             onlyOne: true,
             finishBtn: 'OK'
-          });
+          }, {
+            content:
+              '工单表单中所有可被搜索的字段都隐藏在这儿，当您需要用某些条件查询时，也可以在这里搜索',
+            haveStep: true,
+            nowStep: 2,
+            totalStep: 2,
+            gStyle: 'top:35px',
+            id: 'v-task-step-7',
+            arrowStyle: 'left:-140px',
+            onlyOne: true,
+            finishBtn: 'OK',
+          }]);
           storageSet(TASK_GUIDE_SEARCH_MODEL, '2')
         }
 
@@ -2895,7 +2893,6 @@ export default {
     [BatchEditingCustomerDialog.name]: BatchEditingCustomerDialog,
     [TaskSearchPanel.name]: TaskSearchPanel,
     [TaskViewModel.name]: TaskViewModel,
-    // [guideCompoment.name]: guideCompoment,
     [TaskViewPane.name]: TaskViewPane,
     TaskSelect,
   },

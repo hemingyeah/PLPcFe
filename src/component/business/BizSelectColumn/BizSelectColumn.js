@@ -2,6 +2,8 @@ import './BizSelectColumn.scss'
 
 import BizSelectColumnSort from './BizSelectColumnSort'
 
+
+
 const { TASK_GUIDE_SELECT_COLUMN } = require('@src/component/guide/taskV2Store');
 
 import _ from 'lodash'
@@ -391,8 +393,25 @@ const BizSelectColumn = {
       this.originColumns = _.cloneDeep(columns)
       this.taskType = taskType
       this.columnTree = this.columnsDataGrouped(_.cloneDeep(columns))
-      if (storageGet(this.sotrageKey) == 1) this['guideSelectColumn'] = false;
-      else storageSet(this.sotrageKey, '1')
+      if (!storageGet(TASK_GUIDE_SELECT_COLUMN) == 1) this.$nextTick(()=>{
+        this.$Guide([{
+          content:
+  '随心拖拽，自己配置列表的显示字段和顺序',
+          haveStep: true,
+          nowStep: 1,
+          totalStep: 1,
+          gStyle: 'width:240px;top:100px;margin:auto;left:0;right:0;',
+          id: 'guide-test',
+          onlyOne: true,
+          finishBtn: 'OK',
+        }], 0, '', (e)=>{
+          return new Promise((resolve, reject)=>{
+            if(e.type == 'stop') this['guideSelectColumn'] = false;
+            resolve()
+          })
+        }).create()
+      }), storageSet(TASK_GUIDE_SELECT_COLUMN, '1');
+      else this.$Guide().destroy('guide-test'), this['guideSelectColumn'] = false;
       this.show = true
     },
     /** 
@@ -570,7 +589,7 @@ const BizSelectColumn = {
         </div>
         <div style="position: relative;">
           {/* 新人引导 start*/}
-          <guide-compoment style={ `display : ${this.guideSelectColumn ? 'inline-block' : 'none'}` } content={'随心拖拽，自己配置列表的显示字段和顺序'} onlyOne={ true } haveStep={ false } finishBtn={'OK'} gStyle={'width:240px;top:100px;margin:auto;left:0;right:0;'} stopStep={ this.guide_stopStep } finishBtnFn={ this.guide_finishBtnFn }></guide-compoment>
+          <div id="guide-test"></div>
           {/* 新人引导 end*/}
           <biz-select-column-sort lists={ this.columnSortList }>
             <div slot="title" class="biz-select-column-sort-title">
@@ -593,7 +612,6 @@ const BizSelectColumn = {
   },
   components: {
     [BizSelectColumnSort.name]: BizSelectColumnSort,
-    // [guideCompoment.name]:guideCompoment
   }
 }
 
