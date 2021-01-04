@@ -3,6 +3,7 @@
   <div class="form-select">
     <!-- 多选 -->
     <el-select
+      v-if="updata"
       :id="`form_${field.fieldName}`"
       :placeholder="placeholder"
       :clearable="clearable"
@@ -25,10 +26,10 @@
 </template>
 
 <script>
-import FormMixin from "@src/component/form/mixin/form";
+import FormMixin from '@src/component/form/mixin/form';
 
 export default {
-  name: "form-select",
+  name: 'form-select',
   mixins: [FormMixin],
   props: {
     value: [String, Number, Array],
@@ -42,8 +43,17 @@ export default {
   },
   data() {
     return {
-      newValue: this.value
+      newValue: this.value,
+      updata: true
     };
+  },
+  watch: {
+    isMulti(v) {
+      this.updata = false
+      setTimeout(() => {
+        this.updata = true
+      })
+    }
   },
   computed: {
     isMulti() {
@@ -55,7 +65,7 @@ export default {
       let dataSource = setting.dataSource || [];
 
       dataSource = dataSource.map((d) => {
-        if (typeof d === "string") {
+        if (typeof d === 'string') {
           return {
             text: d,
             value: d,
@@ -70,8 +80,8 @@ export default {
     input(newValue) {
       let oldValue = null;
       this.$refs.elSelect.blur();
-      this.$emit("update", { newValue, oldValue, field: this.field });
-      this.$emit("input", newValue);
+      this.$emit('update', { newValue, oldValue, field: this.field });
+      this.$emit('input', newValue);
     },
   },
 };
