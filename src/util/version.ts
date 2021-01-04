@@ -50,14 +50,7 @@ export function isEnterpriseEdition(): boolean {
  * 3. 企业版 原生支持
 */
 export function isShowCreateChildrenTeam(initData: any): boolean {
-  // 标准版
-  if (isStandardEdition()) return false
-  
-  // 企业版
-  if (isEnterpriseEdition()) return true
-  
-  // 老版本vip版
-  return Boolean(isOldVipEdition() && initData?.showNewTeam === true)
+  return true
 }
 
 /** 
