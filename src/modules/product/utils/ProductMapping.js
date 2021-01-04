@@ -43,7 +43,7 @@ export function packToProduct(fields, form){
   
 
   if(catalogId){
-    product["catalogId"] = catalogId.id
+    product["catalogId"] = catalogId[0].id
   }
 
   if(qrcodeId){
