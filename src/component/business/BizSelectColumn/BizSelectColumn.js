@@ -402,7 +402,6 @@ const BizSelectColumn = {
           totalStep: 1,
           gStyle: 'width:240px;top:100px;margin:auto;left:0;right:0;',
           id: 'guide-test',
-          onlyOne: true,
           finishBtn: 'OK',
         }], 0, '', (e)=>{
           return new Promise((resolve, reject)=>{

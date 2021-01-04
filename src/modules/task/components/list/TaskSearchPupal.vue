@@ -104,7 +104,6 @@ export default {
         totalStep: 1,
         gStyle: 'width:240px;top:250px;margin:auto;left:0;right:0;',
         id: 'task-search-pupal-guide',
-        onlyOne: true,
         finishBtn: '试一下',
       }], 0).create(), storageSet(TASK_GUIDE_SEARCH_PUPAL, '1');
       this.visible = true;

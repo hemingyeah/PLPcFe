@@ -74,6 +74,10 @@ import domGuide from '@src/common/Guide'
 
 
 
+import domGuide from '@src/common/Guide'
+
+
+
 Vue.prototype.$appConfig = appConfig;
 Vue.prototype.$platform = platform;
 Vue.prototype.$previewImg = previewImg;

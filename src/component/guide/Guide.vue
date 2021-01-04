@@ -1,49 +1,42 @@
 <template>
   <!-- tour-content-out-box start -->
-  <div
-    :id="id"
-    class="tour-content-out-box"
-    v-show="showGuide"
-    :style="gStyle ? gStyle : ''"
-  >
-    <div
-      class="normal-arrow-top tour-arrow"
-      :style="arrowStyle"
-    ></div>
+  <div :id="id"
+       class="tour-content-out-box"
+       v-show="showGuide"
+       :style="gStyle ? gStyle : ''">
+    <div class="normal-arrow-top tour-arrow"
+         :style="arrowStyle"></div>
     <div class="tour-content-box">
-      <div v-if="haveStep" class="tour-left-tips">
+      <div v-if="haveStep"
+           class="tour-left-tips">
         {{ `${nowStep}/${totalStep}` }}
       </div>
-      <div class="tour-content">
+      <div class="tour-content" @click="watchContentClick($event)">
         <div class="flex-x tour-content-head">
-          <i
-            @click.prevent="stopStep().then(()=>{showGuide = false})"
-            class="iconfont icon-fe-close"
-          ></i>
+          <i @click.prevent="stopStep().then(()=>{showGuide = false})"
+             class="iconfont icon-fe-close"></i>
         </div>
-        <div class="tour-content-con">{{ content }}</div>
+        <div class="tour-content-con" v-if="!diyContent">{{ content }}</div>
+        <slot name="diyContent"></slot>
       </div>
     </div>
-    <div slot="actions" class="tour-bottom">
+    <div slot="actions"
+         class="tour-bottom">
       <!-- <div
-        v-if="haveStep && nowStep > 1"
+        v-if="totalStep > 1 && nowStep > 1"
         class="text"
         @click.prevent="previousStep(1), (showGuide = false)"
       >
         上一步
       </div> -->
-      <div
-        v-if="haveStep && nowStep > 0 && nowStep < totalStep"
-        class="btns"
-        @click.prevent="nextStep(nowStep).then(()=>{showGuide = false})"
-      >
+      <div v-if="totalStep > 1 && nowStep > 0 && nowStep < totalStep"
+           class="btns"
+           @click.prevent="nextStep(nowStep).then(()=>{showGuide = false})">
         下一步
       </div>
       <div
-        v-if="onlyOne"
         class="btns"
-        @click.prevent="finishBtnFn().then(()=>{showGuide = false})"
-      >
+        @click.prevent="finishBtnFn().then(()=>{showGuide = false})">
         {{ finishBtn }}
       </div>
     </div>
@@ -52,22 +45,58 @@
 </template>
 <script>
 export default {
-  name: "guide-compoment",
-  // eslint-disable-next-line vue/require-prop-types
-  props: [
-    "totalStep",
-    "nowStep",
-    "content",
-    "haveStep",
-    "finishBtn",
-    "gStyle",
-    "onlyOne",
-    "id",
-    "arrowStyle",
-    "stopStep",
-    "finishBtnFn"
-  ],
-  data() {
+  name: 'guide-compoment',
+  props: {
+    totalStep: {
+      type: Number | String,
+      default: 1
+    },
+    nowStep: {
+      type: Number | String,
+      default: 1
+    },
+    content: {
+      type: Number | String,
+      default: ''
+    },
+    finishBtn: {
+      type: Number | String,
+      default: 'ok'
+    },
+    gStyle: {
+      type: Number | String,
+      default: ''
+    },
+    id: {
+      type: Number | String,
+      default: ''
+    },
+    arrowStyle: {
+      type: Number | String,
+      default: ''
+    },
+    stopStep: {
+      type: Function
+    },
+    finishBtnFn: {
+      type: Function
+    },
+    watchContentClick: {
+      type: Function
+    },
+    diyContent:{
+      type:Boolean,
+      default:false
+    },
+    nextStep:{
+      type: Function
+    },
+    haveStep:{
+      type:Boolean,
+      default:false
+    },
+  },
+  data () {
     return {
       showGuide: true,
     };
@@ -174,6 +203,5 @@ export default {
   border-right-color: transparent;
   position: absolute;
   top: -0.5rem;
-
 }
 </style>
