@@ -105,7 +105,7 @@ export default {
         id: 'task-search-pupal-guide',
         domId:'task-search-pupal-guide-dom',
         finishBtn: '试一下',
-      }], 0).create(), storageSet(TASK_GUIDE_SEARCH_PUPAL, '1');
+      }], 0).create().then(res_=>{if(res_)storageSet(TASK_GUIDE_SEARCH_PUPAL, '1')});
       this.visible = true;
       const searchField = localStorage.getItem('task-search-field')
       if (searchField) {

@@ -2,7 +2,10 @@ import guideCompoment from '@src/component/guide/Guide';
 
 import { storageGet, storageSet } from '@src/util/storage';
 
+import GrayUtil from '@src/util/gray';
+
 import Vue from 'vue';
+import { reject } from 'lodash';
 
 // <div id="guide-test"></div>
 // this.$nextTick(()=>{
@@ -13,7 +16,7 @@ import Vue from 'vue';
 //     nowStep: 1,
 //     gStyle: "top:35px",
 //     id: "guide-test",
-//     finishBtn: "OK",      
+//     finishBtn: "OK",
 //     needCover:true,
 //     diyContent:true,
 //     diyContentDom:组件名称
@@ -85,37 +88,61 @@ class Guide {
       });
     };
     this.watchContentClick = (e) => {
-      if(watchStepFn){
-        return watchStepFn({type:'contentClick', nowStep: this.nowStep, event:e})
+      if (watchStepFn) {
+        return watchStepFn({
+          type: 'contentClick',
+          nowStep: this.nowStep,
+          event: e,
+        });
       }
     };
-
-    
   }
   create() {
-    let obj = this.arr[this.nowStep];
-    let Test;
-    if(obj.diyContentDom){
-      Test = obj.diyContentDom
-    }
-
-    let _this = this;
-
-    const guideDom = {
-      render(h) {
-        return (
-          <guide-compoment totalStep= { _this.arr.length } inside= { obj.inside } nowStep= { obj.nowStep } content= { obj.content } needCover= { obj.needCover } finishBtn= { obj.finishBtn } gStyle= { obj.gStyle } id= { obj.id } domId={ obj.domId } domObj= { obj.domObj } diyContent= { obj.diyContent } haveStep= { obj.haveStep } stopStep={ _this.stopStep } finishBtnFn={ _this.finishBtnFn } watchContentClick={ _this.watchContentClick } nextStep= { _this.nextStep }>
-            <template slot="diyContent"><Test></Test></template>
-          </guide-compoment>
-        )
-      },
-      components: {
-        [guideCompoment.name]: guideCompoment,
-        Test
+    return new Promise((resolve, reject) => {
+      let obj = this.arr[this.nowStep];
+      let Test;
+      if (obj.diyContentDom) {
+        Test = obj.diyContentDom;
       }
-    }
-    let GuideCompoments = Vue.extend(guideDom);
-    new GuideCompoments().$mount(`#${obj.id}`);
+
+      let _this = this;
+
+      const guideDom = {
+        render(h) {
+          return (
+            <guide-compoment
+              totalStep={_this.arr.length}
+              inside={obj.inside}
+              nowStep={obj.nowStep}
+              content={obj.content}
+              needCover={obj.needCover}
+              finishBtn={obj.finishBtn}
+              gStyle={obj.gStyle}
+              id={obj.id}
+              domId={obj.domId}
+              domObj={obj.domObj}
+              diyContent={obj.diyContent}
+              haveStep={obj.haveStep}
+              stopStep={_this.stopStep}
+              finishBtnFn={_this.finishBtnFn}
+              watchContentClick={_this.watchContentClick}
+              nextStep={_this.nextStep}
+            >
+              <template slot="diyContent">
+                <Test />
+              </template>
+            </guide-compoment>
+          );
+        },
+        components: {
+          [guideCompoment.name]: guideCompoment,
+          Test,
+        },
+      };
+      let GuideCompoments = Vue.extend(guideDom);
+      new GuideCompoments().$mount(`#${obj.id}`);
+      resolve(true);
+    });
   }
   destroy(id) {
     try {
@@ -127,9 +154,19 @@ class Guide {
   }
 }
 
-
 function domGuide(arr = [], nowStep, storageKe, watchStepFn) {
-  return new Guide(arr, nowStep, storageKe, watchStepFn);
+  let productPreFixedPath = GrayUtil.getProductV2ApiPath();
+  if (productPreFixedPath) {
+    return new Guide(arr, nowStep, storageKe, watchStepFn);
+  }
+  // return {
+  //   create: () => {
+  //     return new Promise((resolve, reject) => {
+  //       resolve(false)
+  //     })
+  //   },
+  //   destroy: () => {},
+  // };
 }
 
 export default domGuide;

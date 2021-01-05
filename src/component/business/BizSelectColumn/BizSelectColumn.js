@@ -397,9 +397,8 @@ const BizSelectColumn = {
         this.$Guide([{
           content:
   '随心拖拽，自己配置列表的显示字段和顺序',
-          haveStep: true,
+          haveStep: false,
           nowStep: 1,
-          gStyle: 'width:240px;top:100px;margin:auto;left:0;right:0;',
           id: 'guide-test',
           domId:'guide-test-dom',
           finishBtn: 'OK',
@@ -408,8 +407,8 @@ const BizSelectColumn = {
             if(e.type == 'stop') this['guideSelectColumn'] = false;
             resolve()
           })
-        }).create()
-      }), storageSet(TASK_GUIDE_SELECT_COLUMN, '1');
+        }).create().then(res_=>{if(res_)storageSet(TASK_GUIDE_SELECT_COLUMN, '1')})
+      });
       else this.$Guide().destroy('guide-test'), this['guideSelectColumn'] = false;
       this.show = true
     },

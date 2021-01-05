@@ -6,6 +6,7 @@ const PRODUCT_PRODUCT_SET = 'guide-product-productSet'
 const PRODUCT_SETTING_SET = 'guide-product-productSetting'
 const PRODUCT_SUPERQRCODE_SET = 'guide-product-productSuperqrcodeSet'
 const PRODUCT_PRODUCT_LIST = 'guide-product-productList'
+const PRODUCT_CATALOG_LIST = 'guide-product-catalogList'
 const PRODUCT_CATALOG_ADD = 'guide-product-catalogAdd'
 const PRODUCT_CATALOG_SET_COTENT = 'guide-product-catalogSetContent'
 const PRODUCT_DETAIL = 'guide-product-detail'
@@ -18,6 +19,7 @@ module.exports = {
   PRODUCT_SETTING_SET,
   PRODUCT_SUPERQRCODE_SET,
   PRODUCT_PRODUCT_LIST,
+  PRODUCT_CATALOG_LIST,
   PRODUCT_CATALOG_ADD,
   PRODUCT_CATALOG_SET_COTENT,
   PRODUCT_DETAIL,

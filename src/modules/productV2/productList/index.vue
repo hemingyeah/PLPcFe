@@ -123,11 +123,11 @@
           </div>
         </div>
 
-        <div class="action-button-group flex-x">
+        <div class="action-button-group flex-x bg-w" id="product-product-list-3">
           <el-dropdown trigger="click"
                        v-if="exportPermission">
             <div class="task-ai task-flex task-font14 task-c6 cur-point bg-w"
-                 id="product-product-list-3"
+                 
                  @click="trackEventHandler('moreAction')">
               <span class="task-mr4 task-ml4">更多操作</span>
               <i class="iconfont icon-triangle-down task-icon"></i>
@@ -158,7 +158,6 @@
                    'cur-point',
                    'task-width103',
                  ]"
-                 id="v-task-step-1"
                  @click="showAdvancedSetting">
               <span class="task-mr4 task-ml4">选择列</span>
               <i class="iconfont icon-triangle-down task-icon"></i>
@@ -849,7 +848,7 @@ export default {
       if (storageGet(PRODUCT_PRODUCT_LIST) && storageGet(PRODUCT_PRODUCT_LIST) > 0) this.$Guide().destroy('product-product-list')
       else this.$Guide([{
         content:
-          '产品类型列表，可拖拽改变列表宽',
+          '产品列表，可拖拽改变列表宽',
         haveStep: true,
         nowStep: 1,
         id: 'product-product-list',
@@ -880,7 +879,7 @@ export default {
         return new Promise((resolve, reject) => {
           resolve()
         })
-      }).create(), storageSet(PRODUCT_PRODUCT_LIST, '4')
+      }).create().then(res_=>{if(res_)storageSet(PRODUCT_PRODUCT_LIST, '1')})
     })
   },
   beforeDestroy () {

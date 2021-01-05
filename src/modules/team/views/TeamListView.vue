@@ -659,7 +659,7 @@ export default {
         return new Promise((resolve, reject) => {
           resolve()
         })
-      }).create(), storageSet(PRODUCT_TEAM_LIST_VIEW, '1')
+      }).create().then(res_=>{if(res_)storageSet(PRODUCT_TEAM_LIST_VIEW, '1')})
     })
 
     this.isAllotByTag = (this.initData.taskConfig && this.initData.taskConfig.allotByTag !== false);

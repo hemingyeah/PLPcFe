@@ -153,7 +153,7 @@ export default {
       return new Promise((resolve, reject) => {
         resolve()
       })
-    }).create(), storageSet(PRODUCT_PRODUCT_EDIT, '4')
+    }).create().then(res_=>{if(res_)storageSet(PRODUCT_PRODUCT_EDIT, '1')})
 
     this.init = true;
   },

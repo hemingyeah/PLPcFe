@@ -468,7 +468,7 @@ export default {
         return new Promise((resolve, reject) => {
           resolve()
         })
-      }).create(), storageSet(PRODUCT_DETAIL, '3')
+      }).create().then(res_=>{if(res_)storageSet(PRODUCT_DETAIL, '3')})
     })
 
     this.$eventBus.$on(

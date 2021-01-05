@@ -1901,7 +1901,6 @@ export default {
             arrowStyle: 'left:-140px',
             finishBtn: 'OK',
           }]);
-          storageSet(TASK_GUIDE_SEARCH_MODEL, '2')
         }
 
         if (storageGet(TASK_GUIDE_SEARCH_MODEL_SAVE) == '1') this['guideSearchModelSave'] = false;

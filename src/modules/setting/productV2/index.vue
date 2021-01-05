@@ -105,7 +105,7 @@ export default {
         return new Promise((resolve, reject) => {
           resolve()
         })
-      }).create(), storageSet(PRODUCT_SETTING_SET, '1')
+      }).create().then(res_=>{if(res_)storageSet(PRODUCT_SETTING_SET, '1')})
     })
   },
   components: {

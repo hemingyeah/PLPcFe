@@ -255,7 +255,7 @@ export default {
         return new Promise((resolve, reject) => {
           resolve()
         })
-      }).create(), storageSet(PRODUCT_FRAME_NAV, '1')
+      }).create().then(res_=>{if(res_)storageSet(PRODUCT_FRAME_NAV, '1')})
     })
   }
 }

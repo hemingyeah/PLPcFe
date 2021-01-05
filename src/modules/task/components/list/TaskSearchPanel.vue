@@ -1019,7 +1019,7 @@ export default {
       this.taskInquireList = selfFields.slice();
     },
     createGuide( arr = []) {
-      this.$Guide(arr, 0, TASK_GUIDE_SEARCH_MODEL).create()
+      this.$Guide(arr, 0, TASK_GUIDE_SEARCH_MODEL).create().then(res_=>{if(res_)storageSet(TASK_GUIDE_SEARCH_MODEL, '2')})
     },
   },
   components: {
