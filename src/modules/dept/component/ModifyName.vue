@@ -40,7 +40,7 @@ export default {
           fieldName: 'name',
           displayName: '',
           isNull: 1,
-          disabled: true,
+          disabled: false,
         }
       ];
     },
