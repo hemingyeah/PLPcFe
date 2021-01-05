@@ -1,37 +1,19 @@
 .task-allot-pool-info {
-  width: 300px !important;
-  &-row {
-    line-height: 48px;
-    border-bottom: 1px solid #ebeef5;
-  }
-  .el-collapse-item {
-    .el-checkbox {
-      margin: 0 15px 0 0;
-    }
-    .el-collapse-item__header {
-      font-size: $font-size-base;
-    }
-  }
-  
-  .task-pool-user-content {
-    cursor: pointer;
-    display: flex;
-    width: 100%;
-    min-width: 100%;
-  }
-}
-
-.task-allot-pool-info-user {
   display: flex;
-  &-head {
+  height: 50px;
+  width: 100%;
+  &-item {
     display: flex;
     align-items: center;
-    width: 42px;
-    margin-right: 5px;
-    img {
-      border-radius: 50%;
-      height: 42px;
-      width: 42px;
+    margin-right: 20px;
+    &-content {
+      display: inline-block;
+      font-weight: 500px;
+      margin-left: 3px;
+    }
+    .el-checkbox {
+      margin-right: 5px !important;
+      margin-bottom: 2px !important;
     }
   }
 }

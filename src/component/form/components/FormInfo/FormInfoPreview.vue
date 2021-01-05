@@ -1,7 +1,7 @@
 <template>
   <div class="form-preview-group form-info-preview">
-    <div class="form-item__text">
-      {{ field.placeHolder || placeholder }}
+    <div class="form-item__text form-ql-editor ql-container">
+        <div class="ql-editor" v-html="field.placeHolder || placeholder "></div>
     </div>
   </div>
 </template>
@@ -23,14 +23,27 @@ export default {
 </script>
 
 <style lang="scss">
+@import './FormInfo.scss';
 .form-info-preview {
   label {
     flex-shrink: 0;
   }
   .form-item__text {
     word-break: break-all;
-    background-color: #FAFAFA;
+    background-color: #FFF;
     padding: 3px 5px;
+    .ql-editor{
+      padding: 0;
+      p{
+        img{
+          float: left;
+        }
+      }
+
+    }
+  }
+  .form-ql-editor{
+    width: 100%;
   }
 }
 </style>

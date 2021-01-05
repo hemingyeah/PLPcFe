@@ -17,6 +17,9 @@ const department = require('./department')
 
 const sparePart = require('./sparePart')
 const linkc = require('./linkc')
+const productV2 = require('./productV2')
+
+const superQrcode = require('./superQrcode')
 
 /** 
  * 定义各个模块的配置，路径相对于项目根路径 
@@ -61,5 +64,7 @@ module.exports = {
   ...sparePart,
   ...task,
   ...sparePart,
-  ...linkc
+  ...linkc,
+  ...productV2,
+  ...superQrcode
 }

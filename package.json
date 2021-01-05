@@ -8,8 +8,8 @@
     "url": "git@code.aliyun.com:publink/shb-pc-fe.git"
   },
   "scripts": {
-    "dev": "node script/dev-script.js",
-    "serve": "node --max_old_space_size=4096 script/development.js",
+    "dev": "node --max-old-space-size=8192 script/dev-script.js",
+    "serve": "node --max-old-space-size=8192 script/development.js",
     "build:new": "cnpm install & node script/production.js",
     "build:cloud": "node script/production.js",
     "build:hbc": "node script/production.js --user=huangbc",
@@ -34,6 +34,7 @@
     "@commitlint/cli": "^11.0.0",
     "@commitlint/config-conventional": "^11.0.0",
     "@types/lodash": "^4.14.118",
+    "@types/mathjs": "^6.0.6",
     "autoprefixer": "^9.4.6",
     "babel-eslint": "^10.0.1",
     "babel-loader": "^8.0.5",

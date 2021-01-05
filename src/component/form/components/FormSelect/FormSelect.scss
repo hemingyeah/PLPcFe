@@ -16,7 +16,15 @@
   white-space: nowrap;
 
   input[type="text"]{
-    width: 220px;
+    width: 185px;
+    border-radius: 4px;
+  }
+  .icon-tuozhuaipaixu{
+    font-size: 12px;
+  }
+  .handle{
+    padding: 0;
+    margin-right: 9px;
   }
 }
 
@@ -44,7 +52,7 @@
 }
 
 .form-select-setting-defaultValue{
-  background-color: #00ac97;
+  background-color:  $color-primary;
   color: #fff;
   padding: 2px 4px;
   border-radius: 2px;
@@ -52,13 +60,25 @@
   display: inline-block;
   vertical-align: middle;
 }
-
+.form-select-setting-btnbox{
+  margin-left: 25px;
+}
 .form-select-setting-operation {
+  margin-top: 12px;
+  
   .btn-text{
     color: $color-primary;
     padding: 0;
-
-    margin-right: 5px;
+  }
+  .btn-divider{
+    position: relative;
+    top: -.06em;
+    display: inline-block;
+    width: 1px;
+    height: .9em;
+    margin: 0 5px;
+    vertical-align: middle;
+    background: #e8e8e8;
   }
 }
 
@@ -74,12 +94,18 @@
     font-size: 18px;
   }
 }
+.btn-active{
+  color: $color-primary !important;
+}
 
 .form-select-setting-delete{
   color: #F56C6C;
+  .iconfont{
+    color: #F56C6C;
+  }
 }
 .form-select-setting-default{
-  color: $color-primary
+  color:$text-color-secondary;
 }
 
 .form-select-tips{
@@ -131,5 +157,14 @@
 }
 .form-select-logical-tip{
   margin-top: 10px 0 0 0;
-  color: #666;
+  color: #999;
+  font-size: 12px;
+}
+.flip-list-move {
+  transition: transform 0.5s;
+}
+.form-select-setting-modal {
+  .dialog-footer{
+    width: 100%;
+  }
 }

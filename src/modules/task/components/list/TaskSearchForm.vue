@@ -1,25 +1,25 @@
 <script>
 /* api */
-import * as TaskApi from "@src/api/TaskApi.ts";
-import * as CustomerApi from "@src/api/CustomerApi";
+import * as TaskApi from '@src/api/TaskApi.ts';
+import * as CustomerApi from '@src/api/CustomerApi';
 
 /* utils */
-import _ from "lodash";
-import * as Utils from "@src/component/form/util";
+import _ from 'lodash';
+import * as Utils from '@src/component/form/util';
 
 /* components */
 import {
   FormFieldMap,
   SettingComponents,
-} from "@src/component/form/components";
-import SearchProductSelect from "./SearchProductSelect.vue";
-import SearchCustomerSelect from "./SearchCustomerSelect.vue";
-import { formatDate } from "@src/util/lang";
+} from '@src/component/form/components';
+import SearchProductSelect from './SearchProductSelect.vue';
+import SearchCustomerSelect from './SearchCustomerSelect.vue';
+import { formatDate } from '@src/util/lang';
 
-const MultiFieldNames = ['serviceType', 'serviceContent', 'level', 'paymentMethod', 'state', 'allotTypeStr', 'onceException', 'paymentMethod','source']
+const MultiFieldNames = ['serviceType', 'serviceContent', 'level', 'paymentMethod', 'state', 'allotTypeStr', 'onceException', 'paymentMethod', 'source']
 
 export default {
-  name: "task-search-form",
+  name: 'task-search-form',
   props: {
     fields: {
       type: Array,
@@ -68,29 +68,33 @@ export default {
     initFormVal() {
       let fields = this.fields;
       let form = {};
-      let tv = "";
+      let tv = '';
       fields.forEach((field) => {
-        tv = "";
+        tv = '';
         // 地址的默认值初始化为对象
-        if (field.formType == "customerAddress" || field.formType == "address")
+        if (field.formType == 'customerAddress' || field.formType == 'address')
           tv = {};
-        if (field.formType == "date" || field.formType == "datetime") tv = [];
-        if (field.formType === "link") {
+        if (field.formType == 'date' || field.formType == 'datetime') tv = [];
+        if (field.formType === 'link') {
           tv = {};
         }
-        if (field.fieldName === "tags") {
+        if (field.fieldName === 'tags') {
           tv = [];
         }
-        if (field.formType === "area" || field.formType === "cascader") {
+        if (field.formType === 'area' || field.formType === 'cascader') {
           tv = [];
         }
 
-        if (field.formType === "user") {
+        if (field.formType === 'user') {
           tv = [];
         }
 
         if (MultiFieldNames.indexOf(field.fieldName) > -1) {
           tv = [];
+        } 
+        if (field.formType === 'select' && !field.isSystem && !field.setting.isMulti) {
+          tv = []
+          console.log(field)
         }
         form[field.fieldName] = this.formBackup[field.fieldName] || tv;
         this.$set(
@@ -101,8 +105,8 @@ export default {
       });
 
       let backUp = this.formBackup.backUp || {};
-      this.$set(this, "customer", backUp.customer || {});
-      this.$set(this, "product", backUp.product || {});
+      this.$set(this, 'customer', backUp.customer || {});
+      this.$set(this, 'product', backUp.product || {});
 
       return form;
     },
@@ -110,7 +114,8 @@ export default {
     renderInput(h, field) {
       const f = _.cloneDeep(field);
       let comp = FormFieldMap.get(f.formType);
-      if (!comp || f.formType === "area") {
+      let setting;
+      if (!comp || f.formType === 'area') {
         return null;
       }
 
@@ -118,19 +123,19 @@ export default {
         f.setting.isMulti = true;
       }
 
-      if (field.formType === 'select' && !field.isSystem) {
-        f.setting.isMulti = false;
+      if (f.formType === 'select' && !f.isSystem) {
+        setting = {setting:{dataSource: f.setting.dataSource, isMulti: !f.setting.isMulti}};
       }
 
       let childComp = null;
 
-      if (f.fieldName == "customer") {
+      if (f.fieldName == 'customer') {
         let value = this.form[f.fieldName];
-        childComp = h("search-customer-select", {
+        childComp = h('search-customer-select', {
           props: {
-            placeholder: "请选择客户",
+            placeholder: '请选择客户',
             field: f,
-            value: value ? [{ label: this.customer.name || "", value }] : [],
+            value: value ? [{ label: this.customer.name || '', value }] : [],
             remoteMethod: this.searchCustomer,
           },
           on: {
@@ -140,13 +145,13 @@ export default {
             },
           },
         });
-      } else if (f.fieldName == "product") {
+      } else if (f.fieldName == 'product') {
         let value = this.form[f.fieldName];
-        childComp = h("search-product-select", {
+        childComp = h('search-product-select', {
           props: {
-            placeholder: "请选择产品",
+            placeholder: '请选择产品',
             field: f,
-            value: value ? [{ label: this.product.name || "", value }] : [],
+            value: value ? [{ label: this.product.name || '', value }] : [],
             remoteMethod: this.searchProduct,
           },
           on: {
@@ -156,8 +161,8 @@ export default {
             },
           },
         });
-      } else if (f.formType === "user") {
-        childComp = h("user-search", {
+      } else if (f.formType === 'user') {
+        childComp = h('user-search', {
           props: {
             multiple: true,
             field: f,
@@ -168,20 +173,20 @@ export default {
             update: (event) => this.update(event),
           },
         });
-      } else if (f.fieldName === "tags") {
+      } else if (f.fieldName === 'tags') {
         let value = this.form[f.fieldName];
-        childComp = h("biz-team-select", {
+        childComp = h('biz-team-select', {
           props: {
             multiple: true,
             value: value || [],
           },
           on: {
-            input: (event) => this.update(event, "tags"),
+            input: (event) => this.update(event, 'tags'),
           },
         });
-      } else if (f.fieldName === "tlmName") {
+      } else if (f.fieldName === 'tlmName') {
         f.clearable = true;
-        childComp = h("linkman-search", {
+        childComp = h('linkman-search', {
           props: {
             field: f,
             value: this.form[f.fieldName],
@@ -198,7 +203,7 @@ export default {
             : comp.build,
           {
             props: {
-              field: f,
+              field: f.formType === 'select' && !f.isSystem ? {...f, ...setting} : f,
               value: this.form[f.fieldName],
               disableMap: true,
               placeholder: Utils.genPlaceholder(f),
@@ -212,7 +217,7 @@ export default {
         );
       }
       return h(
-        "form-item",
+        'form-item',
         {
           props: {
             label: f.displayName,
@@ -251,7 +256,7 @@ export default {
     searchProduct(params) {
       const pms = params || {};
 
-      pms.customerId = this.form.customer || "";
+      pms.customerId = this.form.customer || '';
       return TaskApi.getTaskCustonerProductList(pms)
         .then((res) => {
           if (!res || !res.list) return;
@@ -267,11 +272,11 @@ export default {
         .catch((e) => console.error(e));
     },
     update(event, action) {
-      if (action === "tags") {
+      if (action === 'tags') {
         return (this.form.tags = event);
       }
 
-      if (action === "dist") {
+      if (action === 'dist') {
         return (this.form.area = event);
       }
       const f = event.field;
@@ -282,7 +287,7 @@ export default {
     return (
       <div
         class={`form-item-container ${
-          this.columnNum == 2 ? "two-columns" : ""
+          this.columnNum == 2 ? 'two-columns' : ''
         }`}
       >
         {this.fields.map(item => {

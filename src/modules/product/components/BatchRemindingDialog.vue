@@ -220,8 +220,8 @@ export default {
     fetchData() {
       getProductRemindTemplate()
         .then(res => {
-          if (!res) return;
-          this.remindTemplate = (res || [])
+          if (!res.length) return;
+          this.remindTemplate = res
             .map(r => {
               r.name += r.isDdResponse ? '（内部提醒）' : '（外部提醒）';
               return Object.freeze(r);

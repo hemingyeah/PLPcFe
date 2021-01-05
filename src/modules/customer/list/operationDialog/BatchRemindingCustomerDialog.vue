@@ -200,7 +200,8 @@ export default {
       this.$http.get('/customer/getReminds', {pageSize: 0, })
         .then(res => {
           if (!res || res.status) return;
-          this.remindTemplate = (res.list || [])
+          res.list = res.list || []
+          this.remindTemplate = res.list
             .map(r => {
               r.name += r.isDdResponse ? '（内部提醒）' : '（外部提醒）';
               return Object.freeze(r);

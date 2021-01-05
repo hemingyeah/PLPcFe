@@ -18,6 +18,10 @@ const BizFormRemoteSelect = {
       type: Function,
       default: () => ({})
     },
+    valueKey: {
+      type: String,
+      default: 'value'
+    },
     value: {
       type: Array,
       default: () => []
@@ -26,7 +30,7 @@ const BizFormRemoteSelect = {
       type: Boolean,
       default: false
     },
-    disabled: {
+    inputDisabled: { // 与混入FormMixin的computed中disabled做区分
       type: Boolean,
       default: false
     },
@@ -54,17 +58,18 @@ const BizFormRemoteSelect = {
     return (
       <div class="biz-form-remote-select">
         <base-select
+          value-key={ this.valueKey }
           onInput={ this.input }
           placeholder={ this.placeholder }
           remoteMethod={ this.remoteMethod }
           value={ this.value }
           scopedSlots={ this.$scopedSlots }
           multiple={ this.multiple }
-          disabled={ this.disabled }
+          disabled={ this.inputDisabled }
           collapsed={ this.collapsed }
         >
         </base-select>
-        { this.cleared && this.value.length > 0 && clearButton }
+        { this.cleared && this.value.length > 0 && !this.inputDisabled && clearButton }
       </div>
     )
 

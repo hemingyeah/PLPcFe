@@ -193,6 +193,11 @@ export default {
       type: String,
       default: '请选择人员',
     },
+    /** 从哪个路由进入的  */
+    from: {
+      type: String,
+      default: '',
+    },
   },
   data(){
     let data = {
@@ -363,6 +368,9 @@ export default {
         this.params.tagId = this.selectTeam.id;
         this.params.pageNum = 1;
         this.params.selectType = this.selectType;
+        if (this.from) {
+          this.params.isDelete = null;
+        }
 
         let userPage = await this.fetchUser(this.params);
 
@@ -518,6 +526,9 @@ export default {
     async loadmore(){
       this.loadmoreOptions.disabled = true;
       this.loading = true;
+      if (this.from) {
+        this.params.isDelete = null;
+      }
 
       try {
         this.params.pageNum += 1;
@@ -638,6 +649,9 @@ export default {
 
         this.params.tagId = '';
         this.params.pageNum = 1;
+        if (this.from) {
+          this.params.isDelete = null;
+        }
 
         let userPage = await this.fetchUser(this.params);
 

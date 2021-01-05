@@ -1,3 +1,6 @@
+/* component */
+import TaskAllotExcutor from '@src/modules/task/components/TaskAllotModal/TaskAllotExcutor/TaskAllotExcutor.tsx'
+import TaskAllotModal from '@src/modules/task/components/TaskAllotModal/TaskAllotModal.tsx'
 /* data */
 import TaskAllotUserTableData from '@src/modules/task/components/TaskAllotModal/TaskAllotExcutor/TaskAllotUserTable/TaskAllotUserTableData'
 /* enum */
@@ -70,12 +73,12 @@ class TaskAllotUserTableComputed extends TaskAllotUserTableData {
   }
   
   /* 工单派单组件 */
-  get TaskAllotModalComponent(): any {
+  get TaskAllotModalComponent(): TaskAllotModal {
     return findComponentUpward(this, ComponentNameEnum.TaskAllotModal) || {}
   }
   
   /* 工单派单负责人组件 */
-  get TaskAllotExcutorComponent(): any {
+  get TaskAllotExcutorComponent(): TaskAllotExcutor {
     return findComponentUpward(this, ComponentNameEnum.TaskAllotExcutor) || {}
   }
   

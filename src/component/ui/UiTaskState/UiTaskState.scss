@@ -1,0 +1,22 @@
+.ui-task-state {
+  width: 52px;
+  height: 22px;
+  border-radius: 11px;
+  margin-left: 8px;
+  margin-top: 3px;
+  text-align: center;
+  line-height: 22px;
+  &-overtime,
+  &-approve {
+    display: inline-block;
+    color: #fff !important;
+  }
+
+  &-overtime {
+    background-color: #F56C6C !important;
+  }
+
+  &-approve {
+    background-color: #FAAE14 !important;
+  }
+}

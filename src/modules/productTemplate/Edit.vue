@@ -15,7 +15,7 @@
       <!-- end 页面顶部按钮 -->
 
       <!-- start form builder -->
-      <form-builder ref="productTemplateEditForm" :fields="fields" :value="form" @update="update">
+      <form-builder ref="productTemplateEditForm" :fields="fields" mode="productTemplate" :value="form" @update="update">
 
         <!-- start 产品类型 -->
         <template slot="type" slot-scope="{field}">
@@ -50,7 +50,7 @@
 import * as FormUtil from '@src/component/form/util';
 import platform from '@src/platform';
 
-import { productTemplateCreate, productTemplateUpdate, getProductTemplate } from '@src/api/ProductApi.js'
+import { productTemplateCreate, productTemplateUpdate, getProductTemplate , getProductFields } from '@src/api/ProductApi.js'
 
 export default {
   name: 'product-template-edit',
@@ -72,6 +72,7 @@ export default {
       init: false, // 初始化
       loadingPage: false, // 加载页面
       pending: false, // 等待状态
+      fieldsInfo: []
     }
   },
   computed: {
@@ -82,9 +83,7 @@ export default {
       return this.initData.id
     },
     fields() {
-      let originFields = (
-        this.initData 
-        && this.initData.productFields.filter(f => {
+      let originFields = (this.fieldsInfo.filter(f => {
           return (
             f.fieldName !== 'customer' 
             && f.fieldName !== 'tags'
@@ -106,6 +105,10 @@ export default {
     }
   },
   async mounted() {
+    const { status, data, message } = await getProductFields({isFromSetting:true});
+    if( status == 0 ){
+      this.fieldsInfo = data;
+    }
     // 初始化默认值
     let form = {};
     // 编辑
@@ -229,7 +232,7 @@ export default {
     },
     // 提交
     submit() {
-      this.$refs.productTemplateEditForm.validate()
+      this.$refs.productTemplateEditForm.validate(false)
         .then(valid => {
           if (!valid) return Promise.reject('productTemplateEditForm validate fail.');
 

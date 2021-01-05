@@ -1,13 +1,26 @@
 <template>
   <div class="form-setting-panel form-select-setting">
-    <h3>{{ isSystem ? '系统' : '基础' }}字段 -- {{field.displayName}}</h3>
-    <div class="form-setting-group">
-      <textarea placeholder="请在此添加描述信息" rows="3" data-prop="placeHolder" :value="field.placeHolder" @input="updateForDom" :maxlength="placeholderMaxLength"></textarea>
+    <h3> {{field.displayName}}</h3>
+    <p class="form-design-warning">该字段为系统内置字段，暂不支持修改、删除。</p>
+    <!-- start 描述信息 -->
+    <form-describe-setting
+      :field="field"
+      @input="updateForDom"
+    ></form-describe-setting>
+    <!-- end 描述信息 -->
+    
+    <!-- start 校验 -->
+    <div class="form-setting-group form-setting-item">
+      <h4 class="form-item-title">校验</h4>
+      <div class="form-item-box">
+        <!-- 必填 -->
+        <form-required-setting :field="field" @input="update"></form-required-setting>
+      </div>
     </div>
-    <div class="form-setting-group">
-      <el-checkbox :value="field.isNull" @input="update($event, 'isNull')" :true-label="0" :false-label="1">必填</el-checkbox>
-    </div>
+    <!-- end 校验 -->
+
     <div class="form-select-setting-list">
+      <h4>选项</h4>
       <div v-for="(option, index) in options" :key="index" class="form-select-setting-option">
         <input type="text" :value="option.value" @input="updateOption($event, option)" maxlength="20">
         <button type="button" class="btn-text form-select-setting-delete" @click="delOption(option, index)"><i class="iconfont icon-minus-fill"></i></button>
@@ -20,7 +33,7 @@
 <!--          <span class="form-select-setting-defaultValue" v-else>默认</span>-->
 
           <button
-              type="button" class="btn-text form-select-setting-default"
+              type="button" :class="['btn-text', 'form-select-setting-default', option.isDefault && 'btn-active']"
               @click="setDefaultOption(option)">
             <i class="iconfont icon-check-fill"></i>
           </button>
@@ -31,8 +44,9 @@
     </div>
     <div class="form-setting-group form-select-setting-operation">
       <button type="button" class="btn-text" @click="addOption">增加选项</button>
+      <div class="btn-divider"></div>
       <button type="button" class="btn-text" @click="showBatchModal">批量编辑</button>
-    </div>
+    </div> 
 
     <base-modal 
       title="批量编辑选项" width="520px" class="form-select-setting-modal"
@@ -41,10 +55,11 @@
         <textarea :value="optionText" @input="updateOptionText" rows="10"></textarea>
         <div class="form-select-setting-warn" v-if="errMessage">{{errMessage}}</div>
       </div>
-      <template slot="footer">
+      <div slot="footer" class="dialog-footer">
         <span class="form-select-tips">每行对应一个选项</span>
-        <button type="button" class="btn btn-primary" @click="batchEdit">保存</button>
-      </template>
+        <el-button @click="batchModalShow = false">取 消</el-button>
+        <el-button type="primary" @click="batchEdit">保 存</el-button>
+      </div>
     </base-modal>
   </div>
 </template>
@@ -73,7 +88,7 @@ export default {
     }
   },
   methods: {
-    batchEdit(){
+   batchEdit(){
       let newValues = this.optionText.split('\n').filter(option => option);
       if(!newValues.length) {
         Platform.alert("至少要有一个选项");

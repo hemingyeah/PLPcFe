@@ -1091,6 +1091,12 @@ export default {
         close: true,
         fromId
       });
+    },
+    outsideUpdateTask(task = {}) {
+      this.task = task
+    },
+    outsideUpdateRecords() {
+      this.$eventBus.$emit(TaskEventNameMappingEnum.UpdateRecord);
     }
   },
   created() {
@@ -1103,6 +1109,7 @@ export default {
 
   },
   async mounted() {
+    console.log(this.initData, 'initData')
     try {
       this.loading = true;
 

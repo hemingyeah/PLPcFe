@@ -8,6 +8,8 @@ enum ComponentNameEnum {
   TaskAllotModal = 'task-allot-modal',
   // 工单指派人员表格
   TaskAllotUserTable = 'task-allot-user-table',
+  // 工单指派人员地图
+  TaskAllotUserMap = 'task-allot-user-map',
   // 工单自动分配
   TaskAllotAuto = 'task-allot-auto',
   // 工单分配给负责人
@@ -31,7 +33,17 @@ enum ComponentNameEnum {
   // 工单流程步骤
   TaskProcessSteps = 'task-process-steps',
   // 基础面板侧边栏
-  BasePanelAside = 'base-panel-aside'
+  BasePanelAside = 'base-panel-aside',
+  // 呼叫中心打电话
+  BizCallCenterPhone = 'biz-call-center-phone',
+  // 工单地图信息弹窗
+  TaskMapInfoWindow = 'task-map-info-window',
+  // 修改计划时间
+  BizModifyPlanTime = 'biz-modify-plan-time',
+  // UIInput
+  UiInput = 'ui-input',
+  // 工单状态
+  UiTaskState = 'ui-task-state'
 }
 
 export default ComponentNameEnum

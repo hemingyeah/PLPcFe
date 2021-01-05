@@ -1,51 +1,95 @@
-/* vue */
-import { Vue, Component, Prop } from 'vue-property-decorator'
-import { CreateElement } from 'vue'
+/* components */
+import TaskAllotModal from '@src/modules/task/components/TaskAllotModal/TaskAllotModal.tsx'
+import TaskMapInfoWindow from '@src/modules/task/components/TaskAllotModal/TaskMapInfoWindow/TaskMapInfoWindow.tsx'
 /* entity */
-import Customer from '@model/entity/Customer'
 import TaskAddress from '@model/entity/TaskAddress'
-import CustomerAddress from '@model/entity/CustomerAddress'
+import Field from '@model/entity/Field'
 /* enum */
 import ComponentNameEnum from '@model/enum/ComponentNameEnum'
 import EventNameEnum from '@model/enum/EventNameEnum'
+import TaskStateEnum from '@model/enum/TaskStateEnum'
+import { TaskFieldNameMappingEnum } from '@model/enum/FieldMappingEnum'
 /* util */
 import { findComponentUpward } from '@src/util/assist'
 import Log from '@src/util/log.ts'
 /* scss */
 import '@src/modules/task/components/TaskAllotModal/TaskAllotMap/TaskAllotMap.scss'
+/* vue */
+import { Component, Prop, Ref } from 'vue-property-decorator'
+import { CreateElement } from 'vue'
+import VC from '@model/VC'
+/* types */
+import TaskConfig from '@model/types/TaskConfig'
+import TaskType from "@model/entity/TaskType";
 
 declare let AMap: any
 
 @Component({ 
-  name: ComponentNameEnum.TaskAllotMap
+  name: ComponentNameEnum.TaskAllotMap,
+  components: {
+    TaskMapInfoWindow
+  }
 })
-export default class TaskAllotMap extends Vue {
+export default class TaskAllotMap extends VC {
+  
+  /* 工单地图信息弹窗组件 */
+  @Ref() readonly TaskMapInfoWindowComponent!: TaskMapInfoWindow
   
   // 地图 id
   @Prop() readonly idName: string | undefined
+  // 工单类型列表
+  @Prop() readonly taskTypesMap: { [x: string]: TaskType} | undefined
   // 自定义事件
   @Prop() readonly handlerCustomFunc: Function | undefined
+  // 设置地图事件
+  @Prop() readonly setMapFunc: Function | undefined
   
   /* 地图对象 */
   private AMap: any = null
   /* 地图弹窗对象 */
   private AMapInfoWindow: any = null
+  /* 是否显示地图弹窗信息 */
+  private showMapInfoWindow: boolean = false
   
-  /* 工单派单组件 */
-  private get TaskAllotModalComponent() {
-    return findComponentUpward(this, ComponentNameEnum.TaskAllotModal) || {}
+  /* 是否为创建人 */
+  private get isCreator(): boolean {
+    return this.TaskAllotModalComponent.outsideIsCreator
   }
   
-  /* 客户 */
-  private get customer(): Customer {
-    // 默认是获取的工单派单组件的，如需自定义 需要自己写
-    return this.TaskAllotModalComponent.customer || {}
+  /* 是否为负责人 */
+  private get isExecutor(): boolean {
+    return this.TaskAllotModalComponent.outsideIsExecutor
+  }
+  
+  /* 计划时间字段 */
+  private get planTimeField(): Field {
+    return this.taskFields.filter(field => field.fieldName === TaskFieldNameMappingEnum.PlanTime)[0] || {}
+  }
+  
+  /* 工单派单组件 */
+  private get TaskAllotModalComponent(): TaskAllotModal {
+    return findComponentUpward(this, ComponentNameEnum.TaskAllotModal) || {}
   }
   
   /* 工单 */
   private get task(): any {
     // 默认是获取的工单派单组件的，如需自定义 需要自己写
-    return this.TaskAllotModalComponent.task || {}
+    return this.TaskAllotModalComponent.outsideTask || {}
+  }
+  
+  /* 工单 */
+  private get taskType(): TaskType {
+    return this.taskTypesMap?.[this.task?.templateId] || { id: '', templateId: '' }
+  }
+  
+  /* 工单配置信息 */
+  private get taskConfig(): TaskConfig {
+    return this.TaskAllotModalComponent.outsideTaskConfig || {}
+  }
+  
+  /* 工单字段列表 */
+  private get taskFields(): Field[] {
+    return this.TaskAllotModalComponent.outsideFields
   }
   
   /**
@@ -54,6 +98,17 @@ export default class TaskAllotMap extends Vue {
   */
   get taskAddress(): TaskAddress {
     return new TaskAddress(this.task.taddress || this.task.address || {})
+  }
+  
+  /** 
+   * @description 工单信息中计划时间是否可以修改
+   * 1. 工单状态是待指派或已拒绝
+   * 3. 工单设置允许修改计划时间
+  */
+  get allowModifyPlanTime() {
+    let states = [TaskStateEnum.CREATED.value, TaskStateEnum.REFUSED.value]
+    let { state } = this.task
+    return this.taskConfig.taskPlanTime && states.indexOf(state) >= 0
   }
   
   /** 
@@ -78,11 +133,12 @@ export default class TaskAllotMap extends Vue {
     
     // 鼠标悬停 显示客户信息
     customerAddressMarker.on(EventNameEnum.MouseOver, (event: any) => {
+      this.showMapInfoWindow = true
       this.AMapInfoWindow = new AMap.InfoWindow({
         closeWhenClickMap: true,
         isCustom: true,
         offset: new AMap.Pixel(0, -34),
-        content: this.buildCustomerAddressMapMarkerInfo()
+        content: this.TaskMapInfoWindowComponent?.$el
       })
       
       this.AMapInfoWindow.open(this.AMap, event.target.getPosition())
@@ -93,28 +149,14 @@ export default class TaskAllotMap extends Vue {
    * @description 构建客户地址标记内容
   */
   private buildCustomerAddressMapMarkerContent(): string {
-    return '<i class="bm-location-dot"></i><div class="map-address-title">客户地址</div>';
+    return '<div class="customer-marker"><i class="bm-location-dot"></i><div class="map-address-title">客户地址</div></div>';
   }
   
   /**
-   * @description 构建客户地址标记内容
-  */
-  private buildCustomerAddressMapMarkerInfo(): string {
-    let { tlmName = '', tlmPhone = '' } = this.task
-    let { name = '', id = ''} = this.task?.customer
-    let { taskAddress } = this
-    
-    return (
-      `
-        <div class="map-info-window-content">
-          <div class="customer-name" onclick="openCustomerViewFunc('${id}')">${ name }</div>
-          <p><label>联系人：</label>${ tlmName }</p>
-          <p><label>电话：</label>${ tlmPhone }</p>
-          <p><label>地址：</label>${ taskAddress?.toString() }</p>
-          <div class="info-window-arrow"></div>
-        </div>
-      `
-    )
+   * @description 关闭地图标记弹窗
+   */
+  private closeInfoWindowHandler() {
+    this.AMapInfoWindow?.close()
   }
   
   /**
@@ -154,10 +196,11 @@ export default class TaskAllotMap extends Vue {
     
     // 构建客户地址标记
     this.buildCusomterAddressMarker()
-    
+    // 设置地图数据
+    this.setMapFunc && this.setMapFunc(this.AMap)
     // 自定义操作
     this.handlerCustomFunc && this.handlerCustomFunc(this.AMap, this.AMapInfoWindow)
-    
+    // Log
     Log.succ(Log.End, this.mapInit.name)
   }
   
@@ -169,6 +212,18 @@ export default class TaskAllotMap extends Vue {
     this.mapInit()
   }
   
+  /**
+   * @description 计划时间修改变化事件
+   * -- 支持外部调用的
+  */
+  private planTimeChangedHandler(planTime: string) {
+    Log.succ(Log.Start, `TaskAllotMap -> ${this.planTimeChangedHandler.name}`)
+    this.TaskAllotModalComponent.outsideSetTask({
+      ...this.task,
+      planTime
+    })
+  }
+  
   mounted() {
     this.mapInit()
   }
@@ -177,6 +232,16 @@ export default class TaskAllotMap extends Vue {
     return (
       <div class={ComponentNameEnum.TaskAllotMap}>
         <div id={this.idName}></div>
+        <task-map-info-window
+          onPlanTimeChange={(planTime: string) => this.planTimeChangedHandler(planTime)}
+          ref='TaskMapInfoWindowComponent'
+          planTimeField={this.planTimeField}
+          show={this.showMapInfoWindow}
+          showModifyPlanTime={this.allowModifyPlanTime}
+          task={this.task}
+          taskType={this.taskType}
+          onClose={() => this.closeInfoWindowHandler()}
+        />
       </div>
     )
   }

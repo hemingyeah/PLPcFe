@@ -1,9 +1,8 @@
-import { FieldManager } from './components';
-import * as util from './util';
+import { FieldManager } from "./components";
+import * as util from "./util";
 
 function createFormField(h, field, comp){
   if(null == comp.build) return comp.build;
-  
   let data = {
     props: {
       field,
@@ -11,7 +10,7 @@ function createFormField(h, field, comp){
       placeholder: util.genPlaceholder(field),
     },
     on: {
-      update: event => this.$emit('update', event)
+      update: event => this.$emit("update", event)
     }
   };
   
@@ -23,7 +22,7 @@ function getValue(field, ctx){
 }
 
 const FormBuilder = {
-  name: 'form-builder',
+  name: "form-builder",
   props: {
     fields: {
       type: Array,
@@ -32,10 +31,21 @@ const FormBuilder = {
     value: {
       type: Object,
       default: () => ({})
+    },
+    mode: {
+      type: String,
+      default: ""
     }
   },
   data(){
     return {
+      /* 远程验证数据 */
+      remoteValidateData: {
+        // 字段
+        field: null,
+        // 方法
+        validateFunc: null,
+      },
       validateMap: {} // 所有注册的验证方法
     }
   },
@@ -47,20 +57,20 @@ const FormBuilder = {
     /**
      * 检测所有字段的结果，都验证通过，返回true, 否则返回false
      */
-    validate(){
+    validate(isSample = true){
       let promises = Object.keys(this.validateMap).map(key => {
-        return this.validateMap[key]()
+        return this.validateMap[key](isSample)
       });
       return Promise.all(promises)
         .then(results => results.every(msg => !msg))
-        .catch(err => console.error('validate error', err))
+        .catch(err => console.error("validate error", err))
     },
     /** 注册待验证的组件 */
     addFieldHandler(event){
       event.stopPropagation();
       
       let { fieldName, validate } = event.detail;
-      if (event.detail && event.detail.field && event.detail.field.formType === 'info') {
+      if (event.detail && event.detail.field && event.detail.field.formType === "info") {
         return;
       }
       this.validateMap[fieldName] = validate;
@@ -70,7 +80,10 @@ const FormBuilder = {
       
       let {fieldName} = event.detail;
       delete this.validateMap[fieldName];
-    }
+    },
+    outsideSetRemoteValidateData(data) {
+      this.$set(this, "remoteValidateData", data)
+    } 
   },
   render(h){
     let formGroups = this.fields
@@ -86,7 +99,13 @@ const FormBuilder = {
         
         // 判读是否隐藏该字段
         if(util.isHiddenField(field, this.value, this.fields)) return null;
-        
+
+        // 判断是否是已隐藏字段
+        if(field.isHidden == 1) return null;
+
+        // 判断是否可见
+        if(field.isVisible == false) return null;
+
         let comp = FieldManager.findField(field.formType);
         if(comp == null) {
           console.warn(`[not implement]: ${field.displayName}(${field.fieldName}): ${field.formType}. `)
@@ -94,7 +113,7 @@ const FormBuilder = {
         }
         
         let formField = createFormField.call(this, h, field, comp);
-        if(comp.formType == 'separator' || null == formField) return formField;
+        if(comp.formType == "separator" || null == formField) return formField;
         
         let formItemClass = [];
         if(field.formType == 'attachment') formItemClass.push('form-item-attachment')
@@ -126,7 +145,7 @@ const FormBuilder = {
           if(next == null) continue;
           
           let nextOptions = next.componentOptions || {};
-          return nextOptions.tag != 'form-separator';
+          return nextOptions.tag != "form-separator";
         }
         
         // 默认返回false, 走到这里意味着后面的节点都是null
@@ -141,12 +160,12 @@ const FormBuilder = {
     )
   },
   mounted(){
-    this.$el.addEventListener('form.add.field', this.addFieldHandler)
-    this.$el.addEventListener('form.remove.field', this.removeFieldHandler)
+    this.$el.addEventListener("form.add.field", this.addFieldHandler)
+    this.$el.addEventListener("form.remove.field", this.removeFieldHandler)
   },
   destroyed(){
-    this.$el.removeEventListener('form.add.field', this.addFieldHandler);
-    this.$el.removeEventListener('form.remove.field', this.removeFieldHandler)
+    this.$el.removeEventListener("form.add.field", this.addFieldHandler);
+    this.$el.removeEventListener("form.remove.field", this.removeFieldHandler)
   }
 };
 

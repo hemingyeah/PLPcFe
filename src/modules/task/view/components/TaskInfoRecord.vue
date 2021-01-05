@@ -1,7 +1,7 @@
 <template>
   <!-- start 工单进度 -->
   <div class="task-info-record">
-
+    
     <!-- start 时间轴 -->
     <div class="task-timeline" ref="timeline">
       <base-timeline 
@@ -19,7 +19,7 @@
       <base-comment ref="comment" placeholder="请输入备注内容" :template-list="remarkTemplateList" :show-customer-action="true" @submit="createRemark" :disabled="commentPending" autofocus/>
     </div>
     <!-- end 添加备注 -->
-
+    
   </div>
   <!-- end 工单进度 -->
 </template>
@@ -180,7 +180,7 @@ export default {
     async createRemark(form) {
       try{
         this.commentPending = true;
-
+        
         let params = {
           taskId: this.taskId,
           attachment: form.attachments,
@@ -189,7 +189,7 @@ export default {
           cusNotice: form.cusNotice,
           content: form.content
         }
-
+        
         let result = await TaskApi.taskRecordCreate(params);
         
         if (result.success) {
@@ -204,7 +204,7 @@ export default {
         } else {
           this.$platform.alert(result.message)
         }
-
+        
       } catch(err){
         console.warn(err)
       } finally {
@@ -218,13 +218,13 @@ export default {
       try {
         if (!await this.$platform.confirm('确认删除该备注吗？')) return;
         const result = await TaskApi.taskRecordDelete({ id: record.id });
-
+        
         if (result.success) {
           this.initializeRecord(); 
         } else {
           this.$platform.alert(result.message)
         }
-
+        
       } catch (e) {
         console.warn('task deleteRemark -> error', e);
       }
@@ -237,7 +237,7 @@ export default {
       params.userId = this.loginUser.userId;
       params.hasViewBalanceRecord = 1;
       params.hasViewReviewRecord = 1;
-
+      
       return TaskApi.taskRecordList(params).then(data => {
         let { list = [] } = data?.result;
         list.forEach(record => {
@@ -250,7 +250,7 @@ export default {
             console.warn('searchRecord recordPage.list.forEach -> error', error)
           }
         })
-
+        
         return data;
       })
     },
@@ -268,12 +268,12 @@ export default {
       try {
         this.params.pageNum++;
         this.recordLoading = true;
-
+        
         let data = await this.fetchRecord(this.params);
-
+        
         this.recordLoading = false
         this.recordPage.merge(data.result)
-
+        
       } catch (error) {
         console.warn('loadmore -> error', error)
       }
@@ -281,7 +281,7 @@ export default {
     openMap(content){
       let longitude = content.longitude;
       let latitude = content.latitude;
-
+      
       if(!longitude || !latitude) return;
       
       this.$fast.map
@@ -459,7 +459,7 @@ export default {
       let contentDom = content.toTaskPool === '1'
         ? <p class="pre-line secondary-info">{ `转派说明： ${ content.updateContent }` }</p> 
         : <p class="pre-line secondary-info">{ content.updateContent }</p>;
-
+        
       return [
         <h5><strong>{userName}</strong> 把工单 #{ taskNo } { action } 到工单池。</h5>,
         <div>
@@ -487,7 +487,7 @@ export default {
           { isPositionException && <span>距离客户位置：{ content.distance ? `${content.distance} 公里` : '位置异常，未获取到位置信息' }</span> }
         </div>
       ];
-
+      
       return (
         <div class={className}>
           { startOrFinshRecord }
@@ -504,7 +504,7 @@ export default {
       let { content, userName, action, taskNo } = record;
       let fromTaskPool = content.fromTaskPool == '1';
       let taskPoolAcceptDom = <h5> <strong>{userName}</strong> 从工单池 {action}了工单 #{taskNo}。</h5>
-
+      
       return fromTaskPool ? taskPoolAcceptDom : this.renderBaseTaskAction(record)
     },
     /* 渲染工单审批dom */
@@ -536,7 +536,7 @@ export default {
         addressDom
       ];
       
-
+      
       // 审批成功dom
       let isAutoApprove = userName == '自动审批';
       let autoApproveDom = <h5>工单 #{ taskNo } { content.action }节点未设置审批人，流程自动审批通过</h5>;
@@ -552,7 +552,7 @@ export default {
       ];
       // 审批撤回dom
       let offedDom = [<div><strong>{ userName }</strong> 撤回了对工单 #{taskNo} { content.action } 操作的审批</div>];
-
+      
       return [
         <div>
           { taskState.unApproved ? unApprovedDom : '' }
@@ -561,21 +561,21 @@ export default {
           { taskState.offed ? offedDom : '' }
         </div>
       ]
-
+      
     },
     /* 渲染工单修改结算dom */
     renderTaskBalanceDom(record = {}) {
       let { content, taskNo, userName } = record;
       let balanceArr = [];
-
+      
       for (let name in content){
         let value = content[name];
         let arr = value.split('[ + + ]');
         let data = { name, oldValue: arr[0], newValue: arr[1] }
-
+        
         balanceArr.push(data);
       }
-
+      
       return [
         <h5> <strong>{ userName }</strong> 修改了结算了工单 #{ taskNo }。</h5>,
         balanceArr.map(review => {
@@ -640,12 +640,12 @@ export default {
       let tag = '';
       let star = [];
       let reviewArr = [];
-
+        
       for (let name in content){
         let value = content[name];
         let arr = value.split('[ + + ]');
         let data = { name, oldValue: arr[0], newValue: arr[1] }
-
+        
         if (name == '满意度') {
           degree = _.cloneDeep(data);
         } else if (name == '服务标签') {
@@ -654,11 +654,11 @@ export default {
           star.push(data);
         }
       }
-
+        
       if (degree) reviewArr.push(degree)
       if (star) reviewArr = reviewArr.concat(star)
       if (tag) reviewArr.push(tag)
-
+      
       return [
         this.renderBaseTaskAction(record),
         reviewArr.map(review => {
@@ -732,9 +732,9 @@ export default {
       if (action == '电话日志') return this.renderPhoneLogDom(record)
       if (action == '支付') return this.renderTaskPaymentDom(record)
       if (action == '审核转交') return this.renderTaskApproveTransferDom(record)
-
+      
       const { isGoBack, synergy, updateType, updateContent } = content;
-
+      
       return [
         <h5><strong>{ userName }</strong> { action } 了工单 #{ taskNo }。</h5>,
         synergy && <div>{`协同人：${ synergy }`}</div>,
@@ -746,13 +746,13 @@ export default {
     async searchRecord() {
       try {
         this.recordLoading = true;
-
+        
         let data = await this.fetchRecord(this.params);
-
+        
         this.recordLoading = false;
         this.recordPage.list = [];
         this.recordPage.merge(data.result)
-
+        
       } catch (error) {
         console.warn('searchRecord -> error', error)
       }

@@ -48,3 +48,9 @@ export function isFunction(func) {
 export function isUndefined(value) {
   return typeOf(value) === 'undefined'
 }
+/**
+ * @description 是否为 null
+ */
+export function isNull(value){
+  return typeOf(value) === 'null'
+}

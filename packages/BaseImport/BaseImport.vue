@@ -83,6 +83,7 @@ export default {
         }else{
           let data = result.data || [];
           this.errors = data;
+          this.$emit('fail',result.message);
         }
       })
         .catch(err => {

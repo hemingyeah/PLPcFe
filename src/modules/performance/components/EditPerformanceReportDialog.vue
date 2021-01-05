@@ -32,12 +32,12 @@
           </el-select>
 
           <!-- start 按人员选择 -->
-          <el-input 
+          <el-input
             v-if="!form.range"
             readonly
             :value="form.target.map(({displayName}) => displayName).join(',')"
             :class="{'input-is-error': !formValidation.target}"
-            @click.native="selectUser" 
+            @click.native="selectUser"
             style="width: 315px; margin-left: 15px;"
             placeholder="请选择人员"
           >
@@ -199,7 +199,7 @@
       </div>
     </div>
   </base-modal>
-  <choose-team-user-options-dialog 
+  <choose-team-user-options-dialog
     ref="teamUserOptionsDialog"
     v-model="form.isRepeat"
     @update="updateFormIsrepeat"
@@ -632,7 +632,8 @@ export default {
               users: this.form.target
             } 
           : this.form.target
-        )
+        ),
+        from: 'profermance' // 标示从"绩效报告里进去的，用于是否额外传参"
       }
 
       this.$fast.contact.choose(choose, options).then(res => {
@@ -652,6 +653,7 @@ export default {
         selectType: 'performance',
         selected: this.teamAndUser.data || [],
         showTeamCheckbox: true,
+        from: 'profermance' // 标示从"绩效报告里进去的，用于是否额外传参"
       };
 
       this.$fast.contact.choose('team', options).then(res => {

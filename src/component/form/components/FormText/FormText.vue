@@ -10,7 +10,7 @@
       :maxlength="field.maxlength ? field.maxlength : maxlength"
       :id="`form_${field.fieldName}`" 
       autocomplete="off"
-      :disabled="field.disabled"/>
+      :disabled="disabled"/>
   </div>
 </template>
 
@@ -60,6 +60,9 @@ export default {
 
   input{
     width: 100%;
+    &:disabled{
+      -webkit-text-fill-color: #b2b2b2;
+    }
   }
 }
 </style>

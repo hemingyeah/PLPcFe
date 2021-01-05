@@ -37,7 +37,7 @@
               执行{{scope.row.endSetting.value}}次
             </template>
           </template>
-          <template v-else-if="column.field === 'createdTasks'">
+          <template v-else-if="column.field === 'createdTasks' && scope.row[column.field]">
             <template v-if="scope.row[column.field].length">
               <el-popover
                 placement="left"
@@ -95,14 +95,14 @@
 </template>
 
 <script>
-import {formatDate, } from '@src/util/lang';
-import platform from '@src/platform';
-import { getPlanOfProduct } from '@src/api/ProductApi';
-import { deletePlanTask } from '@src/api/TaskApi.ts';
+import {formatDate, } from "@src/util/lang";
+import platform from "@src/platform";
+import { getPlanOfProduct } from "@src/api/ProductApi";
+import { deletePlanTask } from "@src/api/TaskApi.ts";
 
 
 export default {
-  name: 'plan-table',
+  name: "plan-table",
   props: {
     shareData: {
       type: Object,
@@ -146,14 +146,14 @@ export default {
     sortChange({ prop, order, }) {
       this.searchModel.orderDetail = {
         column: prop,
-        sequence: order === 'ascending' ? 'ASC' : 'DESC',
+        sequence: order === "ascending" ? "ASC" : "DESC",
         isSystem: 1,
       };
       this.fetchData();
     },
     async deletePlan(plan) {
       try {
-        const res = await platform.confirm('确认删除该计划任务？');
+        const res = await platform.confirm("确认删除该计划任务？");
         if (!res) return;
         this.pending[plan.id] = true;
 
@@ -165,9 +165,9 @@ export default {
         } else {
           platform.alert(reqRes.message);
         }
-        this.$eventBus.$emit('customer_info_record.update_record_list');
+        this.$eventBus.$emit("customer_info_record.update_record_list");
       } catch (e) {
-        console.error('deletePlan catch an err', e);
+        console.error("deletePlan catch an err", e);
       }
     },
     jump(pN) {
@@ -192,8 +192,8 @@ export default {
           if (!res) return;
           this.planList = res.list
             .map(plan => {
-              plan.createTime = formatDate(new Date(plan.createTime), 'YYYY-MM-DD HH:mm:ss');
-              plan.nextTaskCreateTime = plan.nextTaskCreateTime ? formatDate(new Date(plan.nextTaskCreateTime), 'YYYY-MM-DD HH:mm:ss') : '';
+              plan.createTime = formatDate(new Date(plan.createTime), "YYYY-MM-DD HH:mm:ss");
+              plan.nextTaskCreateTime = plan.nextTaskCreateTime ? formatDate(new Date(plan.nextTaskCreateTime), "YYYY-MM-DD HH:mm:ss") : "";
               this.$set(this.pending, plan.id, false);
               return Object.freeze(plan);
             });
@@ -202,67 +202,67 @@ export default {
         })
         .catch(e => {
           this.loading = false;
-          console.error('fetchData caught e', e)
+          console.error("fetchData caught e", e)
         });
     },
     buildColumns() {
       return [{
-        label: '名称',
-        field: 'name',
+        label: "名称",
+        field: "name",
         show: true,
         tooltip: true,
-        sortable: 'custom',
+        sortable: "custom",
       }, {
-        label: '工单类型',
-        field: 'templateId',
+        label: "工单类型",
+        field: "templateId",
         show: true,
         tooltip: true,
-        sortable: 'custom',
+        sortable: "custom",
       }, {
-        label: '创建人',
-        field: 'createUserId',
+        label: "创建人",
+        field: "createUserId",
         show: true,
         tooltip: true,
-        sortable: 'custom',
+        sortable: "custom",
       }, {
-        label: '创建时间',
-        field: 'createTime',
+        label: "创建时间",
+        field: "createTime",
         show: true,
         tooltip: true,
-        sortable: 'custom',
+        sortable: "custom",
       }, {
-        label: '截止时间',
-        field: 'endSetting',
+        label: "截止时间",
+        field: "endSetting",
         show: true,
         tooltip: true,
-        sortable: 'custom',
+        sortable: "custom",
       }, {
-        label: '已创建',
-        field: 'createdTasks',
+        label: "已创建",
+        field: "createdTasks",
         show: true,
         tooltip: false,
-        width: '80px',
-        sortable: 'custom',
+        width: "80px",
+        sortable: "custom",
       }, {
-        label: '重复周期',
-        field: 'periodSetting',
+        label: "重复周期",
+        field: "periodSetting",
         show: true,
         tooltip: true,
-        width: '100px',
-        sortable: 'custom',
+        width: "100px",
+        sortable: "custom",
       }, {
-        label: '下次创建时间',
-        field: 'nextTaskCreateTime',
+        label: "下次创建时间",
+        field: "nextTaskCreateTime",
         show: true,
         tooltip: true,
-        width: '120px',
-        sortable: 'custom',
+        width: "120px",
+        sortable: "custom",
       }, {
-        label: '操作',
-        field: 'action',
+        label: "操作",
+        field: "action",
         show: true,
         tooltip: false,
-        width: '50px',
+        width: "50px",
       }]
     },
     /* 新tab 打开计划任务 */
@@ -271,15 +271,15 @@ export default {
       if (!window.frameElement) return;
 
       let el = event.target;
-      let fromId = window.frameElement.getAttribute('id');
+      let fromId = window.frameElement.getAttribute("id");
 
       // 统一id命名
       platform.openTab({
-        id: "editPlanTask_" + el.dataset.id,
+        id: `editPlanTask_${ el.dataset.id}`,
         title: "正在加载",
         close: true,
-        url: el.getAttribute('href'),
-        fromId: fromId
+        url: el.getAttribute("href"),
+        fromId
       });
     }
   },

@@ -41,7 +41,7 @@
     </div>
     </div>
     <!-- S 搜索条件 -->
-    <el-form class="advanced-search-form" onsubmit="return false;">
+    <el-form class="advanced-search-form task-search" onsubmit="return false;">
       <task-search-form
         v-show="show"
         class="task-search-forms"
@@ -90,57 +90,57 @@
 <script>
 /* api */
 
-import Vue from "vue";
-import * as TaskApi from "@src/api/TaskApi.ts";
+import Vue from 'vue';
+import * as TaskApi from '@src/api/TaskApi.ts';
 
 /* components */
-import TaskSearchForm from "./TaskSearchForm.vue";
-import TaskSearchPupal from "./TaskSearchPupal";
-import TaskInquire from "./TaskInquire";
+import TaskSearchForm from './TaskSearchForm.vue';
+import TaskSearchPupal from './TaskSearchPupal';
+import TaskInquire from './TaskInquire';
 
-import guideCompoment from "@src/component/guide/guide";
+import guideCompoment from "@src/component/guide/Guide";
 
 let guideCompoments = Vue.extend(guideCompoment);
 
 /* utils */
-import _ from "lodash";
-import { formatDate } from "@src/util/lang";
-import { isEmptyStringObject } from "@src/util/function";
-import { storageGet, storageSet } from "@src/util/storage";
+import _ from 'lodash';
+import { formatDate } from '@src/util/lang';
+import { isEmptyStringObject } from '@src/util/function';
+import { storageGet, storageSet } from '@src/util/storage';
 
 /* enum */
 
-import TaskStateEnum from "@model/enum/TaskStateEnum.ts";
+import TaskStateEnum from '@model/enum/TaskStateEnum.ts';
 /* constants */
 import {
   AllotTypeConvertMap,
   FlagConvertMap,
   TaskOnceConvertMap,
   TaskApproveConvertMap,
-} from "@src/modules/task/model/TaskConvertMap.ts";
+} from '@src/modules/task/model/TaskConvertMap.ts';
 
-const TASK_HISTORY_KEY = "task_history_list";
+const TASK_HISTORY_KEY = 'task_history_list';
 const MultiFieldNames = [
-  "serviceType",
-  "serviceContent",
-  "level",
-  "paymentMethod",
-  "state",
-  "allotTypeStr",
-  "onceException",
-  "paymentMethod",
-  "tag",
+  'serviceType',
+  'serviceContent',
+  'level',
+  'paymentMethod',
+  'state',
+  'allotTypeStr',
+  'onceException',
+  'paymentMethod',
+  'tag',
 ];
 const TaskInquireConvertFieldNamesToConditionsMap = {
-  customer: "customerId",
-  product: "productId",
-  tlmName: "tlmId",
+  customer: 'customerId',
+  product: 'productId',
+  tlmName: 'tlmId',
 };
 
-const { TASK_GUIDE_SEARCH_MODEL } = require("@src/component/guide/taskV2Store");
+const { TASK_GUIDE_SEARCH_MODEL } = require('@src/component/guide/taskV2Store');
 
 export default {
-  name: "task-search-panel",
+  name: 'task-search-panel',
   props: {
     customizeList: {
       type: Array,
@@ -197,7 +197,7 @@ export default {
         .filter((item) => {
           let bool = [...this.taskTypeFilterFields, ...this.config].some(
             (v) => {
-              return item.displayName === v.displayName;
+              return item.fieldName === v.fieldName;
             }
           );
           if (bool) return item;
@@ -206,12 +206,12 @@ export default {
           f = _.cloneDeep(field);
           let formType = f.formType;
 
-          if (formType === "datetime") {
-            formType = "date";
+          if (formType === 'datetime') {
+            formType = 'date';
           }
 
-          if (formType === "updateTime") {
-            f.displayName = "更新时间";
+          if (formType === 'updateTime') {
+            f.displayName = '更新时间';
           }
           return Object.freeze({
             ...f,
@@ -241,7 +241,7 @@ export default {
   methods: {
     _selfFields() {
       const { column_number } = this.getLocalStorageData();
-      const searchField = localStorage.getItem("task-search-field");
+      const searchField = localStorage.getItem('task-search-field');
 
       if (column_number) this.columnNum = Number(column_number);
 
@@ -259,46 +259,45 @@ export default {
         repeatBool;
       for (let key in searchFormData) {
         if (
-          JSON.stringify(searchFormData[key]) !== "[]" &&
-          searchFormData[key] &&
-          key !== "backUp"
+          JSON.stringify(searchFormData[key]) !== "[]"
+          && searchFormData[key]
+          && key !== "backUp"
         ) {
-          if (key !== "area") {
+          if (key !== 'area') {
             inPar.push(key);
           } else {
             if (
-              JSON.stringify(searchFormData[key]) !== "{}" &&
-              searchFormData[key].province
+              JSON.stringify(searchFormData[key]) !== '{}'
+              && searchFormData[key].province
             ) {
-              inPar.push("area");
+              inPar.push('area');
             }
           }
         }
       }
       for (let key in this.$refs.taskInquireParams.returnData()) {
         if (
-          inPar.indexOf(key) !== -1 &&
-          this.$refs.taskInquireParams.returnData()[key] &&
-          JSON.stringify(this.$refs.taskInquireParams.returnData()[key]) !==
-            "[]" &&
-          key !== "backUp"
+          inPar.indexOf(key) !== -1
+          && this.$refs.taskInquireParams.returnData()[key]
+          && JSON.stringify(this.$refs.taskInquireParams.returnData()[key]) !== '[]'
+          && key !== 'backUp'
         ) {
-          if (key !== "customer" && key !== "tags" && key !== "area") {
+          if (key !== 'customer' && key !== 'tags' && key !== 'area') {
             repeatBool = true;
           } else {
             if (
-              this.$refs.taskInquireParams.returnData()["area"] &&
-              this.$refs.taskInquireParams.returnData()["area"].province
+              this.$refs.taskInquireParams.returnData()['area']
+              && this.$refs.taskInquireParams.returnData()['area'].province
             ) {
               repeatBool = true;
             }
             if (
-              this.$refs.taskInquireParams.returnData()["tags"] &&
-              this.$refs.taskInquireParams.returnData()["tags"].length
+              this.$refs.taskInquireParams.returnData()['tags']
+              && this.$refs.taskInquireParams.returnData()['tags'].length
             ) {
               repeatBool = true;
             }
-            if (this.$refs.taskInquireParams.returnData()["customer"]) {
+            if (this.$refs.taskInquireParams.returnData()['customer']) {
               repeatBool = true;
             }
           }
@@ -327,23 +326,23 @@ export default {
         conditions: [],
       };
       let tv = null;
-      let fn = "";
+      let fn = '';
       // 固定条件
       for (let i = 0; i < isSystemFields.length; i++) {
         tv = isSystemFields[i];
         fn = tv.fieldName;
         // hasRemind
-        if (fn === "hasRemind" && form[fn] !== "") {
+        if (fn === 'hasRemind' && form[fn] !== '') {
           params.hasRemind = form[fn] == 2 ? 0 : form[fn];
           continue;
         }
 
-        if (fn === "qrcodeState" && form[fn] !== "") {
+        if (fn === 'qrcodeState' && form[fn] !== '') {
           params.qrcodeState = form[fn] == 2 ? 0 : form[fn];
           continue;
         }
 
-        if (fn == "area" && form[fn]) {
+        if (fn == 'area' && form[fn]) {
           params.productAddress = {
             ...(params.productAddress || {}),
             province: form[fn].province,
@@ -353,7 +352,7 @@ export default {
           continue;
         }
 
-        if (fn === "addressDetail") {
+        if (fn === 'addressDetail') {
           params.productAddress = {
             ...(params.productAddress || {}),
             address: form[fn],
@@ -365,17 +364,17 @@ export default {
           continue;
         }
 
-        if (typeof form[fn] === "string") {
-          let fieldNamsMap = { customer: "customerId", product: "productId" };
+        if (typeof form[fn] === 'string') {
+          let fieldNamsMap = { customer: 'customerId', product: 'productId' };
 
           params[fieldNamsMap[fn] ? fieldNamsMap[fn] : fn] = form[fn];
           continue;
         }
 
-        if (tv.formType === "date" || tv.formType === "datetime") {
+        if (tv.formType === 'date' || tv.formType === 'datetime') {
           params[fn] = form[fn]
-            .map((t) => formatDate(t, "YYYY/MM/DD"))
-            .join("-");
+            .map((t) => formatDate(t, 'YYYY/MM/DD'))
+            .join('-');
           continue;
         }
 
@@ -385,8 +384,8 @@ export default {
           continue;
         }
 
-        if (tv.fieldName === "tags") {
-          params.tagId = form[fn].map(({ id }) => id).join("");
+        if (tv.fieldName === 'tags') {
+          params.tagId = form[fn].map(({ id }) => id).join('');
         }
 
         params[fn] = form[fn];
@@ -396,32 +395,32 @@ export default {
       for (let i = 0; i < notSystemFields.length; i++) {
         tv = notSystemFields[i];
         fn = tv.fieldName;
-        !tv.operator ? (tv["operator"] = this.matchOperator(tv)) : "";
+        !tv.operator ? (tv['operator'] = this.matchOperator(tv)) : '';
         if (!form[fn] || (Array.isArray(form[fn]) && !form[fn].length)) {
           continue;
         }
 
         // 空对象
         if (
-          typeof form[fn] === "object" &&
-          !Array.isArray(form[fn]) &&
-          !Object.keys(form[fn]).length
+          typeof form[fn] === 'object'
+          && !Array.isArray(form[fn])
+          && !Object.keys(form[fn]).length
         ) {
           continue;
         }
 
         // FIXME: 同下面 datetime
-        if (tv.formType === "date") {
+        if (tv.formType === 'date') {
           params.conditions.push({
             property: fn,
             operator: tv.operator,
-            betweenValue1: formatDate(form[fn][0], "YYYY-MM-DD HH:mm:ss"),
-            betweenValue2: `${formatDate(form[fn][1], "YYYY-MM-DD")} 23:59:59`,
+            betweenValue1: formatDate(form[fn][0], 'YYYY-MM-DD HH:mm:ss'),
+            betweenValue2: `${formatDate(form[fn][1], 'YYYY-MM-DD')} 23:59:59`,
           });
           continue;
         }
 
-        if (tv.formType === "cascader") {
+        if (tv.formType === 'cascader') {
           params.conditions.push({
             property: fn,
             operator: tv.operator,
@@ -429,22 +428,31 @@ export default {
           });
           continue;
         }
-        if (tv.formType === "user" && Array.isArray(form[fn])) {
+        if (tv.formType === 'user' && Array.isArray(form[fn])) {
           params.conditions.push({
             property: fn,
-            operator: "user",
+            operator: 'user',
+            inValue: form[fn],
+          });
+          continue;
+        }
+
+        if (tv.formType === 'select' && !tv.setting.isMulti && !tv.isSystem) {
+          params.conditions.push({
+            property: fn,
+            operator: 'in',
             inValue: form[fn],
           });
           continue;
         }
 
         // FIXME: 这里 form[fn] 为 字 符串的时候 error
-        if (tv.formType === "datetime") {
+        if (tv.formType === 'datetime') {
           params.conditions.push({
             property: fn,
             operator: tv.operator,
-            betweenValue1: formatDate(form[fn][0], "YYYY-MM-DD HH:mm:ss"),
-            betweenValue2: `${formatDate(form[fn][1], "YYYY-MM-DD")} 23:59:59`,
+            betweenValue1: formatDate(form[fn][0], 'YYYY-MM-DD HH:mm:ss'),
+            betweenValue2: `${formatDate(form[fn][1], 'YYYY-MM-DD')} 23:59:59`,
           });
           continue;
         }
@@ -483,7 +491,7 @@ export default {
       params.systemConditions = [];
 
       let tv = null;
-      let fn = "";
+      let fn = '';
       // 固定条件
       for (let i = 0; i < isSystemFields.length; i++) {
         tv = isSystemFields[i];
@@ -495,35 +503,35 @@ export default {
 
         // 空对象
         if (
-          typeof form[fn] === "object" &&
-          !Array.isArray(form[fn]) &&
-          !Object.keys(form[fn]).length
+          typeof form[fn] === 'object'
+          && !Array.isArray(form[fn])
+          && !Object.keys(form[fn]).length
         ) {
           continue;
         }
 
-        if (tv.formType === "address") {
+        if (tv.formType === 'address') {
           let address = [];
           let isEmpty = isEmptyStringObject(form[fn]);
 
           if (!isEmpty) {
             if (form[fn].province) {
               address.push({
-                property: "province",
+                property: 'province',
                 operator: tv.operatorValue,
                 value: form[fn].province,
               });
             }
             if (form[fn].city) {
               address.push({
-                property: "city",
+                property: 'city',
                 operator: tv.operatorValue,
                 value: form[fn].city,
               });
             }
             if (form[fn].dist) {
               address.push({
-                property: "dist",
+                property: 'dist',
                 operator: tv.operatorValue,
                 value: form[fn].dist,
               });
@@ -533,9 +541,9 @@ export default {
           continue;
         }
 
-        if (tv.fieldName == "tags") {
+        if (tv.fieldName == 'tags') {
           let condition = {
-            property: "tagIds",
+            property: 'tagIds',
             operator: tv.operatorValue,
             inValue: form[fn].map((tag) => {
               return tag.id;
@@ -545,7 +553,7 @@ export default {
           continue;
         }
 
-        if (tv.fieldName == "state") {
+        if (tv.fieldName == 'state') {
           let condition = {
             property: fn,
             operator: tv.operatorValue,
@@ -557,37 +565,37 @@ export default {
           continue;
         }
 
-        if (tv.fieldName === "exceptionType") {
+        if (tv.fieldName === 'exceptionType') {
           let exceptionType;
           switch (form[fn]) {
-            case "暂停":
-              exceptionType = 1;
-              break;
-            case "超时":
-              exceptionType = 2;
-              break;
-            default:
-              exceptionType = 0;
-              break;
+          case '暂停':
+            exceptionType = 1;
+            break;
+          case '超时':
+            exceptionType = 2;
+            break;
+          default:
+            exceptionType = 0;
+            break;
           }
           params.systemConditions.push({
-            property: "exceptionType",
+            property: 'exceptionType',
             operator: tv.operatorValue,
             value: exceptionType,
           });
           continue;
         }
 
-        if (tv.fieldName == "product") {
+        if (tv.fieldName == 'product') {
           params.systemConditions.push({
-            property: "productId",
+            property: 'productId',
             operator: tv.operatorValue,
             value: form[fn],
           });
           continue;
         }
 
-        if (tv.fieldName === "paymentMethod") {
+        if (tv.fieldName === 'paymentMethod') {
           params.conditions.push({
             property: fn,
             operator: tv.operatorValue,
@@ -596,29 +604,29 @@ export default {
           continue;
         }
 
-        if (tv.fieldName == "allotTypeStr") {
+        if (tv.fieldName == 'allotTypeStr') {
           params.systemConditions.push({
-            property: "allotType",
+            property: 'allotType',
             operator: tv.operatorValue,
             inValue: form[fn].map((type) => AllotTypeConvertMap[type]),
           });
           continue;
         }
 
-        if (tv.fieldName == "onceException") {
+        if (tv.fieldName == 'onceException') {
           params.systemConditions.push({
-            property: "flags",
+            property: 'flags',
             operator: tv.operatorValue,
             inValue: form[fn].map(
-              (exception) => FlagConvertMap[exception] || ""
+              (exception) => FlagConvertMap[exception] || ''
             ),
           });
           continue;
         }
 
-        if (tv.fieldName === "synergyId") {
+        if (tv.fieldName === 'synergyId') {
           let condition = {
-            property: "synergies",
+            property: 'synergies',
             operator: tv.operatorValue,
             inValue: form[fn],
           };
@@ -636,22 +644,22 @@ export default {
         //   continue;
         // }
 
-        if (tv.formType == "date") {
+        if (tv.formType == 'date') {
           params.systemConditions.push({
             property: fn,
             operator: tv.operatorValue,
-            betweenValue1: `${formatDate(form[fn][0], "YYYY-MM-DD")} 00:00:00`,
-            betweenValue2: `${formatDate(form[fn][1], "YYYY-MM-DD")} 23:59:59`,
+            betweenValue1: `${formatDate(form[fn][0], 'YYYY-MM-DD')} 00:00:00`,
+            betweenValue2: `${formatDate(form[fn][1], 'YYYY-MM-DD')} 23:59:59`,
           });
           continue;
         }
 
-        if (tv.formType === "datetime") {
+        if (tv.formType === 'datetime') {
           params.systemConditions.push({
             property: fn,
             operator: tv.operatorValue,
-            betweenValue1: `${formatDate(form[fn][0], "YYYY-MM-DD")} 00:00:00`,
-            betweenValue2: `${formatDate(form[fn][1], "YYYY-MM-DD")} 23:59:59`,
+            betweenValue1: `${formatDate(form[fn][0], 'YYYY-MM-DD')} 00:00:00`,
+            betweenValue2: `${formatDate(form[fn][1], 'YYYY-MM-DD')} 23:59:59`,
           });
           continue;
         }
@@ -666,8 +674,8 @@ export default {
         }
 
         if (
-          MultiFieldNames.indexOf(tv.formType) !== -1 ||
-          tv.formType === "user"
+          MultiFieldNames.indexOf(tv.formType) !== -1
+          || tv.formType === 'user'
         ) {
           params.systemConditions.push({
             property: fn,
@@ -686,14 +694,12 @@ export default {
           continue;
         }
 
-        let value =
-          TaskOnceConvertMap[form[fn]] != undefined
-            ? TaskOnceConvertMap[form[fn]]
-            : form[fn];
-        value =
-          TaskApproveConvertMap[value] != undefined
-            ? TaskApproveConvertMap[value]
-            : value;
+        let value = TaskOnceConvertMap[form[fn]] != undefined
+          ? TaskOnceConvertMap[form[fn]]
+          : form[fn];
+        value = TaskApproveConvertMap[value] != undefined
+          ? TaskApproveConvertMap[value]
+          : value;
 
         params.systemConditions.push({
           property: fn,
@@ -706,32 +712,32 @@ export default {
       for (let i = 0; i < notSystemFields.length; i++) {
         tv = notSystemFields[i];
         fn = tv.fieldName;
-        !tv.operator ? (tv["operator"] = this.matchOperator(tv)) : "";
+        !tv.operator ? (tv['operator'] = this.matchOperator(tv)) : '';
         if (!form[fn] || (Array.isArray(form[fn]) && !form[fn].length)) {
           continue;
         }
 
         // 空对象
         if (
-          typeof form[fn] === "object" &&
-          !Array.isArray(form[fn]) &&
-          !Object.keys(form[fn]).length
+          typeof form[fn] === 'object'
+          && !Array.isArray(form[fn])
+          && !Object.keys(form[fn]).length
         ) {
           continue;
         }
 
         // FIXME: 同下面 datetime
-        if (tv.formType === "date") {
+        if (tv.formType === 'date') {
           params.conditions.push({
             property: fn,
             operator: tv.operator,
-            betweenValue1: formatDate(form[fn][0], "YYYY-MM-DD HH:mm:ss"),
-            betweenValue2: `${formatDate(form[fn][1], "YYYY-MM-DD")} 23:59:59`,
+            betweenValue1: formatDate(form[fn][0], 'YYYY-MM-DD HH:mm:ss'),
+            betweenValue2: `${formatDate(form[fn][1], 'YYYY-MM-DD')} 23:59:59`,
           });
           continue;
         }
 
-        if (tv.formType === "cascader") {
+        if (tv.formType === 'cascader') {
           params.conditions.push({
             property: fn,
             operator: tv.operator,
@@ -739,22 +745,31 @@ export default {
           });
           continue;
         }
-        if (tv.formType === "user" && Array.isArray(form[fn])) {
+        if (tv.formType === 'user' && Array.isArray(form[fn])) {
           params.conditions.push({
             property: fn,
-            operator: "user",
+            operator: 'user',
+            inValue: form[fn],
+          });
+          continue;
+        }
+
+        if (tv.formType === 'select' && !tv.setting.isMulti && !tv.isSystem) {
+          params.conditions.push({
+            property: fn,
+            operator: 'in',
             inValue: form[fn],
           });
           continue;
         }
 
         // FIXME: 这里 form[fn] 为 字 符串的时候 error
-        if (tv.formType === "datetime") {
+        if (tv.formType === 'datetime') {
           params.conditions.push({
             property: fn,
             operator: tv.operator,
-            betweenValue1: formatDate(form[fn][0], "YYYY-MM-DD HH:mm:ss"),
-            betweenValue2: `${formatDate(form[fn][1], "YYYY-MM-DD")} 23:59:59`,
+            betweenValue1: formatDate(form[fn][0], 'YYYY-MM-DD HH:mm:ss'),
+            betweenValue2: `${formatDate(form[fn][1], 'YYYY-MM-DD')} 23:59:59`,
           });
           continue;
         }
@@ -771,80 +786,80 @@ export default {
     clearParams(params) {
       if (params.systemConditions) {
         params.systemConditions.forEach((item) => {
-          if (item.property === "serviceContent") {
+          if (item.property === 'serviceContent') {
             params.serviceContents = [];
-          } else if (item.property === "serviceType") {
+          } else if (item.property === 'serviceType') {
             params.serviceTypes = [];
-          } else if (item.property === "level") {
+          } else if (item.property === 'level') {
             params.levels = [];
-          } else if (item.property === "state") {
+          } else if (item.property === 'state') {
             params.states = [];
-          } else if (item.property === "allotType") {
+          } else if (item.property === 'allotType') {
             params.allotTypeStrs = [];
-          } else if (item.property === "flags") {
+          } else if (item.property === 'flags') {
             params.onceExceptions = [];
-          } else if (item.property === "allotUser") {
+          } else if (item.property === 'allotUser') {
             params.allotUser = [];
-          } else if (item.property === "createUser") {
+          } else if (item.property === 'createUser') {
             params.createUser = [];
-          } else if (item.property === "executorUser") {
+          } else if (item.property === 'executorUser') {
             params.executor = [];
-          } else if (item.property === "synergies") {
+          } else if (item.property === 'synergies') {
             params.synergyId = [];
-          } else if (item.property === "tagIds") {
+          } else if (item.property === 'tagIds') {
             params.searchTagIds = [];
           } else {
-            params[item.property] = "";
+            params[item.property] = '';
           }
         });
       }
       return params;
     },
     getLocalStorageData() {
-      const dataStr = storageGet(TASK_HISTORY_KEY, "{}");
+      const dataStr = storageGet(TASK_HISTORY_KEY, '{}');
       return JSON.parse(dataStr);
     },
     matchOperator(field) {
       let formType = field.formType;
-      let operator = "";
+      let operator = '';
 
       switch (formType) {
-        case "date": {
-          operator = "between";
-          break;
+      case 'date': {
+        operator = 'between';
+        break;
+      }
+      case 'datetime': {
+        operator = 'between';
+        break;
+      }
+      case 'select': {
+        if (field.setting && field.setting.isMulti) {
+          operator = 'contain';
+        } else {
+          operator = 'eq';
         }
-        case "datetime": {
-          operator = "between";
-          break;
-        }
-        case "select": {
-          if (field.setting && field.setting.isMulti) {
-            operator = "contain";
-          } else {
-            operator = "eq";
-          }
-          break;
-        }
-        case "user": {
-          operator = "user";
-          break;
-        }
-        case "cascader": {
-          operator = "cascader";
-          break;
-        }
-        case "address": {
-          operator = "address";
-          break;
-        }
-        case "location": {
-          operator = "location";
-          break;
-        }
-        default: {
-          operator = "like";
-          break;
-        }
+        break;
+      }
+      case 'user': {
+        operator = 'user';
+        break;
+      }
+      case 'cascader': {
+        operator = 'cascader';
+        break;
+      }
+      case 'address': {
+        operator = 'address';
+        break;
+      }
+      case 'location': {
+        operator = 'location';
+        break;
+      }
+      default: {
+        operator = 'like';
+        break;
+      }
       }
       return operator;
     },
@@ -853,15 +868,15 @@ export default {
     },
     hide() {
       this.visible = false;
-      this.$emit("bj", false);
+      this.$emit('bj', false);
     },
     resetParams() {
       this.formBackup = {};
       this.inquireFormBackup = {};
-      this.$refs.searchForm &&
-        this.$nextTick(this.$refs.searchForm.initFormVal);
-      this.$refs.taskInquireParams &&
-        this.$nextTick(this.$refs.taskInquireParams.initFormVal);
+      this.$refs.searchForm
+        && this.$nextTick(this.$refs.searchForm.initFormVal);
+      this.$refs.taskInquireParams
+        && this.$nextTick(this.$refs.taskInquireParams.initFormVal);
     },
     saveDataToStorage(key, value) {
       const data = this.getLocalStorageData();
@@ -871,7 +886,7 @@ export default {
     },
     setAdvanceSearchColumn(command) {
       this.columnNum = Number(command);
-      this.saveDataToStorage("column_number", command);
+      this.saveDataToStorage('column_number', command);
     },
     _taskPupal({ list, checkSystemList, checkCustomizeList }) {
       this.selfFields = list;
@@ -884,8 +899,8 @@ export default {
         this.mergeTaskFieldsForTaskInquire();
       });
     },
-    _taskInquireList(field = "") {
-      const searchField = field || localStorage.getItem("task-search-field");
+    _taskInquireList(field = '') {
+      const searchField = field || localStorage.getItem('task-search-field');
       if (searchField) {
         this.taskInquireList = [
           ...this.config,
@@ -905,11 +920,11 @@ export default {
     },
     // 设置查询条件
     _setting({ list, check_system_list, check_customize_list }) {
-      const searchField = localStorage.getItem("task-search-field");
+      const searchField = localStorage.getItem('task-search-field');
       let loc;
       [...this.config, ...this.taskTypeFilterFields].filter((value, index) => {
         let bool = list.some((v) => {
-          return value.displayName === v;
+          return value.fieldName === v;
         });
         if (bool) {
           this.selfFields.push(value);
@@ -937,7 +952,7 @@ export default {
             ...JSON.parse(searchField).checkCustomizeList,
             ...list,
           ].some((v) => {
-            return v === value.displayName;
+            return v === value.fieldName;
           });
           if (!bool) {
             return value;
@@ -960,7 +975,7 @@ export default {
           ...this.taskTypeFilterFields,
         ].filter((value, index) => {
           let bool = list.some((v) => {
-            return v === value.displayName;
+            return v === value.fieldName;
           });
           if (!bool) {
             return value;
@@ -972,7 +987,7 @@ export default {
           checkCustomizeList: [...check_customize_list],
         };
       }
-      localStorage.setItem("task-search-field", JSON.stringify(loc));
+      localStorage.setItem('task-search-field', JSON.stringify(loc));
     },
 
     mergeTaskFields(taskAllFields = []) {
@@ -1026,34 +1041,34 @@ export default {
       }).$mount(`#${id}`);
     },
     previousStep(e) {
-      this.createGuide("v-task-step-6", {
+      this.createGuide('v-task-step-6', {
         content:
-          "高级搜索的“空白”，由您来填充。通过“设置”功能，定制您专属的“常用查询条件”",
+          '高级搜索的“空白”，由您来填充。通过“设置”功能，定制您专属的“常用查询条件”',
         haveStep: true,
         nowStep: 1,
         totalStep: 2,
-        id: "v-task-step-6",
-        gStyle: "left:30px",
+        id: 'v-task-step-6',
+        gStyle: 'left:30px',
         onlyOne: true,
-        finishBtn: "OK",
+        finishBtn: 'OK',
       });
     },
     nextStep(e) {
-      this.createGuide("v-task-step-7", {
+      this.createGuide('v-task-step-7', {
         content:
-          "工单表单中所有可被搜索的字段都隐藏在这儿，当您需要用某些条件查询时，也可以在这里搜索",
+          '工单表单中所有可被搜索的字段都隐藏在这儿，当您需要用某些条件查询时，也可以在这里搜索',
         haveStep: true,
         nowStep: 2,
         totalStep: 2,
-        gStyle: "top:35px",
-        id: "v-task-step-7",
-        arrowStyle: "left:-140px",
+        gStyle: 'top:35px',
+        id: 'v-task-step-7',
+        arrowStyle: 'left:-140px',
         onlyOne: true,
-        finishBtn: "OK",
+        finishBtn: 'OK',
       });
     },
     stopStep() {
-      storageSet(TASK_GUIDE_SEARCH_MODEL, "2");
+      storageSet(TASK_GUIDE_SEARCH_MODEL, '2');
     },
     finishBtnFn() {
       this.stopStep();
@@ -1072,6 +1087,13 @@ export default {
   transition: height 0.5s;
   .form-item {
     width: 340px !important;
+  }
+}
+.task-search{
+  .form-item-control {
+    input{
+      width: 100%;
+    }
   }
 }
 </style>

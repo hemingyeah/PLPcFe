@@ -60,12 +60,14 @@ const LogicalFieldModal = {
 
       return Array.isArray(depValues) && depValues.indexOf(this.currValue) >= 0;
     },
-    renderValueItem(option){
+    renderValueItem(option,index){   
+      if(!option.value) return null;
       const className = ['logical-field-value', option.value == this.currValue ? 'logical-field-selected' : null];
-
-      return <div class={className} key={option.value} onClick={() => this.choose(option)}>{option.value}</div>
+      
+      return <div class={className} key={index} onClick={() => this.choose(option)}>{option.value}</div>
     },
     renderTargetItem(field){
+      if(field.isHidden == 1) return null
       const attrs = {
         nativeOn: {
           click: e => e.stopPropagation()
@@ -102,7 +104,7 @@ const LogicalFieldModal = {
     const tooltip = {
       directives: [{name: 'tooltip'}],
       domProps: {
-        title: '在表单中，可以根据单选项的值决定表单中其他字段(位于该字段下方的非系统字段)的显示与隐藏。'
+        title: '在表单中，可以根据单选项的值决定表单中其他字段（位于该字段下方的非系统字段）的显示与隐藏。'
       }
     }
 
@@ -111,15 +113,15 @@ const LogicalFieldModal = {
         <h3 slot="title">配置显示逻辑 <i class="iconfont icon-question" {...tooltip}></i></h3>
         <div class="logical-field-panel">
           <h4 class="logical-field-panel-header">如果该字段值为：</h4>
-          <div class="logical-field-panel-body">{ this.options.map(o => this.renderValueItem(o)) }</div>
+          <div class="logical-field-panel-body">{ this.options.map((o,index) => this.renderValueItem(o,index)) }</div>
         </div>
         <div class="logical-field-panel">
           <h4 class="logical-field-panel-header">那么显示以下字段：</h4>
           <div class="logical-field-panel-body">{ this.logicalFields.map(f => this.renderTargetItem(f)) }</div>
         </div>
-        <div slot="footer">
-          <button type="button" class="btn btn-text" onClick={this.cancel}>取消</button>
-          <button type="button" class="btn btn-primary" onClick={this.submit}>确定</button>
+        <div slot="footer" class="dialog-footer">
+          <el-button  onClick={this.cancel}>取 消</el-button>
+          <el-button type="primary" onClick={this.submit}>保 存</el-button>
         </div>
       </base-modal>
     )

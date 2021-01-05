@@ -18,11 +18,16 @@ import FormInfo from './FormInfo';
 import FormCascader from './FormCascader';
 import FormCustomer from './FormCustomer';
 import FormRelation from './FormRelation';
+import FormRelatedTask from './FormRelatedTask';
 
 import FormAutograph from './FormAutograph'
 import FormSparepart from './FormSparepart'
 import FormServiceIterm from './FormServiceIterm'
 
+import FormFormula from './FormFormula/index.ts';
+
+
+import FormRelatedCatalog from './FormRelatedCatalog';
 
 // 所有字段
 const ALL_FORM_FIELDS = [
@@ -30,6 +35,7 @@ const ALL_FORM_FIELDS = [
   FormTextarea,
   FormNumber,
   FormSelect,
+  FormCascader,
   FormCode,
   FormAttachment,
   FormUser,
@@ -42,12 +48,14 @@ const ALL_FORM_FIELDS = [
   FormAddress,
   FormLocation,
   FormInfo,
-  FormCascader,
   FormCustomer,
   FormRelation,
   FormAutograph,
   FormSparepart,
-  FormServiceIterm
+  FormServiceIterm,
+  FormRelatedTask,
+  FormFormula,
+  FormRelatedCatalog
 ].reduce((acc, val) => (Array.isArray(val) ? acc = acc.concat(val) : acc.push(val)) && acc, []);
 
 const FormFieldMap = {};
@@ -56,7 +64,7 @@ const SettingComponents = {};
 const BuildComponents = {};
 const ViewComponents = {};
 
-for(let i = 0; i < ALL_FORM_FIELDS.length; i++){
+for (let i = 0; i < ALL_FORM_FIELDS.length; i++) {
   let formField = ALL_FORM_FIELDS[i];
   let field = {
     name: formField.name, // 组件显示名称
@@ -67,39 +75,39 @@ for(let i = 0; i < ALL_FORM_FIELDS.length; i++){
     forceDelete: formField.forceDelete === true
   }
 
-  if(!formField.alias){
+  if (!formField.alias) {
     // 预览组件
     let previewComp = formField.component.preview;
-    PreviewComponents[previewComp.name] = previewComp; 
+    PreviewComponents[previewComp.name] = previewComp;
     field.preview = previewComp.name; // 预览组件名
 
     // 设置组件
     let settingComp = formField.component.setting;
-    if(null != settingComp){
+    if (null != settingComp) {
       SettingComponents[settingComp.name] = settingComp;
       field.setting = settingComp.name; // 设置组件名
     }
 
     // 表单组件
     let buildComp = formField.component.build;
-    if(null != buildComp){
+    if (null != buildComp) {
       BuildComponents[buildComp.name] = buildComp;
       field.build = buildComp.name; // 表单组件名
     }
 
     // 显示组件
     let viewComp = formField.component.view;
-    if(null != viewComp){
+    if (null != viewComp) {
       ViewComponents[viewComp.name] = viewComp;
       field.view = viewComp.name
     }
 
     // 扩展组件
     let extendComp = formField.component.extend;
-    if(null != extendComp && Object.keys(extendComp).length > 0) {
+    if (null != extendComp && Object.keys(extendComp).length > 0) {
       let extend = {};
 
-      for(let name in extendComp) {
+      for (let name in extendComp) {
         let comp = extendComp[name];
         SettingComponents[comp.name] = comp;
         extend[name] = comp.name;
@@ -112,7 +120,7 @@ for(let i = 0; i < ALL_FORM_FIELDS.length; i++){
   FormFieldMap[formField.formType] = field;
 }
 
-const COMMON_FIELDS = ['text', 'textarea', 'number', 'select', 'code', 'attachment', 'user', 'date', 'datetime', 'phone', 'email', 'separator', 'address', 'location', 'info'];
+const COMMON_FIELDS = ['text', 'textarea', 'number', 'select', 'cascader', 'attachment', 'user', 'date', 'datetime', 'phone', 'email', 'separator', 'address', 'location', 'info', 'autograph', 'related_task', 'formula'];
 // 工单字段列表，工单彻底改造完成后删除，用 COMMON_FIELDS 替代
 const TASK_FIELDS = ['text', 'textarea', 'number', 'select', 'code', 'attachment', 'user', 'date', 'datetime', 'phone'];
 
@@ -126,6 +134,9 @@ const MODE_MANAGER = {
   product: {
     include: [...COMMON_FIELDS]
   },
+  product_menu: {
+    include: [ ...COMMON_FIELDS]
+  },
   task: {
     include: [
       ...TASK_FIELDS,
@@ -138,16 +149,16 @@ const MODE_MANAGER = {
       ...['cascader', 'address', 'receiptAttachment', 'autograph', 'sparepart', 'serviceIterm', 'systemAutograph']
     ]
   },
-  findMode(mode){
+  findMode(mode) {
     return MODE_MANAGER[mode] || MODE_MANAGER.base;
   }
 }
 
 /** 获取字段 */
-FormFieldMap.get = function(formType){
+FormFieldMap.get = function (formType) {
   let field = FormFieldMap[formType];
 
-  if(field && field.alias){
+  if (field && field.alias) {
     let aliasField = FormFieldMap[field.alias];
     field.preview = aliasField.preview;
     field.setting = aliasField.setting;
@@ -160,33 +171,36 @@ FormFieldMap.get = function(formType){
 
 const FieldManager = {
   /** 根据mode获取字段 */
-  findModeFields(mode = 'base'){
+  findModeFields(mode = 'base') {
     let fields = ALL_FORM_FIELDS;
     let modeConfig = MODE_MANAGER.findMode(mode);
     let include = modeConfig.include || []
 
     // 排除字段
-    if(include.length > 0) {
+    if (include.length > 0) {
       fields = fields.filter(f => include.indexOf(f.formType) >= 0)
     }
 
     return fields.map(f => f.formType);
   },
   /** 根据字段类型获取单个字段 */
-  findField(formType){
+  findField(formType) {
     let field = FormFieldMap.get(formType);
 
-    if(field && field.alias){
+    if (field && field.alias) {
       let aliasField = FormFieldMap[field.alias];
-  
+
       field.preview = aliasField.preview;
       field.setting = aliasField.setting;
       field.build = aliasField.build;
       field.extend = aliasField.extend || {};
-  
-      return {...aliasField, ...field};
+
+      return {
+        ...aliasField,
+        ...field
+      };
     }
-  
+
     return field;
   }
 }

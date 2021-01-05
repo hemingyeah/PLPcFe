@@ -70,6 +70,15 @@ export default {
       type: String,
       default: '请选择部门'
     },
+    departShow: {
+      type: Boolean,
+      default: true
+    },
+    // 是否显示离职人员
+    showDeleteUser: {
+      type: Boolean,
+      default: false
+    }
   },
   data(){
     return {
@@ -106,6 +115,157 @@ export default {
     this.initialize();
   },
   methods: {
+    post(){
+      let data = {};
+      let users = this.chosen.map(item => {
+        return {
+          userId: item.userId,
+          displayName: item.displayName,
+          staffId: item.staffId,
+          head: item.head || ''
+        };
+      });
+      data.users = users;
+
+      if(this.allowCheckDept){
+        let depts = this.chosenDept.map(item => {
+          return {
+            id: item.id,
+            name: item.name
+          }
+        }) 
+        data.depts = depts;
+      }
+
+      this.show = false;
+      this.$emit('input', data);
+    },
+    inputKeyword(event){
+      this.params.keyword = event.target.value;
+      this.search();
+    },
+    /** 搜索人员 */
+    search: _.debounce(function(){
+      if(!this.params.keyword){ // 空值  显示团队
+        this.mode = 'choose';
+        this.initDeptUser(this.selectedDept);
+        return;
+      }
+
+      this.searchUser();
+    }, 500),
+    /** 选择人员 */
+    chooseUser(user){
+      if(!user) return;
+
+      // 单选则直接返回
+      if(!this.isMulti) {
+        this.show = false;
+        this.$emit('input', {
+          users: [{
+            userId: user.userId,
+            displayName: user.displayName,
+            staffId: user.staffId,
+            head: user.head || ''
+          }]
+        })
+        return;
+      }
+
+      user.selected ? this.removeUser(user) : this.addUser(user);
+    },
+    /** 添加人员 */
+    addUser(user){
+      if(!this.allowAddUser) return alert(`最多选择${this.max}人`);
+    
+      user.selected = true;
+
+      var index = -1;
+      var len = this.chosen.length;
+      for(var i = 0; i < len;i++){
+        if(user.userId == this.chosen[i].userId){
+          index = i;
+          break;
+        }
+      }
+      index == -1 && this.chosen.push(user);
+    },
+    /** 移除选择的人员 */
+    removeUser(user){
+      user.selected = false;
+
+      var index = -1;
+      var len = this.chosen.length;
+      for(var i = 0; i < len;i++){
+        if(this.chosen[i].userId == user.userId){
+          index = i;
+          break;
+        }
+      }
+      index >= 0 && this.chosen.splice(index,1);
+    },
+    /** 搜索用户 */
+    async searchUser(){
+      try {
+        this.mode = 'search';
+        this.loading = true;
+        this.userPage.list = [];
+
+        this.params.deptId = 'root';
+        this.params.departmentId = '';
+        this.params.pageNum = 1;
+
+        if(this.showLocation){
+          this.params.lat = this.lat;
+          this.params.lng = this.lng;
+        }
+        this.params.seeAllOrg = this.isSeeAllOrg;
+
+        // 可显示离职人员
+        this.params.showDeleteUser = this.showDeleteUser ? 2 : 0;
+        
+        let userPage = await this.fetchUser(this.params);
+        this.userPage.merge(Page.as(userPage));
+      } catch (error) {
+        console.error(error)
+      }
+
+      this.loading = false
+      this.loadmoreOptions.disabled = !this.userPage.hasNextPage;
+    },
+    /** 选中一个部门 */
+    async initDeptUser(dept){
+      try {
+        this.mode = 'choose';
+        this.selectedDept = dept;
+        this.userPage.list = [];
+        this.loading = true;
+
+        // 查询用户
+        this.params.keyword = '';
+        this.params.deptId = this.selectedDept.id;
+        this.params.departmentId = this.selectedDept.id;
+        this.params.pageNum = 1;
+
+        if(this.showLocation){
+          this.params.lat = this.lat;
+          this.params.lng = this.lng;
+        }
+        this.params.seeAllOrg = this.isSeeAllOrg;
+
+        // 离职人员
+        this.params.showDeleteUser = (dept.id == 'root' && dept.name == '离职人员') ? 1 : 0;
+
+        let userPage = await this.fetchUser(this.params);
+
+        this.userPage.merge(Page.as(userPage));
+      } catch (error) {
+        console.error(error)
+      }
+
+      this.loading = false;
+      this.loadmoreOptions.disabled = !this.userPage.hasNextPage;
+    },
     /** 选择部门 */
     chooseDept(event){
       let {node, value} = event;
@@ -116,6 +276,7 @@ export default {
     fetchDept(){
       let params = {};
       params.seeAllOrg = this.isSeeAllOrg;
+      params.showDeleteUser = this.showDeleteUser ? 1 : 0;
 
       return http.get('/security/department/tree', params).then(result => {
         if(result.status == 1) return [];

@@ -10,52 +10,63 @@ import {
   getTaskAllotTaskPoolApprove, 
   getTaskType,
   taskReAllot,
-  taskReAllotTaskPool
+  taskReAllotTaskPool,
+  getTaskTypesMap
 } from '@src/api/TaskApi'
 import { getStateColorMap } from '@src/api/SettingApi'
 /* computed */
 import TaskAllotModalComputed from '@src/modules/task/components/TaskAllotModal/TaskAllotModalComputed'
+/* decorators */
+import Log from '@src/decorators/LogDecorators'
 /* enum */
 import TaskAllotTypeEnum from '@model/enum/TaskAllotTypeEnum'
-import TaskActionEnum from '@model/enum/TaskActionEnum'
 import ComponentNameEnum from '@model/enum/ComponentNameEnum'
-import LeaderEnum from '@model/enum/LeaderEnum'
+import StorageModuleEnum from '@model/enum/StorageModuleEnum'
+import StorageKeyEnum from '@model/enum/StorageKeyEnum'
 /* entity */
 import Approve from '@model/entity/Approve'
 import LoginUser from '@model/entity/LoginUser/LoginUser'
 import TaskConfig from '@model/types/TaskConfig'
 import TaskApprove from '@model/entity/TaskApprove'
 import TaskAllotUserInfo from '@model/entity/TaskAllotUserInfo'
+import TaskType from '@model/entity/TaskType'
+import Tag from '@model/entity/Tag/Tag'
 /* interface */
 import { 
   AutoDispatchApproveParams, 
   DepeMultiUserResult,
-  AutoDispatchParams, 
-  TaskAllotApproveParams, 
+  AutoDispatchParams,
   AllotExcutorParams,
   AllotTaskPoolParams,
   User,
-  ReAllotTaskPoolParams
+  ReAllotTaskPoolParams,
+  TaskAllotResult
 } from '@src/modules/task/components/TaskAllotModal/TaskAllotModalInterface'
 /* model */
-import { TASK_NOT_AUTO_DISPATCH_RULE, TASK_NO_EXECUTOR_MESSAGE, TASK_NO_REALLOT_REASON_MESSAGE, TASK_REALLOT_NOT_SAME_USER_MESSAGE } from '@src/model/const/Alert'
+import { TaskAllotTypeModeEnum } from '@src/modules/task/components/TaskAllotModal/TaskAllotModalModel'
+import { 
+  TASK_NOT_AUTO_DISPATCH_RULE, 
+  TASK_NO_EXECUTOR_MESSAGE, 
+  TASK_ALLOT_NOT_STORAGE_RESULT, 
+  TASK_NO_REALLOT_REASON_MESSAGE, 
+  TASK_REALLOT_NOT_SAME_USER_MESSAGE 
+} from '@src/model/const/Alert'
 import { getCustomerDetailResult } from '@model/param/out/Customer'
-import { getTaskAllotApproveResult, getTaskAllotResult, getTaskAllotTaskPollApproveResult, getTaskAllotTaskPoolResult, getTaskConfigResult, getTaskTypeResult } from '@model/param/out/Task'
+import { getTaskAllotApproveResult, getTaskAllotResult, getTaskAllotTaskPollApproveResult, getTaskAllotTaskPoolResult, getTaskConfigResult, getTaskTypeResult, getTaskTypesResult } from '@model/param/out/Task'
 import { TaskPoolNotificationTypeEnum } from '@src/modules/task/components/TaskAllotModal/TaskAllotPool/TaskAllotPoolModel'
-/* service */
-import { checkApprove } from '@service/TaskService'
 /* types */
 import StateColorMap from '@model/types/StateColor'
 import AutoDispatchListItem from '@model/types/AutoDispatchListItem'
 /* util */
-import Log from '@src/util/log.ts'
+import LogUtil from '@src/util/log.ts'
 import Platform from '@src/util/Platform'
 import PlatformUtil from '@src/platform'
 import { openTabForTaskView } from '@src/util/business/openTab'
+import { isArray } from '@src/util/type'
+import { storageGet, storageSet } from '@src/util/storage.ts'
+import { isEmpty } from '@src/util/object'
 /* vue */
 import { Emit } from 'vue-property-decorator'
-/* util */
-import { isArray } from '@src/util/type'
 
 /* 加载的组件 */
 const LoadComponentMap = {
@@ -65,7 +76,9 @@ const LoadComponentMap = {
 }
 
 enum TaskAllotModalEmitEventEnum {
-  Success = 'success'
+  Success = 'success',
+  UpdateTask = 'updateTask',
+  UpdateRecords = 'updateRecords',
 }
 
 class TaskAllotModalMethods extends TaskAllotModalComputed {
@@ -75,13 +88,33 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
    * 默认实现。跳转到工单详情页面 如果有需要可以自定义
   */
   @Emit(TaskAllotModalEmitEventEnum.Success)
-  public allotSuccess() {
+  public async allotSuccess(): Promise<void> {
+    LogUtil.succ(LogUtil.Start, this.allotSuccess.name)
+    // 保存派单结果到缓存
+    await this.saveAllotResultToStorage()
     // @ts-ignore
     let id = window?.frameElement?.dataset?.id
     // 关闭当前tab
     PlatformUtil.closeTab(id)
     // 打开新tab
     openTabForTaskView(this.task.id)
+  }
+  
+  /** 
+   * @description 更新工单信息
+  */
+  @Emit(TaskAllotModalEmitEventEnum.UpdateTask)
+  public updateTaskHandler(task: any) {
+    LogUtil.succ(LogUtil.Start, this.updateTaskHandler.name)
+    return task
+  }
+  
+  /** 
+   * @description 更新工单动态
+  */
+  @Emit(TaskAllotModalEmitEventEnum.UpdateRecords)
+  public updateTaskRecordsHandler() {
+    LogUtil.succ(LogUtil.Start, this.updateTaskRecordsHandler.name)
   }
   
   /** 
@@ -229,20 +262,27 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
     this.showTaskAllotModal = false
   }
   
-  /** 
-   * @description 检查自动派单审批
+  /**
+   * @description 清空派单结果
   */
-  public checkApproveWithAutoDispatch(): void {
-    this.showTaskAllotModal = false
+  public clearTaskAllotResult(event: MouseEvent): void {
+    // @ts-ignore 取消按钮的焦点
+    event?.target?.parentNode?.blur()
+    // 清空上次派单结果
+    const allotType = TaskAllotTypeEnum.Person
+    this.handlerAllotTypeChange(allotType)
+    this.executorUser = null
+    this.synergyUserList = []
+    // 隐藏清空派单结果按钮
+    this.showClearTaskAllotResultButton = false
   }
   
-  /** 
-   * @description 删除负责人
-  */
-  public deleteExcutorUser(user: LoginUser) {
-    this.executorUser = null
-    /* 清除选择负责人表格列表 负责人信息 */
-    this.TaskAllotExcutorTableComponent?.outsideUpwardClearExcutorUser()
+  /**
+   * @description 清空人员卡片
+   */
+  public clearUserCardSynergyChecked(user: LoginUser) {
+    this.UserCardComponentWithTaskAllotExecutorMap?.clearSynergyChecked(user)
+    this.UserCardComponentWithTaskAllotPool?.clearSynergyChecked(user)
   }
   
   /** 
@@ -262,7 +302,7 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
   */
   public getAttributes() {
     return {
-      class: 'task-allot-modal',
+      class: ['task-allot-modal', this.isReAllot && 'task-reallot-modal'],
       props: {
         title: '派单'
       },
@@ -311,6 +351,43 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
   }
   
   /**
+   * @description 从缓存获取数据
+  */
+  public async getDataToStorage(key: string, data: any) {
+    return await storageGet(key, data, StorageModuleEnum.Task)
+  }
+  
+  /**
+   * @description 查询所有的工单类型列表
+   */
+  public fetchTaskTypesMap() {
+    // 如果工单类型列表数据已存在则不查询
+    if (this.taskTypes.length > 0) return
+    
+    LogUtil.succ(LogUtil.Start, `TaskAllotModalMethods -> ${this.fetchTaskTypesMap.name}`)
+    
+    return (
+      getTaskTypesMap().then((data: getTaskTypesResult) => {
+        let isSuccess = data.success
+        if (!isSuccess) return
+        
+        this.taskTypes = data?.result || []
+        // key : 工单类型id(string) -> value: TaskType
+        this.taskTypesMap = (
+          this.taskTypes
+            .reduce((acc: {[x: string]: TaskType }, currentTaskType: TaskType) => {
+              acc[currentTaskType.templateId] = currentTaskType
+              return acc
+            }, {})
+        )
+        
+      }).catch(err => {
+        console.error(err)
+      })
+    )
+  }
+  
+  /**
    * @description 获取客户信息
   */
   public fetchCustomer() {
@@ -319,19 +396,19 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
       return console.warn('Caused: TaskAllotModal fetchCustomer not have customerId')
     }
     
-    Log.succ(Log.Start, `TaskAllotModalMethods -> ${this.fetchCustomer.name}`)
+    LogUtil.succ(LogUtil.Start, `TaskAllotModalMethods -> ${this.fetchCustomer.name}`)
     
     return (
       getCustomer(id).then((result: getCustomerDetailResult) => {
         let isSuccess = result.status == 0
         if (!isSuccess) return
         
-        Log.succ(Log.End, `TaskAllotModalMethods -> ${this.fetchCustomer.name}`)
+        LogUtil.succ(LogUtil.End, `TaskAllotModalMethods -> ${this.fetchCustomer.name}`)
         
         this.customer = Object.freeze(result.data || {})
         
-        // @ts-ignore
-        this.$refs.TaskAllotExcutorComponent.outsideFetchUsers()
+        // 查询用户数据
+        this.TaskAllotExcutorComponent?.outsideFetchUsers()
         
       }).catch(err => {
         console.error(err)
@@ -612,9 +689,19 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
   /** 
    * @description 派单方式变化
   */
+  @Log()
   public handlerAllotTypeChange(type: TaskAllotTypeEnum) {
     this.allotType = type
     this.loadedComponents.push(LoadComponentMap[type])
+    this.fetchTaskTypesMap()
+  }
+  
+    /** 
+   * @description 派单方式模式变化
+  */
+  public handlerAllotTypeModeChange(type: TaskAllotTypeModeEnum) {
+    this.allotTypeMode = type
+    this.fetchTaskTypesMap()
   }
   
   /** 
@@ -622,13 +709,16 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
   */
   public async initialize() {
     try {
+      
       await this.fetchStateColor()
+      // 异步获取客户信息
       await this.fetchCustomer()
       // 非转派时获取客户负责人带入协同人
       !this.isReAllot && await this.fetchSynergyUserWithCustomerManager()
+      
     } catch (error) {
       this.toggleTaskAllotExecutorComponentPending()
-      console.error('TaskAllotModalMethods -> initialize -> error', error)
+      LogUtil.error(error, this.initialize.name)
     } finally {
       this.pending = false
     }
@@ -640,7 +730,8 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
   public matchExcutorWithReAllot(): void {
     if (!this.isReAllot) return
     
-    let executor = this.task?.executor
+    let executor: LoginUser = this.task?.executor
+    executor ? executor.selfSelected = true : null
     this.executorUser = executor || null
   }
   
@@ -664,6 +755,7 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
    * @description 工单池通知人员信息变动
   */
   public onTaskNotificationUsersChanged(value: LoginUser[]): void {
+    LogUtil.succ(LogUtil.Start, this.onTaskNotificationUsersChanged.name)
     this.taskPoolNotificationUsers = value
   }
   
@@ -672,6 +764,7 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
    * -- 支持外部调用的
   */
   public outsideSetExcutorUser(user: LoginUser | TaskAllotUserInfo | null) {
+    LogUtil.succ(LogUtil.Start, this.outsideSetExcutorUser.name)
     this.setExecutorUser(user)
   }
   
@@ -680,7 +773,55 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
    * -- 支持外部调用的
   */
   public outsideSetMatchRule(rule: AutoDispatchListItem | null) {
+    LogUtil.succ(LogUtil.Start, this.outsideSetMatchRule.name)
     this.matchRule = rule
+  }
+  
+  /** 
+   * @description 设置工单信息
+   * -- 支持外部调用的
+  */
+  public outsideSetTask(task: any) {
+    LogUtil.succ(LogUtil.Start, this.outsideSetTask.name)
+    this.updateTaskHandler(task)
+    this.updateTaskRecordsHandler()
+  }
+  
+  /** 
+   * @description 删除协同人信息
+   * -- 支持外部调用的
+  */
+  public outsideDeleteSynergyUser(user: LoginUser) {
+    LogUtil.succ(LogUtil.Start, this.outsideDeleteSynergyUser.name)
+    this.deleteSynergyUser(user)
+    this.clearUserCardSynergyChecked(user)
+  }
+  
+  /** 
+   * @description 设置协同人列表
+   * -- 支持外部调用的
+  */
+  public outsideSetSynergyUsers(users: LoginUser[]) {
+    LogUtil.succ(LogUtil.Start, this.outsideSetSynergyUsers.name)
+    this.setSynergyUsers(users)
+  }
+  
+  /**
+   * @description 设置客户团队信息列表
+   * -- 支持外部调用的
+   */
+  public outsideSetCustomerTags(tags: Tag[]) {
+    LogUtil.succ(LogUtil.Start, this.outsideSetCustomerTags.name)
+    this.customerTags = tags
+  }
+  
+  /**
+   * @description 设置转派说明信息
+   * -- 支持外部调用的
+   */
+  public outsideSetReason(value: string) {
+    LogUtil.succ(LogUtil.Start, this.outsideSetReason.name)
+    this.reason = value
   }
   
   /** 
@@ -688,11 +829,14 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
    * --支持外部调用的
   */
   public async outsideShow() {
+    LogUtil.succ(LogUtil.Start, this.outsideShow.name)
     // 等待状态
     this.pending = true
-    this.toggleTaskAllotExecutorComponentPending(true)
+    this.toggleTaskAllotExecutorComponentPending(false)
     // 初始化派单类型
     this.allotType = TaskAllotTypeEnum.Person
+    // 初始化视图模式
+    this.allotTypeMode = TaskAllotTypeModeEnum.List
     // 匹配负责人显示
     this.matchExcutorWithReAllot()
     // 初始化协同人显示
@@ -709,6 +853,7 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
    * @description 设为负责人
   */
   public setExecutorUser(user: LoginUser | TaskAllotUserInfo | null) {
+    LogUtil.succ(LogUtil.Start, this.setExecutorUser.name)
     this.executorUser = user
   }
   
@@ -716,9 +861,17 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
    * @description 设为协同人
   */
   public setSynergyUser(user: LoginUser) {
+    LogUtil.succ(LogUtil.Start, this.setSynergyUser.name)
     // 判断是否已存在该用户
     const IsNotRepeat = this.synergyUserList.every(synergyUser => synergyUser.userId !== user.userId)
     IsNotRepeat && this.synergyUserList.push(user)
+  }
+  
+  /** 
+   * @description 设置协同人列表数据
+  */
+  public setSynergyUsers(users: LoginUser[]) {
+    this.synergyUserList = users
   }
   
   /** 
@@ -734,7 +887,32 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
   */
   public showApproveDialog(data: TaskApprove) {
     // @ts-ignore
-    this.$refs.ApproveDialog && this.$refs.ApproveDialog.openDialog(data)
+    this.$refs?.ApproveDialog?.openDialog(data)
+  }
+  
+  /**
+   * @description 保存数据到缓存
+  */
+  public async saveDataToStorage(key: string, data: any): Promise<void> {
+    await storageSet(key, data, StorageModuleEnum.Task)
+  }
+  
+  /**
+   * @description 保存派单结果到缓存
+  */
+  public async saveAllotResultToStorage(): Promise<void> {
+    LogUtil.succ(LogUtil.Start, this.saveAllotResultToStorage.name)
+    // 工单派单结果
+    const taskAllotResult: TaskAllotResult = {
+      // 派单方式
+      allotType: this.allotType,
+      // 负责人
+      executorUser: this.executorUser as LoginUser,
+      // 协同人列表
+      synergyUserList: this.synergyUserList
+    }
+    // 保存数据
+    await this.saveDataToStorage(StorageKeyEnum.TaskAllotResult, taskAllotResult)
   }
   
   /** 
@@ -807,8 +985,8 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
     }
     
     // 验证审批
-    const allotExcutorParams = this.buildAllotExcutorParams()
-    let approve: any | null = await this.fetchApproveWithTaskAllot(allotExcutorParams)
+    const allotExecutorParams = this.buildAllotExcutorParams()
+    let approve: any | null = await this.fetchApproveWithTaskAllot(allotExecutorParams)
     if (!approve) return
     
     let isNeedApprove = approve.isNeedApprove === true
@@ -919,9 +1097,44 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
    * @description 切换负责人组件状态
   */
   public toggleTaskAllotExecutorComponentPending(pending: boolean = false) {
-    // @ts-ignore
-    this.$refs.TaskAllotExcutorComponent?.outsideSetPending(pending)
+    this.TaskAllotExcutorComponent?.outsideSetPending(pending)
   }
+  
+  /** 
+   * @description 使用上次派单结果
+  */
+  public async useLastTaskAllotResult(event: MouseEvent): Promise<void> {
+    // @ts-ignore 取消按钮的焦点
+    event?.target?.parentNode?.blur()
+    // 取出存储数据
+    const taskAllotResult: TaskAllotResult = await this.getDataToStorage(StorageKeyEnum.TaskAllotResult, {})
+    // 存储数据是否为空
+    if (isEmpty(taskAllotResult)) {
+      return Platform.alert(TASK_ALLOT_NOT_STORAGE_RESULT)
+    }
+    
+    // 还原上次派单结果
+    let allotType = null
+    // 显示工单池且上次派单结果为工单池
+    if (this.isShowTaskPoolType && taskAllotResult.allotType === TaskAllotTypeEnum.Pool) {
+      allotType = taskAllotResult.allotType
+    }
+    // 显示自动派单且上次派单结果为自动派单
+    else if (this.isShowAutoDispatchType && taskAllotResult.allotType === TaskAllotTypeEnum.Auto) {
+      allotType = taskAllotResult.allotType
+    }
+    // 其他为 派单给负责人
+    else {
+      allotType = TaskAllotTypeEnum.Person
+    }
+    
+    this.handlerAllotTypeChange(allotType)
+    this.executorUser = taskAllotResult.executorUser || null
+    this.synergyUserList = taskAllotResult.synergyUserList || []
+    // 显示清空派单结果按钮
+    this.showClearTaskAllotResultButton = true
+  }
+  
 }
 
 export default TaskAllotModalMethods
