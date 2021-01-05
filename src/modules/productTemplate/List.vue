@@ -247,7 +247,7 @@ import { getProductTemplateList, productTemplateDelete } from '@src/api/ProductA
 
 import SearchPanel from './component/SearchPanel.vue';
 import DialogBatchEditProductTemplate from './component/DialogBatchEditProductTemplate.vue';
-import VersionMixin from '@src/mixins/versionMixin'
+import VersionMixin from '@src/mixins/versionMixin/index.ts'
 
 /* 高级搜索面板 列数 */
 const PRODUCT_TEMPLATE_LIST_ADVANCE_SEARCH_COLUMN_NUMBER = 'product_template_list_advance_search_column_number';

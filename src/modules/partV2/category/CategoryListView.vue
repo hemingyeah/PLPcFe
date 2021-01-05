@@ -306,7 +306,7 @@ import PartEditBatchForm from './form/PartEditBatchForm.vue';
 import PartImport from './components/PartImport.vue';
 
 import SampleTooltip from 'packages/SampleTooltip/SampleTooltip'
-import VersionMixin from '@src/mixins/versionMixin'
+import VersionMixin from '@src/mixins/versionMixin/index.ts'
 
 const STORAGE_COLNUM_KEY = 'category_list_column';
 const STORAGE_PAGESIZE_KEY = 'category_list_pagesize';

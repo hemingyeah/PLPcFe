@@ -16,7 +16,7 @@
           </button>
         </div>
       </div>
-
+      
       <customer-edit-form :fields="fields" v-model="form" ref="form" />
     </form>
   </div>
@@ -31,9 +31,12 @@ import * as util from '../util/customer'
 
 import platform from '@src/platform'
 
+import VersionMixin from '@src/mixins/versionMixin/index.ts'
+
 export default {
   name: 'customer-edit-view',
   inject: ['initData'],
+  mixins: [VersionMixin],
   data() {
     return {
       submitting: false,
@@ -212,6 +215,9 @@ export default {
         let cusRes = await CustomerApi.getForEdit(this.initData.id)
         this.loadingPage = false
         if (cusRes.status === 0) form = cusRes.data
+      } else {
+        // 检查版本数量限制
+        this.checkNumExceedLimitBeforeHandler && this.checkNumExceedLimitBeforeHandler()
       }
 
       if (this.initData.action === 'createFromEvent') {

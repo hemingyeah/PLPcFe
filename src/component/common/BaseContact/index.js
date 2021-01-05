@@ -5,46 +5,46 @@ import Department from './Department.vue';
 import Team from './Team.vue';
 
 import { destroyComponent } from '@src/util/dom';
-import fastCall from '@src/component/util/fastCall'
+import fastCall from '@src/component/util/fastCall.ts'
 
 const DeptComponent = Vue.extend(Department);
 const MAX_NUM = 150; // 单次选人上限
 
-function choose(type = 'dept', options = {}){
-  if(type == 'dept') return dept(options);
-  if(type == 'team') return team(options);
+function choose(type = 'dept', options = {}) {
+  if (type == 'dept') return dept(options);
+  if (type == 'team') return team(options);
 }
 
 /** 部门 */
-function dept(options){
+function dept(options) {
   // 处理传入参数
   let selectedUser = [];
   let max = options.max;
 
-  if(
-    ( typeof max == 'number' || typeof max == 'string' )
-    && !isNaN(max) 
+  if (
+    (typeof max == 'number' || typeof max == 'string')
+    && !isNaN(max)
     && isFinite(max)
   ) {
     max = parseInt(max);
   } else {
     max = 0;
   }
-  
+
   // 后端已经限制了人数，前端不应限制选人
-  if(Array.isArray(options.selected)) {
+  if (Array.isArray(options.selected)) {
     selectedUser = max === 1 ? [] : options.selected;
   }
-  
+
   let selectedDepts = [];
-  if(options.showDeptCheckbox && Array.isArray(options.selectedDepts)) {
+  if (options.showDeptCheckbox && Array.isArray(options.selectedDepts)) {
     selectedDepts = options.selectedDepts;
   }
 
   let showLocation = !!options.allotMap;
   let action = '/security/department/user';
-  if(showLocation || options.allot) action = '/task/department/user/dispatch/list';
-  if(options.action) action = options.action;
+  if (showLocation || options.allot) action = '/task/department/user/dispatch/list';
+  if (options.action) action = options.action;
 
   let instance = new DeptComponent({
     propsData: {
@@ -74,17 +74,17 @@ function dept(options){
     })
 
     instance.$on('input', user => {
-      if(pending) return;
+      if (pending) return;
 
       pending = true;
-      resolve({status: 0, data: user});
+      resolve({ status: 0, data: user });
     });
-    
+
     instance.$on('cancel', () => {
-      if(pending) return;
+      if (pending) return;
 
       pending = true;
-      resolve({status: 1, message: 'cancel'});
+      resolve({ status: 1, message: 'cancel' });
     })
 
     body.appendChild(ele);
@@ -93,7 +93,7 @@ function dept(options){
 }
 
 /** 团队  */
-function team( options = {} ){
+function team(options = {}) {
   // 处理传入参数
   let selectedUser = [];
   let selectedTeam = [];
@@ -102,9 +102,9 @@ function team( options = {} ){
   let selectTypes = ['universal', 'performance'];
   let selectType = 'universal';
 
-  if(
-    ( typeof max == 'number' || typeof max == 'string' )
-    && !isNaN(max) 
+  if (
+    (typeof max == 'number' || typeof max == 'string')
+    && !isNaN(max)
     && isFinite(max)
   ) {
     max = parseInt(max);
@@ -112,17 +112,17 @@ function team( options = {} ){
     max = 0;
   }
 
-  if(options.selected && max !== 1 && Object.keys(options.selected).length > 0) {
+  if (options.selected && max !== 1 && Object.keys(options.selected).length > 0) {
     let users = options?.selected?.users;
     let teams = options?.selected?.teams;
     let isUserArray = Array.isArray(users);
     let isTeamArray = Array.isArray(teams);
 
-    if(isUserArray) selectedUser = users;
-    if(isTeamArray) selectedTeam = teams;
+    if (isUserArray) selectedUser = users;
+    if (isTeamArray) selectedTeam = teams;
   }
-  if(options.action) action = options.action;
-  if(selectTypes.indexOf(options.selectType) > 0) {
+  if (options.action) action = options.action;
+  if (selectTypes.indexOf(options.selectType) > 0) {
     selectType = options.selectType;
   }
 
@@ -138,10 +138,10 @@ function team( options = {} ){
       methods: {
         /** 取消  */
         cancel() {
-          if(pending) return;
+          if (pending) return;
 
           pending = true;
-          resolve({status: 1, message: 'cancel'});
+          resolve({ status: 1, message: 'cancel' });
         },
         /** 销毁  */
         destroy() {
@@ -153,33 +153,33 @@ function team( options = {} ){
         },
         /** 值的改变  */
         input(user) {
-          if(pending) return;
+          if (pending) return;
 
           pending = true;
-          resolve({status: 0, data: user});
+          resolve({ status: 0, data: user });
         }
       },
-      render(){
+      render() {
         return (
-          <base-contact-team 
-            action={action}
-            dataFunc={typeof options.dataFunc == 'function' ? options.dataFunc : undefined}
-            lat={options.lat}
-            lng={options.lng}
-            isRepeatUser={options.isRepeatUser === true}
-            isGroup={options.isGroup === true}
-            isHideTeam={options.isHideTeam === true}
-            max={max}
-            selectType={selectType}
-            selectedTeam={selectedTeam}
-            selectedUser={selectedUser}
-            showTeamCheckbox={ options.showTeamCheckbox === true}
-            showTaskCount={options.showTaskCount === true}
-            showUserState={options.showUserState === true}
-            title={options.title}
-            onDestroy={this.destroy.bind(this)}
-            onCancel={this.cancel.bind(this)}
-            onInput={this.input.bind(this)}
+          <base-contact-team
+            action={ action }
+            dataFunc={ typeof options.dataFunc == 'function' ? options.dataFunc : undefined }
+            lat={ options.lat }
+            lng={ options.lng }
+            isRepeatUser={ options.isRepeatUser === true }
+            isGroup={ options.isGroup === true }
+            isHideTeam={ options.isHideTeam === true }
+            max={ max }
+            selectType={ selectType }
+            selectedTeam={ selectedTeam }
+            selectedUser={ selectedUser }
+            showTeamCheckbox={ options.showTeamCheckbox === true }
+            showTaskCount={ options.showTaskCount === true }
+            showUserState={ options.showUserState === true }
+            title={ options.title }
+            onDestroy={ this.destroy.bind(this) }
+            onCancel={ this.cancel.bind(this) }
+            onInput={ this.input.bind(this) }
           >
           </base-contact-team>
         )
@@ -192,7 +192,7 @@ function team( options = {} ){
 }
 
 const BaseContact = {
-  install(Vue){
+  install(Vue) {
     fastCall(Vue, 'contact', { choose })
   },
   namespace: 'contact',

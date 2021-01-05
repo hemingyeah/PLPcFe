@@ -2,13 +2,13 @@ import Vue from 'vue';
 import BaseMapPicker from './BaseMapPicker.vue';
 
 import { destroyComponent } from '@src/util/dom';
-import fastCall from '@src/component/util/fastCall';
+import fastCall from '@src/component/util/fastCall.ts';
 
 const BaseMapPickerComp = Vue.extend(BaseMapPicker);
 
 /**
  * 
- * @param {*} address 
+ * @param {*} address
  * @param {*} options 
  */
 function picker(address, options = {}){

@@ -26,7 +26,7 @@ import { storageGet, storageSet } from "@src/util/storage";
 import { formatDate } from "@src/util/lang";
 import { getRootWindow } from "@src/util/dom";
 import * as FormUtil from "@src/component/form/util"
-import VersionMixin from '@src/mixins/versionMixin'
+import VersionMixin from '@src/mixins/versionMixin/index.ts'
 
 /* mixin */
 import tourGuide from "@src/mixins/tourGuide"

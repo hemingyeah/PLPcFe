@@ -1,7 +1,7 @@
 import './index.scss'
 
 import { getReferenceEl } from './util';
-import fastCall from '@src/component/util/fastCall'
+import fastCall from '@src/component/util/fastCall.ts'
 
 import Vue from 'vue';
 import BizCategorySelect from './BizCategorySelect';

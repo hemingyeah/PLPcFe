@@ -371,7 +371,7 @@ import * as CustomerApi from '@src/api/CustomerApi.ts';
 // import {searchLinkman} from '@src/api/EcSearchApi.js';
 import TeamMixin from '@src/mixins/teamMixin';
 import { isShowCustomerRemind } from '@src/util/version.ts'
-import VersionMixin from '@src/mixins/versionMixin'
+import VersionMixin from '@src/mixins/versionMixin/index.ts'
 
 const link_reg = /((((https?|ftp?):(?:\/\/)?)(?:[-;:&=\+\$]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\?\+=&;:%!\/@.\w_]*)#?(?:[-\+=&;%!\?\/@.\w_]*))?)/g;
 
