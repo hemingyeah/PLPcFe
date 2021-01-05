@@ -134,6 +134,7 @@
 
     <!-- start 导入服务微信 -->
     <base-import title="维护服务微信"
+                 v-if="productV2Gray"
                  ref="serviceWxModal"
                  :is-import-now="isImportNow"
                  @success="importServiceSuccess"
@@ -234,6 +235,9 @@ export default {
   computed: {
     showNewTeam () {
       return isShowCreateChildrenTeam(this.initData)
+    },
+    productV2Gray(){
+      return this.initData.openSuperCode;
     }
   },
   methods: {
