@@ -1,6 +1,7 @@
 <template>
   <div class="work-tree-data-box"
        v-loading="loading">
+    <div id="product-catalog-set"></div>
     <div class="flex-1 scroll-data">
       <template v-if="!propData.canEditConData">
         <no-data-view :notice-msg="'此产品类型分级不可添加内容'"></no-data-view>
@@ -9,7 +10,8 @@
         <no-data-view :notice-msg="'此产品类型分级可以添加内容'">
         </no-data-view>
         <div class="text-center mar-t-24">
-          <el-button @click="setMenuInfo">添加内容</el-button>
+          <el-button id="product-catalog-set-1"
+                     @click="setMenuInfo">添加内容</el-button>
         </div>
       </template>
       <div v-show="propData.canEditConData && propData.conData">
@@ -229,6 +231,12 @@ import {
 import { warn } from 'vue-class-component/lib/util';
 import { log } from 'mathjs';
 
+import { storageGet, storageSet } from '@src/util/storage';
+
+const {
+  PRODUCT_CATALOG_SET_COTENT
+} = require('@src/component/guide/productV2Store');
+
 const urlKey = {
   catalogName: 'catalog_name',
   productDesc: 'product_desc',
@@ -322,6 +330,22 @@ export default {
         }
       })
       .catch((error) => { });
+
+    this.$nextTick(() => {
+      if (storageGet(PRODUCT_CATALOG_SET_COTENT) && storageGet(PRODUCT_CATALOG_SET_COTENT) > 0) this.$Guide().destroy('product-catalog-set')
+      else this.$Guide([{
+        content:
+          '新建产品类型详情、关联知识库、备件等信息',
+        haveStep: false,
+        id: 'product-catalog-set',
+        domId: 'product-catalog-set-1',
+        finishBtn: 'OK',
+      }], 0, '', (e) => {
+        return new Promise((resolve, reject) => {
+          resolve()
+        })
+      }).create().then(res_=>{if(res_)storageSet(PRODUCT_CATALOG_SET_COTENT, '1')})
+    })
   },
   methods: {
     initProductMenuValue () {
@@ -348,13 +372,13 @@ export default {
     },
     handlePreview (file) {
       console.log(file);
-      if(file.response?.url){
+      if (file.response?.url) {
         this.$previewVideo(file.response.url);
       }
-      if (file.url ){
+      if (file.url) {
         this.$previewVideo(file.url)
       }
-      
+
     },
     onBeforeUploadImage (file) {
       const isJPG = file.type === 'image/jpeg' || file.type === 'image/png';
@@ -399,7 +423,7 @@ export default {
       })
     },
     handleSuccess (_res, _file, fileList) {
-      this.productMenuValue.productVideo = fileList.map(item=>item.response);
+      this.productMenuValue.productVideo = fileList.map(item => item.response);
     },
     onRemoveVideo (o, a) {
       this.$set(this.productMenuValue, 'productVideo', this.productMenuValue.productVideo.filter(item => item.uid != o.uid));
@@ -737,7 +761,7 @@ export default {
     flex-shrink: 0;
     text-align: start;
   }
-  .el-upload-list__item{
+  .el-upload-list__item {
     transition: none !important;
   }
   margin-bottom: 12px;
@@ -762,7 +786,7 @@ export default {
   label {
     padding: 0 !important;
   }
-  .el-upload-list__item{
+  .el-upload-list__item {
     transition: none !important;
   }
 }

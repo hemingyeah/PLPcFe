@@ -1,27 +1,30 @@
 <template>
-  <div class="work-tree-box" v-loading.fullscreen.lock="fullscreenLoading">
-    <base-collapse class="modal-box" :right-size="3">
+  <div class="work-tree-box"
+       v-loading.fullscreen.lock="fullscreenLoading">
+    <div id="product-catalog-add"></div>
+    <base-collapse class="modal-box"
+                   :right-size="3">
       <template slot="left">
         <div class="draggable-box">
           <div class="flex-1 draggable-data">
             <template v-if="treeData[0].tasks.length">
-              <work-tree-draggable
-                ref="workTreeDraggable"
-                :com-index="-1"
-                :tasks="treeData[0].tasks"
-                :root-data="{
-                  id: treeData[0].id,
-                  banMoveIn: false,
-                  indexArr: [0],
-                  pathNameArr: [],
-                }"
-                :now-edit-menu="nowEditMenu"
-                :now-hover-menu="nowHoverMenu"
-                :deep-count="0"
-                :sort-menu="sortMenu"
-              />
+              <work-tree-draggable ref="workTreeDraggable"
+                                   :com-index="-1"
+                                   :tasks="treeData[0].tasks"
+                                   :root-data="{
+                                     id: treeData[0].id,
+                                     banMoveIn: false,
+                                     indexArr: [0],
+                                     pathNameArr: [],
+                                   }"
+                                   :now-edit-menu="nowEditMenu"
+                                   :now-hover-menu="nowHoverMenu"
+                                   :deep-count="0"
+                                   :sort-menu="sortMenu" />
             </template>
-            <div class="flex-x jus-center" style="height:100%;" v-else-if="treeLoaded">
+            <div class="flex-x jus-center"
+                 style="height:100%;"
+                 v-else-if="treeLoaded">
               <div class="text-center">
                 还未添加产品分类 <br>
                 请在左下方添加一级分类
@@ -29,17 +32,14 @@
             </div>
           </div>
           <div class="flex-x draggable-data-btn">
-            <div
-              class="draggable-data-btn-item cur-point"
-              @click.stop="changeDialog('addMenu')"
-            >
+            <div class="draggable-data-btn-item cur-point"
+                 id="product-catalog-add-1"
+                 @click.stop="changeDialog('addMenu')">
               <i class="iconfont icon-zhankai"></i>
               新建一级分类
             </div>
-            <div
-              class="draggable-data-btn-item cur-point"
-              @click.stop="changeAll"
-            >
+            <div class="draggable-data-btn-item cur-point"
+                 @click.stop="changeAll">
               全部{{ allType ? '折叠' : '展开' }}
             </div>
           </div>
@@ -47,29 +47,29 @@
       </template>
       <template slot="right">
         <div class="data-box">
-          <work-tree-data :prop-data="nowEditMenu" ref="workTreeData" />
-      </div> </template
-    ></base-collapse>
+          <work-tree-data :prop-data="nowEditMenu"
+                          ref="workTreeData" />
+        </div>
+      </template>
+    </base-collapse>
 
     <!--  -->
-    <public-dialog
-      ref="publicDialog"
-      :visible-prop="visibleProp"
-      @changeVisibleProp="changeVisibleProp"
-      @confirm="dialogConfirm"
-      :dialog-type="dialogType"
-      :now-edit-menu="nowEditMenu"
-      :child-data="childData"
-    ></public-dialog>
-    <!--  -->
+    <public-dialog ref="publicDialog"
+                   :visible-prop="visibleProp"
+                   @changeVisibleProp="changeVisibleProp"
+                   @confirm="dialogConfirm"
+                   :dialog-type="dialogType"
+                   :now-edit-menu="nowEditMenu"
+                   :child-data="childData"></public-dialog>
+                   <!--  -->
   </div>
 </template>
 <script>
-import _, { result } from "lodash";
+import _, { result } from 'lodash';
 
-import workTreeDraggable from "@src/modules/productV2/productMenu/WorkTree/workTreeDraggable";
-import WorkTreeData from "@src/modules/productV2/productMenu/WorkTree/WorkTreeData";
-import PublicDialog from "@src/modules/productV2/productMenu/WorkTree/compoment/PublicDialog";
+import workTreeDraggable from '@src/modules/productV2/productMenu/WorkTree/workTreeDraggable';
+import WorkTreeData from '@src/modules/productV2/productMenu/WorkTree/WorkTreeData';
+import PublicDialog from '@src/modules/productV2/productMenu/WorkTree/compoment/PublicDialog';
 
 import {
   getTreeList,
@@ -77,11 +77,17 @@ import {
   setPagerelationPartOrWiki,
   renameTree,
   cloneMenu,
-} from "@src/api/ProductV2Api";
+} from '@src/api/ProductV2Api';
+
+import { storageGet, storageSet } from '@src/util/storage';
+
+const {
+  PRODUCT_CATALOG_ADD
+} = require('@src/component/guide/productV2Store');
 
 let finded = false;
 export default {
-  provide() {
+  provide () {
     return {
       rootDataChange: this.rootDataChange,
       changeDialog: this.changeDialog,
@@ -90,14 +96,14 @@ export default {
       changeTreeDetail: this.changeTreeDetail,
     };
   },
-  data() {
+  data () {
     return {
       allType: true,
       visibleProp: false,
-      dialogType: "addMenu",
+      dialogType: 'addMenu',
       treeData: [
         {
-          id: "",
+          id: '',
           tasks: [],
         },
       ],
@@ -109,8 +115,8 @@ export default {
       childData: {},
       sortMenu: {},
       dialogInitData: {},
-      fasterFindId: "",
-      treeLoaded:false
+      fasterFindId: '',
+      treeLoaded: false
     };
   },
   components: {
@@ -118,24 +124,41 @@ export default {
     WorkTreeData,
     PublicDialog,
   },
-  created() {
+  created () {
     let id = this.$getUrlObj(window).id;
     if (id) {
       this.fasterFindId = id;
     }
     this.getTreeData();
   },
+  mounted () {
+    this.$nextTick(() => {
+      if (storageGet(PRODUCT_CATALOG_ADD) && storageGet(PRODUCT_CATALOG_ADD) > 0) this.$Guide().destroy('product-catalog-add')
+      else this.$Guide([{
+        content:
+          '新建产品类型，最多支持10级关系',
+        haveStep: false,
+        id: 'product-catalog-add',
+        domId: 'product-catalog-add-1',
+        finishBtn: 'OK',
+      }], 0, '', (e) => {
+        return new Promise((resolve, reject) => {
+          resolve()
+        })
+      }).create().then(res_=>{if(res_)storageSet(PRODUCT_CATALOG_ADD, '1')})
+    })
+  },
   methods: {
-    changeVisibleProp(e) {
+    changeVisibleProp (e) {
       this.visibleProp = e;
     },
-    changeAll() {
+    changeAll () {
       this.allType = !this.allType;
       this.forAllArr(this.treeData[0].tasks, this.allType);
 
       // window.parent.changeLinkPage();  快速刷页面
     },
-    forAllArr(obj, val) {
+    forAllArr (obj, val) {
       for (let index = 0; index < obj.length; index++) {
         let item = obj[index];
         item.showList = val;
@@ -143,58 +166,58 @@ export default {
           if (item.tasks.length > 0) {
             this.forAllArr(item.tasks, val);
           }
-        } catch (error) {}
+        } catch (error) { }
       }
     },
-    dialogConfirm(e) {
+    dialogConfirm (e) {
       this.$refs.publicDialog.changeBtnLoading(true);
       switch (this.dialogType) {
-      case "addMenu":
+      case 'addMenu':
         e = {
           ...e,
-          parentId: "",
+          parentId: '',
           pathName: `${e.catalogName}`,
           orderId: this.treeData[0].tasks.length,
           showList: 1,
         };
         this.addMenu(e);
         break;
-      case "addMenuChild":
+      case 'addMenuChild':
         e = {
           ...e,
           parentId: this.childData.id,
           pathName: [
             ..._.cloneDeep(this.childData.pathNameArr),
             e.catalogName,
-          ].join("/"),
+          ].join('/'),
           showList: 1,
-          orderId:this.childData.orderId
+          orderId: this.childData.orderId
         }
         this.addMenu(e);
         break;
-      case "renameMenuChild":
+      case 'renameMenuChild':
         e = {
           ...e,
-          pathName: [...this.childData.pathNameArr, e.catalogName].join("/"),
+          pathName: [...this.childData.pathNameArr, e.catalogName].join('/'),
           id: this.childData.id,
         };
         this.renameMenu(e);
         break;
-      case "linkPart":
+      case 'linkPart':
         if (Object.keys(e).length) {
-          this.link("part", e.nowChooseArr);
+          this.link('part', e.nowChooseArr);
         } else {
           this.changeVisibleProp(false);
         }
         break;
-      case "linkWiki":
+      case 'linkWiki':
         if (Object.keys(e).length) {
-          this.link("wiki", e.nowChooseArr);
+          this.link('wiki', e.nowChooseArr);
         } else {
           this.changeVisibleProp(false);
         }
         break;
-      case "cloneMenu":
+      case 'cloneMenu':
         if (e.nowChooseArr && e.nowChooseArr.length > 0) {
           cloneMenu({
             cloneId: e.nowChooseArr[0],
@@ -202,27 +225,27 @@ export default {
           }).then((res) => {
             if (res.code == 0) {
               this.$message({
-                message: "复制成功",
-                type: "success",
+                message: '复制成功',
+                type: 'success',
               });
               window.parent.flashSomePage([{
-                type: "M_PRODUCT_CATALOG",
+                type: 'M_PRODUCT_CATALOG',
               }]);
 
               this.$refs.workTreeData.reflashPage(e.nowChooseArr[0]);
-              this.changeTreeDetail("conData", 1)
+              this.changeTreeDetail('conData', 1)
               this.changeVisibleProp(false);
             } else {
               this.$notify.error({
-                title: "网络错误",
+                title: '网络错误',
                 message: res.message,
                 duration: 2000,
               });
             }
-          }).finally(()=>{
+          }).finally(() => {
             this.$refs.publicDialog.changeBtnLoading(false);
           });
-        }else{
+        } else {
           this.$refs.publicDialog.changeBtnLoading(false);
         }
         break;
@@ -230,15 +253,15 @@ export default {
         break;
       }
     },
-    changeDialog(type) {
+    changeDialog (type) {
       this.dialogType = type;
       this.changeVisibleProp(true);
     },
-    rootDataChange(key, val) {
+    rootDataChange (key, val) {
       this.$set(this, key, val);
-      if (key == "nowEditMenu") this.$refs.workTreeData.resetForm();
+      if (key == 'nowEditMenu') this.$refs.workTreeData.resetForm();
     },
-    getTreeData() {
+    getTreeData () {
       this.fullscreenLoading = true;
       this.treeLoaded = false;
       getTreeList()
@@ -263,7 +286,7 @@ export default {
                     [0]
                   );
 
-                  fasterEditRoot_["canEditConData"] = !(
+                  fasterEditRoot_['canEditConData'] = !(
                     fasterEditRoot_.tasks.length > 0
                   );
                   nowEditMenu = fasterEditRoot_;
@@ -276,14 +299,14 @@ export default {
                     );
                   }
                 } catch (error) {
-                  console.warn("getTreeList error", error);
+                  console.warn('getTreeList error', error);
                 }
               }
               this.nowEditMenu = nowEditMenu;
             }
           } else {
             this.$notify.error({
-              title: "网络错误",
+              title: '网络错误',
               message: res.message,
               duration: 2000,
             });
@@ -294,25 +317,25 @@ export default {
           this.fullscreenLoading = false;
         });
     },
-    addMenu(e) {
+    addMenu (e) {
       setTreeList(e)
         .then((res) => {
           if (res.code == 0) {
             if (res.result) {
               res.result.tasks = [];
-              if (this.dialogType == "addMenu") {
-                this.changeTree("add", [0], res.result);
+              if (this.dialogType == 'addMenu') {
+                this.changeTree('add', [0], res.result);
               } else {
-                if(this.nowEditMenu && this.nowEditMenu.id == this.childData.id){
+                if (this.nowEditMenu && this.nowEditMenu.id == this.childData.id) {
                   this.nowEditMenu.canEditConData = false;
                 }
-                this.changeTree("add", this.childData.indexArr, res.result);
+                this.changeTree('add', this.childData.indexArr, res.result);
               }
             }
             this.changeVisibleProp(false);
           } else {
             this.$notify.error({
-              title: "网络错误",
+              title: '网络错误',
               message: res.message,
               duration: 2000,
             });
@@ -322,7 +345,7 @@ export default {
           this.$refs.publicDialog.changeBtnLoading(false);
         });
     },
-    renameMenu(e) {
+    renameMenu (e) {
       renameTree(e)
         .then((res) => {
           if (res.code == 0) {
@@ -335,12 +358,12 @@ export default {
               );
               // console.log(element, this.childData, 'renameMenu');
               element[this.childData.nowIndex].name = res.result.name;
-              if(this.nowEditMenu.id == res.result.id) this.nowEditMenu.name = res.result.name;
+              if (this.nowEditMenu.id == res.result.id) this.nowEditMenu.name = res.result.name;
             }
             this.changeVisibleProp(false);
           } else {
             this.$notify.error({
-              title: "网络错误",
+              title: '网络错误',
               message: res.message,
               duration: 2000,
             });
@@ -350,7 +373,7 @@ export default {
           this.$refs.publicDialog.changeBtnLoading(false);
         });
     },
-    changeTree(type, indexArr, data, des) {
+    changeTree (type, indexArr, data, des) {
       // console.log(type, indexArr, data);
       try {
         let element = this.findRoot(
@@ -359,17 +382,17 @@ export default {
           0,
           indexArr.length - 1
         );
-        if (type == "add") {
+        if (type == 'add') {
           element.push(data);
-        } else if (type == "delete") {
+        } else if (type == 'delete') {
           if (this.nowEditMenu && this.nowEditMenu.id == des.id) {
             this.nowEditMenu = {};
           }
           element.splice(data, 1);
         }
-      } catch (error) {}
+      } catch (error) { }
     },
-    changeTreeDetail(key, val) {
+    changeTreeDetail (key, val) {
       try {
         let element = this.findRoot(
           this.treeData,
@@ -382,7 +405,7 @@ export default {
         console.warn(error);
       }
     },
-    findRoot(data, indexArr, index, max) {
+    findRoot (data, indexArr, index, max) {
       let root = data[indexArr[index]].tasks;
       if (index < max) {
         index++;
@@ -390,9 +413,9 @@ export default {
       }
       return root;
     },
-    fasterFindRootById(arr, id, indexArr) {
+    fasterFindRootById (arr, id, indexArr) {
       let item;
-      
+
       for (let index = 0; index < arr.length; index++) {
 
         let indexArr_ = _.cloneDeep(indexArr)
@@ -403,8 +426,8 @@ export default {
           finded = true;
           item = arr[index];
           indexArr_.push(index);
-          item["indexArr"] = indexArr_;
-          item["nowIndex"] = index;
+          item['indexArr'] = indexArr_;
+          item['nowIndex'] = index;
           break;
         } else if (arr[index].tasks.length > 0) {
           indexArr_.push(index);
@@ -417,18 +440,18 @@ export default {
         return item;
       }
     },
-    fasterShowList(data, indexArr, index) {
+    fasterShowList (data, indexArr, index) {
       let root = data[indexArr[index]].tasks;
       // debugger;
       if (index < indexArr.length - 2) {
         index++;
         if (index > 0 && indexArr.length > 2) {
-          root[indexArr[index]]["showList"] = 1;
+          root[indexArr[index]]['showList'] = 1;
         }
         if (root.length) this.fasterShowList(root, indexArr, index);
       }
     },
-    link(type, data) {
+    link (type, data) {
       setPagerelationPartOrWiki({
         catalogId: this.nowEditMenu.id,
         relationIds: data,
@@ -438,13 +461,13 @@ export default {
           if (res.code == 0) {
             this.changeVisibleProp(false);
             this.$refs.workTreeData.reflashTable(type);
-            this.changeTreeDetail("conData", 1);
+            this.changeTreeDetail('conData', 1);
             window.parent.flashSomePage([{
-              type: "M_PRODUCT_CATALOG",
+              type: 'M_PRODUCT_CATALOG',
             }]);
           } else {
             this.$notify.error({
-              title: "网络错误",
+              title: '网络错误',
               message: res.message,
               duration: 2000,
             });
@@ -462,10 +485,10 @@ export default {
 
 .work-tree-box {
   min-width: 300px;
-  height: 100vh;  
-  padding:10px 10px 0 10px;
+  height: 100vh;
+  padding: 10px 10px 0 10px;
   overflow: hidden;
-  position:relative;
+  position: relative;
 
   .modal-box {
     width: 100%;
