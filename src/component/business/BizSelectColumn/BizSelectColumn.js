@@ -399,11 +399,11 @@ const BizSelectColumn = {
   '随心拖拽，自己配置列表的显示字段和顺序',
           haveStep: true,
           nowStep: 1,
-          totalStep: 1,
           gStyle: 'width:240px;top:100px;margin:auto;left:0;right:0;',
           id: 'guide-test',
+          domId:'guide-test-dom',
           finishBtn: 'OK',
-        }], 0, '', (e)=>{
+        }], 0, null, (e)=>{
           return new Promise((resolve, reject)=>{
             if(e.type == 'stop') this['guideSelectColumn'] = false;
             resolve()
@@ -590,8 +590,8 @@ const BizSelectColumn = {
           {/* 新人引导 start*/}
           <div id="guide-test"></div>
           {/* 新人引导 end*/}
-          <biz-select-column-sort lists={ this.columnSortList }>
-            <div slot="title" class="biz-select-column-sort-title">
+          <biz-select-column-sort lists={ this.columnSortList } >
+            <div slot="title" class="biz-select-column-sort-title" id="guide-test-dom">
               <span class="biz-select-column-sort-title-text">可视字段</span>
             可视字段支持拖拽排序
             </div>

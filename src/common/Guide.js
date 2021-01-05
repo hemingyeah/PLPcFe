@@ -11,11 +11,10 @@ import Vue from 'vue';
 // "步骤1",
 //     haveStep: true,
 //     nowStep: 1,
-//     totalStep: 2,
 //     gStyle: "top:35px",
 //     id: "guide-test",
-//     arrowStyle: "left:-140px",
-//     finishBtn: "OK",
+//     finishBtn: "OK",      
+//     needCover:true,
 //     diyContent:true,
 //     diyContentDom:组件名称
 //   }, {
@@ -23,10 +22,8 @@ import Vue from 'vue';
 // "步骤2",
 //     haveStep: true,
 //     nowStep: 2,
-//     totalStep: 2,
 //     gStyle: "top:35px",
 //     id: "guide-test",
-//     arrowStyle: "left:-140px",
 //     finishBtn: "OK",
 //   }], 0, "", (e)=>{
 //     return new Promise((resolve, reject)=>{
@@ -41,16 +38,15 @@ class Guide {
     this.storageKe = storageKe;
     this.stopStep = () => {
       return new Promise((resolve, reject) => {
-        if (!storageKe) resolve();
         if (watchStepFn)
           return watchStepFn({ type: 'stop', nowStep: this.nowStep }).then(
             (res) => {
-              storageSet(storageKe, arr.length);
+              if (storageKe) storageSet(storageKe, arr.length);
               resolve();
             }
           );
 
-        storageSet(storageKe, arr.length);
+        if (storageKe) storageSet(storageKe, arr.length);
         resolve();
       });
     };
@@ -89,30 +85,15 @@ class Guide {
       });
     };
     this.watchContentClick = (e) => {
-      return watchStepFn({type:'contentClick', nowStep: this.nowStep, event:e})
+      if(watchStepFn){
+        return watchStepFn({type:'contentClick', nowStep: this.nowStep, event:e})
+      }
     };
 
     
   }
   create() {
-    // let GuideCompoments = Vue.extend(guideCompoment);
     let obj = this.arr[this.nowStep];
-
-    // let res_dom = new GuideCompoments({
-    //   data() {
-    //     return {};
-    //   },
-    //   propsData: {
-    //     ...obj,
-    //     stopStep: this.stopStep,
-    //     finishBtnFn: this.finishBtnFn,
-    //     watchContentClick:this.watchContentClick
-    //   },
-    //   methods: {
-    //     previousStep: this.previousStep,
-    //     nextStep: this.nextStep,
-    //   },
-    // });
     let Test;
     if(obj.diyContentDom){
       Test = obj.diyContentDom
@@ -123,7 +104,7 @@ class Guide {
     const guideDom = {
       render(h) {
         return (
-          <guide-compoment totalStep= { obj.totalStep } nowStep= { obj.nowStep } content= { obj.content } finishBtn= { obj.finishBtn } gStyle= { obj.gStyle } id= { obj.id } arrowStyle= { obj.arrowStyle } diyContent= { obj.diyContent } haveStep= { obj.haveStep } stopStep={ _this.stopStep } finishBtnFn={ _this.finishBtnFn } watchContentClick={ _this.watchContentClick } nextStep= { _this.nextStep }>
+          <guide-compoment totalStep= { _this.arr.length } inside= { obj.inside } nowStep= { obj.nowStep } content= { obj.content } needCover= { obj.needCover } finishBtn= { obj.finishBtn } gStyle= { obj.gStyle } id= { obj.id } domId={ obj.domId } domObj= { obj.domObj } diyContent= { obj.diyContent } haveStep= { obj.haveStep } stopStep={ _this.stopStep } finishBtnFn={ _this.finishBtnFn } watchContentClick={ _this.watchContentClick } nextStep= { _this.nextStep }>
             <template slot="diyContent"><Test></Test></template>
           </guide-compoment>
         )

@@ -19,7 +19,8 @@
       </el-dropdown>
     </h3>
     <!--  -->
-    <div class="task-search-panel-title task-pointer task-flex task-ai" @click="show =!show">
+    <div id="v-task-step"></div>
+    <div class="task-search-panel-title task-pointer task-flex task-ai" id="v-task-step-6-dom" @click="show =!show">
       <span class="task-font16">常用查询条件</span>
       <span slot="reference" class="task-font14 task-c2 task-ml12 task-mr4" @click.stop="$refs.taskSearchPupal.open()">设置</span>
       <span class="task-span1">
@@ -30,15 +31,11 @@
       <i class="iconfont icon-triangle-down task-f12 task-c9" v-if="!show"></i>
       <i class="iconfont icon-up task-icon" v-else></i>
     </div>
-
-    <div id="v-task-step-6"></div>
     <div class="task-search-guide" v-show="!fields.length && guide">
       <div></div>
       <div>
         您还未设置常用字段，快去试试吧
       </div>
-    </div>
-    </div>
     </div>
     <!-- S 搜索条件 -->
     <el-form class="advanced-search-form task-search" onsubmit="return false;">
@@ -52,7 +49,7 @@
         :column-num="columnNum"
       >
       </task-search-form>
-      <div style="position: relative">
+      <div style="position: relative" id="v-task-step-7-dom">
         <div class="task-pointer task-flex task-ai">
           <span class="task-font16 task-mr4">添加查询条件</span>
           <span>
@@ -61,7 +58,7 @@
             </el-tooltip>
           </span>
         </div>
-        <div id="v-task-step-7"></div>
+        
       </div>
       <!-- 设置查询条件 -->
       <task-inquire 

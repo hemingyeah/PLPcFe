@@ -1,72 +1,78 @@
 <template>
   <div id="normal-setting-box">
+    <div id="product-setting-guide"></div>
     <div class="flex-x al-start">
       <div class="left-menu">
         <div class="menu-title">产品设置</div>
         <template v-for="(item, index) in menuList">
-          <nav
-            :class="`menu-list ${nowMenu == index ? 'menu-checked' : ''}`"
-            :key="index"
-            @click="changePage(index)"
-          >
+          <nav :class="`menu-list ${nowMenu == index ? 'menu-checked' : ''}`"
+               :id="item.comName"
+               :key="index"
+               @click="changePage(index)">
             <!-- <div class="left-border" v-if="nowMenu==index"></div> -->
             <div class="icon-box">
-              <i
-                :class="
-                  `iconfont ${item.icon} ${
-                    nowMenu == index ? 'font-16 font-w-600' : 'font-14'
-                  }`
-                "
-              ></i>
+              <i :class="
+                `iconfont ${item.icon} ${
+                  nowMenu == index ? 'font-16 font-w-600' : 'font-14'
+                }`
+              "></i>
             </div>
             <span>{{ item.name }}</span>
           </nav>
         </template>
       </div>
       <!-- <keep-alive> -->
-      <component :is="menuList[nowMenu].comName" ref="setData"></component>
-      <!-- </keep-alive> -->
+      <component :is="menuList[nowMenu].comName"
+                 ref="setData"></component>
+                 <!-- </keep-alive> -->
 
-      <!-- <wx-set v-if="nowMenu === 1"></wx-set>
+                 <!-- <wx-set v-if="nowMenu === 1"></wx-set>
       <toast-list v-if="nowMenu === 3"></toast-list> -->
     </div>
   </div>
 </template>
 <script>
-import ProductSet from "@src/modules/setting/productV2/productSet";
-import ProductMenuSet from "@src/modules/setting/productV2/productMenuSet";
+import ProductSet from '@src/modules/setting/productV2/productSet';
+import ProductMenuSet from '@src/modules/setting/productV2/productMenuSet';
+
+import { storageGet, storageSet } from '@src/util/storage';
+import GuideContent from '@src/component/guide/contentCom/ProductSetting.vue';
+
+const {
+  PRODUCT_SETTING_SET
+} = require('@src/component/guide/productV2Store');
 export default {
-  name: "product-menu-setting",
+  name: 'product-menu-setting',
   props: {
     initData: {
       type: Object,
       default: () => ({}),
     },
   },
-  provide() {
+  provide () {
     return {
       initData: this.initData,
     };
   },
-  data() {
+  data () {
     return {
       menuList: [
         {
-          name: "产品管理设置",
-          icon: "icon-shezhi-chanpinguanlishezhi",
-          comName: "product-set",
+          name: '产品管理设置',
+          icon: 'icon-shezhi-chanpinguanlishezhi',
+          comName: 'product-set',
         },
         {
-          name: "产品类型设置",
-          icon: "icon-shezhi-chanpinmulu",
-          comName: "product-menu-set",
+          name: '产品类型设置',
+          icon: 'icon-shezhi-chanpinmulu',
+          comName: 'product-menu-set',
         },
       ],
       nowMenu: 1, // 0 客户自助门户 1 公众号设置 2 短信消息设置 3 消息记录
     };
   },
   computed: {},
-  created() {
+  created () {
     let type = this.$getUrlObj(window).type;
     let typeObj = {
       productSet: 0,
@@ -75,12 +81,32 @@ export default {
     this.nowMenu = typeObj[type];
   },
   methods: {
-    changePage(index) {
+    changePage (index) {
       if (this.nowMenu === index) {
         return;
       }
       this.nowMenu = index;
     },
+  },
+  mounted () {
+    this.$nextTick(() => {
+      if (storageGet(PRODUCT_SETTING_SET) && storageGet(PRODUCT_SETTING_SET) > 0) this.$Guide().destroy('product-setting-guide')
+      else this.$Guide([{
+        content:
+          '',
+        haveStep: false,
+        gStyle: 'top:35px',
+        id: 'product-setting-guide',
+        domId: 'product-menu-set',
+        finishBtn: 'OK',
+        diyContent:true,
+        diyContentDom:GuideContent
+      }], 0, '', (e) => {
+        return new Promise((resolve, reject) => {
+          resolve()
+        })
+      }).create(), storageSet(PRODUCT_SETTING_SET, '1')
+    })
   },
   components: {
     [ProductSet.name]: ProductSet,

@@ -1090,7 +1090,6 @@ export default {
 
           return col;
         });
-      console.log(this.columns, 321);
     },
 
     buildExportParams (checkedArr, ids) {

@@ -19,7 +19,7 @@
         </base-button>
       </div>
       <!-- 系统字段 -->
-      <el-checkbox :indeterminate="isIndeterminateSys" v-model="sysCheckAll" @change="handleCheckAllSysChange"><h3 class="task-mtb13">系统字段</h3></el-checkbox>
+      <el-checkbox :indeterminate="isIndeterminateSys" v-model="sysCheckAll" @change="handleCheckAllSysChange"><h3 class="task-mtb13" id="task-search-pupal-guide-dom">系统字段</h3></el-checkbox>
       <el-checkbox-group v-model="checkSystemList">
         <el-checkbox :label="item.fieldName" v-for="(item, index) in systemList" :key="index" class="wh150">{{item.displayName}}</el-checkbox>
       </el-checkbox-group>
@@ -101,9 +101,9 @@ export default {
   '①选中 ②保存，设置立刻生效',
         haveStep: false,
         nowStep: 1,
-        totalStep: 1,
         gStyle: 'width:240px;top:250px;margin:auto;left:0;right:0;',
         id: 'task-search-pupal-guide',
+        domId:'task-search-pupal-guide-dom',
         finishBtn: '试一下',
       }], 0).create(), storageSet(TASK_GUIDE_SEARCH_PUPAL, '1');
       this.visible = true;

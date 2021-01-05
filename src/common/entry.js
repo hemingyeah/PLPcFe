@@ -33,7 +33,7 @@ function previewImg(url) {
 }
 
 function previewVideo(url) {
-  let previeVideoCompoments = Vue.extend(previeVideoCompoment);
+  let PrevieVideoCompoments = Vue.extend(previeVideoCompoment);
 
   let divDom = document.createElement('div');
   divDom.id = 'normal-preview-video';
@@ -43,7 +43,7 @@ function previewVideo(url) {
   }
 
   // }
-  new previeVideoCompoments({
+  new PrevieVideoCompoments({
     data() {
       return {};
     },
@@ -69,10 +69,6 @@ function getUrlObj(window_) {
   }
   return obj;
 }
-
-import domGuide from '@src/common/Guide'
-
-
 
 import domGuide from '@src/common/Guide'
 

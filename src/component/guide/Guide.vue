@@ -1,49 +1,63 @@
 <template>
   <!-- tour-content-out-box start -->
-  <div :id="id"
-       class="tour-content-out-box"
-       v-show="showGuide"
-       :style="gStyle ? gStyle : ''">
-    <div class="normal-arrow-top tour-arrow"
-         :style="arrowStyle"></div>
-    <div class="tour-content-box">
-      <div v-if="haveStep"
-           class="tour-left-tips">
-        {{ `${nowStep}/${totalStep}` }}
-      </div>
-      <div class="tour-content" @click="watchContentClick($event)">
-        <div class="flex-x tour-content-head">
-          <i @click.prevent="stopStep().then(()=>{showGuide = false})"
-             class="iconfont icon-fe-close"></i>
+  <div>
+    <div class="cover"
+         v-if="needCover && showGuide"></div>
+    <div class="cover-dom"
+         v-if="needCover && showGuide"
+         :style="`width:${guideDom.width || 0}px;height:${guideDom.height || 0}px;top:${guideDom.top || 0}px;left:${guideDom.left || 0}px;`"></div>
+    <div :id="id"
+         class="tour-content-out-box"
+         ref="guideCom"
+         v-show="showGuide && guideDom.top >-1"
+         :style="guideStyle">
+      <div v-if="arrowUp"
+           class="normal-arrow-top tour-arrow"
+           :style="arrowStyle"></div>
+      <div v-if="!arrowUp"
+           class="normal-arrow-down tour-arrow-down"
+           :style="arrowStyle"></div>
+      <div class="tour-content-box">
+        <div v-if="haveStep"
+             class="tour-left-tips">
+          {{ `${nowStep}/${totalStep}` }}
         </div>
-        <div class="tour-content-con" v-if="!diyContent">{{ content }}</div>
-        <slot name="diyContent"></slot>
+        <div class="tour-content"
+             @click="watchContentClick($event)">
+          <div class="flex-x tour-content-head">
+            <i @click.prevent="stopStep().then(()=>{showGuide = false})"
+               class="iconfont icon-fe-close"></i>
+          </div>
+          <div class="tour-content-con"
+               v-if="!diyContent">{{ content }}</div>
+          <slot name="diyContent"></slot>
+        </div>
       </div>
-    </div>
-    <div slot="actions"
-         class="tour-bottom">
-      <!-- <div
+      <div slot="actions"
+           class="tour-bottom">
+        <!-- <div
         v-if="totalStep > 1 && nowStep > 1"
         class="text"
         @click.prevent="previousStep(1), (showGuide = false)"
       >
         上一步
       </div> -->
-      <div v-if="totalStep > 1 && nowStep > 0 && nowStep < totalStep"
-           class="btns"
-           @click.prevent="nextStep(nowStep).then(()=>{showGuide = false})">
-        下一步
-      </div>
-      <div
-        class="btns"
-        @click.prevent="finishBtnFn().then(()=>{showGuide = false})">
-        {{ finishBtn }}
+        <div v-if="totalStep > 1 && nowStep > 0 && nowStep < totalStep"
+             class="btns"
+             @click.prevent="nextStep(nowStep).then(()=>{showGuide = false})">
+          下一步
+        </div>
+        <div class="btns"
+             @click.prevent="finishBtnFn().then(()=>{showGuide = false})">
+          {{ finishBtn }}
+        </div>
       </div>
     </div>
   </div>
   <!-- tour-content-out-box end -->
 </template>
 <script>
+import { set } from 'lodash';
 export default {
   name: 'guide-compoment',
   props: {
@@ -59,6 +73,10 @@ export default {
       type: Number | String,
       default: ''
     },
+    needCover: {
+      type: Boolean,
+      default: false
+    },
     finishBtn: {
       type: Number | String,
       default: 'ok'
@@ -71,9 +89,12 @@ export default {
       type: Number | String,
       default: ''
     },
-    arrowStyle: {
+    domId: {
       type: Number | String,
       default: ''
+    },
+    domObj: {
+      type: Function
     },
     stopStep: {
       type: Function
@@ -84,33 +105,102 @@ export default {
     watchContentClick: {
       type: Function
     },
-    diyContent:{
-      type:Boolean,
-      default:false
+    diyContent: {
+      type: Boolean,
+      default: false
     },
-    nextStep:{
+    nextStep: {
       type: Function
     },
-    haveStep:{
-      type:Boolean,
-      default:false
+    haveStep: {
+      type: Boolean,
+      default: false
+    },
+    inside: {
+      type: Boolean,
+      default: false
     },
   },
   data () {
     return {
       showGuide: true,
+      guideStyle: '',
+      arrowStyle: '',
+      guideDom: {},
+      loop: null,
+      arrowUp: true
     };
   },
   methods: {
   },
+  created () {
+    this.loop = setInterval(() => {
+      let res_ = this.domObj ? this.domObj().getBoundingClientRect() : document.getElementById(`${this.domId}`).getBoundingClientRect();
+      let style_ = '';
+
+      if (window.innerWidth - res_.left < 350) {
+        style_ = `${style_};right:${window.innerWidth - res_.left - res_.width || 0}px`;
+        this.arrowStyle = 'right:20px';
+      } else {
+        style_ = `${style_};left:${res_.left || 0}px`
+        this.arrowStyle = 'left:20px';
+      }
+      if (!this.inside) {
+        if (window.innerHeight - res_.top - res_.height < 400) {
+          style_ = `${style_};bottom:${window.innerHeight - res_.top + 12 || 0}px;`
+          this.arrowUp = false;
+        } else {
+          style_ = `${style_};top:${res_.top + res_.height + 12 || 0}px`
+          this.arrowUp = true;
+        }
+      } else {
+        style_ = `${style_};top:${res_.top + 12 || 0}px;z-index:998`
+        this.arrowUp = true;
+      }
+
+      this.guideStyle = style_;
+      this.guideDom = res_;
+
+    }, 500)
+    if (this.needCover) {
+      (this.domObj ? this.domObj() : document.getElementById(`${this.domId}`)).classList.add('guide-point')
+    }
+  },
+  watch: {
+    showGuide (newVal, oldVal) {
+      if (!newVal) {
+        if (this.needCover) (this.domObj ? this.domObj() : document.getElementById(`${this.domId}`)).classList.remove('guide-point')
+        clearInterval(this.loop)
+      }
+    },
+  },
+  destroyed () {
+    if (this.needCover) (this.domObj ? this.domObj() : document.getElementById(`${this.domId}`)).classList.remove('guide-point')
+    clearInterval(this.loop)
+  }
 };
 </script>
 <style lang="scss" scoped>
+.cover {
+  width: 100vw;
+  height: 100vh;
+  background: rgba($color: #000000, $alpha: 0.5);
+  position: fixed;
+  z-index: 995;
+  top: 0;
+  left: 0;
+}
+.cover-dom {
+  position: fixed;
+  z-index: 998;
+  opacity: 0;
+}
+
 .tour-content-out-box {
-  position: absolute;
+  position: fixed;
   -webkit-filter: drop-shadow(0 0 4px rgba(0, 0, 0, 0.5)) !important;
   filter: drop-shadow(0 0 4px rgba(0, 0, 0, 0.5)) !important;
-  z-index: 999;
+  z-index: 996;
   border-radius: 4px;
   background: #fff;
   min-width: 240px;
@@ -118,10 +208,11 @@ export default {
   max-height: 400px;
   .tour-arrow {
     position: absolute;
-    left: 0;
-    right: 0;
-    margin: auto;
     top: -5px;
+  }
+  .tour-arrow-down {
+    position: absolute;
+    bottom: -5px;
   }
 }
 .tour-content-box {
@@ -203,5 +294,21 @@ export default {
   border-right-color: transparent;
   position: absolute;
   top: -0.5rem;
+}
+
+.normal-arrow-down {
+  font-size: 0;
+  line-height: 0;
+  border-width: 0.5rem;
+  border-color: #fff;
+  width: 0;
+  border-top-width: 0;
+  border-style: dashed;
+  border-bottom-style: solid;
+  border-left-color: transparent;
+  border-right-color: transparent;
+  transform: rotateZ(180deg);
+  position: absolute;
+  bottom: -0.5rem;
 }
 </style>
