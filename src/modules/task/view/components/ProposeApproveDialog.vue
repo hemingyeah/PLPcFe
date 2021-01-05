@@ -133,7 +133,7 @@ export default {
       }
 
       this.approveLevel = data.level || 1;
-      this.multiApproverSetting = [...data.multiApproverSetting] || [];
+      this.multiApproverSetting = data.multiApproverSetting ? [...data.multiApproverSetting] : [];
 
       this.visible = true;
     },
