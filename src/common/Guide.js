@@ -159,14 +159,14 @@ function domGuide(arr = [], nowStep, storageKe, watchStepFn) {
   if (productPreFixedPath) {
     return new Guide(arr, nowStep, storageKe, watchStepFn);
   }
-  // return {
-  //   create: () => {
-  //     return new Promise((resolve, reject) => {
-  //       resolve(false)
-  //     })
-  //   },
-  //   destroy: () => {},
-  // };
+  return {
+    create: () => {
+      return new Promise((resolve, reject) => {
+        resolve(false)
+      })
+    },
+    destroy: () => {},
+  };
 }
 
 export default domGuide;
