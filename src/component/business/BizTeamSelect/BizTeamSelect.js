@@ -157,7 +157,10 @@ const BizTeamSelect = {
       // 多选
       let index = this.value.findIndex(item => item.id === value.id);
       index >= 0 ? this.value.splice(index, 1) : this.value.push(value);
-
+      
+      /* S 临时处理方法 */
+      this.value = this.value.map(item => {return item})
+      /* E 临时处理方法 */
       this.$emit('input', this.value);
       this.updatePopper();
     },
