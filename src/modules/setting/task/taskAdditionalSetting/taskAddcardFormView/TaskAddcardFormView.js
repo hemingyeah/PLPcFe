@@ -45,7 +45,8 @@ export default {
     },
     // 返回
     back(){
-      window.parent.frameHistoryBack(window)
+      let id = window.frameElement.dataset.id;
+      return this.$platform.closeTab(id)
     },
     /** 
     * @description 提交表单字段设置

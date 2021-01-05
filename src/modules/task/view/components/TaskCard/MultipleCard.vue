@@ -62,7 +62,7 @@ export default {
   },
   computed: {
     columns() {
-      return [
+      let fields = [
         ...this.card.fields,
         {
           displayName: '操作人',
@@ -80,6 +80,8 @@ export default {
           minWidth: '140px'
         }
       ]
+
+      return fields.filter(field => !field.isHidden && field.isVisible);
     }
   },
   components: {

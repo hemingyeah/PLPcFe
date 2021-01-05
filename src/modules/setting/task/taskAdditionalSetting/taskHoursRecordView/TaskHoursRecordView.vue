@@ -107,7 +107,7 @@
         <div class="setting-hours-item">
           <div class="setting-hours-box">
             <p class="setting-hours-title">单次工时记录最长不能超过</p>
-            <el-input v-model="cardConfig.maxTime" type="number" maxlength="50"></el-input>
+            <el-input v-model="cardConfig.maxTime" type="number" maxlength="50" @blur="onSetChange"></el-input>
             <p class="setting-hours-title">小时，超过后自动结束计时</p>
           </div>
         </div>

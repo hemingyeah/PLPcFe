@@ -1,5 +1,5 @@
 import http from '@src/util/HttpUtil';
-
+const fixedPrefixTaskPath = "/api/task";
 /* ------------- start 附加组件设置 ---------------- */
 
 /**
@@ -8,7 +8,7 @@ import http from '@src/util/HttpUtil';
  * @param {String} params.id -- 组件id
  */
 export const getAllCardList = (params = {} ) => {
-  return http.get('/outside/pc/task/getAllCardList', params)
+  return http.get(`${fixedPrefixTaskPath}/outside/pc/task/getAllCardList`, params)
 }
 
 /**
