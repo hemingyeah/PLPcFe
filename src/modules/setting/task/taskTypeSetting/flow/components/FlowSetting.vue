@@ -28,7 +28,7 @@
 
         <!--S 审批设置 -->
         <div
-          v-if="['create', 'accept'].includes(type)"
+          v-if="!['create', 'accept'].includes(type)"
           class="setting-specific-approve"
         >
           <h2>
