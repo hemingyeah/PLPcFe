@@ -793,6 +793,11 @@
                     {{ formatCustomizeAddress(scope.row[column.formType]) }}
                   </template>
 
+                  <!-- 表单设计器特殊控件 -->
+                  <template v-else-if="['cascader', 'select', 'user', 'related_task'].includes(column.formType)">
+                    {{ scope.row[column.field] | fmt_form_field(column.formType, column.fieldName, scope.row.attribute)}}
+                  </template>
+
                   <!-- 用户 -->
                   <template
                     v-else-if="
@@ -862,17 +867,17 @@
                           Array.isArray(scope.row.attribute[column.field])
                       "
                     >
-                      {{ scope.row.attribute[column.field].join(",") | fmt_form_field(column.formType, column.fieldName, scope.row.attribute) }}
+                      {{ scope.row.attribute[column.field].join(",") }}
                     </template>
                     <template v-else>
                       {{
-                        scope.row.attribute && scope.row.attribute[column.field] | fmt_form_field(column.formType, column.fieldName, scope.row.attribute)
+                        scope.row.attribute && scope.row.attribute[column.field]
                       }}
                     </template>
                   </template>
 
                   <template v-else>
-                    {{ scope.row[column.field] | fmt_form_field(column.formType, column.fieldName, scope.row.attribute)}}
+                    {{ scope.row[column.field] }}
                   </template>
                 </template>
               </el-table-column>

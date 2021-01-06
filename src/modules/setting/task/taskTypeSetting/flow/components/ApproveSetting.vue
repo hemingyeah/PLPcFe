@@ -108,15 +108,15 @@ export default {
       let multiApproverSetting = [];
       if (val > 1) {
         for (let i = 0; i < val - 1; i++) {
-          if (!this.approveSetting.multiApproverSetting[i]) {
-            multiApproverSetting.push({
+          if (this.approveSetting.multiApproverSetting && this.approveSetting.multiApproverSetting[i]) {
+            multiApproverSetting.push(
+              this.approveSetting.multiApproverSetting[i]
+						);
+          } else {
+						multiApproverSetting.push({
               leader: "",
               approvers: [],
             });
-          } else {
-            multiApproverSetting.push(
-              this.approveSetting.multiApproverSetting[i]
-            );
           }
         }
 

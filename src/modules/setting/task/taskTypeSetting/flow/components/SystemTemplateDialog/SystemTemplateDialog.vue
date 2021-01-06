@@ -247,8 +247,7 @@ export default {
             return receiptAttachmentColumns;
         },
         showAttachment() {
-            //  todo_zr: 缺少jsp页面的参数
-            return true || taskType.options.showAttachment;
+            return !!taskTypeConfig.options.showAttachment;
         },
         cardAttachmentColumns() {
             let cardAttachmentColumns = [];

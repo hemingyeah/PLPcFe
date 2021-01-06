@@ -35,7 +35,7 @@
             审批设置
           </h2>
           <approve-setting
-            :options="approveOptions"
+            :options="approveOptions(type)"
             :approveSetting="flowSetting.approveSetting"
             @change="changeApproveSetting"
           />
@@ -220,7 +220,7 @@
             <el-switch v-model="taskTypeConfig.allowPause" />
           </h2>
           <approve-setting
-            :options="stableOptions"
+            :options="approveOptions('pause')"
             :approveSetting="taskTypeConfig.pauseApproveSetting"
             @change="(setting) => changeApproveSetting(setting, 'pause')"
           />
@@ -231,7 +231,7 @@
             <el-switch v-model="taskTypeConfig.allowCancel" />
           </h2>
           <approve-setting
-            :options="stableOptions"
+            :options="approveOptions('cancel')"
             :approveSetting="taskTypeConfig.cancelApproveSetting"
             @change="(setting) => changeApproveSetting(setting, 'cancel')"
           />
@@ -334,9 +334,33 @@ export default {
       // 展示工单关闭 (mark_zr: 这次不做)
       return false && ["close"].includes(this.type);
     },
-    approveOptions() {
-      // 审批选项
-      let type = this.type;
+    mode() {
+      return this.type == "finish"
+        ? TableNameEnum.TaskReceipt
+        : TableNameEnum.Task;
+    },
+  },
+  watch: {
+    type(val) {
+      if (val) {
+        this.getTaskFields(val);
+        // 获取当前流程超时提醒设置
+        this.taskOverTimeModel =
+          this.taskTypeConfig.taskOverTimeModels.find(
+            (item) => item.overTimeState === val
+          ) || {};
+      }
+    },
+    taskTypeId(id) {
+      if (id) {
+        this.getTaskFields(this.type);
+        this.fetchFromUser(this.taskTypeId);
+      }
+    },
+  },
+  methods: {
+		/** 审批类型选项 */
+		approveOptions(type) {
       let options = [
         {
           value: "leader",
@@ -377,7 +401,7 @@ export default {
         });
       }
 
-      if (!["allot", "accept", "start"].includes(type)) {
+      if (!["allot", "accept", "start", 'pause'].includes(type)) {
         options = [
           ...options,
           ...this.receiptList.map((item) => {
@@ -391,60 +415,6 @@ export default {
 
       return options;
     },
-    stableOptions() {
-      // 暂停/取消工单的审批选项
-      return [
-        {
-          value: "leader",
-          label: "发起人主管",
-        },
-        {
-          value: "users",
-          label: "指定人员",
-        },
-        {
-          value: "createUser",
-          label: "工单创建人",
-        },
-        {
-          value: "allotUser",
-          label: "工单派单人",
-        },
-        {
-          value: "userAdmin",
-          label: "客户负责人",
-        },
-        {
-          value: "promoter",
-          label: "由发起人选择",
-        },
-      ];
-    },
-    mode() {
-      return this.type == "finish"
-        ? TableNameEnum.TaskReceipt
-        : TableNameEnum.Task;
-    },
-  },
-  watch: {
-    type(val) {
-      if (val) {
-        this.getTaskFields(val);
-        // 获取当前流程超时提醒设置
-        this.taskOverTimeModel =
-          this.taskTypeConfig.taskOverTimeModels.find(
-            (item) => item.overTimeState === val
-          ) || {};
-      }
-    },
-    taskTypeId(id) {
-      if (id) {
-        this.getTaskFields(this.type);
-        this.fetchFromUser(this.taskTypeId);
-      }
-    },
-  },
-  methods: {
     /** 获取工单表单、回执表单中必填的人员字段 */
     async fetchFromUser(id) {
       try {

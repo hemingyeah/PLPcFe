@@ -183,12 +183,14 @@ export default {
         isLeader = 'leader';
       }else if(isLeader == 2) {
         isLeader = 'none';
+      }else if(isLeader == 3) {
+        isLeader = 'users';
       }else if(isLeader == 4) {
         isLeader = 'createUser';
       }else if(isLeader == 5) {
         isLeader = 'allotUser';
-      }else if(isLeader == 6) {
-        // todo_zr
+      }else if(isLeader == 6 && pauseApprovers[0]) {
+        isLeader = `formUser_${pauseApprovers[0].taskTemplateId}`;
       }else if(isLeader == 7) {
         isLeader = 'userAdmin';
       }else if(isLeader == 8) {
@@ -326,6 +328,13 @@ export default {
     /** 右上角保存按钮 */
     async submit() {
       if (!this.$refs.comp.submit) return;
+
+      let message = [];
+
+      let name = this.taskTypeConfig.name;
+      if (name === '') return this.$notify.error('工单类型名称为空');
+      if(name.length > 20) return this.$notify.error('工单类型名称超过20个字');
+      if(!/^[a-zA-Z0-9\u4e00-\u9fa5]+$/.test(name)) return this.$notify.error('工单类型名称只能输入中文、字母、数字');
 
       this.pending = true;
         try {

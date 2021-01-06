@@ -16,7 +16,7 @@
                             <i class="iconfont icon-edit-square pointer" @click="chooseTeam"></i>
                         </el-row>
                         <p>
-                            最近更新: {{taskType.updateName}}  {{taskType.createTime}}
+                            最近更新: {{taskType.updateName}}  {{taskType.createTime | fmt_datetime}}
                         </p>
                     </el-row>
                 </el-row >
