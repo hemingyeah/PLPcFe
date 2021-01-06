@@ -38,7 +38,7 @@ import Column from '@model/types/Column'
 import * as _ from 'lodash'
 import LogUtil from '@src/util/log.ts'
 import { isArray } from '@src/util/type'
-import Platform from '@src/util/platform'
+import Platform from '@src/util/Platform'
 import { objectArrayIntersection } from '@src/util/array'
 import { storageGet, storageSet } from '@src/util/storage.ts'
 /* vue */

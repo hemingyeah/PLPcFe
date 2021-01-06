@@ -26,7 +26,7 @@ import {
   AllotSortedEnum
 } from '@src/modules/task/components/TaskAllotModal/TaskAllotExcutor/TaskAllotUserTable/TaskAllotUserTableModel'
 /* util */
-import Platform from '@src/util/platform'
+import Platform from '@src/util/Platform'
 import LogUtil from '@src/util/log.ts'
 import { storageGet } from '@src/util/storage.ts'
 import { openTabForCustomerView } from '@src/util/business/openTab'

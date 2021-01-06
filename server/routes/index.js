@@ -31,9 +31,6 @@ const taskRouter = require('./task');
 const sparePartRouter = require('./sparePart');
 const departmentRouter = require('./department')
 const linkcRouter = require('./linkc')
-
-
-const linkcRouter = require('./linkc')
 const productV2Router = require('./productV2')
 
 const superQrcodeRouter = require('./superQrcode')
