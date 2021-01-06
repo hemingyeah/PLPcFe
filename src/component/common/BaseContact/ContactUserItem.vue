@@ -6,11 +6,11 @@
       <div class="contact-user-info">
         <h3>
           <div class="contact-user-name">{{user.displayName}}</div>
-          <div v-if="user && user.isTeamLeader === 1" class="contact-user-leader">主管</div>
           <div class="contact-user-state" v-if="showUserState && user.state">
             <i class="contact-user-state-icon" :style="{backgroundColor: stateColor[user.state]}"></i> 
             <span>{{user.state}}</span>
           </div>
+          <div v-if="user && user.isTeamLeader === 1" class="user-label user-label-manager">主管</div>
         </h3>
         <p>{{user.cellPhone}}</p>
         <p v-if="showTag" ref="tagName" class="contact-user-item-tagname" :class="isExpandTagName ? 'contact-user-item-tagname-show' : 'contact-user-item-tagname-hide'">
@@ -180,7 +180,11 @@ export default {
     overflow: hidden;
     
     display: flex;
+    align-items: center;
     flex-flow: row nowrap;
+    .user-label {
+      margin-left: 5px;
+    }
   }
 
   p{

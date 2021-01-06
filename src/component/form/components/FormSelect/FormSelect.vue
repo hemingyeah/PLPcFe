@@ -71,7 +71,7 @@ export default {
   },
   data(){
     return{
-      newValue: this.value,
+      newValue: this.value
     }
 
   },

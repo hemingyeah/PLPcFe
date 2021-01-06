@@ -6,6 +6,7 @@ import ComponentNameEnum from '@model/enum/ComponentNameEnum'
 /* entity */
 import LoginUser from '@model/entity/LoginUser/LoginUser'
 import UserCardInfo from '@model/entity/UserCardInfo'
+import TaskAddress from '@model/entity/TaskAddress'
 /* image */
 // @ts-ignore
 import DefaultHead from '@src/assets/img/avatar.png'
@@ -25,8 +26,13 @@ import DateUtil from '@src/util/date'
 import Platform from '@src/util/Platform'
 import { openTabForUserView } from '@src/util/business/openTab'
 import { fmt_display_text, fmt_number_to_fixed } from '@src/filter/fmt'
-import { isArray } from '@src/util/type'
+import { isArray, isNull } from '@src/util/type'
 import { stringArrayIntersection } from '@src/util/array'
+import { parseObject } from '@src/util/parse'
+import Log from '@src/util/log.ts'
+import { getDistance } from '@src/util/distance'
+import Customer from "@model/entity/Customer";
+
 
 enum UserCardEmitEventEnum {
   // 关闭事件
@@ -34,60 +40,88 @@ enum UserCardEmitEventEnum {
   // 设置负责人事件
   SetExecutor = 'setExecutor',
   // 设置协同人事件
-  SetSynergy = 'setSynergy'
+  SetSynergy = 'setSynergy',
+  // 删除协同人事件
+  DeleteSynergyUser = 'deleteSynergyUser'
+}
+
+enum UserCardRadioEnum {
+  Executor = 'executor',
+  Synergy = 'synergy'
 }
 
 @Component({ name: ComponentNameEnum.UserCard })
 export default class UserCard extends Vue {
+  /* 客户信息 */
+  @Prop() readonly customer: Customer | undefined
   // 客户团队名称列表
   @Prop() readonly customerTagNames: string[] | undefined
   // 向外发布事件的 组件名字
   @Prop() readonly emitEventComponentName: string | undefined
-  // 客户负责人图标
-  @Prop() readonly showCustomerManagerIcon: boolean | undefined
+  /* 是否为转派 */
+  @Prop() readonly isReAllot: boolean | undefined
   // 工作状态颜色数组
   @Prop() readonly stateColorMap: StateColorMap | undefined
+  // 是否显示 负责人人按钮
+  @Prop({ default: true }) readonly showExecutorButton: boolean | undefined
   // 是否显示 协同人按钮
   @Prop() readonly showSynergyButton: boolean | undefined
+  /* 工单信息 */
+  @Prop() readonly task: any | undefined
   // 用户id
   @Prop() readonly userId: string | undefined
   
   // 用户是否在客户团队内
   private isUserInCustomerTag: boolean = false
+  // 设为负责人是否选中
+  private isExecutorChecked: boolean = false
+  // 设为协同人是否选中
+  private isSynergyChecked: boolean = false
   // 等待状态
   private pending: boolean = false
   // 时间
   private timeRange: Date[] = []
   // 用户卡片信息
   private userCardInfo: UserCardInfo = new UserCardInfo()
+  // 用户详情最低高度
+  private userDetailMinHeight: number = 200
   
   /* 用户信息 */
   get user(): LoginUser {
     return this.userCardInfo.user
   }
   
-  @Watch('userId')
+  @Watch('userId', { immediate: true })
   onUserIdChanged() {
     this.computedStartAndEndTime()
     this.fetchUserTaskData()
   }
   
   /**
-   * @description 设置负责人人
+   * @description 设置负责人
   */
   @Emit(UserCardEmitEventEnum.SetExecutor)
-  private setExecutorUser() {
-    this.dispatchEvent<LoginUser>(UserCardEmitEventEnum.SetExecutor, this.user)      
-    return this.user
+  private setExecutorUser(user: LoginUser | null = this.user): LoginUser | null {
+    this.dispatchEvent<LoginUser>(UserCardEmitEventEnum.SetExecutor, user)
+    return user
   }
   
   /**
     * @description 设置协同人
   */
   @Emit(UserCardEmitEventEnum.SetSynergy)
-  private setSynergyUser() {
-    this.dispatchEvent<LoginUser>(UserCardEmitEventEnum.SetSynergy, this.user)    
-    return this.user
+  private setSynergyUser(user: LoginUser = this.user): LoginUser {
+    this.dispatchEvent<LoginUser>(UserCardEmitEventEnum.SetSynergy, user)
+    return user
+  }
+  
+  /**
+   * @description 清除协同人
+   */
+  @Emit(UserCardEmitEventEnum.SetSynergy)
+  private deleteSynergyUser(user: LoginUser = this.user): LoginUser {
+    this.dispatchEvent<LoginUser>(UserCardEmitEventEnum.DeleteSynergyUser, user)
+    return user
   }
   
   /**
@@ -97,6 +131,53 @@ export default class UserCard extends Vue {
   private close() {
     this.dispatchEvent<boolean>(UserCardEmitEventEnum.Close, false)
     return false
+  }
+  
+  /* 当前选中的用户是客户的客户负责人，则显示专属标签（鼠标移动标签上提示“客户负责人”） */
+  get isCustomerManager(): boolean {
+    return Boolean(
+      this.user
+      && this.customer
+      && this.user.userId === this.customer.customerManager
+    )
+  }
+  
+  /**
+   * @description 工单客户地址地址
+   * 工单新建后地址信息在taddress里面，新建的信息在address里面
+   */
+  get taskAddress(): TaskAddress {
+    return new TaskAddress(this.task.taddress || this.task.address || {})
+  }
+  
+  /**
+   * @description 获取用户据客户距离
+   */
+  get userToCustomerDistance(): number | null {
+    // 工单客户地址
+    let taskCustomerAddress = this.taskAddress
+    // 工单客户地址纬度
+    let taskCustomerLatitude: number | null | undefined = taskCustomerAddress?.latitude
+    // 工单客户地址经度
+    let taskCustomerLongitude: number | null | undefined = taskCustomerAddress?.longitude
+    // 用户地址纬度
+    let userLatitude: number | null | undefined = this.userCardInfo?.user?.latitude
+    // 用户地址经度
+    let userLongitude: number | null | undefined = this.userCardInfo?.user?.longitude
+    
+    return getDistance(
+      Number(taskCustomerLatitude), Number(taskCustomerLongitude), Number(userLatitude), Number(userLongitude)
+    )
+  }
+  
+  /**
+   * @description 清除选中协同人
+   */
+  public clearSynergyChecked(user: LoginUser) {
+    let isClear: boolean = user.userId === this.user.userId
+    if (isClear) {
+      this.isSynergyChecked = false
+    }
   }
   
   /** 
@@ -116,8 +197,10 @@ export default class UserCard extends Vue {
   /** 
    * @description 发送事件
   */
-  private dispatchEvent<T>(eventName: UserCardEmitEventEnum, data: T): void {
+  private dispatchEvent<T>(eventName: UserCardEmitEventEnum, data: T | null): void {
     if (!this.emitEventComponentName) return
+    
+    Log.succ(Log.Start, this.dispatchEvent.name)
     
     // 支持由自定义组件 发出事件
     dispatch.call(
@@ -146,10 +229,15 @@ export default class UserCard extends Vue {
    * @description 获取人员工单信息
   */
   private fetchUserTaskData() {
+    if (!this.userId) {
+      return Log.warn('this.userId is empty', this.fetchUserTaskData.name)
+    }
+    
     let params = {
       executorId: this.userId || '',
       startTime: DateUtil.format(this.timeRange[0], DateFormatEnum.YTD),
-      endTime: DateUtil.format(this.timeRange[1], DateFormatEnum.YTD)
+      endTime: DateUtil.format(this.timeRange[1], DateFormatEnum.YTD),
+      taskId: this.task?.id
     }
     
     this.pending = true
@@ -158,11 +246,13 @@ export default class UserCard extends Vue {
       .then((data: getTaskUserCardInfoResult) => {
         let isSuccess = data.success
         if (!isSuccess) {
-          Platform.alert(data.message)
+          this.pending = false
+          return Platform.alert(data.message)
         }
         
-        this.userCardInfo = data.result
+        this.userCardInfo = parseObject(data.result)
         this.matchUserInCustomerTags()
+        this.setUserCardDetailHeight()
       })
       .catch((error) => {
         console.error(error)
@@ -185,7 +275,7 @@ export default class UserCard extends Vue {
     return this.getUserInfoData(value, '小时')
   }
   
-  private getUserInfoTashRate(value: string | null): string | number {
+  private getUserInfoTaskRate(value: string | null): string | number {
     if (value !== null) { value = value.substr(0, value.length - 1) }
     return this.getUserInfoData(value, '%')
   }
@@ -209,11 +299,130 @@ export default class UserCard extends Vue {
     this.isUserInCustomerTag = intersectionTags.length > 0
   }
   
+  /**
+   * @description 设为负责人复选框变化
+  */
+  private onExecutorCheckedChanged(value: boolean) {
+    this.isExecutorChecked = value
+    // 设置负责人信息
+    this.setExecutorUser(this.isExecutorChecked ? this.user : null)
+  }
+  
+  /**
+   * @description 设为协同人复选框变化
+  */
+  private onSynergyCheckedChanged(value: boolean) {
+    this.isSynergyChecked = value
+    // 设置/清除 负责人信息
+    this.isSynergyChecked ? this.setSynergyUser() : this.deleteSynergyUser()
+  }
+  
   /** 
    * @description 打开用户详情tab
   */
   private openUserViewTab(): void {
     openTabForUserView(this.userId, { from: 'task' })
+  }
+  
+  /** 
+   * @description 渲染用户标签
+   * -- 支持外部调用的
+  */
+  public outsideRenderUserLabel(label: string, className?: string) {
+    return this.renderUserCardLabel(label, className)
+  }
+  
+  /** 
+   * @description 渲染用户卡片标签列表
+  */
+  private renderUserCardLabels(): VNode | null {
+    // 判断是否有无标签
+    if (!this.userCardInfo.isManager && !this.userCardInfo.isDistance && !this.userCardInfo.isPrecent) return null
+    
+    return (
+      <div class='user-card-header-content-labels'>
+        { this.userCardInfo.isManager && this.renderUserCardLabel('主管', 'manager') }
+        { this.userCardInfo.isDistance && this.renderUserCardLabel('近') }
+        { this.userCardInfo.isPrecent && this.renderUserCardLabel('好评') }
+      </div>
+    )
+  }
+  
+  /** 
+   * @description 渲染用户卡片人员工作状态
+  */
+  private renderUserCardState(): VNode | null {
+    // 判断是否有工作状态和电话
+    if (!this.user.state && !this.user.cellPhone) return null
+    
+    return (
+      <div class='user-card-header-content-state'>
+        <span class='user-state-round' style={{
+          backgroundColor: this.stateColorMap && this.stateColorMap[this.user?.state || '']
+        }}>
+        </span>
+        <span>{this.user?.state}</span>
+        <span>{this.user?.cellPhone}</span>
+      </div>
+    )
+  }
+  
+  /** 
+   * @description 渲染用户卡片标签
+  */
+  private renderUserCardLabel(label: string, className: string = ''): VNode {
+    const baseClassName = 'user-label'
+    const classNames = [baseClassName, `${baseClassName}-${className}`]
+    
+    return (
+      <div class={classNames}>{label}</div>
+    )
+  }
+  
+  /** 
+   * @description 渲染用户卡片团队列表
+  */
+  private renderUserCardTeams() {
+    const departmentText = this.userCardInfo.department.join(', ') 
+    
+    return (
+      <div class='user-card-header-content-team'>
+        {
+          this.isUserInCustomerTag && (
+            <div>
+              <el-tooltip content='客户的服务团队' placement='top'>
+                <i class='iconfont icon-favorfill'></i>
+              </el-tooltip>
+            </div>
+          )
+        }
+        { 
+          <el-tooltip content={departmentText} placement='top'>
+            <span>{departmentText}</span>
+          </el-tooltip>
+        }
+      </div>
+    )
+  }
+  
+  /** 
+   * @description 渲染用户卡片位置
+  */
+  private renderUserCardLocation(): VNode | null {
+    // 用户或客户没有距离不显示
+    if (isNull(this.userToCustomerDistance)) return null
+    // 用户自定义数据属性
+    let userAttribute = this.userCardInfo?.user?.attribute || {}
+    // 最后登录时间
+    let lastLoginTime = DateUtil.getTimeDiffStr(userAttribute?.lastLocateTime)
+    
+    return (
+      <div class='user-card-header-content-location'>
+        <i class='iconfont icon-fdn-location'></i>
+        { `${this.userToCustomerDistance && this.userToCustomerDistance.toFixed(2)}KM ` }
+        { lastLoginTime && `(${lastLoginTime}前)` }
+      </div>
+    )
   }
   
   /** 
@@ -244,46 +453,58 @@ export default class UserCard extends Vue {
     let rangeAccept = this.getUserInfoUsedTime(this.userCardInfo.rangeAccept)
     // 平均工作用时
     let rangeWork = this.getUserInfoUsedTime(this.userCardInfo.rangeWork)
-
+    // 平均响应用时dom
+    let rangeAcceptDom = (
+      <el-tooltip content={rangeAccept} placement='top'>
+        <span>{rangeAccept}</span>
+      </el-tooltip>
+    )
+    // 平均工作用时dom
+    let rangeWorkDom = (
+      <el-tooltip content={rangeWork} placement='top'>
+        <span>{rangeWork}</span>
+      </el-tooltip>
+    )
+    
     return (
-      <div class='user-card-detail'>
+      <div class='user-card-detail' ref='UserCardDetailElement' style={{ minHeight: `${this.userDetailMinHeight}px` }}>
         <div class='user-card-detail-row'>
-          <div class='user-card-detail-row-item'>
-            未完成工单量: {fmt_display_text(this.userCardInfo.unfinished, '个')}
-          </div>
-          <div class='user-card-detail-row-item'>
-            已完成工单量: {fmt_display_text(this.userCardInfo.finished, '个')}
-          </div>
+          {this.renderUserCardDetailChunk('未完成工单量', fmt_display_text(this.userCardInfo.unfinished, '个'))}
+          {this.renderUserCardDetailChunk('已完成工单量', fmt_display_text(this.userCardInfo.finished, '个'))}
+          {this.renderUserCardDetailChunk('平均工作用时', rangeWorkDom)}
         </div>
         <div class='user-card-detail-row'>
-          <div class='user-card-detail-row-item'>
-            平均响应用时: 
-            <el-tooltip content={rangeAccept} placement='top'>
-              <span>{rangeAccept}</span>
-            </el-tooltip>
-          </div>
-          <div class='user-card-detail-row-item'>
-            平均工作用时: 
-            <el-tooltip content={rangeWork} placement='top'>
-              <span>{rangeWork}</span>
-            </el-tooltip>
-          </div>
-        </div>
-        <div class='user-card-detail-row'>
-          <div class='user-card-detail-row-item'>
-            拒单率: {this.getUserInfoTashRate(this.userCardInfo.refuse)}
-          </div>
-          <div class='user-card-detail-row-item'>
-            转派率: {this.getUserInfoTashRate(this.userCardInfo.allot)}
-          </div>
-        </div>
-        <div class='user-card-detail-row'>
-          <div class='user-card-detail-row-item'>
-            好评率: {this.getUserInfoTashRate(this.userCardInfo.degree)}
-          </div>
+          {this.renderUserCardDetailChunk('拒单率', this.getUserInfoTaskRate(this.userCardInfo.refuse))}
+          {this.renderUserCardDetailChunk('转派率', this.getUserInfoTaskRate(this.userCardInfo.allot))}
+          {this.renderUserCardDetailChunk('好评率', this.getUserInfoTaskRate(this.userCardInfo.degree))}
         </div>
       </div>
     )
+  }
+  
+  /** 
+   * @description 渲染用户信息详情
+  */
+  private renderUserCardDetailChunk(label: string, value: string | number | null | VNode): VNode {
+    return (
+      <div class='user-card-detail-chunk'>
+        <div class='user-card-detail-chunk-content'>{value}</div>
+        <div class='user-card-detail-chunk-label'>{label}</div>
+      </div>
+    )
+  }
+  
+  /** 
+   * @description 渲染用户详情高度
+  */
+  private setUserCardDetailHeight() {
+    this.$nextTick(() => {
+      let elHeight: number = this.$el?.clientHeight
+      let teamLength: number = this.userCardInfo.department.join('').length
+      let isHaveLabel: boolean = Boolean(this.userCardInfo.isManager || this.userCardInfo.isDistance || this.userCardInfo.isPrecent)
+      let otherEl: number = 216 - (teamLength > 25 ? 20 : 0) + (isHaveLabel ? 24 : 0)
+      this.userDetailMinHeight = !elHeight ? 200 : elHeight - otherEl
+    })
   }
   
   mounted() {
@@ -299,59 +520,49 @@ export default class UserCard extends Vue {
           <div class='user-card-close' onClick={() => this.close()}>
             <i class='iconfont icon-fe-close'></i>
           </div>
-          <div class='user-card-header'>
+          <div class='user-card-header' ref='UserCardHeaderElement'>
             <div class='user-card-header-head'>
               <img src={this.user?.head || DefaultHead} />
             </div>
             <div class='user-card-header-content'>
+              
               <div class='user-card-header-content-top'>
-                
-                <div class='user-card-header-content-top-left'>
-                  <div class='user-card-header-content-name' onClick={() => this.openUserViewTab()}>
-                    {this?.user?.displayName}
-                    { this.showCustomerManagerIcon && (
-                      <el-tooltip content='客户负责人' placement='top'>
-                        <i class='iconfont icon-huangguan'></i>
-                      </el-tooltip>
-                    )}
-                  </div>
-                  
-                  <div class='user-card-header-content-state'>
-                    <span class='user-state-round' style={{
-                      backgroundColor: this.stateColorMap && this.stateColorMap[this.user?.state || '']
-                    }}>
-                    </span>
-                    <span>{this.user?.state}</span>
-                    <span>{this.user?.cellPhone}</span>
-                  </div>
+                <div class='user-card-header-content-name' onClick={() => this.openUserViewTab()}>
+                  {this?.user?.displayName}
+                  { this.isCustomerManager && (
+                    <el-tooltip content='客户负责人' placement='top'>
+                      <i class='iconfont icon-huangguan'></i>
+                    </el-tooltip>
+                  )}
                 </div>
-                
-                <div class='user-card-header-button-group'>
-                  <base-button class='excutor-button' type='ghost' onEvent={this.setExecutorUser}>设为负责人</base-button>
-                  {
-                    this.showSynergyButton
-                    && <base-button class='synergy-button' type='ghost' onEvent={this.setSynergyUser}>设为协同人</base-button>
-                  }
-                </div>
-                
+                { this.renderUserCardState() }
+                { this.renderUserCardLabels() }  
               </div>
               
-              <div class='user-card-header-content-team'>
-                {
-                  this.isUserInCustomerTag && (
-                    <el-tooltip content='客户的服务团队' placement='top'>
-                      <i class='iconfont icon-favorfill'></i>
-                    </el-tooltip>
-                  )
-                }
-                { this.userCardInfo.department.join(', ') }
-              </div>
+              {this.renderUserCardTeams()}
+              {this.renderUserCardLocation()}
               
             </div>
           </div>
           {this.renderUserCardTime()}
           {this.renderUserCardDetail()}
           
+          <div class='user-card-footer'>
+            {
+              this.showExecutorButton && (
+                <el-checkbox value={this.isExecutorChecked} onInput={(value: boolean) => this.onExecutorCheckedChanged(value)}>
+                  设为负责人
+                </el-checkbox>
+              )
+            }
+            {
+              this.showSynergyButton && (
+                <el-checkbox value={this.isSynergyChecked} onInput={(value: boolean) => this.onSynergyCheckedChanged(value)}>
+                  设为协同人
+                </el-checkbox>
+              )
+            }
+          </div>
       </div>
     )
   }

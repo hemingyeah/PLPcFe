@@ -1,10 +1,20 @@
 import _ from 'lodash';
-import { parse } from '@src/util/querystring'
+import {
+  parse
+} from '@src/util/querystring'
 import Tab from './model/Tab';
-import { getRootWindow } from '@src/util/dom';
+import {
+  getRootWindow
+} from '@src/util/dom';
 import FrameHistoryManager from './FrameHistoryManager'
-import { platform } from '@src/platform';
-import { storageGet, storageSet, storageSetDepth } from '@src/util/storage';
+import {
+  platform
+} from '@src/platform';
+import {
+  storageGet,
+  storageSet,
+  storageSetDepth
+} from '@src/util/storage';
 
 // import normalizeWheel from '@src/util/normalizeWheel'
 
@@ -75,7 +85,11 @@ const FrameManager = {
       window.TDAPP.onEvent(`pc：访问${menu.name || (`未命名页面${menu.menuKey || ''}`)}`);
       let url = this.joinParams(menu.url);
 
-      let tab = new Tab({ id: menu.menuKey, url, title: menu.name });
+      let tab = new Tab({
+        id: menu.menuKey,
+        url,
+        title: menu.name
+      });
       this.openFrameTab(tab)
     },
     /** 
@@ -98,7 +112,7 @@ const FrameManager = {
 
       this.frameTabs.forEach(item => item.show = false);
       this.frameTabs.push(tab);
-      
+
       if (tab.id == 'M_VIP_SPAREPART_LIST') {
         this.currUrl = '/bill';
       } else {
@@ -417,7 +431,10 @@ const FrameManager = {
       }
     },
     closeTabHandler(event) {
-      let { target, command } = event;
+      let {
+        target,
+        command
+      } = event;
       let id = target.id;
       let index = this.frameTabs.findIndex(tab => `tab_${tab.id}` == id);
       if (index < 0) return;
@@ -491,7 +508,9 @@ const FrameManager = {
 
       // 存入缓存
       if (Object.keys(pageData).length <= 0) {
-        let setPageData = { pageSize: 10 };
+        let setPageData = {
+          pageSize: 10
+        };
         storageSet(storageKey, JSON.stringify(setPageData));
       }
 
@@ -543,17 +562,37 @@ const FrameManager = {
       referrer ? originWindow.location.replace(referrer) : originWindow.location.reload(true)
     }
 
-    let homeTab = new Tab({ id: 'HOME', url: '/home', title: '首页', show: true })
+    let homeTab = new Tab({
+      id: 'HOME',
+      url: '/home',
+      title: '首页',
+      show: true
+    })
     this.openForFrame(homeTab);
 
-    window.changeTaskVersion = (data)=>{
+    window.changeTaskVersion = (data) => {
       this.changeTaskVersion(data);
+    }
+    window.changeLinkPage = (data) => {
+      for (let index = 0; index < this.frameTabs.length; index++) {
+        const element = this.frameTabs[index];
+        if (element.id == data.id) {
+          this.reloadFrameTab(data);
+          break;
+        }
+
+      }
+      console.log(this.frameTabs, 'frameTabs')
     }
 
     // 处理消息跳转url
     let query = parse(window.location.search);
     let pcUrl = this.initData.pcUrl || query.pcUrl;
-    if (pcUrl) this.openForFrame({ id: 'PcUrl', title: '正在加载', url: pcUrl });
+    if (pcUrl) this.openForFrame({
+      id: 'PcUrl',
+      title: '正在加载',
+      url: pcUrl
+    });
   }
 };
 

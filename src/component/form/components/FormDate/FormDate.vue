@@ -9,7 +9,7 @@
       clearable
       :placeholder="placeholder"
       :value-format="dateObj.format"
-      :value="_value"
+      :value="field.returnData?_value[field.returnData]:_value"
       :format="dateObj.format"
       @input="choose"
     />
@@ -38,7 +38,7 @@ export default {
     _value() {
       if ( !this.value ) return '';
       let { defaultValueConfig, dateType} = this.field.setting || {};
-      let newDate = fmt_data_time(new Date(this.value), dateType);
+      let newDate = fmt_data_time(new Date(this.value), dateType || 'yyyy-MM-dd');
       this.choose(newDate);
       return newDate
     },
@@ -48,9 +48,9 @@ export default {
      * 否择返回默认设置，兼容老数据
     */
     dateObj() {
-      let  dateTypeObj = pickerOption.find((item=> item.format == this.field.setting.dateType));
+      let dateTypeObj = pickerOption.find((item=> item.format == this.field.setting.dateType));
       if(dateTypeObj && JSON.stringify(dateTypeObj) !== '{}') return dateTypeObj;
-      return { type:'date',format: "yyyy-MM-dd" }  
+      return { type:'date', format: 'yyyy-MM-dd' }  
     }
   },
   methods: {

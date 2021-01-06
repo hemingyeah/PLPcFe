@@ -1,27 +1,27 @@
-import { assign } from 'lodash'
-import { FORM_FIELD_TEXT_MAX_LENGTH, FORM_FIELD_TEXTAREA_MAX_LENGTH } from '@src/model/const/Number.ts';
+import { assign } from "lodash"
+import { FORM_FIELD_TEXT_MAX_LENGTH, FORM_FIELD_TEXTAREA_MAX_LENGTH } from "@src/model/const/Number.ts";
 /* utils */
-import { fmt_data_time } from '@src/util/lang'; 
+import { fmt_data_time } from "@src/util/lang"; 
 
-import FormField from '../FormField';
+import FormField from "../FormField";
 
-export * from './validate';
+export * from "./validate";
 
 const DEFAULT_PLACEHOLDER = {
   text: `最多${FORM_FIELD_TEXT_MAX_LENGTH}字`,
   description: `最多${FORM_FIELD_TEXTAREA_MAX_LENGTH}字`,
   textarea: `最多${FORM_FIELD_TEXTAREA_MAX_LENGTH}字`,
-  number: '请输入数字',
-  customerAddress: '请填写详细地址',
-  relationCustomer: '由客户信息查询',
-  relationProduct: '由产品信息查询',
-  user: '请选择人员',
-  date: '日期',
-  datetime: '日期 + 时间',
-  select: '请选择',
-  location: '请输入',
-  phone: '请输入电话号码',
-  code: '请通过移动端扫码或手动输入'
+  number: "请输入数字",
+  customerAddress: "请填写详细地址",
+  relationCustomer: "由客户信息查询",
+  relationProduct: "由产品信息查询",
+  user: "请选择人员",
+  date: "日期",
+  datetime: "日期 + 时间",
+  select: "请选择",
+  location: "请输入",
+  phone: "请输入电话号码",
+  code: "请通过移动端扫码或手动输入"
 }
 
 /** 
@@ -42,9 +42,9 @@ export function toFormField(fields){
 export function migration(fields){
   return fields.map(field => {
     // 多选格式调整
-    if(field.formType == 'selectMulti'){
+    if(field.formType == "selectMulti"){
       if(!field.setting) field.setting = {isMulti: true, dataSource: []};
-      field.formType = 'select';
+      field.formType = "select";
       field.setting.isMulti = true;
     }
 
@@ -56,64 +56,64 @@ export function migration(fields){
 export function isMultiSelect(field){
   let setting = field.setting || {};
 
-  return (field.formType == 'select' && setting.isMulti) 
-    || field.formType == 'selectMulti';
+  return (field.formType == "select" && setting.isMulti) 
+    || field.formType == "selectMulti";
 }
 
 /** 是否为多级菜单类型 */
 export function isCascader(field){
   let setting = field.setting || {};
 
-  return field.formType == 'cascader' && JSON.stringify(setting) == '{}'
+  return field.formType == "cascader" && JSON.stringify(setting) == "{}"
 }
 
 /** 是否为单选类型 */
 export function isSelect(field){
   let setting = field.setting || {};
 
-  return (field.formType == 'select' && !setting.isMulti)
-    || field.formType == 'level'
-    || field.formType == 'serviceContent'
-    || field.formType == 'serviceType';
+  return (field.formType == "select" && !setting.isMulti)
+    || field.formType == "level"
+    || field.formType == "serviceContent"
+    || field.formType == "serviceType";
 }
 
 /** 是否为日期类型 yyyy-MM-dd */
 export function isDate(field){
   let setting = field.setting;
 
-  return field.formType == 'date' 
-    || (field.formType == 'planTime' && (setting != null && setting.dateType == 'date'));
+  return field.formType == "date" 
+    || (field.formType == "planTime" && (setting != null && setting.dateType == "date"));
 }
 
 /** 是否为日期时间类型 yyyy-MM-dd HH:mm:ss */
 export function isDatetime(field){
   let setting = field.setting;
 
-  return field.formType == 'datetime' 
-    || (field.formType == 'planTime' && (setting == null || setting.dateType != 'date'));
+  return field.formType == "datetime" 
+    || (field.formType == "planTime" && (setting == null || setting.dateType != "date"));
 }
 
 /** 是否为说明信息类型 */
 export function isInfo(field) {
-  return field.formType === 'info';
+  return field.formType === "info";
 }
 
 /** 构建placeholder */
-export function genPlaceholder(field, defaultText = ''){
-  let text = '';
+export function genPlaceholder(field, defaultText = ""){
+  let text = "";
   if(field.isNull == 0) {
-    text += (isSelect(field) || isMultiSelect(field)) ? '[必选] ' : '[必填] '
+    text += (isSelect(field) || isMultiSelect(field)) ? "[必选] " : "[必填] "
   }
 
   let placeholder = field.placeholder || field.placeHolder;
   if(placeholder) return text + placeholder;
 
   let key = field.formType;
-  if(isDate(field)) key = 'date';
-  if(isDatetime(field)) key = 'datetime';
-  if(isSelect(field) || isMultiSelect(field) || field.formType == 'cascader') key = 'select';  
+  if(isDate(field)) key = "date";
+  if(isDatetime(field)) key = "datetime";
+  if(isSelect(field) || isMultiSelect(field) || field.formType == "cascader") key = "select";  
 
-  return text + (DEFAULT_PLACEHOLDER[key] || '');
+  return text + (DEFAULT_PLACEHOLDER[key] || "");
 }
 /**
  * 初始化所有字段的初始值
@@ -122,55 +122,58 @@ export function genPlaceholder(field, defaultText = ''){
  * @param {*} target 待合并的值
  */
 export function initialize(fields = [], origin = {}, callback){
-  let result = typeof callback == 'function' ? callback(fields, origin) : origin;
+  let result = typeof callback == "function" ? callback(fields, origin) : origin;
 
-  fields.filter(field => field.formType !== 'info' && field.formType !== 'separator').forEach(field => {
+  fields.filter(field => field.formType !== "info" && field.formType !== "separator").forEach(field => {
     let formType = field.formType;
     let setting = field.setting || {};
     let fieldName = field.fieldName;
     let dataSource = setting.dataSource || [];
-    let defaultValue = field.defaultValue || '';
+    let defaultValue = field.defaultValue || "";
     let { defaultValueConfig } = setting || {};
     let { isCurrentDate, isCurrentUser } = defaultValueConfig || {};
-    let dateType = setting.dateType || 'yyyy-MM-dd';
-    
+    let dateType = setting.dateType || "yyyy-MM-dd";
     // 客户和编号类型不出初始化值
-    if(field.formType == 'customer' || field.formType == 'eventNo' || field.formType == 'related_task' || field.formType == 'taskNo') return;
+    if(field.formType == "customer" || field.formType == "eventNo" || field.formType == "related_task" || field.formType == "taskNo") return;
     // 如果已经存在值 则无需初始化
     if(result[fieldName]) return;
+
+    if(field.formType == "related_catalog"){
+      defaultValue = [];
+    }
     
     // 屏蔽工单上单选里不存在默认值
-    if(isSelect(field) && dataSource.indexOf(defaultValue) < 0) defaultValue = '';
+    if(isSelect(field) && dataSource.indexOf(defaultValue) < 0) defaultValue = "";
     
     // 优先级、服务类型、服务内容在空值时选中第一个
-    if(field.formType == 'level' || field.formType == 'serviceContent' || field.formType == 'serviceType') {
-      if(defaultValue == '') defaultValue = dataSource[0];
+    if(field.formType == "level" || field.formType == "serviceContent" || field.formType == "serviceType") {
+      if(defaultValue == "") defaultValue = dataSource[0];
     }
     
     // 超链接的默认值初始化为对象
-    if (field.formType === 'link') {
+    if (field.formType === "link") {
       defaultValue = {}
     }
     
     // 多选和附件的默认值初始化为空数组
-    if(isMultiSelect(field) || field.formType == 'attachment' || field.formType == 'taskAttachment' || field.formType == 'receiptAttachment'){
+    if(isMultiSelect(field) || field.formType == "attachment" || field.formType == "taskAttachment" || field.formType == "receiptAttachment"){
       defaultValue = [];
     }
     
     // 多级选择，需要拆解默认值
-    if(formType == 'cascader'){
+    if(formType == "cascader"){
       let cascaderDefaultValue = [];
-      if(defaultValue) cascaderDefaultValue = defaultValue.split(',')
+      if(defaultValue) cascaderDefaultValue = defaultValue.split(",")
     
       defaultValue = cascaderDefaultValue;
     }
     
     // 地址、人员的默认值初始化为对象
-    let objValueFields = ['customerAddress', 'address']
+    let objValueFields = ["customerAddress", "address"]
     if(objValueFields.indexOf(field.formType) >= 0) defaultValue = {};
 
     // 人员字段初始化
-    if(formType == 'user') {
+    if(formType == "user") {
       let { isMultiple } = setting || {};
 
       // 当前登录账户数据
@@ -191,14 +194,14 @@ export function initialize(fields = [], origin = {}, callback){
     
     // 多选改单选,若原来有值则保留第一个
     if(isSelect(field) && Array.isArray(formData)) {
-      formData = (formData && formData.length >= 1) ? formData[0] : '';
+      formData = (formData && formData.length >= 1) ? formData[0] : "";
     }
     // 单选改多选，将原值加入数组
     if(isMultiSelect(field) && !Array.isArray(formData)) {
       formData = formData ? [formData] : [];
     }
     // 日期 若设置默认值，将系统时间设为默认值
-    if( formType == 'date' && ( JSON.stringify(defaultValueConfig) !== '{}' && isCurrentDate == 1)){
+    if( formType == "date" && ( JSON.stringify(defaultValueConfig) !== "{}" && isCurrentDate == 1)){
       defaultValue = fmt_data_time(new Date(), dateType);
     }
 
@@ -266,7 +269,7 @@ export function getValue(field, form, isSmooth = false){
   if(isSmooth) return form[fieldName];
 
   // 客户负责人
-  if(field.tableName == 'customer' && fieldName == 'manager'){
+  if(field.tableName == "customer" && fieldName == "manager"){
     return {userId:form.customerManager, displayName: form.customerManagerName}
   }
 

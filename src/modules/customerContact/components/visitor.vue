@@ -302,11 +302,9 @@ import AuthUtil from "@src/util/auth";
 import diyForm from "../components/diyForm.vue";
 
 /* 高级搜索面板 列数 */
-const PRODUCT_TEMPLATE_LIST_ADVANCE_SEARCH_COLUMN_NUMBER =
-  "customer_contact_search_column_number";
+const PRODUCT_TEMPLATE_LIST_ADVANCE_SEARCH_COLUMN_NUMBER = "customer_contact_search_column_number";
 /* 高级搜索 搜索数据 */
-const STORE_USER_FOR_SEARCH_PRODUCT_TEMPLATE =
-  "store_user_for_search_product_template";
+const STORE_USER_FOR_SEARCH_PRODUCT_TEMPLATE = "store_user_for_search_product_template";
 // 产品模板列表数据
 const PRODUCT_TEMPLATE_LIST_DATA = "product_template_list_data";
 // 产品模板列表选择
@@ -426,7 +424,7 @@ export default {
           customerExtend: "056cd57b-6db3-11ea-bfc9-00163e304a25",
           formType: "customer",
           placeHolder: "请选择客户",
-          children:['address', 'addr'],
+          children:["address", "addr"],
           disabled: true,
           isExport: false,
           isNull: 1,
@@ -472,10 +470,10 @@ export default {
           resTranslate: obj => {
             return {
               value:
-                (obj.province ? obj.province : "") +
-                (obj.city ? obj.city : "") +
-                (obj.dist ? obj.dist : "") +
-                (obj.address ? obj.address : ""),
+                (obj.province ? obj.province : "")
+                + (obj.city ? obj.city : "")
+                + (obj.dist ? obj.dist : "")
+                + (obj.address ? obj.address : ""),
               id: obj.id
             };
           },
@@ -550,8 +548,8 @@ export default {
       }
 
       if (
-        Object.keys(sm.moreConditions).length > 1 ||
-        sm.moreConditions.conditions.length
+        Object.keys(sm.moreConditions).length > 1
+        || sm.moreConditions.conditions.length
       ) {
         params = {
           ...params,
@@ -638,7 +636,7 @@ export default {
             } }
           ],
           minWidth: "150px",
-          show: 'important'
+          show: "important"
         }
       ];
     },
@@ -677,8 +675,7 @@ export default {
         let localField = localColumns[col.field];
 
         if (null != localField) {
-          width =
-            typeof localField.width == "number" ? `${localField.width}px` : "";
+          width = typeof localField.width == "number" ? `${localField.width}px` : "";
           show = localField.show !== false;
         }
         col.show = show;
@@ -749,8 +746,8 @@ export default {
         this.$nextTick(() => {
           original.length > 0
             ? unSelected.forEach(row => {
-                this.$refs.productTemplateTable.toggleRowSelection(row, false);
-              })
+              this.$refs.productTemplateTable.toggleRowSelection(row, false);
+            })
             : this.$refs.productTemplateTable.clearSelection();
         });
         return this.$platform.alert(`最多只能选择${this.selectedLimit}条数据`);
@@ -927,16 +924,15 @@ export default {
               : prop
         };
 
-        const sortedField =
-          this.productTemplateConfig.productFields.filter(
-            sf => sf.fieldName === prop
-          )[0] || {};
+        const sortedField = this.productTemplateConfig.productFields.filter(
+          sf => sf.fieldName === prop
+        )[0] || {};
 
         if (
-          prop === "createTime" ||
-          prop === "updateTime" ||
-          sortedField.formType === "date" ||
-          sortedField.formType === "datetime"
+          prop === "createTime"
+          || prop === "updateTime"
+          || sortedField.formType === "date"
+          || sortedField.formType === "datetime"
         ) {
           sortModel.type = "date";
         } else {
@@ -964,8 +960,8 @@ export default {
       }
 
       if (
-        Object.keys(sm.moreConditions).length > 1 ||
-        sm.moreConditions.conditions.length
+        Object.keys(sm.moreConditions).length > 1
+        || sm.moreConditions.conditions.length
       ) {
         params = {
           ...params,
@@ -992,10 +988,9 @@ export default {
         this.searchModel.pageSize = Number(localStorageData.pageSize);
       }
 
-      const num =
-        localStorage.getItem(
-          PRODUCT_TEMPLATE_LIST_ADVANCE_SEARCH_COLUMN_NUMBER
-        ) || 1;
+      const num = localStorage.getItem(
+        PRODUCT_TEMPLATE_LIST_ADVANCE_SEARCH_COLUMN_NUMBER
+      ) || 1;
       this.columnNum = Number(num);
     },
     panelSearchAdvancedToggle() {
@@ -1075,8 +1070,8 @@ export default {
     buildTextarea(value) {
       return value
         ? value.replace(link_reg, match => {
-            return `<a href="javascript:;" target="_blank" url="${match}">${match}</a>`;
-          })
+          return `<a href="javascript:;" target="_blank" url="${match}">${match}</a>`;
+        })
         : "";
     },
     getRowKey(row) {
@@ -1106,15 +1101,14 @@ export default {
           // 无团队则任何人都可编辑
           if (tags.length == 0) return true;
 
-          let loginUserTagIds =
-            this.initData.loginUser.tagIdsWithChildTag || [];
+          let loginUserTagIds = this.initData.loginUser.tagIdsWithChildTag || [];
           return tags.some(tag => loginUserTagIds.indexOf(tag.id) >= 0);
         },
         // 个人权限判断
         () => {
           return (
-            customer.createUser == loginUserId ||
-            this.isCustomerManager(customer)
+            customer.createUser == loginUserId
+            || this.isCustomerManager(customer)
           );
         }
       );
@@ -1144,8 +1138,7 @@ export default {
           // 无团队则任何人都可编辑
           if (tags.length == 0) return true;
 
-          let loginUserTagIds =
-            this.initData.loginUser.tagIdsWithChildTag || [];
+          let loginUserTagIds = this.initData.loginUser.tagIdsWithChildTag || [];
           return tags.some(tag => loginUserTagIds.indexOf(tag.id) >= 0);
         }),
         // 个人权限判断
@@ -1226,9 +1219,9 @@ export default {
     exportColumns() {
       return this.columns.map(c => {
         if (
-          c.field !== "customerAddress" &&
-          c.field !== "remindCount" &&
-          c.field !== "updateTime"
+          c.field !== "customerAddress"
+          && c.field !== "remindCount"
+          && c.field !== "updateTime"
         ) {
           c.export = true;
         }
@@ -1241,9 +1234,9 @@ export default {
       let exportAll = !ids || ids.length == 0;
       let exportSearchModel = exportAll
         ? {
-            ...this.buildParams(),
-            exportTotal: this.page.total
-          }
+          ...this.buildParams(),
+          exportTotal: this.page.total
+        }
         : { exportTotal: ids.length };
 
       return {
@@ -1675,5 +1668,8 @@ body {
     display: flex;
     justify-content: flex-end;
   }
+  // .flex-1{
+  //   flex:1;
+  // }
 }
 </style>

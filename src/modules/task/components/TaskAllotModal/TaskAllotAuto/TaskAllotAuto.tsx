@@ -2,6 +2,7 @@
 import { getAutoDispatchResultList } from '@src/api/TaskApi'
 /* components */
 import AllotRuleModal from '@src/modules/task/components/AllotRuleModal/AllotRuleModal.tsx'
+import UiInput from '@src/component/ui/UiInput/UiInput.tsx'
 /* enum */
 import ComponentNameEnum from '@model/enum/ComponentNameEnum'
 /* entity */
@@ -23,7 +24,8 @@ import AuthEnum from '@model/enum/AuthEnum'
 @Component({ 
   name: ComponentNameEnum.TaskAllotAuto,
   components: {
-    AllotRuleModal
+    AllotRuleModal,
+    UiInput
   }
 })
 export default class TaskAllotAuto extends Vue {
@@ -60,12 +62,7 @@ export default class TaskAllotAuto extends Vue {
   }
   
   /* 自动派单根据是否显示未匹配的筛选列表 匹配结果用于显示的列表 */
-  get autoDispatchResultFilterList(): AutoDispatchListItem[] {
-    // 显示全部结果
-    if (this.isShowUnMatchResult) {
-      return this.autoDispatchResultList.slice()
-    }
-    
+  get autoDispatchResultFilterList(): AutoDispatchListItem[] {    
     let matchResultBeforeList: AutoDispatchListItem[]  = []
     let item: AutoDispatchListItem | null = null
     let matchSuccessfully = false
@@ -86,11 +83,22 @@ export default class TaskAllotAuto extends Vue {
     this.matchRule = matchSuccessfully ? this.matchRule : null
     this.changeUpwardMatchRule(this.matchRule)
     
-    return matchResultBeforeList
+    return (
+      this.isShowUnMatchResult
+        ? this.autoDispatchResultList
+        : this.matchRule
+          ? [this.matchRule]
+          : [] 
+    )
   }
   
   /* 匹配结果为空 */
-  get isMatchResultEmpty() {
+  get isMatchResultEmpty(): boolean {
+    return this.matchRule === null
+  }
+  
+  /* 自动分配规则为空 */
+  get isAutoDispatchResultListEmpty(): boolean {
     return this.autoDispatchResultList.length <= 0
   }
   
@@ -199,13 +207,12 @@ export default class TaskAllotAuto extends Vue {
     if (!matchSuccessfully) {
       let classNames = ['base-timeline-head', 'base-timeline-head-no-match']
       isBefore && classNames.push('base-timeline-head-before')
-      
       return <div class={classNames}>{index + 1}</div>
     }
     
     return (
       <div class='base-timeline-head base-timeline-head-match'>
-        <i class='iconfont icon-duihao'></i>
+        <i class='iconfont icon-duihao1'></i>
       </div>
     )
   }
@@ -228,7 +235,7 @@ export default class TaskAllotAuto extends Vue {
         <div>
           提交后，系统会按分配规则重新匹配，可能会出现与预估的负责人不一致的情况。您可以
           <el-checkbox value={this.isUsedResult} onInput={(value: boolean) => { this.emitUsedChange(value); }}>
-            使用预估结果
+            勾选可使用预估匹配结果
           </el-checkbox>
         </div>
       </div>
@@ -251,6 +258,28 @@ export default class TaskAllotAuto extends Vue {
     )
   }
   
+  /**
+   * @description 渲染提示和切换按钮
+   */
+  private renderTipOrToggleButton() {
+    // 未匹配到规则
+    if (this.isMatchResultEmpty) {
+      return <div class={`${this.className}-empty`}>未匹配到任何规则，请使用「重新匹配」功能刷新结果，或更换派单方式。</div>
+    }
+    // 未设置分配规则
+    if (this.isAutoDispatchResultListEmpty) {
+      return <div class={`${this.className}-empty`}>未设置自动派单规则</div>
+    }
+    // 切换按钮
+    return (
+      <div class={`${this.className}-button`} onClick={() => this.isShowUnMatchResult = !this.isShowUnMatchResult}>
+        <ui-input toggle={this.isShowUnMatchResult}>
+          <span>{ this.isShowUnMatchResult ? '收起' : '展开更多' }</span>
+        </ui-input>
+      </div>
+    )
+  }
+  
   mounted() {
     this.fetchAutoDispatchResultList()
   }
@@ -268,29 +297,21 @@ export default class TaskAllotAuto extends Vue {
     return (
       <div class={this.className} {...attrs}>
         <div class={`${this.className}-header`}>
-          <el-button type='primary' ref='MatchButton' plain onClick={(event: MouseEvent) => this.fetchAutoDispatchResultList(event)}>重新匹配</el-button>
+          <el-button type='primary' ref='MatchButton' onClick={(event: MouseEvent) => this.fetchAutoDispatchResultList(event)}>重新匹配</el-button>
           {
             this.isHaveSystemSettingAuth
             && <el-button type='ghost' onClick={this.openRuleDialog}>添加新规则</el-button>
           }
         </div>
         <div class={`${this.className}-content`}>
-          <base-timeline 
+          <base-timeline
             data={this.autoDispatchResultFilterList} 
             loading={this.pending} 
             classNameRender={this.renderClassName}
             headRender={this.renderHead}
             recordRender={this.renderAutoMatch}
           />
-        { 
-          this.isMatchResultEmpty 
-            ? <div class={`${this.className}-empty`}>未匹配到任何规则，请使用「重新匹配」功能刷新结果，或更换派单方式。</div>
-            : (
-              <el-button onClick={() => this.isShowUnMatchResult = !this.isShowUnMatchResult}>
-                { this.isShowUnMatchResult ? '收起' : '查看更多' }
-              </el-button>
-            )
-        }
+        {this.renderTipOrToggleButton()}
         </div>
         <allot-rule-modal onSuccess={() => this.fetchAutoDispatchResultList()} ref='AllotRuleModal'></allot-rule-modal>
       </div>

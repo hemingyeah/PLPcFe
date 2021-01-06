@@ -20,9 +20,9 @@
         <label>节点：</label>
         <div class="form-view-row-content">{{ approve.action }}</div>
       </div>
-      <div class="form-view-row">
+      <div class="form-view-row" v-if="approve.id && approveContent()">
         <label>内容：</label>
-        <div class="form-view-row-content" v-if="approve.id">{{ approveContent() }}</div>
+        <div class="form-view-row-content">{{ approveContent() }}</div>
       </div>
       <div class="form-view-row">
         <label>发起人：</label>

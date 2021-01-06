@@ -1,14 +1,14 @@
-import { toArray } from '@src/util/lang';
-import { fmt_address, fmt_datetime, fmt_date } from '@src/filter/fmt';
-import * as FormUtil from './util';
-import { FieldManager } from './components';
-import http from '@src/util/http';
-import platform from '@src/platform';
+import { toArray } from "@src/util/lang";
+import { fmt_address, fmt_datetime, fmt_date } from "@src/filter/fmt";
+import * as FormUtil from "./util";
+import { FieldManager } from "./components";
+import http from "@src/util/http";
+import platform from "@src/platform";
 
 const link_reg = /((((https?|ftp?):(?:\/\/)?)(?:[-;:&=\+\$]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\?\+=&;:%!\/@.\w_]*)#?(?:[-\+=&;%!\?\/@.\w_]*))?)/g;
 
 const FormView = {
-  name: 'form-view',
+  name: "form-view",
   props: {
     fields: {
       type: Array,
@@ -26,20 +26,20 @@ const FormView = {
   },
 
   methods: {
-    //TODO :预览图片
+    // TODO :预览图片
     previewImage(event){
       let element = event.target;
-      let imgSrc =  element.currentSrc;
+      let imgSrc = element.currentSrc;
 
       if ((!/\.(png|bmp|gif|jpg|jpeg|tiff|tif|jfif|ico|pcx|tga)$/i.test(imgSrc) && !imgSrc) || !element) return
 
-      let list = event.target.closest('.ql-editor');
-      let images = Array.prototype.slice.call(list.querySelectorAll('img'));
+      let list = event.target.closest(".ql-editor");
+      let images = Array.prototype.slice.call(list.querySelectorAll("img"));
 
       let currIndex = 0;
       let urls = images.map((item, index) => {
         if(item == element) currIndex = index;
-        return item.getAttribute('src');
+        return item.getAttribute("src");
       });
       platform.imagePreview({
         imageDom: list,
@@ -54,7 +54,7 @@ const FormView = {
     formatValue(field, value){
       // 多选
       if (FormUtil.isMultiSelect(field)) {
-        return toArray(value).join('，')
+        return toArray(value).join("，")
       }
 
       // 日期
@@ -68,10 +68,10 @@ const FormView = {
       }
       
       // 人员
-      if (field.formType === 'user') {
+      if (field.formType === "user") {
         // 多选
         if(Array.isArray(value)) {
-          return value.map(i => i.displayName || i.name).join(',');
+          return value.map(i => i.displayName || i.name).join(",");
         }
       
         return value && (value.displayName || value.name);
@@ -81,8 +81,8 @@ const FormView = {
     },
     buildCommonDom({displayName, value, formType}) {
       let className = {
-        'form-view-row-content': true,
-        'form-view-textarea-preview': formType === 'textarea'
+        "form-view-row-content": true,
+        "form-view-textarea-preview": formType === "textarea"
       };
       
       return (
@@ -112,8 +112,8 @@ const FormView = {
 
     buildPhoneDom(lmPhone) {
       const { value, displayName} = lmPhone;
-      const hasCallCenterModule = localStorage.getItem('call_center_module')
-      const str = hasCallCenterModule == 1 && value ? <el-tooltip content="拨打电话" placement="top"><i onClick={() => this.makePhoneCall(value, hasCallCenterModule)} v-if="hasCallCenterModule" class="iconfont icon-dianhua1" style="color: #55B7B4;padding-left: 5px;font-size: 16px;cursor:pointer;"></i></el-tooltip> : ''
+      const hasCallCenterModule = localStorage.getItem("call_center_module")
+      const str = hasCallCenterModule == 1 && value ? <el-tooltip content="拨打电话" placement="top"><i onClick={() => this.makePhoneCall(value, hasCallCenterModule)} v-if="hasCallCenterModule" class="iconfont icon-dianhua1" style="color: #55B7B4;padding-left: 5px;font-size: 16px;cursor:pointer;"></i></el-tooltip> : ""
       return (
         <div class="form-view-row">
           <label>{displayName}</label>
@@ -128,11 +128,11 @@ const FormView = {
     async makePhoneCall(phone, hasCallCenterModule){
       if(!phone || !hasCallCenterModule) return
       try {
-        const { code, message } = await http.post('/api/callcenter/outside/callcenter/api/dialout', {phone, taskType:'customer'}, false)
+        const { code, message } = await http.post("/api/callcenter/outside/callcenter/api/dialout", {phone, taskType:"customer"}, false)
         if (code !== 0) return this.$platform.notification({
-          title: '呼出失败',
-          message: message || '',
-          type: 'error',
+          title: "呼出失败",
+          message: message || "",
+          type: "error",
         })
       } catch (error) {
         console.error(error);
@@ -142,7 +142,7 @@ const FormView = {
     buildTextarea({displayName, value, formType}) {
       const newVal = value ? value.replace(link_reg, (match) => {
         return `<a href="javascript:;" url="${match}">${match}</a>`
-      }) : '';
+      }) : "";
 
       return (
         <div class="form-view-row">
@@ -150,10 +150,10 @@ const FormView = {
           <div class="form-view-row-content">
             <span domPropsInnerHTML={newVal} class="form-view-textarea-content" onClick={(e) => {
               e.stopPropagation();
-              let url = e.target.getAttribute('url');
+              let url = e.target.getAttribute("url");
 
               if (!url) return;
-              if (!/http/gi.test(url)) return platform.alert('请确保输入的链接以http或者https开始');
+              if (!/http/gi.test(url)) return platform.alert("请确保输入的链接以http或者https开始");
 
               platform.openLink(url)
             }}>{newVal}</span>
@@ -194,14 +194,14 @@ const FormView = {
               <a href="javascript:;" class="link-text" style="margin: 0" onClick={() => {
                 this.$platform.openTab({
                   id: `task_view_${taskId}`,
-                  title: '工单详情',
+                  title: "工单详情",
                   close: true,
                   url: `/task/view/${taskId}?noHistory=1`,
                 })
               }}>
                 {taskNo}
               </a>
-              {index < value.length - 1 && ','}
+              {index < value.length - 1 && ","}
             </span>
           );
         });
@@ -225,13 +225,13 @@ const FormView = {
     openMap({address, title}) {
       if (!address) return;
       this.$fast.map.display(address, {title })
-        .catch(err => console.error('openMap catch an err: ', err));
+        .catch(err => console.error("openMap catch an err: ", err));
     },
   
     mapFieldToDom(field, createElement) {
       let {formType, fieldName, displayName, isSystem, isHidden, isVisible} = field;
-      if (formType === 'separator') {
-        const cn = `iconfont icon-fdn-select ${!this.sectionState[field.id] && 'reversal'}`;
+      if (formType === "separator") {
+        const cn = `iconfont icon-fdn-select ${!this.sectionState[field.id] && "reversal"}`;
         return displayName ? (
           <h4 class="section-title">
             {displayName}
@@ -262,10 +262,10 @@ const FormView = {
       }
 
       // 加密字段
-      if (value == '***') return this.buildCommonDom(params);
+      if (value == "***") return this.buildCommonDom(params);
       
       // 电子签名、客户签名
-      if (formType === 'autograph' || formType === 'systemAutograph') {
+      if (formType === "autograph" || formType === "systemAutograph") {
         params = {
           ...params,
           value
@@ -280,56 +280,56 @@ const FormView = {
         return createElement(FormField.view, attrs);
       }
       
-      if (formType === 'attachment' || formType === 'receiptAttachment') {
+      if (formType === "attachment" || formType === "receiptAttachment") {
         params = {
           ...params,
           value: toArray(value).map(a => <base-file-item file={a} readonly key={a.id}/>)
         };
       }
       
-      if (formType === 'select' && field.setting.isMulti) {
+      if (formType === "select" && field.setting.isMulti) {
         params = {
           ...params,
-          value: toArray(value).join('，')
+          value: toArray(value).join("，")
         };
       }
       
-      if (formType === 'tags') {
+      if (formType === "tags") {
         params = {
           ...params,
-          value: toArray(value).map(t => t.tagName).join(' ')
+          value: toArray(value).map(t => t.tagName).join(" ")
         };
       }
       
-      if (formType === 'select' && fieldName === 'tags') {
+      if (formType === "select" && fieldName === "tags") {
         params = {
           ...params,
-          value: value.map(tag => tag.tagName).join('，')
+          value: value.map(tag => tag.tagName).join("，")
         };
       }
       
-      if (formType === 'user') {
+      if (formType === "user") {
         params = {
           ...params,
           value: this.formatValue(field, value)
         };
       }
       
-      if (formType === 'user' && fieldName === 'manager') {
+      if (formType === "user" && fieldName === "manager") {
         params = {
           ...params,
           value: this.value.customerManagerName
         };
       }
       
-      if (formType === 'customerAddress') {
+      if (formType === "customerAddress") {
         params = {
           ...params,
           value: fmt_address(value)
         };
       }
       
-      if (formType === 'address') {
+      if (formType === "address") {
         params = {
           ...params,
           value: fmt_address(value),
@@ -339,7 +339,7 @@ const FormView = {
         return this.buildAddressDom(params);
       }
      
-      if (formType === 'phone' && fieldName === 'lmPhone') {
+      if (formType === "phone" && fieldName === "lmPhone") {
         params = {
           ...params,
           value,
@@ -348,7 +348,7 @@ const FormView = {
         return this.buildPhoneDom(params);
       }
 
-      if (formType == 'info') {
+      if (formType == "info") {
         params = {
           ...params,
           value: field.placeHolder
@@ -357,7 +357,7 @@ const FormView = {
       }
 
       // 多行文本、客户关联字段、产品关联字段
-      if(formType === 'textarea' || formType === 'relationCustomer' || formType === 'relationProduct') {
+      if(formType === "textarea" || formType === "relationCustomer" || formType === "relationProduct") {
         params = {
           ...params,
           value
@@ -365,24 +365,24 @@ const FormView = {
         return this.buildTextarea(params);
       }
 
-      if (formType === 'cascader') {
+      if (formType === "cascader") {
         params = {
           ...params,
-          value: toArray(value).join('/')
+          value: toArray(value).join("/")
         };
       }
 
-      if (formType === 'timestamp') {
+      if (formType === "timestamp") {
         params = {
           ...params,
           value: fmt_datetime(value)
         };
       }
 
-      if(formType === 'related_task') {
+      if(formType === "related_task") {
         params = {
           ...params,
-          value: value
+          value
         };
         return this.buildRelatedTask(params);
       }
@@ -399,14 +399,14 @@ const FormView = {
         .filter(item => !FormUtil.isHiddenField(item, this.value, fields, false))
         // 隐藏无内容的分割线
         .filter((field, index, arr) => {
-          if(field.formType != 'separator') return true;
+          if(field.formType != "separator") return true;
 
           let next = arr[index + 1];
-          return null != next && next.formType != 'separator';
+          return null != next && next.formType != "separator";
         })
         // 根据分割线分组
         .forEach((f, index, filterArr) => {
-          if (f.formType === 'separator') {
+          if (f.formType === "separator") {
             newArr.push(filterArr.slice(preIndex, index));
             preIndex = index;
           }
@@ -422,11 +422,11 @@ const FormView = {
   render(createElement) {
     if (!this.fields.length || !Object.keys(this.value).length) return null;
     let groups = this.groupField(this.fields);
-    console.log(groups, 'form-view')
+    console.log(groups, "form-view")
     let domGroups = groups.map(group => {
       let currentGroupId = 0;
       
-      let title = group.filter(f => f.formType === 'separator').map(item => {
+      let title = group.filter(f => f.formType === "separator").map(item => {
         currentGroupId = item.id;
         if (this.sectionState[currentGroupId] === undefined) {
           this.$set(this.sectionState, currentGroupId, true);
@@ -434,8 +434,8 @@ const FormView = {
         return this.mapFieldToDom(item, createElement);
       });
 
-      let items = group.filter(f => f.formType !== 'separator').map(item => this.mapFieldToDom(item, createElement));
-      
+      let items = group.filter(f => f.formType !== "separator").map(item => this.mapFieldToDom(item, createElement));
+
       return (
         <div class="view-group">
           {title}

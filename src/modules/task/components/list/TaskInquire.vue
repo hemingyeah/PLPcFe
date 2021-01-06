@@ -29,81 +29,81 @@
 import {
   FormFieldMap,
   SettingComponents,
-} from "@src/component/form/components";
+} from '@src/component/form/components';
 /* api */
 import * as TaskApi from '@src/api/TaskApi.ts';
 import * as CustomerApi from '@src/api/CustomerApi.ts';
 
 /* utils */
-import _ from "lodash";
-import * as Utils from "@src/component/form/util";
+import _ from 'lodash';
+import * as Utils from '@src/component/form/util';
 
-import SearchProductSelect from "./SearchProductSelect.vue";
-import SearchCustomerSelect from "./SearchCustomerSelect.vue";
+import SearchProductSelect from './SearchProductSelect.vue';
+import SearchCustomerSelect from './SearchCustomerSelect.vue';
 
 // const TaskInquireFiltersFieldNames = ["cusAddress", "area", "tags"];
 const OperatorSelectOptionsMap = {
   input: [
-    { label: "包含", value: "like" },
-    { label: "等于", value: "eq" },
-    { label: "大于", value: "gt" },
-    { label: "大于等于", value: "ge" },
-    { label: "小于", value: "lt" },
-    { label: "小于等于", value: "le" },
+    { label: '包含', value: 'like' },
+    { label: '等于', value: 'eq' },
+    { label: '大于', value: 'gt' },
+    { label: '大于等于', value: 'ge' },
+    { label: '小于', value: 'lt' },
+    { label: '小于等于', value: 'le' },
   ],
   text: [
-    { label: "包含", value: "like" },
-    { label: "等于", value: "eq" },
+    { label: '包含', value: 'like' },
+    { label: '等于', value: 'eq' },
   ],
-  multiple: [{ label: "介于", value: "in" }],
-  description: [{ label: "包含", value: "like" }],
-  date: [{ label: "介于", value: "between" }],
-  select: [{ label: "等于", value: "eq" }],
-  cascader: [{ label: "包含", value: "cascader" }],
-  many: [{ label: "包含", value: "contain" }],
+  multiple: [{ label: '包含', value: 'in' }],
+  description: [{ label: '包含', value: 'like' }],
+  date: [{ label: '介于', value: 'between' }],
+  select: [{ label: '等于', value: 'eq' }],
+  cascader: [{ label: '包含', value: 'cascader' }],
+  many: [{ label: '包含', value: 'contain' }],
 };
 
 const MultiFieldNames = [
-  "serviceType",
-  "serviceContent",
-  "level",
-  "paymentMethod",
-  "state",
-  "allotTypeStr",
-  "onceException",
-  "allotUser",
-  "tags",
-  "synergyId",
-  "createUser",
-  "executor",
+  'serviceType',
+  'serviceContent',
+  'level',
+  'paymentMethod',
+  'state',
+  'allotTypeStr',
+  'onceException',
+  'allotUser',
+  'tags',
+  'synergyId',
+  'createUser',
+  'executor',
 ];
 
 function setFieldOperateHandler(field = {}) {
-  let { fieldName, formType, setting } = field;
+  let { fieldName, formType, setting, isSystem } = field;
 
-  if (formType == "number") {
+  if (formType == 'number') {
     field.operatorOptions = OperatorSelectOptionsMap.input.slice();
-  } else if (MultiFieldNames.indexOf(fieldName) > -1) {
+  } else if (MultiFieldNames.indexOf(fieldName) > -1 || (formType == 'select' && !setting.isMulti && !isSystem)) {
     field.operatorOptions = OperatorSelectOptionsMap.multiple.slice();
-  } else if (fieldName == "customer" || fieldName == "product") {
+  } else if (fieldName == 'customer' || fieldName == 'product') {
     field.operatorOptions = OperatorSelectOptionsMap.select.slice();
-  } else if (formType === "description" || fieldName === "eventNo") {
+  } else if (formType === 'description' || fieldName === 'eventNo') {
     field.operatorOptions = OperatorSelectOptionsMap.description.slice();
   } else if (
-    formType == "text" ||
-    formType == "textarea" ||
-    formType === "code" ||
-    formType === "relationProduct" ||
-    formType === "relationCustomer"
+    formType == 'text'
+    || formType == 'textarea'
+    || formType === 'code'
+    || formType === 'relationProduct'
+    || formType === 'relationCustomer'
   ) {
     field.operatorOptions = OperatorSelectOptionsMap.text.slice();
-  } else if (formType == "date" || formType == "datetime") {
+  } else if (formType == 'date' || formType == 'datetime') {
     field.operatorOptions = OperatorSelectOptionsMap.date.slice();
-  } else if (formType == "select" && !setting.isMult) {
+  } else if (formType == 'select' && !setting.isMulti) {
     field.operatorOptions = OperatorSelectOptionsMap.select.slice();
-  } else if (formType == "select" && setting.isMult) {
+  } else if (formType == 'select' && setting.isMulti) {
     field.operatorOptions = OperatorSelectOptionsMap.many.slice();
-  } else if (formType === "cascader") {
+  } else if (formType === 'cascader') {
     field.operatorOptions = OperatorSelectOptionsMap.cascader.slice();
   } else {
     field.operatorOptions = OperatorSelectOptionsMap.select.slice();
@@ -113,11 +113,11 @@ function setFieldOperateHandler(field = {}) {
 }
 
 export default {
-  name: "task-inquire",
+  name: 'task-inquire',
   props: {
     taskNums: {
       type: Array || null,
-      default: () => [], //已经存储的视图参数索引
+      default: () => [], // 已经存储的视图参数索引
     },
     inquireFormBackup: {
       type: Object,
@@ -137,7 +137,7 @@ export default {
     },
     type: {
       type: String,
-      default: "",
+      default: '',
     },
   },
   data() {
@@ -158,7 +158,7 @@ export default {
       this.fields;
     },
     inquireFormBackup(v) {
-      if (JSON.stringify(v) === "{}") {
+      if (JSON.stringify(v) === '{}') {
         this.list = [1];
       }
     },
@@ -180,12 +180,12 @@ export default {
 
         let formType = f.formType;
 
-        if (formType === "datetime") {
-          formType = "date";
+        if (formType === 'datetime') {
+          formType = 'date';
         }
 
-        if (formType === "updateTime") {
-          f.displayName = "更新时间";
+        if (formType === 'updateTime') {
+          f.displayName = '更新时间';
         }
 
         setFieldOperateHandler(f);
@@ -210,12 +210,12 @@ export default {
         for (let key in item.returnDatas()) {
           const value = item.returnDatas()[key];
           if (
-            value &&
-            JSON.stringify(value) !== "{}" &&
-            JSON.stringify(value) !== "[]"
+            value
+            && JSON.stringify(value) !== '{}'
+            && JSON.stringify(value) !== '[]'
           ) {
             data[key] = item.returnDatas()[key];
-          } else if (key === "tags" && item.returnDatas()[key].length) {
+          } else if (key === 'tags' && item.returnDatas()[key].length) {
             data[key] = item.returnDatas()[key];
           } else {
             // data[key] = item.returnDatas()[key];
@@ -236,66 +236,61 @@ export default {
     },
     create() {
       const { check_system_list, check_customize_list, check_list } = this;
-      this.$emit("setting", {
+      this.$emit('setting', {
         list: check_list,
         check_system_list,
         check_customize_list,
       });
-      this.list = [1];
     },
     matchOperator(field) {
       let formType = field.formType;
-      let operator = "";
+      let operator = '';
 
       switch (formType) {
-        case "date": {
-          operator = "between";
-          break;
-        }
-        case "datetime": {
-          operator = "between";
-          break;
-        }
-        case "select": {
-          if (field.setting && field.setting.isMulti) {
-            operator = "contain";
-          } else {
-            operator = "eq";
-          }
-          break;
-        }
-        case 'cascader': {
-          operator = 'cascader';
-          break;
-        }
-        case "user": {
-          operator = "user";
-          break;
-        }
-        case "address": {
-          operator = "address";
-          break;
-        }
-        case "cascader": {
-          operator = "cascader";
-          break;
-        }
-        case "location": {
-          operator = "location";
-          break;
-        }
-        case 'related_task': {
-          operator = 'array_eq';
-          break;
-        }
-        case 'formula': {
+      case 'date': {
+        operator = 'between';
+        break;
+      }
+      case 'datetime': {
+        operator = 'between';
+        break;
+      }
+      case 'select': {
+        if (field.setting && field.setting.isMulti) {
+          operator = 'contain';
+        } else {
           operator = 'eq';
-          break;
         }
-        default: {
-          operator = "like";
-          break;
-        }
+        break;
+      }
+      case 'user': {
+        operator = 'user';
+        break;
+      }
+      case 'address': {
+        operator = 'address';
+        break;
+      }
+      case 'cascader': {
+        operator = 'cascader';
+        break;
+      }
+      case 'location': {
+        operator = 'location';
+        break;
+      }
+      case 'related_task': {
+        operator = 'array_eq';
+        break;
+      }
+      case 'formula': {
+        operator = 'eq';
+        break;
+      }
+      default: {
+        operator = 'like';
+        break;
+      }
       }
       return operator;
     },
@@ -308,21 +303,21 @@ export default {
       this.checkSystemList = [];
       this.checkCustomizeList = [];
       this.check_list = this.check_list.filter((val, i) => {
-        return val !== v.displayName;
+        return val !== v.fieldName;
       });
 
       this.fields
         .filter((item, index) => {
           let bool = this.check_list.some((v) => {
-            return item.displayName === v;
+            return item.fieldName === v;
           });
           return bool;
         })
         .forEach((item) => {
           if (item.isSystem) {
-            this.checkSystemList.push(item.displayName);
+            this.checkSystemList.push(item.fieldName);
           } else {
-            this.checkCustomizeList.push(item.displayName);
+            this.checkCustomizeList.push(item.fieldName);
           }
         });
 
@@ -330,7 +325,7 @@ export default {
       this.check_customize_list = new Set(this.checkCustomizeList);
       this.list = this.list.map((v, i) => {
         if (index === i) {
-          v = "";
+          v = '';
         }
         return v;
       });
@@ -341,7 +336,7 @@ export default {
       if (item.isSystem) {
         this.checkSystemList = this.checkSystemList.map((v, i) => {
           if (index === i) {
-            v = item.displayName;
+            v = item.fieldName;
           }
           return v;
         });
@@ -350,12 +345,12 @@ export default {
             return index !== i;
           })
         ) {
-          this.checkSystemList.push(item.displayName);
+          this.checkSystemList.push(item.fieldName);
         }
       } else {
         this.checkCustomizeList = this.checkCustomizeList.map((v, i) => {
           if (index === i) {
-            v = item.displayName;
+            v = item.fieldName;
           }
           return v;
         });
@@ -364,7 +359,7 @@ export default {
             return index !== i;
           })
         ) {
-          this.checkCustomizeList.push(item.displayName);
+          this.checkCustomizeList.push(item.fieldName);
         }
       }
       this.check_system_list = new Set(this.checkSystemList);
@@ -377,7 +372,7 @@ export default {
   },
   components: {
     BatchForm: {
-      name: "batch-form",
+      name: 'batch-form',
       props: {
         inquireFormBackup: {
           type: Object,
@@ -405,7 +400,7 @@ export default {
         },
         item: {
           type: Number | String | Object,
-          default: "",
+          default: '',
         },
       },
       data: () => {
@@ -419,7 +414,7 @@ export default {
       },
       watch: {
         inquireFormBackup(v) {
-          if (JSON.stringify(v) === "{}") {
+          if (JSON.stringify(v) === '{}') {
             this.reset();
             this.buildForm();
           }
@@ -431,7 +426,7 @@ export default {
           }
         },
         fields(v) {
-          if (JSON.stringify(this.form) === "{}") {
+          if (JSON.stringify(this.form) === '{}') {
             this.reset();
             this.buildForm();
           }
@@ -443,9 +438,9 @@ export default {
         this.buildForm();
       },
       methods: {
-        /*自定义视图参数 */
+        /* 自定义视图参数 */
         customizeParams() {
-          this.form["backUp"] = { customer: {}, product: {} };
+          this.form['backUp'] = { customer: {}, product: {} };
           if (this.item && this.item.fieldName) {
             const {
               fieldName,
@@ -459,63 +454,65 @@ export default {
             } = this.item;
             this.selectField(fieldName);
             const types = [
-              "level",
-              "serviceContent",
-              "serviceType",
-              "paymentMethod",
-              "onceException",
-              "allotTypeStr",
-              "state",
-              "cascader",
+              'level',
+              'serviceContent',
+              'serviceType',
+              'paymentMethod',
+              'onceException',
+              'allotTypeStr',
+              'state',
+              'cascader',
             ];
             const personnel = [
-              "createUser",
-              "allotUser",
-              "executor",
-              "synergyId",
-              "user",
+              'createUser',
+              'allotUser',
+              'executor',
+              'synergyId',
+              'user',
             ];
             if (personnel.indexOf(fieldName) !== -1 || personnel.indexOf(formType) !== -1) {
               this.form[fieldName] = ids;
               ids.forEach((item, i) => {
                 this.userList.push({
                   id: item,
-                  name: content.split("，")[i]
+                  name: content.split('，')[i]
                 })
               })
             } else if (
-              types.indexOf(fieldName) !== -1 ||
-              types.indexOf(formType) !== -1
+              types.indexOf(fieldName) !== -1
+              || types.indexOf(formType) !== -1
             ) {
-              this.form[fieldName] = content.split("，");
-            } else if (fieldName === "tlmName") {
+              this.form[fieldName] = content.split('，');
+            } else if (fieldName === 'tlmName') {
               this.form[fieldName] = id;
               this.userList = [{id, name: content}]
-            } else if (formType === "datetime" || formType === "date") {
-              this.form[fieldName] = content.split("-");
-            } else if (fieldName === "customer") {
+            } else if (formType === 'datetime' || formType === 'date') {
+              this.form[fieldName] = content.split('-');
+            } else if (fieldName === 'customer') {
               this.form[fieldName] = id;
-              this.form["backUp"].customer = { name: content, value: id };
+              this.form['backUp'].customer = { name: content, value: id };
               this.customer = { name: content, value: id };
-            } else if (fieldName === "product") {
+            } else if (fieldName === 'product') {
               this.form[fieldName] = id;
-              this.form["backUp"].product = { name: content, value: id };
+              this.form['backUp'].product = { name: content, value: id };
               this.product = { name: content, value: id };
-            } else if (fieldName === "tags") {
+            } else if (fieldName === 'tags') {
               this.form[fieldName] = [];
               ids.forEach((item, i) => {
                 this.form[fieldName].push({
                   id: item,
-                  tagName: content.split("，")[i],
+                  tagName: content.split('，')[i],
                 });
               });
-            } else if (fieldName === "area") {
+            } else if (fieldName === 'area') {
               this.form[fieldName] = {
                 addressType: 0,
                 province,
                 city,
                 dist,
               };
+            } else if (!this.item.isSystem && formType === 'select' && this.item.setting && !this.item.setting.isMulti) {
+              this.form[fieldName] = content.split('，');
             } else {
               this.form[fieldName] = content;
             }
@@ -543,21 +540,21 @@ export default {
           this.fields.forEach((f) => {
             if (!this.form[f.fieldName] || !this.form[f.fieldName].length) {
               // 地址的默认值初始化为对象
-              let tv = "";
-              if (f.formType == "customerAddress" || f.formType == "address")
+              let tv = '';
+              if (f.formType == 'customerAddress' || f.formType == 'address')
                 tv = {};
-              if (f.formType == "date" || f.formType == "datetime") tv = [];
-              if (f.formType === "link") {
+              if (f.formType == 'date' || f.formType == 'datetime') tv = [];
+              if (f.formType === 'link') {
                 tv = {};
               }
-              if (f.fieldName === "tags") {
+              if (f.fieldName === 'tags') {
                 tv = [];
               }
-              if (f.formType === "area" || f.formType === "cascader") {
+              if (f.formType === 'area' || f.formType === 'cascader') {
                 tv = [];
               }
 
-              if (f.formType === "user") {
+              if (f.formType === 'user') {
                 tv = [];
               }
               if (MultiFieldNames.indexOf(f.fieldName) > -1) {
@@ -588,7 +585,7 @@ export default {
         searchProduct(params) {
           const pms = params || {};
 
-          pms.customerId = this.form.customer || "";
+          pms.customerId = this.form.customer || '';
           return TaskApi.getTaskCustonerProductList(pms)
             .then((res) => {
               if (!res || !res.list) return;
@@ -605,11 +602,11 @@ export default {
         },
         update(event, action) {
           this.form = {};
-          if (action === "tags") {
+          if (action === 'tags') {
             return (this.form.tags = event);
           }
 
-          if (action === "dist") {
+          if (action === 'dist') {
             return (this.form.area = event);
           }
           const f = event.field;
@@ -620,16 +617,19 @@ export default {
           this.selectedField = this.fields.filter(
             (f) => f.fieldName === val
           )[0];
-          this.$emit("setting", {
+          this.$emit('setting', {
             item: this.selectedField,
             index: this.index,
           });
           if(this.selectedField.formType === 'date') {
             this.form[val] = []
           }else {
-            this.form[val] = val == "tags" ? [] : "";
+            this.form[val] = val == 'tags' ? [] : '';
           }
           if (MultiFieldNames.indexOf(this.selectedField.fieldName) > -1) {
+            this.form[val] = [];
+          }
+          if (this.selectedField.formType === 'select' && !this.selectedField.isSystem && !this.selectedField.setting.isMulti) {
             this.form[val] = [];
           }
         },
@@ -673,7 +673,9 @@ export default {
         renderInput(h) {
           const f = this.selectedField;
           const comp = FormFieldMap.get(f.formType);
-          if (!comp || f.formType === "area") {
+          let setting;
+
+          if (!comp || f.formType === 'area') {
             return null;
           }
 
@@ -681,16 +683,20 @@ export default {
             f.setting.isMulti = true;
           }
 
+          if (f.formType === 'select' && !f.isSystem) {
+            setting = {setting:{dataSource: f.setting.dataSource, isMulti: !f.setting.isMulti}};
+          }
+
           let childComp = null;
 
-          if (f.fieldName == "customer") {
+          if (f.fieldName == 'customer') {
             let value = this.form[f.fieldName];
-            childComp = h("search-customer-select", {
+            childComp = h('search-customer-select', {
               props: {
-                placeholder: "请选择客户",
+                placeholder: '请选择客户',
                 field: f,
                 value: value
-                  ? [{ label: this.customer.name || "", value }]
+                  ? [{ label: this.customer.name || '', value }]
                   : [],
                 remoteMethod: this.searchCustomer,
               },
@@ -702,13 +708,13 @@ export default {
                 },
               },
             });
-          } else if (f.fieldName == "product") {
+          } else if (f.fieldName == 'product') {
             let value = this.form[f.fieldName];
-            childComp = h("search-product-select", {
+            childComp = h('search-product-select', {
               props: {
-                placeholder: "请选择产品",
+                placeholder: '请选择产品',
                 field: f,
-                value: value ? [{ label: this.product.name || "", value }] : [],
+                value: value ? [{ label: this.product.name || '', value }] : [],
                 remoteMethod: this.searchProduct,
               },
               on: {
@@ -719,8 +725,8 @@ export default {
                 },
               },
             });
-          } else if (f.formType === "user") {
-            childComp = h("user-search", {
+          } else if (f.formType === 'user') {
+            childComp = h('user-search', {
               props: {
                 multiple: true,
                 field: f,
@@ -732,25 +738,25 @@ export default {
                 update: (event) => this.update(event),
                 input: (event) => {
                   if (event && event.length > 1) {
-                    this.$set(this, "product", event[0]);
+                    this.$set(this, 'product', event[0]);
                   }
                   // this.form[f.fieldName] = event.keyword;
                 },
               },
             });
-          } else if (f.fieldName === "tags") {
+          } else if (f.fieldName === 'tags') {
             let value = this.form[f.fieldName];
-            childComp = h("biz-team-select", {
+            childComp = h('biz-team-select', {
               props: {
                 multiple: true,
                 value: value ? value : [],
               },
               on: {
-                input: (event) => this.update(event, "tags"),
+                input: (event) => this.update(event, 'tags'),
               },
             });
-          } else if (f.fieldName === "tlmName") {
-            childComp = h("linkman-search", {
+          } else if (f.fieldName === 'tlmName') {
+            childComp = h('linkman-search', {
               props: {
                 field: f,
                 value: this.form[f.fieldName],
@@ -768,7 +774,7 @@ export default {
                 : comp.build,
               {
                 props: {
-                  field: f,
+                  field: f.formType === 'select' && !f.isSystem ? {...f, ...setting} : f,
                   value: this.form[f.fieldName],
                   disableMap: true,
                   placeholder: Utils.genPlaceholder(f),
@@ -782,7 +788,7 @@ export default {
             );
           }
           return h(
-            "form-item",
+            'form-item',
             {
               props: {
                 label: f.displayName,
@@ -800,15 +806,15 @@ export default {
               <div
                 class={
                   this.columnNum === 2
-                    ? "task-flex task-ai task-mt12"
-                    : "task-mt12"
+                    ? 'task-flex task-ai task-mt12'
+                    : 'task-mt12'
                 }
               >
                 <div
                   class={
                     this.columnNum === 2
-                      ? "task-inquire-operator-select task-type"
-                      : "task-mt12 task-type"
+                      ? 'task-inquire-operator-select task-type'
+                      : 'task-mt12 task-type'
                   }
                 >
                   {this.renderSelector()}
@@ -816,8 +822,8 @@ export default {
                 <div
                   class={
                     this.columnNum === 2
-                      ? "task-inquire-operator-select task-type"
-                      : "task-mt12 task-type"
+                      ? 'task-inquire-operator-select task-type'
+                      : 'task-mt12 task-type'
                   }
                 >
                   {this.renderOperateSelect()}
@@ -825,20 +831,20 @@ export default {
                 <div
                   class={
                     this.columnNum === 2
-                      ? "task-inquire-two task-flex task-ai"
-                      : "task-inquire task-flex task-ai"
+                      ? 'task-inquire-two task-flex task-ai'
+                      : 'task-inquire task-flex task-ai'
                   }
                 >
                   {this.renderInput(h)}
                   {this.list.length - 1 === this.index ? (
                     <div
                       class={
-                        this.selectedField.displayName
-                          ? "task-font14 task-c13 task-inquire-add task-ml15 task-pointer"
-                          : "task-font14 task-c13 task-inquire-add task-pointer"
+                        this.selectedField.fieldName
+                          ? 'task-font14 task-c13 task-inquire-add task-ml15 task-pointer'
+                          : 'task-font14 task-c13 task-inquire-add task-pointer'
                       }
                       onClick={() => {
-                        this.$emit("add");
+                        this.$emit('add');
                       }}
                     >
                       添加
@@ -847,7 +853,7 @@ export default {
                     <i
                       class="iconfont icon-shanchu1 task-pointer task-ml15 task-icon"
                       onClick={() => {
-                        this.$emit("del", {
+                        this.$emit('del', {
                           index: this.index,
                           v: this.selectedField,
                         });

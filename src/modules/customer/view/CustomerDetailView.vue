@@ -196,27 +196,7 @@ export default {
       return this.customer.status == null || this.customer.status === 0
     },
     fields() {
-      // console.log(this.initData.fieldInfo, 'init_data');
-      // this.initData.fieldInfo.splice(6, 1, {
-      //   defaultValue: null,
-      //   displayName: '注册来源',
-      //   fieldName: 'serialNumber',
-      //   formType: 'icon',
-      //   guideData: false,
-      //   guideProfessions: [],
-      //   id: 481,
-      //   isDelete: 0,
-      //   isGuideData: false,
-      //   isNull: 1,
-      //   isSearch: 1,
-      //   isSystem: 1,
-      //   orderId: 6,
-      //   placeHolder: null,
-      //   setting: {},
-      //   tableName: 'customer',
-      //   tenantId: '7416b42a-25cc-11e7-a500-00163e12f748'
-      // });
-      const fields = (this.fieldInfo || []).sort(
+      const fields = (this.initData.fieldInfo || []).sort(
         (a, b) => a.orderId - b.orderId
       )
       return [
@@ -257,7 +237,6 @@ export default {
     },
     /** 当前用户的权限 */
     permission() {
-      // console.log(this.initData.loginUser.authorities);
       return this.initData.loginUser.authorities
     },
     allowDeleteCustomer() {
@@ -659,10 +638,13 @@ export default {
         const params = { ids: this.customer.id }
         const result = await this.$http.post('/customer/delete', params)
         if (!result.status) {
-          let fromId = window.frameElement.getAttribute('fromid')
-          this.$platform.refreshTab(fromId)
+          let id = window.frameElement.dataset.id
+          this.$platform.closeTab(id)
 
-          window.location.reload()
+          // let fromId = window.frameElement.getAttribute('fromid')
+          // this.$platform.refreshTab(fromId)
+
+          // window.location.reload()
         }
       } catch (e) {
         console.error('customer-detail-view deleteCustomer error', e)
@@ -704,6 +686,7 @@ export default {
           this.StatisticalData = res
           this.StatisticalData.callQuantity = callCount
           this.tabs = this.buildTabs()
+          localStorage.setItem('customer_remind_count',res.remindQuantity)
         })
         .catch(err => console.error('fetchStatisticalData', err))
     },

@@ -170,6 +170,8 @@ export default {
         .catch(err => console.error('err', err))
     },
     updateMethod(params) {
+      const remindCount=localStorage.getItem('customer_remind_count');
+      params.attribute.remindCount=remindCount || 0;
       this.$http
         .post(`/customer/update?id=${this.editId}`, params)
         .then(res => {

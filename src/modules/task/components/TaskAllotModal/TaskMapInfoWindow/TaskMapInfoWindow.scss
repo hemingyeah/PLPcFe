@@ -1,0 +1,43 @@
+.task-map-info-window {
+  position: absolute;
+  top: -10000px;
+  .map-info-window-content p {
+    display: flex;
+    & > label {
+      min-width: 60px;
+    }
+    & > span {
+      @include text-ellipsis-2();
+    }
+    i {
+      margin-left: 5px;
+    }
+  }
+  &-close {
+    background-color: transparent;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    margin: 0;
+    border: none;
+    outline: none;
+    transition: color ease 0.15s;
+
+    position: absolute;
+    top: 0px;
+    right: 0;
+    &:hover {
+      color: #e84040;
+    }
+  }
+}
+
+.map-task-content-window-header {
+  padding-right: 30px;
+  position: relative;
+}
+
+.map-task-content-window-header-plantime {
+  display: flex;
+  align-items: center;
+}

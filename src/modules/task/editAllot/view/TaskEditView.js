@@ -486,34 +486,25 @@ export default {
           this.togglePending(true)
           
           // 指派需要对比 现在的表单于上一次表单数据是否相同，不相同则更新工单数据
-          if (isAllot) {
-            // 是否是相同的工单数据
-            let isSameForm = true
-            try {
-              isSameForm = (
-                JSON.stringify(params) === JSON.stringify(this.backParams)
-                && Object.keys(this.backParams).length > 0
-              )
-            } catch (error) {
-              isSameForm = true
-            }
-            // 表单数据不相同
-            if (!isSameForm) {
-              this.backParams = params
-              let isFirstCreate = this.submitCount <= 1 && this.isTaskCreate
-              let taskMethodFunc = isFirstCreate ? this.createTaskMethod : this.updateTaskMethod
-              return taskMethodFunc(params, isAllot)
-            } 
-            
+          // 是否是相同的工单数据
+          let isSameForm = true
+          try {
+            isSameForm = (
+              JSON.stringify(params) === JSON.stringify(this.backParams)
+              && Object.keys(this.backParams).length > 0
+            )
+          } catch (error) {
+            isSameForm = true
+          }
+
+          // 表单数据不相同 或非指派
+          if (!isSameForm || !isAllot) {
+            this.backParams = params
+            let isFirstCreate = this.submitCount <= 1 && this.isTaskCreate
+            let taskMethodFunc = isFirstCreate ? this.createTaskMethod : this.updateTaskMethod
+            return taskMethodFunc(params, isAllot)
+          } else {
             return this.openAllotModel(this.allotTask)
-          }
-          
-          if (this.isTaskCreate) {
-            return this.createTaskMethod(params, isAllot)
-          }
-          
-          if (this.isTaskEdit) {
-            return this.updateTaskMethod(params, isAllot);
           }
           
         })
