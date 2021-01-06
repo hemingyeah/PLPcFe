@@ -155,8 +155,14 @@ class Guide {
 }
 
 function domGuide(arr = [], nowStep, storageKe, watchStepFn) {
-  let productPreFixedPath = GrayUtil.getProductV2ApiPath();
-  if (productPreFixedPath) {
+  let productPreFixedPath = false;
+  let guideType;
+  try {
+    guideType = arr[0].id.split('-')[0]
+  } catch (error) {
+    console.warn(error, 'error try catch');
+  }
+  if ((productPreFixedPath && guideType == 'product') || guideType != 'product') {
     return new Guide(arr, nowStep, storageKe, watchStepFn);
   }
   return {
