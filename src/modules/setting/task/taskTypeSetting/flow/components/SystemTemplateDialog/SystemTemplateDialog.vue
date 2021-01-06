@@ -247,7 +247,7 @@ export default {
             return receiptAttachmentColumns;
         },
         showAttachment() {
-            return !!taskTypeConfig.options.showAttachment;
+            return this.taskTypeConfig.options && !!this.taskTypeConfig.options.showAttachment;
         },
         cardAttachmentColumns() {
             let cardAttachmentColumns = [];
