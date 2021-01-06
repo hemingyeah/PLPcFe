@@ -103,7 +103,22 @@ export default {
                         ...cancelApproveSetting,
                         state: taskTypeConfig.allowCancel
                     }
-                } 
+                }
+
+                if(flowSetting[key].leader && flowSetting[key].leader.indexOf('formUser') > -1){
+                    flowSetting[key].approvers = [];
+                }
+
+                let multiApproverSetting = flowSetting[key].multiApproverSetting;
+                if(Array.isArray(multiApproverSetting)) {
+                    flowSetting[key].multiApproverSetting = multiApproverSetting.map(item => {
+                        if(item.leader && item.leader.indexOf('formUser') > -1){
+                            item.approvers = [];
+                        }
+
+                        return item;
+                    })
+                }
             });
             flowSetting.pause = {
                 state: allowPause,

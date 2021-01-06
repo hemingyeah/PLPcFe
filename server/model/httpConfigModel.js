@@ -3,10 +3,10 @@ const http = require('http')
 const https = require(isNotLocalEnv ? 'https' : 'http');
 // 默认配置
 const DEFAULT_OPIONS = {
-  host: '30.40.59.151',
-  port: 8080,
+  host: '30.40.58.216',
+  port: 8090,
   headers:{
-    'cookie':'VIPPUBLINKJSESSIONID=4597f93d-b3f3-4ca7-a89d-1da16984c215'
+    'cookie':'VIPPUBLINKJSESSIONID=282657ba-becc-4639-aa2a-f030da24671e'
   }
 };
 // https agent

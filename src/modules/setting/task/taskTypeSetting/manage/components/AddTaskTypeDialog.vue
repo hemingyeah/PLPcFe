@@ -100,7 +100,7 @@ export default {
     },
     data() {
         let validateTypeName = (rule, value, callback) => {
-            if (value === '') return callback(new Error('请输入密码'));
+            if (value === '') return callback(new Error('请输入工单类型名称'));
             if(value.length > 20) callback(new Error('名称不能超过20个字'));
             if(!/^[a-zA-Z0-9\u4e00-\u9fa5]+$/.test(value)) return callback(new Error('请输入中文、字母、数字'));
 

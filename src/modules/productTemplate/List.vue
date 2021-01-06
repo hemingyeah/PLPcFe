@@ -941,6 +941,7 @@ export default {
     },
     // 产品新建
     productCreate() {
+
       window.TDAPP.onEvent('pc：产品模板-新建事件');
 
       // window.location = '/product/create';

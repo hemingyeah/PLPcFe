@@ -20,9 +20,9 @@
         <label>节点：</label>
         <div class="form-view-row-content">{{ approve.action }}</div>
       </div>
-      <div class="form-view-row">
+      <div class="form-view-row" v-if="approve.id && approveContent()">
         <label>内容：</label>
-        <div class="form-view-row-content" v-if="approve.id">{{ approveContent() }}</div>
+        <div class="form-view-row-content">{{ approveContent() }}</div>
       </div>
       <div class="form-view-row">
         <label>发起人：</label>
@@ -102,7 +102,7 @@
     <div slot="footer" class="dialog-footer">
       <div class="dialog-footer-left"></div>
       <div class="dialog-footer-right">
-        <el-button @click="submit('fail')">拒绝</el-button>
+        <el-button type="danger" plain @click="submit('fail')">拒绝</el-button>
         <el-button type="primary" @click="submit('success')" :disabled="pending">审 批</el-button>
       </div>
     </div>

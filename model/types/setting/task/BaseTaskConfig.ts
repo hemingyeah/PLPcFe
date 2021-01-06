@@ -48,7 +48,7 @@ class BaseTaskConfig {
     color: String = 'rgb(115,127,124)';
 
     /**
-     * 表单人员 (工单表单/回执表单中必填的人员字段) todo_zr: 审批下拉框需要表单人员
+     * 表单人员 (工单表单/回执表单中必填的人员字段，现由/setting/getFromUser/接口单独获取）
      */
     formUser: any = null;
 

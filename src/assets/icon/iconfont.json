@@ -6,6 +6,76 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "4766688",
+      "name": "filter",
+      "font_class": "filter",
+      "unicode": "e7c7",
+      "unicode_decimal": 59335
+    },
+    {
+      "icon_id": "4767025",
+      "name": "upload",
+      "font_class": "upload1",
+      "unicode": "e7ef",
+      "unicode_decimal": 59375
+    },
+    {
+      "icon_id": "19202616",
+      "name": "排序",
+      "font_class": "paixu1",
+      "unicode": "e75c",
+      "unicode_decimal": 59228
+    },
+    {
+      "icon_id": "4766903",
+      "name": "cloud-download",
+      "font_class": "cloud-download",
+      "unicode": "e7d9",
+      "unicode_decimal": 59353
+    },
+    {
+      "icon_id": "6598317",
+      "name": "signal-fill",
+      "font_class": "signal-fill",
+      "unicode": "e8e9",
+      "unicode_decimal": 59625
+    },
+    {
+      "icon_id": "12494553",
+      "name": "地图",
+      "font_class": "ditu2",
+      "unicode": "e900",
+      "unicode_decimal": 59648
+    },
+    {
+      "icon_id": "4936520",
+      "name": "pie chart-circle-fil",
+      "font_class": "piechart-circle-fil",
+      "unicode": "e84b",
+      "unicode_decimal": 59467
+    },
+    {
+      "icon_id": "4936544",
+      "name": "calendar-fill",
+      "font_class": "calendar-fill",
+      "unicode": "e84d",
+      "unicode_decimal": 59469
+    },
+    {
+      "icon_id": "4936571",
+      "name": "detail-fill",
+      "font_class": "detail-fill",
+      "unicode": "e850",
+      "unicode_decimal": 59472
+    },
+    {
+      "icon_id": "4936634",
+      "name": "fund-fill",
+      "font_class": "fund-fill",
+      "unicode": "e860",
+      "unicode_decimal": 59488
+    },
+    {
       "icon_id": "19035006",
       "name": "菜单-产品",
       "font_class": "caidan-chanpin1",

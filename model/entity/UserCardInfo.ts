@@ -20,6 +20,12 @@ class UserCardInfo {
   department: string[] = []
   // 用户信息
   user: LoginUser = new LoginUser()
+  // 是否满意度前三
+  isPrecent: boolean = false
+  // 是否距离最近
+  isDistance: boolean = false
+  // 是否主管
+  isManager: boolean = false
 }
 
 export default UserCardInfo

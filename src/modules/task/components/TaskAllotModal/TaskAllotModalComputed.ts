@@ -1,19 +1,20 @@
+/* component */
+import UserCard from '@src/modules/task/components/TaskAllotModal/UserCard/UserCard.tsx'
 /* enum */
 import AuthEnum from '@model/enum/AuthEnum'
 import TaskStateEnum from '@model/enum/TaskStateEnum'
 import TaskAllotTypeEnum from '@model/enum/TaskAllotTypeEnum'
 import ComponentNameEnum from '@model/enum/ComponentNameEnum'
+/* entity */
+import Field from '@model/entity/Field'
 /* data */
 import TaskAllotModalData from '@src/modules/task/components/TaskAllotModal/TaskAllotModalData'
 /* util */
 import { findComponentDownward } from '@src/util/assist'
+/* types */
+import TaskConfig from '@model/types/TaskConfig'
 
 class TaskAllotModalComputed extends TaskAllotModalData {
-  
-  /* 工单派单负责人表格组件 */
-  get TaskAllotExcutorTableComponent(): any {
-    return findComponentDownward(this, ComponentNameEnum.TaskAllotUserTable)
-  }
   
   get allotContentStyle() {
     return {
@@ -49,19 +50,19 @@ class TaskAllotModalComputed extends TaskAllotModalData {
   /** 
    * @description 是否是工单创建人
   */
-  get isCreator() {
+  get isCreator(): boolean {
     let loginUser = this.loginUser || {}
     let createUser = this.task?.createUser || {}
-    return createUser.userId && loginUser.userId && createUser.userId == loginUser.userId
+    return Boolean(createUser.userId && loginUser.userId && createUser.userId == loginUser.userId)
   }
   
   /** 
    * @description 是否是工单负责人
   */
-  get isExecutor() {
+  get isExecutor(): boolean {
     let loginUser = this.loginUser || {}
     let executorUser = this.task?.executor || {}
-    return executorUser.userId && loginUser.userId && executorUser.userId == loginUser.userId
+    return Boolean(executorUser.userId && loginUser.userId && executorUser.userId == loginUser.userId)
   }
   
   /** 
@@ -78,6 +79,29 @@ class TaskAllotModalComputed extends TaskAllotModalData {
     return this.loadedComponents.includes(ComponentNameEnum.TaskAllotAuto)
   }
   
+  /**
+   * @description 是否显示工单池类型
+   * 1. 工单设置 -> 工单池 开启
+   * 2. 且该工单目前不在工单池中
+   * 3. 指派 或 转派并开启 转派工单池设置
+   */
+  get isShowTaskPoolType(): boolean {
+    return Boolean(
+      this.taskConfig.taskPoolOn === true
+      && !this.isTaskInTaskPool
+      && (!this.isReAllot || (this.isReAllot && this.taskConfig.reallotToPool === true))
+    )
+  }
+  
+  /**
+   * @description 是否显示自动派单类型
+   * 1. 工单设置 -> 自动派单 开启
+   * 2. 且非转派 (仅支持指派)
+   */
+  get isShowAutoDispatchType(): boolean {
+    return Boolean(this.taskConfig.autoDispatch === true && !this.isReAllot)
+  }
+  
   /** 
    * @description 当前工单是否在工单池中
   */
@@ -90,6 +114,56 @@ class TaskAllotModalComputed extends TaskAllotModalData {
   */
   get reallotRemarkNotNull(): boolean {
     return this.taskConfig?.reallotRemarkNotNull === true
+  }
+  
+  /** 
+   * @description 是否是工单创建人
+   * -- 供外部获取的
+  */
+  get outsideIsCreator(): boolean {
+    return this.isCreator
+  }
+  
+  /** 
+   * @description 是否是工单负责人
+   * -- 供外部获取的
+  */
+  get outsideIsExecutor(): boolean {
+    return this.isExecutor
+  }
+  
+  /** 
+   * @description 工单字段列表
+   * -- 供外部获取的
+  */
+  get outsideFields(): Field[] {
+    return this.fields || []
+  }
+  
+  /** 
+   * @description 工单信息
+   * -- 供外部获取的
+  */
+  get outsideTask(): any {
+    return this.task
+  }
+  
+  /** 
+   * @description 工单配置
+   * -- 供外部获取的
+  */
+  get outsideTaskConfig(): TaskConfig {
+    return this.taskConfig
+  }
+  
+  /* 工单派单负责人地图 人员卡片组件 */
+  get UserCardComponentWithTaskAllotExecutorMap(): UserCard {
+    return findComponentDownward(this.TaskAllotExcutorComponent, ComponentNameEnum.UserCard)
+  }
+  
+  /* 工单派单负责人地图 人员卡片组件 */
+  get UserCardComponentWithTaskAllotPool(): UserCard {
+    return findComponentDownward(this.TaskAllotPoolComponent, ComponentNameEnum.UserCard)
   }
 }
 

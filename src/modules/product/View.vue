@@ -475,7 +475,7 @@ export default {
       let res = await getProductFields({isFromSetting: false});
       this.dynamicProductFields = res.data || [];
     } catch (error) {
-      console.error('product-view fetch product fields error',error);
+      console.error('product-view fetch product fields error', error);
     }
     this.updateProductNameStyle();
     this.createCode();
@@ -658,6 +658,7 @@ export default {
         if(!result) return 
         this.statisticalData = result;
         this.tabs = this.buildTabs();
+        localStorage.setItem('product_remind_count',result.remindQuantity);
       })
         .catch(err => console.error(err))
     },

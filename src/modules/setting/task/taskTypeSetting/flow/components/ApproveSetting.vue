@@ -108,15 +108,15 @@ export default {
       let multiApproverSetting = [];
       if (val > 1) {
         for (let i = 0; i < val - 1; i++) {
-          if (!this.approveSetting.multiApproverSetting[i]) {
-            multiApproverSetting.push({
+          if (this.approveSetting.multiApproverSetting && this.approveSetting.multiApproverSetting[i]) {
+            multiApproverSetting.push(
+              this.approveSetting.multiApproverSetting[i]
+						);
+          } else {
+						multiApproverSetting.push({
               leader: "",
               approvers: [],
             });
-          } else {
-            multiApproverSetting.push(
-              this.approveSetting.multiApproverSetting[i]
-            );
           }
         }
 
@@ -140,14 +140,14 @@ export default {
       // 一级设置
       if (level <= 1) {
         approveSetting[key] = value;
-        if (key === "leader") {
+        if (key !== 'users') {
           approveSetting.approvers = [];
         }
       }
       // 多级设置
       if (level > 1) {
         approveSetting.multiApproverSetting[level - 2][key] = value;
-        if (key === "leader") {
+        if (key !== 'users') {
           approveSetting.approvers = [];
         }
       }

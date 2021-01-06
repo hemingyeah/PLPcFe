@@ -49,7 +49,9 @@ import {
   Upload,
   Collapse,
   CollapseItem,
-  Tree
+  Tree,
+  Carousel,
+  CarouselItem
 } from 'shb-element-ui';
 
 import CollapseTransition from 'shb-element-ui/lib/transitions/collapse-transition';
@@ -98,14 +100,16 @@ const ElementUI = {
     Vue.use(Row);
     Vue.use(OptionGroup);
     Vue.use(Message.name, Message);
-    Vue.use(Col.name, Col);
     Vue.use(Tree);
+    Vue.use(Col);
     
     Vue.component(Autocomplete.name, Autocomplete);
     Vue.component(CollapseTransition.name, CollapseTransition);
     Vue.use(Upload);
     Vue.use(Collapse);
     Vue.use(CollapseItem);
+    Vue.use(Carousel);
+    Vue.use(CarouselItem);
     
 
     Vue.prototype.$loading = Loading.service;
