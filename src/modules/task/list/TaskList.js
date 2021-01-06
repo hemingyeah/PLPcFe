@@ -12,7 +12,8 @@ import TaskTransfer from './components/TaskTransfer.vue';
 import TaskMap from './components/TaskMap.vue';
 import TaskView from './components/TaskView.vue'
 import TaskViewPane from '@src/modules/task/components/list/TaskViewPanel.vue';
-
+/* enum */
+import StorageModuleEnum from '@model/enum/StorageModuleEnum'
 /** model */
 import TaskStateEnum from '@model/enum/TaskStateEnum.ts';
 import { fields, selectIds, advancedList, allExport, Inquire } from './TaskFieldModel';
@@ -25,6 +26,8 @@ import { storageGet, storageSet } from '@src/util/storage';
 import { formatDate } from '@src/util/lang';
 import { getRootWindow } from '@src/util/dom';
 import * as FormUtil from '@src/component/form/util'
+// 新存储工具方法
+import * as StorageUtil from '@src/util/storage.ts'
 
 /* mixin */
 import tourGuide from '@src/mixins/tourGuide'
@@ -1015,8 +1018,8 @@ export default {
     /**
      * @description 构建列
      */
-    buildColumns() {
-      const localStorageData = this.getLocalStorageData();
+    async buildColumns() {
+      const localStorageData = await this.getIndexedDbData();
       const {
         paymentConfig
       } = this.initData;
@@ -1555,6 +1558,21 @@ export default {
       return JSON.parse(dataStr);
     },
     /**
+     * @description 获取本地db数据
+     */
+    async getIndexedDbData() {
+      let data = {}
+      
+      try {
+        data = await StorageUtil.storageGet(TASK_LIST_KEY, {}, StorageModuleEnum.Task)
+      } catch (error) {
+        data = {}
+        console.error('Caused ~ TaskList ~ getIndexedDbData ~ error', error)
+      }
+      
+      return data
+    },
+    /**
      * @description 获取行的key
      * @param {Object} row 行数据
      * @return {String} key
@@ -1940,20 +1958,26 @@ export default {
     },
     /**
      * @description 保存数据到本地存储
-     */
+    */
     saveDataToStorage(key, value) {
       const data = this.getLocalStorageData();
       data[key] = value;
       storageSet(TASK_LIST_KEY, JSON.stringify(data));
     },
     /**
+     * @description 保存数据到本地indexedDB
+    */
+    async saveDataToIndexedDb(key, value) {
+      const data = await this.getIndexedDbData()
+      data[key] = value
+      StorageUtil.storageSet(TASK_LIST_KEY, data, StorageModuleEnum.Task)
+    },
+    /**
      * @description 搜索之前处理
      */
     searchBefore() {
-     
       this.params.pageNum = 1;
       this.taskPage.list = [];
-
       this.search();
       this.trackEventHandler('search');
     },
@@ -2803,7 +2827,7 @@ export default {
         columnsStatus = columnsList;
       }
 
-      this.saveDataToStorage('columnStatus', columnsStatus);
+      this.saveDataToIndexedDb('columnStatus', columnsStatus);
     },
     /** 
      * @description 批量创建服务报告
