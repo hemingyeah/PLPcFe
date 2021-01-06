@@ -155,7 +155,7 @@ class Guide {
 }
 
 function domGuide(arr = [], nowStep, storageKe, watchStepFn) {
-  let productPreFixedPath = false;
+  let productPreFixedPath = GrayUtil.getProductV2ApiPath();
   let guideType;
   try {
     guideType = arr[0].id.split('-')[0]

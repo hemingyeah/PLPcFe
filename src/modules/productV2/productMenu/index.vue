@@ -219,32 +219,38 @@ export default {
         break;
       case 'cloneMenu':
         if (e.nowChooseArr && e.nowChooseArr.length > 0) {
-          cloneMenu({
-            cloneId: e.nowChooseArr[0],
-            catalogId: this.nowEditMenu.id,
-          }).then((res) => {
-            if (res.code == 0) {
-              this.$message({
-                message: '复制成功',
-                type: 'success',
-              });
-              window.parent.flashSomePage([{
-                type: 'M_PRODUCT_CATALOG',
-              }]);
-
-              this.$refs.workTreeData.reflashPage(e.nowChooseArr[0]);
-              this.changeTreeDetail('conData', 1)
-              this.changeVisibleProp(false);
-            } else {
-              this.$notify.error({
-                title: '网络错误',
-                message: res.message,
-                duration: 2000,
-              });
-            }
-          }).finally(() => {
-            this.$refs.publicDialog.changeBtnLoading(false);
+          this.$message({
+            message: '复制成功',
+            type: 'success',
           });
+          this.$refs.workTreeData.reflashPage(e.nowChooseArr[0]);
+          this.changeVisibleProp(false);
+          // cloneMenu({
+          //   cloneId: e.nowChooseArr[0],
+          //   catalogId: this.nowEditMenu.id,
+          // }).then((res) => {
+          //   if (res.code == 0) {
+          //     this.$message({
+          //       message: '复制成功',
+          //       type: 'success',
+          //     });
+          //     window.parent.flashSomePage([{
+          //       type: 'M_PRODUCT_CATALOG',
+          //     }]);
+
+          //     this.$refs.workTreeData.reflashPage(e.nowChooseArr[0]);
+          //     this.changeTreeDetail('conData', 1)
+          //     this.changeVisibleProp(false);
+          //   } else {
+          //     this.$notify.error({
+          //       title: '网络错误',
+          //       message: res.message,
+          //       duration: 2000,
+          //     });
+          //   }
+          // }).finally(() => {
+          //   this.$refs.publicDialog.changeBtnLoading(false);
+          // });
         } else {
           this.$refs.publicDialog.changeBtnLoading(false);
         }
