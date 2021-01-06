@@ -51,27 +51,25 @@
             :key="`${column.field}_${index}`"
             :prop="column.fieldName" 
             :label="column.displayName"
+            :show-overflow-tooltip="column.showTooltip"
             :min-width="column.minWidth || '120px'">
             <template slot-scope="scope">
               <!-- start 自定义字段 -->
-              <template v-if="scope.row.taskCardInfo[column.fieldName]">
                 <!-- start 多选 -->
                 <template v-if="isMulti(column)">
                   {{ (scope.row.taskCardInfo[column.fieldName] || []).join('，') }}
                 </template>
                 <!-- end 多选 -->
-
                 <template v-else>
-                  {{scope.row.taskCardInfo[column.fieldName]}}
+                  {{scope.row.taskCardInfo[column.fieldName] | fmt_form_field(column.formType, column.fieldName, scope.row.taskCardInfo)}}
                 </template>
-              </template> 
               <!-- end 自定义字段 -->
             </template>
           </el-table-column>
           <el-table-column prop="userName" label="操作人">
             <template slot-scope="scope">
               <template v-if="scope.row.taskCardInfo['userName']">
-                <template >
+                <template>
                   {{scope.row.taskCardInfo['userName']}}
                 </template>
               </template>
@@ -112,7 +110,7 @@
               <!-- end 开始结速时间 -->
 
               <template v-else>
-                {{ scope.row[column.fieldName] }}
+                {{ scope.row[column.fieldName] | fmt_form_field(column.formType, column.fieldName, scope.row) }}
               </template>
             </template>
           </el-table-column>
@@ -207,16 +205,10 @@ export default {
         if(this.card.specialfrom == '工时记录'){
           let fields = fieldUtil.toTableFields(cardFields[0].fields, this.card.config);
           return fields.filter(field => field.enabled == 1);
+        }else{
+          return fieldUtil.packCustomFields(cardFields[0].fields)
         }
-        return cardFields[0].fields.filter(i=>{
-          if(i.formType !== 'attachment'){
-            if(i.formType == 'datetime'){
-              i.minWidth = '160' ;
-            }
-                     
-            return  !i.isHidden && i.isVisible 
-          }
-        })    
+        return newCard 
       }
     }
   },

@@ -100,7 +100,7 @@ export default {
     justify-content: flex-start;
     padding-inline-start: 0;
     li {
-      width: 108px;
+      width: 101px;
       height: 50px;
       line-height: 50px;
       background: #ffffff;
@@ -122,7 +122,7 @@ export default {
     display: flex;
     flex-flow: wrap;
     .tabs-card-box{
-        width: 530px;
+        width: 440px;
         margin-right: 12px;
         margin-bottom: 12px;
         box-shadow: 0px 4px 10px 0px rgba(0, 0, 0, 0.04); 

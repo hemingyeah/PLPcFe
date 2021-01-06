@@ -86,9 +86,31 @@ function toTableFields(fields, config) {
     }
   ];
 }
+
+/** 
+ * @description 自定义字段特殊处理
+ */
+function packCustomFields(fields) {
+  let newCard = fields.filter(i=>{
+    if(i.formType !== 'attachment'){
+      if(i.formType == 'datetime'){
+        i.minWidth = '160px' ;
+      }
+      if(i.formType == 'related_task'){
+        i.minWidth = '160px' ;
+        i.showTooltip = true ;
+      }
+               
+      return !i.isHidden && i.isVisible 
+    }
+  }) 
+  return newCard
+}
+
 const fieldUtil = {
   packFields,
-  toTableFields
+  toTableFields,
+  packCustomFields
 }
 
 export default fieldUtil;
