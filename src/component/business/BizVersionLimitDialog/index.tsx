@@ -51,7 +51,7 @@ function initVersionLimitDialog(): Vue {
     }
   }
   
-  return mount(BizVersionLimitDialogHOC, ComponentNameEnum.BizVersionLimitDialogHOC)
+  return mount(BizVersionLimitDialogHOC, ComponentNameEnum.BizVersionLimitDialogHOC) as Vue
 }
 
 const BizVersionLimitDialog = {

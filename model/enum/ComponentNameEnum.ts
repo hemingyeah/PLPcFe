@@ -46,6 +46,8 @@ enum ComponentNameEnum {
   BizVersionLimitDialogHOC = 'biz-version-limit-dialog-hoc',
   // 版本混入组件
   VersionMixin = 'version-mixin',
+  // 空
+  Empty = 'empty',
 }
 
 export default ComponentNameEnum
