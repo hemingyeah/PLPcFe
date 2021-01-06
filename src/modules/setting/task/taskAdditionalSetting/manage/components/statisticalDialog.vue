@@ -54,15 +54,15 @@
             :min-width="column.minWidth || '120px'">
             <template slot-scope="scope">
               <!-- start 自定义字段 -->
-              <template v-if="scope.row.taskCardInfo.attribute[column.fieldName]">
+              <template v-if="scope.row.taskCardInfo[column.fieldName]">
                 <!-- start 多选 -->
                 <template v-if="isMulti(column)">
-                  {{ (scope.row.taskCardInfo.attribute[column.fieldName] || []).join('，') }}
+                  {{ (scope.row.taskCardInfo[column.fieldName] || []).join('，') }}
                 </template>
                 <!-- end 多选 -->
 
                 <template v-else>
-                  {{scope.row.taskCardInfo.attribute[column.fieldName]}}
+                  {{scope.row.taskCardInfo[column.fieldName]}}
                 </template>
               </template> 
               <!-- end 自定义字段 -->
@@ -70,18 +70,18 @@
           </el-table-column>
           <el-table-column prop="userName" label="操作人">
             <template slot-scope="scope">
-              <template v-if="scope.row.taskCardInfo.attribute['userName']">
+              <template v-if="scope.row.taskCardInfo['userName']">
                 <template >
-                  {{scope.row.taskCardInfo.attribute['userName']}}
+                  {{scope.row.taskCardInfo['userName']}}
                 </template>
               </template>
             </template>
           </el-table-column>
           <el-table-column prop="updateTime" label="操作时间" width="160" >
             <template slot-scope="scope">
-              <template v-if="scope.row.taskCardInfo.attribute['updateTime']">
+              <template v-if="scope.row.taskCardInfo['updateTime']">
                 <template >
-                  {{scope.row.taskCardInfo.attribute['updateTime'] | formatDate}}
+                  {{scope.row.taskCardInfo['updateTime'] | formatDate}}
                 </template>
               </template>
             </template>
@@ -177,14 +177,14 @@ export default {
     return {
       loading: true,
       visible: false,
-      totalElements:0,
+      totalElements: 0,
       form: {
         cardId: '',
         pageNum: 1,
         pageSize: 10,
         timeRange: '', // 2020/11/11 - 2020/12/10
         taskNoStr: '',
-        userNameStr: ''    
+        userNameStr: ''
       },
       tableData:[],
       cardFieldsData:[],
@@ -202,7 +202,7 @@ export default {
     * @description 表头设置
     */
     columns() {
-      let cardFields = this.cardFieldsData.filter((item)=>item.cardId == this.card.id);
+      let cardFields = this.cardFieldsData.filter(field=>field.cardId == this.card.id);
       if(cardFields.length > 0){
         if(this.card.specialfrom == '工时记录'){
           let fields = fieldUtil.toTableFields(cardFields[0].fields, this.card.config);
@@ -213,7 +213,8 @@ export default {
             if(i.formType == 'datetime'){
               i.minWidth = '160' ;
             }
-            return i
+                     
+            return  !i.isHidden && i.isVisible 
           }
         })    
       }
@@ -231,12 +232,12 @@ export default {
     */
     timeRange() {
       this.timeArrRange = [formatDate(new Date() - (29 * 24 * 60 * 60 * 1000), 'YYYY/MM/DD'), formatDate(new Date(), 'YYYY/MM/DD')];
-      this.form.timeRange = this.timeArrRange.join('-')
+      this.form.timeRange = this.timeArrRange.join(' - ')
     },
 
     onTimeChange(e) {
       if(e){
-        this.form.timeRange = this.timeArrRange.join('-')
+        this.form.timeRange = this.timeArrRange.join(' - ')
       }else{
         this.form.timeRange = [];
       }
@@ -332,8 +333,10 @@ export default {
 
         this.totalElements = res.total;
         if(this.card.specialfrom != '工时记录'){  
-          let newData = list.filter(item=> typeof item.taskCardInfo == 'object')
-          this.tableData = newData;
+          list.forEach(item=>{
+            item.taskCardInfo = item.taskCardInfo ? JSON.parse(item.taskCardInfo) : {}
+          })
+          this.tableData = list;
         }else{
           this.tableData = list;
         }

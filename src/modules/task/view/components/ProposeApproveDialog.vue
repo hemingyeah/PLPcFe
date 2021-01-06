@@ -38,19 +38,20 @@
             </el-row>
           </el-step>
           <!-- 二级以上审批步骤 -->
-          <el-step title="二级审批" status="process">
+          <el-step v-for="(item, idx) in multiApproverSetting" :key="idx" :title="`${cnNumName[idx + 2]}级审批`" status="process">
             <el-row slot="description" type="flex">
               <div class="form-item-control">
                 <form-user
-                  v-if="multiApproverSetting.isOpt === 1"
-                  :field="{ displayName: '二级审批人' }"
-                  v-model="multiApproverSetting.approver"
+                  v-if="item.isOpt === 1"
+                  :field="{ displayName: `${cnNumName[idx + 2]}级审批人` }"
+                  :value="item.approver"
+                  @input="(val) => updateApprover(val, idx)"
                   :see-all-org="true"
-                  placeholder="请选择二级审批人"
+                  :placeholder="`请选择${cnNumName[idx + 2]}级审批人`"
                 />
                 <div v-else>
                   <label><span class="form-item-required" v-if="remarkRequired">*</span>审批人：</label>
-                  {{multiApproverSetting.approversName}}
+                  {{item.approversName}}
                 </div>
               </div>
             </el-row>
@@ -86,7 +87,7 @@ export default {
       default: '',
     }
   },
-  data: () => {
+  data() {
     return {
       visible: false,
       pending: false,
@@ -95,15 +96,28 @@ export default {
       approver: {},
       approversName: '',
       approveLevel: 1, // 审批等级
-      multiApproverSetting: {} // 多级审批（2级以上审批）
+      multiApproverSetting: [], // 多级审批（2级以上审批）
     }
   },
   computed: {
     remarkPlaceholder() {
       return `请输入审批说明[最多500字]${this.remarkRequired ? '[必填]' : '[选填]'}`;
+    },
+    cnNumName() {
+      return ['零', '一', '二', '三', '四', '五', '六', '七', '八', '九'];
     }
   },
   methods: {
+    /**
+     * 更新多级选择的审批人
+     */
+    updateApprover(data, idx) {
+      console.log(data, idx);
+      this.$set(this.multiApproverSetting, idx, {
+        ...this.multiApproverSetting[idx],
+        approver: data
+      })
+    },
     openDialog(data) {
       // 重置
       this.approver = {};
@@ -119,17 +133,18 @@ export default {
       }
 
       this.approveLevel = data.level || 1;
-      this.multiApproverSetting = data.multiApproverSetting || {};
-      if(this.multiApproverSetting.approver === undefined) {
-        this.$set(this.multiApproverSetting, 'approver', {});
-      }
+      this.multiApproverSetting = data.multiApproverSetting ? [...data.multiApproverSetting] : [];
 
       this.visible = true;
     },
     submit() {
       // 审批人由发起人选择时
       if (this.chooseApprover && !this.approver.userId) return this.$platform.alert('请选择审批人');
-      if (this.multiApproverSetting.isOpt === 1 && !this.multiApproverSetting.approver.userId) return this.$platform.alert('请选择二级审批人');
+
+      for (let i = 0; i < this.multiApproverSetting.length; i++) {
+        const approve = this.multiApproverSetting[i];
+        if (approve.isOpt === 1 && !approve.approver.userId) return this.$platform.alert(`请选择${this.cnNumName[i + 2]}级审批人`);
+      }
 
       // 审批说明必填校验
       if (!this.apprForm.applyRemark && this.remarkRequired) return this.$platform.alert('请填写审批说明');
@@ -137,8 +152,11 @@ export default {
       if (this.chooseApprover) this.apprForm.params.approveId = this.approver.userId;
 
       // 多级审批参数
-      if(this.level > 1) {
-        if (this.multiApproverSetting.isOpt === 1) this.apprForm.params.multiApproverSetting.approveId = this.multiApproverSetting.approver.userId;
+      for (let i = 0; i < this.multiApproverSetting.length; i++) {
+        const approve = this.multiApproverSetting[i];
+        if(this.approveLevel > 1) {
+          if (approve.isOpt === 1) this.apprForm.params.multiApproverSetting[i].approveId = approve.approver.userId;
+        }
       }
       this.pending = true;
 

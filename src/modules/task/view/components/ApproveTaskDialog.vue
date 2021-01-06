@@ -63,11 +63,11 @@
         <el-step class="approve-step-item" v-for="(item, idx) in approverResult" :key="idx">
           <el-row slot="title" type="flex" justify="space-between">
             <h2>{{formatNumToCN(idx + 1)}}级审批</h2>
-            <p>2019-07-30 12:32:02</p>
+            <p>{{item.completeTime | fmt_datetime}}</p>
           </el-row>
           <div class="approve-step-item-desc" slot="description">
-            <label>审批人： </label>{{ item | formatApproveNames}}
-            <p>审批建议：</p>
+            <label>审批人： </label>{{ item.approverName }}
+            <p>审批建议： {{item.approveRemark}}</p>
           </div>
         </el-step>
         <!--E 已经审批的步骤 -->
@@ -102,7 +102,7 @@
     <div slot="footer" class="dialog-footer">
       <div class="dialog-footer-left"></div>
       <div class="dialog-footer-right">
-        <el-button @click="submit('fail')">拒绝</el-button>
+        <el-button type="danger" plain @click="submit('fail')">拒绝</el-button>
         <el-button type="primary" @click="submit('success')" :disabled="pending">审 批</el-button>
       </div>
     </div>
@@ -143,7 +143,7 @@ export default {
   },
   filters: {
     formatApproveNames(approvers) {
-      return approvers.map(item => item.displayName).jion(',');
+      return approvers.map(item => item.displayName).join(',');
     }
   },
   methods: {
