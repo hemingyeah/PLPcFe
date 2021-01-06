@@ -314,6 +314,7 @@ export default {
               if (item.fieldName == 'catalogName') item['maxlength'] = 30;
               if (item.fieldName == 'catalogNum') item['disabled'] = true;
               if (item.fieldName == 'productVideo') item['limit'] = 1;
+              if(item.formType == 'attachment') item['action'] = '/files/uploadVideo'
               return item;
             });
 

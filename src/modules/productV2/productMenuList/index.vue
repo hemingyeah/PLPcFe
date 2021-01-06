@@ -481,7 +481,7 @@ export default {
             f.formType !== 'separator'
             && f.formType !== 'info'
             && f.formType !== 'autograph'
-            && f.formType !== 'attachment'
+            && ( ( f.fieldName == 'productVideo' || f.fieldName == 'productPic' || f.fieldName == 'thumbnail' ) ? true : f.formType !== 'attachment')
         )
         .map((f) => {
           if (f.isSystem == 1) {
@@ -1045,7 +1045,7 @@ export default {
       this.columns = this.productFields
         .filter(
           (f) =>
-            f.formType !== 'attachment'
+            ( ( f.fieldName == 'productVideo' || f.fieldName == 'productPic' || f.fieldName == 'thumbnail' ) ? true : f.formType !== 'attachment')
             && f.formType !== 'separator'
             && f.formType !== 'info'
             && f.formType !== 'autograph'

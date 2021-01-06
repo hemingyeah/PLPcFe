@@ -10,7 +10,7 @@ export const FILE_MAX_NUM = 9;
 export const fileTypeObj = {
   xlsx : {
     fileName : 'xlsx',
-    errMsg : "只支持[xlsx]格式的文件，请重新选择"
+    errMsg : '只支持[xlsx]格式的文件，请重新选择'
   }
 };
 
@@ -25,7 +25,7 @@ export function validate(file, source){
   if(source == 'wiki') {
     // 验证文件大小
     if(file.size > WIKI_FILE_MAX_SIZE) return new Error(`文件[${fileName}]的大小超过50MB，系统暂不支持上传`);
-  } else  {
+  } else {
     // 验证文件大小
     if(file.size > FILE_MAX_SIZE) return new Error(`文件[${fileName}]的大小超过50MB，系统暂不支持上传`);
   }
@@ -143,6 +143,7 @@ function getResult(file, msg){
  * 上传失败会返回Error对象
  */
 export function uploadWithParse(file, action = '/files/upload', options = {}){
+  
   return upload(file, action, options)
     .then(msg => getResult(file, msg))
     .catch(error => getErrorResult(file, error))
@@ -160,6 +161,7 @@ export function batchUploadWithParse({files = {}, action = '/files/upload', opti
   return validateTenantStorage(options.validateStorage, files)
     .then(() => {
       let fileArr = toArray(files);
+      
       let validateRes = fileArr.map(item => validate(item, source)).filter(item => item instanceof Error);
       if(validateRes.length > 0){ // 文件验证失败
         return Promise.resolve(validateRes);
