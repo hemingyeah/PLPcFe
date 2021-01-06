@@ -85,7 +85,6 @@ export default {
       guideSearchModelSave: false,
       guideDropdownMenu: false,
       isGuide: false,
-      marTop: 197,
       // 显示详情向导
       showTaskDetailGuide: false,
       // 是否显示指派弹窗
@@ -656,13 +655,7 @@ export default {
      */
     collapseBtn() {
       this.$refs.container.scrollTop = 0; 
-      this.collapse = !this.collapse; 
-      
-      this.$nextTick(() => {
-        setTimeout(() => {
-          this.marTop = this.$refs.header.clientHeight + 25
-        }, 200)
-      })
+      this.collapse = !this.collapse;
     },
     /**
      * 滚动的距离
@@ -1217,8 +1210,6 @@ export default {
     } catch (e) {
       console.error('error ', e)
     }
-
-    this.marTop = this.$refs.header.clientHeight + 12
   },
   watch: {
     collapse(newValue) {

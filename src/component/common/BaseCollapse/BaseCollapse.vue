@@ -88,6 +88,7 @@ export default {
 
   &-left,
   &-right {
+    position: relative;
     max-width: 100%;
     min-width: 128px;
     height: 100%;
