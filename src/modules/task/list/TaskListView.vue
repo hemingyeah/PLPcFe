@@ -1020,20 +1020,20 @@
               :labels="tour.labels"
             >
               <template>
-                <div slot="content" class="tour-content-box">
-                  <div class="tour-left-tips">
+                <div slot="content" class="v-tour-content-box">
+                  <div class="v-tour-left-tips">
                     {{ `${index + 1}/${listSteps.length}` }}
                   </div>
-                  <div class="tour-content">
-                    <div class="flex-x tour-content-head">
+                  <div class="v-tour-content">
+                    <div class="flex-x v-tour-content-head">
                       <i @click="tour.stop" class="iconfont icon-fe-close"></i>
                     </div>
-                    <div class="tour-content-con">
+                    <div class="v-tour-content-con">
                       {{ listSteps[index].content }}
                     </div>
                   </div>
                 </div>
-                <div slot="actions" class="tour-bottom">
+                <div slot="actions" class="v-tour-bottom">
                   <!-- <div class="text" v-if="index > 0" @click="tour.previousStep">
                     上一步
                   </div> -->
@@ -1097,6 +1097,85 @@ export default TaskList;
     border-color: #fff !important;
     border-left-color: transparent !important;
     border-right-color: transparent !important;
+  }
+  .v-tour-content-box {
+    position: relative;
+    overflow: hidden;
+    padding: 0 20px;
+    border-radius: 4px;
+    .v-tour-left-tips {
+      width: 80px;
+      height: 32px;
+      background: $color-primary;
+      color: #fff;
+      position: absolute;
+      left: -40px;
+      top: 0px;
+      line-height: 40px;
+      font-size: 12px;
+      transform-origin: center top;
+      transform: rotateZ(-45deg);
+      text-align: center;
+    }
+    .v-tour-content {
+      .v-tour-content-head {
+        justify-content: flex-end;
+        padding-top: 16px;
+        .iconfont {
+          font-size: 10px;
+          margin-bottom: 2px;
+          color: #999;
+          cursor: pointer;
+        }
+      }
+      .v-tour-content-con {
+        text-align: start;
+        padding-bottom: 12px;
+      }
+    }
+  }
+
+  .v-tour-bottom {
+    height: 52px;
+    padding: 0 20px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    .btns {
+      width: 60px;
+      height: 28px;
+      background: $color-primary;
+      color: #fff;
+      text-align: center;
+      line-height: 28px;
+      border-radius: 4px;
+    }
+    .text {
+      color: $color-primary;
+    }
+    :nth-child(n) {
+      cursor: pointer;
+    }
+    :not(:last-child) {
+      margin-right: 12px;
+    }
+  }
+
+  /* 向上的箭头 */
+
+  .normal-arrow-top {
+    font-size: 0;
+    line-height: 0;
+    border-width: 0.5rem;
+    border-color: #fff;
+    width: 0;
+    border-top-width: 0;
+    border-style: dashed;
+    border-bottom-style: solid;
+    border-left-color: transparent;
+    border-right-color: transparent;
+    position: absolute;
+    top: -0.5rem;
   }
 
   .guide-model-box{
