@@ -1,4 +1,4 @@
-import {toArray} from "@src/util/lang";
+import {toArray} from '@src/util/lang';
 
 /** 将form对象转成产品对象，用于提交表单 */
 export function packToProduct(fields, form){
@@ -14,18 +14,18 @@ export function packToProduct(fields, form){
       attribute[f.fieldName] = form[f.fieldName];
     }
     
-    if (f.formType === "address" && !f.isSystem) {
+    if (f.formType === 'address' && !f.isSystem) {
       tv = form[f.fieldName];
-      let all = [tv.province, tv.city, tv.dist, tv.address].filter(str => !!str).join("");
+      let all = [tv.province, tv.city, tv.dist, tv.address].filter(str => !!str).join('');
 
       attribute[f.fieldName] = {
         ...tv,
       };
 
-      all ? attribute[f.fieldName]["all"] = all : "";
+      all ? attribute[f.fieldName]['all'] = all : '';
     }
   
-    if (f.formType === "location") {
+    if (f.formType === 'location') {
       attribute[f.fieldName] = {};
     }
   
@@ -43,11 +43,11 @@ export function packToProduct(fields, form){
   
 
   if(catalogId){
-    product["catalogId"] = catalogId[0].id
+    product['catalogId'] = catalogId[0]?.id || ''
   }
 
   if(qrcodeId){
-    product["qrcodeId"] = qrcodeId
+    product['qrcodeId'] = qrcodeId
   }
   
   if (id) {
@@ -120,7 +120,7 @@ export function packToForm(field, product){
       id:catalogId,
       pathName:product.catalogPathName
     }
-    form["catalogId"] = [obj]
+    form['catalogId'] = [obj]
   }
   
   return {
