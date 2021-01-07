@@ -139,7 +139,14 @@ export default {
   },
   created () {
     this.loop = setInterval(() => {
-      let res_ = this.domObj ? this.domObj().getBoundingClientRect() : document.getElementById(`${this.domId}`).getBoundingClientRect();
+      let res_;
+      try {
+        let dom = this.domObj ? this.domObj().getBoundingClientRect() : document.getElementById(`${this.domId}`);
+        if(dom) res_ = dom.getBoundingClientRect();
+      } catch (error) {
+        console.warn(error, 'error try catch');
+      }
+      if(!res_) return
       let style_ = '';
 
       if (document.documentElement.clientWidth - res_.left < 350) {
