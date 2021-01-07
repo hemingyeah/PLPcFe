@@ -1,4 +1,4 @@
-import { uniqBy } from 'lodash';
+import _ from 'lodash';
 
 export const flowRules = [{
   value: 'accept',
@@ -74,7 +74,7 @@ export const getFlowRuleOptions = (keys) => {
       let values = flowMapState[item] || [];
       option.push(...values)
     });
-    return uniqBy(option, 'value')
+    return _.uniqBy(option, 'value')
   } else if(keys){
     return flowMapState[keys] || []
   } 

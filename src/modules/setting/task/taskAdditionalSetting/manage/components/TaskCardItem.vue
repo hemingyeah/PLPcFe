@@ -40,10 +40,10 @@
           <i class="icon-diandiandian iconfont">更多操作</i>
           <el-dropdown-menu slot="dropdown">
             <el-dropdown-item>
-              <div class="opearte_btn" @click="editRename"><i class="iconfont icon-bianji1"></i>重命名</div>
+              <div class="opearte_btn" @click="editRename"><i class="iconfont icon-edit-square"></i>重命名</div>
             </el-dropdown-item>
             <el-dropdown-item>
-              <div class="opearte_btn" @click="delTaskCard"><i class="iconfont icon-shanchu-copy"></i>删除</div>
+              <div class="opearte_btn" @click="delTaskCard"><i class="iconfont icon-delete"></i>删除</div>
             </el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>

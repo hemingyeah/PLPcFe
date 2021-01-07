@@ -6,6 +6,27 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "2992341",
+      "name": "工单表单设置",
+      "font_class": "gongdanbiaodanshezhi",
+      "unicode": "e6e4",
+      "unicode_decimal": 59108
+    },
+    {
+      "icon_id": "2993739",
+      "name": "工单流程设置",
+      "font_class": "gongdanliuchengshezhi",
+      "unicode": "e6e5",
+      "unicode_decimal": 59109
+    },
+    {
+      "icon_id": "4045510",
+      "name": "add",
+      "font_class": "add3",
+      "unicode": "e6e6",
+      "unicode_decimal": 59110
+    },
+    {
       "icon_id": "4766688",
       "name": "filter",
       "font_class": "filter",
