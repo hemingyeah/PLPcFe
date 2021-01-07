@@ -1,3 +1,5 @@
+
+
 import guideCompoment from '@src/component/guide/Guide';
 
 import { storageGet, storageSet } from '@src/util/storage';
@@ -5,30 +7,29 @@ import { storageGet, storageSet } from '@src/util/storage';
 import GrayUtil from '@src/util/gray';
 
 import Vue from 'vue';
-import { reject } from 'lodash';
 
 // <div id="guide-test"></div>
 // this.$nextTick(()=>{
-//   this.$Guide("guide-test", [{
+//   this.$Guide([{
 //     content:
-// "步骤1",
+// '步骤1',
 //     haveStep: true,
 //     nowStep: 1,
-//     gStyle: "top:35px",
-//     id: "guide-test",
-//     finishBtn: "OK",
+//     gStyle: 'top:35px',
+//     id: 'guide-test',
+//     finishBtn: 'OK',
 //     needCover:true,
 //     diyContent:true,
 //     diyContentDom:组件名称
 //   }, {
 //     content:
-// "步骤2",
+// '步骤2',
 //     haveStep: true,
 //     nowStep: 2,
-//     gStyle: "top:35px",
-//     id: "guide-test",
-//     finishBtn: "OK",
-//   }], 0, "", (e)=>{
+//     gStyle: 'top:35px',
+//     id: 'guide-test',
+//     finishBtn: 'OK',
+//   }], 0, '', (e)=>{
 //     return new Promise((resolve, reject)=>{
 //       resolve()
 //     })
