@@ -114,6 +114,7 @@ class Guide {
           return (
             <guide-compoment
               totalStep={_this.arr.length}
+              canUse={obj.canUse}
               inside={obj.inside}
               nowStep={obj.nowStep}
               content={obj.content}

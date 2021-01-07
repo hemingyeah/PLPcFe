@@ -67,6 +67,7 @@
         <!-- start 服务电话 -->
         <div class="team-service-btn">
           <base-button type="success"
+                       v-if="productV2Gray"
                        id="product-team-list-1"
                        @event="openWxDialog">
             维护服务微信
@@ -134,7 +135,7 @@
 
     <!-- start 导入服务微信 -->
     <base-import title="维护服务微信"
-                 v-if="productV2Gray"
+                
                  ref="serviceWxModal"
                  :is-import-now="isImportNow"
                  @success="importServiceSuccess"

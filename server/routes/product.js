@@ -6,7 +6,7 @@ const router = new KoaRouter();
 const modules = require('../../modules');
 
 // 产品灰度 本地测试用 productV2  打包 上线需改为product
-const productGray = 'product'
+const productGray = 'productV2'
 /** start 产品 */
 router.get('/customer/product', async ctx => {
   // let script = ['/product.list.js'];
