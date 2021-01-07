@@ -164,6 +164,8 @@
                      @click="goProductEdit">V2新建产品</a>
                   <a href="javascript:;"
                      @click="resetGuide('productV2')">重置超级二维码引导</a>
+                  <a href="javascript:;"
+                     @click="resetGuide('taskV2')">重置工单引导</a>
                      <!-- <a href="javascript:;" @click="goCallCenterSetting">呼叫中心设置</a>
                   <a href="javascript:;" @click="goCallCenterWorkbench">呼叫工作台</a>
                   <a href="javascript:;" @click="goCallCenter">呼叫中心</a> -->
