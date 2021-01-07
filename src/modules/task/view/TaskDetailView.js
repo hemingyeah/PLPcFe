@@ -660,11 +660,8 @@ export default {
     /**
      * 滚动的距离
      */
-    getScroll({target}) {
-      const scrollTop = target.scrollTop;
-      if (scrollTop >= 80) {
-        this.collapse = false
-      }
+    getScroll() {
+      this.collapse = false
     },
     // 是否含有某一指定权限
     hasAuth(keys) {
