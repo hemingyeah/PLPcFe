@@ -794,7 +794,7 @@
                   </template>
 
                   <!-- 表单设计器特殊控件 -->
-                  <template v-else-if="['cascader', 'select', 'user', 'related_task'].includes(column.formType)">
+                  <template v-else-if="['cascader', 'select', 'user', 'related_task','relationProduct'].includes(column.formType)">
                     {{ scope.row[column.field] | fmt_form_field(column.formType, column.fieldName, scope.row.attribute)}}
                   </template>
 

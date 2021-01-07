@@ -511,8 +511,10 @@ export default {
           console.warn(err);
         });
     },
+    /** 刷新字段和表单必填人员 */
     refreshFields() {
-      console.log(this.mode);
+      this.getTaskFields(this.type);
+      this.fetchFromUser(this.taskTypeId);
     },
   },
   mounted() {
