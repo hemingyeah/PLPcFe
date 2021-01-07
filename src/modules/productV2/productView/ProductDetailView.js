@@ -433,7 +433,7 @@ export default {
       if (storageGet(PRODUCT_DETAIL) && storageGet(PRODUCT_DETAIL) > 0) this.$Guide().destroy('product-product-detail')
       else this.$Guide([{
         content:
-          '[详情资料] 信息展示',
+          '[详细信息] 信息展示',
         haveStep: true,
         nowStep: 1,
         id: 'product-product-detail',
