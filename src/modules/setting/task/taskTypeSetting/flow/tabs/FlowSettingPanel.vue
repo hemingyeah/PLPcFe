@@ -100,7 +100,7 @@ export default {
                 if(key === 'off') {
                     flowSetting[key] = {
                         ...flowSetting[key],
-                        ...cancelApproveSetting,
+                        ...this.formatApproveSetting(cancelApproveSetting),
                         state: taskTypeConfig.allowCancel
                     }
                 }
@@ -122,7 +122,7 @@ export default {
             });
             flowSetting.pause = {
                 state: allowPause,
-                ...pauseApproveSetting
+                ...this.formatApproveSetting(pauseApproveSetting)
             }
             delete flowSetting.autoReview;
             
