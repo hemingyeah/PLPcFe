@@ -141,7 +141,7 @@ export default {
     this.loop = setInterval(() => {
       let res_;
       try {
-        let dom = this.domObj ? this.domObj().getBoundingClientRect() : document.getElementById(`${this.domId}`);
+        let dom = this.domObj ? this.domObj() : document.getElementById(`${this.domId}`);
         if(dom) res_ = dom.getBoundingClientRect();
       } catch (error) {
         console.warn(error, 'error try catch');
