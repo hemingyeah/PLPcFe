@@ -394,62 +394,7 @@
     <download-code :code-data="downloadCodeData"
                    ref="downloadCodeDialog"></download-code>
 
-    <!-- tour s -->
-    <v-tour v-if="1 == 2"
-            name="myTour"
-            :steps="detailSteps"
-            :options="detailOptions"
-            :callbacks="myCallbacks">
-      <template slot-scope="tour">
-        <transition name="fade">
-          <template v-for="(step, index) of tour.steps">
-            <v-step v-if="tour.currentStep === index"
-                    :key="index"
-                    :step="step"
-                    :previous-step="tour.previousStep"
-                    :next-step="tour.nextStep"
-                    :stop="tour.stop"
-                    :is-first="tour.isFirst"
-                    :is-last="tour.isLast"
-                    :labels="tour.labels">
-              <template>
-                <div slot="content"
-                     class="tour-content-box">
-                  <div class="tour-left-tips">
-                    {{ `${index + 1}/${detailSteps.length}` }}
-                  </div>
-                  <div class="tour-content">
-                    <div class="flex-x tour-content-head">
-                      {{ detailSteps[index].title }}
-                    </div>
-                    <div class="tour-content-con">
-                      {{ detailSteps[index].content }}
-                    </div>
-                  </div>
-                </div>
-                <div slot="actions"
-                     class="tour-bottom">
-                  <!-- <div class="text" v-if="index > 0" @click="tour.previousStep">
-                    上一步
-                  </div> -->
-                  <div class="btns"
-                       v-if="index < detailSteps.length - 1"
-                       @click="tour.nextStep">
-                    下一步
-                  </div>
-                  <div v-if="index == detailSteps.length - 1"
-                       class="btns"
-                       @click="tour.stop">
-                    知道啦
-                  </div>
-                </div>
-              </template>
-            </v-step>
-          </template>
-        </transition>
-      </template>
-    </v-tour>
-    <!-- tour e -->
+ 
   </div>
 </template>
 

@@ -241,6 +241,7 @@ export default {
     .tour-content-head {
       justify-content: flex-end;
       padding-bottom: 10px;
+      padding-top: 16px;
       .iconfont {
         font-size: 10px;
         margin-bottom: 2px;
