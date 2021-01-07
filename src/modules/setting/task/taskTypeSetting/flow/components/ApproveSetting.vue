@@ -140,15 +140,16 @@ export default {
       // 一级设置
       if (level <= 1) {
         approveSetting[key] = value;
-        if (key !== 'users') {
+        if (approveSetting.leader !== 'users') {
           approveSetting.approvers = [];
         }
       }
       // 多级设置
       if (level > 1) {
-        approveSetting.multiApproverSetting[level - 2][key] = value;
-        if (key !== 'users') {
-          approveSetting.approvers = [];
+        let multiApproverSetting = approveSetting.multiApproverSetting[level - 2];
+        multiApproverSetting[key] = value;
+        if (multiApproverSetting.leader !== 'users') {
+          multiApproverSetting.approvers = [];
         }
       }
 

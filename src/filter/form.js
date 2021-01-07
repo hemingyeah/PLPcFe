@@ -23,6 +23,9 @@ export const fmt_form_field = function(value, formType, fieldName, attribute) {
             case 'related_task': // 关联工单
                 formatVal = fmt_form_related_task(attribute[fieldName]);
                 break;
+            case 'relationProduct': 
+                formatVal = fmt_form_array(attribute[fieldName]);
+                break;
             default: 
                 break;
         }
@@ -32,6 +35,7 @@ export const fmt_form_field = function(value, formType, fieldName, attribute) {
 }
 
 
+/** 多级菜单 */
 export function fmt_form_cascader(value) {
     if (!value) return null;
     if (value && typeof value === 'string') {
@@ -43,6 +47,7 @@ export function fmt_form_cascader(value) {
     return null;
 }
 
+/** 下拉 */
 export function fmt_form_select(value) {
     if (!value) return null;
     if (value && typeof value === 'string') {
@@ -54,6 +59,7 @@ export function fmt_form_select(value) {
     return null;
 }
 
+/** 人员（支持多选） */
 export function fmt_form_user(value) {
     // 多选
     if(Array.isArray(value)) {
@@ -64,8 +70,14 @@ export function fmt_form_user(value) {
     return user.displayName || user.name;
 }
 
+/** 关联工单 */
 export function fmt_form_related_task(value) {
     return Array.isArray(value) ? value.map(item => item.taskNo).join(',') : '';
+}
+
+/** 字符串数组 */
+export function fmt_form_array(value) {
+    return value && value.join(", ")
 }
 
 export default {

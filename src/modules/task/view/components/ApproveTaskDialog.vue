@@ -60,7 +60,7 @@
       <!-- S 多级审批 -->
       <el-steps v-else class="approve-steps" direction="vertical">
         <!--S 已经审批的步骤 -->
-        <el-step class="approve-step-item" v-for="(item, idx) in approverResult" :key="idx">
+        <el-step class="approve-step-item" v-for="(item, idx) in approve.approverResult" :key="idx">
           <el-row slot="title" type="flex" justify="space-between">
             <h2>{{formatNumToCN(idx + 1)}}级审批</h2>
             <p>{{item.completeTime | fmt_datetime}}</p>
@@ -74,7 +74,7 @@
         <!--S 当前审批的步骤 -->
         <el-step class="approve-step-item">
           <el-row slot="title" type="flex" justify="space-between">
-            <h2>{{formatNumToCN(approverResult.length + 1)}}级审批</h2>
+            <h2>{{formatNumToCN(approve.approverResult.length + 1)}}级审批</h2>
           </el-row>
           <div class="approve-step-item-desc" slot="description">
             <label>审批人： </label>{{ approve.approvers | formatApproveNames}}
@@ -87,9 +87,9 @@
         </el-step>
         <!--E 当前审批的步骤 -->
         <!--S 未到审批的步骤 -->
-        <el-step class="approve-step-item" v-for="(item, idx) in unApproverData" :key="idx">
+        <el-step class="approve-step-item" v-for="(item, idx) in approve.multiApprover" :key="idx">
           <el-row slot="title" type="flex" justify="space-between">
-            <h2>{{formatNumToCN(approverResult.length + idx + 2)}}级审批</h2>
+            <h2>{{formatNumToCN(approve.approverResult.length + idx + 2)}}级审批</h2>
           </el-row>
           <div class="approve-step-item-desc" slot="description">
             <label>审批人： </label>{{ item | formatApproveNames}}
@@ -102,7 +102,7 @@
     <div slot="footer" class="dialog-footer">
       <div class="dialog-footer-left"></div>
       <div class="dialog-footer-right">
-        <el-button type="danger" plain @click="submit('fail')">拒绝</el-button>
+        <el-button type="danger" plain @click="submit('fail')" :disabled="pending">拒绝</el-button>
         <el-button type="primary" @click="submit('success')" :disabled="pending">审 批</el-button>
       </div>
     </div>
@@ -131,8 +131,6 @@ export default {
       pending: false,
       approve: {},
       approveRemark: '',
-      unApproverData: [], // 未到审批节点信息
-      approverResult: [], // 已经审批节点信息
       currLevel: 1 // 当前审批层级
     };
   },
@@ -167,8 +165,6 @@ export default {
           if (res.status == 0) {
             this.approve = res.data;
             this.visible = true;
-            this.unApproverData = res.data.multiApprover || [];
-            this.approverResult = res.data.approverResult || [];
             this.currLevel = res.data.approverLevel;
           } else {
             this.$platform.alert(res.message);

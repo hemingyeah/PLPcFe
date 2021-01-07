@@ -5,18 +5,16 @@
       <textarea v-model="apprForm.applyRemark" :placeholder="remarkPlaceholder" rows="3" maxlength="500" />
       <!--S 审批步骤 -->
       <div class="approve-steps">
-        <el-row v-if="approveLevel === 1" type="flex">
-          <label><span class="form-item-required" v-if="remarkRequired">*</span>审批人：</label>
-          <div class="form-item-control">
-            <form-user
-              v-if="chooseApprover"
-              :field="{ displayName: '审批人' }"
-              v-model="approver"
-              :see-all-org="true"
-              placeholder="请选择审批人"
-            />
-            <template v-else>{{approversName}}</template>
-          </div>
+        <el-row v-if="approveLevel === 1">
+          <p>审批人：</p>
+          <form-user
+            v-if="chooseApprover"
+            :field="{ displayName: '审批人' }"
+            v-model="approver"
+            :see-all-org="true"
+            placeholder="请选择审批人"
+          />
+          <template v-else>{{approversName}}</template>
         </el-row>
         <el-steps v-else direction="vertical">
           <!-- 一级审批步骤 -->
@@ -31,7 +29,7 @@
                   placeholder="请选择一级审批人"
                 />
                 <div v-else>
-                  <label><span class="form-item-required" v-if="remarkRequired">*</span>审批人：</label>
+                  <label>审批人：</label>
                   {{approversName}}
                 </div>
               </div>
@@ -50,7 +48,7 @@
                   :placeholder="`请选择${cnNumName[idx + 2]}级审批人`"
                 />
                 <div v-else>
-                  <label><span class="form-item-required" v-if="remarkRequired">*</span>审批人：</label>
+                  <label>审批人：</label>
                   {{item.approversName}}
                 </div>
               </div>
@@ -139,10 +137,11 @@ export default {
     },
     submit() {
       // 审批人由发起人选择时
-      if (this.chooseApprover && !this.approver.userId) return this.$platform.alert('请选择审批人');
+      if (this.chooseApprover && !this.approver.userId) return this.$platform.alert(`请选择${this.approveLevel > 1 ? '一级' : ''}审批人`);
 
       for (let i = 0; i < this.multiApproverSetting.length; i++) {
         const approve = this.multiApproverSetting[i];
+        if(!approve.approver) return this.$platform.alert(`请选择${this.cnNumName[i + 2]}级审批人`);
         if (approve.isOpt === 1 && !approve.approver.userId) return this.$platform.alert(`请选择${this.cnNumName[i + 2]}级审批人`);
       }
 
