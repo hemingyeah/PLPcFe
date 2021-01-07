@@ -43,7 +43,11 @@ export function packToProduct(fields, form){
   
 
   if(catalogId){
-    product['catalogId'] = catalogId[0]?.id || ''
+    try {
+      product['catalogId'] = catalogId.id
+    } catch (error) {
+      console.warn(error, 'error try catch');
+    }
   }
 
   if(qrcodeId){
