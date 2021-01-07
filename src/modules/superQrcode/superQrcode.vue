@@ -7,7 +7,6 @@
                    id="product-superqrcode-set-1"
                    v-model="catalogId"
                    expand-trigger="hover"
-                   filterable
                    :options="catalogList"
                    :show-all-levels="false"
                    :props="{
