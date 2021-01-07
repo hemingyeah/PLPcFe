@@ -44,7 +44,7 @@ export function packToProduct(fields, form){
 
   if(catalogId){
     try {
-      product['catalogId'] = catalogId.id
+      product['catalogId'] = catalogId.id ? catalogId.id : catalogId[0].id
     } catch (error) {
       console.warn(error, 'error try catch');
     }
