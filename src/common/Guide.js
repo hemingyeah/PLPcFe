@@ -69,6 +69,7 @@ class Guide {
           );
         this.nowStep--;
         this.create();
+        resolve();
       });
     };
     this.nextStep = () => {
@@ -167,9 +168,7 @@ function domGuide(arr = [], nowStep, storageKe, watchStepFn) {
   }
   return {
     create: () => {
-      return new Promise((resolve, reject) => {
-        resolve(false)
-      })
+      return Promise.resolve(false)
     },
     destroy: () => {},
   };

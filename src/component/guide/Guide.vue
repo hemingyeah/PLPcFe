@@ -132,22 +132,26 @@ export default {
     };
   },
   methods: {
+    clearGuide(){
+      if (this.needCover) (this.domObj ? this.domObj() : document.getElementById(`${this.domId}`)).classList.remove('guide-point')
+      clearInterval(this.loop)
+    }
   },
   created () {
     this.loop = setInterval(() => {
       let res_ = this.domObj ? this.domObj().getBoundingClientRect() : document.getElementById(`${this.domId}`).getBoundingClientRect();
       let style_ = '';
 
-      if (window.innerWidth - res_.left < 350) {
-        style_ = `${style_};right:${window.innerWidth - res_.left - res_.width || 0}px`;
-        this.arrowStyle = 'right:20px';
+      if (document.documentElement.clientWidth - res_.left < 350) {
+        style_ = `${style_};right:${document.documentElement.clientWidth - res_.left - res_.width || 0}px`;
+        this.arrowStyle = `right:${((res_.width / 2) - 8) > 112 ? 112 : (res_.width / 2) - 8}px`;
       } else {
         style_ = `${style_};left:${res_.left || 0}px`
-        this.arrowStyle = 'left:20px';
+        this.arrowStyle = `left:${((res_.width / 2) - 8) > 112 ? 112 : (res_.width / 2) - 8}px`;
       }
       if (!this.inside) {
-        if (window.innerHeight - res_.top - res_.height < 400) {
-          style_ = `${style_};bottom:${window.innerHeight - res_.top + 12 || 0}px;`
+        if (document.documentElement.clientHeight - res_.top - res_.height < 400) {
+          style_ = `${style_};bottom:${document.documentElement.clientHeight - res_.top + 12 || 0}px;`
           this.arrowUp = false;
         } else {
           style_ = `${style_};top:${res_.top + res_.height + 12 || 0}px`
@@ -169,14 +173,12 @@ export default {
   watch: {
     showGuide (newVal, oldVal) {
       if (!newVal) {
-        if (this.needCover) (this.domObj ? this.domObj() : document.getElementById(`${this.domId}`)).classList.remove('guide-point')
-        clearInterval(this.loop)
+        this.clearGuide()
       }
     },
   },
   destroyed () {
-    if (this.needCover) (this.domObj ? this.domObj() : document.getElementById(`${this.domId}`)).classList.remove('guide-point')
-    clearInterval(this.loop)
+    this.clearGuide()
   }
 };
 </script>
@@ -238,7 +240,6 @@ export default {
   .tour-content {
     .tour-content-head {
       justify-content: flex-end;
-      padding-top: 16px;
       padding-bottom: 10px;
       .iconfont {
         font-size: 10px;
