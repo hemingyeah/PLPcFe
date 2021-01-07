@@ -1119,8 +1119,9 @@ export default TaskList;
     }
     .v-tour-content {
       .v-tour-content-head {
-        padding-top: 32px;
+        padding-top: 16px;
         padding-bottom: 10px;
+        justify-content: flex-end;
         .iconfont {
           font-size: 10px;
           margin-bottom: 2px;
