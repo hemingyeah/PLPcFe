@@ -426,8 +426,8 @@ export default TaskDetailView;
     }
     .v-tour-content {
       .v-tour-content-head {
-        justify-content: flex-end;
-        padding-top: 16px;
+        padding-top: 32px;
+        padding-bottom: 10px;
         .iconfont {
           font-size: 10px;
           margin-bottom: 2px;
