@@ -106,8 +106,7 @@ export default {
         })
 
         // 查询客户关联字段
-        let customerId = data.id || '';
-        this.selectCustomerRelation(customerId);
+        this.relationFieldSelectHandler();
         // 关闭弹窗
         this.addCustomerDialog = false;
 

@@ -328,7 +328,7 @@ export default {
 
         // 加延时异步是因为form-design的insertField方法更新value异步会导致选择多个关联项时只能插入一个
         setTimeout(() => {
-          this.$refs.formDesign.immediateInsert(field);
+          this.$refs.formDesign.immediateInsert(field, null, true);
         }, 0)
       }
     }
