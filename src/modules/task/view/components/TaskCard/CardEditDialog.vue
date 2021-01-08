@@ -1,7 +1,7 @@
 <template>
   <base-modal class="task-card-edit-dialog" :title="title" :show.sync="visible" width="700px" @closed="reset">
     <div class="base-modal-content" v-if="init">
-      <form-builder ref="form" :fields="fields" :value="form" @update="update">
+      <form-builder ref="form" :fields="fields" :value="form" @update="update" mode="task_card">
         <!-- start 用时时间 -->
         <template slot="usedTime" slot-scope="{ field, value }" v-if="isHoursRecord">
           <form-item :label="field.displayName">
@@ -116,7 +116,7 @@ export default {
     */
     submit() {
       this.$refs.form
-        .validate()
+        .validate(false)
         .then(async valid => {
           if (!valid) return Promise.reject('validate fail.');
 

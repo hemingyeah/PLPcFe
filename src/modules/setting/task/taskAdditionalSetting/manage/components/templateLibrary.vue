@@ -22,15 +22,16 @@
             <template v-if="cardItem.type!=='工时'">
               <el-button type="primary" class="preview" @click="previewCard(cardItem)">预览</el-button>
               <el-tooltip class="item" effect="dark" content="每个工单中填写一组该数据" placement="top">
-                <el-button type="primary" @click="importcard(cardItem.cardId,'single')">添加为单次</el-button>
+                <el-button type="primary" class="btn" @click="importcard(cardItem.cardId,'single')">添加为单次</el-button>
               </el-tooltip>
               <el-tooltip class="item" effect="dark" content="每个工单中填写多组该数据" placement="top">
-                <el-button type="primary" @click="importcard(cardItem.cardId,'multiple')">添加为多次</el-button>
+                <el-button type="primary" class="btn" @click="importcard(cardItem.cardId,'multiple')">添加为多次</el-button>
               </el-tooltip>  
             </template>   
             <template v-else>
+              <el-button type="primary" class="preview" @click="previewCard(cardItem)">预览</el-button>
               <el-tooltip class="item" effect="dark" content="每个工单中填写多组该数据" placement="top">
-                <el-button type="primary" @click="importcard(cardItem.cardId,'multiple')">添加</el-button>
+                <el-button type="primary" class="btn" @click="importcard(cardItem.cardId,'multiple')">添加</el-button>
               </el-tooltip>
             </template>
           </div>
@@ -183,12 +184,16 @@ export default {
         .task-card-footer{
             display: flex;
             justify-content: flex-end;
+            .btn{
+              width: 92px;
+            }
             .preview{
               background: #e7f9f9;
               border-color: #a1e7e7;
               color: #13C2C2;
 
             }
+            
         }
 
     }

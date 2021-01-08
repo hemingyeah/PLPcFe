@@ -50,3 +50,13 @@ export function fieldRepeatProductTemplate(params: {} | undefined) {
 export function fieldRepeatTask(params: {} | undefined) {
   return http.post(`${fixedPrefixTaskPath}/outside/pc/task/fieldRepeat`, params);
 }
+
+/**
+ * 附加组件字段唯一性校验
+ * @param {Object} params - 参数
+ * @param {String} params params.fieldName - 自定义字段fieldName
+ * @param {String} params params.fieldValue - 自定义字段value
+ */
+export function fieldRepeatCard(params: {} | undefined) {
+  return http.post(`${fixedPrefixTaskPath}/outside/pc/task/cardFieldRepeat`, params);
+}

@@ -35,7 +35,9 @@ export const fieldValidateMap = {
   product: FieldValidateApi.fieldRepeatProduct,
   productTemplate: FieldValidateApi.fieldRepeatProductTemplate,
   [TableNameEnum.Task]: FieldValidateApi.fieldRepeatTask,
-  [TableNameEnum.TaskReceipt]: FieldValidateApi.fieldRepeatTask
+  [TableNameEnum.TaskReceipt]: FieldValidateApi.fieldRepeatTask,
+  [TableNameEnum.TaskCard]: FieldValidateApi.fieldRepeatCard,
+
 }
 
 let remoteValidateDebounceFunc = null
@@ -273,7 +275,6 @@ function planTime(value, field = {}) {
 
 function number(value, field = {}, origin = {}, mode, changeStatus, isSample = true, formBuilderComponent = {}) {
   let { decimalConfig, limitConig, defaultValueConfig, isRepeat } = field.setting || {};
-  
   // 默认值是否允许修改
   let { isNotModify } = defaultValueConfig || {};
   let notModifyValue = isNotModify == 1 && !!field.defaultValue;

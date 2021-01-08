@@ -74,7 +74,8 @@ export const getFlowRuleOptions = (keys) => {
       let values = flowMapState[item] || [];
       option.push(...values)
     });
-    return _.uniqBy(option, 'value')
+    // return _.uniqBy(option, 'value')
+    return option
   } else if(keys){
     return flowMapState[keys] || []
   } 

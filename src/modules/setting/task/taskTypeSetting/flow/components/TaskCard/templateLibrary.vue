@@ -21,15 +21,15 @@
           <div class="task-card-footer">
             <template v-if="cardItem.type!=='工时'">
               <el-tooltip class="item" effect="dark" content="每个工单中填写一组该数据" placement="top">
-                <el-button type="primary" @click="importcard(cardItem,'single')">添加为单次</el-button>
+                <el-button type="primary" class="btn" @click="importcard(cardItem,'single')">添加为单次</el-button>
               </el-tooltip>
               <el-tooltip class="item" effect="dark" content="每个工单中填写多组该数据" placement="top">
-                <el-button type="primary" @click="importcard(cardItem,'multiple')">添加为多次</el-button>
+                <el-button type="primary" class="btn" @click="importcard(cardItem,'multiple')">添加为多次</el-button>
               </el-tooltip>
             </template>
             <template v-else>
               <el-tooltip class="item" effect="dark" content="每个工单中填写多组该数据" placement="top">
-                <el-button type="primary" @click="importcard(cardItem,'multiple')">添加</el-button>
+                <el-button type="primary" class="btn" @click="importcard(cardItem,'multiple')">添加</el-button>
               </el-tooltip>
             </template>
           </div>
@@ -178,6 +178,9 @@ export default {
         .task-card-footer{
             display: flex;
             justify-content: flex-end;
+            .btn{
+              width: 92px;
+            }
             .preview{
               &:hover{
                   background: #e7f9f9;

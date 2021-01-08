@@ -1,5 +1,5 @@
 import http from '@src/util/HttpUtil';
-const fixedPrefixTaskPath = "/api/task";
+const fixedPrefixTaskPath = '/api/task';
 /* ------------- start 附加组件设置 ---------------- */
 
 /**
@@ -122,6 +122,14 @@ export const taskCardFieldsSave = (params = {}) => {
  */
 export const deleteCardField = (params = {}) => {
   return http.post('/setting/task/cardField/delete', params, false)
+}
+
+/**
+ * @description 附加组件字段唯一性校验
+ * @param {Object} 
+ */
+export const cardFieldRepeat = (params = {}) => {
+  return http.post(`${fixedPrefixTaskPath}/outside/pc/task/cardFieldRepeat`, params, false)
 }
 
 /**
