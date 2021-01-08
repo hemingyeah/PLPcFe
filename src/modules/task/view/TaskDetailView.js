@@ -1042,7 +1042,7 @@ export default {
       return value === ENCRYPT_FIELD_VALUE;
     },
     buildButtonData() {
-      return [
+      let buttonData = [
         { name: '指派', type: 'primary', show: this.allowAllotTask, event: this.allot },
         { name: '接单', type: 'primary', show: this.allowPoolTask, event: () => { this.openDialog('acceptFromPool') } },
         { name: '接受', type: 'primary', show: this.allowAcceptTask, event: () => { this.openDialog('accept') } },
@@ -1057,6 +1057,8 @@ export default {
         { name: '审批', type: 'primary', show: this.allowApprove, event: () => { this.openDialog('approve') } },
         { name: '撤回审批', type: 'default', show: this.allowoffApprove, event: this.offApprove }
       ]
+
+      return buttonData.reverse();
     },
     /** 
      * 关闭并打开新的Tab
@@ -1181,7 +1183,7 @@ export default {
       if (query.active == 'balance' && this.viewBalanceTab && this.allowBalanceTask) {
         this.openDialog('balance');
       } else {
-        this.rightActiveTab = this.viewBalanceTab ? 'balance-tab' : this.viewFeedbackTab ? 'feedback-tab' : 'record';
+        // this.rightActiveTab = this.viewBalanceTab ? 'balance-tab' : this.viewFeedbackTab ? 'feedback-tab' : 'record';
       }
       
       // 是否显示详情向导
