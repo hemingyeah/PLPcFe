@@ -105,8 +105,11 @@ export default {
                 flowSetting[key] = {
                     state,
                     overTime,
-                    reallotAppr,
                     ...this.formatApproveSetting(approveSetting)
+                }
+
+                if(key === 'allot') {
+                    flowSetting[key].reallotAppr =  reallotAppr !== 'none';
                 }
 
                 if(key === 'off') {
@@ -146,7 +149,7 @@ export default {
                 minutes: Number(planRemindSetting.minutes),
                 minutesType: planRemindSetting.minutesType,
                 planningTimeState: 'notice',
-                planningTimeMes: noticeLeader,
+                planningTimeMes: noticeLeader ? ['none','leader','users'][Number(noticeLeader)] : 'none',
                 usersIds: noticeUsers.map(item => item.userId).join(','),
                 taskOverTimeModels: taskOverTimeModels.map(item => {
                     item.reminders = item.reminders || [];

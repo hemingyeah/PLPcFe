@@ -240,12 +240,6 @@ export default {
         }
       })
 
-      // 计划提醒设置
-      taskTypeConfig.planRemindSetting = {
-        ...planRemindSetting,
-        minutesType: taskTypeConfig.minutesType || 0,
-      }
-
       // 兼容旧超时提醒设置
       if(config.newOverTimeSetting === undefined || (config.newOverTimeSetting && config.newOverTimeSetting.length === 0)) {
         taskTypeConfig.taskOverTimeModels = taskTypeConfig.taskOverTimeModels.map(item => {
@@ -338,10 +332,13 @@ export default {
 
       this.pending = true;
         try {
-          await this.$refs.comp.submit();
-          await this.updateTaskTypeNameAndColor();
-          
-          this.fetchTasktype();
+          let res = await this.$refs.comp.submit();
+          if(res.status == 1) {
+            return this.$notify.error(res.message);
+          }else{
+            await this.updateTaskTypeNameAndColor();
+            this.fetchTasktype();
+          }
         } catch (error) {
           console.error(error);
         }finally {

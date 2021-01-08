@@ -3,7 +3,7 @@
     <li>
       <a href="/setting/task/taskSet" :class="current === 'taskSet' && 'active'">
         <i class="icon-gongdanbiaodanshezhi iconfont" ></i>
-        工单类型
+        工单设置
       </a>
     </li>
     <li>
