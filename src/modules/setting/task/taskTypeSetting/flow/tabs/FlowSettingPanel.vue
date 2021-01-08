@@ -92,6 +92,8 @@ export default {
                 approveSetting.multiApproverSetting = approveSetting.multiApproverSetting.map(item => this.formatApproveSetting(item));
             }
 
+            if(typeof approveSetting.leader === 'undefined') approveSetting.leader = '';
+
             return approveSetting;
         },
         /** 将数据转化成保存需要的数据结构 */
@@ -164,8 +166,12 @@ export default {
         async submit() {
             try {
                 let params = this.convertDataToParams();
-                await SettingApi.saveProcess(params);
-                this.$notify.success('保存成功');
+                let res = await SettingApi.saveProcess(params);
+                if(res.status == 1) {
+                    return this.$notify.error(res.message);
+                }else {
+                    this.$notify.success('保存成功');
+                }
             } catch (error) {
                 console.error('sumbit saveProcess => error', error);
             }

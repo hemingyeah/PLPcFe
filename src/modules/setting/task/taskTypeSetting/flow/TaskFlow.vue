@@ -246,7 +246,7 @@ export default {
           return {
             ...item,
             ...overTimeSetting,
-            remindType: overTimeSetting.remindType || null,
+            remindType: overTimeSetting.remindType == undefined ? null : overTimeSetting.remindType + '',
             reminders: overTimeSetting.reminders || []
           }
         })
@@ -254,7 +254,7 @@ export default {
         taskTypeConfig.taskOverTimeModels = config.newOverTimeSetting.map(item => {
           return {
             ...item,
-            remindType: overTimeSetting.remindType || null,
+            remindType: overTimeSetting.remindType == undefined ? null : overTimeSetting.remindType + '',
             reminders: item.reminders || []
           }
         })
@@ -332,13 +332,9 @@ export default {
 
       this.pending = true;
         try {
-          let res = await this.$refs.comp.submit();
-          if(res.status == 1) {
-            return this.$notify.error(res.message);
-          }else{
-            await this.updateTaskTypeNameAndColor();
-            this.fetchTasktype();
-          }
+          await this.$refs.comp.submit();
+          await this.updateTaskTypeNameAndColor();
+          this.fetchTasktype();
         } catch (error) {
           console.error(error);
         }finally {
