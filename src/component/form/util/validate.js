@@ -61,8 +61,27 @@ function select(field){
 function info (field) {
   let message = [];
   
-  if(field.placeHolder && field.placeHolder.length > config.INFO_FIELD_LENGTH_MAX){
-    message.push(`描述信息长度超过${config.INFO_FIELD_LENGTH_MAX}个字符`);
+  // if(field.placeHolder && field.placeHolder.length > config.INFO_FIELD_LENGTH_MAX){
+  //   message.push(`描述信息长度超过${config.INFO_FIELD_LENGTH_MAX}个字符`);
+  // }
+
+  return message;
+}
+
+function formula(fields, field) {
+  let message = [];
+  let formula = (field.setting && field.setting.formula) || [];
+  
+  // 验证是否存在已删除的无效字段
+  for(let i = 0; i < formula.length; i++) {
+    let index = fields.findIndex(field => field.fieldName == formula[i].value);
+    let field = fields[index];
+    let isDelete = !formula[i].isOperator && (!field || !!field.isHidden);
+
+    if(isDelete){
+      message.push('存在已删除或已隐藏的无效字段');
+      break;
+    }
   }
 
   return message;
@@ -80,12 +99,19 @@ export function validate(fields){
   return fields.map(field => {
     let message = common(field);
 
+    // 服务团队不需要校验
+    if(field.fieldName == 'tags') return; 
+
     if(isSelect(field) || isMultiSelect(field)){
       message = message.concat(select(field));
     }
 
     if(isInfo(field)) {
       message = message.concat(info(field));
+    }
+
+    if(field.formType == 'formula') {
+      message = message.concat(formula(fields, field));
     }
 
     return message.length > 0 ? {message, title: field.displayName} : null;

@@ -79,11 +79,11 @@ const MultiFieldNames = [
 ];
 
 function setFieldOperateHandler(field = {}) {
-  let { fieldName, formType, setting } = field;
+  let { fieldName, formType, setting, isSystem } = field;
 
   if (formType == 'number') {
     field.operatorOptions = OperatorSelectOptionsMap.input.slice();
-  } else if (MultiFieldNames.indexOf(fieldName) > -1) {
+  } else if (MultiFieldNames.indexOf(fieldName) > -1 || (formType == 'select' && !setting.isMulti && !isSystem)) {
     field.operatorOptions = OperatorSelectOptionsMap.multiple.slice();
   } else if (fieldName == 'customer' || fieldName == 'product') {
     field.operatorOptions = OperatorSelectOptionsMap.select.slice();
@@ -241,7 +241,6 @@ export default {
         check_system_list,
         check_customize_list,
       });
-      this.list = [1];
     },
     matchOperator(field) {
       let formType = field.formType;
@@ -296,21 +295,21 @@ export default {
       this.checkSystemList = [];
       this.checkCustomizeList = [];
       this.check_list = this.check_list.filter((val, i) => {
-        return val !== v.displayName;
+        return val !== v.fieldName;
       });
 
       this.fields
         .filter((item, index) => {
           let bool = this.check_list.some((v) => {
-            return item.displayName === v;
+            return item.fieldName === v;
           });
           return bool;
         })
         .forEach((item) => {
           if (item.isSystem) {
-            this.checkSystemList.push(item.displayName);
+            this.checkSystemList.push(item.fieldName);
           } else {
-            this.checkCustomizeList.push(item.displayName);
+            this.checkCustomizeList.push(item.fieldName);
           }
         });
 
@@ -329,7 +328,7 @@ export default {
       if (item.isSystem) {
         this.checkSystemList = this.checkSystemList.map((v, i) => {
           if (index === i) {
-            v = item.displayName;
+            v = item.fieldName;
           }
           return v;
         });
@@ -338,12 +337,12 @@ export default {
             return index !== i;
           })
         ) {
-          this.checkSystemList.push(item.displayName);
+          this.checkSystemList.push(item.fieldName);
         }
       } else {
         this.checkCustomizeList = this.checkCustomizeList.map((v, i) => {
           if (index === i) {
-            v = item.displayName;
+            v = item.fieldName;
           }
           return v;
         });
@@ -352,7 +351,7 @@ export default {
             return index !== i;
           })
         ) {
-          this.checkCustomizeList.push(item.displayName);
+          this.checkCustomizeList.push(item.fieldName);
         }
       }
       this.check_system_list = new Set(this.checkSystemList);
@@ -504,6 +503,8 @@ export default {
                 city,
                 dist,
               };
+            } else if (!this.item.isSystem && formType === 'select' && this.item.setting && !this.item.setting.isMulti) {
+              this.form[fieldName] = content.split('，');
             } else {
               this.form[fieldName] = content;
             }
@@ -594,7 +595,7 @@ export default {
         update(event, action) {
           this.form = {};
           if (action === 'tags') {
-            return (this.form.tags = event);
+            return (this.form.tags = event.map(item => {return item}));
           }
 
           if (action === 'dist') {
@@ -614,6 +615,9 @@ export default {
           });
           this.form[val] = val == 'tags' ? [] : '';
           if (MultiFieldNames.indexOf(this.selectedField.fieldName) > -1) {
+            this.form[val] = [];
+          }
+          if (this.selectedField.formType === 'select' && !this.selectedField.isSystem && !this.selectedField.setting.isMulti) {
             this.form[val] = [];
           }
         },
@@ -657,6 +661,8 @@ export default {
         renderInput(h) {
           const f = this.selectedField;
           const comp = FormFieldMap.get(f.formType);
+          let setting;
+
           if (!comp || f.formType === 'area') {
             return null;
           }
@@ -666,7 +672,7 @@ export default {
           }
 
           if (f.formType === 'select' && !f.isSystem) {
-            f.setting.isMulti = false;
+            setting = {setting:{dataSource: f.setting.dataSource, isMulti: !f.setting.isMulti}};
           }
 
           let childComp = null;
@@ -756,7 +762,7 @@ export default {
                 : comp.build,
               {
                 props: {
-                  field: f,
+                  field: f.formType === 'select' && !f.isSystem ? {...f, ...setting} : f,
                   value: this.form[f.fieldName],
                   disableMap: true,
                   placeholder: Utils.genPlaceholder(f),
@@ -821,7 +827,7 @@ export default {
                   {this.list.length - 1 === this.index ? (
                     <div
                       class={
-                        this.selectedField.displayName
+                        this.selectedField.fieldName
                           ? 'task-font14 task-c13 task-inquire-add task-ml15 task-pointer'
                           : 'task-font14 task-c13 task-inquire-add task-pointer'
                       }

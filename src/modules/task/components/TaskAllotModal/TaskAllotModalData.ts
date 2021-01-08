@@ -4,9 +4,12 @@ import LoginUser from '@model/entity/LoginUser/LoginUser'
 import TaskConfig from '@model/types/TaskConfig'
 import TaskAllotUserInfo from '@model/entity/TaskAllotUserInfo'
 import TaskType from '@model/entity/TaskType'
+import Tag from '@model/entity/Tag/Tag'
 /* enum */
 import TaskAllotTypeEnum from '@model/enum/TaskAllotTypeEnum'
 import ComponentNameEnum from '@model/enum/ComponentNameEnum'
+/* model */
+import { TaskAllotTypeModeEnum } from '@src/modules/task/components/TaskAllotModal/TaskAllotModalModel'
 /* props */
 import TaskAllotModalProps from '@src/modules/task/components/TaskAllotModal/TaskAllotModalProps'
 /* types */
@@ -17,12 +20,14 @@ import { TaskPoolNotificationTypeEnum } from '@src/modules/task/components/TaskA
 class TaskAllotModalData extends TaskAllotModalProps {
   /* 派单方式 */
   public allotType: TaskAllotTypeEnum = TaskAllotTypeEnum.Person
+  /* 派单方式 模式(列表，地图) */
+  public allotTypeMode: TaskAllotTypeModeEnum = TaskAllotTypeModeEnum.List
   /* 客户信息 */
   public customer: Customer = {}
+  /* 客户团队信息 */
+  public customerTags: Tag[] = []
   /* 负责人 */
   public executorUser: LoginUser | TaskAllotUserInfo | null = null
-  /* 是否是按团队派单 */
-  public isAllotByTag: boolean = true
   /* 是否使用匹配出的预估结果 */
   public isUsedResult: boolean = false
   /* 已经加载的组件列表 TODO: 实现 keep-alive component 功能 */
@@ -39,6 +44,8 @@ class TaskAllotModalData extends TaskAllotModalProps {
   public transferList: Array<string> = ['1','2','3']
   /* 转派选择的原因 */
   public customReason: string = ''
+  /* 是否显示清空派单结果 */
+  public showClearTaskAllotResultButton: boolean = false
   /* 是否显示派单弹窗 */
   public showTaskAllotModal: boolean = false
   /* 协同人列表 */
@@ -53,6 +60,10 @@ class TaskAllotModalData extends TaskAllotModalProps {
   public taskPoolNotificationUsers: LoginUser[] = []
   /* 工单类型数据 */
   public taskType: TaskType | null = null
+  /* 工单类型列表 */
+  public taskTypes: TaskType[] = []
+  /* 工单类型列表map */
+  public taskTypesMap: { [x: string]: TaskType} = {}
 }
 
 export default TaskAllotModalData

@@ -15,7 +15,8 @@
       <search-form :fields="fields" ref="searchForm" :form-backup="formBackup" :columnNum="columnNum"></search-form>
       <slot name="footer"></slot>
     </el-form>
-</base-panel></template>
+</base-panel>
+</template>
 
 <script>
 import { FormFieldMap, SettingComponents } from '@src/component/form/components';
@@ -61,7 +62,6 @@ export default {
       return [...this.config.fields, ...this.selfFields]
         .filter(f => (f.isSearch || f.isSystem) && f.fieldName !== 'qrcodeId' && f.fieldName !== 'customer')
         .map(field => {
-
           f = Object.assign({}, field);
 
           let formType = f.formType;
@@ -147,12 +147,24 @@ export default {
         operator = 'user';
         break;
       }
+      case 'cascader': {
+        operator = 'cascader';
+        break;
+      }
       case 'address': {
         operator = 'address';
         break;
       }
       case 'location': {
         operator = 'location';
+        break;
+      }
+      case 'related_task': {
+        operator = 'array_eq';
+        break;
+      }
+      case 'formula': {
+        operator = 'eq';
         break;
       }
       default: {
@@ -210,6 +222,7 @@ export default {
       }
 
       for(let i = 0;i < notSystemFields.length;i++) {
+        let key = null;
         tv = notSystemFields[i];
         fn = tv.fieldName;
 
@@ -241,6 +254,14 @@ export default {
           });
           continue;
         }
+        if (tv.formType === 'cascader') {
+          params.conditions.push({
+            property: fn,
+            operator: tv.operator,
+            inValue: form[fn]
+          });
+          continue;
+        }
 
         if (tv.formType === 'address') {
           let address = {
@@ -256,10 +277,15 @@ export default {
           continue;
         }
 
+        if (tv.originalFormType === 'related_task') {
+          key = "taskNo";
+        }
+
         params.conditions.push({
           property: fn,
           operator: tv.operator,
           value: form[fn],
+          key
         });
       }
 
@@ -323,7 +349,9 @@ export default {
             if (field.formType === 'tags') {
               tv = []
             }
-
+            if (field.formType === 'cascader' ) {
+              tv = []
+            }
             form[field.fieldName] = this.formBackup[field.fieldName] || tv;
 
             this.$set(this.form, field.fieldName, this.formBackup[field.fieldName] || tv)
@@ -334,11 +362,11 @@ export default {
         },
         update(event, isTags) {
           if (isTags) {
-            return this.form.tags = event;
+            return this.$set(this.form,'tags',event);
           }
 
           const f = event.field;
-          this.form[f.fieldName] = event.newValue;
+          this.$set(this.form,f.fieldName,event.newValue);
         },
         renderInput(h, field) {
           const f = {

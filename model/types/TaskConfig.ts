@@ -93,7 +93,7 @@ class TaskConfig {
   public taskReallot: boolean = true
   
   /**
-   * 预约时间
+   * 计划时间
    */
   public taskPlanTime: boolean = true
   /**

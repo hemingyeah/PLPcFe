@@ -41,3 +41,10 @@ export function isObject(object) {
 export function isFunction(func) {
   return func && typeOf(func) === 'function'
 }
+
+/**
+ * @description 是否为 null
+ */
+export function isNull(value){
+  return typeOf(value) === 'null'
+}

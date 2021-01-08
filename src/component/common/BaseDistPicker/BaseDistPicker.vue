@@ -84,6 +84,7 @@ export default {
         width: 100%;
         line-height: 21px;
         position: relative;
+        padding-right: 8px;
       }
 
     }

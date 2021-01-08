@@ -62,7 +62,7 @@
     <!-- end 新建/编辑 计划任务弹窗 -->
     
     <!-- start 分配弹窗 -->
-    <task-allot-modal v-if="Object.keys(allotTask).length > 0" ref="TaskAllotModal" :task="allotTask" :login-user="initData.loginUser"></task-allot-modal>
+    <task-allot-modal v-if="Object.keys(allotTask).length > 0" ref="TaskAllotModal" :fields="fields" :task="allotTask" :login-user="initData.loginUser"></task-allot-modal>
     <!-- end 分配弹窗 -->
     
   </div>

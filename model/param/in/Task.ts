@@ -124,7 +124,9 @@ export interface TaskUserCardSearchModel {
   // 开始时间 示例： 2020-10-01
   startTime: string
   // 结束时间 示例： 2020-10-01
-  endTime: string
+  endTime: string,
+  // 工单id
+  taskId: string
 }
 
 /* 工单派单-获取人员列表搜索model */
@@ -147,6 +149,8 @@ export interface TaskAllotUserSearchModel {
   code: number,
   lng?: number | null,
   lat?: number | null,
+  // 标签类型  0 主管  1 距离最近 2 好评率前三
+  label?: string,
   pageNum: number,
   pageSize: number
 }

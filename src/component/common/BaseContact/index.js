@@ -60,7 +60,8 @@ function dept(options){
       action,
       showDeptCheckbox: options.showDeptCheckbox === true,
       seeAllOrg: options.seeAllOrg || false, /** 是否 只可见本团队成员 */
-      departShow: options.departShow
+      departShow: options.departShow,
+      showDeleteUser: options.showDeleteUser || false, // 是否显示离职人员
     }
   });
 

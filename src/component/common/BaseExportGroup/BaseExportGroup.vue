@@ -26,7 +26,7 @@
       </el-checkbox-group>
     </div>
 
-    <div class="base-export-modal-content">
+    <div class="base-export-modal-content" v-if="needchooseBreak">
       <div class="base-export-modal-title">
         导出选项
       </div>
@@ -80,6 +80,7 @@
 
 <script>
 import baseExportMixin from '@src/mixins/baseExportMixin';
+import { string } from 'mathjs';
 
 let filterColumnsExpandLength = 0;
 let filterColumnsExpand = [];
@@ -111,6 +112,10 @@ export default {
      * 如果验证失败，promise需要返回错误信息，否则返回null
      */
     validate: Function,
+    needchooseBreak:{
+      type: Boolean | String,
+      default: true,
+    },
   },
   data() {
     let checkedMap = {};
@@ -167,7 +172,7 @@ export default {
           console.warn('Caused: base-export-group filter columns item has no columns');
         }
 
-        item.columns = columns.filter((column) => column.export);
+        item.columns = columns.filter((column) => column.export && column.formType != 'attachment');
 
         filterColumnsExpandLength += item.columns.length;
         filterColumnsExpand.push(...item.columns);

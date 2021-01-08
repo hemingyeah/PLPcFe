@@ -1,11 +1,13 @@
 <template>
   <div class="form-attachment">
-    <base-upload @input="input" :value="value" :for-id="`form_${field.fieldName}`" :placeholder="placeHolder"></base-upload>
+    <base-upload @input="input" :is-water-mark="isWaterMark" :value="value" :action="field.action" :limit="field.limit || defautUploadMax" :for-id="`form_${field.fieldName}`" :placeholder="placeHolder"></base-upload>
   </div>
 </template>
 
 <script>
 import FormMixin from '@src/component/form/mixin/form';
+
+import Uploader from '@src/util/uploader';
 
 export default {
   name: 'form-attachment',
@@ -14,6 +16,12 @@ export default {
     value: {
       type: Array,
       default: () => []
+    }
+  },
+  data() {
+    return {
+      isWaterMark: false,
+      defautUploadMax:Uploader.FILE_MAX_NUM
     }
   },
   computed: {
@@ -27,6 +35,12 @@ export default {
       this.$emit('update', {newValue, oldValue, field: this.field});
       this.$emit('input', newValue);
     }
+  },
+  mounted() {
+    let { setting } = this.field;
+    setting = setting || {};
+    // 图片是否添加水印
+    this.isWaterMark = !!setting.isAddWatermark;
   }
 }
 </script>

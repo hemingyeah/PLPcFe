@@ -25,6 +25,13 @@
 .no-padding-left{
   padding-left: 0 !important;
 }
+.no-position {
+  position: relative !important;
+  top: 0 !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+}
 
 .pre-line{
   white-space: pre-line !important;

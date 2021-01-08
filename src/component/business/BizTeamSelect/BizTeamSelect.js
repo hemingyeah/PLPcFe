@@ -158,7 +158,6 @@ const BizTeamSelect = {
       let index = this.value.findIndex(item => item.id === value.id);
       index >= 0 ? this.value.splice(index, 1) : this.value.push(value);
       
-      this.value = this.value.map(item => {return item})
       this.$emit('input', this.value);
       this.updatePopper();
     },

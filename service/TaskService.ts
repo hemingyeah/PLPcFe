@@ -18,6 +18,26 @@ import LeaderEnum from '@model/enum/LeaderEnum'
 import FlowSetting from '@model/types/FlowSetting'
 /* util */
 import { isArray, isString } from '@src/util/type'
+import { getRootWindow } from '@src/util/dom'
+import Log from '@src/util/log.ts'
+
+/** 
+ * @description 获取初始化数据
+*/
+function getInitData(): any | null {  
+  try {
+    const RootWindow: any = getRootWindow(window)
+    const RootWindowInitData = JSON.parse(RootWindow._init)
+    
+		return RootWindowInitData || {}
+	
+  } catch (error) {
+    Log.error(error, getInitData.name)
+    return {}
+  }
+}
+/* 初始数据 */
+const InitData = getInitData()
 
 // 有重复的代码，后续优化
 
@@ -278,4 +298,19 @@ function getApproversName(flowSetting: FlowSetting, task: Task | null, result: a
 	approversName = approvers.map((user: LoginUser) => user.displayName).join(', ')
   
 	return approversName
+}
+
+/** 
+ * @description 是否是工单创建人
+*/
+export function isCreator(task: any = {}): boolean {
+	let loginUser = InitData?.user || {}
+	let createUser = task?.createUser || {}
+	// 工单创建人存在 且 登录用户存在 且 相等
+	return createUser.userId && loginUser.userId && createUser.userId == loginUser.userId
+}
+
+export default {
+	checkApprove,
+	getFieldValue2string
 }

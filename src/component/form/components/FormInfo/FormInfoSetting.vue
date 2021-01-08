@@ -1,11 +1,15 @@
 <template>
-  <div class="form-setting-panel">
-    <h3>基础字段 -- {{ setting.name }}</h3>
-    <!-- <div class="form-setting-group">
-      <input type="text" placeholder="[必填] 请输入字段标题" data-prop="displayName" :value="field.displayName" @input="updateForDom" :maxlength="nameMaxLength">
-    </div> -->
+  <div class="form-setting-panel form-ql-editor">
+    <!--富文本编辑器 -->
+    <div class="form-setting-group form-setting-group-small form-common-setting">
+      <div class="form-common-setting-panel">
+        <h4 class="form-item-title">{{ setting.name }}</h4>
+      </div>
+      <base-editor :placeholder="placeHolder"  v-model="field.placeHolder" @input="getInput" ref="editor" :toolbarOptions="toolbarOptions" :maxLength="maxLength"></base-editor>
+    </div>
     <div class="form-setting-group">
-      <textarea :placeholder="placeHolder" rows="3" data-prop="placeHolder" :value="field.placeHolder" @input="updateForDom" :maxlength="maxLength"></textarea>
+      <p class="form-item-text-msg">您可以在表单中放置一段内容说明来引导用户进行内容填写，效果图示：</p>
+      <img class="form-item-msg-img" src="@src/assets/img/info.jpg"/>
     </div>
   </div>
 </template>
@@ -13,7 +17,7 @@
 <script>
 import SettingMixin from '@src/component/form/mixin/setting';
 import { settingProps } from '@src/component/form/components/props';
-
+import { toolbarOptions } from './editorOption';
 import {INFO_FIELD_LENGTH_MAX} from '../../config';
 import {PLACE_HOLDER} from './config';
 
@@ -31,7 +35,17 @@ export default {
       default: INFO_FIELD_LENGTH_MAX
     }
   },
+  computed:{
+    toolbarOptions(){
+      return toolbarOptions
+    }
+  },
   methods: {
+    // 获取带格式的文章内容
+    getInput (html) {
+      this.update(html,'placeHolder');
+    },
+
     updateForDom (event) {
       let el = event.target;
       let prop = el.dataset.prop;
@@ -45,4 +59,22 @@ export default {
   }
 }
 </script>
+<style lang="scss">
+@import './FormInfo.scss';
+.form-ql-editor{
+  .form-item-text-msg{
+    color: #666666;
+    font-size: 12px;
+    line-height: 17px;
+    margin-block-start: 0em;
+    margin-block-end: 0em;
+  }
+  .form-item-msg-img{
+    width: 90%;
+    display: flex;
+    flex: 1;
+  }
+
+}
+</style>
 

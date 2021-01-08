@@ -422,7 +422,7 @@ class AllotRuleModalMethods extends AllotRuleModalComputed {
     if (according === RuleAccordingMap[RuleTypeEnum.Type]) {
       this.form.type = RuleTypeEnum.Type
       typeData[RuleTypeEnum.Type] = typeInfo.map(taskType => {
-        return { id: taskType.id || '', name: taskType.name || '', value: taskType.id || '', label: taskType.name || '' }
+        return { id: taskType.id || '', name: taskType.name || '', value: taskType.id || '', label: taskType.name || '', templateId: taskType.id || '' }
       })
     }
     

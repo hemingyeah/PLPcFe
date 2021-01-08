@@ -15,7 +15,8 @@
       <search-form :fields="fields" ref="searchForm" :form-backup="formBackup" :column-num="columnNum"></search-form>
       <slot name="footer"></slot>
     </el-form>
-</base-panel></template>
+  </base-panel>
+</template>
 
 <script>
 import { FormFieldMap, SettingComponents } from '@src/component/form/components';
@@ -147,7 +148,6 @@ export default {
           f.fieldName !== 'customerAddress' &&
           f.fieldName !== 'lmName')
         .map(field => {
-
           f = _.cloneDeep(field);
 
           let formType = f.formType;
@@ -174,7 +174,7 @@ export default {
             formType,
             originalFormType: f.formType,
             orderId: f.isSystem ? f.orderId - 100 : f.orderId,
-            operator: this.matchOperator(f)
+            operator: this.matchOperator(f),
           })
         })
         .sort((a, b) => a.orderId - b.orderId);
@@ -218,6 +218,10 @@ export default {
         }
         break;
       }
+      case 'cascader': {
+        operator = 'cascader';
+        break;
+      }
       case 'user': {
         operator = 'user';
         break;
@@ -228,6 +232,14 @@ export default {
       }
       case 'location': {
         operator = 'location';
+        break;
+      }
+      case 'related_task': {
+        operator = 'array_eq';
+        break;
+      }
+      case 'formula': {
+        operator = 'eq';
         break;
       }
       default: {
@@ -315,6 +327,7 @@ export default {
       }
 
       for(let i = 0;i < notSystemFields.length;i++) {
+        let key = null;
         tv = notSystemFields[i];
         fn = tv.fieldName;
 
@@ -347,6 +360,15 @@ export default {
           continue;
         }
 
+        if (tv.formType === 'cascader') {
+          params.conditions.push({
+            property: fn,
+            operator: tv.operator,
+            inValue: form[fn]
+          });
+          continue;
+        }
+
         if (tv.formType === 'address') {
           let address = {
             property: fn,
@@ -361,11 +383,16 @@ export default {
           continue;
         }
 
+        if (tv.originalFormType === 'related_task') {
+          key = "taskNo";
+        }
+
 
         params.conditions.push({
           property: fn,
           operator: tv.operator,
           value: form[fn],
+          key
         });
       }
 
@@ -435,7 +462,9 @@ export default {
             if (field.formType === 'select' && field.displayName === '服务团队') {
               tv = []
             }
-
+            if (field.formType === 'cascader' ) {
+              tv = []
+            }
             form[field.fieldName] = this.formBackup[field.fieldName] || tv;
 
 
@@ -450,15 +479,15 @@ export default {
         },
         update(event, action) {
           if (action === 'tags') {
-            return this.form.tags = event;
+            return this.$set(this.form,'tags',event);
           }
 
           if (action === 'dist') {
-            return this.form.area = event;
+            return this.$set(this.form,'area',event);
           }
-
           const f = event.field;
-          this.form[f.fieldName] = event.newValue;
+          this.$set(this.form,f.fieldName,event.newValue);
+
         },
         renderInput(h, field) {
           const f = {

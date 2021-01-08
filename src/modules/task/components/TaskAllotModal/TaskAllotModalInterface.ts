@@ -1,3 +1,8 @@
+/* entity */
+import LoginUser from '@model/entity/LoginUser/LoginUser'
+/* enum */
+import TaskAllotTypeEnum from '@model/enum/TaskAllotTypeEnum'
+
 export interface User {
   displayName?: string
   head?: string
@@ -104,4 +109,14 @@ export interface ReAllotTaskPoolParams {
   toPool: boolean,
   // 协同人
   synergies?: User[]
+}
+
+/* 派单结果 */
+export interface TaskAllotResult {
+  // 派单方式
+  allotType: TaskAllotTypeEnum
+  // 负责人
+  executorUser: LoginUser | null
+  // 协同人列表
+  synergyUserList: LoginUser[]
 }

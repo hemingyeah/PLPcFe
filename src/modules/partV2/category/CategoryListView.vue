@@ -297,30 +297,30 @@
 </template>
 
 <script>
-import _ from 'lodash';
-import Page from '@src/model/Page';
-import AuthUtil from '@src/util/auth';
-import DateUtil from '@src/util/date';  
-import StorageUtil from '@src/util/storageUtil';
-import PartEditBatchForm from './form/PartEditBatchForm.vue';
-import PartImport from './components/PartImport.vue';
+import _ from "lodash";
+import Page from "@src/model/Page";
+import AuthUtil from "@src/util/auth";
+import DateUtil from "@src/util/date";  
+import StorageUtil from "@src/util/storageUtil";
+import PartEditBatchForm from "./form/PartEditBatchForm.vue";
+import PartImport from "./components/PartImport.vue";
 
-import SampleTooltip from 'packages/SampleTooltip/SampleTooltip'
+import SampleTooltip from "packages/SampleTooltip/SampleTooltip"
 
-const STORAGE_COLNUM_KEY = 'category_list_column';
-const STORAGE_PAGESIZE_KEY = 'category_list_pagesize';
+const STORAGE_COLNUM_KEY = "category_list_column";
+const STORAGE_PAGESIZE_KEY = "category_list_pagesize";
 
 export default {
-  name: 'part-list-view',
-  inject: ['initData'],
+  name: "part-list-view",
+  inject: ["initData"],
   data(){
     let pageSize = StorageUtil.get(STORAGE_PAGESIZE_KEY) || 10;
     let originModel = {
-      keyWord: '',
-      type: '',
-      enable: '',
-      timeStart: '',
-      timeEnd: '',
+      keyWord: "",
+      type: "",
+      enable: "",
+      timeStart: "",
+      timeEnd: "",
       pageNum: 1,
       pageSize,
       sortBy: {}
@@ -345,29 +345,29 @@ export default {
       selected: [],
       dateRange: [],
 
-      editPartParam:'',
+      editPartParam:"",
       editPartPostParam: {},
 
       maxHeight: window.innerHeight - 180,
       multipleSelectionPanelShow: false,
       fields: [{
-        name: '名称',
-        field: 'name'
+        name: "名称",
+        field: "name"
       }, {
-        name: '类别',
-        field: 'type'
+        name: "类别",
+        field: "type"
       }, {
-        name: '规格',
-        field: 'standard'
+        name: "规格",
+        field: "standard"
       }, {
-        name: '单位',
-        field: 'unit'
+        name: "单位",
+        field: "unit"
       }, {
-        name: '销售价',
-        field: 'salePrice'
+        name: "销售价",
+        field: "salePrice"
       }, {
-        name: '出库价',
-        field: 'costPrice'
+        name: "出库价",
+        field: "costPrice"
       }]
     }
   },
@@ -384,17 +384,17 @@ export default {
     },
     // 是否允许编辑、删除备件
     allowEdit(){
-      return AuthUtil.hasAuth(this.auths, 'VIP_SPAREPART_EDIT');
+      return AuthUtil.hasAuth(this.auths, "VIP_SPAREPART_EDIT");
     },
     allowCreate() {
-      return AuthUtil.hasAuth(this.auths, 'VIP_SPAREPART_CREATE');
+      return AuthUtil.hasAuth(this.auths, "VIP_SPAREPART_CREATE");
     },
     allowInout(){
-      return AuthUtil.hasAuth(this.auths, 'VIP_SPAREPART_INOUT');
+      return AuthUtil.hasAuth(this.auths, "VIP_SPAREPART_INOUT");
     },
     // 是否允许导入导出
     allowImportAndExport(){
-      return AuthUtil.hasAuth(this.auths, 'EXPORT_IN')
+      return AuthUtil.hasAuth(this.auths, "EXPORT_IN")
     }
   },
   methods: {
@@ -432,9 +432,9 @@ export default {
       this.pending = true;
 
       try {
-        let result = await this.$http.post('/partV2/category/batchUpdateField', params);
+        let result = await this.$http.post("/partV2/category/batchUpdateField", params);
         if(result.status == 0){
-          this.$platform.toast('批量编辑成功');
+          this.$platform.toast("批量编辑成功");
           this.editBatchDialog = false;
           form.reset();
           // reload data
@@ -449,16 +449,16 @@ export default {
       this.pending = false;
     },
     openEditSparepartDialog(value) {
-      this.trackEventHandler('batchEdit');
+      this.trackEventHandler("batchEdit");
       // 编辑的权限
       if (!this.selected.length) {
-        return this.$platform.alert('请先勾选要编辑的备件');
+        return this.$platform.alert("请先勾选要编辑的备件");
       }
       this.editBatchDialog = true;
     },
 
     chooseColnum(column){
-      this.trackEventHandler('selectColumn');
+      this.trackEventHandler("selectColumn");
 
       column.show = !column.show;
 
@@ -473,18 +473,18 @@ export default {
         delete this.model.timeStart;
         delete this.model.timeEnd;
       } else {
-        this.model.timeStart = DateUtil.format(range[0], 'yyyy-MM-dd 00:00:00')
-        this.model.timeEnd = DateUtil.format(range[1], 'yyyy-MM-dd 23:59:59')
+        this.model.timeStart = DateUtil.format(range[0], "yyyy-MM-dd 00:00:00")
+        this.model.timeEnd = DateUtil.format(range[1], "yyyy-MM-dd 23:59:59")
       }
     },
     exportPart(exportAll = false){
       if(!this.allowImportAndExport || !this.allowEdit || !this.allowInout) return;
 
       let ids = [];
-      let fileName = `${DateUtil.format(new Date(), 'yyyy-MM-dd')}备件数据.xlsx`;
+      let fileName = `${DateUtil.format(new Date(), "yyyy-MM-dd")}备件数据.xlsx`;
 
       if(!exportAll){
-        if(this.selected.length == 0) return this.$platform.alert('请选择要导出的数据');
+        if(this.selected.length == 0) return this.$platform.alert("请选择要导出的数据");
         ids = this.selected.map(item => item.id);
       }
 
@@ -519,42 +519,42 @@ export default {
       for (let i in param) {
         arr.push(`${i }=${ param[i]}`);
       }
-      this.editPartParam = arr.join('&');
+      this.editPartParam = arr.join("&");
 
       let instance = this.$refs.importEditPart;
       instance.open(param);
     },
     create(){
-      this.trackEventHandler('create');
+      this.trackEventHandler("create");
       if(!this.allowCreate) return;
-      window.location.href = '/partV2/category/create'
+      window.location.href = "/partV2/category/create"
     },
     openDetail(row){
       this.$platform.openTab({
         id: `partV2_category_detail_${row.id}`,
         url:`/partV2/category/detail?id=${row.id}`,
-        title: '备件品类详情',
+        title: "备件品类详情",
         close: true
       })
     },
     async remove(){
-      this.trackEventHandler('remove');
+      this.trackEventHandler("remove");
       try {
         let selected = this.selected;
 
         if(!this.allowEdit) return;
-        if(!selected || selected.length == 0) return this.$platform.alert('请选择要删除的备件')
-        if(!await this.$platform.confirm('确定要删除选中的备件？')) return;
+        if(!selected || selected.length == 0) return this.$platform.alert("请选择要删除的备件")
+        if(!await this.$platform.confirm("确定要删除选中的备件？")) return;
 
         this.pending = true;
         let ids = selected.map(item => item.id);
-        let result = await this.$http.post('/partV2/category/batchRemove', ids);
+        let result = await this.$http.post("/partV2/category/batchRemove", ids);
         
         if(result.status == 0){
           this.selected = [];
           this.loadData();
         }else{
-          this.$platform.alert(result.message || '选中的备件尚有库存，请先办理出库后再删除');
+          this.$platform.alert(result.message || "选中的备件尚有库存，请先办理出库后再删除");
         }
 
         this.pending = false;
@@ -571,7 +571,7 @@ export default {
       }
 
       row.disabled = true;
-      this.$http.post('/partV2/category/toggleEnable', params, false).then(result => {
+      this.$http.post("/partV2/category/toggleEnable", params, false).then(result => {
         if(result.status != 0){
           row.enable = !row.enable;
           this.$platform.alert(result.message);
@@ -657,9 +657,9 @@ export default {
       let sortBy = {};
       
       if(prop){
-        let tableName = 'sparepart';
+        let tableName = "sparepart";
         let key = `${tableName}.${prop}`
-        sortBy[key] = order == 'ascending';
+        sortBy[key] = order == "ascending";
       }
 
       this.model.sortBy = sortBy;
@@ -679,7 +679,7 @@ export default {
       loading.close();
     },
     fetchData(){
-      return this.$http.get('/partV2/category/listData', this.model).then(result => {
+      return this.$http.get("/partV2/category/listData", this.model).then(result => {
         let list = result.list || [];
         list.forEach(item => {
           item.disabled = false;
@@ -701,81 +701,81 @@ export default {
 
       let columns = [
         {
-          label: '编号',
-          field: 'serialNumber',
+          label: "编号",
+          field: "serialNumber",
           show: true,
-          fixed: 'left',
-          sortable: 'custom',
+          fixed: "left",
+          sortable: "custom",
           minWidth: 150
         },
         {
-          label: '名称',
-          field: 'name',
+          label: "名称",
+          field: "name",
           show: true,
           minWidth: 150
         },
         {
-          label: '类别',
-          field: 'type',
+          label: "类别",
+          field: "type",
           show: true,
           minWidth: 100
         },
         {
-          label: '规格',
-          field: 'standard',
+          label: "规格",
+          field: "standard",
           show: true,
           minWidth: 100
         },
         {
-          label: '单位',
-          field: 'unit',
+          label: "单位",
+          field: "unit",
           show: true,
           minWidth: 100
         },
         {
-          label: '销售价',
-          field: 'salePrice',
+          label: "销售价",
+          field: "salePrice",
           show: true,
           minWidth: 80
         },
         {
-          label: '出库价',
-          field: 'costPrice',
+          label: "出库价",
+          field: "costPrice",
           show: true,
           minWidth: 80
         },
         {
-          label: '说明',
-          field: 'description',
+          label: "说明",
+          field: "description",
           show: true,
           minWidth: 120
         },
         {
-          label: '启用/禁用',
-          field: 'enable',
+          label: "启用/禁用",
+          field: "enable",
           width: 100,
           show: true
         },
         {
-          label: '创建时间',
-          field: 'createTime',
+          label: "创建时间",
+          field: "createTime",
           show: true,
           width: 180,
-          sortable: 'custom'
+          sortable: "custom"
         }
       ]
 
       columns.forEach(column => {
         let isShow = localData[column.field];
-        if(typeof isShow == 'boolean') column.show = isShow;
+        if(typeof isShow == "boolean") column.show = isShow;
       })
 
       return columns;
     },
     buildExportColumns() {
       const fixedFields = [{
-        label: '备件系统编号',
-        field: 'id',
+        label: "备件系统编号",
+        field: "id",
         show: true,
       }];
 
@@ -786,29 +786,29 @@ export default {
     // TalkingData事件埋点
     trackEventHandler (type) {
       switch (type) {
-      case 'search':
-        this.$tdOnEvent('pc：备件品类-搜索事件');
+      case "search":
+        this.$tdOnEvent("pc：备件品类-搜索事件");
         break;
-      case 'reset':
-        this.$tdOnEvent('pc：备件品类-重置事件');
+      case "reset":
+        this.$tdOnEvent("pc：备件品类-重置事件");
         break;
-      case 'advSearch':
-        this.$tdOnEvent('pc：备件品类-高级搜索事件');
+      case "advSearch":
+        this.$tdOnEvent("pc：备件品类-高级搜索事件");
         break;
-      case 'create':
-        this.$tdOnEvent('pc：备件品类-新建事件');
+      case "create":
+        this.$tdOnEvent("pc：备件品类-新建事件");
         break;
-      case 'remove':
-        this.$tdOnEvent('pc：备件品类-删除事件');
+      case "remove":
+        this.$tdOnEvent("pc：备件品类-删除事件");
         break;
-      case 'batchEdit':
-        this.$tdOnEvent('pc：备件品类-批量编辑事件');
+      case "batchEdit":
+        this.$tdOnEvent("pc：备件品类-批量编辑事件");
         break;
-      case 'selectColumn':
-        this.$tdOnEvent('pc：备件品类-选择列事件');
+      case "selectColumn":
+        this.$tdOnEvent("pc：备件品类-选择列事件");
         break;
-      case 'moreAction':
-        this.$tdOnEvent('pc：备件品类-更多操作事件');
+      case "moreAction":
+        this.$tdOnEvent("pc：备件品类-更多操作事件");
         break;
       default:
         break;

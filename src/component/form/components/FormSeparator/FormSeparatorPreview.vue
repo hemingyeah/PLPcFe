@@ -1,6 +1,10 @@
 <template>
-  <div class="form-preview-group">
-    <div class="form-design-separator"><span v-if="field.displayName">{{field.displayName}}</span></div>
+  <div class="form-preview-group form-preview-divider">
+    <div class="form-design-separator">
+      <span v-if="field.displayName">{{field.displayName}}</span>
+      <i class="iconfont icon-fdn-select"></i>
+
+    </div>
   </div>
 </template>
 
@@ -13,16 +17,24 @@ export default {
 }
 </script>
 
-<style lang="scss">
-.form-design-separator{
-  background-color: #eef8f8;
-  color: #55B7B4;
-  height: 30px;
-  line-height: 30px;
-  width: calc(100% + 20px);
-  margin-left: -10px;
-  margin-right: -10px;
-
-  padding: 0 10px;
+<style lang="scss" scoped>
+.form-preview-divider{
+  padding: 0;
+  .form-design-separator{
+    background-color: #eef8f8;
+    color: $color-primary;
+    height: 32px;
+    line-height: 32px;
+    padding: 0 10px;
+    display: flex;
+    justify-content: space-between;
+    span{
+      margin-left: 12px;
+    }
+    .iconfont{
+      margin-right: 10px;
+    }
+  }
 }
+
 </style>

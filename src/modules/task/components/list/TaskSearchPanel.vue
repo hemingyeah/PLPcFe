@@ -19,7 +19,8 @@
       </el-dropdown>
     </h3>
     <!--  -->
-    <div class="task-search-panel-title task-pointer task-flex task-ai" @click="show =!show">
+    <div id="v-task-step"></div>
+    <div class="task-search-panel-title task-pointer task-flex task-ai" id="v-task-step-6-dom" @click="show =!show">
       <span class="task-font16">常用查询条件</span>
       <span slot="reference" class="task-font14 task-c2 task-ml12 task-mr4" @click.stop="$refs.taskSearchPupal.open()">设置</span>
       <span class="task-span1">
@@ -30,18 +31,14 @@
       <i class="iconfont icon-triangle-down task-f12 task-c9" v-if="!show"></i>
       <i class="iconfont icon-up task-icon" v-else></i>
     </div>
-
-    <div id="v-task-step-6"></div>
     <div class="task-search-guide" v-show="!fields.length && guide">
       <div></div>
       <div>
         您还未设置常用字段，快去试试吧
       </div>
     </div>
-    </div>
-    </div>
     <!-- S 搜索条件 -->
-    <el-form class="advanced-search-form" onsubmit="return false;">
+    <el-form class="advanced-search-form task-search" onsubmit="return false;">
       <task-search-form
         v-show="show"
         class="task-search-forms"
@@ -52,7 +49,7 @@
         :column-num="columnNum"
       >
       </task-search-form>
-      <div style="position: relative">
+      <div style="position: relative" id="v-task-step-7-dom">
         <div class="task-pointer task-flex task-ai">
           <span class="task-font16 task-mr4">添加查询条件</span>
           <span>
@@ -61,7 +58,7 @@
             </el-tooltip>
           </span>
         </div>
-        <div id="v-task-step-7"></div>
+        
       </div>
       <!-- 设置查询条件 -->
       <task-inquire 
@@ -197,7 +194,7 @@ export default {
         .filter((item) => {
           let bool = [...this.taskTypeFilterFields, ...this.config].some(
             (v) => {
-              return item.displayName === v.displayName;
+              return item.fieldName === v.fieldName;
             }
           );
           if (bool) return item;
@@ -432,6 +429,15 @@ export default {
           params.conditions.push({
             property: fn,
             operator: 'user',
+            inValue: form[fn],
+          });
+          continue;
+        }
+
+        if (tv.formType === 'select' && !tv.setting.isMulti && !tv.isSystem) {
+          params.conditions.push({
+            property: fn,
+            operator: 'in',
             inValue: form[fn],
           });
           continue;
@@ -756,6 +762,15 @@ export default {
           continue;
         }
 
+        if (tv.formType === 'select' && !tv.setting.isMulti && !tv.isSystem) {
+          params.conditions.push({
+            property: fn,
+            operator: 'in',
+            inValue: form[fn],
+          });
+          continue;
+        }
+
         // FIXME: 这里 form[fn] 为 字 符串的时候 error
         if (tv.formType === 'datetime') {
           params.conditions.push({
@@ -917,7 +932,7 @@ export default {
       let loc;
       [...this.config, ...this.taskTypeFilterFields].filter((value, index) => {
         let bool = list.some((v) => {
-          return value.displayName === v;
+          return value.fieldName === v;
         });
         if (bool) {
           this.selfFields.push(value);
@@ -945,7 +960,7 @@ export default {
             ...JSON.parse(searchField).checkCustomizeList,
             ...list,
           ].some((v) => {
-            return v === value.displayName;
+            return v === value.fieldName;
           });
           if (!bool) {
             return value;
@@ -968,7 +983,7 @@ export default {
           ...this.taskTypeFilterFields,
         ].filter((value, index) => {
           let bool = list.some((v) => {
-            return v === value.displayName;
+            return v === value.fieldName;
           });
           if (!bool) {
             return value;
@@ -1017,54 +1032,8 @@ export default {
       });
       this.taskInquireList = selfFields.slice();
     },
-    createGuide(id, obj = {}) {
-      new guideCompoments({
-        data() {
-          return {};
-        },
-        propsData: {
-          ...obj,
-          stopStep: this.stopStep,
-          finishBtnFn: this.finishBtnFn,
-        },
-        methods: {
-          previousStep: this.previousStep,
-          nextStep: this.nextStep,
-        },
-      }).$mount(`#${id}`);
-    },
-    previousStep(e) {
-      this.createGuide('v-task-step-6', {
-        content:
-          '高级搜索的“空白”，由您来填充。通过“设置”功能，定制您专属的“常用查询条件”',
-        haveStep: true,
-        nowStep: 1,
-        totalStep: 2,
-        id: 'v-task-step-6',
-        gStyle: 'left:30px',
-        onlyOne: true,
-        finishBtn: 'OK',
-      });
-    },
-    nextStep(e) {
-      this.createGuide('v-task-step-7', {
-        content:
-          '工单表单中所有可被搜索的字段都隐藏在这儿，当您需要用某些条件查询时，也可以在这里搜索',
-        haveStep: true,
-        nowStep: 2,
-        totalStep: 2,
-        gStyle: 'top:35px',
-        id: 'v-task-step-7',
-        arrowStyle: 'left:-140px',
-        onlyOne: true,
-        finishBtn: 'OK',
-      });
-    },
-    stopStep() {
-      storageSet(TASK_GUIDE_SEARCH_MODEL, '2');
-    },
-    finishBtnFn() {
-      this.stopStep();
+    createGuide( arr = []) {
+      this.$Guide(arr, 0, TASK_GUIDE_SEARCH_MODEL).create().then(res_=>{if(res_)storageSet(TASK_GUIDE_SEARCH_MODEL, '2')})
     },
   },
   components: {
@@ -1080,6 +1049,13 @@ export default {
   transition: height 0.5s;
   .form-item {
     width: 340px !important;
+  }
+}
+.task-search{
+  .form-item-control {
+    input{
+      width: 100%;
+    }
   }
 }
 </style>

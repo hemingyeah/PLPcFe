@@ -11,6 +11,11 @@ module.exports = {
       userId: '94f920b1-ee5e-11ea-879a-00163e0f1a1b',
       tenantId: '2fe245f4-31f0-11ea-9ddd-00163e0f1a1b'
     },
+    pre2: {
+      corpId: 'ding73b203abd39ac5e935c2f4657eb6378f',
+      userId: 'cc73a50e-bbb0-11ea-9ddd-00163e0f1a1b',
+      tenantId: 'fee37844-bbab-11ea-9ddd-00163e0f1a1b'
+    },
     production: {
       corpId: 'ding73b203abd39ac5e935c2f4657eb6378f',
       userId: 'b8a4dc27-d82f-11e8-8abd-7cd30abca02e',

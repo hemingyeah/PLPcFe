@@ -1,15 +1,16 @@
 <template>
   <div class="contact-user-item" :class="{'contact-selected': user.selected}" @click="$emit('toggle', user)">
     <div class="contact-user-wrap">
+      <div class="contact-user-delete-state" v-if="user.isDelete == 1"></div>
       <div class="contact-user-avatar" :class="showTag ? 'contact-user-avatar-margin' : ''" :style="{backgroundImage: `url(${head})`}"></div>
       <div class="contact-user-info">
         <h3>
           <div class="contact-user-name">{{user.displayName}}</div>
-          <div v-if="user && user.isTeamLeader === 1" class="contact-user-leader">主管</div>
           <div class="contact-user-state" v-if="showUserState && user.state">
             <i class="contact-user-state-icon" :style="{backgroundColor: stateColor[user.state]}"></i> 
             <span>{{user.state}}</span>
           </div>
+          <div v-if="user && user.isTeamLeader === 1" class="user-label user-label-manager">主管</div>
         </h3>
         <p>{{user.cellPhone}}</p>
         <p v-if="showTag" ref="tagName" class="contact-user-item-tagname" :class="isExpandTagName ? 'contact-user-item-tagname-show' : 'contact-user-item-tagname-hide'">
@@ -129,6 +130,7 @@ export default {
   padding: 0 8px;
   cursor: pointer;
   transition: background-color ease .15s;
+  position: relative;
 
   &.contact-selected{
     background-color: $color-primary-hover;
@@ -178,7 +180,11 @@ export default {
     overflow: hidden;
     
     display: flex;
+    align-items: center;
     flex-flow: row nowrap;
+    .user-label {
+      margin-left: 5px;
+    }
   }
 
   p{
@@ -220,6 +226,17 @@ export default {
   border-radius: 50%;
   background-color: #f0f0f0;
   margin: 0 2px 0 5px;
+}
+
+.contact-user-delete-state { 
+  width: 30px;
+  height: 30px;
+  background: url(../../../assets/img/leave_icon.png) no-repeat;
+  background-size: 100%;
+
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
 .contact-user-item-tagname {

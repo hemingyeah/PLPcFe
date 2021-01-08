@@ -23,7 +23,7 @@ export default class AllotRuleModal extends AllotRuleModalRender {
     
     return (
       <base-modal class={[this.className, this.isDisabled && `${this.className}-disabled`]} id={this.className} show={this.showAllotRuleModal} {...attrs}>
-        <el-form ref='form' model={this.form} label-width='200px' label-position='left'>
+        <el-form ref='form' model={this.form} label-width='120px' label-position='left'>
           
           <el-form-item label='名称：' required>
             <el-input
@@ -60,7 +60,7 @@ export default class AllotRuleModal extends AllotRuleModalRender {
         
         <div slot='footer' class='dialog-footer'>
           <el-button onClick={() => this.close()}>
-            取 消
+            关 闭
           </el-button>
           {this.renderConfirmButton()}
         </div>

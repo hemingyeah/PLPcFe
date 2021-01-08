@@ -1,11 +1,20 @@
 <template>
   <div class="form-setting-panel">
-    <h3>系统字段 -- {{setting.name}}</h3>
+    <!-- start 标题 -->
+    <form-title-setting
+      :field="field"
+      :setting="setting"
+      @input="updateForDom"
+    ></form-title-setting>
+    <!-- end 标题 -->
     <div class="form-setting-group">
       <p class="form-separator-setting-tips">备件组件可以在工单完成时选择备件库中的备件直接管理核销出库，并生成价格。</p>
-      <div class="form-setting-group">
-        <textarea placeholder="请在此添加描述信息" rows="3" data-prop="placeHolder" :value="field.placeHolder" @input="updateForDom" :maxlength="placeholderMaxLength"></textarea>
-      </div>
+      <!-- start 描述信息 -->
+      <form-describe-setting
+        :field="field"
+        @input="updateForDom"
+      ></form-describe-setting>
+      <!-- end 描述信息 -->
       <div class="form-setting-group">
         <el-checkbox :value="field.isNull" @input="update($event, 'isNull')" :true-label="0" :false-label="1">必填</el-checkbox>
       </div>

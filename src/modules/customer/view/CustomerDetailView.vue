@@ -159,7 +159,7 @@ export default {
       loading: false,
       showWholeName: -1, // -1代表不显示展开icon 0代表收起 1代表展开
       statisticalData: {},
-
+      fieldInfo: [],
       attentionUsers: [] // 该客户的关注用户,
     }
   },
@@ -196,26 +196,6 @@ export default {
       return this.customer.status == null || this.customer.status === 0
     },
     fields() {
-      // console.log(this.initData.fieldInfo, 'init_data');
-      // this.initData.fieldInfo.splice(6, 1, {
-      //   defaultValue: null,
-      //   displayName: '注册来源',
-      //   fieldName: 'serialNumber',
-      //   formType: 'icon',
-      //   guideData: false,
-      //   guideProfessions: [],
-      //   id: 481,
-      //   isDelete: 0,
-      //   isGuideData: false,
-      //   isNull: 1,
-      //   isSearch: 1,
-      //   isSystem: 1,
-      //   orderId: 6,
-      //   placeHolder: null,
-      //   setting: {},
-      //   tableName: 'customer',
-      //   tenantId: '7416b42a-25cc-11e7-a500-00163e12f748'
-      // });
       const fields = (this.initData.fieldInfo || []).sort(
         (a, b) => a.orderId - b.orderId
       )
@@ -257,7 +237,6 @@ export default {
     },
     /** 当前用户的权限 */
     permission() {
-      // console.log(this.initData.loginUser.authorities);
       return this.initData.loginUser.authorities
     },
     allowDeleteCustomer() {
@@ -740,6 +719,18 @@ export default {
           this.selectedRemind.sendRoleSetting || {}
         )
       })
+    }
+  },
+  async created() {
+    try {
+      // 获取客户表单字段列表
+      let result = await CustomerApi.getCustomerFields({isFromSetting: false});
+      if (result.succ) {
+        this.fieldInfo = result.data;
+      }
+
+    } catch(err) {
+      console.error('customer list get fields error', err);
     }
   },
   mounted() {

@@ -24,6 +24,7 @@ import BaseCascader from './common/BaseCascader';
 import BaseSelectionBar from './common/BaseSelectionBar';
 import BaseServiceStar from './common/BaseServiceStar';
 import BaseCollapse from './common/BaseCollapse';
+import BaseCalculationFormula from './common/BaseCalculationFormula'
 import BaseFlod from './common/BaseFlod/index.ts';
 
 
@@ -51,6 +52,8 @@ import BaseEditor from './common/BaseEditor'
 
 // 自定义组件
 import GuideCompoment from './guide'
+
+import LenovoSelect from './compomentV2/LenovoSelect'
 
 import Form from './form';
 
@@ -99,10 +102,11 @@ const components = [
   BaseEditor,
   BaseServiceStar,
   BaseCollapse,
+  BaseCalculationFormula,
   
   GuideCompoment,
-  
   ...BaseFlod,
+  LenovoSelect
 ];
 
 export default {
