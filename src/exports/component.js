@@ -13,7 +13,8 @@ import BaseModal from '../component/common/BaseModal';
 import BaseTree from '../component/common/BaseTree';
 import BaseContact from '../component/common/BaseContact';
 import BaseMapPicker from '../component/common/BaseMapPicker';
-import BizTeamSelect from '../component/business/BizTeamSelect'
+import BizTeamSelect from '../component/business/BizTeamSelect';
+import BizProposeApproveDialog from '../component/business/BizProposeApproveDialog';
 
 import {
   Checkbox
@@ -31,7 +32,8 @@ Vue.prototype.$ELEMENT = { size: 'small'};
 const components = {
   [BaseContact.namespace]: BaseContact.props,
   [BaseMapPicker.namespace]: BaseMapPicker.props,
-  [BizTeamSelect.namespace]: BizTeamSelect.props
+  [BizTeamSelect.namespace]: BizTeamSelect.props,
+  [BizProposeApproveDialog.namespace]: BizProposeApproveDialog.props
 }
 
 window._pc_componentsV2 = components;
@@ -39,6 +41,7 @@ window._pc_componentsV2 = components;
 function install(Vue){
   Vue.use(directive)
   Vue.component(BizTeamSelect.name, BizTeamSelect)
+  Vue.component(BizProposeApproveDialog.name, BizProposeApproveDialog)
 }
 
 window._pc_components_exports = install;
