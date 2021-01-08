@@ -1,6 +1,7 @@
 <template>
   <div class="product-list-container"
        v-loading.fullscreen.lock="loading">
+    <div id="product-catalog-list"></div>
     <div class="product-list-search-group-container flex-x jus-end bg-w">
       <!-- 搜索 -->
       <div class="task-list-header-seach ">
@@ -27,9 +28,9 @@
               重置
             </base-button>
             <div class="guide-box">
-              <div id="v-task-step-2"
-                   :class="['advanced-search-visible-btn', 'task-ml12']"
-                   @click.self="panelSearchAdvancedToggle">
+              <div 
+                :class="['advanced-search-visible-btn', 'task-ml12']"
+                @click.self="panelSearchAdvancedToggle">
                 <i class="iconfont icon-gaojisousuo task-font12 task-mr4"></i>
                 高级搜索
               </div>
@@ -53,7 +54,7 @@
                        v-if="deletePermission">删除</base-button>
         </div>
 
-        <div class="action-button-grou flex-x">
+        <div class="action-button-grou flex-x bg-w" id="product-catalog-list-2">
           <!-- <base-button type="plain" @event="openDialog('sendMessage')" v-if="editedPermission === 3">发送短信</base-button> -->
           <!-- <base-button
             type="plain"
@@ -92,7 +93,6 @@
                    'task-pointer',
                    'task-width103',
                  ]"
-                 id="v-task-step-1"
                  @click="showAdvancedSetting">
               <span class="task-mr4 task-ml4">选择列</span>
               <i class="iconfont icon-triangle-down task-icon"></i>
@@ -107,163 +107,123 @@
                             @toggle-selection="toggleSelection"
                             @show-panel="() => (multipleSelectionPanelShow = true)" />
       </div>
-
-      <!-- <el-table
-        :data="page.list"
-        :key="tableKey"
-        stripe
-        @select="handleSelection"
-        @select-all="handleSelection"
-        @sort-change="sortChange"
-        :highlight-current-row="false"
-        header-row-class-name="product-table-header"
-        ref="multipleTable"
-        class="product-table"
-      > -->
-      <el-table stripe
-                :data="page.list"
-                :highlight-current-row="false"
-                :key="tableKey"
-                :border="true"
-                @select="handleSelection"
-                @select-all="handleSelection"
-                @sort-change="sortChange"
-                @header-dragend="headerDragend"
-                :class="['task-list-table', 'common-list-table']"
-                header-row-class-name="common-list-table-header taks-list-table-header"
-                ref="multipleTable">
-        <el-table-column type="selection"
-                         width="48"
-                         align="center"
-                         class-name="flex-x jus-center"></el-table-column>
-        <template v-for="(column, index) in columns">
-          <el-table-column v-if="column.show"
-                           :key="`${column.field}_${index}`"
-                           :label="column.label"
-                           :prop="column.field"
-                           :width="column.width"
-                           :class-name="
-                             column.field == 'name' ? 'product-name-superscript-td' : ''
-                           "
-                           :min-width="column.minWidth || '120px'"
-                           :sortable="column.sortable"
-                           :show-overflow-tooltip="column.fieldName !== 'productPic' && column.fieldName !== 'thumbnail'"
-                           :align="column.align">
-            <template slot-scope="scope">
-              <template v-if="column.fieldName === 'pathName'">
-                <a href=""
-                   class="color-primary"
-                   @click.stop.prevent="openProductMenuTab(scope.row.id)">
-                  {{ (scope.row[column.field] && scope.row[column.field].replace(new RegExp("/","g") ,' / ')) || '' }}
-                </a>
-              </template>
-
-              <template v-else-if="column.fieldName === 'productVideo'">
-                <template v-if="scope.row.productVideo.length">
+      <div id="product-catalog-list-1">
+        <el-table stripe
+                  :data="page.list"
+                  :highlight-current-row="false"
+                  :key="tableKey"
+                  :border="true"
+                  @select="handleSelection"
+                  @select-all="handleSelection"
+                  @sort-change="sortChange"
+                  @header-dragend="headerDragend"
+                  :class="['task-list-table', 'common-list-table']"
+                  header-row-class-name="common-list-table-header taks-list-table-header"
+                  ref="multipleTable">
+          <el-table-column type="selection"
+                           width="48"
+                           align="center"
+                           class-name="flex-x jus-center"></el-table-column>
+          <template v-for="(column, index) in columns">
+            <el-table-column v-if="column.show"
+                             :key="`${column.field}_${index}`"
+                             :label="column.label"
+                             :prop="column.field"
+                             :width="column.width"
+                             :class-name="
+                               column.field == 'name' ? 'product-name-superscript-td' : ''
+                             "
+                             :min-width="column.minWidth || '120px'"
+                             :sortable="column.sortable"
+                             :show-overflow-tooltip="column.fieldName !== 'productPic' && column.fieldName !== 'thumbnail'"
+                             :align="column.align">
+              <template slot-scope="scope">
+                <template v-if="column.fieldName === 'pathName'">
                   <a href=""
                      class="color-primary"
-                     @click.stop.prevent="
-                       previewVideo(scope.row.productVideo[0].url)
-                     ">
-                    {{
-                      scope.row.productVideo[0] &&
-                        scope.row.productVideo[0].filename
-                    }}
+                     @click.stop.prevent="openProductMenuTab(scope.row.id)">
+                    {{ (scope.row[column.field] && scope.row[column.field].replace(new RegExp("/","g") ,' / ')) || '' }}
                   </a>
-
                 </template>
-              </template>
 
-              <template v-else-if="column.field === 'tags'">
-                {{ scope.row | formatTags }}
-              </template>
-              <template v-else-if="column.formType === 'cascader'">
-                {{ scope.row.attribute[column.field] | displayCascader }}
-              </template>
-              <template v-else-if="column.formType === 'select' && !column.isSystem">
-                {{scope.row.attribute[column.field] | displaySelect}}
-              </template>
-              <template v-else-if="column.formType === 'user' && scope.row.attribute[column.field]">
-                {{ getUserName(column, scope.row.attribute[column.field]) }}
-              </template>
-              <template v-else-if="column.formType == 'related_task'">
-                {{ getRelatedTask(scope.row.attribute[column.field]) }}
-              </template>
-              <template v-else-if="column.field === 'updateTime'">
-                <template v-if="scope.row.latesetUpdateRecord">
-                  <el-tooltip class="item"
-                              effect="dark"
-                              :content="scope.row.latesetUpdateRecord"
-                              placement="top-start">
+                <template v-else-if="column.fieldName === 'productVideo'">
+                  <template v-if="scope.row.productVideo.length">
+                    <a href=""
+                       class="color-primary"
+                       @click.stop.prevent="
+                         previewVideo(scope.row.productVideo[0].url)
+                       ">
+                      {{
+                        scope.row.productVideo[0] &&
+                          scope.row.productVideo[0].filename
+                      }}
+                    </a>
+
+                  </template>
+                </template>
+
+                <template v-else-if="column.field === 'tags'">
+                  {{ scope.row | formatTags }}
+                </template>
+                <template v-else-if="column.formType === 'cascader'">
+                  {{ scope.row.attribute[column.field] | displayCascader }}
+                </template>
+                <template v-else-if="column.formType === 'select' && !column.isSystem">
+                  {{scope.row.attribute[column.field] | displaySelect}}
+                </template>
+                <template v-else-if="column.formType === 'user' && scope.row.attribute[column.field]">
+                  {{ getUserName(column, scope.row.attribute[column.field]) }}
+                </template>
+                <template v-else-if="column.formType == 'related_task'">
+                  {{ getRelatedTask(scope.row.attribute[column.field]) }}
+                </template>
+                <template v-else-if="column.field === 'updateTime'">
+                  <template v-if="scope.row.latesetUpdateRecord">
+                    <el-tooltip class="item"
+                                effect="dark"
+                                :content="scope.row.latesetUpdateRecord"
+                                placement="top-start">
+                      <div @mouseover="showLatestUpdateRecord(scope.row)">
+                        {{ scope.row.updateTime | formatDate }}
+                      </div>
+                    </el-tooltip>
+                  </template>
+                  <template v-else>
                     <div @mouseover="showLatestUpdateRecord(scope.row)">
                       {{ scope.row.updateTime | formatDate }}
                     </div>
-                  </el-tooltip>
-                </template>
-                <template v-else>
-                  <div @mouseover="showLatestUpdateRecord(scope.row)">
-                    {{ scope.row.updateTime | formatDate }}
-                  </div>
-                </template>
-              </template>
-              <template v-else-if="column.field === 'createUser'">
-                {{ scope.row.createUser && scope.row.createUser.displayName }}
-              </template>
-              <template v-else-if="column.field === 'createTime'">
-                {{ scope.row.createTime | formatDate }}
-              </template>
-              <div v-else-if="
-                     column.formType === 'textarea' && column.isSystem != 1
-                   "
-                   v-html="buildTextarea(scope.row.attribute[column.field])"
-                   @click="openOutsideLink"></div>
-
-              <template v-else-if="column.fieldName == 'address'">
-                {{ getAddress(scope.row.address) }}
-              </template>
-
-              <template v-else-if="!column.isSystem">
-                {{ scope.row.attribute && scope.row.attribute[column.field] }}
-              </template>
-
-              <template v-else-if="column.fieldName == 'catalogId'">
-                {{ scope.row.pathName }}
-              </template>
-              <template v-else-if="column.fieldName === 'productPic'">
-                <div class="flex-x goods-img-list"
-                     style="height:100%">
-                  <template v-for="(item, index) in scope.row.productPic">
-                    <img :key="index"
-                         v-if="index <= 4"
-                         class="cur-point mar-r-8"
-                         :src="
-                           item.url
-                             ? `${item.url}?x-oss-process=image/resize,m_fill,h_32,w_32`
-                             : defaultImg
-                         "
-                         @click.stop="previewImg(item.url)" />
                   </template>
-                  <div>
-                    {{
-                      scope.row[column.field].length > 5
-                        ? `+${scope.row[column.field].length - 5}`
-                        : ''
-                    }}
-                  </div>
-                </div>
-              </template>
-              <!-- <template v-else-if="column.fieldName == 'productNum'">
-                  {{ scope.row['remind'] || '' }}
-                </template> -->
+                </template>
+                <template v-else-if="column.field === 'createUser'">
+                  {{ scope.row.createUser && scope.row.createUser.displayName }}
+                </template>
+                <template v-else-if="column.field === 'createTime'">
+                  {{ scope.row.createTime | formatDate }}
+                </template>
+                <div v-else-if="
+                       column.formType === 'textarea' && column.isSystem != 1
+                     "
+                     v-html="buildTextarea(scope.row.attribute[column.field])"
+                     @click="openOutsideLink"></div>
 
-              <template v-else-if="column.fieldName === 'thumbnail'">
-                <div class="flex-x">
+                <template v-else-if="column.fieldName == 'address'">
+                  {{ getAddress(scope.row.address) }}
+                </template>
+
+                <template v-else-if="!column.isSystem">
+                  {{ scope.row.attribute && scope.row.attribute[column.field] }}
+                </template>
+
+                <template v-else-if="column.fieldName == 'catalogId'">
+                  {{ scope.row.pathName }}
+                </template>
+                <template v-else-if="column.fieldName === 'productPic'">
                   <div class="flex-x goods-img-list"
                        style="height:100%">
-                    <template v-for="(item, index) in scope.row.thumbnail">
+                    <template v-for="(item, index) in scope.row.productPic">
                       <img :key="index"
-                           v-if="index==0"
-                           class="cur-point"
+                           v-if="index <= 4"
+                           class="cur-point mar-r-8"
                            :src="
                              item.url
                                ? `${item.url}?x-oss-process=image/resize,m_fill,h_32,w_32`
@@ -271,18 +231,45 @@
                            "
                            @click.stop="previewImg(item.url)" />
                     </template>
+                    <div>
+                      {{
+                        scope.row[column.field].length > 5
+                          ? `+${scope.row[column.field].length - 5}`
+                          : ''
+                      }}
+                    </div>
                   </div>
-                </div>
-              </template>
-              <template v-else>
-                {{ scope.row[column.field] || '' }}
-              </template>
-            </template>
-          </el-table-column>
-        </template>
-        </el-table-column>
-      </el-table>
+                </template>
+                <!-- <template v-else-if="column.fieldName == 'productNum'">
+                  {{ scope.row['remind'] || '' }}
+                </template> -->
 
+                <template v-else-if="column.fieldName === 'thumbnail'">
+                  <div class="flex-x">
+                    <div class="flex-x goods-img-list"
+                         style="height:100%">
+                      <template v-for="(item, index) in scope.row.thumbnail">
+                        <img :key="index"
+                             v-if="index==0"
+                             class="cur-point"
+                             :src="
+                               item.url
+                                 ? `${item.url}?x-oss-process=image/resize,m_fill,h_32,w_32`
+                                 : defaultImg
+                             "
+                             @click.stop="previewImg(item.url)" />
+                      </template>
+                    </div>
+                  </div>
+                </template>
+                <template v-else>
+                  {{ scope.row[column.field] || '' }}
+                </template>
+              </template>
+            </el-table-column>
+          </template>
+        </el-table>
+      </div>
       <div class="table-footer">
         <div class="list-info">
           共<span class="level-padding">{{ page.total }}</span>记录， 已选中<span class="product-selected-count"
@@ -425,6 +412,10 @@ import {
 import TeamMixin from '@src/mixins/teamMixin';
 import { isShowCustomerRemind } from '@src/util/version.ts';
 
+import { storageGet, storageSet } from '@src/util/storage';
+const {
+  PRODUCT_CATALOG_LIST
+} = require('@src/component/guide/productV2Store');
 const link_reg = /((((https?|ftp?):(?:\/\/)?)(?:[-;:&=\+\$]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\?\+=&;:%!\/@.\w_]*)#?(?:[-\+=&;%!\?\/@.\w_]*))?)/g;
 
 export default {
@@ -490,7 +481,7 @@ export default {
             f.formType !== 'separator'
             && f.formType !== 'info'
             && f.formType !== 'autograph'
-            && f.formType !== 'attachment'
+            && ( ( f.fieldName == 'productVideo' || f.fieldName == 'productPic' || f.fieldName == 'thumbnail' ) ? true : f.formType !== 'attachment')
         )
         .map((f) => {
           if (f.isSystem == 1) {
@@ -568,6 +559,35 @@ export default {
 
     // [tab_spec]标准化刷新方式
     window.__exports__refresh = this.resetPage;
+
+    this.$nextTick(() => {
+      if (storageGet(PRODUCT_CATALOG_LIST) && storageGet(PRODUCT_CATALOG_LIST) > 0) this.$Guide().destroy('product-catalog-list')
+      else this.$Guide([{
+        content:
+          '产品类型列表，可拖拽改变列表宽',
+        haveStep: true,
+        nowStep: 1,
+        id: 'product-catalog-list',
+        domObj:()=>{
+          return document.getElementById('product-catalog-list-1').getElementsByClassName('el-table__header-wrapper')[0]
+        },
+        needCover: true,
+        finishBtn: 'ok',
+      }, {
+        content:
+          '选择自定义列展示、数据导出等功能',
+        haveStep: true,
+        nowStep: 2,
+        id: 'product-catalog-list',
+        domId: 'product-catalog-list-2',
+        needCover: true,
+        finishBtn: 'ok',
+      }], 0, '', (e) => {
+        return new Promise((resolve, reject) => {
+          resolve()
+        })
+      }).create().then(res_=>{if(res_)storageSet(PRODUCT_CATALOG_LIST, '1')})
+    })
 
   },
   beforeDestroy () {
@@ -1025,7 +1045,7 @@ export default {
       this.columns = this.productFields
         .filter(
           (f) =>
-            f.formType !== 'attachment'
+            ( ( f.fieldName == 'productVideo' || f.fieldName == 'productPic' || f.fieldName == 'thumbnail' ) ? true : f.formType !== 'attachment')
             && f.formType !== 'separator'
             && f.formType !== 'info'
             && f.formType !== 'autograph'
@@ -1090,7 +1110,6 @@ export default {
 
           return col;
         });
-      console.log(this.columns, 321);
     },
 
     buildExportParams (checkedArr, ids) {
