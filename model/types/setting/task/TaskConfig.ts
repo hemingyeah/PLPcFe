@@ -74,7 +74,7 @@ class TaskConfig {
     planRemindSetting: PlanRemindSetting = new PlanRemindSetting();
 
     /** 计划时间提醒类型 */
-    notice: String = '';
+    noticeLeader: String = '';
 
     /** 计划时间提醒指定人员 */
     noticeUsers: Preson[] = [];

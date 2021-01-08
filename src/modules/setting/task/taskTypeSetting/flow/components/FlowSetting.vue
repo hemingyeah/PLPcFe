@@ -195,7 +195,7 @@
           </div>
           <div>
             工单负责人、协同人及
-            <el-select v-model="taskTypeConfig.notice" placeholder="请选择">
+            <el-select v-model="taskTypeConfig.noticeLeader" placeholder="请选择">
               <el-option
                 v-for="item in options"
                 :key="item.value"
@@ -205,7 +205,7 @@
               </el-option>
             </el-select>
             <el-input
-              v-if="taskTypeConfig.notice === null"
+              v-if="taskTypeConfig.noticeLeader === null"
               class="w-187"
               placeholder="请选择审批人"
               readonly
@@ -294,11 +294,11 @@ export default {
 
       options: [
         {
-          value: 0,
+          value: '0',
           label: "无需通知其他人",
         },
         {
-          value: 1,
+          value: '1',
           label: "通知负责人团队主管",
         },
         {

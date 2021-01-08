@@ -320,7 +320,7 @@ export default {
           name: this.taskTypeConfig.name,
           color: this.taskTypeConfig.config.color
         }
-        await SettingApi.updateTaskTypeNameAndColor(params);
+        await TaskApi.updateTaskTypeNameAndColor(params);
       } catch (error) {
         console.error(error);
       }
@@ -340,6 +340,8 @@ export default {
         try {
           await this.$refs.comp.submit();
           await this.updateTaskTypeNameAndColor();
+          
+          this.fetchTasktype();
         } catch (error) {
           console.error(error);
         }finally {

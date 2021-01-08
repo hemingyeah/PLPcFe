@@ -143,8 +143,10 @@ export default {
 
       for (let i = 0; i < this.multiApproverSetting.length; i++) {
         const approve = this.multiApproverSetting[i];
-        if(!approve.approver) return this.$platform.alert(`请选择${this.cnNumName[i + 2]}级审批人`);
-        if (approve.isOpt === 1 && !approve.approver.userId) return this.$platform.alert(`请选择${this.cnNumName[i + 2]}级审批人`);
+        if(approve.isOpt === 1){
+          if(!approve.approver) return this.$platform.alert(`请选择${this.cnNumName[i + 2]}级审批人`);
+          if(!approve.approver.userId) return this.$platform.alert(`请选择${this.cnNumName[i + 2]}级审批人`);
+        }
       }
 
       // 审批说明必填校验
@@ -265,5 +267,9 @@ export default {
 // elemeny-ui 
 /deep/.el-step__description{
   padding: 0;
+}
+
+/deep/.el-step{
+  width: auto;
 }
 </style>

@@ -1009,6 +1009,16 @@ export function saveSystemPrint(params: {} | undefined) {
 }
 
 /**
+ * 修改工单类型颜色和名称
+ * 
+ * @param {string} params.name 工单类型名称
+ * @param {string} parmas.color 工单类型颜色
+ */
+export function updateTaskTypeNameAndColor(params: {} | undefined) {
+  return http.post(`${fixedPrefixTaskPath}/outside/pc/task/taskType/updateTaskType`, params);
+}
+
+/**
  * @description 新建工单
  */
 export function createTask(params: TaskCreateAndEditModel) {

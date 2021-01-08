@@ -73,10 +73,23 @@ export default {
          */
         formatApproveSetting(setting) {
             if(setting === undefined) return {};
-            console.log('setting',setting);
             let approveSetting = _.cloneDeep(setting);
+            if(approveSetting.level < 2) {
+                delete approveSetting.multiApproverSetting;
+            }
             if(approveSetting.level === 0) {
                 approveSetting.leader = 'none';
+            }
+
+            // 发起人选择
+            if(approveSetting.leader === 'promoter') {
+                approveSetting.approvers = [];
+                approveSetting.displayName = '';
+                approveSetting.taskTemplateId = '';
+            }
+
+            if(Array.isArray(approveSetting.multiApproverSetting)) {
+                approveSetting.multiApproverSetting = approveSetting.multiApproverSetting.map(item => this.formatApproveSetting(item));
             }
 
             return approveSetting;
@@ -85,9 +98,8 @@ export default {
         convertDataToParams() {
             let taskTypeConfig = _.cloneDeep(this.taskFlowData.taskTypeConfig);
             let {id,flowSetting, delayBack, delayBackMin, allowPause, pauseApproveSetting,
-                planRemindSetting,notice, noticeUsers,cancelApproveSetting,
+                planRemindSetting,noticeLeader, noticeUsers,cancelApproveSetting,
                  autoReviewState, taskOverTimeModels } = taskTypeConfig;
-            
             Object.keys(flowSetting).map(key => {
                 let {state, overTime, approveSetting, reallotAppr} = flowSetting[key];
                 flowSetting[key] = {
@@ -125,7 +137,6 @@ export default {
                 ...this.formatApproveSetting(pauseApproveSetting)
             }
             delete flowSetting.autoReview;
-            
             let params = {
                 typeId: id,
                 flowSetting,
@@ -135,8 +146,8 @@ export default {
                 minutes: Number(planRemindSetting.minutes),
                 minutesType: planRemindSetting.minutesType,
                 planningTimeState: 'notice',
-                planningTimeMes: notice,
-                usersIds: noticeUsers.map(item => item.id).join(','),
+                planningTimeMes: noticeLeader,
+                usersIds: noticeUsers.map(item => item.userId).join(','),
                 taskOverTimeModels: taskOverTimeModels.map(item => {
                     item.reminders = item.reminders || [];
                     item.ids = item.reminders.map(item => item.userId).join(',');
@@ -144,7 +155,6 @@ export default {
                 }),
                 autoReviewState
             };
-            console.log(JSON.stringify(params));
             return params;
         },
         /** 保存流程设置 */
