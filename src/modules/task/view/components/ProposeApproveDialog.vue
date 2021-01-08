@@ -5,7 +5,7 @@
       <textarea v-model="apprForm.applyRemark" :placeholder="remarkPlaceholder" rows="3" maxlength="500" />
       <!--S 审批步骤 -->
       <div class="approve-steps">
-        <el-row v-if="approveLevel === 1">
+        <el-row v-if="approveLevel === 1" :type="chooseApprover || 'flex'">
           <p>审批人：</p>
           <form-user
             v-if="chooseApprover"
@@ -68,6 +68,8 @@
 <script>
 /* api */
 import * as TaskApi from '@src/api/TaskApi.ts';
+
+import FormUser from "@src/component/form/components/FormUser/FormUser.vue";
 
 export default {
   name: 'propose-approve-dialog',
@@ -173,6 +175,9 @@ export default {
       })
     },
 
+  },
+  components: {
+    [FormUser.name]: FormUser
   }
 }
 </script>
@@ -183,7 +188,73 @@ export default {
     margin-bottom: 10px;
     align-items: baseline;
   }
+  // 以下为jsp页面兼容样式 
+  .form-item-required {
+    color: red;
+  }
+  .base-modal {
+    .base-modal-body {
+      padding: 20px;
+
+      .base-modal-content {
+        textarea {
+          width: 100%;
+        }
+        
+        p {
+          margin-bottom: 8px;
+
+          &.tips {
+            color: #999;
+            font-size: 12px;
+          }
+
+          &.base-upload-placeholder {
+            margin-bottom: 0;
+          }
+        }
+
+        button{
+          height: 24px;
+          line-height: 32px;
+          width: 24px;
+
+          padding: 0;
+          margin: 0;
+          outline: none;
+          color: #666;
+          border: none;
+          background-color: transparent;
+          transition: color ease .15s;
+
+          i {
+            font-size: 14px;
+          }
+
+          &:hover{
+            color: #e84040;
+          }
+        }
+      }
+
+      .el-button {
+        min-width: auto;
+        max-width: auto;
+      }
+    }
+
+    .base-modal-footer {
+      text-align: right;
+    }
+
+    .task-back-dialog {
+      p {
+        font-size: 12px;
+      }
+    }
+  }
 }
+
 </style>
 
 <style lang="scss" scoped>
