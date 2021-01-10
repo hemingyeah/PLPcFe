@@ -773,7 +773,7 @@ const FormDesign = {
     },
 
     /** 添加新字段 */
-    insertField(option = {}, value, index) {
+    insertField(option = {}, value, index, isRelatedField) {
       // 拖进来的是公共字段
       let isDragCommon = option.isCommon == 1;
 
@@ -784,7 +784,7 @@ const FormDesign = {
         fieldName: option.fieldName,
         isSystem: option.isSystem,
         isDragCommon: isDragCommon ? 1 : 0,
-        setting: isDragCommon ? option.setting : {}
+        setting: (isDragCommon || isRelatedField) ? option.setting : {}
       });
       
       let arr = cloneDeep(value ? value : this.value);
@@ -796,7 +796,7 @@ const FormDesign = {
       return newField;
     },
     /** 立即插入字段 */
-    immediateInsert(field, event) {
+    immediateInsert(field, event, isRelatedField = false) {
       // 禁止拖拽
       if (this.draggingDisable(field)) return;
 
@@ -804,9 +804,15 @@ const FormDesign = {
       if (dragEvent) dragEvent.direction = 0;
 
       // 限制字段数量
-      if (this.value.length >= this.max) return 
+      if (this.value.length >= this.max) return Platform.alert(`单个表单最多支持${ this.max }个字段`)
+
+      // 拖拽客户关联、产品关联字段
+      if(!isRelatedField && (field.formType == 'relationCustomer' || field.formType == 'relationProduct')) {
+        this.$eventBus.$emit('task_form_design_relation_options_set', field);
+        return;
+      }
     
-      let newField = this.insertField(field, this.value, this.value.length);
+      let newField = this.insertField(field, this.value, this.value.length, isRelatedField);
       this.insertedField = newField;
     },
     scrollPreviewList(e) {

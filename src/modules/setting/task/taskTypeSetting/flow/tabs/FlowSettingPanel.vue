@@ -73,11 +73,26 @@ export default {
          */
         formatApproveSetting(setting) {
             if(setting === undefined) return {};
-            console.log('setting',setting);
             let approveSetting = _.cloneDeep(setting);
+            if(approveSetting.level < 2) {
+                delete approveSetting.multiApproverSetting;
+            }
             if(approveSetting.level === 0) {
                 approveSetting.leader = 'none';
             }
+
+            // 发起人选择
+            if(approveSetting.leader === 'promoter') {
+                approveSetting.approvers = [];
+                approveSetting.displayName = '';
+                approveSetting.taskTemplateId = '';
+            }
+
+            if(Array.isArray(approveSetting.multiApproverSetting)) {
+                approveSetting.multiApproverSetting = approveSetting.multiApproverSetting.map(item => this.formatApproveSetting(item));
+            }
+
+            if(typeof approveSetting.leader === 'undefined') approveSetting.leader = '';
 
             return approveSetting;
         },
@@ -85,16 +100,18 @@ export default {
         convertDataToParams() {
             let taskTypeConfig = _.cloneDeep(this.taskFlowData.taskTypeConfig);
             let {id,flowSetting, delayBack, delayBackMin, allowPause, pauseApproveSetting,
-                planRemindSetting,notice, noticeUsers,cancelApproveSetting,
+                planRemindSetting,noticeLeader, noticeUsers,cancelApproveSetting,
                  autoReviewState, taskOverTimeModels } = taskTypeConfig;
-            
             Object.keys(flowSetting).map(key => {
                 let {state, overTime, approveSetting, reallotAppr} = flowSetting[key];
                 flowSetting[key] = {
                     state,
                     overTime,
-                    reallotAppr,
                     ...this.formatApproveSetting(approveSetting)
+                }
+
+                if(key === 'allot') {
+                    flowSetting[key].reallotAppr =  reallotAppr !== 'none';
                 }
 
                 if(key === 'off') {
@@ -125,7 +142,6 @@ export default {
                 ...this.formatApproveSetting(pauseApproveSetting)
             }
             delete flowSetting.autoReview;
-            
             let params = {
                 typeId: id,
                 flowSetting,
@@ -135,8 +151,8 @@ export default {
                 minutes: Number(planRemindSetting.minutes),
                 minutesType: planRemindSetting.minutesType,
                 planningTimeState: 'notice',
-                planningTimeMes: notice,
-                usersIds: noticeUsers.map(item => item.id).join(','),
+                planningTimeMes: noticeLeader ? ['none','leader','users'][Number(noticeLeader)] : 'none',
+                usersIds: noticeUsers.map(item => item.userId).join(','),
                 taskOverTimeModels: taskOverTimeModels.map(item => {
                     item.reminders = item.reminders || [];
                     item.ids = item.reminders.map(item => item.userId).join(',');
@@ -144,15 +160,18 @@ export default {
                 }),
                 autoReviewState
             };
-            console.log(JSON.stringify(params));
             return params;
         },
         /** 保存流程设置 */
         async submit() {
             try {
                 let params = this.convertDataToParams();
-                await SettingApi.saveProcess(params);
-                this.$notify.success('保存成功');
+                let res = await SettingApi.saveProcess(params);
+                if(res.status == 1) {
+                    return this.$notify.error(res.message);
+                }else {
+                    this.$notify.success('保存成功');
+                }
             } catch (error) {
                 console.error('sumbit saveProcess => error', error);
             }

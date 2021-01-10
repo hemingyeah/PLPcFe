@@ -44,7 +44,7 @@
 
         <!--S 转派时也审批-->
         <div v-if="type === 'allot'" class="mt-8" style="margin-bottom: -18px">
-          <el-checkbox v-model="flowSetting.reallotAppr"
+          <el-checkbox v-model="flowSetting.reallotAppr" true-label="" false-label="none"
             >转派时也审批</el-checkbox
           >
         </div>
@@ -74,7 +74,7 @@
               @change="updateOvertimeSetting"
             >
               <el-option
-                v-for="item in options"
+                v-for="item in overTimeOptions"
                 :key="item.value"
                 :label="item.label"
                 :value="item.value"
@@ -195,9 +195,9 @@
           </div>
           <div>
             工单负责人、协同人及
-            <el-select v-model="taskTypeConfig.notice" placeholder="请选择">
+            <el-select v-model="taskTypeConfig.noticeLeader" placeholder="请选择">
               <el-option
-                v-for="item in options"
+                v-for="item in planOptions"
                 :key="item.value"
                 :label="item.label"
                 :value="item.value"
@@ -205,7 +205,7 @@
               </el-option>
             </el-select>
             <el-input
-              v-if="taskTypeConfig.notice === null"
+              v-if="taskTypeConfig.noticeLeader == 2"
               class="w-187"
               placeholder="请选择审批人"
               readonly
@@ -292,17 +292,32 @@ export default {
       fields: [],
       flowMap,
 
-      options: [
+      overTimeOptions: [
         {
-          value: 0,
+          value: '0',
           label: "无需通知其他人",
         },
         {
-          value: 1,
+          value: '1',
           label: "通知负责人团队主管",
         },
         {
           value: null,
+          label: "指定人员",
+        },
+      ],
+
+      planOptions: [
+        {
+          value: '0',
+          label: "无需通知其他人",
+        },
+        {
+          value: '1',
+          label: "通知负责人团队主管",
+        },
+        {
+          value: '2',
           label: "指定人员",
         },
       ],

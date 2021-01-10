@@ -141,7 +141,7 @@ export default {
   },
   filters: {
     formatApproveNames(approvers) {
-      return approvers.map(item => item.displayName).join(',');
+      return approvers.map(item => item.displayName).join(',') || '未找到审批人，将自动审批通过';
     }
   },
   methods: {

@@ -240,19 +240,13 @@ export default {
         }
       })
 
-      // 计划提醒设置
-      taskTypeConfig.planRemindSetting = {
-        ...planRemindSetting,
-        minutesType: taskTypeConfig.minutesType || 0,
-      }
-
       // 兼容旧超时提醒设置
       if(config.newOverTimeSetting === undefined || (config.newOverTimeSetting && config.newOverTimeSetting.length === 0)) {
         taskTypeConfig.taskOverTimeModels = taskTypeConfig.taskOverTimeModels.map(item => {
           return {
             ...item,
             ...overTimeSetting,
-            remindType: overTimeSetting.remindType || null,
+            remindType: overTimeSetting.remindType == undefined ? null : overTimeSetting.remindType + '',
             reminders: overTimeSetting.reminders || []
           }
         })
@@ -260,7 +254,7 @@ export default {
         taskTypeConfig.taskOverTimeModels = config.newOverTimeSetting.map(item => {
           return {
             ...item,
-            remindType: overTimeSetting.remindType || null,
+            remindType: overTimeSetting.remindType == undefined ? null : overTimeSetting.remindType + '',
             reminders: item.reminders || []
           }
         })
@@ -320,7 +314,7 @@ export default {
           name: this.taskTypeConfig.name,
           color: this.taskTypeConfig.config.color
         }
-        await SettingApi.updateTaskTypeNameAndColor(params);
+        await TaskApi.updateTaskTypeNameAndColor(params);
       } catch (error) {
         console.error(error);
       }
@@ -340,6 +334,7 @@ export default {
         try {
           await this.$refs.comp.submit();
           await this.updateTaskTypeNameAndColor();
+          this.fetchTasktype();
         } catch (error) {
           console.error(error);
         }finally {

@@ -1,7 +1,7 @@
 <template>
   <div class="task-manage">
     <task-nav-bar current="taskType"/>
-    <div class="task-manage-main">
+    <div class="task-manage-main" v-loading="pendding">
       <div class="task-manage-header">
         <div>
           <h2>工单类型</h2>
@@ -12,7 +12,6 @@
         </div>
       </div>
       <draggable
-        v-loading="pendding"
         v-model="taskTypeList"
         v-bind="dragOptions"
         class="task-type-list"

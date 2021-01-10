@@ -509,8 +509,8 @@ export default {
     },
     /* 渲染工单审批dom */
     renderTaskApproveDom(record = {}) {
-      let { content, taskNo, address, userName, longitude, latitude, level } = record;
-      let { state } = content;
+      let { content, taskNo, address, userName, longitude, latitude } = record;
+      let { state, level } = content;
       // 工单审批状态
       let taskState = {
         unApproved: state == 'unapproved',
