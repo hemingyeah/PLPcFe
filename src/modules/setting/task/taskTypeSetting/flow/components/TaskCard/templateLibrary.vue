@@ -134,7 +134,7 @@ export default {
                 color: #333333;
                 line-height: 22px;
                 .task-card-angle{
-                    width: 44px;
+                    padding: 0 9px;
                     height: 22px;
                     line-height: 22px;
                     font-size: 12px;

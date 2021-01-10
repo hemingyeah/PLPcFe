@@ -259,7 +259,7 @@ export default {
               }
             }))
           }
-          cardSysList.push({name:'全部', list:cardAll}, {name:'物流', list:wuliu}, {name:'质量', list:zhiliang}, {name:'产品', list:chanpin}, {name:'市场', list:shichang}, {name:'客诉', list:kesu}, {name:'费用', list:feiyong}, {name:'工时', list:gongshi})
+          cardSysList.push({name:'全部', list:cardAll}, {name:'物流', list:wuliu}, {name:'质量', list:zhiliang}, {name:'产品', list:chanpin}, {name:'市场', list:shichang}, {name:'客诉', list:kesu}, {name:'费用', list:feiyong}, {name:'系统组件', list:gongshi})
           if(!this.isShowCardWorkTime){
             this.cardSysList = cardSysList.filter(item=>item.name !== '工时') 
           }else{
