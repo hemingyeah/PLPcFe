@@ -9,15 +9,6 @@
       <span class="el-dialog__title">{{
         id ? "编辑组件名称" : "新建附加组件"
       }}</span>
-      <el-tooltip
-        class="item"
-        effect="dark"
-        content="每个附加组件可以有5个自定义字段"
-        placement="top"
-        v-if="!id"
-      >
-        <span><i class="el-icon-question"></i></span>
-      </el-tooltip>
     </div>
     <div class="base-modal-content">
       <el-form :model="form" :rules="rules" ref="form" label-width="80px">
