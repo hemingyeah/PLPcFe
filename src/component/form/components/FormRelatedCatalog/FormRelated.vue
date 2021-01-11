@@ -39,15 +39,15 @@
 
 <script>
 /** api */
-import { searchAllcatalog } from "@src/api/ProductV2Api";
+import { searchAllcatalog } from '@src/api/ProductV2Api';
 
 /** mixin */
-import FormMixin from "@src/component/form/mixin/form";
+import FormMixin from '@src/component/form/mixin/form';
 
-import _ from "lodash";
+import _ from 'lodash';
 
 export default {
-  name: "form-related-catalog",
+  name: 'form-related-catalog',
   mixins: [FormMixin],
   props: {
     value: {
@@ -84,7 +84,7 @@ export default {
         this.options = value;
       }
     },
-    search(keyword = "") {
+    search(keyword = '') {
       let params = {
         page: this.page,
         pageSize: this.pageSize,

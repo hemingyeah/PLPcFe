@@ -50,7 +50,7 @@ function getStorageKey(key: string): string {
   return userId ? `${userId}-${key}` : key
 }
 
-export async function storageGet<T, K>(key: string, defaultValue: K, module: StorageModuleEnum,): Promise<T | K | string | null>{  
+export async function storageGet<T, K>(key: string, defaultValue: K, module: StorageModuleEnum): Promise<T | K | string | null> {  
   try {
     localForage.config({
       storeName: module

@@ -1,71 +1,73 @@
 <template>
   <div class="shb-main">
     <div class="frame">
-      <frame-nav
-        :collapse.sync="collapse"
-        :source="navBarMenus"
-        :callcenter="has_call_center_module"
-        @open="openForNav"
-        @collapse-changed="adjustOpenTab"
-        v-if="showNavBar"
-      />
+      <frame-nav :collapse.sync="collapse"
+                 :source="navBarMenus"
+                 :callcenter="has_call_center_module"
+                 @open="openForNav"
+                 @collapse-changed="adjustOpenTab"
+                 v-if="showNavBar" />
 
       <div class="frame-content">
         <header class="frame-header">
           <div class="frame-quick">
             <div class="frame-quick-left">
-              <button
-                type="button"
-                class="btn-text frame-header-btn frame-collapse frame-header-btn-bg"
-                @click="collapse = !collapse"
-              >
-                <i
-                  :class="['iconfont', collapse ? 'icon-open' : 'icon-Takeup']"
-                ></i>
+              <button type="button"
+                      class="btn-text frame-header-btn frame-collapse frame-header-btn-bg"
+                      @click="collapse = !collapse">
+                <i :class="['iconfont', collapse ? 'icon-open' : 'icon-Takeup']"></i>
               </button>
 
               <!-- start 工单列表切换新旧版 -->
               <template v-if="allowChangeTaskVersion">
-                <el-button
-                  @click="openReason"
-                  class="task-version-btn"
-                  type="primary"
-                  v-if="isUserTaskGray"
-                >返回旧版</el-button
-                >
+                <el-button @click="openReason"
+                           class="task-version-btn"
+                           type="primary"
+                           v-if="isUserTaskGray">返回旧版</el-button>
 
-                <el-button
-                  @click="changeTaskVersion(true)"
-                  class="task-version-btn task-new-version"
-                  type="primary"
-                  v-else
-                >切换新版</el-button
-                >
+                <el-button @click="changeTaskVersion(true)"
+                           class="task-version-btn task-new-version"
+                           type="primary"
+                           v-else>切换新版</el-button>
               </template>
               <!-- end 工单列表切换新旧版 -->
             </div>
 
-            <div class="frame-quick-notification" v-show="notificationShow">
-              <div class="frame-quick-notification-info" ref="notificationInfo">
-                <div class="frame-quick-notification-content" ref="notificationContent">
-                  <p ref="notificationText" class="frame-quick-notification-text">{{ notification.title }}</p>
+            <div class="frame-quick-notification"
+                 v-show="notificationShow">
+              <div class="frame-quick-notification-info"
+                   ref="notificationInfo">
+                <div class="frame-quick-notification-content"
+                     ref="notificationContent">
+                  <p ref="notificationText"
+                     class="frame-quick-notification-text">
+                    {{ notification.title }}
+                  </p>
                 </div>
               </div>
-              <button type="button" @click="closeNotification" class="frame-quick-notification-btn" >
+              <button type="button"
+                      @click="closeNotification"
+                      class="frame-quick-notification-btn">
                 <i class="iconfont icon-chahao"></i>
               </button>
             </div>
 
             <!-- profile -->
             <div class="frame-quick-right">
-              <button v-if="has_call_center_module" type="button" class="btn-text frame-header-btn" @click="handleCallCenterClick">
+              <button v-if="has_call_center_module"
+                      type="button"
+                      class="btn-text frame-header-btn"
+                      @click="handleCallCenterClick">
                 <i class="iconfont icon-dianhua1"></i>
               </button>
-              <div v-if="showCallCenter" class="call-center-box">
-                <p class="customer-name" v-if="!callData.linkmanName">
+              <div v-if="showCallCenter"
+                   class="call-center-box">
+                <p class="customer-name"
+                   v-if="!callData.linkmanName">
                   未知联系人
                 </p>
-                <p class="customer-name" v-if="callData.linkmanName">
+                <p class="customer-name"
+                   v-if="callData.linkmanName">
                   {{ callData.linkmanName }}
                 </p>
                 <p v-if="callData.linkmanName">{{ callData.customerName }}</p>
@@ -80,23 +82,23 @@
                 <p style="margin-top: 10px; font-size: 26px">
                   {{ callData.callPhone }}
                 </p>
-                <el-button
-                  type="danger"
-                  @click="hangUpCall"
-                  style="margin-bottom: 20px"
-                >挂断</el-button
-                >
+                <el-button type="danger"
+                           @click="hangUpCall"
+                           style="margin-bottom: 20px">挂断</el-button>
                 <!-- 呼入 -->
                 <template v-if="callData.callType == 'normal'">
                   <div class="call-in">
                     <p class="today">
-                      今日已来电（<span>{{ callData.dialCount || 0 }}</span>）
+                      今日已来电（
+                      <span>{{ callData.dialCount || 0 }}</span>）
                     </p>
                     <p>
-                      未完成工单（<span>{{ callData.taskCount || 0 }}</span>）
+                      未完成工单（
+                      <span>{{ callData.taskCount || 0 }}</span>）
                     </p>
                     <p>
-                      未完成事件（ <span>{{ callData.eventCount || 0 }}</span>）
+                      未完成事件（
+                      <span>{{ callData.eventCount || 0 }}</span>）
                     </p>
                   </div>
                 </template>
@@ -104,14 +106,17 @@
                   <!-- 呼出 -->
                   <div class="call-out">
                     <p>
-                      今日已来电（<span>{{ callData.dialCount || 0 }}</span >）
+                      今日已来电（
+                      <span>{{ callData.dialCount || 0 }}</span>）
                     </p>
                     <div class="unfinsh">
                       <p>
-                        未完成工单（<span>{{ callData.taskCount || 0 }}</span >）
+                        未完成工单（
+                        <span>{{ callData.taskCount || 0 }}</span>）
                       </p>
                       <p>
-                        未完成事件（<span>{{ callData.eventCount || 0 }}</span>）
+                        未完成事件（
+                        <span>{{ callData.eventCount || 0 }}</span>）
                       </p>
                     </div>
                   </div>
@@ -120,97 +125,98 @@
               </div>
 
               <el-popover v-if="showDevTool">
-                <button type="button" class="btn-text frame-header-btn dev-tool"  slot="reference" >
+                <button type="button"
+                        class="btn-text frame-header-btn dev-tool"
+                        slot="reference">
                   <i class="iconfont icon-experiment"></i>
                 </button>
 
                 <div class="dev-tool-menu">
-                  <a href="javascript:;" @click="clearStorage">清空缓存</a>
-                  <a href="javascript:;" @click="openDemo">demo</a>
+                  <a href="javascript:;"
+                     @click="clearStorage">清空缓存</a>
+                  <a href="javascript:;"
+                     @click="openDemo">demo</a>
                   <a href="javascript:;" @click="goDepartment">组织架构管理</a>
-                  <a href="javascript:;" @click="goDepartment2">组织架构管理2</a>
-                  <a href="javascript:;" @click="goTaskSetting">工单表单设置</a>
-                  <a href="javascript:;" @click="goTaskReceiptSetting"
-                  >工单回执表单设置</a
-                  >
-                  <a href="javascript:;" @click="goCreateTask">新建工单</a>
-                  <a href="javascript:;" @click="goCreateTaskForCallcenter"
-                  >新建工单呼叫中心</a
-                  >
-                  <a href="javascript:;" @click="goTaskList">工单列表</a>
-                  <a href="javascript:;" @click="goProductMenu">产品类型管理</a>
-                  <a href="javascript:;" @click="goProductMenuList"
-                  >产品类型列表</a
-                  >
-                  <a href="javascript:;" @click="goProductMenuField"
-                  >产品类型设置</a
-                  >
-                  <a href="javascript:;" @click="goProductList">产品列表</a>
-                  <a href="javascript:;" @click="goProductEdit">V2新建产品</a>
-                  <!-- <a href="javascript:;" @click="goCallCenterSetting">呼叫中心设置</a>
+                  <a href="javascript:;" @click="goDepartment2">组织架构管理2</a>   
+                  <!-- <a href="javascript:;" @click="goRoleTeam">团队管理</a> -->
+                  <!-- <a href="javascript:;" @click="goProductTemplate">产品模板旧版</a>
+                  <a href="javascript:;" @click="goProductOld">产品管理旧版</a>
+                  <a href="javascript:;" @click="goProductSetting">产品字段设置</a>
+                  <a href="javascript:;" @click="goCustomerContact">客户联系人</a>
+                  <a href="javascript:;" @click="goDoMyself">自助门户设置</a> -->
+                  <a href="javascript:;"
+                     @click="goTaskSetting">工单表单设置</a>
+                  <a href="javascript:;"
+                     @click="goTaskReceiptSetting">工单回执表单设置</a>
+                  <a href="javascript:;"
+                     @click="goCreateTask">新建工单</a>
+                  <a href="javascript:;"
+                     @click="goCreateTaskForCallcenter">新建工单呼叫中心</a>
+                  <a href="javascript:;"
+                     @click="goTaskList">工单列表</a>
+                  <a href="javascript:;"
+                     @click="goProductMenu">产品类型管理</a>
+                  <a href="javascript:;"
+                     @click="goProductMenuList">产品类型列表</a>
+                  <a href="javascript:;"
+                     @click="goProductMenuField">产品类型设置</a>
+                  <a href="javascript:;"
+                     @click="goProductList">产品列表</a>
+                  <a href="javascript:;"
+                     @click="goProductEdit">V2新建产品</a>
+                  <a href="javascript:;"
+                     @click="resetGuide('productV2')">重置超级二维码引导</a>
+                  <a href="javascript:;"
+                     @click="resetGuide('taskV2')">重置工单引导</a>
+                     <!-- <a href="javascript:;" @click="goCallCenterSetting">呼叫中心设置</a>
                   <a href="javascript:;" @click="goCallCenterWorkbench">呼叫工作台</a>
                   <a href="javascript:;" @click="goCallCenter">呼叫中心</a> -->
                 </div>
               </el-popover>
 
-              <button
-                type="button"
-                class="btn-text frame-header-btn frame-header-btn-bg"
-                @click="openHelpDoc"
-                title="帮助文档"
-                v-tooltip
-              >
+              <button type="button"
+                      class="btn-text frame-header-btn frame-header-btn-bg"
+                      @click="openHelpDoc"
+                      title="帮助文档"
+                      v-tooltip>
                 <i class="iconfont icon-bangzhu"></i>
               </button>
 
-              <button
-                type="button"
-                class="btn-text frame-header-btn frame-header-btn-bg"
-                @click="openSaleManager"
-                title="专属客服"
-                v-tooltip
-              >
+              <button type="button"
+                      class="btn-text frame-header-btn frame-header-btn-bg"
+                      @click="openSaleManager"
+                      title="专属客服"
+                      v-tooltip>
                 <i class="iconfont icon-customerservice"></i>
               </button>
 
-              <el-popover
-                trigger="click"
-                :value="exportPopperVisible"
-                popper-class="export-panel-popper"
-                placement="bottom-end"
-                @input="exportPopoverToggle"
-              >
-                <button
-                  type="button"
-                  :title="backgroundTaskTitle"
-                  v-tooltip
-                  class="btn-text frame-header-btn frame-header-btn-bg"
-                  slot="reference"
-                >
+              <el-popover trigger="click"
+                          :value="exportPopperVisible"
+                          popper-class="export-panel-popper"
+                          placement="bottom-end"
+                          @input="exportPopoverToggle">
+                <button type="button"
+                        :title="backgroundTaskTitle"
+                        v-tooltip
+                        class="btn-text frame-header-btn frame-header-btn-bg"
+                        slot="reference">
                   <i class="iconfont icon-xiazai"></i>
                 </button>
                 <!-- start 导入导出下载 -->
-                <import-and-export-view
-                  :title="backgroundTaskTitle"
-                  :source-list="exportList"
-                  @change="operationListChange"
-                ></import-and-export-view>
-                <!-- end 导入导出下载 -->
+                <import-and-export-view :title="backgroundTaskTitle"
+                                        :source-list="exportList"
+                                        @change="operationListChange"></import-and-export-view>
+                                        <!-- end 导入导出下载 -->
               </el-popover>
               <!--导出下载-->
 
-              <button
-                type="button"
-                class="btn-text frame-header-btn frame-header-btn-bg notification-btn"
-                @click="openNotificationCenter"
-                title="通知中心"
-                v-tooltip
-              >
-                <span
-                  class="notification-new"
-                  v-show="notification.count && notification.count > 0"
-                >{{ notification.count > 99 ? 99 : notification.count }}</span
-                >
+              <button type="button"
+                      class="btn-text frame-header-btn frame-header-btn-bg notification-btn"
+                      @click="openNotificationCenter"
+                      title="通知中心"
+                      v-tooltip>
+                <span class="notification-new"
+                      v-show="notification.count && notification.count > 0">{{ notification.count > 99 ? 99 : notification.count }}</span>
                 <i class="iconfont">&#xe624;</i>
               </button>
 
@@ -226,10 +232,8 @@
                     @click.stop.prevent="openUserView"
                   >
                     <img :src="userAvatar" />
-                    <span
-                      class="user-color-icon user-color-icon-mini"
-                      :style="{ backgroundColor: userStateColor }"
-                    ></span>
+                    <span class="user-color-icon user-color-icon-mini"
+                          :style="{ backgroundColor: userStateColor }"></span>
                   </a>
                   <div class="user-info">
                     <h4>{{ loginUser.displayName }}</h4>
@@ -238,37 +242,30 @@
                   <i class="iconfont icon-nav-down user-profile-down"></i>
                 </div>
 
-                <el-popover
-                  placement="left-start"
-                  popper-class="user-state-popper"
-                  trigger="hover"
-                  v-model="userStatePopperVisible"
-                >
-                  <div class="user-profile-item" slot="reference">
+                <el-popover placement="left-start"
+                            popper-class="user-state-popper"
+                            trigger="hover"
+                            v-model="userStatePopperVisible">
+                  <div class="user-profile-item"
+                       slot="reference">
                     <i class="iconfont icon-user-status"></i>工作状态
                   </div>
 
                   <div class="user-state-panel">
-                    <div
-                      class="user-profile-item user-state-item"
-                      v-for="(color, state) in userStateMap"
-                      :key="state"
-                      @click="chooseUserState(state)"
-                    >
-                      <span
-                        class="user-color-icon"
-                        :style="{ backgroundColor: color }"
-                      ></span>
+                    <div class="user-profile-item user-state-item"
+                         v-for="(color, state) in userStateMap"
+                         :key="state"
+                         @click="chooseUserState(state)">
+                      <span class="user-color-icon"
+                            :style="{ backgroundColor: color }"></span>
                       <span>{{ state }}</span>
                     </div>
                   </div>
                 </el-popover>
 
                 <div class="user-profile-item">
-                  <a
-                    :href="`/mine/` + loginUser.userId"
-                    @click.prevent.self="openUserView"
-                  >
+                  <a :href="`/mine/` + loginUser.userId"
+                     @click.prevent.self="openUserView">
                     <i class="iconfont icon-people"></i>个人中心
                   </a>
                 </div>
@@ -279,8 +276,9 @@
                 </div>
 
                 <div class="user-profile-item logout">
-                  <a href="javascript:;" @click.prevent="logout">
-                    <i class="iconfont icon-logout"></i>退出
+                  <a href="javascript:;"
+                     @click.prevent="logout">
+                    <i class="iconfont icon-logout"></i>{{isInDingTalk ? '注销' : '退出'}}
                   </a>
                 </div>
               </el-popover>
@@ -288,41 +286,38 @@
           </div>
 
           <div class="frame-tabs">
-            <button
-              type="button"
-              class="btn-text frame-tabs-prev"
-              :class="{ 'frame-tab-highlight': prevBtnEnable }"
-              @click="prev"
-            >
+            <button type="button"
+                    class="btn-text frame-tabs-prev"
+                    :class="{ 'frame-tab-highlight': prevBtnEnable }"
+                    @click="prev">
               <i class="iconfont icon-zuoyidong"></i>
             </button>
 
             <!-- tabs -->
-            <div class="frame-tabs-scroll" ref="scroll" @wheel="tabScroll">
-              <div
-                ref="list"
-                :class="{ 'frame-tabs-list': true,'frame-tab-transition': offsetTransition,}"
-                :style="{ transform: `translateX(${-offset}px)` }"
-                @transitionend="tabTransitionEnd"
-              >
-                <frame-tab
-                  v-for="(tab, index) in frameTabs"
-                  :key="`${index}_${tab.url}`"
-                  :tab="tab"
-                  @jump="jumpFrameTab"
-                  @reload="reloadFrameTab"
-                  @close="closeFrameTab"
-                />
+            <div class="frame-tabs-scroll"
+                 ref="scroll"
+                 @wheel="tabScroll">
+              <div ref="list"
+                   :class="{
+                     'frame-tabs-list': true,
+                     'frame-tab-transition': offsetTransition,
+                   }"
+                   :style="{ transform: `translateX(${-offset}px)` }"
+                   @transitionend="tabTransitionEnd">
+                <frame-tab v-for="(tab, index) in frameTabs"
+                           :key="`${index}_${tab.url}`"
+                           :tab="tab"
+                           @jump="jumpFrameTab"
+                           @reload="reloadFrameTab"
+                           @close="closeFrameTab" />
               </div>
               <div class="frame-tabs-border"></div>
             </div>
 
-            <button
-              type="button"
-              class="btn-text frame-tabs-next"
-              :class="{ 'frame-tab-highlight': nextBtnEnable }"
-              @click="next"
-            >
+            <button type="button"
+                    class="btn-text frame-tabs-next"
+                    :class="{ 'frame-tab-highlight': nextBtnEnable }"
+                    @click="next">
               <i class="iconfont icon-youyidong"></i>
             </button>
           </div>
@@ -330,46 +325,37 @@
 
         <div class="frame-main">
           <div class="frame-tab-content">
-            <div
-              class="frame-tab-window"
-              v-for="(tab, index) in frameTabs"
-              :key="`${index}_${tab.url}`"
-              v-show="tab.show"
-            >
-              <iframe
-                :id="`frame_tab_${tab.id}`"
-                :fromid="tab.fromId"
-                :data-id="tab.id"
-                :src="tab.url"
-                @load="updateFrameTab($event, tab)"
-                allowfullscreen
-              />
+            <div class="frame-tab-window"
+                 v-for="(tab, index) in frameTabs"
+                 :key="`${index}_${tab.url}`"
+                 v-show="tab.show">
+              <iframe :id="`frame_tab_${tab.id}`"
+                      :fromid="tab.fromId"
+                      :data-id="tab.id"
+                      :src="tab.url"
+                      @load="updateFrameTab($event, tab)"
+                      allowfullscreen />
             </div>
           </div>
         </div>
       </div>
-      <version
-        :version="releaseVersion"
-        v-if="loadedEdition"
-        :edition="shbEdition"
-        @showSystemPopup="updateSystemPopup"
-      />
+      <version :version="releaseVersion"
+               v-if="loadedEdition"
+               :edition="shbEdition"
+               @showSystemPopup="updateSystemPopup" />
       <!--start 系统弹窗 -->
-      <system-popup :system-data.sync="systemData" v-if="loadedSystemModal" />
+      <system-popup :system-data.sync="systemData"
+                    v-if="loadedSystemModal" />
       <!--end 系统弹窗 -->
-      <sale-manager
-        :service-group-url="initData.serviceGroupUrl"
-        :qrcode="initData.saleManagerQRCode"
-        :show.sync="saleManagerShow"
-      />
-      <notification-center
-        ref="notification"
-        :info="notificationInfo"
-        :all-count="notification.count"
-        @clearNum="clearNum"
-        @getNum="getNum"
-      ></notification-center>
-      <!-- <base-context-menu for=".frame-tab" :menu-render="menuRender" @command="closeTabHandler"></base-context-menu> -->
+      <sale-manager :service-group-url="initData.serviceGroupUrl"
+                    :qrcode="initData.saleManagerQRCode"
+                    :show.sync="saleManagerShow" />
+      <notification-center ref="notification"
+                           :info="notificationInfo"
+                           :all-count="notification.count"
+                           @clearNum="clearNum"
+                           @getNum="getNum"></notification-center>
+                           <!-- <base-context-menu for=".frame-tab" :menu-render="menuRender" @command="closeTabHandler"></base-context-menu> -->
     </div>
     <!-- start 用户向导 -->
     <user-guide ref="userGuideView"></user-guide>
@@ -421,8 +407,9 @@
     <!--end 提醒存在多个企业-->
 
     <!-- S 返回旧版原因弹框 -->
-    <reason-panel ref="reasonPanel" @oldVersion="changeTaskVersion(false)" />
-    <!-- E 返回旧版原因弹框 -->
+    <reason-panel ref="reasonPanel"
+                  @oldVersion="changeTaskVersion(false)" />
+                  <!-- E 返回旧版原因弹框 -->
   </div>
 </template>
 
@@ -476,8 +463,9 @@ export default {
   mixins: [FrameManager],
   name: 'frame-view',
   inject: ['initData'],
-  data() {
+  data () {
     return {
+      isInDingTalk: platform.inDingTalk,
       tenantInform:{},
       showTour: false,
       options: {
@@ -528,7 +516,7 @@ export default {
         num: 3, // 3次心跳均未响应重连
         timeoutObj: null,
         serverTimeoutObj: null,
-        start() {
+        start () {
           let _num = this.num;
           this.timeoutObj && clearTimeout(this.timeoutObj);
           this.serverTimeoutObj && clearTimeout(this.serverTimeoutObj);
@@ -562,7 +550,7 @@ export default {
     loadedSystemModal() {
       return this.loadedSystemPopup && this.showSystemPopup;
     },
-    wsUrl() {
+    wsUrl () {
       // websocket连接地址
       // return `ws://30.40.56.211:8080/websocket/asset/7416b42a-25cc-11e7-a500-00163e12f748_dd4531bf-7598-11ea-bfc9-00163e304a25`
       const currentProtocol = window.location.protocol;
@@ -570,10 +558,8 @@ export default {
       if (currentProtocol === 'https:') {
         protocol = 'wss';
       }
-      return `${protocol}://${
-        window.location.hostname
-      }/api/callcenter/outside/websocket/asset/${this.loginUser.tenantId}_${
-        this.loginUser.userId
+      return `${protocol}://${window.location.hostname
+      }/api/callcenter/outside/websocket/asset/${this.loginUser.tenantId}_${this.loginUser.userId
       }`;
     },
     /** 是否显示devtool */
@@ -581,19 +567,19 @@ export default {
       return this.$appConfig.env != "production" || this.initData.env != "prod" || this.initData.env != "production";
     },
     /** 用户工作状态颜色配置 */
-    userStateMap() {
+    userStateMap () {
       return this.initData.userStateMap || {};
     },
     /** 用户工作状态颜色 */
-    userStateColor() {
+    userStateColor () {
       let state = this.loginUser.state;
       return this.userStateMap[state];
     },
     /** 用户头像 */
-    userAvatar() {
+    userAvatar () {
       return this.loginUser.head || DefaultHead;
     },
-    releaseVersion() {
+    releaseVersion () {
       return (
         (this.initData.releaseVersion
           && this.initData.releaseVersion
@@ -603,21 +589,21 @@ export default {
       );
     },
     /** 激活状态的工单列表 */
-    currentTaskListTab() {
+    currentTaskListTab () {
       let taskList = this.frameTabs.filter(
         (tab) => this.taskListIds.indexOf(tab.id) > -1 && tab.show
       );
       return taskList[0] || {};
     },
     /** 允许切换工单新旧版本 */
-    allowChangeTaskVersion() {
+    allowChangeTaskVersion () {
       // 企业是否开启工单灰度功能
       let isTaskGray = this.initData.isTaskGrayFunction
       return isTaskGray && this.currentTaskListTab.id;
     },
   },
   methods: {
-    openReason() {
+    openReason () {
       if (localStorage.getItem('reason_bool')) {
         this.changeTaskVersion(false);
         return;
@@ -655,7 +641,7 @@ export default {
     updateSystemPopup(){
       this.showSystemPopup = true
     },
-    async hangUpCall() {
+    async hangUpCall () {
       try {
         let { code, message } = await CallCenterApi.hangUpCall();
         if (code != 0) this.$message.error(message || '内部错误');
@@ -665,7 +651,7 @@ export default {
       }
     },
     // 判断当前租户是否开启呼叫中心灰度功能
-    async judgeCallCenterGray() {
+    async judgeCallCenterGray () {
       localStorage.setItem('call_center_gray', 0);
       localStorage.setItem('call_center_module', 0);
       try {
@@ -685,7 +671,7 @@ export default {
         console.error(error);
       }
     },
-    async getAccountInfo() {
+    async getAccountInfo () {
       localStorage.setItem('call_center_module', 0);
       try {
         const { code, result } = await CallCenterApi.getAccountInfo();
@@ -709,7 +695,7 @@ export default {
         console.error(error);
       }
     },
-    menuRender(h, target) {
+    menuRender (h, target) {
       let menus = [
         <base-context-menu-item command="other">
           关闭其他
@@ -725,11 +711,11 @@ export default {
 
       return menus;
     },
-    adjustOpenTab() {
+    adjustOpenTab () {
       let tab = this.frameTabs.find((item) => item.show);
       this.adjustFrameTabs(tab);
     },
-    openDemo() {
+    openDemo () {
       this.openForFrame({
         id: 'demo',
         url: '/demo',
@@ -737,7 +723,7 @@ export default {
       });
     },
     /** @deprecated */
-    async updateUser() {
+    async updateUser () {
       try {
         let result = await http.get(
           `/security/user/get/${this.loginUser.userId}`
@@ -751,7 +737,7 @@ export default {
       }
     },
     /** 选择用户状态 */
-    async chooseUserState(state) {
+    async chooseUserState (state) {
       this.userStatePopperVisible = false;
       this.profilePopperVisible = false;
       try {
@@ -769,10 +755,10 @@ export default {
         console.error(error);
       }
     },
-    updateUserState(state) {
+    updateUserState (state) {
       this.loginUser.state = state;
     },
-    async logout() {
+    async logout () {
       if (await platform.confirm('您确定要退出系统吗？')) {
         window.location.href = platform.inDingTalk
           ? '/smlogin/pc/logout'
@@ -783,7 +769,7 @@ export default {
       platform.openLink(!platform.inDingTalk ? 'https://www.yuque.com/shb/help2' : 'https://www.yuque.com/shb/help');
       this.profilePopperVisible = false;
     },
-    openUserView(event) {
+    openUserView (event) {
       this.openForFrame({
         id: 'userCenter',
         url: `/mine/${this.loginUser.userId}`,
@@ -791,16 +777,16 @@ export default {
       });
       this.profilePopperVisible = false;
     },
-    openSaleManager() {
+    openSaleManager () {
       this.saleManagerShow = true;
       this.profilePopperVisible = false;
     },
-    openNotificationCenter() {
+    openNotificationCenter () {
       this.$refs.notification.showComponent();
       this.profilePopperVisible = false;
     },
     /** 检测是否有导出 */
-    async checkExports() {
+    async checkExports () {
       try {
         this.exportList = (await http.get('/excels/getList')) || []; // 报错
         // 更新操作列表
@@ -838,15 +824,15 @@ export default {
       }
     },
     /* 导入导出操作列表变化 */
-    operationListChange(list) {
+    operationListChange (list) {
       this.operationList = list;
       this.checkExports();
     },
-    clearStorage() {
+    clearStorage () {
       localStorage.clear();
     },
     /** @deprecated */
-    clearCachedIds() {
+    clearCachedIds () {
       let cachedKey = localStorage.getItem('cachedKey');
       let cachedKeyArray = [];
 
@@ -855,7 +841,7 @@ export default {
       localStorage.removeItem('cachedKey');
     },
     // popover manage
-    exportPopoverToggle(visible) {
+    exportPopoverToggle (visible) {
       this.exportPopperVisible = visible;
 
       if (visible) {
@@ -863,7 +849,7 @@ export default {
         this.userStatePopperVisible = false;
       }
     },
-    goRoleTeam() {
+    goRoleTeam () {
       platform.openTab({
         id: 'team',
         title: '团队管理',
@@ -871,7 +857,7 @@ export default {
         reload: true,
       });
     },
-    closeNotification() {
+    closeNotification () {
       this.notificationShow = false;
       sessionStorage.setItem(
         'shb_systemMsg',
@@ -880,7 +866,7 @@ export default {
       this.clearAnimation();
     },
     // 获取系统弹窗
-    async getSystemPopup() {
+    async getSystemPopup () {
       try {
         let info = await http.get('/api/app/outside/message/v1/getSysMsgAlert');
         if (info.status == 0 && info.data.length > 0) {
@@ -892,7 +878,7 @@ export default {
       }
     },
     // 获取系统消息，本地存储，超出滚动
-    async getSystemMsg() {
+    async getSystemMsg () {
       try {
         let info = await NotificationApi.newGetMessage();
         if (info.status == 0) {
@@ -918,7 +904,7 @@ export default {
     },
 
     /** 设置滚动动画 */
-    setAnimation() {
+    setAnimation () {
       this.$nextTick(() => {
         let textWidth = this.$refs.notificationText.offsetWidth;
         let infoWidth = this.$refs.notificationInfo.offsetWidth - 30;
@@ -928,12 +914,12 @@ export default {
         }
       });
     },
-    clearAnimation() {
+    clearAnimation () {
       this.$refs.notificationContent.style.animation = '';
     },
 
     /** 删除未读消息或消息已读后更新新通知数量 */
-    clearNum(e) {
+    clearNum (e) {
       if (e.count == -1) return (this.notification.count = 0);
       let count_ = this.notification.count - e.count;
       // 通知总数风险把控不把非正整数暴露给用户
@@ -944,7 +930,7 @@ export default {
       count_ = Math.round(count_);
       this.notification.count = count_;
     },
-    getNum() {
+    getNum () {
       this.getSystemMsg();
     },
     goDepartment() {
@@ -963,7 +949,23 @@ export default {
         reload: true,
       });
     },
-    goCustomerContact() {
+    goProductTemplate () {
+      platform.openTab({
+        id: "department_view",
+        title: "组织架构管理",
+        url: "/security/department/view",
+        reload: true,
+      });
+    },
+    goProductOld () {
+      platform.openTab({
+        id: "dept_view",
+        title: "组织架构管理",
+        url: "/security/dept/view",
+        reload: true,
+      });
+    },
+    goProductSetting () {
       platform.openTab({
         id: 'product_setting',
         title: '产品设置',
@@ -971,7 +973,7 @@ export default {
         reload: true,
       });
     },
-    goProductSetting() {
+    goCustomerContact () {
       platform.openTab({
         id: 'customer_contact',
         title: '产品设置',
@@ -979,7 +981,7 @@ export default {
         reload: true,
       });
     },
-    goDoMyself() {
+    goDoMyself () {
       platform.openTab({
         id: 'do_myself',
         title: '消息中心',
@@ -987,7 +989,7 @@ export default {
         reload: true,
       });
     },
-    goTaskSetting() {
+    goTaskSetting () {
       platform.openTab({
         id: 'task_fields_setting',
         title: '工单表单设置',
@@ -995,7 +997,7 @@ export default {
         reload: true,
       });
     },
-    goTaskReceiptSetting() {
+    goTaskReceiptSetting () {
       platform.openTab({
         id: 'task_receipt_fields_setting',
         title: '工单回执表单设置',
@@ -1003,7 +1005,7 @@ export default {
         reload: true,
       });
     },
-    goCreateTask() {
+    goCreateTask () {
       platform.openTab({
         id: 'task_create',
         title: '新建工单',
@@ -1011,7 +1013,7 @@ export default {
         reload: true,
       });
     },
-    goCreateTaskForCallcenter() {
+    goCreateTaskForCallcenter () {
       platform.openTab({
         id: 'task_create',
         title: '新建工单呼叫中心',
@@ -1020,7 +1022,7 @@ export default {
           '/task/edit4CallCenter?callRecordId=1&linkmanId=e8540bd4-e5eb-11ea-9929-00163e304a25',
       });
     },
-    goTaskList() {
+    goTaskList () {
       platform.openTab({
         id: 'task_list',
         title: '工单列表',
@@ -1028,7 +1030,7 @@ export default {
         reload: true,
       });
     },
-    goCallCenterSetting() {
+    goCallCenterSetting () {
       platform.openTab({
         id: 'callcenter_setting',
         title: '呼叫中心设置',
@@ -1036,7 +1038,7 @@ export default {
         reload: true,
       });
     },
-    goCallCenter() {
+    goCallCenter () {
       platform.openTab({
         id: 'callcenter_stage',
         title: '呼叫中心',
@@ -1044,7 +1046,7 @@ export default {
         reload: true,
       });
     },
-    goCallCenterWorkbench() {
+    goCallCenterWorkbench () {
       platform.openTab({
         id: 'M_CALLCENTER_WORKBENCH_LIST',
         title: '呼叫中心工作台',
@@ -1052,7 +1054,7 @@ export default {
         reload: true,
       });
     },
-    goMyShopOrder() {
+    goMyShopOrder () {
       platform.openTab({
         id: 'my_shop_order_list',
         title: '订单列表',
@@ -1060,7 +1062,7 @@ export default {
         reload: true,
       });
     },
-    goProductMenu() {
+    goProductMenu () {
       platform.openTab({
         id: 'productV2_catalog_edit',
         title: '产品类型管理',
@@ -1068,7 +1070,7 @@ export default {
         reload: true,
       });
     },
-    goProductMenuList() {
+    goProductMenuList () {
       platform.openTab({
         id: 'M_PRODUCT_CATALOG',
         title: '产品类型列表',
@@ -1076,7 +1078,7 @@ export default {
         reload: true,
       });
     },
-    goProductList() {
+    goProductList () {
       platform.openTab({
         id: 'productV2_list',
         title: '产品类型',
@@ -1084,7 +1086,7 @@ export default {
         reload: true,
       });
     },
-    goProductEdit(){
+    goProductEdit () {
       platform.openTab({
         id: 'productV2_edit',
         title: '新建产品V2',
@@ -1092,7 +1094,7 @@ export default {
         reload: true,
       });
     },
-    goProductMenuField() {
+    goProductMenuField () {
       platform.openTab({
         id: 'productV2_set_field',
         title: '产品类型设置',
@@ -1100,19 +1102,28 @@ export default {
         reload: true,
       });
     },
-    handleCallCenterClick() {
+    resetGuide (path) {
+
+      try {
+        let res_ = require(`src/component/guide/${path}Store`);
+        for (let key in res_) {
+          localStorage.removeItem(res_[key]);
+
+        }
+      } catch (error) {
+        console.warn(error, 'error try catch');
+      }
+    },
+    handleCallCenterClick () {
       // this.showCallCenter = true
       this.goCallCenterWorkbench();
     },
-    openCallCenterWorkbench(data) {
+    openCallCenterWorkbench (data) {
       // console.info('data::', data);
       let url = data && data.id
-        ? `/setting/callcenter/workbench?id=${data.id}&dialCount=${
-          data.dialCount
-        }&linkmanName=${data.linkmanName}&callPhone=${
-          data.callPhone
-        }&callType=${data.callType}&callState=${data.callState}&ringTime=${
-          data.ringTime
+        ? `/setting/callcenter/workbench?id=${data.id}&dialCount=${data.dialCount
+        }&linkmanName=${data.linkmanName}&callPhone=${data.callPhone
+        }&callType=${data.callType}&callState=${data.callState}&ringTime=${data.ringTime
         }`
         : '/setting/callcenter/workbench';
       platform.openTab({
@@ -1122,7 +1133,7 @@ export default {
         reload: true,
       });
     },
-    initWebSocket() {
+    initWebSocket () {
       webSocketClient = new WebSocket(this.wsUrl);
       try {
         webSocketClient.onopen = this.webSocketOpen;
@@ -1134,7 +1145,7 @@ export default {
         this.reconnect(this.wsUrl);
       }
     },
-    webSocketOpen() {
+    webSocketOpen () {
       // console.info('WebSocket连接成功')
       // this.heartCheck.start();
 
@@ -1142,7 +1153,7 @@ export default {
         this.send(JSON.stringify({ action: 'ping' }));
       }, 500);
     },
-    async webSocketOnMessage(e) {
+    async webSocketOnMessage (e) {
       this.heartCheck.start();
       // console.info('数据内容：{0}', e.data)
       // pong 是心跳
@@ -1178,7 +1189,7 @@ export default {
         console.error(error);
       }
     },
-    send(param) {
+    send (param) {
       try {
         // console.info('readyState:', webSocketClient.readyState)
         webSocketClient.send(param);
@@ -1186,15 +1197,15 @@ export default {
         console.error('error', err);
       }
     },
-    webSocketClose(e) {
+    webSocketClose (e) {
       // console.error('WebSocket连接关闭', e)
       this.reconnect(this.wsUrl);
     },
-    webSocketError() {
+    webSocketError () {
       // console.error('WebSocket连接失败')
       this.reconnect(this.wsUrl);
     },
-    reconnect(url) {
+    reconnect (url) {
       if (lockReconnect) {
         return;
       }
@@ -1209,7 +1220,7 @@ export default {
     /**
      * @description 切换工单新旧版本
      */
-    changeTaskVersion: _.debounce(function(version) {
+    changeTaskVersion: _.debounce(function (version) {
       // 工单列表重定向
       this.currentTaskListTab.url = `/task?newVersion=${version}`;
       this.reloadFrameTab(this.currentTaskListTab, true);
@@ -1218,7 +1229,7 @@ export default {
     /**
      * 获取售后宝版本号
      */
-    async getShbEdition() {
+    async getShbEdition () {
       const DefaultEdition = 1;
       let shbEdition = DefaultEdition;
 
@@ -1239,7 +1250,7 @@ export default {
       this.shbEdition = shbEdition;
       this.buildNavbarMenus();
     },
-    buildNavbarMenus() {
+    buildNavbarMenus () {
       let menus = this.initData?.menus || [];
       // 需要被过滤掉的菜单key对象
       let filterMeunKeyMap = {
@@ -1276,16 +1287,16 @@ export default {
       this.navBarMenus = menus;
       this.showNavBar = true;
     },
-    pushTaskListIds(id) {
+    pushTaskListIds (id) {
       this.taskListIds.push(id);
     },
-    getUserTaskGray() {
+    getUserTaskGray () {
       return this.isUserTaskGray
     },
-    flashSomePage(arr = []) {
+    flashSomePage (arr = []) {
       try {
         for (let index = 0; index < this.frameTabs.length; index++) {
-          if (arr.some(item=> item.type == this.frameTabs[index].id)) {
+          if (arr.some(item => item.type == this.frameTabs[index].id)) {
             this.$platform.refreshTab(this.frameTabs[index].id);
           }
         }
@@ -1304,7 +1315,7 @@ export default {
     window.loginUser = this.loginUser;
     window.getUserTaskGray = this.getUserTaskGray;
 
-    window.resizeFrame = function() {
+    window.resizeFrame = function () {
       console.warn('此方法只用于兼容旧页面，无实际效果，不推荐调用');
     };
 
@@ -1316,7 +1327,7 @@ export default {
       this.getSystemMsg();
     }, NOTIFICATION_TIME);
   },
-  async mounted() {
+  async mounted () {
     await this.judgeCallCenterGray();
     let userGuide = this?.initData?.userGuide === true || false;
 
@@ -1333,7 +1344,7 @@ export default {
           Object.keys(GuideStoreObj[item]).forEach((items) => {
             localStorage.setItem(GuideStoreObj[item][items], '-1');
           });
-        } catch (error) {}
+        } catch (error) { }
       });
     }
 
@@ -1345,7 +1356,7 @@ export default {
           Object.keys(GuideStoreObj[item]).forEach((items) => {
             localStorage.setItem(GuideStoreObj[item][items], '-1');
           });
-        } catch (error) {}
+        } catch (error) { }
       });
     }
 
@@ -1357,7 +1368,7 @@ export default {
           Object.keys(GuideStoreObj[item]).forEach((items) => {
             localStorage.removeItem(GuideStoreObj[item][items]);
           });
-        } catch (error) {}
+        } catch (error) { }
       });
     }
     /** * 部分页面引导 数据处理  e*/

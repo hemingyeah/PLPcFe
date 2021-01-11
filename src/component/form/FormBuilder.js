@@ -1,8 +1,10 @@
-import { FieldManager } from "./components";
-import * as util from "./util";
+import { FieldManager } from './components';
+import * as util from './util';
 
 function createFormField(h, field, comp){
   if(null == comp.build) return comp.build;
+  
+  
   let data = {
     props: {
       field,
@@ -10,9 +12,10 @@ function createFormField(h, field, comp){
       placeholder: util.genPlaceholder(field),
     },
     on: {
-      update: event => this.$emit("update", event)
+      update: event => this.$emit('update', event)
     }
   };
+
   
   return h(comp.build, data);
 }
@@ -22,7 +25,7 @@ function getValue(field, ctx){
 }
 
 const FormBuilder = {
-  name: "form-builder",
+  name: 'form-builder',
   props: {
     fields: {
       type: Array,
@@ -34,7 +37,7 @@ const FormBuilder = {
     },
     mode: {
       type: String,
-      default: ""
+      default: ''
     }
   },
   data(){
@@ -63,14 +66,14 @@ const FormBuilder = {
       });
       return Promise.all(promises)
         .then(results => results.every(msg => !msg))
-        .catch(err => console.error("validate error", err))
+        .catch(err => console.error('validate error', err))
     },
     /** 注册待验证的组件 */
     addFieldHandler(event){
       event.stopPropagation();
       
       let { fieldName, validate } = event.detail;
-      if (event.detail && event.detail.field && event.detail.field.formType === "info") {
+      if (event.detail && event.detail.field && event.detail.field.formType === 'info') {
         return;
       }
       this.validateMap[fieldName] = validate;
@@ -82,7 +85,7 @@ const FormBuilder = {
       delete this.validateMap[fieldName];
     },
     outsideSetRemoteValidateData(data) {
-      this.$set(this, "remoteValidateData", data)
+      this.$set(this, 'remoteValidateData', data)
     } 
   },
   render(h){
@@ -113,11 +116,10 @@ const FormBuilder = {
         }
         
         let formField = createFormField.call(this, h, field, comp);
-        if(comp.formType == "separator" || null == formField) return formField;
+        if(comp.formType == 'separator' || null == formField) return formField;
         
         let formItemClass = [];
         if(field.formType == 'attachment') formItemClass.push('form-item-attachment')
-        
         if(field.formType === 'info') {
           return formField;
         }
@@ -137,7 +139,6 @@ const FormBuilder = {
         let options = vnode.componentOptions || {};
         // 非分割线字段直接显示
         if(options.tag != 'form-separator') return true;
-        
         // 只有在下一个元素存在且不是分割线时，才显示该分割线
         // 如果该节点后面没有非分割线字段，则不显示
         for(let i = index + 1; i < arr.length; i++){
@@ -145,7 +146,7 @@ const FormBuilder = {
           if(next == null) continue;
           
           let nextOptions = next.componentOptions || {};
-          return nextOptions.tag != "form-separator";
+          return nextOptions.tag != 'form-separator';
         }
         
         // 默认返回false, 走到这里意味着后面的节点都是null
@@ -160,12 +161,12 @@ const FormBuilder = {
     )
   },
   mounted(){
-    this.$el.addEventListener("form.add.field", this.addFieldHandler)
-    this.$el.addEventListener("form.remove.field", this.removeFieldHandler)
+    this.$el.addEventListener('form.add.field', this.addFieldHandler)
+    this.$el.addEventListener('form.remove.field', this.removeFieldHandler)
   },
   destroyed(){
-    this.$el.removeEventListener("form.add.field", this.addFieldHandler);
-    this.$el.removeEventListener("form.remove.field", this.removeFieldHandler)
+    this.$el.removeEventListener('form.add.field', this.addFieldHandler);
+    this.$el.removeEventListener('form.remove.field', this.removeFieldHandler)
   }
 };
 

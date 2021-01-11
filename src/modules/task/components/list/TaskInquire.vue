@@ -595,7 +595,7 @@ export default {
         update(event, action) {
           this.form = {};
           if (action === 'tags') {
-            return (this.form.tags = event);
+            return (this.form.tags = event.map(item => {return item}));
           }
 
           if (action === 'dist') {

@@ -195,7 +195,7 @@
     <!-- end 顶部操作区 -->
 
     <!-- start 工单详情折叠面板 -->
-    <base-collapse class="task-detail-main-content" @scroll="getScroll" :show-collapse="showCollapse" :direction.sync="collapseDirection" :style="`margin-top: ${collapse ? marTop - 4 : 60}px`">
+    <base-collapse class="task-detail-main-content" @scroll="getScroll" :show-collapse="showCollapse" :direction.sync="collapseDirection">
       
       <!-- start 工单详情 -->
       <template slot="left">
@@ -211,16 +211,6 @@
             <el-tooltip :popper-options="popperOptions" content="删除工单" placement="top" v-if="allowDeleteTask">
               <i class="iconfont icon-shanchu-copy" @click="deleteTask"></i>
             </el-tooltip>
-          </div>
-
-          <div class="task-detail-step-2-box" :style="nowGuideStep == 3 ? 'width: 104px;height: 40px;background:#fff' : ''" id="v-task-detail-step-2">
-
-            <div class="task-detail-step-2" v-if="nowGuideStep == 3">
-              动态信息
-              <div style="position: relative;">
-                <div class="guide-disable-cover"></div>
-              </div>
-            </div>
           </div>
 
           <el-tabs v-model="leftActiveTab">
@@ -258,6 +248,15 @@
 
         <div class="collapse-right" v-show="collapseDirection == 'right'">
           {{ viewBalanceTab ? '审核结算' : viewFeedbackTab ? '客户评价' : '附加组件' }}
+        </div>
+        <div class="task-detail-step-2-box" :style="nowGuideStep == 3 ? 'width: 104px;height: 40px;background:#fff' : ''" id="v-task-detail-step-2">
+
+          <div class="task-detail-step-2" v-if="nowGuideStep == 3">
+            动态信息
+            <div style="position: relative;">
+              <div class="guide-disable-cover"></div>
+            </div>
+          </div>
         </div>
       </template>
       <!-- end 附加组件 -->
@@ -346,20 +345,20 @@
           <template v-for="(step, index) of tour.steps">
             <v-step v-if="tour.currentStep === index" :key="index" :step="step" :previous-step="tour.previousStep" :next-step="tour.nextStep" :stop="tour.stop" :is-first="tour.isFirst" :is-last="tour.isLast" :labels="tour.labels">
               <template>
-                <div slot="content" class="tour-content-box">
-                  <div class="tour-left-tips">
+                <div slot="content" class="v-tour-content-box">
+                  <div class="v-tour-left-tips">
                     {{ `${index + 1}/${detailSteps.length}` }}
                   </div>
-                  <div class="tour-content">
-                    <div class="flex-x tour-content-head">
+                  <div class="v-tour-content">
+                    <div class="flex-x v-tour-content-head">
                       {{detailSteps[index].title}}
                     </div>
-                    <div class="tour-content-con">
+                    <div class="v-tour-content-con">
                       {{ detailSteps[index].content }}
                     </div>
                   </div>
                 </div>
-                <div slot="actions" class="tour-bottom">
+                <div slot="actions" class="v-tour-bottom">
                   <!-- <div class="text" v-if="index > 0" @click="tour.previousStep">
                     上一步
                   </div> -->
@@ -406,96 +405,85 @@ export default TaskDetailView;
         border-left-color: transparent !important;
         border-right-color: transparent !important;
     }
-
-    .tour-content-box {
-        position: relative;
-        overflow: hidden;
-        padding: 0 20px;
-        border-radius: 4px;
-
-        .tour-left-tips {
-            width: 80px;
-            height: 32px;
-            background: $color-primary;
-            color: #fff;
-            position: absolute;
-            left: -40px;
-            top: 0px;
-            line-height: 40px;
-            font-size: 12px;
-            transform-origin: center top;
-            transform: rotateZ(-45deg);
-            text-align: center;
-        }
-
-        .tour-content {
-            .tour-content-head {
-                padding-top: 32px;
-                padding-bottom: 10px;
-
-                .iconfont {
-                    font-size: 10px;
-                    margin-bottom: 2px;
-                    color: #999;
-                    cursor: pointer;
-                }
-            }
-
-            .tour-content-con {
-                text-align: start;
-                padding-bottom: 12px;
-                color: #666;
-            }
-        }
+    .v-tour-content-box {
+    position: relative;
+    overflow: hidden;
+    padding: 0 20px;
+    border-radius: 4px;
+    .v-tour-left-tips {
+      width: 80px;
+      height: 32px;
+      background: $color-primary;
+      color: #fff;
+      position: absolute;
+      left: -40px;
+      top: 0px;
+      line-height: 40px;
+      font-size: 12px;
+      transform-origin: center top;
+      transform: rotateZ(-45deg);
+      text-align: center;
     }
-
-    .tour-bottom {
-        height: 52px;
-        padding: 0 20px;
-        display: flex;
-        justify-content: flex-end;
-        align-items: center;
-
-        .btns {
-            width: 60px;
-            height: 28px;
-            background: $color-primary;
-            color: #fff;
-            text-align: center;
-            line-height: 28px;
-            border-radius: 4px;
+    .v-tour-content {
+      .v-tour-content-head {
+        padding-top: 32px;
+        padding-bottom: 10px;
+        .iconfont {
+          font-size: 10px;
+          margin-bottom: 2px;
+          color: #999;
+          cursor: pointer;
         }
-
-        .text {
-            color: $color-primary;
-        }
-
-        :nth-child(n) {
-            cursor: pointer;
-        }
-
-        :not(:last-child) {
-            margin-right: 12px;
-        }
+      }
+      .v-tour-content-con {
+        text-align: start;
+        padding-bottom: 12px;
+      }
     }
+  }
 
-    /* 向上的箭头 */
-
-    .normal-arrow-top {
-        font-size: 0;
-        line-height: 0;
-        border-width: 0.5rem;
-        border-color: #fff;
-        width: 0;
-        border-top-width: 0;
-        border-style: dashed;
-        border-bottom-style: solid;
-        border-left-color: transparent;
-        border-right-color: transparent;
-        position: absolute;
-        top: -0.5rem;
+  .v-tour-bottom {
+    height: 52px;
+    padding: 0 20px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    .btns {
+      width: 60px;
+      height: 28px;
+      background: $color-primary;
+      color: #fff;
+      text-align: center;
+      line-height: 28px;
+      border-radius: 4px;
     }
+    .text {
+      color: $color-primary;
+    }
+    :nth-child(n) {
+      cursor: pointer;
+    }
+    :not(:last-child) {
+      margin-right: 12px;
+    }
+  }
 
+  /* 向上的箭头 */
+
+  .normal-arrow-top {
+    font-size: 0;
+    line-height: 0;
+    border-width: 0.5rem;
+    border-color: #fff;
+    width: 0;
+    border-top-width: 0;
+    border-style: dashed;
+    border-bottom-style: solid;
+    border-left-color: transparent;
+    border-right-color: transparent;
+    position: absolute;
+    top: -0.5rem;
+  }
     .guide-model-box {
         position: fixed;
         width: 100%;
@@ -518,7 +506,7 @@ export default TaskDetailView;
     .task-detail-step-2-box {
         position: absolute;
         top: 0;
-        right: -120px;
+        left: 0;
         z-index: 997;
 
         .task-detail-step-2 {

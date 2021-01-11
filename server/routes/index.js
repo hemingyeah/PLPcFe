@@ -163,6 +163,8 @@ router.use('', sparePartRouter.routes(), sparePartRouter.allowedMethods());
 router.use('', departmentRouter.routes(), departmentRouter.allowedMethods());
 router.use('', linkcRouter.routes(), sparePartRouter.allowedMethods());
 router.use('', productV2Router.routes(), sparePartRouter.allowedMethods());
+router.use('', superQrcodeRouter.routes(), sparePartRouter.allowedMethods());
+
 
 router.all('/*', (ctx) => {
   return HttpClient.proxy(ctx);
