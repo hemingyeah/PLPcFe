@@ -3,7 +3,7 @@
     <!--start 新建附加组件 -->
     <div class="card-setting-heard">
       <div class="card-setting-title">
-        <p>附加组件设置</p>
+        <h2>附加组件设置</h2>
         <el-button
           type="primary"
           icon="el-icon-plus"
@@ -12,19 +12,18 @@
         >新建</el-button
         >
       </div>
-      <p class="card-setting-msg">
+      <div class="card-setting-msg">
         附加组件是管理工单的辅助工具，您可以分类记录更新工单的信息，如需更多附加组件请在工单组件管理中添加
         <el-tooltip placement="top" popper-class="card-display-tooltip" >
           <div slot="content">
             <template>
-              <div class="card-displaymode--item">● 使用规则：可以控制每个附加组件在什么节点前必填，以及在什么状态时可以被编辑；可以通过【配置使用规则】功能查看配置详情或修改</div>
-              <div class="card-displaymode-item">● 使用权限：可以控制哪些角色能查看及修改附加组件；默认能看到工单的用户都可以使用附加组件，可以通过【配置使用权限】功能查看详情或修改</div>
-              <div class="card-displaymode-item">类型：可以添加多次还是只能添加一次，由附加组件属性决定</div>
+              <div class="card-displaymode--item">● 使用规则：可以控制每个附加组件在什么节点前必填，以及在什么状态时可以被编辑；可通过【配置使用规则】功能查看配置详情或修改</div>
+              <div class="card-displaymode-item">● 使用权限：可以控制哪些角色能查看及修改附加组件；默认能看到工单的用户都可以使用附加组件，可通过【配置使用权限】功能查看详情或修改</div>
             </template>
           </div>
           <i class="iconfont icon-question"></i>
         </el-tooltip>
-      </p>
+      </div>
     </div>
     <!--end 新建附加组件 -->
 
@@ -135,7 +134,6 @@ export default {
       } catch (error) {
         console.error(error);
       }
-      this.saveCard();
     },
     // 新建附件组件
     addTaskCard() {
@@ -241,23 +239,30 @@ export default {
 </script>
 <style lang="scss" scoped>
 .card-setting-container {
+  min-height: calc(100vh - 48px);
+  background: #F5F5F5;
   .card-setting-heard {
     font-weight: 500;
     color: #333333;
     font-size: 16px;
     background: #fff;
-    padding: 16px 33px 20px 33px;
+    padding: 16px 33px 16px 33px;
     .card-setting-title {
       display: flex;
       justify-content: space-between;
-      line-height: 32px;
-      p {
+      position: relative;
+      h2 {
         margin-right: 16px;
         margin-bottom: 0;
+        color: #333333;
+        font-size: 16px;
+        margin-bottom: 8px;
       }
       button {
         width: 88px;
         height: 32px;
+        position: absolute;
+        right: 0;
       }
     }
     .card-setting-msg {

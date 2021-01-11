@@ -230,10 +230,14 @@ export default {
                 .task-card-scope{
                     display: flex;
                     justify-content: flex-start;
-                    span{
-                       color: $color-primary;
-                       font-size: 12px; 
+                    .el-dropdown{
+                      line-height: 15px;
+                      span{
+                        color: $color-primary;
+                        font-size: 12px;  
+                      }
                     }
+                    
                 }
                 .task-card-li{
                     display: flex;
