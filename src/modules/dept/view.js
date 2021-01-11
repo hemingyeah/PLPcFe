@@ -1,6 +1,10 @@
 import Vue from '@src/common/entry';
 import http from '@src/util/http';
 
+import VueTour from 'vue-tour';
+require('vue-tour/dist/vue-tour.css');
+Vue.use(VueTour);
+
 const DepartmentView = () => import('./DepartmentView.vue');
 
 Vue.prototype.$http = http;

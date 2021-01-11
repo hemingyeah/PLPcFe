@@ -47,6 +47,28 @@ export default {
         title:'工单操作'
       },
       ],
+      deptOptions: {},
+      deptSteps: [{
+        target: '#v-dept-step-0',
+        content: '这里展示您的组织架构信息'
+      },
+      {
+        target: '#v-dept-step-1',
+        content: '点击此处编辑您的主部门信息'
+      },
+      {
+        target: '#v-dept-step-2',
+        content: '在这里展示部门成员信息，您可以对部门成员进行操作'
+      },
+      {
+        target: '#v-dept-step-3',
+        content: '点击此处创建您的子部门'
+      },
+      {
+        target: '#v-dept-step-4',
+        content: '在这里管理您的系统角色'
+      }
+      ],
     };
   },
   methods: {}
