@@ -70,7 +70,11 @@ export default {
     },
     // 返回
     back(){
-      window.parent.frameHistoryBack(window)
+      let fromId = window.frameElement.getAttribute('fromid');
+      this.$platform.refreshTab(fromId);
+
+      let id = window.frameElement.dataset.id
+      this.$platform.closeTab(id)
     },
     // 保存工时记录配置
     saveCardConfigReq() {

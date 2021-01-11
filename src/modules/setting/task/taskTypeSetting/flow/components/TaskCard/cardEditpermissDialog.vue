@@ -89,6 +89,7 @@ export default {
   watch: {
     visiable(newValue) {
       this.show = newValue;
+
       if (newValue) {
         this.getRoleListReq();
         this.tableData = this.rolesList()
@@ -141,6 +142,14 @@ export default {
     },
 
     onClose() {
+      this.allRoles = {
+        canCreate: true,
+        canDelete: true,
+        canRead: true,
+        canWrite: true,
+        id: 'all',
+        name: '全部'
+      }
       this.$emit('onClose');
     },
     onSubmit(form) {

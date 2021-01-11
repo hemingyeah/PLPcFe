@@ -4,24 +4,22 @@
       <el-row type="flex">
         <el-row class="task-card-content" type="flex">
           <div class="task-card-inforn"> 
-            <h2 class="task-card-name"><el-tooltip class="item" effect="dark" :content="card.name" :disabled="card.name.length<13" placement="top-start"><span>{{card.name}}</span></el-tooltip></h2>                                       
+            <h2 class="task-card-name"><el-tooltip class="item" effect="dark" :content="card.name" :disabled="card.name.length<13" placement="top-start"><span>{{card.name}}</span></el-tooltip></h2>                                    
             <p class="task-card-des">{{htmlUnEscape(card.description)}}</p>
           </div>
                     
           <el-row class="task-card-others">
             <div class="task-card-scope">
-              <p>已应用范围：</p>
-              <template v-if="card.range.length>1">
+              <p>  
+                <span class="task-card-tit">已应用范围：</span>
                 <el-dropdown placement="top" @command="modifyTaskType">
-                  <span class="pointer">{{card.range[0].name}}等{{card.range.length}}个</span>         
+                  <span v-if="rangeName.length>35">{{rangeName.substring(0, 35)}}...等{{card.range.length}}个</span>
+                  <span v-else>{{rangeName}}</span>
                   <el-dropdown-menu slot="dropdown">
                     <el-dropdown-item v-for="(item,index) in card.range" :key="index" :command="item.id">{{item.name}}</el-dropdown-item>       
                   </el-dropdown-menu>
                 </el-dropdown>
-              </template>
-              <template v-if="card.range.length == 1">
-                <span class="pointer" @click="modifyTaskType(card.range[0].id)">{{card.range[0].name}}</span>
-              </template>
+              </p>
             </div>
             <div class="task-card-li">
               <p>类型：<span class="task_type">{{card.inputType=='single'?'单次':'多次'}}</span></p>
@@ -75,6 +73,14 @@ export default {
       default: () => ({})
     }
   },
+  computed:{
+    rangeName() {   
+      let range = this.card.range.map((item)=>{
+        return item.name     
+      }).join('，')
+      return range
+    }
+  },
   data() {
     return {
     }
@@ -85,7 +91,7 @@ export default {
     },
     // 删除组件
     delTaskCard() {
-      this.$confirm('组件删除后，所有使用该组件的信息将被删除，且不能恢复，确认是否删除？', '提示', {
+      this.$confirm(`确定要删除【${this.card.name}】吗？删除后，工单类型中该组件中的数据不可恢复!`, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning',
@@ -136,19 +142,24 @@ export default {
     // TODO:编辑表单
     modifyTaskForm() {
       let cardId = this.card.id;
+      let fromId = window.frameElement.getAttribute('id');
       if(this.card.specialfrom !== '工时记录'){
         this.$platform.openTab({
           id: 'task_card_setting',
           title: '附加组件表单设置',
-          url: `/setting/task/cardFormfields?cardId=${cardId}`,
+          close: true,
           reload: true,
+          url: `/setting/task/cardFormfields?cardId=${cardId}`,
+          fromId
         });
       }else{
         this.$platform.openTab({
           id: 'task_cardhours_setting',
-          title: '附加组件表单设置',
+          title: '附加组件设置',
           url: `/setting/task/cardHoursRecord?cardId=${cardId}`,
           reload: true,
+          close: true,
+          fromId
         });
       }
     
@@ -230,13 +241,28 @@ export default {
                 .task-card-scope{
                     display: flex;
                     justify-content: flex-start;
+                    p{
+                      color: $color-primary;
+                      word-break: break-all;
+                      text-overflow: ellipsis;
+                      overflow: hidden;
+                      display: -webkit-box;
+                      -webkit-line-clamp: 2;
+                      -webkit-box-orient: vertical;
+                      .task-card-tit{
+                        color: #666666;
+                      }
+                    }
                     .el-dropdown{
                       line-height: 15px;
-                      span{
+                      display: inline;
+                      cursor: pointer;
+                      
+                    }
+                    span{
                         color: $color-primary;
                         font-size: 12px;  
                       }
-                    }
                     
                 }
                 .task-card-li{

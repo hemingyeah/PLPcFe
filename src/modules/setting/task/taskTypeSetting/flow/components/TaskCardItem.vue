@@ -95,7 +95,7 @@ export default {
   methods: {
     // 删除组件
     delTaskCard() {
-      this.$confirm('确认删除该组件？删除后将无法恢复', '提示', {
+      this.$confirm(`确定要删除【${this.taskCard.name}】吗？`, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning',

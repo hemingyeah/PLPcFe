@@ -140,7 +140,11 @@ export default {
   },
   methods: {
     goBack() {
-      window.history.go(-1);
+      let fromId = window.frameElement.getAttribute("fromid");
+      this.$platform.refreshTab(fromId);
+      
+      let id = window.frameElement.dataset.id;
+      this.$platform.closeTab(id);
     },
     /** 兼容旧审批结构 */
     compatibleOldApprove(setting) {
@@ -175,6 +179,11 @@ export default {
     convertTaskTypeConfig(taskTypeConfig) {
       let { flowSetting, isLeader, pauseApprovers, planRemindSetting, delayBack, config, overTimeSetting } =  taskTypeConfig;
 
+      taskTypeConfig.planRemindSetting = {
+        ...new TaskConfig().planRemindSetting,
+        ...planRemindSetting
+      };
+      
       taskTypeConfig.delayBack = delayBack === 'true' ? true : false;
       taskTypeConfig.allowPause = Boolean(taskTypeConfig.allowPause);
       taskTypeConfig.allowCancel = Boolean(taskTypeConfig.allowCancel);

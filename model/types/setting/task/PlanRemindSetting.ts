@@ -3,7 +3,7 @@ class PlanRemindSetting {
     state: Boolean = false;
 
     /** 提醒时间前后设置(0=前,1=后) */
-    isAhead: Number =  0;
+    minutesType: Number =  0;
 
     /** 计划时间提醒分钟 */
     minutes: Number = 0;
