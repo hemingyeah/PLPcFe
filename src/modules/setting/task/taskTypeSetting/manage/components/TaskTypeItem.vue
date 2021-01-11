@@ -28,7 +28,7 @@
                 @change="switchEnabled"/>
         </el-row>
         <el-row class="task-type-opearte" type="flex">
-            <div class="task-type-opearte-del" @click="delTaskType">
+            <div v-if="!isSysTaskType" class="task-type-opearte-del" @click="delTaskType">
                 <i class="iconfont icon-delete">删除</i>
             </div>
             <div class="task-type-opearte-modify" @click="modifyTaskType">
@@ -55,7 +55,7 @@ import ChooseTeamDialog from './ChooseTeamDialog.vue';
 export default {
     name: 'task-type-item',
     props: {
-        taskType: {
+        taskType: { // 工单类型对象
             type: Object,
             default: () => {}
         },
@@ -63,7 +63,7 @@ export default {
             type: Number,
             default: 0
         },
-        maxTypeNum: {
+        maxTypeNum: { // 最大可开启的工单类型
             type: Number,
             default: 0
         },
@@ -77,12 +77,20 @@ export default {
             isShowChooseTeamModal: false  // 选择可用团队弹窗
         }
     },
+    computed: {
+        // 是否系统默认工单类型
+        isSysTaskType() {
+            return this.taskType.id == '1';
+        }
+    },
     methods: {
+        /** 可用团队名称显示 */
         formatTeamName(tagIds) {
             return tagIds.length === 0 ? '全部团队' : tagIds.map(tagId => {
                 return this.teamList.find(team => team.id === tagId).tagName;
             }).join(',');
         },
+        /** 启用/禁用 */
         switchEnabled: _.debounce(function(value) {
             if(value === 1 && this.typeNum >= this.maxTypeNum) {
                 return this.$message.warning(`最多只能同时存在${this.maxTypeNum}种工单类型`);
@@ -102,14 +110,16 @@ export default {
                 console.log("taskType enabled => err", err);
             });
         }, 300),
+        /** 打开可用团队弹窗 */
         chooseTeam() {
             this.isShowChooseTeamModal = true;
         },
+        /** 删除工单类型 */
         delTaskType() {
-            if(this.typeNum <= 1) {
-                return this.$message.warning(`无法删除全部工单类型`);
+            if(this.isSysTaskType) {
+                return this.$message.warning(`默认工单模版，不允许删除`);
             }
-            this.$confirm('确认删除该工单类型？删除后将无法恢复', '提示', {
+            this.$confirm(`确定要删除【${this.taskType.name}】该工单类型吗?`, '提示', {
                 confirmButtonText: '确定',
                 cancelButtonText: '取消',
                 type: 'error',
@@ -129,10 +139,18 @@ export default {
                 });
             });
         },
+        /** 进入修改工单类型设置页面 */
         modifyTaskType() {
-            // 修改工单类型
+            let fromId = window.frameElement.getAttribute('id');
+
             let taskTypeId = this.taskType.id;
-            window.location.href = "/setting/task/taskFormSet?taskTypeId=" + taskTypeId;
+            this.$platform.openTab({
+                id: 'task_form_setting',
+                title: '工单类型设置',
+                url: "/setting/task/taskFormSet?taskTypeId=" + taskTypeId,
+                reload: true,
+                fromId
+            });
         },
         /**
          * 更新taskType
@@ -169,7 +187,7 @@ export default {
     .task-type-main{
         display: flex;
         height: calc(100% - 32px);
-        padding: 20px;
+        padding: 16px 20px;
         .task-type-color{
             display: block;
             width: 14px;

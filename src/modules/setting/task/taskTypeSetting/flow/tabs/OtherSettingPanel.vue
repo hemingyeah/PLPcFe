@@ -15,6 +15,7 @@
             <div class="setting-service-report">
                 <h2>
                     发送服务报告
+                    <el-switch class="ml-16" v-model="taskFlowData.taskTypeConfig.options.serviceReport"/>
                 </h2>
                 可在PC端或移动端针对完成的工单生成电子服务报告
                 <div class="mt-8">
@@ -55,6 +56,7 @@
             <div class="setting-photo">
                 <h2>
                     启用打印功能
+                    <el-switch class="ml-16" v-model="taskFlowData.taskTypeConfig.options.printTask"/>
                 </h2>
                 可以在PC端打印工单信息
                 <div class="mt-8">

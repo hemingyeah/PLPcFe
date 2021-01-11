@@ -182,6 +182,7 @@ export default {
                 _this.$refs.form.resetFields();
             }, 100)
         },
+        /** 选择行业模板 */
         selectTemplate({taskTypeId, typeName}) {
             this.clickTaskType = 'template';
             this.form = {
@@ -190,6 +191,7 @@ export default {
                 taskTypeId
             }
         },
+        /** 选择新建类型 */
         chooseTypeTemplate(type) {
             if(type === 'template') {
                 return this.isShowChooseTradeDialog = true;
@@ -203,12 +205,19 @@ export default {
         createTaskType() {
             this.$refs.form.validate(valid => {
                 if(valid) {
+                    let fromId = window.frameElement.getAttribute('id');
                     // 从行业模板创建
                     if(this.taskType === 'template') {
                         this.pedding = true;
                         SettingApi.importTaskType(this.form).then(res => {
                             if(res.status == 0){
-                                window.location.href = "/setting/task/taskFormSet?taskTypeId="+res.data+"&new=true";
+                                this.$platform.openTab({
+                                    id: 'task_form_setting',
+                                    title: '工单类型设置',
+                                    url: "/setting/task/taskFormSet?taskTypeId="+res.data+"&new=true",
+                                    reload: true,
+                                    fromId
+                                });
                             }else{
                                 this.$message.error(res.message);
                             }
@@ -224,7 +233,13 @@ export default {
                     this.pedding = true;
                     SettingApi.createTaskType(this.form).then(res => {
                         if(res.status == 0){
-                            window.location.href = "/setting/task/taskFormSet?taskTypeId="+res.data+"&new=true";
+                            this.$platform.openTab({
+                                id: 'task_form_setting',
+                                title: '工单类型设置',
+                                url: "/setting/task/taskFormSet?taskTypeId="+res.data+"&new=true",
+                                reload: true,
+                                fromId
+                            });
                         }else{
                             this.$message.error(res.message);
                         }
