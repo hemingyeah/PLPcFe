@@ -1,5 +1,6 @@
 <template>
   <div class="task-box">
+    <div id="task-task-list-view"></div>
     <div class="guide-model-box" v-if="nowGuideStep < listSteps.length + 1">
       
     </div>
@@ -539,10 +540,10 @@
           <span class="task-c2 task-pointer" @click="toggleSelection">清空</span>
         </div>
         <!-- start content 列表表格 -->
-        <div class="guide-box">
-          <div class="guide-disable-cover" v-if="nowGuideStep == 1"></div>
+        <div class="guide-box" id="v-task-step-0">
+          <!-- <div class="guide-disable-cover" v-if="nowGuideStep == 1"></div> -->
           <div
-            id="v-task-step-0"
+            
             class="task-list-section common-list-table-view"
             v-if="columns.length"
           >

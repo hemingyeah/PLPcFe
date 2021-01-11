@@ -4,7 +4,7 @@
     <div class="cover"
          v-if="needCover && showGuide"></div>
     <div class="cover-dom"
-         v-if="needCover && showGuide && canUse"
+         v-if="needCover && showGuide && !canUse"
          :style="`width:${guideDom.width || 0}px;height:${guideDom.height || 0}px;top:${guideDom.top || 0}px;left:${guideDom.left || 0}px;`"></div>
     <div :id="id"
          class="tour-content-out-box"
@@ -143,6 +143,8 @@ export default {
   },
   created () {
     this.loop = setInterval(() => {
+
+      // console.log(this.domObj, 321321);
       let res_;
       try {
         let dom = this.domObj ? this.domObj() : document.getElementById(`${this.domId}`);
