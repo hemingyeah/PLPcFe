@@ -45,8 +45,11 @@ export default {
     },
     // 返回
     back(){
-      let id = window.frameElement.dataset.id;
-      return this.$platform.closeTab(id)
+      let fromId = window.frameElement.getAttribute('fromid');
+      this.$platform.refreshTab(fromId);
+
+      let id = window.frameElement.dataset.id
+      this.$platform.closeTab(id)
     },
     /** 
     * @description 提交表单字段设置

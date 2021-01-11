@@ -181,6 +181,9 @@ export default {
             .btn{
               width: 92px;
             }
+            .el-button--small{
+              padding: 6px 15px;
+            }
             .preview{
               &:hover{
                   background: #e7f9f9;

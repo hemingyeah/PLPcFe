@@ -85,7 +85,7 @@ export default {
     },
     // 删除组件
     delTaskCard() {
-      this.$confirm('组件删除后，所有使用该组件的信息将被删除，且不能恢复，确认是否删除？', '提示', {
+      this.$confirm(`确定要删除【${this.card.name}】吗？删除后，工单类型中该组件中的数据不可恢复!`, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning',
@@ -136,19 +136,24 @@ export default {
     // TODO:编辑表单
     modifyTaskForm() {
       let cardId = this.card.id;
+      let fromId = window.frameElement.getAttribute('id');
       if(this.card.specialfrom !== '工时记录'){
         this.$platform.openTab({
           id: 'task_card_setting',
           title: '附加组件表单设置',
-          url: `/setting/task/cardFormfields?cardId=${cardId}`,
+          close: true,
           reload: true,
+          url: `/setting/task/cardFormfields?cardId=${cardId}`,
+          fromId
         });
       }else{
         this.$platform.openTab({
           id: 'task_cardhours_setting',
-          title: '附加组件表单设置',
+          title: '附加组件设置',
           url: `/setting/task/cardHoursRecord?cardId=${cardId}`,
           reload: true,
+          close: true,
+          fromId
         });
       }
     
@@ -232,11 +237,12 @@ export default {
                     justify-content: flex-start;
                     .el-dropdown{
                       line-height: 15px;
-                      span{
+                      
+                    }
+                    span{
                         color: $color-primary;
                         font-size: 12px;  
                       }
-                    }
                     
                 }
                 .task-card-li{
