@@ -40,7 +40,8 @@
 
     .task-type-list {
       display: flex;
-      flex-flow: wrap;
+      flex-wrap: wrap;
+      align-content: flex-start;
       width: calc(100% + 12px); 
       height: calc(100% - 110px);
       overflow: auto;

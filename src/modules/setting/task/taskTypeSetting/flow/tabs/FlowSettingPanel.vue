@@ -88,6 +88,14 @@ export default {
                 approveSetting.taskTemplateId = '';
             }
 
+            // leader审批类型为表单人员
+            if(approveSetting.leader && !approveSetting.leader.indexOf('formUser') > -1){
+                approveSetting.approvers = [];
+            }else{
+                approveSetting.taskTemplateId = '';
+            }
+
+            // 递归:格式化多级审批
             if(Array.isArray(approveSetting.multiApproverSetting)) {
                 approveSetting.multiApproverSetting = approveSetting.multiApproverSetting.map(item => this.formatApproveSetting(item));
             }
@@ -120,21 +128,6 @@ export default {
                         ...this.formatApproveSetting(cancelApproveSetting),
                         state: taskTypeConfig.allowCancel
                     }
-                }
-
-                if(flowSetting[key].leader && flowSetting[key].leader.indexOf('formUser') > -1){
-                    flowSetting[key].approvers = [];
-                }
-
-                let multiApproverSetting = flowSetting[key].multiApproverSetting;
-                if(Array.isArray(multiApproverSetting)) {
-                    flowSetting[key].multiApproverSetting = multiApproverSetting.map(item => {
-                        if(item.leader && item.leader.indexOf('formUser') > -1){
-                            item.approvers = [];
-                        }
-
-                        return item;
-                    })
                 }
             });
             flowSetting.pause = {
