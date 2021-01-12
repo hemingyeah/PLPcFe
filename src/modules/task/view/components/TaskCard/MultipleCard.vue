@@ -62,6 +62,7 @@ export default {
   },
   computed: {
     columns() {
+      let formTypes = ['autograph', 'attachment', 'separator', 'info'];
       let fields = [
         ...this.card.fields,
         {
@@ -81,7 +82,7 @@ export default {
         }
       ]
 
-      return fields.filter(field => !field.isHidden && field.isVisible);
+      return fields.filter(field => !field.isHidden && field.isVisible && formTypes.indexOf(field.formType) < 0);
     }
   },
   components: {

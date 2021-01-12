@@ -20,6 +20,7 @@
           </div>
           <div class="task-card-footer">
             <template v-if="cardItem.type!=='工时'">
+              <el-button type="primary" class="preview" @click="previewCard(cardItem)">预览</el-button>
               <el-tooltip class="item" effect="dark" content="每个工单中填写一组该数据" placement="top">
                 <el-button type="primary" class="btn" @click="importcard(cardItem,'single')">添加为单次</el-button>
               </el-tooltip>
@@ -28,6 +29,7 @@
               </el-tooltip>
             </template>
             <template v-else>
+              <el-button type="primary" class="preview" @click="previewCard(cardItem)">预览</el-button>
               <el-tooltip class="item" effect="dark" content="每个工单中填写多组该数据" placement="top">
                 <el-button type="primary" class="btn" @click="importcard(cardItem,'multiple')">添加</el-button>
               </el-tooltip>
@@ -39,10 +41,15 @@
     </div>
     <!--end  组件库列表 -->
 
+    <!--start 预览组件 -->
+    <preview-card-dialog ref="previewDialog" :fields="fields"></preview-card-dialog>
+    <!--end 预览组件 -->
   </div>
 </template>
 <script>
 import * as SettingTaskApi from '@src/api/SettingTaskApi';
+// components
+import PreviewCardDialog from '../../../../taskAdditionalSetting/manage/components/PreviewCardDialog';
 export default {
   name: 'template-library',
   props: {
@@ -53,6 +60,7 @@ export default {
   },
   data() {
     return {
+      fields:[],
       tabIndex:0,
     };
   },
@@ -79,7 +87,15 @@ export default {
           this.$message.warning(message);
         }
       }).catch(error=>({}))
+    },
+    // 预览组件
+    previewCard(card) {
+      this.fields = card.fieldsModule;
+      this.$refs.previewDialog.openDialog();
     }
+  },
+  components: {
+    [PreviewCardDialog.name]: PreviewCardDialog
   },
 };
 </script>
@@ -185,11 +201,9 @@ export default {
               padding: 6px 15px;
             }
             .preview{
-              &:hover{
-                  background: #e7f9f9;
-                  border-color: #a1e7e7;
-                  color: #13C2C2;
-              }
+              background: #e7f9f9;
+              border-color: #a1e7e7;
+              color: #13C2C2;
             }
         }
 

@@ -192,10 +192,9 @@ export default {
               padding: 6px 15px;
             }
             .preview{
-              background: #e7f9f9;
-              border-color: #a1e7e7;
-              color: #13C2C2;
-
+                background: #e7f9f9;
+                border-color: #a1e7e7;
+                color: #13C2C2;
             }
             
         }

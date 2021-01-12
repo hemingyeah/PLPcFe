@@ -91,6 +91,7 @@ function toTableFields(fields, config) {
  * @description 自定义字段特殊处理
  */
 function packCustomFields(fields) {
+  let formTypes = ['autograph', 'attachment', 'separator', 'info'];
   let newCard = fields.filter(i=>{
     if(i.formType !== 'attachment'){
       if(i.formType == 'datetime'){
@@ -101,7 +102,7 @@ function packCustomFields(fields) {
         i.showTooltip = true ;
       }
                
-      return !i.isHidden && i.isVisible 
+      return !i.isHidden && i.isVisible && formTypes.indexOf(i.formType) < 0
     }
   }) 
   return newCard

@@ -9,7 +9,7 @@
           icon="el-icon-plus"
           :loading="false"
           @click="addTaskCard"
-        >新建</el-button
+        >添加</el-button
         >
       </div>
       <div class="card-setting-msg">

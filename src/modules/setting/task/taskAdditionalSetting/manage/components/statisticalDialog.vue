@@ -55,14 +55,14 @@
             :min-width="column.minWidth || '120px'">
             <template slot-scope="scope">
               <!-- start 自定义字段 -->
-                <!-- start 多选 -->
-                <template v-if="isMulti(column)">
-                  {{ (scope.row.taskCardInfo[column.fieldName] || []).join('，') }}
-                </template>
-                <!-- end 多选 -->
-                <template v-else>
-                  {{scope.row.taskCardInfo[column.fieldName] | fmt_form_field(column.formType, column.fieldName, scope.row.taskCardInfo)}}
-                </template>
+              <!-- start 多选 -->
+              <template v-if="isMulti(column)">
+                {{ (scope.row.taskCardInfo[column.fieldName] || []).join('，') }}
+              </template>
+              <!-- end 多选 -->
+              <template v-else>
+                {{scope.row.taskCardInfo[column.fieldName] | fmt_form_field(column.formType, column.fieldName, scope.row.taskCardInfo)}}
+              </template>
               <!-- end 自定义字段 -->
             </template>
           </el-table-column>
@@ -205,10 +205,9 @@ export default {
         if(this.card.specialfrom == '工时记录'){
           let fields = fieldUtil.toTableFields(cardFields[0].fields, this.card.config);
           return fields.filter(field => field.enabled == 1);
-        }else{
-          return fieldUtil.packCustomFields(cardFields[0].fields)
         }
-        return newCard 
+        return fieldUtil.packCustomFields(cardFields[0].fields)
+        
       }
     }
   },
