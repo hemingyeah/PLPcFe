@@ -294,11 +294,11 @@ export default {
 
       overTimeOptions: [
         {
-          value: '0',
+          value: 0,
           label: "无需通知其他人",
         },
         {
-          value: '1',
+          value: 1,
           label: "通知负责人团队主管",
         },
         {

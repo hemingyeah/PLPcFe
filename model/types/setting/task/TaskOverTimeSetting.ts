@@ -8,10 +8,10 @@ class TaskOverTimeSetting {
     isAhead: Number = 0;
 
     /** 超时提醒时间设置(分钟) */
-    minutes: String = '';
+    minutes: Number = 0;
 
     /** 超时提醒类型 */
-    remindType: String = '';
+    remindType: Number = 0;
 
     /** 提醒指定人员 */
     reminders: Preson[] = [];

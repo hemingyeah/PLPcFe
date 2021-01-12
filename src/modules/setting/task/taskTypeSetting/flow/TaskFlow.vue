@@ -254,19 +254,11 @@ export default {
         taskTypeConfig.taskOverTimeModels = taskTypeConfig.taskOverTimeModels.map(item => {
           return {
             ...item,
-            ...overTimeSetting,
-            remindType: overTimeSetting.remindType == undefined ? null : overTimeSetting.remindType + '',
-            reminders: overTimeSetting.reminders || []
+            ...overTimeSetting
           }
         })
       }else {
-        taskTypeConfig.taskOverTimeModels = config.newOverTimeSetting.map(item => {
-          return {
-            ...item,
-            remindType: overTimeSetting.remindType == undefined ? null : overTimeSetting.remindType + '',
-            reminders: item.reminders || []
-          }
-        })
+        taskTypeConfig.taskOverTimeModels = config.newOverTimeSetting || [];
       }
 
       delete taskTypeConfig.isLeader;

@@ -147,9 +147,14 @@ export default {
                 planningTimeMes: noticeLeader ? ['none','leader','users'][Number(noticeLeader)] : 'none',
                 usersIds: noticeUsers.map(item => item.userId).join(','),
                 taskOverTimeModels: taskOverTimeModels.map(item => {
-                    item.reminders = item.reminders || [];
-                    item.ids = item.reminders.map(item => item.userId).join(',');
-                    return item;
+                    let {reminders = [], overTimeState, isAhead, minutes, remindType} = item;
+                    return {
+                        overTimeState, 
+                        isAhead, 
+                        minutes: Number(minutes), 
+                        remindType,
+                        ids: reminders.map(item => item.userId).join(','),
+                    };
                 }),
                 autoReviewState
             };
