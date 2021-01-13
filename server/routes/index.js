@@ -34,6 +34,7 @@ const linkcRouter = require('./linkc')
 const productV2Router = require('./productV2')
 
 const superQrcodeRouter = require('./superQrcode')
+const guideForNewUser = require('./guideForNewUser')
 
 router.get('/', async (ctx) => {
   let modConfig = modules['system.frame'];
@@ -163,6 +164,8 @@ router.use('', sparePartRouter.routes(), sparePartRouter.allowedMethods());
 router.use('', linkcRouter.routes(), sparePartRouter.allowedMethods());
 router.use('', productV2Router.routes(), sparePartRouter.allowedMethods());
 router.use('', superQrcodeRouter.routes(), sparePartRouter.allowedMethods());
+router.use('', guideForNewUser.routes(), sparePartRouter.allowedMethods());
+
 
 
 router.all('/*', (ctx) => {
