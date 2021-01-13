@@ -961,7 +961,7 @@ export default {
     /** 
     * @description 打开客户详情
     */
-    openCustomerView() {
+    openCustomerView(openTaskTab) {
       if (!this.allowOpenCustomerView) return;
       
       let fromId = window.frameElement.getAttribute('id');
@@ -969,11 +969,15 @@ export default {
 
       if(!customerId) return;
 
+      let url = `/customer/view/${customerId}?noHistory=1`;
+
+      if (openTaskTab) url += '&active=task';
+
       this.$platform.openTab({
         id: `customer_view_${customerId}`,
         title: '客户详情',
         close: true,
-        url: `/customer/view/${customerId}?noHistory=1`,
+        url,
         fromId
       })
     },
