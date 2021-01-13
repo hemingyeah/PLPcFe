@@ -55,27 +55,12 @@
         <!-- start 顶部按钮组 -->
         <div class="task-detail-header-top-btn">
           <template v-if="!isDelete">
-            <!-- start 当前工单状态操作按钮 -->
-            <div class="current-state-button" v-show="!collapse">
-              <template v-for="(item, index) in stateButtonData">
-                <el-button :key="index" :type="item.type" @click="item.event" :disabled="pending" v-if="item.show">
-                  {{ item.name }}
-                </el-button>
-              </template>
-            </div>
-            <!-- end 当前工单状态操作按钮 -->
-
-            <el-button @click="openDialog('cancel')" :disabled="pending" size="mini" v-if="allowCancelTask">取消
-            </el-button>
-            <el-button @click="redeploy" :disabled="pending" size="mini" v-if="allowRedeployTask">转派</el-button>
-            <el-button :class="{'once-printed': task.oncePrinted == 1}" @click="printTask" :disabled="pending" size="mini" v-if="allowPrintTask">打印</el-button>
-
             <!-- start 服务报告 -->
             <template v-if="allowServiceReport && isShowReport">
-              <el-button @click="createReport(true)" :disabled="pending" v-if="srSysTemplate || srSysTemplate == null" size="mini">服务报告</el-button>
+              <el-button @click="createReport(true)" :disabled="pending" v-if="srSysTemplate || srSysTemplate == null">服务报告</el-button>
 
               <el-dropdown trigger="click" v-if="!srSysTemplate && srSysTemplate != null">
-                <el-button :disabled="pending" size="mini">服务报告</el-button>
+                <el-button :disabled="pending">服务报告</el-button>
 
                 <el-dropdown-menu slot="dropdown">
                   <el-dropdown-item>
@@ -91,7 +76,40 @@
             </template>
             <!-- end 服务报告 -->
 
-            <el-button @click="ding" :disabled="pending" size="mini" v-if="allowDing">DING</el-button>
+            <el-button @click="openDialog('cancel')" :disabled="pending" v-if="allowCancelTask">取消</el-button>
+            <el-button @click="redeploy" :disabled="pending" v-if="allowRedeployTask">转派</el-button>
+
+            <!-- start 当前工单状态操作按钮 -->
+            <div class="current-state-button" v-show="!collapse">
+              <template v-for="(item, index) in stateButtonData">
+                <el-button :key="index" :type="item.type" @click="item.event" :disabled="pending" v-if="item.show">
+                  {{ item.name }}
+                </el-button>
+              </template>
+            </div>
+            <!-- end 当前工单状态操作按钮 -->
+
+            <!-- start icon按钮 -->
+            <div class="task-detail-btn-group" :class="nowGuideStep == 4 ? 'task-detail-btn-group-point' : ''" id="v-task-detail-step-3">
+              <div class="guide-disable-cover" v-if="nowGuideStep == 4"></div>
+              <el-tooltip :popper-options="popperOptions" content="打印工单" placement="top" v-if="allowPrintTask">
+                <i class="iconfont icon-printer icon-btn" @click="printTask"></i>
+              </el-tooltip>
+              <el-tooltip :popper-options="popperOptions" content="DING" placement="top" v-if="allowDing">
+                <i class="iconfont icon-thunderbolt icon-btn" @click="ding"></i>
+              </el-tooltip>
+              <el-tooltip :popper-options="popperOptions" content="复制工单" placement="top" v-if="allowCopyTask">
+                <i class="iconfont icon-file-copy icon-btn" @click="goCopyTask"></i>
+              </el-tooltip>
+              <el-tooltip :popper-options="popperOptions" content="删除工单" placement="top" v-if="allowDeleteTask">
+                <i class="iconfont icon-delete icon-btn" @click="deleteTask"></i>
+              </el-tooltip>
+              <el-tooltip :popper-options="popperOptions" content="编辑工单" placement="top" v-if="allowEditTask">
+                <i class="iconfont icon-edit-square icon-btn" @click="goEdit"></i>
+              </el-tooltip>
+            </div>
+            <!-- end icon按钮 -->
+
           </template>
         </div>
         <!-- end 顶部按钮组 -->
@@ -195,24 +213,11 @@
     <!-- end 顶部操作区 -->
 
     <!-- start 工单详情折叠面板 -->
-    <base-collapse class="task-detail-main-content" @scroll="getScroll" :show-collapse="showCollapse" :direction.sync="collapseDirection">
+    <base-collapse class="task-detail-main-content" @scroll="getScroll" :direction.sync="collapseDirection">
       
       <!-- start 工单详情 -->
       <template slot="left">
         <div class="task-detail-main-content-left" v-show="collapseDirection != 'left'">
-          <div class="task-detail-btn-group" :class=" nowGuideStep == 4 ? 'task-detail-btn-group-point' : ''" id="v-task-detail-step-3">
-            <div class="guide-disable-cover" v-if="nowGuideStep == 4"></div>
-            <el-tooltip :popper-options="popperOptions" content="编辑工单" placement="top" v-if="allowEditTask">
-              <i class="iconfont icon-bianji1" @click="goEdit"></i>
-            </el-tooltip>
-            <el-tooltip :popper-options="popperOptions" content="复制工单" placement="top" v-if="allowCopyTask">
-              <i class="iconfont icon-fuzhi" @click="goCopyTask"></i>
-            </el-tooltip>
-            <el-tooltip :popper-options="popperOptions" content="删除工单" placement="top" v-if="allowDeleteTask">
-              <i class="iconfont icon-shanchu-copy" @click="deleteTask"></i>
-            </el-tooltip>
-          </div>
-
           <el-tabs v-model="leftActiveTab">
             <el-tab-pane label="工单详情" name="task-view">
               <task-view :task="task" :fields="fields" :plan-time="planTime" :is-paused="isPaused" :state-text="stateText" :state-color="stateColor" :finished-state="finishedState" :customer-option="customerOption" :can-see-customer="canSeeCustomer" :allow-edit-synergy="allowEditSynergy" :allow-modify-plan-time="allowModifyPlanTime" @modifyPlanTime="openDialog('modifyPlanTime')" />

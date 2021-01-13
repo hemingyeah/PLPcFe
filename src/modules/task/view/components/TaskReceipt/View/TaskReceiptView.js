@@ -25,15 +25,15 @@ export default {
       }, {
         label: '单价',
         field: 'salePrice',
-        minWidth: '88px'
+        width: '88px'
       }, {
         label: '数量',
         field: 'number',
-        minWidth: '88px'
+        width: '88px'
       }, {
         label: '小计',
         field: 'total',
-        minWidth: '128px'
+        width: '88px'
       }],
       serviceColums: [{
         label: '编号',
@@ -47,15 +47,15 @@ export default {
       }, {
         label: '单价',
         field: 'salePrice',
-        minWidth: '88px'
+        width: '88px'
       }, {
         label: '数量',
         field: 'number',
-        minWidth: '88px'
+        width: '88px'
       }, {
         label: '小计',
         field: 'total',
-        minWidth: '128px'
+        width: '88px'
       }]
     }
   },

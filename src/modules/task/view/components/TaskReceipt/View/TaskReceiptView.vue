@@ -17,7 +17,7 @@
       <form-view :fields="fields" :value="form">
         <!-- start 备件 -->
         <template slot="sparepart" slot-scope="{ field, value }">
-          <div class="form-view-row">
+          <div class="form-view-row form-view-row-receipt">
             <label>{{ field.displayName }}</label>
             <div class="form-view-row-content">
               <receipt-view-common-table :data="value" :colums="sparepartColums" />
@@ -28,7 +28,7 @@
 
         <!-- start 服务项目 -->
         <template slot="serviceIterm" slot-scope="{ field, value }">
-          <div class="form-view-row">
+          <div class="form-view-row form-view-row-receipt">
             <label>{{ field.displayName }}</label>
             <div class="form-view-row-content">
               <receipt-view-common-table :data="value" :colums="serviceColums" />
@@ -40,7 +40,7 @@
       <!-- end 回执信息 -->
 
       <!-- start 合计 -->
-      <div class="form-view-row" v-if="hasExpense">
+      <div class="form-view-row form-view-row-receipt" v-if="hasExpense">
         <label>费用合计</label>
         <div class="form-view-row-content">
           <el-table :data="totalData" header-row-class-name="base-table-header-v3" row-class-name="base-table-row-v3" border>
