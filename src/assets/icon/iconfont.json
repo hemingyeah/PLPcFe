@@ -6,6 +6,20 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "4936668",
+      "name": "eye-fill",
+      "font_class": "eye-fill",
+      "unicode": "e8b5",
+      "unicode_decimal": 59573
+    },
+    {
+      "icon_id": "19343745",
+      "name": "down-circle",
+      "font_class": "down-circle",
+      "unicode": "e6e7",
+      "unicode_decimal": 59111
+    },
+    {
       "icon_id": "2992341",
       "name": "工单表单设置",
       "font_class": "gongdanbiaodanshezhi",
