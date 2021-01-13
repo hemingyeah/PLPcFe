@@ -25,7 +25,7 @@
 
         <!-- start 折叠时客户信息 -->
         <div class="customer-info-wrap" v-show="!collapse && customerField && customerField.id">
-          <div :class="['customer-name', {'link-text': allowOpenCustomerView}]" @click="openCustomerView">
+          <div :class="['customer-name', {'link-text': allowOpenCustomerView}]" @click="openCustomerView(false)">
             {{ customer.name }}
           </div>
 
@@ -124,13 +124,13 @@
       <div class="task-detail-header-bottom" :class="{'active': !collapse, 'guide-point bg-w' : nowGuideStep == 2}" id="v-task-detail-step-1">
         <div class="guide-disable-cover" v-if="nowGuideStep == 2"></div>
         <div class="customer-info-wrap">
-          <div :class="['customer-name', {'link-text': allowOpenCustomerView}]" @click="openCustomerView">
+          <div :class="['customer-name', {'link-text': allowOpenCustomerView}]" @click="openCustomerView(false)">
             {{ customer.name }}
           </div>
           <el-tooltip v-if="showCustomerRelationTaskCount" placement="top">
             <div slot="content" v-html="`未完成工单：${customerRelationTaskCountData.unfinished} </br> 全部工单：${customerRelationTaskCountData.all}`">
             </div>
-            <div class="relation-count-button" @click="openCustomerView">
+            <div class="relation-count-button" @click="openCustomerView(true)">
               {{ `${customerRelationTaskCountData.unfinished}/${customerRelationTaskCountData.all}` }}
             </div>
           </el-tooltip>

@@ -742,6 +742,8 @@ export default {
     let query = qs.parse(window.location.search)
     if (query && query.active === 'product') {
       this.currTab = 'customer-product-table'
+    } else if (query && query.active === 'task') {
+      this.currTab = 'customer-task-table';
     }
 
     this.$eventBus.$on('customer_detail_view.update_remind', this.updateRemind)
