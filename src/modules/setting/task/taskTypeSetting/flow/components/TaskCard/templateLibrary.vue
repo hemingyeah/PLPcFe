@@ -49,7 +49,7 @@
 <script>
 import * as SettingTaskApi from '@src/api/SettingTaskApi';
 // components
-import PreviewCardDialog from '../../../../taskAdditionalSetting/manage/components/PreviewCardDialog';
+import PreviewCardDialog from '../../../../components/PreviewCardDialog';
 export default {
   name: 'template-library',
   props: {

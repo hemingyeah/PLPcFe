@@ -34,10 +34,10 @@
     </el-row>
     <el-row class="task-card-opearte" type="flex">
       <div class="task-card-opearte-del" @click="delTaskCard">
-        <i class="iconfont icon-shanchu-copy"> 删除</i>
+        <i class="iconfont icon-delete">删除</i>
       </div>
-      <div class="task-card-opearte-modify" @click="delTaskCard">
-        <i class="iconfont icon-shanchu-copy"> 预览</i>
+      <div class="task-card-opearte-modify" @click="previewCard(taskCard)">
+        <i class="iconfont icon-eye-fill">预览</i>
       </div>
     </el-row>
 
@@ -57,7 +57,11 @@
       :visiable.sync="isShowEditpermissModal"
       @onClose="onCloseEditpermiss"
       @update="updateRolesList"/>
-      <!-- end 设置使用权限 -->
+    <!-- end 设置使用权限 -->
+
+    <!--start 预览组件 -->
+    <preview-card-dialog ref="previewDialog" :fields="fields"></preview-card-dialog>
+    <!--end 预览组件 -->
   </div>
 </template>
 
@@ -69,7 +73,8 @@ import * as SettingTaskApi from '@src/api/SettingTaskApi';
 /** component */
 import UseRulesDialog from '../components/TaskCard/UseRulesDialog';
 import CardEditpermissDialog from '../components/TaskCard/CardEditpermissDialog';
-
+// components
+import PreviewCardDialog from '../../../components/PreviewCardDialog';
 export default {
   name: 'task-card-item',
   props: {
@@ -91,6 +96,7 @@ export default {
   },
   data() {
     return {
+      fields:[],
       isShowEditpermissModal: false,
       isShowRulesModal: false // 选择可用团队弹窗
     }
@@ -142,11 +148,17 @@ export default {
         authInfo
       });
       this.onCloseEditpermiss();
+    },
+    // 预览组件
+    previewCard(card) {
+      // this.fields = card.fieldsModule;
+      this.$refs.previewDialog.openDialog();
     }
   },
   components: {
     [UseRulesDialog.name]: UseRulesDialog,
     [CardEditpermissDialog.name]: CardEditpermissDialog,   
+    [PreviewCardDialog.name]: PreviewCardDialog,   
   }
 }
 </script>
@@ -247,7 +259,10 @@ export default {
             line-height: 32px;
             color: #999999;
             i{
-                font-size: 12px;
+              font-size: 12px;
+              &::before{
+                margin-right: 8px;
+              }
             }
         }
         .task-card-opearte-del{
