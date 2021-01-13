@@ -38,7 +38,7 @@ html, body {
       }
     }
 
-    .base-modal-body {
+    & > .base-modal-body {
       overflow-y: hidden;
       display: flex;
 
