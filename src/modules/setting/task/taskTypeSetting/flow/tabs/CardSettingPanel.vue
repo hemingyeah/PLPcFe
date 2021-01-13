@@ -111,10 +111,6 @@ export default {
 
   },
   methods: {
-    // 对比数据是否变动
-    checkModified() {
-      return JSON.stringify(this.oldCardInfo) === JSON.stringify(this.taskCardList)
-    },
     // 保存数据
     async submit() {
       try {
@@ -234,6 +230,14 @@ export default {
         this.loading = false;
       }
     },
+    // 检查内容是否有修改 (暴露的方法)
+    checkModified() {
+      return JSON.stringify(this.taskCardList) != JSON.stringify(this.oldCardInfo)
+    },
+    // 同步初始数据 (暴露的方法) 
+    resetInit() {
+      this.taskCardList = cloneDeep(this.oldCardInfo);
+    }
   },
   components: {
     [TaskCardItem.name]: TaskCardItem,
