@@ -91,7 +91,8 @@ export default {
       loading: true,
       taskTypeId: '',
       taskCardList: [],
-      authInfo:[]
+      authInfo:[],
+      oldCardInfo:[]
     };
   },
   computed: {
@@ -110,6 +111,10 @@ export default {
 
   },
   methods: {
+    // 对比数据是否变动
+    checkModified() {
+      return JSON.stringify(this.oldCardInfo) === JSON.stringify(this.taskCardList)
+    },
     // 保存数据
     async submit() {
       try {
@@ -221,6 +226,7 @@ export default {
         if( status == 0 ){
           if(JSON.stringify(data.cardSetting) !== '{}' && data.cardSetting.cardInfo){
             this.taskCardList = data.cardSetting.cardInfo;
+            this.oldCardInfo = cloneDeep(data.cardSetting.cardInfo)
           }
         }     
       } catch (err) {

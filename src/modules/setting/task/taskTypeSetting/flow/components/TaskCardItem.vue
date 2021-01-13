@@ -36,6 +36,9 @@
       <div class="task-card-opearte-del" @click="delTaskCard">
         <i class="iconfont icon-shanchu-copy"> 删除</i>
       </div>
+      <div class="task-card-opearte-modify" @click="delTaskCard">
+        <i class="iconfont icon-shanchu-copy"> 预览</i>
+      </div>
     </el-row>
 
     <!-- start 设置使用规则 -->
