@@ -82,6 +82,9 @@ export default {
           this.$emit('success');
         }else{
           let data = result.data || [];
+          if(!Array.isArray(data)){
+            data=[data];
+          }
           this.errors = data;
           this.$emit('fail',result.message);
         }
