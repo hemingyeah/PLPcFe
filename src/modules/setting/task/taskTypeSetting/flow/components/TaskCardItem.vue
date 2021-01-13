@@ -149,9 +149,22 @@ export default {
       });
       this.onCloseEditpermiss();
     },
+    getCardFieldsReq(card) {
+      const params = {
+        cardId:card.id,
+        isFromSetting: false
+      }
+      SettingTaskApi.getAddCardFields(params)
+        .then((res) => {
+          this.fields = res; 
+        }).catch((error) => {
+          console.log(error);
+        });
+    },
+   
     // 预览组件
     previewCard(card) {
-      // this.fields = card.fieldsModule;
+      this.getCardFieldsReq(card)
       this.$refs.previewDialog.openDialog();
     }
   },
@@ -166,7 +179,7 @@ export default {
 <style lang="scss" scoped>
 .task-card{
     cursor: move;
-    width: 358px;
+    // width: 358px;
     height: 159px;
     background: #FFFFFF;
     border-radius: 4px;
@@ -287,4 +300,19 @@ export default {
 .pointer{
     cursor: pointer;
 }
+@media screen and (max-width: 1920px) {
+  .task-card-item {
+    width: calc(25% - 12px);
+  }
+}
+@media screen and (max-width: 1680px) {
+  .task-card-item {
+    width: calc(33.3% - 12px);
+  }
+}
+// @media screen and (max-width: 1440px) {
+//   .task-card-item {
+//    width: calc(33.3% - 12px);
+//   }
+// }
 </style>
