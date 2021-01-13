@@ -149,7 +149,6 @@
           </el-dropdown>
           <!-- 选择列 -->
           <div class="guide-box mar-l-25">
-            <!-- <div class="guide-disable-cover" v-if="nowGuideStep == 2"></div> -->
             <div :class="[
                    'task-ai',
                    'task-flex',
@@ -845,8 +844,9 @@ export default {
     );
 
     this.$nextTick(() => {
-      if (storageGet(PRODUCT_PRODUCT_LIST) && storageGet(PRODUCT_PRODUCT_LIST) > 0) this.$Guide().destroy('product-product-list')
-      else this.$Guide([{
+      // if (storageGet(PRODUCT_PRODUCT_LIST) && storageGet(PRODUCT_PRODUCT_LIST) > 0) this.$Guide().destroy('product-product-list')
+      console.log(12321312);
+      this.$Guide([{
         content:
           '产品列表，可拖拽改变列表宽',
         haveStep: true,

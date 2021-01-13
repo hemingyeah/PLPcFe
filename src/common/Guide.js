@@ -117,6 +117,7 @@ class Guide {
               canUse={obj.canUse}
               inside={obj.inside}
               nowStep={obj.nowStep}
+              title={obj.title}
               content={obj.content}
               needCover={obj.needCover}
               finishBtn={obj.finishBtn}
@@ -130,6 +131,7 @@ class Guide {
               finishBtnFn={_this.finishBtnFn}
               watchContentClick={_this.watchContentClick}
               nextStep={_this.nextStep}
+              copyDom={obj.copyDom}
             >
               <template slot="diyContent">
                 <Test />
@@ -158,6 +160,14 @@ class Guide {
 }
 
 function domGuide(arr = [], nowStep, storageKe, watchStepFn) {
+  if(!arr || arr.length <= 0){
+    return {
+      create: () => {
+        return Promise.resolve(false)
+      },
+      destroy: () => {},
+    };
+  }
   let productPreFixedPath = GrayUtil.getProductV2ApiPath();
   let guideType;
   try {
@@ -168,12 +178,7 @@ function domGuide(arr = [], nowStep, storageKe, watchStepFn) {
   if ((productPreFixedPath && guideType == 'product') || guideType != 'product') {
     return new Guide(arr, nowStep, storageKe, watchStepFn);
   }
-  return {
-    create: () => {
-      return Promise.resolve(false)
-    },
-    destroy: () => {},
-  };
+  
 }
 
 export default domGuide;

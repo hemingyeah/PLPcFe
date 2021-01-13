@@ -6,6 +6,7 @@
     <div class="cover-dom"
          v-if="needCover && showGuide && !canUse"
          :style="`width:${guideDom.width || 0}px;height:${guideDom.height || 0}px;top:${guideDom.top || 0}px;left:${guideDom.left || 0}px;`"></div>
+    <div id="vmDom"></div>
     <div :id="id"
          class="tour-content-out-box"
          ref="guideCom"
@@ -25,6 +26,7 @@
         <div class="tour-content"
              @click="watchContentClick($event)">
           <div class="flex-x tour-content-head">
+            <div class="flex-1 overHideCon-1">{{title}}</div>
             <i @click.prevent="stopStep().then(()=>{showGuide = false})"
                class="iconfont icon-fe-close"></i>
           </div>
@@ -68,6 +70,10 @@ export default {
     nowStep: {
       type: Number | String,
       default: 1
+    },
+    title: {
+      type: Number | String,
+      default: ''
     },
     content: {
       type: Number | String,
@@ -124,6 +130,10 @@ export default {
       type: Boolean,
       default: false
     },
+    copyDom: {
+      type: Boolean,
+      default: false
+    },
   },
   data () {
     return {
@@ -136,23 +146,33 @@ export default {
     };
   },
   methods: {
-    clearGuide(){
-      if (this.needCover) (this.domObj ? this.domObj() : document.getElementById(`${this.domId}`)).classList.remove('guide-point')
+    clearGuide () {
+      if (this.needCover) {
+        let dom_ = this.domObj ? this.domObj() : document.getElementById(`${this.domId}`)
+        dom_.classList.remove('guide-point')
+        if (this.copyDom) {
+          try {
+            document.getElementById('vmDom').children[0].remove();
+          } catch (error) {
+            console.warn(error, 'error try catch');
+          }
+        }
+      }
       clearInterval(this.loop)
     }
   },
   created () {
     this.loop = setInterval(() => {
 
-      // console.log(this.domObj, 321321);
+      // console.log(this.domObj(), 321321);
       let res_;
       try {
         let dom = this.domObj ? this.domObj() : document.getElementById(`${this.domId}`);
-        if(dom) res_ = dom.getBoundingClientRect();
+        if (dom) res_ = dom.getBoundingClientRect();
       } catch (error) {
         console.warn(error, 'error try catch');
       }
-      if(!res_) return
+      if (!res_) return
       let style_ = '';
 
       if (document.documentElement.clientWidth - res_.left < 350) {
@@ -179,8 +199,24 @@ export default {
       this.guideDom = res_;
 
     }, 500)
-    if (this.needCover) {
-      (this.domObj ? this.domObj() : document.getElementById(`${this.domId}`)).classList.add('guide-point')
+
+
+  },
+  mounted () {
+    if (this.needCover && this.copyDom) {
+      // 针对部分无法sticky的父元素使用直接复制引导dom元素 需要引入css不推荐使用
+      let dom = this.domObj ? this.domObj() : document.getElementById(`${this.domId}`);
+      let res_;
+      if (dom) res_ = dom.getBoundingClientRect();
+
+      let dom_clone = dom.cloneNode(true);
+      dom_clone.setAttribute('id', '');
+      dom_clone.style.cssText = `position: fixed;z-index: 997;top:${res_.top}px;left:${res_.left}px;width:${res_.width}px;height:${res_.height}px;background:#fff;`;
+      document.getElementById('vmDom').appendChild(dom_clone);
+    }
+    if (this.needCover && !this.copyDom) {
+      let dom_ = this.domObj ? this.domObj() : document.getElementById(`${this.domId}`)
+      dom_.classList.add('guide-point');
     }
   },
   watch: {
@@ -195,6 +231,30 @@ export default {
   }
 };
 </script>
+<style lang="scss">
+.task-detail-btn-group {
+  position: absolute;
+  right: 12px;
+  top: 8px;
+
+  font-size: 0;
+  z-index: 991;
+
+  .iconfont {
+    margin-left: 16px;
+    color: $text-color-secondary;
+    cursor: pointer;
+
+    &.icon-bianji1 {
+      color: $color-primary;
+    }
+
+    &.icon-shanchu-copy {
+      margin-left: 13px;
+    }
+  }
+}
+</style>
 <style lang="scss" scoped>
 .cover {
   width: 100vw;
@@ -209,6 +269,7 @@ export default {
   position: fixed;
   z-index: 998;
   opacity: 0;
+  // background: #fff;
 }
 
 .tour-content-out-box {
@@ -238,13 +299,13 @@ export default {
   overflow: hidden;
   .tour-left-tips {
     width: 80px;
-    height: 32px;
+    height: 28px;
     background: $color-primary;
     color: #fff;
     position: absolute;
     left: -40px;
     top: 0px;
-    line-height: 40px;
+    line-height: 35px;
     font-size: 12px;
     transform-origin: center top;
     transform: rotateZ(-45deg);
@@ -252,7 +313,6 @@ export default {
   }
   .tour-content {
     .tour-content-head {
-      justify-content: flex-end;
       padding-bottom: 10px;
       padding-top: 16px;
       .iconfont {

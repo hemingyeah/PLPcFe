@@ -84,7 +84,6 @@
 
           <!-- 选择列 -->
           <div class="guide-box mar-l-25">
-            <!-- <div class="guide-disable-cover" v-if="nowGuideStep == 2"></div> -->
             <div :class="[
                    'task-ai',
                    'task-flex',

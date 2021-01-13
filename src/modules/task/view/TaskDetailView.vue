@@ -1,5 +1,6 @@
 <template>
   <div class="task-detail-container" v-loading="loading" ref="container">
+    <div id="task-task-detail-view"></div>
     <div class="guide-model-box" v-if="nowGuideStep < 5">
 
     </div>
@@ -17,7 +18,7 @@
         <div class="task-delete-status" v-if="isDelete">已删除</div>
 
         <!-- start 工单流程信息 -->
-        <div class="progress-wrap" v-show="collapse" id="v-task-detail-step-0">
+        <div class="progress-wrap bg-w" v-show="collapse" id="v-task-detail-step-0">
           <div class="guide-disable-cover" v-if="nowGuideStep == 1"></div>
           <biz-process :value="task.state" :class="nowGuideStep == 1 ? 'guide-point bg-w':''" :data="task" :flow-setting="initData.taskType.flowSetting" @change="changeTaskProcessState"></biz-process>
         </div>
@@ -103,7 +104,7 @@
       </div>
       <!-- end 审批中icon -->
 
-      <div class="task-detail-header-bottom" :class="{'active': !collapse, 'guide-point bg-w' : nowGuideStep == 2}" id="v-task-detail-step-1">
+      <div class="task-detail-header-bottom bg-w" :class="{'active': !collapse}" id="v-task-detail-step-1">
         <div class="guide-disable-cover" v-if="nowGuideStep == 2"></div>
         <div class="customer-info-wrap">
           <div :class="['customer-name', {'link-text': allowOpenCustomerView}]" @click="openCustomerView">
@@ -200,8 +201,8 @@
       <!-- start 工单详情 -->
       <template slot="left">
         <div class="task-detail-main-content-left" v-show="collapseDirection != 'left'">
-          <div class="task-detail-btn-group" :class=" nowGuideStep == 4 ? 'task-detail-btn-group-point' : ''" id="v-task-detail-step-3">
-            <div class="guide-disable-cover" v-if="nowGuideStep == 4"></div>
+          <div class="task-detail-btn-group" id="v-task-detail-step-3">
+
             <el-tooltip :popper-options="popperOptions" content="编辑工单" placement="top" v-if="allowEditTask">
               <i class="iconfont icon-bianji1" @click="goEdit"></i>
             </el-tooltip>
@@ -211,6 +212,7 @@
             <el-tooltip :popper-options="popperOptions" content="删除工单" placement="top" v-if="allowDeleteTask">
               <i class="iconfont icon-shanchu-copy" @click="deleteTask"></i>
             </el-tooltip>
+
           </div>
 
           <el-tabs v-model="leftActiveTab">
@@ -248,15 +250,6 @@
 
         <div class="collapse-right" v-show="collapseDirection == 'right'">
           {{ viewBalanceTab ? '审核结算' : viewFeedbackTab ? '客户评价' : '附加组件' }}
-        </div>
-        <div class="task-detail-step-2-box" :style="nowGuideStep == 3 ? 'width: 104px;height: 40px;background:#fff' : ''" id="v-task-detail-step-2">
-
-          <div class="task-detail-step-2" v-if="nowGuideStep == 3">
-            动态信息
-            <div style="position: relative;">
-              <div class="guide-disable-cover"></div>
-            </div>
-          </div>
         </div>
       </template>
       <!-- end 附加组件 -->

@@ -465,7 +465,7 @@
             <div class="guide-box">
               <div class="guide-disable-cover" v-if="nowGuideStep == 2"></div>
               <div
-                :class="['task-ai', 'task-flex', 'task-font14', 'task-c6', 'task-pointer', 'task-width103', nowGuideStep==2 ? 'guide-point bg-w' :'']"
+                :class="['task-ai', 'task-flex', 'task-font14', 'task-c6', 'task-pointer', 'task-width103', 'bg-w']"
                 id="v-task-step-1"
                 @click="showAdvancedSetting"
               >

@@ -333,8 +333,8 @@ export default {
 
     this.$nextTick(() => {
       setTimeout(() => {
-      // if (storageGet(TASK_GUIDE_LIST) && storageGet(TASK_GUIDE_LIST) > 0) this.$Guide().destroy('task-task-list-view')
-        this.$Guide([{
+        if (storageGet(TASK_GUIDE_LIST) && storageGet(TASK_GUIDE_LIST) > 0) this.$Guide().destroy('task-task-list-view')
+        else this.$Guide([{
           content:
             '可拖拽改变列宽',
           haveStep: true,
@@ -344,7 +344,6 @@ export default {
             return document.getElementById('v-task-step-0').getElementsByClassName('el-table__header-wrapper')[0]
           },
           needCover: true,
-          finishBtn: 'ok',
         }, {
           content:
             '可自定义组合查询条',
@@ -353,7 +352,6 @@ export default {
           id: 'task-task-list-view',
           domId: 'v-task-step-1',
           needCover: true,
-          finishBtn: 'ok',
         }, {
           content:
             '可自定义列表显示项',
@@ -362,12 +360,11 @@ export default {
           id: 'task-task-list-view',
           domId: 'v-task-step-2',
           needCover: true,
-          finishBtn: 'ok',
         }], 0, '', (e) => {
           return new Promise((resolve, reject) => {
             resolve()
           })
-        }).create().then(res_=>{if(res_)storageSet(TASK_GUIDE_LIST, '44')})
+        }).create().then(res_=>{if(res_)storageSet(TASK_GUIDE_LIST, '4')})
       
 
         
