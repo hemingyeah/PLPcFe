@@ -228,7 +228,8 @@
         <div class="setting-specific-form">
           <h2>
             允许工单在完成前被取消
-            <el-switch v-model="taskTypeConfig.allowCancel" />
+            <!-- mark_zr: 暂时不做 -->
+            <!-- <el-switch v-model="taskTypeConfig.allowCancel" /> -->
           </h2>
           <approve-setting
             :options="approveOptions('cancel')"
@@ -346,7 +347,7 @@ export default {
       return ["review"].includes(this.type);
     },
     showTaskClose() {
-      // 展示工单关闭 (mark_zr: 这次不做)
+      // 展示工单关闭 (mark_zr: 暂时不做)
       return false && ["close"].includes(this.type);
     },
     mode() {
