@@ -621,13 +621,6 @@ export default {
     stateColor() {
       return TaskStateEnum.getColorForTask(this.task);
     },
-    /**
-    * @description 显示折叠按钮
-    * 审核结算、客户评价、附加组件有任一存在即显示
-    */
-    showCollapse() {
-      return this.viewBalanceTab || this.viewFeedbackTab || this.viewTaskCardTab;
-    },
     messageConfig() {
       return this.initData?.messageConfig || {};
     },

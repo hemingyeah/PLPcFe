@@ -213,7 +213,7 @@
     <!-- end 顶部操作区 -->
 
     <!-- start 工单详情折叠面板 -->
-    <base-collapse class="task-detail-main-content" @scroll="getScroll" :show-collapse="showCollapse" :direction.sync="collapseDirection">
+    <base-collapse class="task-detail-main-content" @scroll="getScroll" :direction.sync="collapseDirection">
       
       <!-- start 工单详情 -->
       <template slot="left">
