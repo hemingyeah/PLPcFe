@@ -3,7 +3,7 @@
     <!--S 头部 -->
     <div class="setting-flow-header">
       <el-row class="setting-flow-header-left" type="flex">
-        <p class="return-btn" @click="goBack">返回</p>
+        <p class="return-btn" @click="checkModified(goBack, true)">返回</p>
         <div>
           <el-row type="flex">
             <el-popover placement="bottom" width="224" trigger="click">
@@ -44,7 +44,7 @@
         <div
           v-for="(step, idx) in settingStep"
           :key="step.stepName"
-          @click="currTab = idx"
+          @click="clickTab(idx)"
           :class="idx === currTab && 'active'"
         >
           <i>{{ idx + 1 }}</i>
@@ -114,6 +114,7 @@ export default {
 	    taskTypeConfig: new TaskConfig(),
       currTab: 0,
 
+      initTaskTypeConfig: new TaskConfig(),
       pending: false,
     };
   },
@@ -145,6 +146,12 @@ export default {
       
       let id = window.frameElement.dataset.id;
       this.$platform.closeTab(id);
+    },
+    clickTab(idx) {
+      if(this.currTab === idx) return;
+      this.checkModified(() => {
+        this.currTab = idx;
+      });
     },
     /** 兼容旧审批结构 */
     compatibleOldApprove(setting) {
@@ -255,7 +262,7 @@ export default {
           return {
             ...item,
             ...overTimeSetting,
-            remindType: overTimeSetting.remindType == undefined ? null : overTimeSetting.remindType + '',
+            remindType: overTimeSetting.remindType ? overTimeSetting.remindType + '' : null,
             reminders: overTimeSetting.reminders || []
           }
         })
@@ -263,7 +270,7 @@ export default {
         taskTypeConfig.taskOverTimeModels = config.newOverTimeSetting.map(item => {
           return {
             ...item,
-            remindType: overTimeSetting.remindType == undefined ? null : overTimeSetting.remindType + '',
+            remindType: overTimeSetting.remindType ? overTimeSetting.remindType + '' : null,
             reminders: item.reminders || []
           }
         })
@@ -287,6 +294,7 @@ export default {
 
         // 转化获取到的结果
         this.taskTypeConfig = this.convertTaskTypeConfig(Object.assign(this.taskTypeConfig, res.data));
+        this.initTaskTypeConfig = _.cloneDeep(this.taskTypeConfig);
 
         // 传递给FlowSetting组件工单类型名称
         this.$eventBus.$emit('setting_task_type_name', this.taskTypeConfig.name);
@@ -350,6 +358,48 @@ export default {
           this.pending = false;
         }
     },
+    /**
+     * @description 检查当前tab页是否有修改
+     * @param {function} bc 回调函数
+     * @param {boolean} isisReturn 是否是返回操作
+     */
+    async checkModified(bc, isReturn = false) {
+      let isModified = false;
+      
+      if(this.$refs.comp.checkModified) {
+        isModified = this.$refs.comp.checkModified();
+      }
+
+      let confirmObj = {
+        content: isReturn ? '有修改的内容未保存，确认离开吗？' : '有修改的内容未保存，是否要保存？',
+        confirmText: isReturn ? '离开' : '保存',
+        cancelText: isReturn ? '取消' : '暂不保存'
+      }
+
+      if(isModified) {
+        this.$confirm(confirmObj.content, '', {
+          confirmButtonText: confirmObj.confirmText,
+          cancelButtonText: confirmObj.cancelText,
+          type: 'warning',
+          showClose: false,
+          closeOnClickModal: false
+        }).then(async () => {
+          // 保存
+          if(!isReturn) await this.submit();
+          bc();
+        }).catch(() => {
+          // 取消
+          if(isReturn) return;
+          // 暂不保存
+          if(!isReturn && this.$refs.comp.resetInit) {
+            this.$refs.comp.resetInit();
+          }
+          bc();
+        });
+      }else {
+        bc();
+      }
+    }
   },
   mounted() {
     let query = parse(window.location.search) || {};

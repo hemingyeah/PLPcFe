@@ -235,7 +235,7 @@ export default {
             });
         },
         /**
-         * 保存
+         * 保存 (暴露的方法) 
          */
         async submit() {
             let {taskTypeId,taskTypeConfig} = this.taskFlowData;
@@ -257,6 +257,16 @@ export default {
             } catch (error) {
                 console.error(error);
             }
+        },
+        /** 检查内容是否有修改 (暴露的方法) */
+        checkModified() {
+            let {taskTypeConfig, initTaskTypeConfig} = this.taskFlowData;
+            return JSON.stringify(taskTypeConfig) != JSON.stringify(initTaskTypeConfig);
+        },
+        /** 同步初始数据 (暴露的方法) */
+        resetInit() {
+            let {taskTypeConfig} = this.taskFlowData;
+            this.taskFlowData.initTaskTypeConfig = _.cloneDeep(taskTypeConfig);
         }
     },
     mounted() {

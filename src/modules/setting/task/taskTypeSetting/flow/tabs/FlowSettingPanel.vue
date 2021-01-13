@@ -147,15 +147,20 @@ export default {
                 planningTimeMes: noticeLeader ? ['none','leader','users'][Number(noticeLeader)] : 'none',
                 usersIds: noticeUsers.map(item => item.userId).join(','),
                 taskOverTimeModels: taskOverTimeModels.map(item => {
-                    item.reminders = item.reminders || [];
-                    item.ids = item.reminders.map(item => item.userId).join(',');
-                    return item;
+                    let {reminders = [], overTimeState, isAhead = '0', minutes = '0', remindType} = item;
+                    return {
+                        overTimeState, 
+                        isAhead, 
+                        minutes, 
+                        remindType,
+                        ids: reminders.map(item => item.userId).join(','),
+                    };
                 }),
                 autoReviewState
             };
             return params;
         },
-        /** 保存流程设置 */
+        /** 保存流程设置 (暴露的方法) */
         async submit() {
             try {
                 let params = this.convertDataToParams();
@@ -168,6 +173,16 @@ export default {
             } catch (error) {
                 console.error('sumbit saveProcess => error', error);
             }
+        },
+        /** 检查内容是否有修改 (暴露的方法) */
+        checkModified() {
+            let {taskTypeConfig, initTaskTypeConfig} = this.taskFlowData;
+            return JSON.stringify(taskTypeConfig) != JSON.stringify(initTaskTypeConfig);
+        },
+        /** 同步初始数据 (暴露的方法) */
+        resetInit() {
+            let {taskTypeConfig} = this.taskFlowData;
+            this.taskFlowData.initTaskTypeConfig = _.cloneDeep(taskTypeConfig);
         }
     },
     components: {
