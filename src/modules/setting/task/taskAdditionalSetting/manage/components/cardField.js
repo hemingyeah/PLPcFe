@@ -99,7 +99,9 @@ function packCustomFields(fields) {
       }
       if(i.formType == 'related_task'){
         i.minWidth = '160px' ;
-        i.showTooltip = true ;
+      }
+      if(i.formType == 'address' || i.formType == 'location'){
+        i.minWidth = '160px' ;
       }
                
       return !i.isHidden && i.isVisible && formTypes.indexOf(i.formType) < 0

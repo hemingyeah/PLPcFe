@@ -51,7 +51,7 @@
             :key="`${column.field}_${index}`"
             :prop="column.fieldName" 
             :label="column.displayName"
-            :show-overflow-tooltip="column.showTooltip"
+            :show-overflow-tooltip="true"
             :min-width="column.minWidth || '120px'">
             <template slot-scope="scope">
               <!-- start 自定义字段 -->

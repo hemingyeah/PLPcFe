@@ -81,7 +81,7 @@ export default {
           minWidth: '140px'
         }
       ]
-
+      
       return fields.filter(field => !field.isHidden && field.isVisible && formTypes.indexOf(field.formType) < 0);
     }
   },
