@@ -9,10 +9,10 @@
                     </h2>
                     <el-row class="task-type-others">
                         <el-row type="flex">
-                            <p @click="chooseTeam"> 
+                            <p @click="chooseTeam" class="pointer"> 
                                 <span style="color: #666666;">可用团队: </span>
-                                <el-popover v-if="formatTeamName.length>35" width="300" trigger="hover" :content="formatTeamName">
-                                    <span slot="reference">{{formatTeamName.substring(0, 35)}}...等{{tagIds.length}}个</span>
+                                <el-popover v-if="formatTeamName.length>28" width="300" trigger="hover" :content="formatTeamName">
+                                    <span slot="reference">{{formatTeamName.substring(0, 28)}}...等{{tagIds.length}}个</span>
                                 </el-popover>
                                 <span v-else>{{formatTeamName}}</span>
                             </p>
@@ -116,7 +116,7 @@ export default {
             }).catch(err => {
                 console.log("taskType enabled => err", err);
             });
-        }, 300),
+        }, 100),
         /** 打开可用团队弹窗 */
         chooseTeam() {
             this.isShowChooseTeamModal = true;
@@ -200,7 +200,7 @@ export default {
             min-width: 14px;
             height: 14px;
             line-height: 22px;
-            margin: 2px 5px 0 0;
+            margin: 4px 5px 0 0;
             border-radius: 50%;
         }
         .task-type-content{
@@ -284,7 +284,7 @@ export default {
 }
 @media screen and (max-width: 1440px) {
   .task-type {
-    width: 358px;
+    width: 326px;
   }
 }
 

@@ -7,7 +7,7 @@
           <i class="iconfont icon-arrow-left"></i> 返回
         </p>
         <div>
-          <el-row type="flex" style="height: 30px">
+          <el-row type="flex" style="height: 30px;max-width: 185px;">
             <el-popover placement="bottom" width="224" trigger="click">
               <div class="choose-color-box">
                 <div
@@ -265,6 +265,7 @@ export default {
             ...item,
             ...overTimeSetting,
             overTimeStatus: true,
+            remindType: overTimeSetting.remindType ? overTimeSetting.remindType : null,
             reminders: overTimeSetting.reminders || []
           }
         })
@@ -272,6 +273,7 @@ export default {
         taskTypeConfig.taskOverTimeModels = config.newOverTimeSetting.map(item => {
           return {
             ...item,
+            remindType: item.remindType ? item.remindType : null,
             overTimeStatus: !!item.overTimeStatus,
             reminders: item.reminders || []
           }

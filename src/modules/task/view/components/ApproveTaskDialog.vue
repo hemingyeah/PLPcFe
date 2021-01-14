@@ -179,7 +179,7 @@ export default {
       this.pending = true;
 
       let { approveId, approveRemark } = this;
-      TaskApi.saveApprove({ id: approveId, result, approveRemark })
+      TaskApi.saveApprove({ id: approveId, result, approveRemark, currLevel: this.currLevel || 1 })
         .then((res) => {
           if (res.status == 0) {
             this.$platform.notification({

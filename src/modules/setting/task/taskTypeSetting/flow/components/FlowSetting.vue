@@ -20,7 +20,7 @@
         <!--S 工单表单设置 -->
         <div v-if="showFormBuilder" class="setting-specific-form">
           <h2>工单表单设置</h2>
-          <p @click="openFormDesign">
+          <p style="color: #13C2C2" @click="openFormDesign">
             工单{{ type === "create" ? "新建" : "回执" }}表单设置
           </p>
         </div>
@@ -55,7 +55,8 @@
           <h2>
             超时提醒<el-switch
               class="ml-12"
-              v-model="flowSetting.overTimeState"
+              v-model="taskOverTimeModel.overTimeStatus"
+              @change="updateOvertimeSetting"
             />
           </h2>
           <div>

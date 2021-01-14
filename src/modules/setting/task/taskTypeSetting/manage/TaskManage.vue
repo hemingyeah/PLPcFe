@@ -4,7 +4,22 @@
     <div class="task-manage-main" v-loading="pendding">
       <div class="task-manage-header">
         <div>
-          <h2>工单类型</h2>
+          <h2>
+            工单类型
+            <el-popover
+              trigger="hover"
+            >
+              <div slot="default" style="width: 420px">
+                <h3>规则说明</h3>
+                <p>单个租户可启用的工单类型上限为{{maxTypeNum}}个</p>
+                <h3>字段说明</h3>
+                <p>可用团队：可以配置该工单类型只给部分团队使用，默认为全部可用，工单管理员（拥有查看工单全部权限）不受该条件显示，具体使用场景为：</p>
+                <p>1.  新建工单时，工单类型仅【可见团队】可以使用，查看不受影响；</p>
+                <p>2.  工单池中的工单，仅该工单类型设置的可见团队才可查看；</p>
+              </div>
+              <i slot="reference" class="el-icon-question" />
+            </el-popover>
+          </h2>
           <p>工单支持多种工单类型，可以添加或配置不同类型的工单来分类处理服务台业务一个工单类型中可以定义表单、流程及附加组件</p>
         </div>
         <div class="lh-52">
@@ -124,7 +139,6 @@ export default {
 <style lang="scss" scoped>
 .task-manage{
   display: flex;
-  overflow: auto;
   height: 100vh;
   padding: 16px;
   background: #F5F5F5;
@@ -141,6 +155,9 @@ export default {
       height: 88px;
       background: #FFFFFF;
       border-radius: 4px;
+      .el-icon-question{
+        color: $color-primary;
+      }
       h2{
         margin-bottom: 10px;
         font-size: 16px;

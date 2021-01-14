@@ -155,6 +155,17 @@ export function createTaskType(params) {
 }
 
 /**
+ * 创建工单类型 (新版)
+ * 
+ * @param {string} params.typeName 工单类型名称
+ * @param {string} params.templateId 模板id  
+ * @param {string} params.color 颜色
+ */
+export function createInitTaskType(params) {
+  return http.post('/taskType/init/create', params, false);
+}
+
+/**
  * 根据行业模板创建工单类型
  * 
  * @param {string} params.taskTypeId 行业模板id
