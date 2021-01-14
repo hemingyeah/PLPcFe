@@ -231,7 +231,7 @@ export default {
 
                     // 从空白模板/现有工单类型创建
                     this.pedding = true;
-                    SettingApi.createTaskType(this.form).then(res => {
+                    SettingApi.createInitTaskType(this.form).then(res => {
                         if(res.status == 0){
                             this.$platform.openTab({
                                 id: 'task_form_setting',
@@ -240,6 +240,8 @@ export default {
                                 reload: true,
                                 fromId
                             });
+                            let id = window.frameElement.dataset.id;
+                            this.$platform.refreshTab(id);
                         }else{
                             this.$message.error(res.message);
                         }

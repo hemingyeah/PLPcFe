@@ -36,7 +36,7 @@
         <label>发起人备注：</label>
         <div class="form-view-row-content">{{ approve.applyRemark }}</div>
       </div>
-      <hr class="dividing-line" />
+      <div class="dividing-line"></div>
       <!--S 一级审批 -->
       <template v-if="configLevel === 1">
         <!-- <div class="form-view-row">
@@ -102,8 +102,8 @@
     <div slot="footer" class="dialog-footer">
       <div class="dialog-footer-left"></div>
       <div class="dialog-footer-right">
-        <el-button type="danger" plain @click="submit('fail')" :disabled="pending">拒绝</el-button>
-        <el-button type="primary" @click="submit('success')" :disabled="pending">审 批</el-button>
+        <el-button type="danger" plain @click="submit('fail')" :disabled="pending">拒 绝</el-button>
+        <el-button type="primary" @click="submit('success')" :disabled="pending">同 意</el-button>
       </div>
     </div>
   </base-modal>
@@ -179,7 +179,7 @@ export default {
       this.pending = true;
 
       let { approveId, approveRemark } = this;
-      TaskApi.saveApprove({ id: approveId, result, approveRemark })
+      TaskApi.saveApprove({ id: approveId, result, approveRemark, currLevel: this.currLevel || 1 })
         .then((res) => {
           if (res.status == 0) {
             this.$platform.notification({

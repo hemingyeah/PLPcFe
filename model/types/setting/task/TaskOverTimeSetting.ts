@@ -15,7 +15,10 @@ class TaskOverTimeSetting {
 
     /** 提醒指定人员 */
     reminders: Preson[] = [];
-    
+
+    /** 超时提醒开关 */
+    overTimeStatus: Boolean = false;
+
     constructor(overTimeState?: string) {
         this.overTimeState = overTimeState || '';
     }

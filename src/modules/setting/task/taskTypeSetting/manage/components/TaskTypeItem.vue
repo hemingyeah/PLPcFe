@@ -9,14 +9,17 @@
                     </h2>
                     <el-row class="task-type-others">
                         <el-row type="flex">
-                            <p>
-                                可用团队: 
-                                <span class="pointer" @click="chooseTeam">{{formatTeamName(taskType.tags)}} </span>
+                            <p @click="chooseTeam" class="pointer"> 
+                                <span style="color: #666666;">可用团队: </span>
+                                <el-popover v-if="formatTeamName.length>28" width="300" trigger="hover" :content="formatTeamName">
+                                    <span slot="reference">{{formatTeamName.substring(0, 28)}}...等{{tagIds.length}}个</span>
+                                </el-popover>
+                                <span v-else>{{formatTeamName}}</span>
                             </p>
                             <i class="iconfont icon-edit-square pointer" @click="chooseTeam"></i>
                         </el-row>
                         <p>
-                            最近更新: {{taskType.modifyUserName}}  {{taskType.modifyTime | fmt_datetime}}
+                            最近更新: {{taskType.modifyUserName}}  {{(taskType.modifyTime || taskType.createTime) | fmt_datetime}}
                         </p>
                     </el-row>
                 </el-row >
@@ -81,15 +84,19 @@ export default {
         // 是否系统默认工单类型
         isSysTaskType() {
             return this.taskType.id == '1';
-        }
-    },
-    methods: {
-        /** 可用团队名称显示 */
-        formatTeamName(tagIds) {
+        },
+        tagIds() {
+            return this.taskType.tags || [];
+        },
+        // 可用团队名称显示
+        formatTeamName() {
+            let tagIds = this.tagIds;
             return tagIds.length === 0 ? '全部团队' : tagIds.map(tagId => {
                 return this.teamList.find(team => team.id === tagId).tagName;
             }).join(',');
         },
+    },
+    methods: {
         /** 启用/禁用 */
         switchEnabled: _.debounce(function(value) {
             if(value === 1 && this.typeNum >= this.maxTypeNum) {
@@ -109,7 +116,7 @@ export default {
             }).catch(err => {
                 console.log("taskType enabled => err", err);
             });
-        }, 300),
+        }, 100),
         /** 打开可用团队弹窗 */
         chooseTeam() {
             this.isShowChooseTeamModal = true;
@@ -175,7 +182,6 @@ export default {
 
 <style lang="scss" scoped>
 .task-type{
-    cursor: move;
     width: 358px;
     height: 159px;
     background: #FFFFFF;
@@ -194,7 +200,7 @@ export default {
             min-width: 14px;
             height: 14px;
             line-height: 22px;
-            margin: 2px 5px 0 0;
+            margin: 4px 5px 0 0;
             border-radius: 50%;
         }
         .task-type-content{
@@ -213,9 +219,6 @@ export default {
             .task-type-others{
                 i{
                     font-size: 12px;
-                    &:hover{
-                        color: $color-primary;
-                    }
                 }
                 p{
                     margin-bottom: 6px;
@@ -225,6 +228,11 @@ export default {
                     color: #666666;
                     &:last-child{
                         margin-bottom: 0;
+                    }
+                }
+                & > div:hover{
+                    p, i {
+                        color: $color-primary;
                     }
                 }
             }
@@ -263,4 +271,21 @@ export default {
 .pointer{
     cursor: pointer;
 }
+
+@media screen and (max-width: 1920px) {
+  .task-type {
+    width: calc(25% - 12px);
+  }
+}
+@media screen and (max-width: 1680px) {
+  .task-type {
+    width: calc(33.3% - 12px);
+  }
+}
+@media screen and (max-width: 1440px) {
+  .task-type {
+    width: 326px;
+  }
+}
+
 </style>

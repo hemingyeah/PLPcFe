@@ -3,9 +3,11 @@
     <!--S 头部 -->
     <div class="setting-flow-header">
       <el-row class="setting-flow-header-left" type="flex">
-        <p class="return-btn" @click="checkModified(goBack, true)">返回</p>
+        <p class="return-btn" @click="checkModified(goBack, true)">
+          <i class="iconfont icon-arrow-left"></i> 返回
+        </p>
         <div>
-          <el-row type="flex">
+          <el-row type="flex" style="height: 30px;max-width: 185px;">
             <el-popover placement="bottom" width="224" trigger="click">
               <div class="choose-color-box">
                 <div
@@ -57,7 +59,7 @@
           plain
           @click="submit"
           :loading="pending"
-          >保存</el-button
+          >保 存</el-button
         >
       </div>
     </div>
@@ -262,6 +264,8 @@ export default {
           return {
             ...item,
             ...overTimeSetting,
+            overTimeStatus: true,
+            remindType: overTimeSetting.remindType ? overTimeSetting.remindType : null,
             reminders: overTimeSetting.reminders || []
           }
         })
@@ -269,6 +273,8 @@ export default {
         taskTypeConfig.taskOverTimeModels = config.newOverTimeSetting.map(item => {
           return {
             ...item,
+            remindType: item.remindType ? item.remindType : null,
+            overTimeStatus: !!item.overTimeStatus,
             reminders: item.reminders || []
           }
         })
@@ -322,18 +328,18 @@ export default {
       }
     },
     /** 更新工单类型颜色和名称 */
-    async updateTaskTypeNameAndColor() {
-      try {
-        let params =  {
-          id: this.taskTypeId,
-          name: this.taskTypeConfig.name,
-          color: this.taskTypeConfig.config.color
-        }
-        await TaskApi.updateTaskTypeNameAndColor(params);
-      } catch (error) {
-        console.error(error);
-      }
-    },
+    // async updateTaskTypeNameAndColor() {
+    //   try {
+    //     let params =  {
+    //       id: this.taskTypeId,
+    //       name: this.taskTypeConfig.name,
+    //       color: this.taskTypeConfig.config.color
+    //     }
+    //     await TaskApi.updateTaskTypeNameAndColor(params);
+    //   } catch (error) {
+    //     console.error(error);
+    //   }
+    // },
     /** 右上角保存按钮 */
     async submit() {
       if (!this.$refs.comp.submit) return;
@@ -345,16 +351,20 @@ export default {
       if(name.length > 20) return this.$notify.error('工单类型名称超过20个字');
       if(!/^[a-zA-Z0-9\u4e00-\u9fa5]+$/.test(name)) return this.$notify.error('工单类型名称只能输入中文、字母、数字');
 
+      let nameAndColor = {
+        name: this.taskTypeConfig.name,
+        color: this.taskTypeConfig.config.color
+      };
       this.pending = true;
-        try {
-          await this.$refs.comp.submit();
-          await this.updateTaskTypeNameAndColor();
-          this.fetchTasktype();
-        } catch (error) {
-          console.error(error);
-        }finally {
-          this.pending = false;
-        }
+      try {
+        await this.$refs.comp.submit(nameAndColor);
+        // await this.updateTaskTypeNameAndColor();
+        this.fetchTasktype();
+      } catch (error) {
+        console.error(error);
+      }finally {
+        this.pending = false;
+      }
     },
     /**
      * @description 检查当前tab页是否有修改

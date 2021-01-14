@@ -89,7 +89,7 @@ export default {
             }
 
             // leader审批类型为表单人员
-            if(approveSetting.leader && !approveSetting.leader.indexOf('formUser') > -1){
+            if(approveSetting.leader && !approveSetting.leader.indexOf('formUser') > -1 && approveSetting.leader !== 'users'){
                 approveSetting.approvers = [];
             }else{
                 approveSetting.taskTemplateId = '';
@@ -147,12 +147,13 @@ export default {
                 planningTimeMes: noticeLeader ? ['none','leader','users'][Number(noticeLeader)] : 'none',
                 usersIds: noticeUsers.map(item => item.userId).join(','),
                 taskOverTimeModels: taskOverTimeModels.map(item => {
-                    let {reminders = [], overTimeState, isAhead = '0', minutes = '0', remindType} = item;
+                    let {reminders = [], overTimeState, isAhead = '0', minutes = '0', remindType, overTimeStatus} = item;
                     return {
                         overTimeState, 
                         isAhead, 
                         minutes, 
                         remindType,
+                        overTimeStatus,
                         ids: reminders.map(item => item.userId).join(','),
                     };
                 }),
@@ -161,9 +162,14 @@ export default {
             return params;
         },
         /** 保存流程设置 (暴露的方法) */
-        async submit() {
+        async submit(otherParams) {
             try {
                 let params = this.convertDataToParams();
+                params = {
+                    ...params,
+                    ...otherParams
+                };
+                
                 let res = await SettingApi.saveProcess(params);
                 if(res.status == 1) {
                     return this.$notify.error(res.message);

@@ -3,13 +3,15 @@
     <!--S 预览组件 -->
     <div v-if="showFormBuilder" class="flow-setting-left">
       <form-preview :fields="fields" class="flow-setting-form-preview">
-        <el-button
-          type="primary"
-          class="form-preview-btn"
-          @click="openFormDesign"
-        >
-          {{ type === "create" ? "新建" : "回执" }}表单设置
-        </el-button>
+        <div class="form-preview-box">
+          <el-button
+            type="primary"
+            class="form-preview-btn"
+            @click="openFormDesign"
+          >
+            {{ type === "create" ? "新建" : "回执" }}表单设置
+          </el-button>
+        </div>
       </form-preview>
     </div>
     <!--E 预览组件 -->
@@ -20,7 +22,7 @@
         <!--S 工单表单设置 -->
         <div v-if="showFormBuilder" class="setting-specific-form">
           <h2>工单表单设置</h2>
-          <p @click="openFormDesign">
+          <p style="color: #13C2C2" @click="openFormDesign">
             工单{{ type === "create" ? "新建" : "回执" }}表单设置
           </p>
         </div>
@@ -55,7 +57,8 @@
           <h2>
             超时提醒<el-switch
               class="ml-12"
-              v-model="flowSetting.overTimeState"
+              v-model="taskOverTimeModel.overTimeStatus"
+              @change="updateOvertimeSetting"
             />
           </h2>
           <div>
@@ -558,11 +561,18 @@ export default {
     .flow-setting-form-preview {
       padding-top: 10%;
     }
-    .form-preview-btn {
+    .form-preview-box{
       position: absolute;
-      bottom: 50px;
-      left: 22px;
-      width: calc(100% - 50px);
+      bottom: 40px;
+      left: 16px;
+      text-align: center;
+      width: calc(100% - 39px);
+      height: 50px;
+      line-height: 40px;
+      background: #F2F2F2;
+      .form-preview-btn {
+        width: calc(100% - 20px);
+      }
     }
   }
   .flow-setting-right {
