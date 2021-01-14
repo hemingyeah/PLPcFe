@@ -251,6 +251,7 @@ export default {
 .card-setting-container {
   min-height: calc(100vh - 48px);
   background: #F5F5F5;
+  overflow-y: auto;
   .card-setting-heard {
     font-weight: 500;
     color: #333333;
@@ -291,6 +292,8 @@ export default {
       display: flex;
       flex-flow: wrap;
       min-height: 300px;
+      width: calc(100% + 16px);
+
       .task-card-item{
         margin: 0 12px 12px 0;
       }

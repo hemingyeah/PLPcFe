@@ -188,7 +188,7 @@ export default {
 
 <style lang="scss">
 .task-card{
-    width: 358px;
+    // width: 358px;
     height: 180px;
     background: #FFFFFF;
     border-radius: 4px;
@@ -331,5 +331,20 @@ export default {
         }  
     }
 
+}
+@media screen and (max-width: 1920px) {
+  .task-card {
+    width: calc(25% - 12px);
+  }
+}
+@media screen and (max-width: 1680px) {
+  .task-card {
+    width: calc(33.3% - 12px);
+  }
+}
+@media screen and (max-width: 1440px) {
+  .task-card {
+    width: 358px;
+  }
 }
 </style>

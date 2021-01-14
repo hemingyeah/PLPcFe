@@ -123,7 +123,7 @@ export default {
     display: flex;
     flex-flow: wrap;
     .tabs-card-box{
-        width: 440px;
+        // width: 440px;
         margin-right: 12px;
         margin-bottom: 12px;
         box-shadow: 0px 4px 10px 0px rgba(0, 0, 0, 0.04); 
@@ -202,5 +202,20 @@ export default {
     }
   }
   
+}
+@media screen and (max-width: 1920px) {
+  .tabs-card-box {
+    width: calc(25% - 12px);
+  }
+}
+@media screen and (max-width: 1680px) {
+  .tabs-card-box {
+    width: calc(33.3% - 12px);
+  }
+}
+@media screen and (max-width: 1440px) {
+ .tabs-card-box {
+    width: 440px;
+  }
 }
 </style>
