@@ -11,12 +11,8 @@
           <el-button type="primary" icon="el-icon-plus"  :loading="false" @click="addTaskType"> 新建</el-button>
         </div>
       </div>
-      <draggable
-        v-model="taskTypeList"
-        v-bind="dragOptions"
+      <div
         class="task-type-list"
-        tag="div"
-        @change="updateTaskTypeOrder"
       >
         <task-type-item
           class="task-type-item"
@@ -31,7 +27,7 @@
             updateTaskType(item, obj)
           }">
         </task-type-item>
-      </draggable>
+      </div>
     </div>
 
     <!-- 新建工单类型弹窗 -->
@@ -64,12 +60,6 @@ export default {
     }
   },
   computed: {
-    dragOptions() {
-      return {
-        animation: 380,
-        ghostClass: "ghost"
-      };
-    },
     enableTypeNum() {
       return this.taskTypeList.filter(item => item.enabled === 1).length;
     }
@@ -86,19 +76,19 @@ export default {
     addTaskType() {
       this.isAddTaskTypeModal = true;
     },
-    /** 工单类型排序 */
-    updateTaskTypeOrder(data) {
-      let params = {};
-      this.taskTypeList.forEach((item, idx) => {
-        params[item.id] = idx +1;
-      })
+    // /** 工单类型排序 (不做拖拽排序，统一后端排序) */
+    // updateTaskTypeOrder(data) {
+    //   let params = {};
+    //   this.taskTypeList.forEach((item, idx) => {
+    //     params[item.id] = idx +1;
+    //   })
 
-      SettingApi.taskTypeOrder(params).then(() => {
-        console.log('updateTaskTypeOrder success');
-      }).catch(err => {
-        console.log('updateTaskTypeOrder => err', err);
-      });
-    },
+    //   SettingApi.taskTypeOrder(params).then(() => {
+    //     console.log('updateTaskTypeOrder success');
+    //   }).catch(err => {
+    //     console.log('updateTaskTypeOrder => err', err);
+    //   });
+    // },
     /** 获取工单类型列表 */
     fetchTaskTypeList() {
       this.pendding = true;
@@ -183,9 +173,5 @@ export default {
 // transtion
 .flip-list-move {
   transition: transform 0.5s;
-}
-.ghost {
-  opacity: 0.5;
-  background: #c8ebfb;
 }
 </style>

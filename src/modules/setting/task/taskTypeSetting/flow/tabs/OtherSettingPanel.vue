@@ -3,9 +3,9 @@
         <div class="other-setting-main">
             <!--S 工单费用折扣 -->
             <div class="setting-service-price">
-                <h2>允许修改工单费用折扣</h2>
+                <h2 style="margin-top: 0">允许修改工单费用折扣</h2>
                 如果启用该选项，允许工单负责人修改工单折扣费
-                <div>
+                <div class="mt-12">
                     <el-checkbox v-model="taskFlowData.taskTypeConfig.options.editUnitPrice">修改单品价格</el-checkbox>
                     <el-checkbox v-model="taskFlowData.taskTypeConfig.options.showDiscountCost">修改工单总折扣价</el-checkbox>
                 </div>
@@ -18,7 +18,7 @@
                     <el-switch class="ml-16" v-model="taskFlowData.taskTypeConfig.options.serviceReport"/>
                 </h2>
                 可在PC端或移动端针对完成的工单生成电子服务报告
-                <div class="mt-8">
+                <div class="mt-12">
                     <el-radio-group v-model="taskFlowData.taskTypeConfig.options.srSysTemplate">
                         <el-radio :label="true" class="mr-50">
                             使用系统模板
@@ -59,7 +59,7 @@
                     <el-switch class="ml-16" v-model="taskFlowData.taskTypeConfig.options.printTask"/>
                 </h2>
                 可以在PC端打印工单信息
-                <div class="mt-8">
+                <div class="mt-12">
                     <el-radio-group v-model="taskFlowData.taskTypeConfig.options.ptSysTemplate">
                         <el-radio :label="true" class="mr-50">
                             使用系统模板
@@ -138,13 +138,13 @@
                     位置异常提醒
                     <el-switch class="ml-16" v-model="taskFlowData.taskTypeConfig.config.positionExceptionConfig.positionExceptionFlag" />
                 </h2>
-                <p>
+                <p style="color: #999999">
                     开启后，在以下节点时若负责人超出工单距离
                     <el-input class="w-120" v-model="taskFlowData.taskTypeConfig.config.positionExceptionConfig.exceptionRange" onkeyup="if(isNaN(value))execCommand('undo')" placeholder="请输入距离"></el-input>
                     公里
                 </p>
                 将在工单流程中提示位置异常
-                <div class="mt-8">
+                <div class="mt-12">
                     <el-select class="w-542" v-model="taskFlowData.taskTypeConfig.config.positionExceptionConfig.exceptionFlagFlows" multiple placeholder="请选择">
                         <el-option
                             v-for="item in processArr"
@@ -237,7 +237,7 @@ export default {
         /**
          * 保存 (暴露的方法) 
          */
-        async submit() {
+        async submit(otherParams) {
             let {taskTypeId,taskTypeConfig} = this.taskFlowData;
             let saveOptionFormList = this.objectToParams(taskTypeConfig.options, 'state');
             let typeConfigForms = this.objectToParams(taskTypeConfig.config.positionExceptionConfig, 'value');
@@ -245,7 +245,8 @@ export default {
             let params = {
                 templateId: taskTypeId,
                 saveOptionFormList,
-                typeConfigForms
+                typeConfigForms,
+                ...otherParams
             }
             try {
                 let res = await SettingApi.advancedSetting(params);
@@ -295,7 +296,7 @@ export default {
             h2{
                 color: #333333;
                 font-size: 16px;
-                margin: 12px 0;
+                margin: 24px 0 8px 0;
             }
             p{
                 margin-bottom: 8px;
@@ -313,6 +314,9 @@ export default {
     width: 542px;
 }
 
+.mt-12{
+    margin-top: 12px;
+}
 .mr-50{
     margin-right: 50px;
 }
@@ -321,5 +325,14 @@ export default {
 }
 .mt-8{
     margin-top: 8px;
+}
+
+/** element-ui */
+.el-checkbox{
+    margin-bottom: 0;
+}
+.el-button--small{
+    height: 28px;
+    padding: 6px 15px;
 }
 </style>
