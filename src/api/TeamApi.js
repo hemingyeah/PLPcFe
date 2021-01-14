@@ -1,5 +1,4 @@
 import http from '@src/util/http';
-import {isEnterprise} from '@src/util/Platform';
 
 /**
  * 获取团队列表数据
@@ -9,7 +8,7 @@ import {isEnterprise} from '@src/util/Platform';
  * @returns Promise<Team>
  */
 export function tagList(params) {
-  return http.post(isEnterprise ? '/security/tag/tree' : '/security/tag/list', params);
+  return http.post('/security/tag/tree', params);
 }
 
 /**

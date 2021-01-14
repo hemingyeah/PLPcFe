@@ -188,7 +188,7 @@ export default {
         // deptId: '',
         // departmentId: '',
         pageNum: 1,
-        pageSize: 0
+        pageSize: 50
       }, // 参数
       userPage: new Page(),
 
@@ -199,6 +199,11 @@ export default {
     return data
   },
   computed: {
+    isDingtalk(){
+      // 判断是否钉钉端选择通讯录
+      let tenantType = localStorage.getItem('tenantType');
+      return !tenantType && !localStorage.getItem('allotByTag'); 
+    },
     btnText(){
       return this.max > 0 ? `(${this.chosen.length}/${this.max})` : "";
     },
@@ -351,7 +356,10 @@ export default {
         // 查询用户
         this.params.keyword = '';
         this.params.tagId = this.selectedDept.id;
-        // this.params.departmentId = this.selectedDept.id;
+        // start 兼容钉钉端 
+        this.params.deptId = this.selectedDept.id;
+        this.params.departmentId = this.selectedDept.id;
+        // end 
         this.params.pageNum = 1;
 
         if(this.showLocation){
@@ -415,7 +423,8 @@ export default {
       this.loadmoreOptions.disabled = !this.userPage.hasNextPage;
     },
     /** 抓取用户数据 */
-    fetchUser(params = {}){      
+    fetchUser(params = {}){    
+      if(this.isDingtalk) return this.fetchDingtalkUser()
       return http.post(this.action, params, false).then(page => {
         // 合并数据
         let rows = page.list || [];
@@ -442,8 +451,18 @@ export default {
       })
         .catch(err => console.error('err', err));
     },
+     /** 抓取钉钉端用户数据 */
+    fetchDingtalkUser(){      
+      let params = this.params;
+      return http.get('/security/department/user', params).then(userPage => {
+
+        return userPage;
+      })
+        .catch(err => console.error('err', err))
+    },
     /** 抓取部门数据 */
     fetchDept(){
+      if(this.isDingtalk) return this.fetchDingtalkDept();
       let params = {};
       params.seeAllOrg = this.isSeeAllOrg;
       return http.post('/security/tag/tree', params).then(result => {
@@ -452,6 +471,54 @@ export default {
       })
         .catch(err => console.error('err', err));
     },
+    /** 抓取钉钉部门数据 */
+    fetchDingtalkDept(){
+      let params = {};
+      params.seeAllOrg = this.isSeeAllOrg;
+
+      return http.get('/security/department/tree', params).then(result => {
+        if(result.status == 1) return [];
+
+        let depts = result.data || [];
+        // 钉钉端数据处理
+        depts =  JSON.parse(JSON.stringify(depts).replaceAll("name", "tagName").replaceAll("subDepartments","children")); 
+        let index = -1;
+
+        for(var i = 0; i < depts.length; i++){
+          if(depts[i].name == '单独授权人员'){
+            index = i;
+            break;
+          }
+        }
+
+        // 将单独授权人员放在最后
+        if(index >= 0){
+          let arr = depts.splice(index,1);
+          depts.push(arr[0]); 
+        }
+        
+        return depts;
+      })
+        .catch(err => console.error('err', err));
+    },
+    // handleDeptsData(depts){
+    //   depts = depts.map(dept => {
+    //     let item = {
+    //       ...dept,
+    //       tagName: dept.name,
+    //       children: dept.subDepartments.map(c => {
+    //         let citem = {
+    //           ...c,
+    //           tagName: c.name,
+    //           children: c.subDepartments,
+    //         }
+    //         return citem
+    //       }) || []
+    //     } 
+    //     return item;
+    //   });
+    //   return depts
+    // },
     fetchDeptCount(){
       return http.get('/security/department/depUserCount')
     },

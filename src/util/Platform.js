@@ -189,10 +189,13 @@ function isDingTalk() {
   return isDingDingDesktop() || isDingDingWeb()
 }
 
+// tenantType  0-钉钉  1-多端自建用户  2-企业微信  第三方 3-企业微信 自建
+export const TenantType = localStorage.getItem('tenantType') || 0
 // 判断是否是多端环境(企业版)
-export const isEnterprise = true
+export const isEnterprise = TenantType != 0
 
 export default {
+  TenantType,
   isEnterprise,
   getRootWindow,
   getDingTalkPC,

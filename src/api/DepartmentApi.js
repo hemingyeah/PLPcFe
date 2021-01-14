@@ -5,8 +5,8 @@ import http from '@src/util/http';
  * @description 获取组织架构 树级列表
  * @returns {*}
  */
-export function getDepartmentTree (id) {
-  return http.get('/security/department/tree')
+export function getDepartmentTree (params) {
+  return http.get('/security/department/tree', params)
 }
 
 /**

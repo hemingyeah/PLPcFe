@@ -4,7 +4,6 @@ import _ from 'lodash'
 import Popper from 'popper.js';
 import Page from '@model/Page';
 import * as TeamApi from '@src/api/TeamApi'
-import {isEnterprise} from '@src/util/Platform';
 import BaseTreeDept from '../../common/BaseTreeDept';
 import Clickoutside from '@src/util/clickoutside'
 
@@ -44,7 +43,7 @@ const BizTeamSelect = {
     },
     placeholder: {
       type: String,
-      default: isEnterprise ? '请选择部门' : '请选择团队'
+      default: '请选择部门'
     },
     value: {
       type: Array,
@@ -289,72 +288,6 @@ const BizTeamSelect = {
         </span>
       )
     },
-    renderItem(h, item){
-      let clazz = ['biz-team-select-item']
-      let checked = this.getValue(true).findIndex(i => i.id == item.id) >= 0
-      if(checked) clazz.push('biz-team-select-selected');
-      
-      return (
-        <div class={clazz} onClick={e => this.choose(item)} key={item.id}>
-          { this.renderPrefix(item) }
-          <div class="biz-team-select-name">{ item.tagName || item.name}</div>
-          { checked && <div class="checked"></div> }
-        </div>
-      )
-    },
-    renderSubItem(h, items = [], current) {
-      return items.map((item, index) => {
-        let clazz = ['biz-team-select-item biz-team-select-subItem'];
-        if (!index && index !== items.length - 1) clazz.push('biz-team-select-subItem-start');
-        if (index && index === items.length - 1) clazz.push('biz-team-select-subItem-end');
-        if (items.length === 1) clazz.push('biz-team-select-subItem-only');
-        
-        if (this.getValue(true).findIndex(i => i.id == item.id) >= 0) clazz.push('biz-team-select-selected');
-        let styleline = isEnterprise ? `left: ${17 * current}px` : ''
-        let stylename = isEnterprise ? `paddingLeft: ${15 * (current - 1)}px` : ''
-        return (
-          <div class={clazz} onClick={e => this.choose(item)} key={item.id}>
-            <div class="biz-team-select-line" style={styleline}></div>
-            <div class="biz-team-select-name" style={stylename}>{item.tagName || item.name}</div>
-          </div>
-        );
-      })
-    },
-    /** 渲染团队树 */
-    renderTree(h, items = []) {
-      if (!this.loading && items.length == 0) {
-        return <div class="biz-team-select-empty">暂无可用团队</div>
-      }
-      
-      let teamItems = [];
-      let index = 0 ;
-      for (let i = 0; i < items.length; i++) {
-        let item = items[i];
-        teamItems.push(this.renderItem(h, item));
-        if(isEnterprise) {
-          teamItems = teamItems.concat(this.mulRender(h, item, index))
-        } else {
-          if (item.children && item.children.length && item.expand !== false) {
-            teamItems = teamItems.concat(this.renderSubItem(h, item.children))
-          }
-        }
-      }
-      
-      return teamItems;
-    },
-    // 如果children里面还有children就递归循环渲染
-    mulRender(h, item, index){
-      let arr = [];
-      if (item.children && item.children.length && item.expand !== false) {
-        index++;
-        arr.push(this.renderSubItem(h, item.children, index))
-        item.children.forEach(child => {
-          arr.push(...this.mulRender(h, child, index))
-        })
-      }
-      return arr;
-    },
-    
     /** 渲染popper */
     renderPopper(h) {
       let clazz = ['biz-team-select-popper', this.popperClassName].filter(cn => cn);

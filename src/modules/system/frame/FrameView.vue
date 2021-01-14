@@ -1328,6 +1328,8 @@ export default {
     }, NOTIFICATION_TIME);
   },
   async mounted () {
+    localStorage.setItem('tenantType', this.initData.tenantType || 0);
+    if(this.initData.tenantType == 0) localStorage.setItem('allotByTag', this.initData.allotByTag);
     await this.judgeCallCenterGray();
     let userGuide = this?.initData?.userGuide === true || false;
 

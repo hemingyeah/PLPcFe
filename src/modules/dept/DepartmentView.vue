@@ -910,8 +910,9 @@ export default {
         }
 
         if (result.status != 0) {
-          this.$platform.alert(result.message);
+          return this.$platform.alert(result.message);
         }
+        localStorage.setItem('allotByTag', setTag == 'tag')
       } catch (error) {
         console.log('setUsedAllot error: ', error);
       }
