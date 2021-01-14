@@ -5,7 +5,7 @@
         <el-row class="task-card-content" type="flex">
           <div class="task-card-inforn"> 
             <h2 class="task-card-name"><el-tooltip class="item" effect="dark" :content="card.name" :disabled="card.name.length<13" placement="top-start"><span>{{card.name}}</span></el-tooltip></h2>                                    
-            <p class="task-card-des">{{htmlUnEscape(card.description)}}</p>
+            <p class="task-card-des" ref="parentHeight"><el-tooltip class="item" effect="dark" :content="htmlUnEscape(card.description)" :disabled="!isOverflow" placement="top"><span ref="childHeight">{{htmlUnEscape(card.description)}}</span></el-tooltip></p>
           </div>
                     
           <el-row class="task-card-others">
@@ -13,7 +13,7 @@
               <p>  
                 <span class="task-card-tit">已应用范围：</span>
                 <el-dropdown placement="top" @command="modifyTaskType">
-                  <span v-if="rangeName.length>35">{{rangeName.substring(0, 35)}}...等{{card.range.length}}个</span>
+                  <span v-if="rangeName.length>30">{{rangeName.substring(0, 30)}}...等{{card.range.length}}个</span>
                   <span v-else>{{rangeName}}</span>
                   <el-dropdown-menu slot="dropdown">
                     <el-dropdown-item v-for="(item,index) in card.range" :key="index" :command="item.id">{{item.name}}</el-dropdown-item>       
@@ -75,7 +75,7 @@ export default {
   },
   computed:{
     rangeName() {   
-      let range = this.card.range.map((item)=>{
+      let range = this.card.range.map((item)=> {
         return item.name     
       }).join('，')
       return range
@@ -83,7 +83,13 @@ export default {
   },
   data() {
     return {
+      isOverflow: false
     }
+  },
+  mounted() {
+    this.$nextTick(()=> {
+      this.isOverflow = this.$refs?.parentHeight?.offsetHeight < this.$refs?.childHeight?.offsetHeight
+    })
   },
   methods: {
     editCardSubmit() {
@@ -205,7 +211,7 @@ export default {
             justify-content: space-between;
             height: 100%;
             .task-card-inforn{
-                width: 257px;
+                width: 220px;
                 .task-card-name{  
                     margin-bottom: 0;
                     @include text-ellipsis;
@@ -344,7 +350,7 @@ export default {
 }
 @media screen and (max-width: 1440px) {
   .task-card {
-    width: 358px;
+    width: 328px;
   }
 }
 </style>

@@ -11,7 +11,7 @@
       }}</span>
     </div>
     <div class="base-modal-content">
-      <el-form :model="form" :rules="rules" ref="form" label-width="80px">
+      <el-form :model="form" :rules="rules" ref="form" label-width="80px" label-position="left">
         <el-form-item label="名称:" prop="name">
           <el-input
             v-model="form.name"
@@ -24,6 +24,7 @@
             type="textarea"
             v-model="form.description"
             placeholder="请输入说明信息"
+            maxlength="500"
           ></el-input>
         </el-form-item>
         <el-form-item prop="resource">

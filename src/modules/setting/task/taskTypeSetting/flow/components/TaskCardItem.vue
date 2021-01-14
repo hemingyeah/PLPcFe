@@ -312,7 +312,7 @@ export default {
 }
 @media screen and (max-width: 1440px) {
   .task-card-item {
-    width: 358px;
+    width: 328px;
   }
 }
 </style>

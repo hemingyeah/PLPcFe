@@ -111,6 +111,20 @@ export default {
 
   },
   methods: {
+    goBack() {
+      let fromId = window.frameElement.getAttribute('fromid');
+      let id = window.frameElement.dataset.id;
+      this.$platform.closeTab(id);
+
+      this.$platform.openTab({
+        id: 'M_SYSTEM',
+        title: '工单流程设置',
+        url: '/setting/taskType/manage',
+        reload: true,
+        close: true,
+        fromId
+      });
+    },
     // 保存数据
     async submit() {
       try {
@@ -122,12 +136,7 @@ export default {
         if(res.status === 0) {
           this.$notify.success('保存成功');
           setTimeout(()=>{
-            this.$platform.openTab({
-              id: 'task_flow_setting',
-              title: '工单流程设置',
-              url: '/setting/taskType/manage',
-              reload: true,
-            });
+            this.goBack();
           }, 1000)
         }else {
           this.$notify.error(res.message);

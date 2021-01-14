@@ -198,7 +198,7 @@ export default {
               width: 92px;
             }
             .el-button--small{
-              padding: 6px 15px;
+              padding: 7px 15px;
             }
             .preview{
               background: #e7f9f9;

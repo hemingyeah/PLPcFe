@@ -46,10 +46,17 @@ export default {
     // 返回
     back(){
       let fromId = window.frameElement.getAttribute('fromid');
-      this.$platform.refreshTab(fromId);
-
       let id = window.frameElement.dataset.id
       this.$platform.closeTab(id)
+
+      this.$platform.openTab({
+        id: 'M_SYSTEM',
+        title: '附加组件设置',
+        url: '/setting/task/cardManage',
+        reload: true,
+        close: true,
+        fromId
+      });
     },
     /** 
     * @description 提交表单字段设置
