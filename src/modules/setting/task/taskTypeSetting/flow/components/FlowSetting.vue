@@ -191,10 +191,7 @@
               onkeyup="this.value=this.value.replace(/\D/g,'')"
               v-model="taskTypeConfig.planRemindSetting.minutes"
             />
-            分钟提醒
-          </div>
-          <div>
-            工单负责人、协同人及
+            分钟提醒工单负责人、协同人及
             <el-select v-model="taskTypeConfig.noticeLeader" placeholder="请选择">
               <el-option
                 v-for="item in planOptions"
@@ -228,8 +225,7 @@
         <div class="setting-specific-form">
           <h2>
             允许工单在完成前被取消
-            <!-- mark_zr: 暂时不做 -->
-            <!-- <el-switch v-model="taskTypeConfig.allowCancel" /> -->
+            <el-switch v-model="taskTypeConfig.allowCancel" />
           </h2>
           <approve-setting
             :options="approveOptions('cancel')"
@@ -295,11 +291,11 @@ export default {
 
       overTimeOptions: [
         {
-          value: '0',
+          value: 0,
           label: "无需通知其他人",
         },
         {
-          value: '1',
+          value: 1,
           label: "通知负责人团队主管",
         },
         {

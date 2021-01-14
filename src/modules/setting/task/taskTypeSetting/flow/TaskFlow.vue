@@ -262,7 +262,6 @@ export default {
           return {
             ...item,
             ...overTimeSetting,
-            remindType: overTimeSetting.remindType ? overTimeSetting.remindType + '' : null,
             reminders: overTimeSetting.reminders || []
           }
         })
@@ -270,7 +269,6 @@ export default {
         taskTypeConfig.taskOverTimeModels = config.newOverTimeSetting.map(item => {
           return {
             ...item,
-            remindType: overTimeSetting.remindType ? overTimeSetting.remindType + '' : null,
             reminders: item.reminders || []
           }
         })
