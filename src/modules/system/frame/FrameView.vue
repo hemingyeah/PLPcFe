@@ -1373,8 +1373,10 @@ export default {
     }
     /** * 部分页面引导 数据处理  e*/
     this.checkExports();
-    
-    this.getTenantInform();
+    if(this.tenantType == 1) {
+      // 多端自建的
+      this.getTenantInform();
+    }
     this.getShbEdition()
     this.getSystemPopup();
   },

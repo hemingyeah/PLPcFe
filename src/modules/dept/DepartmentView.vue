@@ -4,8 +4,8 @@
     <div class="guide-model-box" v-if="nowGuideStep < 4"></div>
     <!-- start 主要内容 -->
     <div class="department-main">
-      <div :class="{'department-left': true, 'department-state': isWeChat!=2 && isWeChat!=3}">
-        <el-button type="primary" @click="synchronousWeChat" :loading="synchronousState" class="base-button" v-if="isWeChat==2 || isWeChat==3">
+      <div :class="{'department-left': true, 'department-state': tenantType!=2 && tenantType!=3}">
+        <el-button type="primary" @click="synchronousWeChat" :loading="synchronousState" class="base-button" v-if="tenantType==2 || tenantType==3">
           {{ synchronousState ? '同步中': '同步企业微信通讯录' }}
         </el-button>
 
@@ -39,24 +39,28 @@
             <el-popover placement="bottom-end" width="300" trigger="hover" content="开启本选项后，在选择协同人等只可见自己所属部门的成员，管理员除外">
               <i class="iconfont icon-help" slot="reference"></i>
             </el-popover>
-          </el-tab-pane>
-                  
-          <el-tab-pane label="角色管理" name="role">
+            <template v-if="tenantType == 0">
+              <el-checkbox v-model="isAllotByDept" @change="setUsedAllot" class="dept-header-see">按钉钉组织架构选择</el-checkbox>
+              <el-popover placement="bottom-end" width="300" trigger="hover" content="勾选后，在选人界面时，将通过钉钉的组织架构进行人员选择。">
+                <i class="iconfont icon-help" slot="reference"></i>
+              </el-popover>
+            </template>  
+            <el-tab-pane label="角色管理" name="role">
             
-            <div class="create-role">
-              <el-button type="primary" @click="createRole">新建角色</el-button>
-            </div>
-            <div v-if="roles.length > 0" class="department-child-list">
-              <div class="department-child-item dept-role-item" v-for="role in roles" :key="role.id" @click="chooseRole(role)" :class="{'department-role-selected': role.id == selectedRole.id}">
-                <span>
-                  {{ role.text }} &nbsp;&nbsp;
-                  <!-- ({{ deptUserCount[department.id] || 0 }}人) -->
-                </span>
-                <i class="iconfont icon-arrowright"></i>
+              <div class="create-role">
+                <el-button type="primary" @click="createRole">新建角色</el-button>
               </div>
-            </div>
-          </el-tab-pane>
-        </el-tabs>
+              <div v-if="roles.length > 0" class="department-child-list">
+                <div class="department-child-item dept-role-item" v-for="role in roles" :key="role.id" @click="chooseRole(role)" :class="{'department-role-selected': role.id == selectedRole.id}">
+                  <span>
+                    {{ role.text }} &nbsp;&nbsp;
+                  <!-- ({{ deptUserCount[department.id] || 0 }}人) -->
+                  </span>
+                  <i class="iconfont icon-arrowright"></i>
+                </div>
+              </div>
+            </el-tab-pane>
+        </el-tab-pane></el-tabs>
         
         <div class="dept-step-1-box" :style="nowGuideStep == 0 ? 'width: 120px;height: 40px;' : ''" id="v-dept-step-0">
           <div v-if="nowGuideStep == 0" style="position: relative;">
@@ -91,7 +95,7 @@
             <div class="department-user-block-header-text">
               <h4>
                 角色名称：
-                <a :href="`/security/role/view/${selectedRole.id}`" :data-id="selectedRole.id" @click="goRoleDetail" style="color:#55B7B4;">{{selectedRole.text}}</a>
+                <a :href="`/security/role/view/${selectedRole.id}`" :data-id="selectedRole.id" @click="goRoleDetail" style="color:#13c2c2;">{{selectedRole.text}}</a>
                 <!-- <base-button style="margin-left:10px;" type="ghost" @event="openCreateUserPanel"> 查看 </base-button> -->
                 <base-button v-if="canEditSystemRole || isCustomeRole" style="margin-left:10px;" type="ghost" @event="editRole(selectedRole.id)">编辑</base-button>
                 <base-button v-if="selectedRole.custom" style="margin-left:10px;" type="ghost" @event="resetRole(selectedRole.custom)">重置权限</base-button>
@@ -109,7 +113,7 @@
             <base-button v-if="isSystemRole || isCustomeRole" type="primary" @event="chooseUser('role')">添加成员</base-button>
             <base-button v-if="(isSystemRole || isCustomeRole) && rolePage.list.length" type="primary" @event="roleDeleteConfirm()">移除成员</base-button>
             <!-- <base-button v-if="isCustomeRole" type="primary" @event="createRole">新建角色</base-button> -->
-            <base-button v-if="selectedRole.id == 0 && isWeChat != 1" type="primary" @event="roleDialogVisible = true">自动分配角色</base-button>
+            <base-button v-if="selectedRole.id == 0 && tenantType != 1" type="primary" @event="roleDialogVisible = true">自动分配角色</base-button>
           </div>
 
           <div class="department-user-table" v-if="rolePage.list.length > 0">
@@ -150,7 +154,7 @@
                 <el-table-column label="操作">
                   <template slot-scope="scope">
                     <el-button v-if="scope.row.eventCount || scope.row.taskCount || scope.row.customerCount || scope.row.spareCount" type="text" @click="createTransTab('event', scope.row.userId)">去转交</el-button>
-                    <el-button type="text" @click="resume(scope.row.userId)" v-if="isWeChat!=2 && isWeChat!=3">恢复</el-button>
+                    <el-button type="text" @click="resume(scope.row.userId)" v-if="tenantType!=2 && tenantType!=3">恢复</el-button>
                   </template>
                 </el-table-column>
               </template>
@@ -317,7 +321,7 @@
               <span id="v-dept-step-2">成员信息</span>
               <div class="guide-disable-cover" v-if="nowGuideStep == 1"></div>
             </div>
-            <base-button type="primary" @event="openCreateUserPanel" v-if="isWeChat!=2 && isWeChat!=3">新建成员账号</base-button>
+            <base-button type="primary" @event="openCreateUserPanel" v-if="tenantType!=2 && tenantType!=3">新建成员账号</base-button>
             <!-- <div class="department-user-block-header-btn">
               <base-button type="primary" @event="openCreateUserPanel" v-if="allowAddUser"> 添加成员 </base-button>
               <base-button type="primary" @event="chooseDepartmentMulti"> 调整部门 </base-button>
@@ -367,16 +371,19 @@
               <el-table-column prop="enabled" label="状态">
                 <template slot-scope="scope">{{scope.row.enabled == 1 ? '启用' : '禁用'}}</template>
               </el-table-column>
-
-              <el-table-column label="操作" width="210px">
-                <template slot-scope="scope">
-                  <el-button :disabled="scope.row.pending" type="text" @click="toggleEditor(scope.row)">编辑</el-button>
-                  <el-button :disabled="scope.row.pending" v-if="scope.row.enabled == 1" type="text" style="color:#e6a23c" @click="toggleEnable(scope.row)">停用</el-button>
-                  <el-button :disabled="scope.row.pending" v-else type="text" @click="toggleEnable(scope.row)">启用</el-button>
-                  <el-button :disabled="scope.row.pending" type="text" style="color:#FB602C" @click="deleteDeptUser(scope.row)" v-if="isWeChat!=2 && isWeChat!=3">删除</el-button>
-                  <el-button type="text" @click="userResetPwdConfirm(scope.row.userId)" v-if="isWeChat!=2 && isWeChat!=3">重置密码</el-button>
-                </template>
-              </el-table-column>
+              <template v-if="tenantType == 1">
+                <!-- 多端操作按钮 -->
+                <el-table-column label="操作" width="210px">
+                  <template slot-scope="scope">
+                    <el-button :disabled="scope.row.pending" type="text" @click="toggleEditor(scope.row)">编辑</el-button>
+                    <el-button :disabled="scope.row.pending" v-if="scope.row.enabled == 1" type="text" style="color:#e6a23c" @click="toggleEnable(scope.row)">停用</el-button>
+                    <el-button :disabled="scope.row.pending" v-else type="text" @click="toggleEnable(scope.row)">启用</el-button>
+                    <el-button :disabled="scope.row.pending" type="text" style="color:#FB602C" @click="deleteDeptUser(scope.row)" v-if="tenantType!=2 && tenantType!=3">删除</el-button>
+                    <el-button type="text" @click="userResetPwdConfirm(scope.row.userId)" v-if="tenantType!=2 && tenantType!=3">重置密码</el-button>
+                  </template>
+                </el-table-column>
+              </template>
+              
             </el-table>
 
             <div class="table-footer">
@@ -548,6 +555,7 @@ export default {
   mixins: [tourGuide],
   data() {
     return {
+      isAllotByDept: false,
       nowGuideStep: 5,
       collapse: false,
       showModifynameDialog: false,
@@ -640,7 +648,7 @@ export default {
     }
   },
   computed: {
-    isWeChat() {
+    tenantType() {
       return this.initData.tenantType
     },
     authorities() {
@@ -648,9 +656,9 @@ export default {
     },
     allowAddUser() {
       return (
-        this.authorities.AUTH_STAFF == 3 &&
-        this.authorities.AUTH_ROLE == 3 &&
-        this.authorities.AUTH_TAG == 3
+        this.authorities.AUTH_STAFF == 3
+        && this.authorities.AUTH_ROLE == 3
+        && this.authorities.AUTH_TAG == 3
       )
     },
     /* 子部门 */
@@ -683,8 +691,8 @@ export default {
     },
     teamLeadersName() {
       return (
-        this.deptInfo.teamLeaders &&
         this.deptInfo.teamLeaders
+        && this.deptInfo.teamLeaders
           .map((i) => (i && i.displayName) || '')
           .join('，')
       )
@@ -716,6 +724,8 @@ export default {
     },
   },
   mounted() {
+    // isAllotByDept对应钉钉端是否按照钉钉通讯录选人 如果钉钉端之前勾选了按服务团队派单isAllotByDept为false, 
+    this.isAllotByDept = !this.initData.allotByTag;
     setTimeout(()=>{
       if (!storageGet(DEPT_GUIDE) || storageGet(DEPT_GUIDE) < this.deptSteps.length) {
         this.$tours['myTour'].start()
@@ -886,6 +896,25 @@ export default {
       this.resetForm.userId = ''
       this.resetForm.pwd = ''
       this.resetDialogvisible = false
+    },
+    /* 钉钉端设置是否按 服务团队 还是钉钉通讯录 派单 */
+    async setUsedAllot (setTag) {
+      try {
+        let params = {
+          set: setTag ? 'dept' : 'tag'
+        }
+        let result = await TeamApi.usedAllot(params);
+
+        if (!setTag) {
+          this.setSeeAllOrg();
+        }
+
+        if (result.status != 0) {
+          this.$platform.alert(result.message);
+        }
+      } catch (error) {
+        console.log('setUsedAllot error: ', error);
+      }
     },
     /* 是否开启 降低组织架构 */
     async setSeeAllOrg(state = false) {
@@ -1838,7 +1867,7 @@ export default {
 .text-center {
   display: block;
   text-align: center;
-  color: #55b7b4;
+  color: #13c2c2;
 }
 .create-role {
   display: flex;
@@ -1857,7 +1886,7 @@ export default {
   }
   .el-dropdown {
     padding: 5px 15px;
-    background: #55b7b4;
+    background: #13c2c2;
     color: #fff;
     font-size: 14px;
     border: none;
@@ -2033,7 +2062,7 @@ body {
   margin-top: 10px;
 
   .view-detail-btn {
-    color: #55b7b4;
+    color: #13c2c2;
     display: inline-block;
     min-width: 50px;
     max-width: 140px;
