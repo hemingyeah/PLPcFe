@@ -45,7 +45,7 @@
         <!-- 可见性 -->
         <form-visible-setting :field="field" @input="update"></form-visible-setting>
         <!-- 支持高级搜索 -->
-        <form-search-setting :field="field" @input="update"></form-search-setting>
+        <form-search-setting :field="field" @input="update" v-if="!isTaskForm"></form-search-setting>
       </div>
     </div>
     <!-- end 字段权限 -->
@@ -65,6 +65,8 @@
 <script>
 import SettingMixin from '@src/component/form/mixin/setting';
 import { settingProps } from '@src/component/form/components/props';
+/* enum */
+import TableNameEnum from '@model/enum/TableNameEnum.ts';
 
 export default {
   name: 'form-address-setting',
@@ -73,6 +75,10 @@ export default {
   computed: {
     defaultValueConfig() {
       return this.field.setting.defaultValueConfig || {}
+    },
+    // 是否是工单或者回执表单模块
+    isTaskForm() {
+      return [TableNameEnum.Task, TableNameEnum.TaskReceipt].indexOf(this.mode) > -1;
     }
   },
   methods: {
