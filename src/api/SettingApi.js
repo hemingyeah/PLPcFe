@@ -162,7 +162,7 @@ export function createTaskType(params) {
  * @param {string} params.color 颜色
  */
 export function createInitTaskType(params) {
-  return http.post('/taskType/init/create', params, false);
+  return http.post('/setting/taskType/init/create', params, false);
 }
 
 /**
