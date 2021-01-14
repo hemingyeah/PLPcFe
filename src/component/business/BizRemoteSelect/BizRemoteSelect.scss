@@ -1,0 +1,29 @@
+.biz-form-remote-select {
+  .el-select {
+    width: 100%;
+    .el-select__tags {
+      .el-tag {
+        max-width: 100%;
+        padding-right: 20px;
+        .el-tag__close.el-icon-close {
+          right: -5px;
+          top: -6px;
+        }
+      }
+      .el-select__tags-text {
+        display: inline-block;
+        width: 100%;
+        max-width: 100%;
+        @include text-ellipsis();
+      }
+    }
+  }
+}
+
+.el-select-dropdown {
+  .biz-remote-select-option {
+    height: 100% !important;
+    min-height: 34px;
+  }
+}
+

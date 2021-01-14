@@ -114,7 +114,7 @@
         <form-item v-if="customerOption.product" label="产品" :validation="validation.product">
 
           <div class="input-and-btn">
-            <biz-form-remote-select
+            <biz-remote-select
               ref="product"
               :field="productField"
               v-model="value.product"
@@ -145,7 +145,7 @@
                   </span>
                 </p>
               </div>
-            </biz-form-remote-select>
+            </biz-remote-select>
             <el-button @click="dialogOpen('product')">新建</el-button>
           </div>
 

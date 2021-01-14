@@ -3,6 +3,9 @@ import EventNameEnum from '@model/enum/EventNameEnum'
 import ComponentNameEnum from '@model/enum/ComponentNameEnum'
 /* mixin */
 import FormMixin from '@src/component/form/mixin/form'
+/* model */
+import ElSelectOption from '@model/types/ElSelectOption'
+import Page from '@model/Page'
 /* vue */
 import VC from '@model/VC'
 import { VNode } from 'vue'
@@ -10,6 +13,18 @@ import { CreateElement } from 'vue'
 import { Component, Emit, Prop } from 'vue-property-decorator'
 /* scss */
 import '@src/component/business/BizRemoteSelect/BizRemoteSelect.scss'
+/* util */
+import Log from '@src/util/log'
+import { uuid } from '@src/util/string'
+
+interface LoadmoreOptions {
+  // 是否禁用
+  disabled: boolean,
+  // 回调函数
+  callback: Function,
+  // 触发距离
+  distance: number,
+}
 
 @Component({
   name: ComponentNameEnum.BizRemoteSelect,
@@ -25,6 +40,8 @@ class BizRemoteSelect extends VC<{}> {
   @Prop({ default: false }) readonly inputDisabled: boolean | undefined
   /* 多选 */
   @Prop({ default: false }) readonly multiple: boolean | undefined
+  /* 配置项列表 */
+  @Prop() readonly options: any[] | undefined
   /* 占位符 */
   @Prop() readonly placeholder: string | undefined
   /* 远程搜索方法 */
@@ -34,14 +51,32 @@ class BizRemoteSelect extends VC<{}> {
   /* select数据值的键名 */
   @Prop({ default: 'value' }) readonly valueKey: string | undefined
   
+  private loadmoreOptions: LoadmoreOptions = {
+    disabled: false,
+    callback: this.loadmore,
+    distance: 10,
+  }
+  /* 等待状态 */
+  private pending: boolean = false
+  /* 页面对象 */
+  private page: Page = new Page()
+  /* 聚焦次数 */
+  private focusedNum: number = 0
+  
   @Emit(EventNameEnum.Clear)
-  private clearHandler(value: any[]) {
-    return value
+  private clearHandler() {
+    return []
   }
   
   @Emit(EventNameEnum.Input)
-  private inputHandler() {
-    return []
+  private inputHandler(value: any[]) {
+    return value
+  }
+  
+  get optionList() {
+    if (this.options?.length) return this.options
+    
+    return this.page.list
   }
   
   /**
@@ -52,7 +87,78 @@ class BizRemoteSelect extends VC<{}> {
     return Boolean(this.cleared && this.value && this.value?.length > 0 && !this.inputDisabled)
   }
   
+  private focusHandler() {
+    this.focusedNum++
+    // 是否为第一次聚焦
+    const isFirstFocus = this.focusedNum <= 1
+    if (!isFirstFocus) return 
+    
+    this.search()
+  }
+  
   /**
+   * @description: 获取远程数据
+   * @param {string} keyword 搜索关键字
+   * @return {Promise<Page>}
+  */  
+  private fetchRemoteData(keyword: string = '') {    
+    if (!this.remoteMethod) return null
+    
+    // 页面信息
+    const { pageNum, pageSize } = this.page
+    const params = { keyword, pageNum, pageSize }
+    
+    return (
+      this.remoteMethod(params)
+        .then((result: Page) => {
+          this.pending = false
+          this.loadmoreOptions.disabled = Boolean(!result?.hasNextPage)
+          return result
+        })
+        .catch((error: any) => {
+          this.pending = false
+          Log.error(error, this.search.name)
+        })
+    )
+  }
+  
+  /**
+   * @description: 加载更多
+  */  
+  private async loadmore() {
+    if (this.pending || this.loadmoreOptions.disabled) return
+    
+    this.loadmoreOptions.disabled = true
+    this.pending = true
+    
+    try {
+      this.page.pageNum += 1
+      const result = await this.fetchRemoteData()
+      this.page.merge(result)
+    } catch (error) {
+      Log.error(error, this.loadmore.name)
+    }
+  }
+  
+  /**
+   * @description: 搜索
+   * @param {string} keyword 搜索关键字
+   * @return {void}
+  */  
+  private search(keyword: string = '') {
+    if (!this.remoteMethod) return null
+    if (this.pending) return null
+    
+    // 初始化page对象
+    this.page = new Page()
+    // 获取远程数据
+    this.fetchRemoteData(keyword).then((data: Page) => {
+      this.page.cover(data)
+    })
+  }
+  
+  /**
+   * @deprecated -- 已废弃 
    * @description: 渲染清除按钮
    * @return {VNode | null}
   */
@@ -60,28 +166,50 @@ class BizRemoteSelect extends VC<{}> {
     if (!this.showClearButton) return null
     
     return (
-      <div class="biz-form-remote-select-clear" onClick={(event: any) => this.clearHandler(event)}>
+      <div class="biz-form-remote-select-clear" onClick={() => this.clearHandler()}>
         <i class="el-icon-error" style="color:rgba(211, 214, 217, 0.69);"></i>
       </div>
+    )
+  }
+  
+  /**
+   * @description: 渲染列表
+   * @return {VNode}
+  */
+  private renderOptionList(): VNode {
+    const className = 'biz-remote-select-option'
+    return (
+      this.optionList.map((option: ElSelectOption) => {
+        return (
+          <el-option class={className} key={uuid()} label={option.label} value={option.value}>
+            { this.$scopedSlots.option && this.$scopedSlots.option({ option }) }
+          </el-option>
+        )
+      })
     )
   }
   
   render(h: CreateElement) {
     return (
       <div class='biz-form-remote-select'>
-        <base-select
-          value-key={this.valueKey}
-          onInput={this.inputHandler}
+        <el-select
+          v-el-select-loadmore={this.loadmoreOptions}
+          collapsed={this.collapsed}
+          disabled={this.inputDisabled}
+          multiple={this.multiple}
+          filterable
+          no-data-text='无匹配数据'
+          remote
+          reserve-keyword
+          remoteMethod={this.search}
           placeholder={this.placeholder}
-          remoteMethod={this.remoteMethod}
+          scopedSlots={this.$scopedSlots}
           value={this.value}
-          scopedSlots={ this.$scopedSlots }
-          multiple={ this.multiple }
-          disabled={ this.inputDisabled }
-          collapsed={ this.collapsed }
+          onInput={this.inputHandler}
+          onFocus={this.focusHandler}
         >
-        </base-select>
-        {this.renderClearButton()}
+          {this.renderOptionList()}
+        </el-select>
       </div>
     )
   }

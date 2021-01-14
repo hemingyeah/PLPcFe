@@ -328,7 +328,7 @@ export function getCountForCreate(params: {} | undefined) {
  * @param {String} params.phone - 手机号
  */
 export function getCustomerByPhone(params: {} | undefined) {
-  return http.get("task/getCustomerByPhone", params, false);
+  return http.get("/task/getCustomerByPhone", params, false);
 }
 
 /**

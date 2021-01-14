@@ -101,10 +101,6 @@ $--select-border-color-hover: $input-border-hover-color !default;
   color: $color-primary;
 }
 
-.el-select-dropdown__empty {
-  display: none;
-}
-
 .el-step__title {
   font-size: $font-size-base;
 }
@@ -126,3 +122,6 @@ $--select-border-color-hover: $input-border-hover-color !default;
   z-index: 100000 !important;
 }
 
+.el-select-dropdown {
+  max-width: calc(100% - 15px);
+}
