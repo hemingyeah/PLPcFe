@@ -6,10 +6,10 @@
         <div>
           <h2>
             工单类型
-            <el-popover
+            <el-tooltip
               trigger="hover"
             >
-              <div slot="default" style="width: 420px">
+              <div slot="content" style="width: 420px">
                 <h3>规则说明</h3>
                 <p>单个租户可启用的工单类型上限为{{maxTypeNum}}个</p>
                 <h3>字段说明</h3>
@@ -17,13 +17,13 @@
                 <p>1.  新建工单时，工单类型仅【可见团队】可以使用，查看不受影响；</p>
                 <p>2.  工单池中的工单，仅该工单类型设置的可见团队才可查看；</p>
               </div>
-              <i slot="reference" class="el-icon-question" />
-            </el-popover>
+              <i class="el-icon-question" />
+            </el-tooltip>
           </h2>
           <p>工单支持多种工单类型，可以添加或配置不同类型的工单来分类处理服务台业务一个工单类型中可以定义表单、流程及附加组件</p>
         </div>
         <div class="lh-52">
-          <el-button type="primary" icon="el-icon-plus"  :loading="false" @click="addTaskType"> 新建</el-button>
+          <el-button type="primary" icon="el-icon-plus" :loading="false" @click="addTaskType"> 新建</el-button>
         </div>
       </div>
       <div
@@ -40,13 +40,13 @@
           @update="fetchTaskTypeList"
           @updateAttr="obj => {
             updateTaskType(item, obj)
-          }">
+        }">
         </task-type-item>
       </div>
     </div>
 
     <!-- 新建工单类型弹窗 -->
-    <add-task-type-dialog :visiable.sync="isAddTaskTypeModal" :taskTypeList="taskTypeList"/>
+    <add-task-type-dialog :visiable.sync="isAddTaskTypeModal" :task-type-list="taskTypeList"/>
   </div>
 </template>
 
@@ -54,7 +54,7 @@
 import draggable from 'vuedraggable';
 
 /** api */
-import * as SettingApi from "@src/api/SettingApi";
+import * as SettingApi from '@src/api/SettingApi';
 import * as TeamApi from '@src/api/TeamApi';
 
 /** component */
@@ -109,7 +109,7 @@ export default {
       this.pendding = true;
       SettingApi.getTaskTypeManage().then((res) => {
         this.pendding = false;
-        let {tagListJson,taskTypeListJson,maxTypeNum} = res;
+        let {tagListJson, taskTypeListJson, maxTypeNum} = res;
 
         this.maxTypeNum = maxTypeNum;
         this.teamList = tagListJson || [];
@@ -117,12 +117,13 @@ export default {
 
         // 排序
         this.taskTypeList = taskTypeListJson.sort(
-            (a, b) => (a.orderId > b.orderId && a.enabled > b.enabled));
+          (a, b) => (a.orderId > b.orderId && a.enabled > b.enabled));
       }).catch(err => {
-        console.error("fetch taskTypeList => error", err);
-      }).finally(() => {
-        this.pendding = false;
+        console.error('fetch taskTypeList => error', err);
       })
+        .finally(() => {
+          this.pendding = false;
+        })
     },
   },
   mounted() {
