@@ -1,5 +1,5 @@
 <template>
-  <el-card class="task-card" shadow="hover">
+  <div class="task-card" shadow="hover">
     <el-row class="task-card-main" type="flex" justify="space-between">
       <el-row class="task-card-content" type="flex">
         <div class="task-card-inforn"> 
@@ -54,7 +54,7 @@
 
     <!-- 统计 -->
     <statistical-dialog :card="card" ref="statisteDialog" ></statistical-dialog>
-  </el-card>
+  </div>
 </template>
 
 <script>
