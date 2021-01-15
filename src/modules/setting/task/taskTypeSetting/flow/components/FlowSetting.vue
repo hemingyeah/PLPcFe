@@ -37,7 +37,7 @@
             审批设置
           </h2>
           <approve-setting
-            :options="approveOptions(type)"
+            :options="options.flow"
             :approve-setting="flowSetting.approveSetting"
             @change="changeApproveSetting"
           />
@@ -221,7 +221,7 @@
             <el-switch class="ml-12" v-model="taskTypeConfig.allowPause" />
           </h2>
           <approve-setting
-            :options="approveOptions('pause')"
+            :options="options.pause"
             :approve-setting="taskTypeConfig.pauseApproveSetting"
             @change="(setting) => changeApproveSetting(setting, 'pause')"
           />
@@ -232,7 +232,7 @@
             <el-switch class="ml-12" v-model="taskTypeConfig.allowCancel" />
           </h2>
           <approve-setting
-            :options="approveOptions('cancel')"
+            :options="options.cancel"
             :approve-setting="taskTypeConfig.cancelApproveSetting"
             @change="(setting) => changeApproveSetting(setting, 'cancel')"
           />
@@ -292,6 +292,12 @@ export default {
 
       fields: [],
       flowMap,
+
+      options: {
+        pause: [],
+        cancel: [],
+        flow: []
+      },
 
       overTimeOptions: [
         {
@@ -374,6 +380,11 @@ export default {
     },
   },
   methods: {
+    buildApproveOptions() {
+      this.options.flow = this.approveOptions(this.type);
+      this.options.pause = this.approveOptions('pause');
+      this.options.cancel = this.approveOptions('cancel');
+    },
     /** 审批类型选项 */
     approveOptions(type) {
       let options = [
@@ -436,6 +447,8 @@ export default {
         let res = await SettingApi.getFromUser(id);
         this.formList = res.data.list;
         this.receiptList = res.data.receiptList;
+
+        this.buildApproveOptions();
       } catch (error) {
         console.error('fetch getFromUser => error', error);
       }

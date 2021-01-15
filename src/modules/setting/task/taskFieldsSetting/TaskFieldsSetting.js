@@ -63,6 +63,11 @@ export default {
       return MODE_NAME_MAP[this.mode];
     }
   },
+  watch: {
+    visble(val) {
+      if(!val) this.$emit('success');
+    }
+  },
   methods: {
     initialize() {
       this.pending = true;
@@ -149,7 +154,6 @@ export default {
 
         if(isSuccess) {
           this.visble = false;
-          this.$emit('success');
         }
 
       } catch (error) {

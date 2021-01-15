@@ -27,7 +27,7 @@ import TableNameEnum from '@model/enum/TableNameEnum.ts';
  * 展示是否必填项的字段
  * manager:  客户负责人
  */
-const SHOW_IS_NULL_FIELD_COMP = ["manager"];
+const SHOW_IS_NULL_FIELD_COMP = ['manager'];
 
 /** 创建字段预览组件 */
 export function createPreviewComp(h, field){
@@ -43,7 +43,7 @@ export function createPreviewComp(h, field){
   // todo 临时解决
   if (!previewComp) return;
 
-  //TODO 隐藏字段不渲染
+  // TODO 隐藏字段不渲染
   if(field.isHidden == 1) return;
   
   let fieldPreview = h(previewComp.preview, {
@@ -61,8 +61,8 @@ export function createPreviewComp(h, field){
     <div class={previewClass} key={currFieldId}
       onMousedown={e => this.beginSort(field, e)}>
       {fieldPreview}
-      {(field.isSystem == 0 || previewComp.forceDelete) && 
-      <div class="form-design-operation">
+      {(field.isSystem == 0 || previewComp.forceDelete) 
+      && <div class="form-design-operation">
         <div class="form-design-preview-hidden form-design-preview-btn" onClick={e => this.hiddenField(field)}>
           <el-tooltip class="item" effect="dark" content="隐藏" placement="top">
             <i class="iconfont icon-fdn-hidden"></i>
@@ -152,7 +152,7 @@ function createSettingComp(h, field){
  * 创建必填项
  */
 function createRequired(h, field) {
-  return h("el-checkbox", {
+  return h('el-checkbox', {
     props: {
       value: field.isNull,
       trueLabel: 0,
@@ -163,7 +163,7 @@ function createRequired(h, field) {
         field.isNull = value;
       }
     },
-  },["必填"]);
+  }, ['必填']);
 }
 
 /**
@@ -244,7 +244,7 @@ const FormDesign = {
     })
 
     return {
-      //角色列表
+      // 角色列表
       roleList:[],
       // 当前模式下可用字段
       availableFields,
@@ -332,11 +332,11 @@ const FormDesign = {
     isEmpty(){
       return !Array.isArray(this.value) || this.value.length == 0;
     },
-    //已隐藏字段
+    // 已隐藏字段
     hiddenFields() {
-     return this.value.filter(item => item.isHidden == 1);
+      return this.value.filter(item => item.isHidden == 1);
     },
-    //未隐藏字段
+    // 未隐藏字段
     unHiddenFields() {
       return this.value.filter(item => item.isHidden !== 1);
     },
@@ -661,7 +661,7 @@ const FormDesign = {
       let insertIndex = arr.indexOf(enterField);
       arr.splice(insertIndex + distance, 0, dragField);
       
-      let newArr = [...arr,...this.hiddenFields]
+      let newArr = [...arr, ...this.hiddenFields]
       this.emitInput(newArr)
       this.chooseField(dragField)
     },
@@ -689,7 +689,7 @@ const FormDesign = {
       let isNext = true;
 
       // 删除字段需与后端交互的模块
-      const checkUserArr = [TableNameEnum.Task, TableNameEnum.TaskReceipt, TableNameEnum.Event, TableNameEnum.EventReceipt,TableNameEnum.TaskCard];
+      const checkUserArr = [TableNameEnum.Task, TableNameEnum.TaskReceipt, TableNameEnum.Event, TableNameEnum.EventReceipt, TableNameEnum.TaskCard];
       // 排除新拖进来的公共字段
       if(checkUserArr.indexOf(this.mode) > -1 && item.id && !item.isDragCommon) {
         // item.id表明该字段已经在后端存储过，不是本次的新增字段
@@ -744,7 +744,10 @@ const FormDesign = {
       }
       // 是否需要审批
       let isNeedApproval = result.data && result.data.show == 1
-      if (!isNeedApproval) return true
+      if (!isNeedApproval) {
+        callback(item);
+        return true;
+      }
 
       // 是审批人
       let confirm = await this.$platform.confirm('该人员字段已在审批流程中选择，如果删除，对应的审批流程将设置为“无需审批”，确定要删除吗？');
@@ -821,7 +824,7 @@ const FormDesign = {
       let {pixelY} = normalizeWheel(e);
       containerEl.scrollTop += pixelY;
     },
-    //获取角色列表
+    // 获取角色列表
     getRoleListreq() {
       this.$http.get('/setting/role/list', {pageSize: 0 }).then(res => {
         const { list } = res;
@@ -882,27 +885,27 @@ const FormDesign = {
         </div>
       )
     },
-    //渲染已隐藏字段弹窗dom
+    // 渲染已隐藏字段弹窗dom
     renderBaseModal(h){
       if(!this.show) return null;
       const scopedSlots = {
-        default:({row,column})=>{
-          return  <el-button type="text" size="small" onClick={()=>this.onRestoreField(row)}>恢复</el-button>
+        default:({row, column})=>{
+          return <el-button type="text" size="small" onClick={()=>this.onRestoreField(row)}>恢复</el-button>
         }
       }
       return (
         <base-modal
-         appendToBody={ true }
-         class="base-hidden-modal"
-         title="已隐藏字段" 
-         show={ this.show } 
-         onClose={ this.onCloseBaseModal }
-         width="400px"
+          appendToBody={ true }
+          class="base-hidden-modal"
+          title="已隐藏字段" 
+          show={ this.show } 
+          onClose={ this.onCloseBaseModal }
+          width="400px"
         >
           <el-table data={this.hiddenFields} header-row-class-name="base-table-header-v3" row-class-name="base-table-row-v3" border>
             <el-table-column prop="displayName" label="已隐藏字段"/>
             <el-table-column label="操作" width="100" scopedSlots={ scopedSlots }/> 
-         </el-table>
+          </el-table>
         </base-modal>
       );
     },
@@ -934,7 +937,7 @@ const FormDesign = {
      * @description 显示弹窗
     */
     onShowBaseModal() {
-      if(this.hiddenFields.length==0) return this.$platform.confirm('暂无隐藏字段');
+      if(this.hiddenFields.length == 0) return this.$platform.confirm('暂无隐藏字段');
       this.show = true;
     },
     /** 
@@ -1030,22 +1033,22 @@ const FormDesign = {
             {
               this.fieldControls.map(field => {
                 return(
-                <div class="form-design-widget">
-                  { this.renderTabHeader(field.name) }
-                  <div class="form-design-tabs-content">
-                    { this.renderFieldList(field.field) }
+                  <div class="form-design-widget">
+                    { this.renderTabHeader(field.name) }
+                    <div class="form-design-tabs-content">
+                      { this.renderFieldList(field.field) }
+                    </div>
                   </div>
-                </div>
                 )
               })
             }
           </div>
         </div>
         <div class="form-design-main">  
-         <div class="form-design-box">
+          <div class="form-design-box">
             <div class="form-design-hidden">
-            { this.hiddenFields.length > 0 && (
-              <p onClick={this.onShowBaseModal }><i class="iconfont icon-fdn-hidden"></i>查看已隐藏字段</p> )} 
+              { this.hiddenFields.length > 0 && (
+                <p onClick={this.onShowBaseModal }><i class="iconfont icon-fdn-hidden"></i>查看已隐藏字段</p> )} 
             </div>
             <div class="form-design-center">
               <div class={['form-design-phone', this.silence ? 'form-design-silence' : null]}>
