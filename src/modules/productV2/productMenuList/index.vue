@@ -506,7 +506,7 @@ export default {
           ['customer', 'productTemplate', 'remindCount'].some(
             (key) => key === field.fieldName
           )
-          || field.formType === 'info'
+          || field.formType === 'info' || field.formType === 'attachment'
         ) {
           field.export = false;
         } else {

@@ -43,7 +43,7 @@ export default {
       },
       {
         target: '#v-task-detail-step-3',
-        content: '编辑、复制及删除',
+        content: '编辑、删除、复制、DING及打印工单',
         title:'工单操作'
       },
       ],

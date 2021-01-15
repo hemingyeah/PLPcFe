@@ -65,7 +65,7 @@ export default {
     fields() {
       let f = {};
       let fields = [...this.config.fields, ...this.selfFields]
-        .filter((f) =>(f.isSearch || f.isSystem ) && f.fieldName != "pathName" && f.fieldName != "catalogName" && f.fieldName != "catalogNum")
+        .filter((f) =>(f.isSearch || f.isSystem ) && f.fieldName != "pathName" && f.fieldName != "catalogName" && f.fieldName != "catalogNum" && f.formType !== 'attachment')
         .map((field) => {
           f = _.cloneDeep(field);
 
