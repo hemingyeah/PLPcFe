@@ -1,5 +1,5 @@
 <template>
-  <div class="task-card" :style="{padding: '0px', height: '100%'}" shadow="hover">
+  <div class="task-card" shadow="hover">
     <el-row class="task-card-main" type="flex" justify="space-between">
       <el-row type="flex">
         <el-row class="task-card-content" type="flex">
