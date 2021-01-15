@@ -156,6 +156,7 @@ export default {
                 }
             }
             .task-card-des{
+                height: 34px;
                 font-size: 12px; 
                 color: #666666;
                 line-height: 17px;

@@ -4,7 +4,7 @@
       <el-row class="task-card-content" type="flex">
         <div class="task-card-inforn"> 
           <el-tooltip class="item" effect="dark" :content="card.name" :disabled="!isCardNameOverflow" placement="top-start"><h2 class="task-card-name" ref="parentNameWidth"><span ref="childNameWidth">{{card.name}}</span></h2> </el-tooltip>                                   
-          <p class="task-card-des" ref="parentHeight"><el-tooltip class="item" effect="dark" :content="htmlUnEscape(card.description)" :disabled="!isOverflow" placement="top"><span ref="childHeight">{{htmlUnEscape(card.description)}}</span></el-tooltip></p>
+          <el-tooltip class="item" effect="dark" :content="htmlUnEscape(card.description)" :disabled="!isOverflow" placement="top"><p class="task-card-des" ref="parentHeight"><span ref="childHeight">{{htmlUnEscape(card.description)}}</span></p></el-tooltip>
           <div class="task-card-others">
             <div class="task-card-scope">
               <p>  
@@ -92,7 +92,7 @@ export default {
     initOverflow() {
       this.$nextTick(()=> {
         this.isCardNameOverflow = this.$refs?.parentNameWidth?.offsetWidth < this.$refs?.childNameWidth?.offsetWidth
-        this.isOverflow = this.$refs?.parentHeight?.offsetHeight < this.$refs?.childHeight?.offsetHeight
+        this.isOverflow = this.$refs?.parentHeight?.offsetWidth < this.$refs?.childHeight?.offsetWidth
       })
     },
     editCardSubmit() {
@@ -198,7 +198,7 @@ export default {
 <style lang="scss">
 .task-card{
     // width: 358px;
-    height: 195px;
+    height: 178px;
     background: #FFFFFF;
     border-radius: 4px;
     box-shadow: 0px 4px 10px 0px rgba(0, 0, 0, 0.04); 
@@ -225,13 +225,15 @@ export default {
 
                 }
                 .task-card-des{
+                    height: 17px;
                     font-size: 12px; 
                     color: #666666;
                     line-height: 17px;
-                    @include text-ellipsis-2; 
+                    @include text-ellipsis; 
                     margin-block-end: 0em;
                     margin-bottom: 8px;
                     margin-top: 8px;
+                    width: 248px;
 
 
                 }

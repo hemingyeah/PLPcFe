@@ -4,13 +4,7 @@
     <div class="card-setting-heard">
       <div class="card-setting-title">
         <h2>附加组件设置</h2>
-        <el-button
-          type="primary"
-          icon="el-icon-plus"
-          :loading="false"
-          @click="addTaskCard"
-        >添加</el-button
-        >
+        <el-button type="primary" :loading="false" @click="addTaskCard"><i class="iconfont icon-add2"></i>添加</el-button>
       </div>
       <div class="card-setting-msg">
         附加组件是管理工单的辅助工具，您可以分类记录更新工单的信息，如需更多附加组件请在工单组件管理中添加
@@ -280,10 +274,13 @@ export default {
         margin-bottom: 8px;
       }
       button {
-        width: 88px;
-        height: 32px;
         position: absolute;
         right: 0;
+        padding: 8px 15px;
+      .iconfont{
+        font-size: 14px;
+        margin-right: 8px;
+      }
       }
     }
     .card-setting-msg {

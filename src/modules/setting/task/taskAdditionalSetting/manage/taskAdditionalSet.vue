@@ -18,7 +18,9 @@
           </el-tabs>
         </div>
         <div class="lh-52" v-if="activeTab=='task-added'">
-          <el-button type="primary" icon="el-icon-plus" :loading="false" @click="addTaskCard">新建</el-button>
+          <el-button type="primary" :loading="false" @click="addTaskCard">
+            <i class="iconfont icon-add2"></i>新建
+          </el-button>
         </div>
       </div>
       
