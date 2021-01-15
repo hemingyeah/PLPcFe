@@ -23,7 +23,9 @@
           <p>工单支持多种工单类型，可以添加或配置不同类型的工单来分类处理服务台业务一个工单类型中可以定义表单、流程及附加组件</p>
         </div>
         <div class="lh-52">
-          <el-button type="primary" icon="el-icon-plus" :loading="false" @click="addTaskType"> 新建</el-button>
+          <el-button type="primary" :loading="false" @click="addTaskType">
+            <i class="iconfont icon-add2" style="font-size: 12px;"></i>新建
+          </el-button>
         </div>
       </div>
       <div
@@ -156,7 +158,7 @@ export default {
       background: #FFFFFF;
       border-radius: 4px;
       .el-icon-question{
-        color: $color-primary;
+        color: #666666;
       }
       h2{
         margin-bottom: 10px;

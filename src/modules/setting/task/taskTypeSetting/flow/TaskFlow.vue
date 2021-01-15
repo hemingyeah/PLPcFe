@@ -144,10 +144,17 @@ export default {
   methods: {
     goBack() {
       let fromId = window.frameElement.getAttribute('fromid');
-      this.$platform.refreshTab(fromId);
-      
       let id = window.frameElement.dataset.id;
       this.$platform.closeTab(id);
+
+      this.$platform.openTab({
+        id: 'M_SYSTEM',
+        title: '工单类型设置',
+        url: '/setting/taskType/manage',
+        reload: true,
+        close: true,
+        fromId
+      });
     },
     clickTab(idx) {
       if(this.currTab === idx) return;

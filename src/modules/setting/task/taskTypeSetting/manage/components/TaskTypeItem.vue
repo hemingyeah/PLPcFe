@@ -206,7 +206,6 @@ export default {
         }
         .task-type-content{
             flex-direction: column;
-            justify-content: space-between;
             height: 100%;
             .task-type-name{
                 margin-bottom: 0;
@@ -215,9 +214,11 @@ export default {
                 padding-right: 32px;
                 font-size: 16px;
                 color: #333333;
+                height: 40px;
                 line-height: 20px;
             }
             .task-type-others{
+                margin-top: 2px;
                 i{
                     font-size: 12px;
                 }

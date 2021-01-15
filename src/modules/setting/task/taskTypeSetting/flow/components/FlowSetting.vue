@@ -21,7 +21,7 @@
       <div class="setting-specific">
         <!--S 工单表单设置 -->
         <div v-if="showFormBuilder" class="setting-specific-form">
-          <h2>工单表单设置</h2>
+          <h2 class="mt-12">工单表单设置</h2>
           <p style="color: #13C2C2" @click="openFormDesign">
             工单{{ type === "create" ? "新建" : "回执" }}表单设置
           </p>
@@ -31,7 +31,7 @@
         <!--S 审批设置 -->
         <div
           v-if="!['create', 'accept'].includes(type)"
-          class="setting-specific-approve"
+          :class="['setting-specific-approve',showFormBuilder && 'mt-12']"
         >
           <h2>
             审批设置
@@ -45,7 +45,7 @@
         <!--E 审批设置 -->
 
         <!--S 转派时也审批-->
-        <div v-if="type === 'allot'" class="mt-8" style="margin-bottom: -18px">
+        <div v-if="type === 'allot'" class="mt-8">
           <el-checkbox v-model="flowSetting.reallotAppr" true-label="" false-label="none"
           >转派时也审批</el-checkbox
           >
@@ -54,8 +54,9 @@
 
         <!--S 超时提醒 -->
         <div v-if="showOvertime" class="setting-specific-overtime">
-          <h2>
-            超时提醒<el-switch
+          <h2 class="mb-0">
+            超时提醒
+            <el-switch
               class="ml-12"
               v-model="taskOverTimeModel.overTimeStatus"
               @change="updateOvertimeSetting"
@@ -172,7 +173,7 @@
       <!-- 公共设置 -->
       <div class="setting-common">
         <div class="setting-specific-form">
-          <h2>
+          <h2 class="mt-12">
             计划时间提醒
             <el-switch
               class="ml-12"
@@ -217,7 +218,7 @@
         <div class="setting-specific-form">
           <h2>
             允许工单负责人将工单状态设为暂停
-            <el-switch v-model="taskTypeConfig.allowPause" />
+            <el-switch class="ml-12" v-model="taskTypeConfig.allowPause" />
           </h2>
           <approve-setting
             :options="approveOptions('pause')"
@@ -228,7 +229,7 @@
         <div class="setting-specific-form">
           <h2>
             允许工单在完成前被取消
-            <el-switch v-model="taskTypeConfig.allowCancel" />
+            <el-switch class="ml-12" v-model="taskTypeConfig.allowCancel" />
           </h2>
           <approve-setting
             :options="approveOptions('cancel')"
@@ -559,7 +560,7 @@ export default {
     margin-right: 12px;
     border-radius: 4px;
     .flow-setting-form-preview {
-      padding-top: 10%;
+      padding-top: 20px;
     }
     .form-preview-box{
       position: absolute;
@@ -569,7 +570,7 @@ export default {
       width: calc(100% - 39px);
       height: 50px;
       line-height: 40px;
-      background: #F2F2F2;
+      background: #ffffff;
       .form-preview-btn {
         width: calc(100% - 20px);
       }
@@ -588,9 +589,8 @@ export default {
       border-radius: 4px;
       h2 {
         color: #333333;
-        font-size: 16px;
-        margin-top: 12px;
-        margin-bottom: 6px;
+        font-size: 14px;
+        margin: 20px 0 8px 0;
       }
       p {
         margin-bottom: 0;
@@ -604,9 +604,6 @@ export default {
           }
         }
       }
-      &-overtime {
-        line-height: 32px;
-      }
     }
 
     .setting-common {
@@ -619,11 +616,15 @@ export default {
       color: #999999;
       h2 {
         color: #333333;
-        font-size: 16px;
-        margin: 12px 0;
+        font-size: 14px;
+        margin: 20px 0 8px 0;
       }
     }
   }
+}
+
+.form-design-main .form-design-center{
+  height: 90%;
 }
 
 .w-87 {
@@ -638,20 +639,27 @@ export default {
   margin-left: 12px;
 }
 
+.mb-0{
+  margin-bottom: 0 !important;
+}
+
 .mt-8 {
   margin-top: 8px;
+}
+
+.mt-12{
+  margin-top: 12px !important;
 }
 
 .mb-8 {
   margin-bottom: 8px;
 }
 
-.inline-block {
-  display: inline-block;
-}
-
 /** element style */
-.div {
-  margin-bottom: 8px;
+/deep/.el-input{
+    margin-top: 8px;
+}
+/deep/.el-checkbox{
+  margin-bottom: 0;
 }
 </style>

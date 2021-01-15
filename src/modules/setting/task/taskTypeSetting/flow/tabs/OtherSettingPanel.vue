@@ -293,7 +293,7 @@ export default {
             color: #999999;
             h2{
                 color: #333333;
-                font-size: 16px;
+                font-size: 14px;
                 margin: 24px 0 8px 0;
             }
             p{
