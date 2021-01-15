@@ -10,7 +10,7 @@
         </el-button>
 
         <!-- start 同步钉钉通讯录 -->
-        <el-button v-if="isDingTalk" class="base-button" type="primary" :loading="syncDingTalkState" @click="syncDingTalkAddressBook">
+        <el-button v-if="tenantType==0" class="base-button" type="primary" :loading="syncDingTalkState" @click="syncDingTalkAddressBook">
           {{ syncDingTalkState ? '同步中': '同步钉钉通讯录' }}
         </el-button>
         <!-- end 同步钉钉通讯录 -->
@@ -35,32 +35,33 @@
             </div>
             <!-- end 左侧部门列表 -->
 
-            <el-checkbox v-model="isSeeAllOrg" @change="setSeeAllOrg" class="dept-header-see">选择时隐藏非本部门的人员</el-checkbox>
-            <el-popover placement="bottom-end" width="300" trigger="hover" content="开启本选项后，在选择协同人等只可见自己所属部门的成员，管理员除外">
-              <i class="iconfont icon-help" slot="reference"></i>
-            </el-popover>
             <template v-if="tenantType == 0">
               <el-checkbox v-model="isAllotByDept" @change="setUsedAllot" class="dept-header-see">按钉钉组织架构选择</el-checkbox>
               <el-popover placement="bottom-end" width="300" trigger="hover" content="勾选后，在选人界面时，将通过钉钉的组织架构进行人员选择。">
                 <i class="iconfont icon-help" slot="reference"></i>
               </el-popover>
-            </template>  
-            <el-tab-pane label="角色管理" name="role">
+            </template>
+            <el-checkbox v-model="isSeeAllOrg" @change="setSeeAllOrg" :disabled="tenantType==0 && isAllotByDept" class="dept-header-see">选择时隐藏非本部门的人员</el-checkbox>
+            <el-popover placement="bottom-end" width="300" trigger="hover" content="开启本选项后，在选择协同人等只可见自己所属部门的成员，管理员除外">
+              <i class="iconfont icon-help" slot="reference"></i>
+            </el-popover>  
+          </el-tab-pane>
+          <el-tab-pane label="角色管理" name="role">
             
-              <div class="create-role">
-                <el-button type="primary" @click="createRole">新建角色</el-button>
-              </div>
-              <div v-if="roles.length > 0" class="department-child-list">
-                <div class="department-child-item dept-role-item" v-for="role in roles" :key="role.id" @click="chooseRole(role)" :class="{'department-role-selected': role.id == selectedRole.id}">
-                  <span>
-                    {{ role.text }} &nbsp;&nbsp;
+            <div class="create-role">
+              <el-button type="primary" @click="createRole">新建角色</el-button>
+            </div>
+            <div v-if="roles.length > 0" class="department-child-list">
+              <div class="department-child-item dept-role-item" v-for="role in roles" :key="role.id" @click="chooseRole(role)" :class="{'department-role-selected': role.id == selectedRole.id}">
+                <span>
+                  {{ role.text }} &nbsp;&nbsp;
                   <!-- ({{ deptUserCount[department.id] || 0 }}人) -->
-                  </span>
-                  <i class="iconfont icon-arrowright"></i>
-                </div>
+                </span>
+                <i class="iconfont icon-arrowright"></i>
               </div>
-            </el-tab-pane>
-        </el-tab-pane></el-tabs>
+            </div>
+          </el-tab-pane>
+        </el-tabs>
         
         <div class="dept-step-1-box" :style="nowGuideStep == 0 ? 'width: 120px;height: 40px;' : ''" id="v-dept-step-0">
           <div v-if="nowGuideStep == 0" style="position: relative;">
@@ -321,7 +322,7 @@
               <span id="v-dept-step-2">成员信息</span>
               <div class="guide-disable-cover" v-if="nowGuideStep == 1"></div>
             </div>
-            <base-button type="primary" @event="openCreateUserPanel" v-if="tenantType!=2 && tenantType!=3">新建成员账号</base-button>
+            <base-button type="primary" @event="openCreateUserPanel" v-if="tenantType==1">新建成员账号</base-button>
             <!-- <div class="department-user-block-header-btn">
               <base-button type="primary" @event="openCreateUserPanel" v-if="allowAddUser"> 添加成员 </base-button>
               <base-button type="primary" @event="chooseDepartmentMulti"> 调整部门 </base-button>
