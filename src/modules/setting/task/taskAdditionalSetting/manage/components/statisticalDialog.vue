@@ -243,6 +243,7 @@ export default {
         id: `task_view_${taskId}`,
         title: '工单详情',
         close: true,
+        
         url: `/task/view/${taskId}`,
         fromId
       });

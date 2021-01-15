@@ -96,6 +96,7 @@ export default {
 </script>
 <style lang="scss" scoped>
 .template-library-content {
+  width: 100%;
   .tabs-card-type {
     display: flex;
     justify-content: flex-start;
@@ -159,7 +160,6 @@ export default {
                 color: #666666;
                 line-height: 17px;
                 margin-top: 8px;
-                height: 34px;
                 @include text-ellipsis-2; 
                 cursor: pointer;
                 margin-block-end: 0em;

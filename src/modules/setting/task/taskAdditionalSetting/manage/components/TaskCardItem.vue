@@ -1,14 +1,11 @@
 <template>
   <el-card class="task-card" :body-style="{padding: '0px', height: '100%'}" shadow="hover">
     <el-row class="task-card-main" type="flex" justify="space-between">
-      <el-row type="flex">
-        <el-row class="task-card-content" type="flex">
-          <div class="task-card-inforn"> 
-            <h2 class="task-card-name"><el-tooltip class="item" effect="dark" :content="card.name" :disabled="card.name.length<13" placement="top-start"><span>{{card.name}}</span></el-tooltip></h2>                                    
-            <p class="task-card-des" ref="parentHeight"><el-tooltip class="item" effect="dark" :content="htmlUnEscape(card.description)" :disabled="!isOverflow" placement="top"><span ref="childHeight">{{htmlUnEscape(card.description)}}</span></el-tooltip></p>
-          </div>
-                    
-          <el-row class="task-card-others">
+      <el-row class="task-card-content" type="flex">
+        <div class="task-card-inforn"> 
+          <el-tooltip class="item" effect="dark" :content="card.name" :disabled="!isCardNameOverflow" placement="top-start"><h2 class="task-card-name" ref="parentNameWidth"><span ref="childNameWidth">{{card.name}}</span></h2> </el-tooltip>                                   
+          <p class="task-card-des" ref="parentHeight"><el-tooltip class="item" effect="dark" :content="htmlUnEscape(card.description)" :disabled="!isOverflow" placement="top"><span ref="childHeight">{{htmlUnEscape(card.description)}}</span></el-tooltip></p>
+          <div class="task-card-others">
             <div class="task-card-scope">
               <p>  
                 <span class="task-card-tit">已应用范围：</span>
@@ -25,8 +22,8 @@
               <p>类型：<span class="task_type">{{card.inputType=='single'?'单次':'多次'}}</span></p>
               <p>使用统计：<span class="task_see" @click="onSee">查看</span></p>
             </div>
-          </el-row>
-        </el-row >
+          </div>
+        </div>
       </el-row>
       <el-switch v-model="card.enabled" :active-value="1" :inactive-value="0" @change="statusChange(card.enabled)"/>
     </el-row>
@@ -83,17 +80,23 @@ export default {
   },
   data() {
     return {
+      isCardNameOverflow: false,
       isOverflow: false
     }
   },
   mounted() {
-    this.$nextTick(()=> {
-      this.isOverflow = this.$refs?.parentHeight?.offsetHeight < this.$refs?.childHeight?.offsetHeight
-    })
+    this.initOverflow()
   },
   methods: {
+    // 初始化溢出tips
+    initOverflow() {
+      this.$nextTick(()=> {
+        this.isCardNameOverflow = this.$refs?.parentNameWidth?.offsetWidth < this.$refs?.childNameWidth?.offsetWidth
+        this.isOverflow = this.$refs?.parentHeight?.offsetHeight < this.$refs?.childHeight?.offsetHeight
+      })
+    },
     editCardSubmit() {
-      this.$emit('update');
+      location.reload();
     },
     // 删除组件
     delTaskCard() {
@@ -195,7 +198,7 @@ export default {
 <style lang="scss">
 .task-card{
     // width: 358px;
-    height: 180px;
+    height: 195px;
     background: #FFFFFF;
     border-radius: 4px;
     box-shadow: 0px 4px 10px 0px rgba(0, 0, 0, 0.04); 
@@ -205,13 +208,13 @@ export default {
     .task-card-main{
         display: flex;
         height: calc(100% - 32px);
-        padding: 20px;
+        padding: 16px 20px;
         .task-card-content{
             flex-direction: column;
             justify-content: space-between;
             height: 100%;
             .task-card-inforn{
-                width: 220px;
+
                 .task-card-name{  
                     margin-bottom: 0;
                     @include text-ellipsis;
@@ -219,20 +222,23 @@ export default {
                     font-size: 16px;
                     color: #333333;
                     line-height: 22px;
+
                 }
                 .task-card-des{
                     font-size: 12px; 
                     color: #666666;
                     line-height: 17px;
-                    margin-top: 8px;
-                    height: 34px;
                     @include text-ellipsis-2; 
                     margin-block-end: 0em;
+                    margin-bottom: 8px;
+                    margin-top: 8px;
+
 
                 }
             }
 
             .task-card-others{
+              margin-top: 12px;
                 p{
                     margin-bottom: 4px;
                     font-size: 12px;
@@ -247,6 +253,7 @@ export default {
                 .task-card-scope{
                     display: flex;
                     justify-content: flex-start;
+                    margin-bottom: 8px;
                     p{
                       color: $color-primary;
                       word-break: break-all;
@@ -342,15 +349,24 @@ export default {
   .task-card {
     width: calc(25% - 12px);
   }
+  .task-card-name{
+    width: 240px;
+  }
 }
 @media screen and (max-width: 1680px) {
   .task-card {
     width: calc(33.3% - 12px);
   }
+  .task-card-name{
+    width: 300px;
+  }
 }
 @media screen and (max-width: 1440px) {
   .task-card {
     width: 328px;
+  }
+  .task-card-name{
+    width: 240px;
   }
 }
 </style>

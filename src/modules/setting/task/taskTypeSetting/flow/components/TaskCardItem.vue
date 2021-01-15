@@ -3,9 +3,9 @@
     <el-row class="task-card-main" type="flex" justify="space-between">
       <el-row type="flex">
         <el-row class="task-card-content" type="flex">
-          <h2 class="task-card-title">
-            <el-tooltip class="item" effect="dark" :content="taskCard.name" :disabled="disabledState" placement="top">
-              <span :class="['task-card-name',taskCard.enabled == 0 && 'task-card-enabled']">{{taskCard.name}}</span>
+          <h2 class="task-card-title" >
+            <el-tooltip class="item" effect="dark" :content="taskCard.name" :disabled="!isCardNameOverflow" placement="top">
+              <p :class="['task-card-name',taskCard.enabled == 0 && 'task-card-enabled']" ref="parentNameWidth"><span ref="childNameWidth">{{taskCard.name}}</span></p>
             </el-tooltip>    
             <el-tooltip class="item" effect="dark" content="可在附加组件设置中开启" placement="top">
               <span class="task-card-disable" v-if="taskCard.enabled == 0">已禁用</span>
@@ -89,19 +89,24 @@ export default {
       type: String,
     }
   },
-  computed: {
-    disabledState(){
-      return this.taskCard.name.length < 19 && (this.taskCard.enabled != 0 || (this.taskCard.name.length < 15 && this.taskCard.enabled == 0))
-    }
-  },
   data() {
     return {
       fields:[],
       isShowEditpermissModal: false,
-      isShowRulesModal: false // 选择可用团队弹窗
+      isShowRulesModal: false, // 设置使用规则
+      isCardNameOverflow: false
     }
   },
+  mounted() {
+    this.initOverflow()
+  },
   methods: {
+    // 初始化溢出tips
+    initOverflow() {
+      this.$nextTick(()=> {
+        this.isCardNameOverflow = this.$refs?.parentNameWidth?.offsetWidth < this.$refs?.childNameWidth?.offsetWidth
+      })
+    },
     // 删除组件
     delTaskCard() {
       this.$confirm(`确定要删除【${this.taskCard.name}】吗？`, '提示', {
@@ -190,7 +195,7 @@ export default {
     .task-card-main{
         display: flex;
         height: calc(100% - 32px);
-        padding: 20px;
+        padding: 16px 20px;
         .drag-icon{
             font-size: 12px;
             display: none;
@@ -205,7 +210,7 @@ export default {
                 justify-content: flex-start;
                 .task-card-name{
                     display: inline-block;
-                    max-width: 300px;
+                    max-width: 260px;
                     margin-bottom: 0;
                     @include text-ellipsis;
                     word-break: break-all;
@@ -216,7 +221,7 @@ export default {
                     cursor: pointer;
                 }
                 .task-card-enabled{        
-                    max-width: 230px;
+                    max-width: 200px;
                     padding-right: 0px;
                     margin-right: 12px;          
                 }
