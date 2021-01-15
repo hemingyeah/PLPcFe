@@ -38,7 +38,7 @@
           </h2>
           <approve-setting
             :options="approveOptions(type)"
-            :approveSetting="flowSetting.approveSetting"
+            :approve-setting="flowSetting.approveSetting"
             @change="changeApproveSetting"
           />
         </div>
@@ -47,7 +47,7 @@
         <!--S 转派时也审批-->
         <div v-if="type === 'allot'" class="mt-8" style="margin-bottom: -18px">
           <el-checkbox v-model="flowSetting.reallotAppr" true-label="" false-label="none"
-            >转派时也审批</el-checkbox
+          >转派时也审批</el-checkbox
           >
         </div>
         <!--E 转派时也审批-->
@@ -221,7 +221,7 @@
           </h2>
           <approve-setting
             :options="approveOptions('pause')"
-            :approveSetting="taskTypeConfig.pauseApproveSetting"
+            :approve-setting="taskTypeConfig.pauseApproveSetting"
             @change="(setting) => changeApproveSetting(setting, 'pause')"
           />
         </div>
@@ -232,7 +232,7 @@
           </h2>
           <approve-setting
             :options="approveOptions('cancel')"
-            :approveSetting="taskTypeConfig.cancelApproveSetting"
+            :approve-setting="taskTypeConfig.cancelApproveSetting"
             @change="(setting) => changeApproveSetting(setting, 'cancel')"
           />
         </div>
@@ -252,33 +252,33 @@
 
 <script>
 // api
-import * as TaskApi from "@src/api/TaskApi.ts";
-import * as SettingApi from "@src/api/SettingApi.js";
+import * as TaskApi from '@src/api/TaskApi.ts';
+import * as SettingApi from '@src/api/SettingApi.js';
 // model
-import TaskConfig from "@model/types/setting/task/TaskConfig";
-import TaskOverTimeSetting from "@model/types/setting/task/TaskOverTimeSetting";
+import TaskConfig from '@model/types/setting/task/TaskConfig';
+import TaskOverTimeSetting from '@model/types/setting/task/TaskOverTimeSetting';
 // components
-import ApproveSetting from "./ApproveSetting.vue";
-import TaskFieldsSetting from "@src/modules/setting/task/taskFieldsSetting/TaskFieldsSetting.vue";
+import ApproveSetting from './ApproveSetting.vue';
+import TaskFieldsSetting from '@src/modules/setting/task/taskFieldsSetting/TaskFieldsSetting.vue';
 /* enum */
-import TableNameEnum from "@model/enum/TableNameEnum.ts";
+import TableNameEnum from '@model/enum/TableNameEnum.ts';
 
-import flowMap from "../flowMap";
+import flowMap from '../flowMap';
 
 export default {
-  name: "flow-setting",
+  name: 'flow-setting',
   props: {
     taskTypeId: {
       type: String,
-      default: "",
+      default: '',
     },
     type: {
       type: String,
-      default: "create",
+      default: 'create',
     },
     flowSetting: {
       type: Object,
-      default: () => {},
+      default: () => ({}),
     },
     taskTypeConfig: {
       type: Object,
@@ -287,7 +287,7 @@ export default {
   },
   data() {
     return {
-      taskTypeName: "", // 接口返回的工单类型名称
+      taskTypeName: '', // 接口返回的工单类型名称
 
       fields: [],
       flowMap,
@@ -295,30 +295,30 @@ export default {
       overTimeOptions: [
         {
           value: 0,
-          label: "无需通知其他人",
+          label: '无需通知其他人',
         },
         {
           value: 1,
-          label: "通知负责人团队主管",
+          label: '通知负责人团队主管',
         },
         {
           value: null,
-          label: "指定人员",
+          label: '指定人员',
         },
       ],
 
       planOptions: [
         {
           value: '0',
-          label: "无需通知其他人",
+          label: '无需通知其他人',
         },
         {
           value: '1',
-          label: "通知负责人团队主管",
+          label: '通知负责人团队主管',
         },
         {
           value: '2',
-          label: "指定人员",
+          label: '指定人员',
         },
       ],
 
@@ -331,7 +331,7 @@ export default {
   computed: {
     showFormBuilder() {
       // 展示表单组件
-      return ["create", "finish"].includes(this.type);
+      return ['create', 'finish'].includes(this.type);
     },
     showApporeve() {
       // 展示审批
@@ -339,18 +339,18 @@ export default {
     },
     showOvertime() {
       // 展示超时提醒
-      return !["create", "cost", "review", "close"].includes(this.type);
+      return !['create', 'cost', 'review', 'close'].includes(this.type);
     },
     showReview() {
       // 展示自动回访
-      return ["review"].includes(this.type);
+      return ['review'].includes(this.type);
     },
     showTaskClose() {
       // 展示工单关闭 (mark_zr: 暂时不做)
-      return false && ["close"].includes(this.type);
+      return false && ['close'].includes(this.type);
     },
     mode() {
-      return this.type == "finish"
+      return this.type == 'finish'
         ? TableNameEnum.TaskReceipt
         : TableNameEnum.Task;
     },
@@ -360,10 +360,9 @@ export default {
       if (val) {
         this.getTaskFields(val);
         // 获取当前流程超时提醒设置
-        this.taskOverTimeModel =
-          this.taskTypeConfig.taskOverTimeModels.find(
-            (item) => item.overTimeState === val
-          ) || {};
+        this.taskOverTimeModel = this.taskTypeConfig.taskOverTimeModels.find(
+          (item) => item.overTimeState === val
+        ) || {};
       }
     },
     taskTypeId(id) {
@@ -374,28 +373,28 @@ export default {
     },
   },
   methods: {
-		/** 审批类型选项 */
-		approveOptions(type) {
+    /** 审批类型选项 */
+    approveOptions(type) {
       let options = [
         {
-          value: "leader",
-          label: "发起人主管",
+          value: 'leader',
+          label: '发起人主管',
         },
         {
-          value: "users",
-          label: "指定人员",
+          value: 'users',
+          label: '指定人员',
         },
         {
-          value: "createUser",
-          label: "工单创建人",
+          value: 'createUser',
+          label: '工单创建人',
         },
         {
-          value: "userAdmin",
-          label: "客户负责人",
+          value: 'userAdmin',
+          label: '客户负责人',
         },
         {
-          value: "promoter",
-          label: "由发起人选择",
+          value: 'promoter',
+          label: '由发起人选择',
         },
       ];
 
@@ -403,25 +402,25 @@ export default {
         ...options,
         ...this.formList.map((item) => {
           return {
-            label: "表单人员:" + item.showName,
+            label: `表单人员:${ item.showName}`,
             value: item.stateTemplateId,
           };
         }),
       ];
 
-      if (type !== "allot") {
+      if (type !== 'allot') {
         options.splice(3, 0, {
-          value: "allotUser",
-          label: "工单派单人",
+          value: 'allotUser',
+          label: '工单派单人',
         });
       }
 
-      if (!["allot", "accept", "start", 'pause'].includes(type)) {
+      if (!['allot', 'accept', 'start', 'pause'].includes(type)) {
         options = [
           ...options,
           ...this.receiptList.map((item) => {
             return {
-              label: "回执表单人员:" + item.showName,
+              label: `回执表单人员:${ item.showName}`,
               value: item.stateTemplateId,
             };
           }),
@@ -437,14 +436,14 @@ export default {
         this.formList = res.data.list;
         this.receiptList = res.data.receiptList;
       } catch (error) {
-        console.error("fetch getFromUser => error", error);
+        console.error('fetch getFromUser => error', error);
       }
     },
     /**
      * 获取工单表单/回执表单自定义字段
      */
     async getTaskFields(type) {
-      if (["create", "finish"].includes(type)) {
+      if (['create', 'finish'].includes(type)) {
         try {
           let fields = await TaskApi.getAllFields({
             tableName: this.mode,
@@ -453,7 +452,7 @@ export default {
           });
           this.fields = fields || [];
         } catch (error) {
-          console.error("fetch task getAllFields => err", error);
+          console.error('fetch task getAllFields => err', error);
         }
       }
     },
@@ -466,15 +465,15 @@ export default {
     /** 更新审批设置 */
     changeApproveSetting(setting, key) {
       switch (key) {
-        case "pause":
-          this.taskTypeConfig.pauseApproveSetting = setting;
-          break;
-        case "cancel":
-          this.taskTypeConfig.cancelApproveSetting = setting;
-          break;
-        default:
-          this.$set(this.flowSetting, "approveSetting", setting);
-          break;
+      case 'pause':
+        this.taskTypeConfig.pauseApproveSetting = setting;
+        break;
+      case 'cancel':
+        this.taskTypeConfig.cancelApproveSetting = setting;
+        break;
+      default:
+        this.$set(this.flowSetting, 'approveSetting', setting);
+        break;
       }
     },
     /** 更新流程超时提醒设置 */
@@ -492,34 +491,35 @@ export default {
     },
     /** 格式化审批人员名称 */
     getApproverNames(approvers) {
-      return approvers.map((item) => item.displayName).join(",");
+      return approvers.map((item) => item.displayName).join(',');
     },
     /** 选择指定审批人员 */
     selectApproveUser(type) {
       let selected = [];
 
-      if (type === "overTime") selected = this.taskOverTimeModel.reminders;
-      if (type === "planRemind") selected = this.taskTypeConfig.noticeUsers;
+      if (type === 'overTime') selected = this.taskOverTimeModel.reminders;
+      if (type === 'planRemind') selected = this.taskTypeConfig.noticeUsers;
 
       let options = {
-        title: "选择审批人", //[选填] 默认值为 '请选择人员'
-        max: 14, //[选填]最大人数：当值小于等于0或者不填时，不对选择人数做限制，max值为1时单选，大于1时多选
-        selected, //[选填] 已选人员 每个人员必须包括userId,displayName,staffId,head这四个属性，只有带max大于1时生效
+        title: '选择审批人', // [选填] 默认值为 '请选择人员'
+        max: 14, // [选填]最大人数：当值小于等于0或者不填时，不对选择人数做限制，max值为1时单选，大于1时多选
+        selected, // [选填] 已选人员 每个人员必须包括userId,displayName,staffId,head这四个属性，只有带max大于1时生效
       };
 
       this.$fast.contact
-        .choose("dept", options)
+        .choose('dept', options)
         .then((res) => {
           if (res.status != 0) return;
           switch (type) {
-            case "overTime": // 超时审批指定人员
-              this.taskOverTimeModel.reminders = res.data.users;
-              this.updateOvertimeSetting();
-              break;
-            case "planRemind": // 计划提醒指定人员
-              this.taskTypeConfig.noticeUsers = res.data.users;
-            default:
-              break;
+          case 'overTime': // 超时审批指定人员
+            this.taskOverTimeModel.reminders = res.data.users;
+            this.updateOvertimeSetting();
+            break;
+          case 'planRemind': // 计划提醒指定人员
+            this.taskTypeConfig.noticeUsers = res.data.users;
+            break;
+          default:
+            break;
           }
         })
         .catch((err) => {
@@ -533,12 +533,12 @@ export default {
     },
   },
   mounted() {
-    this.$eventBus.$on("setting_task_type_name", (taskTypeName) => {
+    this.$eventBus.$on('setting_task_type_name', (taskTypeName) => {
       this.taskTypeName = taskTypeName;
     });
   },
   beforeDestroy() {
-    this.$eventBus.$off("setting_task_type_name");
+    this.$eventBus.$off('setting_task_type_name');
   },
   components: {
     [ApproveSetting.name]: ApproveSetting,

@@ -1,5 +1,5 @@
 <template>
-  <div class="task-type" :body-style="{padding: '0px', height: '100%'}">
+  <div class="task-type">
     <el-row class="task-type-main" type="flex" justify="space-between">
       <el-row type="flex">
         <i class="task-type-color" :style="{'background-color': taskType.config.color}"></i>
@@ -61,7 +61,7 @@ export default {
   props: {
     taskType: { // 工单类型对象
       type: Object,
-      default: () => {}
+      default: () => ({})
     },
     typeNum: { // 已经开启的数量
       type: Number,
@@ -201,7 +201,7 @@ export default {
             min-width: 14px;
             height: 14px;
             line-height: 22px;
-            margin: 4px 5px 0 0;
+            margin: 3px 5px 0 0;
             border-radius: 50%;
         }
         .task-type-content{
@@ -215,7 +215,7 @@ export default {
                 padding-right: 32px;
                 font-size: 16px;
                 color: #333333;
-                line-height: 22px;
+                line-height: 20px;
             }
             .task-type-others{
                 i{

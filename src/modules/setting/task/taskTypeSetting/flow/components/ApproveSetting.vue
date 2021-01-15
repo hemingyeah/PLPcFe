@@ -70,10 +70,11 @@
 </template>
 
 <script>
-import TaskApprover from "@model/types/setting/task/TaskApprover";
+import _ from 'lodash';
+import TaskApprover from '@model/types/setting/task/TaskApprover';
 
 export default {
-  name: "approve-setting",
+  name: 'approve-setting',
   props: {
     options: {
       type: Array,
@@ -87,16 +88,16 @@ export default {
   filters: {
     formatNumToCN(num) {
       let changeNum = [
-        "零",
-        "一",
-        "二",
-        "三",
-        "四",
-        "五",
-        "六",
-        "七",
-        "八",
-        "九",
+        '零',
+        '一',
+        '二',
+        '三',
+        '四',
+        '五',
+        '六',
+        '七',
+        '八',
+        '九',
       ];
 
       return changeNum[num];
@@ -111,10 +112,10 @@ export default {
           if (this.approveSetting.multiApproverSetting && this.approveSetting.multiApproverSetting[i]) {
             multiApproverSetting.push(
               this.approveSetting.multiApproverSetting[i]
-						);
+            );
           } else {
-						multiApproverSetting.push({
-              leader: "",
+            multiApproverSetting.push({
+              leader: '',
               approvers: [],
             });
           }
@@ -124,7 +125,7 @@ export default {
       }
     },
     getApproverNames(approvers) {
-      return approvers.map((item) => item.displayName).join(",");
+      return approvers.map((item) => item.displayName).join(',');
     },
     /**
      * 更新审批设置
@@ -153,29 +154,28 @@ export default {
         }
       }
 
-      this.$emit("change", approveSetting);
+      this.$emit('change', approveSetting);
     },
     /**
      * 选择指定的审批人员
      * @param {number} level 审批的层级
      */
     selectApproveUser(level) {
-      let selected =
-        level < 2
-          ? this.approveSetting.approvers
-          : this.approveSetting.multiApproverSetting[level - 2].approvers;
+      let selected = level < 2
+        ? this.approveSetting.approvers
+        : this.approveSetting.multiApproverSetting[level - 2].approvers;
       let options = {
-        title: "选择审批人", //[选填] 默认值为 '请选择人员'
-        max: 14, //[选填]最大人数：当值小于等于0或者不填时，不对选择人数做限制，max值为1时单选，大于1时多选
-        selected, //[选填] 已选人员 每个人员必须包括userId,displayName,staffId,head这四个属性，只有带max大于1时生效
+        title: '选择审批人', // [选填] 默认值为 '请选择人员'
+        max: 14, // [选填]最大人数：当值小于等于0或者不填时，不对选择人数做限制，max值为1时单选，大于1时多选
+        selected, // [选填] 已选人员 每个人员必须包括userId,displayName,staffId,head这四个属性，只有带max大于1时生效
       };
 
       this.$fast.contact
-        .choose("dept", options)
+        .choose('dept', options)
         .then((res) => {
           if (res.status != 0) return;
 
-          this.updateApproveSetting("approvers", res.data.users, level);
+          this.updateApproveSetting('approvers', res.data.users, level);
         })
         .catch((err) => {
           console.warn(err);

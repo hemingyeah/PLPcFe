@@ -1,178 +1,178 @@
 <template>
-    <base-modal
-        title="新建工单类型"
-        width="977px"
-        @cancel="cancel"
-        :show.sync="isShow"
-        :mask-closeable="false">
-        <div class="choose-trade">
-            <el-row type="flex" class="choose-trade-nav">
-                <div
-                    class="choose-trade-nav-tab pointer"
-                    :class="industry === industryName && 'active'"
-                    v-for="industryName in industryNames"
-                    :key="industryName"
-                    @click="industry = industryName"
-                >
-                    {{industryName}}
-                </div>
-            </el-row>
-            <el-row class="trade-list" type="flex" justify="space-between">
-                <el-row class="trade-item pointer apply" type="flex" v-for="item in industryItems" :key="item.taskTypeId" @click.native="selectTemplate(item)">
-                    <div class="trade-item-left" :style="{'background-color': getColor(item.taskTypeName)}">
-                        <i :class="['iconfont', getIcon(item.taskTypeName)]">
-                        </i>
-                    </div>
-                    <div class="trade-item-main">
-                        <el-row type="flex">
-                            <h2>
-                                {{item.taskTypeName}}
-                            </h2>
-                            <div v-for="label in item.labels" :key="label" class="trade-item-tag">
-                                {{label}}
-                            </div>
-                        </el-row>
-                         <p v-html="item.description"></p>
-                    </div>
-                </el-row>
-            </el-row>
+  <base-modal
+    title="新建工单类型"
+    width="977px"
+    @cancel="cancel"
+    :show.sync="isShow"
+    :mask-closeable="false">
+    <div class="choose-trade">
+      <el-row type="flex" class="choose-trade-nav">
+        <div
+          class="choose-trade-nav-tab pointer"
+          :class="industry === industryName && 'active'"
+          v-for="industryName in industryNames"
+          :key="industryName"
+          @click="industry = industryName"
+        >
+          {{industryName}}
         </div>
-        <div slot="footer" class="dialog-footer">
-            <el-button type="primary" @click="cancel">上一步</el-button>
-        </div>
-    </base-modal>
+      </el-row>
+      <el-row class="trade-list" type="flex" justify="space-between">
+        <el-row class="trade-item pointer apply" type="flex" v-for="item in industryItems" :key="item.taskTypeId" @click.native="selectTemplate(item)">
+          <div class="trade-item-left" :style="{'background-color': getColor(item.taskTypeName)}">
+            <i :class="['iconfont', getIcon(item.taskTypeName)]">
+            </i>
+          </div>
+          <div class="trade-item-main">
+            <el-row type="flex">
+              <h2>
+                {{item.taskTypeName}}
+              </h2>
+              <div v-for="label in item.labels" :key="label" class="trade-item-tag">
+                {{label}}
+              </div>
+            </el-row>
+            <p v-html="item.description"></p>
+          </div>
+        </el-row>
+      </el-row>
+    </div>
+    <div slot="footer" class="dialog-footer">
+      <el-button type="primary" @click="cancel">上一步</el-button>
+    </div>
+  </base-modal>
 </template>
 
 <script>
-import * as SettingApi from "@src/api/SettingApi";
+import * as SettingApi from '@src/api/SettingApi';
 
-let industryNames = ['全部','设备','IT服务','家居建材','电商','机械','上门服务','公共服务','其他'];
+let industryNames = ['全部', '设备', 'IT服务', '家居建材', '电商', '机械', '上门服务', '公共服务', '其他'];
 let iconMap = {
-    "机械报修工单": {
-        icon: "icon-mechanics",
-        color: "#3094d3"
-    },
-    "设备巡检保养": {
-        icon: "icon-maintain",
-        color: "#1db6c5"
-    },
-    "设备交机培训": {
-        icon: "icon-train",
-        color: "#3ba3da"
-    },
-    "办公设备工单": {
-        icon: "icon-work",
-        color: "#1db6c5"
-    },
-    "医疗器械工单": {
-        icon: "icon-medicalcare",
-        color: "#29b7ec"
-    },
-    "实施服务单": {
-        icon: "icon-implement",
-        color: "#1db6c5"
-    },
-    "客户回访单": {
-        icon: "icon-tel",
-        color: "#1db6c5"
-    },
-    "电商售后工单": {
-        icon: "icon-service1",
-        color: "#f4c21d"
-    },
-    "家电维修": {
-        icon: "icon-appliance",
-        color: "#3ba3da"
-    },
-    "电商退换货单": {
-        icon: "icon-refundable",
-        color: "#f4c21d"
-    },
-    "内部报修": {
-        icon: "icon-inside",
-        color: "#1db6c5"
-    },
-    "水电煤报修": {
-        icon: "icon-water",
-        color: "#29b7ec"
-    },
-    "家居建材工单": {
-        icon: "icon-furniture",
-        color: "#29b7ec"
-    },
-    "上门测量": {
-        icon: "icon-measure",
-        color: "#52c0d1"
-    },
-    "设备维修": {
-        icon: "icon-equipment",
-        color: "#41b8a3"
-    }
+  '机械报修工单': {
+    icon: 'icon-mechanics',
+    color: '#3094d3'
+  },
+  '设备巡检保养': {
+    icon: 'icon-maintain',
+    color: '#1db6c5'
+  },
+  '设备交机培训': {
+    icon: 'icon-train',
+    color: '#3ba3da'
+  },
+  '办公设备工单': {
+    icon: 'icon-work',
+    color: '#1db6c5'
+  },
+  '医疗器械工单': {
+    icon: 'icon-medicalcare',
+    color: '#29b7ec'
+  },
+  '实施服务单': {
+    icon: 'icon-implement',
+    color: '#1db6c5'
+  },
+  '客户回访单': {
+    icon: 'icon-tel',
+    color: '#1db6c5'
+  },
+  '电商售后工单': {
+    icon: 'icon-service1',
+    color: '#f4c21d'
+  },
+  '家电维修': {
+    icon: 'icon-appliance',
+    color: '#3ba3da'
+  },
+  '电商退换货单': {
+    icon: 'icon-refundable',
+    color: '#f4c21d'
+  },
+  '内部报修': {
+    icon: 'icon-inside',
+    color: '#1db6c5'
+  },
+  '水电煤报修': {
+    icon: 'icon-water',
+    color: '#29b7ec'
+  },
+  '家居建材工单': {
+    icon: 'icon-furniture',
+    color: '#29b7ec'
+  },
+  '上门测量': {
+    icon: 'icon-measure',
+    color: '#52c0d1'
+  },
+  '设备维修': {
+    icon: 'icon-equipment',
+    color: '#41b8a3'
+  }
 }
 
 export default {
-    name: 'choose-trade-dialog',
-    props: {
-        visiable: {
-            type: Boolean,
-            default: false
-        },
+  name: 'choose-trade-dialog',
+  props: {
+    visiable: {
+      type: Boolean,
+      default: false
     },
-    computed: {
-        industryNames: function() {
-            return industryNames;
-        },
-        industryItems: function(){
-            let industry = this.industry;
-            if(industry == '全部') industry = null;
+  },
+  computed: {
+    industryNames() {
+      return industryNames;
+    },
+    industryItems(){
+      let industry = this.industry;
+      if(industry == '全部') industry = null;
 
-            return this.whole.filter(function(item){
-                return industry == null || item.professions.indexOf(industry) >= 0;
-            })
-        }
-    },
-    data() {
-        return {
-            industry: "全部",
-            whole: [],// 全部数据
-            isShow: false
-        }
-    },
-    watch: {
-        visiable(newVal){
-            this.isShow = newVal;
-        },
-    },
-    methods: {
-        getIcon: function(key){
-            var o = iconMap[key] || {};
-            return o.icon
-        },
-        getColor: function(key){
-            var o = iconMap[key] || {};
-            return o.color
-        },
-        fetchSysTaskTypeList() {
-            SettingApi.getSysTaskTypeList().then(res => {
-                this.whole = res.data;
-            }).catch(e => {
-                console.error('fetchSysTaskTypeList => error', e);
-            })
-        },
-        selectTemplate({taskTypeId, taskTypeName}) {
-            this.$emit('select', {
-                taskTypeId,
-                typeName: taskTypeName
-            });
-            this.cancel();
-        },
-        cancel() {
-            this.$emit('update:visiable', false);
-        },
-    },
-    mounted() {
-        this.fetchSysTaskTypeList();
+      return this.whole.filter(function(item){
+        return industry == null || item.professions.indexOf(industry) >= 0;
+      })
     }
+  },
+  data() {
+    return {
+      industry: '全部',
+      whole: [], // 全部数据
+      isShow: false
+    }
+  },
+  watch: {
+    visiable(newVal){
+      this.isShow = newVal;
+    },
+  },
+  methods: {
+    getIcon(key){
+      let o = iconMap[key] || {};
+      return o.icon
+    },
+    getColor(key){
+      let o = iconMap[key] || {};
+      return o.color
+    },
+    fetchSysTaskTypeList() {
+      SettingApi.getSysTaskTypeList().then(res => {
+        this.whole = res.data;
+      }).catch(e => {
+        console.error('fetchSysTaskTypeList => error', e);
+      })
+    },
+    selectTemplate({taskTypeId, taskTypeName}) {
+      this.$emit('select', {
+        taskTypeId,
+        typeName: taskTypeName
+      });
+      this.cancel();
+    },
+    cancel() {
+      this.$emit('update:visiable', false);
+    },
+  },
+  mounted() {
+    this.fetchSysTaskTypeList();
+  }
 }
 </script>
 
