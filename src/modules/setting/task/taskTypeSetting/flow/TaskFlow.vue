@@ -113,7 +113,7 @@ export default {
   data() {
     return {
       taskTypeId: '',
-	    taskTypeConfig: new TaskConfig(),
+      taskTypeConfig: new TaskConfig(),
       currTab: 0,
 
       initTaskTypeConfig: new TaskConfig(),

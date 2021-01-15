@@ -278,7 +278,7 @@ export default {
     },
     flowSetting: {
       type: Object,
-      default: () => {},
+      default: () => ({}),
     },
     taskTypeConfig: {
       type: Object,

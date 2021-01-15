@@ -61,7 +61,7 @@ export default {
   props: {
     taskType: { // 工单类型对象
       type: Object,
-      default: () => {}
+      default: () => ({})
     },
     typeNum: { // 已经开启的数量
       type: Number,

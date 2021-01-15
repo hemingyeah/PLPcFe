@@ -70,6 +70,7 @@
 </template>
 
 <script>
+import _ from 'lodash';
 import TaskApprover from '@model/types/setting/task/TaskApprover';
 
 export default {
