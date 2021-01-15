@@ -92,19 +92,19 @@ function toTableFields(fields, config) {
  */
 function packCustomFields(fields) {
   let formTypes = ['autograph', 'attachment', 'separator', 'info'];
-  let newCard = fields.filter(i=>{
-    if(i.formType !== 'attachment'){
-      if(i.formType == 'datetime'){
-        i.minWidth = '160px' ;
+  let newCard = fields.filter(field=>{
+    if(field.formType !== 'attachment'){
+      if(field.formType == 'datetime'){
+        field.minWidth = '160px' ;
       }
-      if(i.formType == 'related_task'){
-        i.minWidth = '160px' ;
+      if(field.formType == 'related_task'){
+        field.minWidth = '160px' ;
       }
-      if(i.formType == 'address' || i.formType == 'location'){
-        i.minWidth = '160px' ;
+      if(field.formType == 'address' || field.formType == 'location'){
+        field.minWidth = '160px' ;
       }
                
-      return !i.isHidden && i.isVisible && formTypes.indexOf(i.formType) < 0
+      return !field.isHidden && (field.isVisible == undefined || field.isVisible) && formTypes.indexOf(field.formType) < 0
     }
   }) 
   return newCard

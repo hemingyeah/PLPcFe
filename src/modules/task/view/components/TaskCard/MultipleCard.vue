@@ -82,7 +82,7 @@ export default {
         }
       ]
       
-      return fields.filter(field => !field.isHidden && field.isVisible && formTypes.indexOf(field.formType) < 0);
+      return fields.filter(field => !field.isHidden && (field.isVisible == undefined || field.isVisible) && formTypes.indexOf(field.formType) < 0);
     }
   },
   components: {
