@@ -1,5 +1,5 @@
 <template>
-  <div class="task-type" :body-style="{padding: '0px', height: '100%'}">
+  <div class="task-type" :style="{padding: '0px', height: '100%'}">
     <el-row class="task-type-main" type="flex" justify="space-between">
       <el-row type="flex">
         <i class="task-type-color" :style="{'background-color': taskType.config.color}"></i>

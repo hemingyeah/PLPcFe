@@ -31,9 +31,9 @@
       >
         <task-type-item
           class="task-type-item"
-          v-for="(item, idx) in taskTypeList"
+          v-for="item in taskTypeList"
           :key="item.id"
-          :task-type="taskTypeList[idx]"
+          :task-type="item"
           :team-list="teamList"
           :type-num="enableTypeNum"
           :max-type-num="maxTypeNum"
@@ -55,7 +55,6 @@ import draggable from 'vuedraggable';
 
 /** api */
 import * as SettingApi from '@src/api/SettingApi';
-import * as TeamApi from '@src/api/TeamApi';
 
 /** component */
 import TaskNavBar from '../../components/TaskNavBar.vue';

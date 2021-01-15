@@ -59,7 +59,7 @@
           plain
           @click="submit"
           :loading="pending"
-          >保 存</el-button
+        >保 存</el-button
         >
       </div>
     </div>
@@ -70,7 +70,7 @@
       <component
         ref="comp"
         :is="settingStep[currTab].compName"
-        :taskTypeId="taskTypeId"
+        :task-type-id="taskTypeId"
       ></component>
     </keep-alive>
   </div>
@@ -78,33 +78,33 @@
 
 <script>
 // api
-import * as TaskApi from "@src/api/TaskApi.ts";
-import * as SettingApi from "@src/api/SettingApi";
+import * as TaskApi from '@src/api/TaskApi.ts';
+import * as SettingApi from '@src/api/SettingApi';
 // model
-import TaskConfig from "@model/types/setting/task/TaskConfig";
+import TaskConfig from '@model/types/setting/task/TaskConfig';
 import TaskApprover from '@model/types/setting/task/TaskApprover';
 // utils
-import { parse } from "@src/util/querystring";
+import { parse } from '@src/util/querystring';
 // components
-import FlowSettingPanel from "./tabs/FlowSettingPanel";
-import OtherSettingPanel from "./tabs/OtherSettingPanel";
-import CardSettingPanel from "./tabs/CardSettingPanel";
+import FlowSettingPanel from './tabs/FlowSettingPanel';
+import OtherSettingPanel from './tabs/OtherSettingPanel';
+import CardSettingPanel from './tabs/CardSettingPanel';
 
 const TASK_TYPE_COLOR = [
-	'rgb(115,127,124)',
-	'rgb(38,111,255)',
-	'rgb(82,85,255)',
-	'rgb(133,82,255)',
-	'rgb(188,82,255)',
-	'rgb(255,82,212)',
-	'rgb(255,149,38)',
-	'rgb(110,207,64)',
-	'rgb(0,184,213)',
-	'rgb(11,161,148)'
+  'rgb(115,127,124)',
+  'rgb(38,111,255)',
+  'rgb(82,85,255)',
+  'rgb(133,82,255)',
+  'rgb(188,82,255)',
+  'rgb(255,82,212)',
+  'rgb(255,149,38)',
+  'rgb(110,207,64)',
+  'rgb(0,184,213)',
+  'rgb(11,161,148)'
 ];
 
 export default {
-  name: "setting-flow",
+  name: 'setting-flow',
   provide() {
     return {
       taskFlowData: this.$data,
@@ -112,7 +112,7 @@ export default {
   },
   data() {
     return {
-      taskTypeId: "",
+      taskTypeId: '',
 	    taskTypeConfig: new TaskConfig(),
       currTab: 0,
 
@@ -127,23 +127,23 @@ export default {
     settingStep() {
       return [
         {
-          stepName: "流程设置",
-          compName: "flow-setting-panel",
+          stepName: '流程设置',
+          compName: 'flow-setting-panel',
         },
         {
-          stepName: "高级设置",
-          compName: "other-setting-panel",
+          stepName: '高级设置',
+          compName: 'other-setting-panel',
         },
         {
-          stepName: "组件设置",
-          compName: "card-setting-panel",
+          stepName: '组件设置',
+          compName: 'card-setting-panel',
         },
       ];
     },
   },
   methods: {
     goBack() {
-      let fromId = window.frameElement.getAttribute("fromid");
+      let fromId = window.frameElement.getAttribute('fromid');
       this.$platform.refreshTab(fromId);
       
       let id = window.frameElement.dataset.id;
@@ -160,17 +160,17 @@ export default {
       let {leader, level, approvers} = setting;
       if(level === undefined) {
         switch(leader) {
-          case undefined:
-            if(approvers && approvers.length > 0) {
-              leader = 'users';
-              level = 1;
-            }else {
-              level = 0;
-            }
-            break;
-          default: 
+        case undefined:
+          if(approvers && approvers.length > 0) {
+            leader = 'users';
             level = 1;
-            break
+          }else {
+            level = 0;
+          }
+          break;
+        default: 
+          level = 1;
+          break
         }
       }
 
@@ -186,14 +186,14 @@ export default {
     },
     /** 转化getOne接口返回的数据 */
     convertTaskTypeConfig(taskTypeConfig) {
-      let { flowSetting, isLeader, pauseApprovers, planRemindSetting, delayBack, config, overTimeSetting } =  taskTypeConfig;
+      let { flowSetting, isLeader, pauseApprovers, planRemindSetting, delayBack, config, overTimeSetting } = taskTypeConfig;
 
       taskTypeConfig.planRemindSetting = {
         ...new TaskConfig().planRemindSetting,
         ...planRemindSetting
       };
       
-      taskTypeConfig.delayBack = delayBack === 'true' ? true : false;
+      taskTypeConfig.delayBack = delayBack === 'true';
       taskTypeConfig.allowPause = Boolean(taskTypeConfig.allowPause);
       taskTypeConfig.allowCancel = Boolean(taskTypeConfig.allowCancel);
 
@@ -217,7 +217,7 @@ export default {
         isLeader = 'users';
       }
 
-      taskTypeConfig.pauseApproveSetting =  this.compatibleOldApprove({leader: isLeader, approvers: pauseApprovers, multiApproverSetting: []});
+      taskTypeConfig.pauseApproveSetting = this.compatibleOldApprove({leader: isLeader, approvers: pauseApprovers, multiApproverSetting: []});
       
       // 流程审批格式转化
       Object.keys(flowSetting).forEach(key => {
@@ -249,7 +249,7 @@ export default {
 
           // 转派需要审批开关
           if(key === 'allot') {
-            this.$set(taskTypeConfig.flowSetting[key], 'reallotAppr', reallotAppr === 'none' ? false : true);
+            this.$set(taskTypeConfig.flowSetting[key], 'reallotAppr', reallotAppr !== 'none');
           }
 
           if(key === 'pause') {
@@ -303,12 +303,12 @@ export default {
         // 传递给FlowSetting组件工单类型名称
         this.$eventBus.$emit('setting_task_type_name', this.taskTypeConfig.name);
         // 判断是否有设置服务报告模板
-        if (JSON.stringify(res.data.reportSetting) == "{}") {
+        if (JSON.stringify(res.data.reportSetting) == '{}') {
           let reportSetting = {
-            tenantFields: ["name", "phone", "email", "address", "portal"],
-            customerFields: ["name", "product", "address", "linkman"],
-            taskFields: ["taskNo", "planTime", "executor"],
-            receiptFields: ["sparepart", "service", "autograph"],
+            tenantFields: ['name', 'phone', 'email', 'address', 'portal'],
+            customerFields: ['name', 'product', 'address', 'linkman'],
+            taskFields: ['taskNo', 'planTime', 'executor'],
+            receiptFields: ['sparepart', 'service', 'autograph'],
           };
           let reportForm = {};
           reportForm.id = this.taskTypeId;
@@ -317,14 +317,14 @@ export default {
           try {
             let res = await TaskApi.saveSystemReport(reportForm);
             if (res.status == 0) {
-              console.log("默认回执报告设置已保存");
+              console.log('默认回执报告设置已保存');
             }
           } catch (err) {
-            console.error("设置默认回执报告出错 => err", err);
+            console.error('设置默认回执报告出错 => err', err);
           }
         }
       } catch (err) {
-        console.error("fetch Tasktype => err", err);
+        console.error('fetch Tasktype => err', err);
       }
     },
     /** 更新工单类型颜色和名称 */
