@@ -43,7 +43,7 @@
         <!-- start 客户 -->
         <form-item :label="field.displayName">
           <div class="input-and-btn">
-            <biz-remote-select
+            <biz-form-remote-select
               :value="value.customer"
               :field="customerField"
               :remote-method="searchCustomer"
@@ -64,7 +64,7 @@
                   </span>
                 </p>
               </div>
-            </biz-remote-select>
+            </biz-form-remote-select>
             <el-button @click="dialogOpen('customer')" v-if="!isCreateCustomer">新建</el-button>
           </div>
           
@@ -81,7 +81,7 @@
         <!-- start 联系人 -->
         <form-item v-if="customerOption.linkman" label="联系人">
           <div class="input-and-btn">
-            <biz-remote-select
+            <biz-form-remote-select
               ref="linkman"
               placeholder="请输入关键字搜索联系人"
               v-model="value.linkman"
@@ -90,7 +90,7 @@
               :input-disabled="isCreateCustomer"
               @input="updateLinkman(value.linkman[0])"
             >
-            </biz-remote-select>
+            </biz-form-remote-select>
             <el-button @click="dialogOpen('contact')" v-if="!isCreateCustomer">新建</el-button>
           </div>
         </form-item>
@@ -99,13 +99,13 @@
         <!-- start 地址 -->
         <form-item v-if="customerOption.address" label="地址">
           <div class="input-and-btn">
-            <biz-remote-select
+            <biz-form-remote-select
               v-model="value.address"
               placeholder="请输入关键字搜索地址"
               :cleared="true"
               :remote-method="searchAddressOuterHandler"
             >
-            </biz-remote-select>
+            </biz-form-remote-select>
             <el-button @click="dialogOpen('address')" v-if="!isCreateCustomer">新建</el-button>
           </div>
         </form-item>
@@ -115,7 +115,7 @@
         <form-item v-if="customerOption.product" label="产品" :validation="validation.product">
           
           <div class="input-and-btn">
-            <biz-remote-select
+            <biz-form-remote-select
               ref="product"
               :field="productField"
               v-model="value.product"
@@ -147,7 +147,7 @@
                   </span>
                 </p>
               </div>
-            </biz-remote-select>
+            </biz-form-remote-select>
             <el-button @click="dialogOpen('product')">新建</el-button>
           </div>
           

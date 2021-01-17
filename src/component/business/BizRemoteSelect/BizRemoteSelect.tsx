@@ -27,6 +27,7 @@ interface LoadmoreOptions {
   distance: number,
 }
 
+/* @deprecated 已弃用 */
 @Component({
   name: ComponentNameEnum.BizRemoteSelect,
   mixins: [FormMixin]
@@ -216,10 +217,10 @@ class BizRemoteSelect extends VC<{}> {
     return (
       <div class='biz-form-remote-select'>
         <el-select
-          v-el-select-loadmore={this.loadmoreOptions}
           clearable={this.showClearButton}
           collapsed={this.collapsed}
           disabled={this.inputDisabled}
+          loading={this.pending}
           multiple={this.isMulti}
           filterable
           no-data-text='无匹配数据'
@@ -231,6 +232,7 @@ class BizRemoteSelect extends VC<{}> {
           value={this.selectValue}
           onInput={this.inputHandler}
           onFocus={this.focusHandler}
+          v-el-select-loadmore={this.loadmoreOptions}
         >
           {this.renderOptionList()}
         </el-select>
