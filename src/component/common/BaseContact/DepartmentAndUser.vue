@@ -151,6 +151,11 @@ export default {
     departShow: {
       type: Boolean,
       default: true
+    },
+    // 是否显示离职人员
+    showDeleteUser: {
+      type: Boolean,
+      default: false
     }
   },
   data(){
@@ -169,7 +174,7 @@ export default {
       chosenDept: this.selectedDepts.map(dept => {
         return {
           id: dept.id,
-          name: dept.name
+          name: dept.name || dept.tagName
         }
       }),
       // 已选择的人
@@ -202,7 +207,8 @@ export default {
     isDingtalk(){
       // 判断是否钉钉端选择通讯录
       let tenantType = localStorage.getItem('tenantType');
-      return !tenantType && !localStorage.getItem('allotByTag'); 
+      console.log('tenantType:', tenantType, localStorage.getItem('allotByTag'));
+      return tenantType == 0 && localStorage.getItem('allotByTag') == 0; 
     },
     btnText(){
       return this.max > 0 ? `(${this.chosen.length}/${this.max})` : "";
@@ -326,7 +332,7 @@ export default {
         this.loading = true;
         this.userPage.list = [];
 
-        // this.params.deptId = 'root';
+        this.params.deptId = 'root';
         this.params.tagId = '';
         this.params.pageNum = 1;
 
@@ -335,7 +341,9 @@ export default {
           this.params.lng = this.lng;
         }
         this.params.seeAllOrg = this.isSeeAllOrg;
-        
+        // 可显示离职人员
+        this.params.showDeleteUser = this.showDeleteUser ? 2 : 0;
+
         let userPage = await this.fetchUser(this.params);
         this.userPage.merge(Page.as(userPage));
       } catch (error) {
@@ -367,7 +375,9 @@ export default {
           this.params.lng = this.lng;
         }
         this.params.seeAllOrg = this.isSeeAllOrg;
-
+        // 离职人员
+        dept.name = dept.name || dept.tagName
+        this.params.showDeleteUser = (dept.id == 'root' && dept.name == '离职人员') ? 1 : 0;
         let userPage = await this.fetchUser(this.params);
 
         this.userPage.merge(Page.as(userPage));
@@ -465,6 +475,7 @@ export default {
       if(this.isDingtalk) return this.fetchDingtalkDept();
       let params = {};
       params.seeAllOrg = this.isSeeAllOrg;
+      params.showDeleteUser = this.showDeleteUser ? 1 : 0;
       return http.post('/security/tag/tree', params).then(result => {
         let depts = (result && result.list) || [];
         return depts;
@@ -475,7 +486,7 @@ export default {
     fetchDingtalkDept(){
       let params = {};
       params.seeAllOrg = this.isSeeAllOrg;
-
+      params.showDeleteUser = this.showDeleteUser ? 1 : 0;
       return http.get('/security/department/tree', params).then(result => {
         if(result.status == 1) return [];
 
@@ -501,24 +512,6 @@ export default {
       })
         .catch(err => console.error('err', err));
     },
-    // handleDeptsData(depts){
-    //   depts = depts.map(dept => {
-    //     let item = {
-    //       ...dept,
-    //       tagName: dept.name,
-    //       children: dept.subDepartments.map(c => {
-    //         let citem = {
-    //           ...c,
-    //           tagName: c.name,
-    //           children: c.subDepartments,
-    //         }
-    //         return citem
-    //       }) || []
-    //     } 
-    //     return item;
-    //   });
-    //   return depts
-    // },
     fetchDeptCount(){
       return http.get('/security/department/depUserCount')
     },

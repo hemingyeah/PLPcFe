@@ -6,7 +6,7 @@ import Page from '@model/Page';
 import * as TeamApi from '@src/api/TeamApi'
 import BaseTreeDept from '../../common/BaseTreeDept';
 import Clickoutside from '@src/util/clickoutside'
-
+import http from '@src/util/http'
 /**
  * TODO: item option render(jsx、template)
 */
@@ -90,11 +90,8 @@ const BizTeamSelect = {
       loading: false,
       page: new Page(),
       params: {
-        pageSize: 50,
-        pageNum: 1,
         keyword: '',
-        // 是否只查主团队，true时只查出主团队来，子团队附带在主团队的children里，同时搜索条件支持子团队查询；不传或false时主团队和子团队会在同一级返回
-        onlyParent: true
+        seeAllOrg: true
       },
       
       loadmoreOptions: {
@@ -214,11 +211,21 @@ const BizTeamSelect = {
       this.$emit('input', []);
       this.close();
     },
-    
+    getSeeAllOrg() {
+      return http.post('/setting/user/getSeeAllOrg').then((result) => {
+        return result
+      })
+    },
     /** 获取团队数据 */
     async fetchTeam(action){
       try {
         this.loading = true;
+        try {
+          let result = await this.getSeeAllOrg()
+          this.params.seeAllOrg = result.data
+        } catch (error) {
+          this.params.seeAllOrg = true
+        }
         let page = await this.fetchFunc(this.params);
         if (!page) return;
         this.page = page; 

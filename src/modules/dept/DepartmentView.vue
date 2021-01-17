@@ -10,8 +10,8 @@
         </el-button>
 
         <!-- start 同步钉钉通讯录 -->
-        <el-button v-if="tenantType==0" class="base-button" type="primary" :loading="syncDingTalkState" @click="syncDingTalkAddressBook">
-          {{ syncDingTalkState ? '同步中': '同步钉钉通讯录' }}
+        <el-button v-if="tenantType==0" class="base-button" type="primary" :loading="synchronousState" @click="syncDingTalkAddressBook">
+          {{ synchronousState ? '同步中': '同步钉钉通讯录' }}
         </el-button>
         <!-- end 同步钉钉通讯录 -->
 
@@ -35,16 +35,18 @@
             </div>
             <!-- end 左侧部门列表 -->
 
-            <template v-if="tenantType == 0">
+            <div v-if="tenantType == 0">
               <el-checkbox v-model="isAllotByDept" @change="setUsedAllot" class="dept-header-see">按钉钉组织架构选择</el-checkbox>
               <el-popover placement="bottom-end" width="300" trigger="hover" content="勾选后，在选人界面时，将通过钉钉的组织架构进行人员选择。">
                 <i class="iconfont icon-help" slot="reference"></i>
               </el-popover>
-            </template>
-            <el-checkbox v-model="isSeeAllOrg" @change="setSeeAllOrg" :disabled="tenantType==0 && isAllotByDept" class="dept-header-see">选择时隐藏非本部门的人员</el-checkbox>
-            <el-popover placement="bottom-end" width="300" trigger="hover" content="开启本选项后，在选择协同人等只可见自己所属部门的成员，管理员除外">
-              <i class="iconfont icon-help" slot="reference"></i>
-            </el-popover>  
+            </div>
+            <div>
+              <el-checkbox v-model="isSeeAllOrg" @change="setSeeAllOrg" :disabled="tenantType==0 && isAllotByDept" class="dept-header-see">选择时隐藏非本部门的人员</el-checkbox>
+              <el-popover placement="bottom-end" width="300" trigger="hover" content="开启本选项后，在选择协同人等只可见自己所属部门的成员，管理员除外">
+                <i class="iconfont icon-help" slot="reference"></i>
+              </el-popover>  
+            </div>
           </el-tab-pane>
           <el-tab-pane label="角色管理" name="role">
             
@@ -63,13 +65,13 @@
           </el-tab-pane>
         </el-tabs>
         
-        <div class="dept-step-1-box" :style="nowGuideStep == 0 ? 'width: 120px;height: 40px;' : ''" id="v-dept-step-0">
+        <div class="dept-step-1-box" :style="nowGuideStep == 0 ? 'width: 120px;height: 100px;' : ''" id="v-dept-step-0">
           <div v-if="nowGuideStep == 0" style="position: relative;">
             <div class="guide-disable-cover"></div>
           </div>
         </div>
         
-        <div class="dept-step-1-box" :style="nowGuideStep == 4 ? 'width: 280px;height: 40px;' : ''" id="v-dept-step-4">
+        <div class="dept-step-1-box" :style="nowGuideStep == 4 ? 'width: 280px;height: 100px;' : ''" id="v-dept-step-4">
           <div v-if="nowGuideStep == 4" style="position: relative;">
             <div class="guide-disable-cover"></div>
           </div>
@@ -379,8 +381,16 @@
                     <el-button :disabled="scope.row.pending" type="text" @click="toggleEditor(scope.row)">编辑</el-button>
                     <el-button :disabled="scope.row.pending" v-if="scope.row.enabled == 1" type="text" style="color:#e6a23c" @click="toggleEnable(scope.row)">停用</el-button>
                     <el-button :disabled="scope.row.pending" v-else type="text" @click="toggleEnable(scope.row)">启用</el-button>
-                    <el-button :disabled="scope.row.pending" type="text" style="color:#FB602C" @click="deleteDeptUser(scope.row)" v-if="tenantType!=2 && tenantType!=3">删除</el-button>
-                    <el-button type="text" @click="userResetPwdConfirm(scope.row.userId)" v-if="tenantType!=2 && tenantType!=3">重置密码</el-button>
+                    <el-button :disabled="scope.row.pending" type="text" style="color:#FB602C" @click="deleteDeptUser(scope.row)">删除</el-button>
+                    <el-button type="text" @click="userResetPwdConfirm(scope.row.userId)">重置密码</el-button>
+                  </template>
+                </el-table-column>
+              </template>
+              <template v-if="tenantType == 0">
+                <!-- 钉钉端操作按钮 -->
+                <el-table-column label="操作">
+                  <template slot-scope="scope">
+                    <el-button :disabled="scope.row.pending" type="text" style="color:#FB602C" @click="deleteDeptUser(scope.row)">删除</el-button>
                   </template>
                 </el-table-column>
               </template>
@@ -649,6 +659,9 @@ export default {
     }
   },
   computed: {
+    corpId() {
+      return this.initData.corpId || ''
+    },
     tenantType() {
       return this.initData.tenantType
     },
@@ -726,13 +739,16 @@ export default {
   },
   mounted() {
     // isAllotByDept对应钉钉端是否按照钉钉通讯录选人 如果钉钉端之前勾选了按服务团队派单isAllotByDept为false, 
-    this.isAllotByDept = !this.initData.allotByTag;
-    setTimeout(()=>{
-      if (!storageGet(DEPT_GUIDE) || storageGet(DEPT_GUIDE) < this.deptSteps.length) {
-        this.$tours['myTour'].start()
-        this.nowGuideStep = 0
-      } 
-    }, 500)
+    if(this.tenantType == 0) {
+      // 钉钉端
+      this.isAllotByDept = !this.initData.allotByTag;
+      setTimeout(()=>{
+        if (!storageGet(DEPT_GUIDE) || storageGet(DEPT_GUIDE) < this.deptSteps.length) {
+          this.$tours['myTour'].start()
+          this.nowGuideStep = 0
+        } 
+      }, 500)
+    }
     this.initialize()
     this.dept_role_data = this.initData.rolesJson || []
     this.roles = [{ id: '0', text: '待分配' }].concat(this.dept_role_data)
@@ -773,21 +789,21 @@ export default {
     },
     // 同步企业微信通讯录
     async synchronousWeChat() {
+      let timeout
       try {
         this.synchronousState = true
         // 获取token
         const token = await this.$http.get('/account/synToken')
 
-        let timeout = setTimeout(() => {
+        timeout = setTimeout(() => {
           this.$platform.alert('同步时间较长，系统将在后台继续为您尝试同步')
           this.synchronousState = false
         }, 30000)
-        this.$http
-          .get('/login/synContact', { token })
+        this.$http.get('/login/synContact', { token })
           .then((res) => {
             this.synchronousState = false
 
-            clearTimeout(timeout)
+            timeout && clearTimeout(timeout)
             timeout = null
             if (res.status == 0) {
               this.$platform.alert('同步成功！')
@@ -797,13 +813,39 @@ export default {
             }
           })
           .catch((err) => {
-            clearTimeout(timeout)
+            timeout && clearTimeout(timeout)
             timeout = null
             this.synchronousState = false
             console.error('toggleStatus catch err', err)
           })
       } catch (error) {
-        clearTimeout(timeout)
+        timeout && clearTimeout(timeout)
+        this.synchronousState = false
+        console.error(error)
+      }
+    },
+    // 同步钉钉通讯录
+    async syncDingTalkAddressBook() {
+      let timeout
+      try {
+        this.synchronousState = true
+        timeout = setTimeout(() => {
+          this.$platform.alert('同步时间较长，系统将在后台继续为您尝试同步')
+          this.synchronousState = false
+        }, 30000)
+        //  parent.httpGet("/dd/synAddressBook?corpId="+$("#corpId").val(),{},false,function(data){
+        let res = await this.$http.get(`/dd/synAddressBook?corpId=${this.corpId}`, {})
+        this.synchronousState = false
+        timeout && clearTimeout(timeout)
+        timeout = null
+        if (res.status == 0) {
+          this.$platform.alert('同步成功！')
+          window.location.reload()
+        } else {
+          this.$platform.alert('同步失败！')
+        }
+      } catch (error) {
+        timeout && clearTimeout(timeout)
         this.synchronousState = false
         console.error(error)
       }
@@ -900,6 +942,7 @@ export default {
     },
     /* 钉钉端设置是否按 服务团队 还是钉钉通讯录 派单 */
     async setUsedAllot (setTag) {
+      // setTag为true按通讯录 false按团队
       try {
         let params = {
           set: setTag ? 'dept' : 'tag'
@@ -913,7 +956,7 @@ export default {
         if (result.status != 0) {
           return this.$platform.alert(result.message);
         }
-        localStorage.setItem('allotByTag', setTag == 'tag')
+        localStorage.setItem('allotByTag', setTag ? 0 : 1)
       } catch (error) {
         console.log('setUsedAllot error: ', error);
       }
@@ -1860,6 +1903,9 @@ export default {
   margin-top: 10px;
   border: 1px solid #eee;
 }
+.dept-del-role-item-expand {
+  min-width: 400px;
+}
 .dept-info {
   display: flex;
   .form-view-row label {
@@ -2130,8 +2176,9 @@ body {
   height: calc(100% - 50px);
 }
 .department-left {
+  border-right: 1px solid #f2f2f2;
   .base-button {
-    margin: 10px 0 10px 20px;
+    margin: 10px 20px;
     width: 280px;
   }
 }
@@ -2143,11 +2190,7 @@ body {
 </style>
 <style lang="scss" scoped>
 .department-container {
- 
-}  
-
-.department-container {
-  .v-step[data-v-7c9c03f0] {
+   /deep/ .v-step[data-v-7c9c03f0] {
     background: #fff !important;
     color: #333 !important;
     -webkit-filter: drop-shadow(
@@ -2159,8 +2202,8 @@ body {
     max-width: 350px !important;
   }
 
-  .v-step .v-step__arrow[data-v-7c9c03f0] {
-    border-color: #fff !important;
+   /deep/ .v-step .v-step__arrow[data-v-7c9c03f0] {
+    border-color: #fff;
     border-left-color: transparent !important;
     border-right-color: transparent !important;
   }
