@@ -76,7 +76,9 @@
         <div 
           v-show="showList"
           class="list-wrapper" 
-          :style="selectCon ? `${topShow ? `top:${(selectCon.top -254)}px;` : `top:${(selectCon.top +selectCon.height +13)}px;`}left:${ selectCon.left}px;width:${selectCon.width}px` : ''"
+          ref="popper"
+          :class="{ 'is-multiple': multiple }"
+          :style="{ minWidth: minWidth, width: `${popperWidth}px` }"
         >
           
           <template v-if="!topShow">
@@ -115,10 +117,14 @@
 </template>
 
 <script>
-import Clickoutside from '@src/util/clickoutside';
-let timeInterval;
-import Page from '@model/Page';
+/* util */
 import _ from 'lodash';
+import Clickoutside from '@src/util/clickoutside';
+import Popper from 'popper.js';
+/* model */
+import Page from '@model/Page';
+/* variable */
+let timeInterval;
 
 /**
    * Todo
@@ -171,10 +177,21 @@ export default {
     collapsed: {
       type: Boolean,
       default: false
+    },
+    /** 
+     * popper options
+     * @see https://github.com/FezVrasta/popper.js/blob/master/docs/_includes/popper-documentation.md
+     */
+    popperOptions: {
+      type: Object,
+      default: () => ({})
     }
   },
   data() {
     return {
+      $parentEl: document.body,
+      $popper: null,
+      popperWidth: 0,
       showList: false,
       pending: false,
       isFocus: false,
@@ -211,6 +228,13 @@ export default {
   },
   beforeDestroy() {
     clearInterval(timeInterval)
+    // 销毁popper
+    if(this.$data.$popper){
+      this.$data.$popper.destroy();
+      if(this.$refs.popper && this.$refs.popper.parentNode == this.$data.$parentEl) {
+        this.$data.$parentEl.removeChild(this.$refs.popper);
+      }
+    }
   },
   computed: {
     optionList() {
@@ -239,6 +263,10 @@ export default {
       }
       return '载入更多结果......';
     },
+    // 最小宽度
+    minWidth() {
+      return `${this.$el?.getBoundingClientRect()?.width}px`
+    }
   },
   methods: {
     getValueKey(op) {
@@ -327,14 +355,37 @@ export default {
     }, 800),
     initList() {
       this.pending = true;
-      this.showList = true;
+      
+      let options = {
+        placement: this.getPlacement(),
+        removeOnDestroy: true,
+        onUpdate: this.updatePopperWidth,
+        // modifiers: [
+        //   {
+        //     name: 'preventOverflow',
+        //     options: {
+        //       boundary: document.body,
+        //       altBoundary: true,
+        //       rootBoundary: 'document',
+        //     },
+        //   }
+        // ]
+      }
+      
+      this.$data.$parentEl.appendChild(this.$refs.popper)
+      this.$data.$popper = new Popper(this.$el, this.$refs.popper, {...options, ...this.popperOptions});
+      
+      // 更新宽度
+      this.popperWidth = this.$el.offsetWidth
+      this.showList = true
+      this.$data.$popper.scheduleUpdate()
       
       this.search()
         .then(res => {
-          if (!res || !res.list) return;
-          this.$refs.input.focus();
+          if (!res || !res.list) return
           
-          this.page = Page.as(res);
+          this.page = Page.as(res)
+          this.$refs.input.focus()
         })
         .catch(e => {
           console.error('initList catch e', e)
@@ -346,6 +397,37 @@ export default {
     },
     close() {
       this.showList = false;
+    },
+    /** 更新popper定位 */
+    updatePopper(){
+      if(this.$data.$popper) {
+        let oldHeight = this.$el.offsetHeight;
+        this.$nextTick(() => {
+          let currHeight = this.$el.offsetHeight;
+          if(currHeight != oldHeight) this.$data.$popper.scheduleUpdate()
+        })
+      }
+    },
+    updatePopperWidth(value) {
+      console.log('Caused ~ file: BaseSelect.vue ~ line 402 ~ updatePopperWidth ~ value', value)
+      let placement = value?.attributes?.['x-placement'] || ''
+      let isTop = placement.indexOf('top') >= 0
+      let top = value?.styles?.top || 0
+      let popperEl = value?.instance?.popper
+      
+      if (!popperEl) return
+      
+      popperEl.style.top = isTop ? `${top - 10}px` : `${top + 10}px`
+      
+      this.popperWidth = this.$el.offsetWidth;
+    },
+    getPlacement() {
+      let rectData = this.$el.getBoundingClientRect()
+      let y = rectData.y
+      let windowHeight = document.body.innerHeight
+      let isOverflow = windowHeight - y < 400
+      
+      return isOverflow ? 'top-start' : 'bottom-start'
     }
   },
   directives: {
@@ -356,24 +438,24 @@ export default {
 
 <style lang="scss">
   $color-primary-light-9: mix(#fff, $color-primary, 90%) !default;
-
+  
   .form-item.err :not(.is-success) input,
   .form-item.err :not(.is-success) .base-select-main-content {
     border-color: #f56c6c !important;
   }
-
+  
   .base-select-container {
     position: relative;
-
+    
     .content {
       position: relative;
-
+      
       &:hover {
         .clear-btn {
           display: block;
         }
       }
-
+      
       .clear-btn {
         position: absolute;
         display: none;
@@ -382,16 +464,16 @@ export default {
         transform: translateY(-50%);
         font-size: 12px;
         color: #c0c4cc;
-
+        
         &:hover {
           cursor: pointer;
           color: #909399;
         }
       }
     }
-
+    
     .base-select-main-content {
-
+      
       display: flex;
       flex-wrap: wrap;
       border: 1px solid #e0e1e2;
@@ -399,147 +481,33 @@ export default {
       padding: 0 10px;
       min-height: 32px;
       line-height: 30px;
-
+      
       .placeholder-text {
         color: #9e9e9e;
         font-size: 14px;
         line-height: 20px;
         margin-top: 5px;
       }
-
+      
       .el-tag {
         margin: 5px 3px 0px;
       }
     }
-
+    
     .wrapper-is-focus {
       border-color: $color-primary;
     }
-
+    
     .multiple-layout {
       padding-bottom: 5px;
     }
-
+    
     .clearable-layout {
       padding-right: 20px;
     }
-
+    
     .error.base-select-main-content {
       border-color: red;
-    }
-
-    .list-wrapper {
-      border-radius: 4px;
-      position: fixed;
-      left: 0;
-      top: calc(100% + 13px);
-      width: 100%;
-      // padding-top: 34px;
-      box-shadow: 1px 1px 8px rgba(0, 0, 0, 0.15);
-      background: #fff;
-      z-index: 99999;
-
-      .arrow {
-        position: absolute;
-        width: 0;
-        height: 0;
-        top: -7px;
-        left: 37px;
-        border-left: 5px solid transparent;
-        border-right: 5px solid transparent;
-        border-bottom: 7px solid white;
-      }
-
-      .arrow-bottom {
-        position: absolute;
-        width: 0;
-        height: 0;
-        bottom: -7px;
-        transform: rotateZ(180deg);
-        left: 37px;
-        border-left: 5px solid transparent;
-        border-right: 5px solid transparent;
-        border-bottom: 7px solid white;
-      }
-
-      .input-container {
-        // position: absolute;
-        width: 100%;
-        // top: 0;
-        // left: 0;
-        padding: 4px 10px;
-        line-height: 34px;
-
-
-        input {
-          width: 100%;
-          margin: 2px 0;
-          padding: 0 5px;
-          height: 26px;
-          line-height: 26px;
-        }
-      }
-
-    }
-
-    .option-list {
-      max-height: 200px;
-      overflow: auto;
-      padding: 0;
-      margin: 0;
-
-      &::-webkit-scrollbar-track {
-        background-color: white;
-      }
-
-      &::-webkit-scrollbar-thumb {
-        border-radius: 4px;
-        background-color: rgba(144, 147, 153, 0.3);
-      }
-
-
-      li {
-        list-style: none;
-        padding: 0 10px;
-        line-height: 34px;
-        position: relative;
-
-        &:hover {
-          background: $color-primary-light-9;
-        }
-
-        .checked {
-          display: none;
-          position: absolute;
-          right: 5px;
-          top: calc(50% - 4px);
-          width: 10px;
-          height: 5px;
-          border-left: 1px solid $color-primary;
-          border-bottom: 1px solid $color-primary;
-          transform: rotateZ(-45deg);
-        }
-      }
-
-      li:last-child {
-        &:hover {
-          background: white;
-        }
-      }
-
-      li.selected {
-        background-color: #eef8f7;
-        color: $color-primary;
-        /*font-weight: 700;*/
-
-        .checked {
-          display: block;
-        }
-      }
-
-      .list-message {
-        color: $text-color-secondary;
-      }
     }
   }
 
@@ -574,5 +542,115 @@ export default {
     cursor: pointer;
   }
   height: 100% !important;
+}
+
+.list-wrapper {
+  border-radius: 4px;
+  position: fixed;
+  left: 0;
+  top: calc(100% + 13px);
+  width: 100%;
+  // padding-top: 34px;
+  box-shadow: 1px 1px 8px rgba(0, 0, 0, 0.15);
+  background: #fff;
+  z-index: 99999;
+  
+  .arrow {
+    position: absolute;
+    width: 0;
+    height: 0;
+    top: -7px;
+    left: 37px;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-bottom: 7px solid white;
+  }
+  
+  .arrow-bottom {
+    position: absolute;
+    width: 0;
+    height: 0;
+    bottom: -7px;
+    transform: rotateZ(180deg);
+    left: 37px;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-bottom: 7px solid white;
+  }
+  
+  .input-container {
+    // position: absolute;
+    width: 100%;
+    // top: 0;
+    // left: 0;
+    padding: 4px 10px;
+    line-height: 34px;
+    
+    input {
+      width: 100%;
+      margin: 2px 0;
+      padding: 0 5px;
+      height: 26px;
+      line-height: 26px;
+    }
+  }
+    
+  .option-list {
+    max-height: 400px;
+    overflow: auto;
+    padding: 0;
+    margin: 0;
+    
+    &::-webkit-scrollbar-track {
+      background-color: white;
+    }
+    
+    &::-webkit-scrollbar-thumb {
+      border-radius: 4px;
+      background-color: rgba(144, 147, 153, 0.3);
+    }
+    
+    li {
+      list-style: none;
+      padding: 0 10px;
+      line-height: 34px;
+      position: relative;
+      
+      &:hover {
+        background: $color-primary-light-9;
+      }
+      
+      .checked {
+        display: none;
+        position: absolute;
+        right: 5px;
+        top: calc(50% - 4px);
+        width: 10px;
+        height: 5px;
+        border-left: 1px solid $color-primary;
+        border-bottom: 1px solid $color-primary;
+        transform: rotateZ(-45deg);
+      }
+    }
+    li:last-child {
+      &:hover {
+        background: white;
+      }
+    }
+    
+    li.selected {
+      background-color: #eef8f7;
+      color: $color-primary;
+      /*font-weight: 700;*/
+      
+      .checked {
+        display: block;
+      }
+    }
+    
+    .list-message {
+      color: $text-color-secondary;
+    }
+  }
 }
 </style>
