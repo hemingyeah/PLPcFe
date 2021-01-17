@@ -83,12 +83,12 @@
           <div class="input-and-btn">
             <biz-form-remote-select
               ref="linkman"
-              v-model="value.linkman"
-              :remote-method="searchLinkmanOuterHandler"
-              @input="updateLinkman(value.linkman[0])"
               placeholder="请输入关键字搜索联系人"
-              :input-disabled="isCreateCustomer"
+              v-model="value.linkman"
               :cleared="true"
+              :remote-method="searchLinkmanOuterHandler"
+              :input-disabled="isCreateCustomer"
+              @input="updateLinkman(value.linkman[0])"
             >
             </biz-form-remote-select>
             <el-button @click="dialogOpen('contact')" v-if="!isCreateCustomer">新建</el-button>
@@ -100,10 +100,11 @@
         <form-item v-if="customerOption.address" label="地址">
           <div class="input-and-btn">
             <biz-form-remote-select
+              placeholder="请输入关键字搜索地址"
               v-model="value.address"
               :cleared="true"
               :remote-method="searchAddressOuterHandler"
-              placeholder="请输入关键字搜索地址">
+            >
             </biz-form-remote-select>
             <el-button @click="dialogOpen('address')" v-if="!isCreateCustomer">新建</el-button>
           </div>

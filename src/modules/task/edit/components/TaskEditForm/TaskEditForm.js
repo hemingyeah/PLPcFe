@@ -9,6 +9,7 @@ import { findComponentDownward } from '@src/util/assist'
 import { getFieldValue2string } from '@service/TaskService.ts'
 import ObjectUtil from '@src/util/object';
 import Filter from '@src/filter/filter.js';
+import { isEmpty } from '@src/util/type';
 import { 
   customerAddressSelectConversion,
   linkmanSelectConversion,
@@ -58,7 +59,7 @@ export default {
     this.taskValue = this.value;
     this.selectedType = taskTypeSelectConversion(this?.initData?.defaultType) || this.taskTypes[0] || {};
     this.$emit('updatetemplateId', this.selectedType);
-
+    
     this.$eventBus.$on('task_create_or_edit.update_linkman', this.updateLinkman);
     this.$eventBus.$on('task_create_or_edit.update_address', this.bindAddress);
   },
@@ -178,6 +179,32 @@ export default {
           })
         }
       });
+    },
+    /**
+     * @description: 绑定地址select数据
+     * @param {Object | null} address 地址信息
+     * @return {void}
+    */    
+    bindAddressOptions(address) {
+      if (isEmpty(address)) return
+      
+      this.customerAddressOptions = [customerAddressSelectConversion(address)]
+      this.$nextTick(() => {
+        this.bindAddress(address)
+      })
+    },
+    /**
+     * @description: 绑定联系人select数据
+     * @param {Object | null} address 地址信息
+     * @return {void}
+    */    
+    bindLinkmanOptions(linkman) {
+      if (isEmpty(linkman)) return
+      
+      this.customerLinkmanOptions = [linkmanSelectConversion(linkman)]
+      this.$nextTick(() => {
+        this.bindLinkman(linkman)
+      })
     },
     /** 
      * @description 绑定地址
@@ -583,7 +610,7 @@ export default {
       let customerId = this.selectedCustomer?.value || '';
       
       params.customerId = this.selectedCustomer?.value || '';
-
+      
       return customerId ? this.searchLinkman(params) : this.searchCustomerByPhone(params);
     },
     /** 
@@ -605,7 +632,7 @@ export default {
         module: 'customer',
         id: customerId
       };
-
+      
       this.$eventBus.$emit('es.Relation.Customer', forRelation);
     },
     /** 
@@ -613,7 +640,7 @@ export default {
      * @param {Array<Object>} value 客户数据
      * @param {Object} options 配置
     */
-    async updateCustomer(value = [], options = { 
+    async updateCustomer(value = [], options = {
       isForceUpdateCustomer: false,
       isUpdateCustomerProduct: true
     }) {
@@ -621,24 +648,24 @@ export default {
       let selectedCustomer = value?.[0] || {};
       let currentCustomerId = this.selectedCustomer?.id || this.selectedCustomer?.value;
       let selectedCustomerId = selectedCustomer?.id || selectedCustomer?.value || '';
-
+      
       // 更新客户数据
       this.updateCustomerValue(value.slice());
-
+      
       // 判断选中的客户是否与当前客户数据一致
       if(currentCustomerId == selectedCustomerId && !isForceUpdateCustomer) return
-
+      
       try {
         const result = await this.fetchTaskDefaultInfo({ customerId: selectedCustomerId });
         let { linkman, address } = result;
-
+        
         // 重置联系人和地址
         this.updateLinkmanValue([]);
         this.updateAddressValue([]);
-
-        // 绑定联系人和地址
-        linkman && this.bindLinkman(linkman);
-        address && this.bindAddress(address);
+        
+        // 绑定联系人和地址 select数据
+        this.bindAddressOptions(address)
+        this.bindLinkmanOptions(linkman)
         
         // 更新产品数据
         if (Array.isArray(this.value.product) && this.value.product.length && isUpdateCustomerProduct) {
@@ -646,14 +673,14 @@ export default {
             this.value.product.filter(item => item.customerId == selectedCustomer.id)
           )
         }
-
+        
         // 查询关联工单数量
         this.fetchCountForCreate({ module: TaskFieldNameMappingEnum.Customer, id: selectedCustomerId });
-
+        
       } catch (error) {
         console.warn('task-edit-form: updateCustomer -> error', error);
       }
-
+        
       // 查询客户关联字段
       this.relationFieldSelectHandler();
     },
@@ -667,7 +694,7 @@ export default {
       
       let isHaveCustomer = this.value.customer && this.value.customer.length;
       let linkmanCustomer = linkman?.customer || {};
-
+      
       try {
         // 判断客户是否存在
         if (!isHaveCustomer) {
@@ -679,23 +706,23 @@ export default {
             value: linkmanCustomer.id,
             id: linkmanCustomer.id
           }];
-
+          
           // 设置客户数据
           this.updateCustomerValue(customerData);
           // 更新客户信息
           await this.updateCustomer(customerData);
         }
-
+        
         // 绑定联系人数据
         this.bindLinkman(linkman);
         const addressResult = await this.fetchLmBindAddress({ lmId: linkman.id });
         // 如果存在地址信息则绑定地址
         addressResult.data.id && this.bindAddress(addressResult.data);
-
+        
       } catch (error) {
         console.warn('task-edit-form: updateLinkman -> error', error);
       }
-
+    
     },
     /** 
      * @description 更新产品信息
@@ -710,15 +737,15 @@ export default {
       let { isForceUpdateCustomer, isUpdateCustomerProduct, isSilentUpdateLinkmanAndAddress } = options;
       let product = value[0] || {};
       let isHaveCustomer = (this.value.customer && this.value.customer.length);
-
+      
       try {
         // 判断客户是否存在
         if ((!isHaveCustomer || isForceUpdateCustomer) && product.value) {
           // 客户不存在时则下拉框隐藏
           findComponentDownward(this.$refs.product, 'base-select').close();
-
+          
           const result = await this.fetchCustomerByProduct({ id: product.value });
-
+          
           const customerData = [{
             label: result.customerName,
             value: result.customerId,
@@ -729,7 +756,7 @@ export default {
           // 更新客户信息
           await this.updateCustomer(customerData, { isForceUpdateCustomer, isUpdateCustomerProduct });
         }
-
+        
         // 查询产品关联字段, 选一个产品才带入
         let isOnlyOneProduct = value.length === 1;
         
@@ -746,7 +773,7 @@ export default {
         else if(isOnlyOneProduct && !isHaveCustomer) {
           this.bindProductLinkmanAndAddress(product);
         }
-
+        
         if (isOnlyOneProduct) {
           // 产品关联字段数据
           this.relationFieldSelectHandler(TaskFieldNameMappingEnum.Product);
@@ -756,7 +783,7 @@ export default {
           // 清空产品关联字段数据
           this.relationFieldClear(TaskFieldNameMappingEnum.Product);
         }
-
+        
       } catch (error) {
         console.warn('task-edit-form: updateProduct -> error', error);
       }

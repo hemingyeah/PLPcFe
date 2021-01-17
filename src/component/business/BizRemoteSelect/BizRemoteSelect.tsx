@@ -14,8 +14,9 @@ import { Component, Emit, Prop } from 'vue-property-decorator'
 /* scss */
 import '@src/component/business/BizRemoteSelect/BizRemoteSelect.scss'
 /* util */
-import Log from '@src/util/log'
+import Log from '@src/util/log.ts'
 import { uuid } from '@src/util/string'
+import { isUndefined } from '@src/util/type'
 
 interface LoadmoreOptions {
   // 是否禁用
@@ -69,14 +70,41 @@ class BizRemoteSelect extends VC<{}> {
   }
   
   @Emit(EventNameEnum.Input)
-  private inputHandler(value: any[]) {
-    return value
+  private inputHandler(value: any[] | string): Array<any> {
+    let data: any[] = []
+    // 多选
+    if (this.isMulti) {
+      data = value.slice() as Array<any>
+    } else {
+      data = this.optionList.filter((item: any) => item?.id === value || item?.value === value)
+    }
+    
+    return data
+  }
+  
+  @Emit('searchEnd')
+  private emitSearchEndHandler() {}
+  
+  get isMulti(): boolean {
+    return !isUndefined(this.multiple) && this.multiple !== false
   }
   
   get optionList() {
     if (this.options?.length) return this.options
     
     return this.page.list
+  }
+  
+  get selectValue(): any[] {
+    // 多选
+    if (this.isMulti) {
+      return this.value || []
+    }
+    // 单选
+    let data = this.value?.[0] || {}
+    let value = data.id || data.value
+    
+    return value
   }
   
   /**
@@ -88,11 +116,6 @@ class BizRemoteSelect extends VC<{}> {
   }
   
   private focusHandler() {
-    this.focusedNum++
-    // 是否为第一次聚焦
-    const isFirstFocus = this.focusedNum <= 1
-    if (!isFirstFocus) return 
-    
     this.search()
   }
   
@@ -194,9 +217,10 @@ class BizRemoteSelect extends VC<{}> {
       <div class='biz-form-remote-select'>
         <el-select
           v-el-select-loadmore={this.loadmoreOptions}
+          clearable={this.showClearButton}
           collapsed={this.collapsed}
           disabled={this.inputDisabled}
-          multiple={this.multiple}
+          multiple={this.isMulti}
           filterable
           no-data-text='无匹配数据'
           remote
@@ -204,7 +228,7 @@ class BizRemoteSelect extends VC<{}> {
           remoteMethod={this.search}
           placeholder={this.placeholder}
           scopedSlots={this.$scopedSlots}
-          value={this.value}
+          value={this.selectValue}
           onInput={this.inputHandler}
           onFocus={this.focusHandler}
         >
