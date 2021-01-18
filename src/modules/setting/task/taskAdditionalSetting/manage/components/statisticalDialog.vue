@@ -24,7 +24,7 @@
           <el-button type="primary" @click="onSearch">搜索</el-button>
         </div>
         <div class="search-right">       
-          <a :href="`/setting/task/card/count/export?cardId=${card.id}`">导出</a>
+          <a :href="`/setting/task/card/count/export?cardId=${card.id}&timeRange=${form.timeRange}&taskNoStr=${form.taskNoStr}&userNameStr=${form.userNameStr}`">导出</a>
         </div>
       </div>
       <el-table
