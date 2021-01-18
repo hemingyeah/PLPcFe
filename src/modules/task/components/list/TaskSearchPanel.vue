@@ -458,7 +458,7 @@ export default {
           continue;
         }
 
-        if (tv.originalFormType === 'related_task') {
+        if (tv.formType === 'related_task') {
           key = 'taskNo';
         }
 
@@ -717,6 +717,8 @@ export default {
 
       // 自定义条件
       for (let i = 0; i < notSystemFields.length; i++) {
+        let key = null;
+
         tv = notSystemFields[i];
         fn = tv.fieldName;
         !tv.operator ? (tv['operator'] = this.matchOperator(tv)) : '';
@@ -780,7 +782,13 @@ export default {
           });
           continue;
         }
+
+        if(tv.formType === 'related_task') {
+          key = 'taskNo';
+        }
+
         params.conditions.push({
+          key,
           property: fn,
           operator: tv.operator,
           value: form[fn],

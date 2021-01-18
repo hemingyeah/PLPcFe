@@ -281,7 +281,7 @@ export default {
 .other-setting-panel{
     width: 100%;
     min-height: calc(100vh - 48px);
-    padding: 16px 12px 24px 12px;
+    padding: 12px;
     .other-setting-main{
         height: 100%;
         background: #FFFFFF;

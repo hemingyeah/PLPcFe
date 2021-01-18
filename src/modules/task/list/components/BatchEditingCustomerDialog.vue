@@ -155,12 +155,15 @@ export default {
         });
       }
 
+      params.formType = sf.formType;
+
       return params;
     },
     async onSubmit() {
       const { selectedIds, config } = this;
       const buildParams = this.buildParams();
       let params = {
+        formType: buildParams.formType,
         taskIds: selectedIds,
         templateId: config.currentTaskType.id,
         fieldType: buildParams.fieldType ? 0 : 1,

@@ -23,9 +23,6 @@ export const fmt_form_field = function(value, formType, fieldName, attribute) {
     case 'related_task': // 关联工单
       formatVal = fmt_form_related_task(attribute[fieldName]);
       break;
-    case 'relationProduct': 
-      formatVal = fmt_form_array(attribute[fieldName]);
-      break;
     case 'address': 
       formatVal = fmt_form_address(attribute[fieldName]);
       break;
@@ -33,6 +30,7 @@ export const fmt_form_field = function(value, formType, fieldName, attribute) {
       formatVal = fmt_form_location(attribute[fieldName]);
       break;
     default: 
+      formatVal = fmt_form_default(attribute[fieldName]);
       break;
     }
   }
@@ -95,6 +93,14 @@ export function fmt_form_location(value) {
   return JSON.stringify(value) !== '{}' ? value.address : ''
 }
 
+/** 默认格式化 */
+function fmt_form_default(value) {
+  if(Array.isArray(value)){
+    return fmt_form_array(value);
+  }
+
+  return value;
+}
 
 export default {
   fmt_form_field,
@@ -103,5 +109,6 @@ export default {
   fmt_form_user,
   fmt_form_related_task,
   fmt_form_address,
-  fmt_form_location
+  fmt_form_location,
+  fmt_form_default
 };

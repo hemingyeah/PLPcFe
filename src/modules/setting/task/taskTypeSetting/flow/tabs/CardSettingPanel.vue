@@ -260,7 +260,7 @@ export default {
     color: #333333;
     font-size: 16px;
     background: #fff;
-    padding: 16px 24px 16px 33px;
+    padding: 12px;
     .card-setting-title {
       display: flex;
       justify-content: space-between;

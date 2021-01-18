@@ -284,7 +284,7 @@ export default {
     width: calc(33.3% - 12px);
   }
 }
-@media screen and (max-width: 1440px) {
+@media screen and (max-width: 1250px) {
   .task-type {
     width: 326px;
   }

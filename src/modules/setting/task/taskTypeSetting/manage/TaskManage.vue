@@ -142,7 +142,7 @@ export default {
 .task-manage{
   display: flex;
   height: 100vh;
-  padding: 16px;
+  padding: 12px;
   .task-manage-main{
     flex: 1;
     min-width: 730px;

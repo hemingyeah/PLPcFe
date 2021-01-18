@@ -63,7 +63,7 @@
             />
           </h2>
           <div>
-            {{ flowMap[type].name }}后超过
+            {{ preFlowName }}后超过
             <el-input
               class="w-87"
               onkeyup="if(isNaN(value))execCommand('undo')"
@@ -361,6 +361,21 @@ export default {
         ? TableNameEnum.TaskReceipt
         : TableNameEnum.Task;
     },
+    preFlowName() {
+      // 上一个启用流程的节点
+      let name = '';
+
+      for (const key in this.flowMap) {
+        debugger;
+        if(!!this.taskTypeConfig.flowSetting[key].state) {
+          if(this.type !== 'create' && this.type === key) {
+            return name;
+          }
+
+          name = this.flowMap[key].name;
+        }
+      }
+    }
   },
   watch: {
     type(val) {
