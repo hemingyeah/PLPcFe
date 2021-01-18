@@ -571,7 +571,7 @@ export default {
     align-items: center;
     background: #ffffff;
     margin-right: 12px;
-    border-radius: 4px;
+    border-radius: 0 0 4px 4px;
     .flow-setting-form-preview {
       padding-top: 20px;
     }
@@ -599,7 +599,7 @@ export default {
       padding: 8px 20px 20px 20px;
       background: #ffffff;
       color: #999999;
-      border-radius: 4px;
+      border-radius: 0 0 4px 4px;
       h2 {
         color: #333333;
         font-size: 14px;
