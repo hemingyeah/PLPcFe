@@ -663,9 +663,9 @@ export default {
         this.updateLinkmanValue([]);
         this.updateAddressValue([]);
         
-        // 绑定联系人和地址 select数据
-        this.bindAddressOptions(address)
-        this.bindLinkmanOptions(linkman)
+        // 绑定联系人和地址
+        linkman && this.bindLinkman(linkman);
+        address && this.bindAddress(address);
         
         // 更新产品数据
         if (Array.isArray(this.value.product) && this.value.product.length && isUpdateCustomerProduct) {

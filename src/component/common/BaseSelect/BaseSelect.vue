@@ -1,6 +1,6 @@
 <template>
   <div class="base-select-container">
-    <div class="content el-select el-input el-input--small el-input--suffix" v-clickoutside="closeList">
+    <div class="content el-select el-input el-input--small el-input--suffix" v-clickoutside="closeList" ref="BaseSelectContainer">
       <!-- start 多选显示 -->
       <div 
         v-if="multiple"
@@ -74,24 +74,23 @@
       <!-- start 列表 -->
       <transition name="el-zoom-in-top">
         <div 
-          v-show="showList"
+          v-if="showList"
           class="list-wrapper" 
           ref="popper"
           :class="{ 'is-multiple': multiple }"
           :style="{ minWidth: minWidth, width: `${popperWidth}px` }"
         >
-          
           <template v-if="!topShow">
             <div class="arrow"></div>
             <div class="input-container" v-if="!options.length">
               <input type="text" v-model="keyword" @input="searchByKeyword" ref="input" :placeholder="placeholder">
             </div>
           </template>
-          
-          <ul class="option-list" v-loadmore="loadmoreOptions" ref="list">
-            <li 
-              v-for="(op, index) in optionList" 
-              :key="index" @click="selectTag(op)"
+          <ul class="option-list" v-loadmore="loadmoreOptions" ref="list" v-if="showList">
+            <li
+              v-for="(op) in optionList"
+              :key="op.value" 
+              @click="selectTag(op)"
               :class="{'selected': value.some(user => user[valueKey] ===op[valueKey])}"
             >
               <slot name="option" :option="op" v-if="optionSlot"></slot>
@@ -121,11 +120,12 @@
 import _ from 'lodash';
 import Clickoutside from '@src/util/clickoutside';
 import Popper from 'popper.js';
+import { computedStrLen } from '@src/util/string'
+import { isString } from '@src/util/type'
 /* model */
 import Page from '@model/Page';
 /* variable */
 let timeInterval;
-
 /**
    * Todo
    * 1. 列表出现在上部还是下部。
@@ -185,6 +185,11 @@ export default {
     popperOptions: {
       type: Object,
       default: () => ({})
+    },
+    /* 计算宽度的属性 */
+    computedWidthKeys: {
+      type: Array,
+      default: () => []
     }
   },
   data() {
@@ -355,30 +360,11 @@ export default {
     }, 800),
     initList() {
       this.pending = true;
-      
-      let options = {
-        placement: this.getPlacement(),
-        removeOnDestroy: true,
-        onUpdate: this.updatePopperWidth,
-        // modifiers: [
-        //   {
-        //     name: 'preventOverflow',
-        //     options: {
-        //       boundary: document.body,
-        //       altBoundary: true,
-        //       rootBoundary: 'document',
-        //     },
-        //   }
-        // ]
-      }
-      
-      this.$data.$parentEl.appendChild(this.$refs.popper)
-      this.$data.$popper = new Popper(this.$el, this.$refs.popper, {...options, ...this.popperOptions});
-      
-      // 更新宽度
-      this.popperWidth = this.$el.offsetWidth
       this.showList = true
-      this.$data.$popper.scheduleUpdate()
+      
+      this.$nextTick(() => {
+        this.createPopper()
+      })
       
       this.search()
         .then(res => {
@@ -386,6 +372,8 @@ export default {
           
           this.page = Page.as(res)
           this.$refs.input.focus()
+          
+          this.computedPopperWidth()
         })
         .catch(e => {
           console.error('initList catch e', e)
@@ -398,18 +386,7 @@ export default {
     close() {
       this.showList = false;
     },
-    /** 更新popper定位 */
-    updatePopper(){
-      if(this.$data.$popper) {
-        let oldHeight = this.$el.offsetHeight;
-        this.$nextTick(() => {
-          let currHeight = this.$el.offsetHeight;
-          if(currHeight != oldHeight) this.$data.$popper.scheduleUpdate()
-        })
-      }
-    },
     updatePopperWidth(value) {
-      console.log('Caused ~ file: BaseSelect.vue ~ line 402 ~ updatePopperWidth ~ value', value)
       let placement = value?.attributes?.['x-placement'] || ''
       let isTop = placement.indexOf('top') >= 0
       let top = value?.styles?.top || 0
@@ -419,7 +396,7 @@ export default {
       
       popperEl.style.top = isTop ? `${top - 10}px` : `${top + 10}px`
       
-      this.popperWidth = this.$el.offsetWidth;
+      this.computedPopperWidth()
     },
     getPlacement() {
       let rectData = this.$el.getBoundingClientRect()
@@ -428,11 +405,62 @@ export default {
       let isOverflow = windowHeight - y < 400
       
       return isOverflow ? 'top-start' : 'bottom-start'
+    },
+    createPopper() {
+      let options = {
+        placement: this.getPlacement(),
+        removeOnDestroy: true,
+        onUpdate: this.updatePopperWidth,
+        modifiers: {
+          preventOverflow: { enabled: true },
+        },
+      }
+      
+      this.$data.$parentEl.appendChild(this.$refs.popper)
+      this.$data.$popper = new Popper(this.$refs.BaseSelectContainer, this.$refs.popper, {...options, ...this.popperOptions});
+      this.popperWidth = this.$el.offsetWidth
+      this.$data.$popper.scheduleUpdate()
+    },
+    /**
+     * @description: 计算宽度
+     * @param {*}
+     * @return {*}
+    */    
+    computedPopperWidth() {
+      if (this.computedWidthKeys.length <= 0) return
+      
+      let keys = this.computedWidthKeys
+      let bodyWidth = document.body.clientWidth - 30
+      let width = this.$el.offsetWidth
+      let isOverflow = false
+      let textWidth = 15
+      let option = null
+      let keyItem = null
+      let keyItemWidth = 0
+      
+      for (let i = 0; i < this.optionList.length; i++) {
+        if (isOverflow) break
+        
+        option = this.optionList[i]
+        for (let k = 0; k < keys.length; k++) {
+          keyItem = option[keys[k]]
+          keyItemWidth = keyItem && isString(keyItem) ? computedStrLen(keyItem) * textWidth : 0
+          if (keyItemWidth > width) {
+            isOverflow = true
+            break
+          }
+        }
+      }
+      
+      if (!isOverflow) return 
+      
+      this.popperWidth = bodyWidth > keyItemWidth ? keyItemWidth : bodyWidth
+      this.$data.$popper.scheduleUpdate()
     }
   },
   directives: {
     Clickoutside
-  },
+  }
 }
 </script>
 

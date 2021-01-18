@@ -9,7 +9,7 @@
     font-weight: 500;
     line-height: 24px;
   }
-
+  
   p {
     display: flex;
     justify-content: space-between;
@@ -21,13 +21,15 @@
       width: 100%;
       display: flex;
       justify-content: flex-start;
+      flex: 1;
       font-size: 12px;
       color: #666666;
       padding-right: 10px;
       
       & > label {
         padding: 0;
-        width: 60px;
+        width: 70px;
+        max-width: 70px;
       }
     }
   }
@@ -46,6 +48,13 @@
 .product-template-option { 
   h3 {
     @include text-ellipsis()
+  }
+  & > p {
+    & > span {
+      & > span {
+        flex: 1;
+      }
+    }
   }
 }
 
@@ -98,4 +107,8 @@
   .option-list {
     max-height: 400px;
   }
+}
+
+.biz-form-remote-select {
+  width: 100%;
 }

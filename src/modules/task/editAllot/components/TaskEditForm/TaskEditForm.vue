@@ -50,6 +50,7 @@
               @input="updateCustomer"
               placeholder="请输入关键字搜索客户"
               :input-disabled="isCreateCustomer"
+              :computed-width-keys="['name']"
             >
               <div class="customer-template-option" slot="option" slot-scope="{ option }">
                 <h3>{{ option.name }}</h3>
@@ -89,6 +90,7 @@
               :remote-method="searchLinkmanOuterHandler"
               :input-disabled="isCreateCustomer"
               @input="updateLinkman(value.linkman[0])"
+              :computed-width-keys="['name']"
             >
             </biz-form-remote-select>
             <el-button @click="dialogOpen('contact')" v-if="!isCreateCustomer">新建</el-button>
@@ -104,6 +106,7 @@
               v-model="value.address"
               :cleared="true"
               :remote-method="searchAddressOuterHandler"
+              :computed-width-keys="['address']"
             >
             </biz-form-remote-select>
             <el-button @click="dialogOpen('address')" v-if="!isCreateCustomer">新建</el-button>
@@ -122,7 +125,9 @@
               :remote-method="searchProductOuterHandler"
               @input="updateProductForProductSelect"
               placeholder="请输入关键字搜索产品"
-              multiple>
+              multiple
+              :computed-width-keys="['name', 'serialNumber']"
+            >
               <div class="product-template-option" slot="option" slot-scope="{ option }">
                 <h3>{{ option.name }}</h3>
                 <p>

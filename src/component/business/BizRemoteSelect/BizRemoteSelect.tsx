@@ -16,7 +16,7 @@ import '@src/component/business/BizRemoteSelect/BizRemoteSelect.scss'
 /* util */
 import Log from '@src/util/log.ts'
 import { uuid } from '@src/util/string'
-import { isUndefined } from '@src/util/type'
+import { isEmpty, isObject, isUndefined } from '@src/util/type'
 
 interface LoadmoreOptions {
   // 是否禁用
@@ -70,28 +70,36 @@ class BizRemoteSelect extends VC<{}> {
     return []
   }
   
-  @Emit(EventNameEnum.Input)
-  private inputHandler(value: any[] | string): Array<any> {
+  @Emit('searchEnd')
+  private emitSearchEndHandler() {}
+  
+  private inputHandler(value: any[] | string) {
     let data: any[] = []
     // 多选
     if (this.isMulti) {
-      data = value.slice() as Array<any>
+      // 根据valuekey 返回原始数据
+      let optionValue = ''
+      data = this.optionList.filter((option: any) => {
+        optionValue = option[this.valueKey || '']
+        return value.indexOf(optionValue) >= 0
+      })
     } else {
       data = this.optionList.filter((item: any) => item?.id === value || item?.value === value)
     }
     
-    return data
+    this.$emit(EventNameEnum.Input, data)
   }
-  
-  @Emit('searchEnd')
-  private emitSearchEndHandler() {}
   
   get isMulti(): boolean {
     return !isUndefined(this.multiple) && this.multiple !== false
   }
   
   get optionList() {
-    if (this.options?.length) return this.options
+    let isOptionsEmpty = isEmpty(this.options)
+    let isPageListEmpty = isEmpty(this.page.list)
+    
+    if (isOptionsEmpty && isPageListEmpty) return this.value || []
+    if (!isOptionsEmpty) return this.options
     
     return this.page.list
   }
@@ -99,11 +107,21 @@ class BizRemoteSelect extends VC<{}> {
   get selectValue(): any[] {
     // 多选
     if (this.isMulti) {
-      return this.value || []
+      return (
+        this.value?.map(item => {
+          // 对象只取value
+          if (isObject(item)) {
+            return item[this.valueKey || '']
+          }
+          
+          return item
+
+        }).filter(item => Boolean(item)) || []
+      )
     }
     // 单选
     let data = this.value?.[0] || {}
-    let value = data.id || data.value
+    let value = data[this.valueKey || ''] || data.id
     
     return value
   }
@@ -114,10 +132,6 @@ class BizRemoteSelect extends VC<{}> {
   */
   get showClearButton(): boolean {
     return Boolean(this.cleared && this.value && this.value?.length > 0 && !this.inputDisabled)
-  }
-  
-  private focusHandler() {
-    this.search()
   }
   
   /**
@@ -182,6 +196,17 @@ class BizRemoteSelect extends VC<{}> {
   }
   
   /**
+   * @description: 下拉框出现/隐藏时触发
+   * @param {visible} 出现则为 true，隐藏则为 false
+   * @return {void}
+  */  
+  private visibleHandler(visible: boolean) {
+    if (visible) return this.search()
+    
+    this.page.list = []
+  }
+  
+  /**
    * @deprecated -- 已废弃 
    * @description: 渲染清除按钮
    * @return {VNode | null}
@@ -217,6 +242,7 @@ class BizRemoteSelect extends VC<{}> {
     return (
       <div class='biz-form-remote-select'>
         <el-select
+          v-el-select-loadmore={this.loadmoreOptions}
           clearable={this.showClearButton}
           collapsed={this.collapsed}
           disabled={this.inputDisabled}
@@ -230,9 +256,9 @@ class BizRemoteSelect extends VC<{}> {
           placeholder={this.placeholder}
           scopedSlots={this.$scopedSlots}
           value={this.selectValue}
+          valueKey={this.valueKey}
           onInput={this.inputHandler}
-          onFocus={this.focusHandler}
-          v-el-select-loadmore={this.loadmoreOptions}
+          onVisible-change={this.visibleHandler}
         >
           {this.renderOptionList()}
         </el-select>
