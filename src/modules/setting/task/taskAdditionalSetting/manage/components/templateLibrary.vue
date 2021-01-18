@@ -124,7 +124,7 @@ export default {
     display: flex;
     flex-flow: wrap;
     .tabs-card-box{
-        // width: 440px;
+        width: 440px;
         margin-right: 12px;
         margin-bottom: 12px;
         box-shadow: 0px 4px 10px 0px rgba(0, 0, 0, 0.04); 

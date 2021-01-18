@@ -184,7 +184,7 @@ export default {
 <style lang="scss" scoped>
 .task-card{
     cursor: move;
-    // width: 358px;
+    width: 358px;
     height: 159px;
     background: #FFFFFF;
     border-radius: 4px;

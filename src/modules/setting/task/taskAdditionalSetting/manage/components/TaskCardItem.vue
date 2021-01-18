@@ -197,7 +197,7 @@ export default {
 
 <style lang="scss">
 .task-card{
-    // width: 358px;
+    width: 358px;
     height: 178px;
     background: #FFFFFF;
     border-radius: 4px;
