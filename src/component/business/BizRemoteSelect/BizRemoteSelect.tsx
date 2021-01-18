@@ -62,8 +62,8 @@ class BizRemoteSelect extends VC<{}> {
   private pending: boolean = false
   /* 页面对象 */
   private page: Page = new Page()
-  /* 聚焦次数 */
-  private focusedNum: number = 0
+  /* 关键词 */
+  private keyword: string = ''
   
   @Emit(EventNameEnum.Clear)
   private clearHandler() {
@@ -95,10 +95,11 @@ class BizRemoteSelect extends VC<{}> {
   }
   
   get optionList() {
+    let isKeywordEmpty = isEmpty(this.keyword)
     let isOptionsEmpty = isEmpty(this.options)
     let isPageListEmpty = isEmpty(this.page.list)
     
-    if (isOptionsEmpty && isPageListEmpty) return this.value || []
+    if (isOptionsEmpty && isPageListEmpty && isKeywordEmpty) return this.value || []
     if (!isOptionsEmpty) return this.options
     
     return this.page.list
@@ -115,7 +116,7 @@ class BizRemoteSelect extends VC<{}> {
           }
           
           return item
-
+          
         }).filter(item => Boolean(item)) || []
       )
     }
@@ -161,6 +162,21 @@ class BizRemoteSelect extends VC<{}> {
   }
   
   /**
+   * @description: 获取属性列表
+   * @return {Object}
+  */  
+  private getAttributes() {
+    return {
+      directives: [
+        {
+          name: 'loading',
+          value: this.pending
+        }
+      ]
+    }
+  }
+  
+  /**
    * @description: 加载更多
   */  
   private async loadmore() {
@@ -187,6 +203,8 @@ class BizRemoteSelect extends VC<{}> {
     if (!this.remoteMethod) return null
     if (this.pending) return null
     
+    this.keyword = keyword
+    
     // 初始化page对象
     this.page = new Page()
     // 获取远程数据
@@ -207,25 +225,10 @@ class BizRemoteSelect extends VC<{}> {
   }
   
   /**
-   * @deprecated -- 已废弃 
-   * @description: 渲染清除按钮
-   * @return {VNode | null}
-  */
-  private renderClearButton(): VNode | null {
-    if (!this.showClearButton) return null
-    
-    return (
-      <div class="biz-form-remote-select-clear" onClick={() => this.clearHandler()}>
-        <i class="el-icon-error" style="color:rgba(211, 214, 217, 0.69);"></i>
-      </div>
-    )
-  }
-  
-  /**
    * @description: 渲染列表
    * @return {VNode}
   */
-  private renderOptionList(): VNode {
+  private renderOptionList(): VNode {    
     const className = 'biz-remote-select-option'
     return (
       this.optionList.map((option: ElSelectOption) => {
@@ -239,9 +242,12 @@ class BizRemoteSelect extends VC<{}> {
   }
   
   render(h: CreateElement) {
+    const attrs = this.getAttributes()
+    
     return (
       <div class='biz-form-remote-select'>
         <el-select
+          ref='BaseRemoteSelect'
           v-el-select-loadmore={this.loadmoreOptions}
           clearable={this.showClearButton}
           collapsed={this.collapsed}
@@ -249,6 +255,7 @@ class BizRemoteSelect extends VC<{}> {
           loading={this.pending}
           multiple={this.isMulti}
           filterable
+          no-match-text='无数据'
           no-data-text='无匹配数据'
           remote
           reserve-keyword
@@ -260,7 +267,9 @@ class BizRemoteSelect extends VC<{}> {
           onInput={this.inputHandler}
           onVisible-change={this.visibleHandler}
         >
-          {this.renderOptionList()}
+          <div class='biz-form-remote-select-option-container' {...attrs}>
+            {this.renderOptionList()}
+          </div>
         </el-select>
       </div>
     )
