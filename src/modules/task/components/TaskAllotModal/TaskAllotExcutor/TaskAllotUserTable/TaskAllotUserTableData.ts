@@ -37,6 +37,8 @@ class TaskAllotUserTableData extends TaskAllotUserTableComponents {
   @Prop() readonly tableHeight: string | undefined
   /* 用户选择状态 */
   @Prop() readonly userPageCheckedMap: {[x: number]: boolean} | undefined
+  /* 是否是引导展示 */
+  @Prop() readonly justGuide: any | undefined
   
   /* 地图对象 */
   public AMap: any = null

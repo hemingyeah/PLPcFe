@@ -543,3 +543,11 @@
   position: sticky !important;
   position: -webkit-sticky !important;
 }
+
+.hide-scroll{
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  overflow: -moz-scrollbars-none;
+  -ms-overflow-style: none;
+}

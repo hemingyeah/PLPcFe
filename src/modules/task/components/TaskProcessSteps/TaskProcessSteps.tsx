@@ -18,6 +18,8 @@ import { checkApprove } from '@service/TaskService'
 /* scss */
 import '@src/modules/task/components/TaskProcessSteps/TaskProcessSteps.scss'
 
+import {taskSteps} from '@src/modules/guideForNewUser/initData.js'
+
 interface TaskProcessStep {
   // 节点名称
   name: string,
@@ -53,6 +55,9 @@ export default class TaskProcessSteps extends Vue {
   @Prop() state: string | undefined
   /* 工单类型id */
   @Prop() templateId: string | undefined
+
+  /* 是否是引导展示 */
+  @Prop() readonly justGuide: any | undefined
   
   /* 步骤条列表 */
   private steps: TaskProcessStep[] = []
@@ -172,11 +177,15 @@ export default class TaskProcessSteps extends Vue {
       && StepMap[flow]
       && this.steps.push({ ...StepMap[flow],  flow: currentFlow})
     }
+    console.log(JSON.stringify(this.steps),3);
     
   }
   
   mounted() {
+    if(this.justGuide) this.steps = taskSteps;
     this.fetchTaskType()
+    
+    
   }
   
   render(h: CreateElement) {    

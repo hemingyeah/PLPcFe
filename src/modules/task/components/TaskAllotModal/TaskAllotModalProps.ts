@@ -15,6 +15,9 @@ class TaskAllotModalProps extends TaskAllotModalComponents {
   @Prop() readonly task: any | undefined
   /* 工单字段列表 */
   @Prop() readonly fields: Field[] | undefined
+  /* 是否是引导展示 */
+  @Prop() readonly justGuide: any | undefined
+  
 }
 
 export default TaskAllotModalProps

@@ -8,7 +8,7 @@ module.exports = {
     },
     pre: {
       corpId: 'ding73b203abd39ac5e935c2f4657eb6378f',
-      userId: '94f920b1-ee5e-11ea-879a-00163e0f1a1b',
+      userId: '94f920b1-ee5e-11ea-879a-00163e0f1a1b1',
       tenantId: '2fe245f4-31f0-11ea-9ddd-00163e0f1a1b'
     },
     pre2: {

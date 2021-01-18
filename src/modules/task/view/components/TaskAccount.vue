@@ -169,6 +169,8 @@ export default {
     },
     // 打开弹窗
     async openDialog(action) {
+      console.log(JSON.stringify(this.balanceAvailableFields), 1);
+      console.log(JSON.stringify(this.balanceForm), 2);
       if (action === 'create' || action === 'edit') {
         // 是否开启自定义结算
         if (this.openUserDefinedBalance) {

@@ -1,51 +1,80 @@
 <template>
-  <base-modal title="回访" :show.sync="visible" width="700px" class="task-feedback-dialog">
+  <div class="task-feedback-dialog flex-y">
+    <div class="base-modal-header">
+      <h3>
+        审核结算
+      </h3>
+    </div>
     <div class="base-modal-content">
       <div class="form-view-row">
         <label>服务满意度：</label>
         <div class="form-view-row-content">
-          <label class="degree-item" v-for="item in degreeOption" :key="item">
-            <input type="radio" class="hidden" name="degree" :value="item" v-model="form.degree" :disabled="!allowModify" />
+          <label class="degree-item"
+                 v-for="item in degreeOption"
+                 :key="item">
+            <input type="radio"
+                   class="hidden"
+                   name="degree"
+                   :value="item"
+                   v-model="form.degree"
+                   :disabled="!allowModify" />
             <span :class="['evaluate-degree-img', getDegreeImg(item, form.degree == item)]"></span>
             <span class="degree-text">{{ item }}</span>
           </label>
         </div>
       </div>
-      <div class="form-view-row" v-if="evaluateConfig.useStarEvaluate && starEvaluates.length">
+      <div class="form-view-row"
+           v-if="evaluateConfig.useStarEvaluate && starEvaluates.length">
         <label>服务评价：</label>
         <div class="star-evaluate-row-content">
-          <div class="star-evaluate-row" v-for="(name, index) in starEvaluates" :key="index">
+          <div class="star-evaluate-row"
+               v-for="(name, index) in starEvaluates"
+               :key="index">
             <div class="star-title">{{ name }}</div>
-            <base-service-star :value="starValue[starFeilds[index]]" @input="marks(starFeilds[index], $event)" :handle="allowModify"></base-service-star>
+            <base-service-star :value="starValue[starFeilds[index]]"
+                               @input="marks(starFeilds[index], $event)"
+                               :handle="allowModify"></base-service-star>
           </div>
         </div>
       </div>
-      <div class="form-view-row" v-if="evaluateConfig.useTagEvaluate && tagEvaluates.length">
+      <div class="form-view-row"
+           v-if="evaluateConfig.useTagEvaluate && tagEvaluates.length">
         <label>服务标签：</label>
         <div class="form-view-row-content evaluate-tag">
-          <label class="tag-item" v-for="name in tagEvaluates" :key="name">
-            <input type="checkbox" class="hidden" :value="name" v-model="tagValue" :disabled="!allowModify">
+          <label class="tag-item"
+                 v-for="name in tagEvaluates"
+                 :key="name">
+            <input type="checkbox"
+                   class="hidden"
+                   :value="name"
+                   v-model="tagValue"
+                   :disabled="!allowModify">
             <span class="evaliate-tag-item">{{ name }}</span>
           </label>
         </div>
       </div>
-      <div class="form-view-row" v-if="evaluateContent">
+      <div class="form-view-row"
+           v-if="evaluateContent">
         <label>客户评价：</label>
         <div class="form-view-row-content">{{ evaluateContent }}</div>
       </div>
       <div class="form-view-row">
         <label>回访备注：</label>
         <div class="form-view-row-content">
-          <textarea v-model="form.suggestion" placeholder="请填写回访备注[最多500字]" rows="3" maxlength="500" />
+          <textarea v-model="form.suggestion"
+                    placeholder="请填写回访备注[最多500字]"
+                    rows="3"
+                    maxlength="500" />
         </div>
       </div>
     </div>
-    <div slot="footer" class="dialog-footer">
-      <el-button @click="visible = false" v-if="!evaluateConfig.autoCloseTask">取 消</el-button>
-      <el-button class="close-task-btn" @click="submit(true)" :disabled="pending" v-else>回访并关闭工单</el-button>
-      <el-button type="primary" @click="submit(false)" :disabled="pending">回 访</el-button>
+    <div slot="footer"
+         class="dialog-footer flex-x jus-end">
+      <el-button class="close-task-btn"
+                 @click="justGuide('menu',0)"
+      >回访并关闭工单</el-button>
     </div>
-  </base-modal>
+  </div>
 </template>
 
 <script>
@@ -65,9 +94,12 @@ export default {
     evaluateConfig: {
       type: Object,
       default: () => ({})
+    },
+    justGuide: {
+      type: Function
     }
   },
-  data() {
+  data () {
     return {
       visible: false,
       pending: false,
@@ -81,18 +113,18 @@ export default {
     }
   },
   computed: {
-    starEvaluates(){
+    starEvaluates () {
       return this.evaluateConfig.starEvaluates || [];
     },
-    starFeilds(){
+    starFeilds () {
       return this.evaluateConfig.starEvaluateFeilds || [];
     },
-    tagEvaluates(){
+    tagEvaluates () {
       return this.evaluateConfig.tagEvaluates || [];
     }
   },
   methods: {
-    getDegreeImg(type, selected) {
+    getDegreeImg (type, selected) {
       if (type === '满意') {
         return selected ? 'review-degree-satisfy-active' : 'review-degree-satisfy';
       }
@@ -105,10 +137,10 @@ export default {
         return selected ? 'review-degree-unsatisfy-active' : 'review-degree-unsatisfy';
       }
     },
-    marks(feild, value){
+    marks (feild, value) {
       this.$set(this.starValue, feild, value);
     },
-    buildForm() {
+    buildForm () {
       return {
         taskId: this.task.id,
         degree: '满意',
@@ -119,9 +151,7 @@ export default {
         }
       }
     },
-    openDialog() {
-      console.log(JSON.stringify(this.task), 1);
-      console.log(JSON.stringify(this.evaluateConfig), 2);
+    openDialog () {
       // 初始化数据
       this.starValue = {};
       this.tagValue = [];
@@ -136,14 +166,14 @@ export default {
         this.form.evaluate = this.task.evaluateObj || {};
 
         // 服务标签
-        if(this.evaluateConfig.useTagEvaluate && this.form.evaluate.tagEvaluates) {
+        if (this.evaluateConfig.useTagEvaluate && this.form.evaluate.tagEvaluates) {
           this.form.tagValue = this.tagEvaluates.filter(tags => {
             return this.form.evaluate.tagEvaluates.some(tag => tags == tag);
           })
         }
 
         // 服务评价
-        if(this.evaluateConfig.useStarEvaluate && this.starEvaluates.length) {
+        if (this.evaluateConfig.useStarEvaluate && this.starEvaluates.length) {
           this.starEvaluates.forEach((item, i) => {
             let value = this.form.evaluate[this.starFeilds[i]];
             this.$set(this.starValue, this.starFeilds[i], value || 0);
@@ -156,21 +186,21 @@ export default {
 
       this.visible = true;
     },
-    async submit(autoClosed) {
+    async submit (autoClosed) {
       let { useStarEvaluate, starEvaluateNotNull } = this.evaluateConfig;
 
       // 服务评星必填校验
-      if(useStarEvaluate && starEvaluateNotNull) {
+      if (useStarEvaluate && starEvaluateNotNull) {
         let message = [];
-        for(let i = 0; i < this.starEvaluates.length; i++) {
+        for (let i = 0; i < this.starEvaluates.length; i++) {
           let name = this.starEvaluates[i];
-          if(!this.starValue[this.starFeilds[i]]) {
+          if (!this.starValue[this.starFeilds[i]]) {
             message.push(`请评价[${name}]`);
           }
         }
 
         // 允许修改客户评价时
-        if(message.length > 0 && this.allowModify) return this.$platform.alert(message.join('\n'));
+        if (message.length > 0 && this.allowModify) return this.$platform.alert(message.join('\n'));
       }
 
       this.pending = true;
@@ -199,7 +229,7 @@ export default {
 
       const params = _.cloneDeep(this.form);
       params.autoClosed = autoClosed;
-      
+
       TaskApi.reviewTask(params).then((res) => {
         if (res.success) {
           this.$platform.notification({
@@ -223,10 +253,12 @@ export default {
 
 <style lang="scss">
 .task-feedback-dialog {
+  height: 100%;
   .form-view-row {
     padding: 6px 0px;
 
-    .degree-item, .tag-item {
+    .degree-item,
+    .tag-item {
       width: auto !important;
       margin-right: 16px;
       cursor: pointer;
@@ -239,6 +271,75 @@ export default {
 
   .close-task-btn {
     max-width: 120px !important;
+  }
+}
+
+.evaluate-degree-img {
+  width: 24px;
+  height: 24px;
+  margin-right: 2px;
+  display: inline-block;
+  vertical-align: middle;
+
+  background: url(../../../../../assets/img/task/review-degree.png) no-repeat;
+  background-size: 24px 144px;
+
+  &.review-degree-satisfy {
+    background-position: 0 0;
+  }
+
+  &.review-degree-commonly {
+    background-position: 0 -24px;
+  }
+
+  &.review-degree-unsatisfy {
+    background-position: 0 -48px;
+  }
+
+  &.review-degree-satisfy-active {
+    background-position: 0 -72px;
+  }
+
+  &.review-degree-commonly-active {
+    background-position: 0 -96px;
+  }
+
+  &.review-degree-unsatisfy-active {
+    background-position: 0 -120px;
+  }
+}
+
+.star-evaluate-row-content {
+  flex: 1;
+
+  .star-evaluate-row {
+    display: flex;
+    margin-bottom: 10px;
+
+    .star-title {
+      width: 86px;
+      margin-right: 6px;
+    }
+  }
+}
+
+.evaluate-tag {
+  .evaliate-tag-item {
+    display: inline-block;
+    padding: 2px 8px;
+    margin: 0 10px 10px 0;
+    font-size: 12px;
+    border: 1px solid #e5e5e5;
+    background-color: #f8f7f6;
+    border-radius: 2px;
+    color: #757575;
+  }
+
+  .evaliate-tag-active,
+  input[type="checkbox"]:checked ~ span {
+    color: #00d1d3;
+    background-color: #f5fffd;
+    border-color: #00d1d3;
   }
 }
 </style>
