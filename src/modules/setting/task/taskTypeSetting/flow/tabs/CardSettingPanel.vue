@@ -254,7 +254,6 @@ export default {
 <style lang="scss" scoped>
 .card-setting-container {
   min-height: calc(100vh - 48px);
-  background: #F5F5F5;
   overflow-y: auto;
   .card-setting-heard {
     font-weight: 500;
@@ -299,7 +298,7 @@ export default {
       display: flex;
       flex-flow: wrap;
       min-height: 300px;
-      width: calc(100% + 16px);
+      width: calc(100% + 12px);
 
       .task-card-item{
         margin: 0 12px 12px 0;
