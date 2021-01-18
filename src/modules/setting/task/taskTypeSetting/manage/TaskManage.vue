@@ -143,7 +143,6 @@ export default {
   display: flex;
   height: 100vh;
   padding: 16px;
-  background: #F5F5F5;
   .task-manage-main{
     flex: 1;
     min-width: 730px;

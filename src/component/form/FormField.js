@@ -92,6 +92,8 @@ export default class FormField{
     this.isPublic = this.isCommon;
     // 是否是拖拽进来的公共字段 0 - 不是，1 - 是
     this.isDragCommon = typeof params.isDragCommon == 'number' ? params.isDragCommon : 0;
+    // 是否曾经是公共字段 0 - 不是，1 - 是
+    this.isOnceCommon = typeof params.isOnceCommon == 'number' ? params.isOnceCommon : 0;
 
     // formType 为select时需要补全一下字段
     let {options, isMulti, dependencies} = fillPropForSelect(params)
@@ -143,6 +145,7 @@ export default class FormField{
     option.isCommon = field.isCommon;
     option.isPublic = field.isPublic;
     option.isDragCommon = field.isDragCommon;
+    option.isOnceCommon = field.isOnceCommon;
 
     let setting = {};
     let defaultValue = null;
