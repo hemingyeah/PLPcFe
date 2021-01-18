@@ -580,7 +580,7 @@ export default {
       bottom: 40px;
       left: 16px;
       text-align: center;
-      width: calc(100% - 39px);
+      width: calc(100% - 32px);
       height: 50px;
       line-height: 40px;
       background: #ffffff;

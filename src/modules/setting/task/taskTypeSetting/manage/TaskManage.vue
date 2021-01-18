@@ -24,7 +24,7 @@
         </div>
         <div class="lh-52">
           <el-button type="primary" :loading="false" @click="addTaskType">
-            <i class="iconfont icon-add2" style="font-size: 12px;"></i>新建
+            <i class="iconfont icon-add2" style="font-size: 12px;"></i> 新建
           </el-button>
         </div>
       </div>
