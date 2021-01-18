@@ -370,6 +370,7 @@ export default {
         this.taskOverTimeModel = this.taskTypeConfig.taskOverTimeModels.find(
           (item) => item.overTimeState === val
         ) || {};
+        this.options.flow = this.approveOptions(this.type);
       }
     },
     taskTypeId(id) {
