@@ -27,6 +27,7 @@ export default class Field{
     this.isCommon = options.isCommon || 0;
     this.isPublic = options.isPublic || 0;
     this.isDragCommon = options.isDragCommon || 0;
+    this.isOnceCommon = options.isOnceCommon || 0;
 
     // 客户、产品的字段id
     this.fieldId = options.id;
