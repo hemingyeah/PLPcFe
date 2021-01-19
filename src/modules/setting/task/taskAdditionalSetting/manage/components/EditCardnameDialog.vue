@@ -11,15 +11,15 @@
       }}</span>
     </div>
     <div class="base-modal-content">
-      <el-form :model="form" :rules="rules" ref="form" label-width="80px" label-position="left">
-        <el-form-item label="名称:" prop="name">
+      <el-form :model="form" :rules="rules" ref="form" label-width="80px" label-position="right">
+        <el-form-item label="名称：" prop="name">
           <el-input
             v-model="form.name"
             placeholder="请输入名称[最多20个字]"
             maxlength="20"
           ></el-input>
         </el-form-item>
-        <el-form-item label="说明:" prop="description">
+        <el-form-item label="说明：" prop="description">
           <el-input
             type="textarea"
             v-model="form.description"
@@ -29,13 +29,13 @@
         </el-form-item>
         <el-form-item prop="resource">
           <div slot="label">
-            类型:
+            类型
             <el-tooltip
               effect="dark"
               content="设置附加组件在单个工单中添加多次还是单次"
               placement="top"
             >
-              <span><i class="el-icon-question"></i></span>
+              <span><i class="el-icon-question"></i>：</span>
             </el-tooltip>
           </div>
           <el-radio-group v-model="form.inputType" :disabled="form.id?true:false">
