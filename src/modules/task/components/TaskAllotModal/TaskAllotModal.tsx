@@ -31,106 +31,13 @@ import AutoDispatchListItem from '@model/types/AutoDispatchListItem'
     TaskAllotType,
     UserButton,
     ProposeApproveDialog
-  },
+  }
 })
 
 export default class TaskAllotModal extends TaskAllotModalRender {
   
   render(h: CreateElement) {
     const attrs = this.getAttributes()
-    
-
-    if(this.justGuide){
-      return (
-        <div class="task-allot-modal">
-          <div class="base-modal">
-          <div class="base-modal-header"><h3>
-              派单
-              </h3> </div>
-          
-          {this.renderTaskAllotHeader()}
-          
-          <div class='task-allot-content'>
-            <keep-alive>
-              <div class='task-allot-content-active'>
-                <div class='task-allot-excutor-container' style={this.allotContentStyle[TaskAllotTypeEnum.Person]}>
-                  <task-allot-excutor
-                    ref='TaskAllotExcutorComponent'
-                    customer={this.customer}
-                    executor={this.executorUser}
-                    isShowSynergy={this.allowModifySynergyUser}
-                    isReAllot={this.isReAllot}
-                    loginUser={this.loginUser}
-                    mode={this.allotTypeMode}
-                    reason={this.reason}
-                    task={this.task}
-                    taskConfig={this.taskConfig}
-                    taskTypesMap={this.taskTypesMap}
-                    stateColorMap={this.stateColorMap}
-                    synergyUserList={this.synergyUserList}
-                    onDeleteSynergyUser={(user: LoginUser) => this.outsideDeleteSynergyUser(user)}
-                    onSetExecutor={(user: LoginUser) => this.setExecutorUser(user)}
-                    onSetSynergy={(user: LoginUser) => this.setSynergyUser(user)}
-                    onSetSynergys={(users: LoginUser[]) => this.outsideSetSynergyUsers(users)}
-                    onSetCustomerTags={(tags: Tag[]) => this.outsideSetCustomerTags(tags)}
-                    onSetReason={(value: string) => this.outsideSetReason(value)}
-                    justGuide= { true }
-                  />
-                </div>
-                {
-                  this.isShowTaskPoolComponent
-                  && (
-                    <task-allot-pool 
-                      ref='TaskAllotPoolComponent'
-                      customer={this.customer}
-                      customerTags={this.customerTags}
-                      isShowSynergy={this.allowModifySynergyUser}
-                      isReAllot={this.isReAllot}
-                      loginUser={this.loginUser}
-                      reason={this.reason}
-                      show={this.allotType === TaskAllotTypeEnum.Pool}
-                      style={this.allotContentStyle[TaskAllotTypeEnum.Pool]}
-                      stateColorMap={this.stateColorMap}
-                      task={this.task}
-                      taskConfig={this.taskConfig}
-                      taskTypesMap={this.taskTypesMap}
-                      onDeleteSynergyUser={(user: LoginUser) => this.outsideDeleteSynergyUser(user)}
-                      onSetExecutor={(user: LoginUser) => this.setExecutorUser(user)}
-                      onSetSynergy={(user: LoginUser) => this.setSynergyUser(user)}
-                      onSetSynergys={(users: LoginUser[]) => this.outsideSetSynergyUsers(users)}
-                      onSetCustomerTags={(tags: Tag[]) => this.outsideSetCustomerTags(tags)}
-                      onSetReason={(value: string) => this.outsideSetReason(value)}
-                      justGuide= { true }
-                    />
-                  )
-                }
-                {
-                  this.isShowTaskAutoDispatchComponent
-                  && (
-                    <task-allot-auto
-                      loginUser={this.loginUser}
-                      task={this.task}
-                      show={this.allotType === TaskAllotTypeEnum.Auto} 
-                      style={this.allotContentStyle[TaskAllotTypeEnum.Auto]}
-                      changeMatchRule={(rule: AutoDispatchListItem | null) => this.outsideSetMatchRule(rule)}
-                      onUsedChange={(used: boolean) => this.onIsUsedResultChanged(used)}
-                      justGuide= { true }
-                    />
-                  )
-                }
-              </div>
-            </keep-alive>
-          </div>
-          
-          <propose-approve-dialog ref='ApproveDialog' taskId={this?.task?.id} onSuccess={() => this.allotSuccess()} />
-          
-          <div slot='footer' class='dialog-footer flex-x jus-end'>
-              <el-button type='primary' onClick={() => this.justGuide('task', 3)}>提 交</el-button>
-          </div>
-          </div>
-          </div>
-      )
-    }
     
     return (
       <base-modal show={this.showTaskAllotModal} {...attrs}>

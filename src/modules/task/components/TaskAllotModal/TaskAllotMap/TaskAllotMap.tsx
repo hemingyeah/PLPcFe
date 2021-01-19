@@ -130,10 +130,6 @@ export default class TaskAllotMap extends VC {
       // 自定义点标记覆盖物内容
       content: this.buildCustomerAddressMapMarkerContent()
     })
-
-
-    
-    
     
     // 鼠标悬停 显示客户信息
     customerAddressMarker.on(EventNameEnum.MouseOver, (event: any) => {
@@ -191,7 +187,6 @@ export default class TaskAllotMap extends VC {
     }
     
     Log.succ(Log.Start, this.mapInit.name)
-    
     
     this.AMap = new AMap.Map(this.idName, {
       resizeEnable: true,

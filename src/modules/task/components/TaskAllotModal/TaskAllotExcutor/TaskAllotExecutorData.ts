@@ -53,10 +53,6 @@ class TaskAllotExecutorData extends TaskAllotExecutorProps {
   @Prop() readonly taskConfig: TaskConfig | undefined
   /* 工单类型列表 */
   @Prop() readonly taskTypesMap: { [x: string]: TaskType} | undefined
-
-  /* 是否是引导展示 */
-  @Prop() readonly justGuide: any | undefined
-  
   
   /* 备份的获取人员数据参数 */
   public backupFetchUserParams: {

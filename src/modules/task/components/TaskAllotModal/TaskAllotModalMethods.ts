@@ -919,7 +919,6 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
    * @description 提交
   */
   public submit() {
-    if(this.confirm)
     this.pending = true
     // 转派 提交
     if (this.isReAllot) {
