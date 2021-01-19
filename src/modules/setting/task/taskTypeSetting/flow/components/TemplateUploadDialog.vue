@@ -117,16 +117,19 @@ export default {
       const isLt1M = file.size / 1024 / 1024 < 1;
 
       if (!isLt1M) {
-        this.$message.error('不支持大于1M的模板');
+        this.$platform.notification({
+          type: 'error',
+          title: '不支持大于1M的模板'
+        });
         return false;
       }
 
       Uploader.upload(file, '/files/upload').then((result) => {
         if (result.status != 0) {
-          this.$message({
-            message: `${result.message}`,
-            duration: 1500,
+          this.$platform.notification({
             type: 'error',
+            title: `${result.message}`,
+            duration: 1500,
           });
 
           return false;
@@ -163,7 +166,10 @@ export default {
         let res = await fetchFn(params);
         if(res.status === 0) {
           this.taskFlowData.taskTypeConfig[this.type].templates = this.templates;
-          this.$notify.success('设置成功');
+          this.$platform.notification({
+            type: 'success',
+            title: '设置成功'
+          });
           this.close();
         }
       } catch (err) {

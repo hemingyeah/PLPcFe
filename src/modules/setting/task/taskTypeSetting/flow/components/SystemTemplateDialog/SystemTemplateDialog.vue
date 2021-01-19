@@ -431,9 +431,15 @@ export default {
       try {
         let res = await fetchFn(params);
         if(res.succ) {
-          this.$notify.success('保存成功');
+          this.$platform.notification({
+            type: 'success',
+            title: '保存成功'
+          });
         }else{
-          this.$notify.error(res.message);
+          this.$platform.notification({
+            type: 'error',
+            title: res.message
+          });
         }
 
         this.cancel();

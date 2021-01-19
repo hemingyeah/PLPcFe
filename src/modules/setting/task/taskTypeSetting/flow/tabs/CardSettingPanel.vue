@@ -129,12 +129,18 @@ export default {
         }
         let res = await SettingTaskApi.batchSaveTaskCard(params); 
         if(res.status === 0) {
-          this.$notify.success('保存成功');
+          this.$platform.notification({
+            title: '保存成功',
+            type: 'success'
+          });
           setTimeout(()=>{
             this.goBack();
           }, 1000)
         }else {
-          this.$notify.error(res.message);
+          this.$platform.notification({
+            title: res.message,
+            type: 'error'
+          });
         }
       } catch (error) {
         console.error(error);
@@ -149,7 +155,10 @@ export default {
     },
     deleteCard(index) {
       this.taskCardList.splice(index, 1);
-      this.$message.success('删除成功')
+      this.$platform.notification({
+        title: '删除成功',
+        type: 'success'
+      });
     },
     updateTaskCard(cardList, updateObj) {
       for (const key in updateObj) {
