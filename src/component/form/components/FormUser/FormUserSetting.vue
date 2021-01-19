@@ -20,7 +20,8 @@
       <h4 class="form-item-title">校验</h4>
       <div class="form-item-box">
         <!-- 必填 -->
-        <el-checkbox :value="field.isNull" @input="update($event, 'isNull')" @change="isNullUserField" :true-label="0" :false-label="1">必填</el-checkbox>
+        <form-required-setting :field="field" @input="update"></form-required-setting>
+        <!-- <el-checkbox :value="field.isNull" @input="update($event, 'isNull')" @change="isNullUserField" :true-label="0" :false-label="1">必填</el-checkbox> -->
       </div>
     </div>
     <!-- end 校验 -->

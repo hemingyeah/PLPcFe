@@ -777,6 +777,15 @@ export function deleteComponent(params: {} | undefined) {
 }
 
 /**
+ * 工单设置，删除组件
+ * @param {Object} params - 参数对象
+ * @param {String} params.id - 字段id
+ */
+export function deleteField(params: {} | undefined) {
+  return http.post('/setting/fieldInfo/delete3', params, false);
+}
+
+/**
  * 获取工单设置的除组件外的其他信息
  * @param {Object} params - 参数对象
  * @param {String} params.id - 工单id

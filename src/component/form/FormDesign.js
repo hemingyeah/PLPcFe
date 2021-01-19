@@ -18,10 +18,16 @@ import {
 import { 
   isSelect 
 } from './util'
-import {checkUser, deleteComponent} from '@src/api/TaskApi.ts';
+import { checkUser, deleteField } from '@src/api/TaskApi.ts';
 import {deleteCardField} from '@src/api/SettingTaskApi';
 /* enum */
 import TableNameEnum from '@model/enum/TableNameEnum.ts';
+
+const deleteFieldApiMap = {
+  [TableNameEnum.Task]: deleteField,
+  [TableNameEnum.TaskReceipt]: deleteField,
+  [TableNameEnum.TaskCard]: deleteCardField,
+}
 
 /**
  * 展示是否必填项的字段
@@ -689,21 +695,10 @@ const FormDesign = {
       let isNext = true;
 
       // 删除字段需与后端交互的模块
-      const checkUserArr = [TableNameEnum.Task, TableNameEnum.TaskReceipt, TableNameEnum.Event, TableNameEnum.EventReceipt, TableNameEnum.TaskCard];
-      // 排除新拖进来的公共字段
-      if(checkUserArr.indexOf(this.mode) > -1 && item.id && !item.isDragCommon) {
-        // item.id表明该字段已经在后端存储过，不是本次的新增字段
-        if(this.mode == 'task_card') {
-          isNext = await this.deleteCardFormField(item);
-        }else{
-          if(item.formType == 'user') {
-            // 删除的是人员，先check是否在审批流程中
-            isNext = await this.deleteUser(item, this.deleteFormField);
-          }else{
-            isNext = await this.deleteFormField(item);
-          }
-        }
-
+      const specialModeArr = [TableNameEnum.Task, TableNameEnum.TaskReceipt, TableNameEnum.Event, TableNameEnum.EventReceipt, TableNameEnum.TaskCard];
+      // 字段已经在后端存储过，且排除新拖进来的公共字段
+      if(specialModeArr.indexOf(this.mode) > -1 && item.id && !item.isDragCommon) {
+        isNext = await this.deleteFormField(item);
       }
 
       if(!isNext) {
@@ -756,17 +751,10 @@ const FormDesign = {
     },
     
     async deleteFormField(item) {
-      let result = await deleteComponent({ id : item.id });
-      if(result.code) {
-        this.$platform.alert(result.message);
-        return false;
-      }
-      
-      return true;
-    },
-    // 附加组件删除表单
-    async deleteCardFormField(item) {
-      let result = await deleteCardField({ id : item.id });
+      const api = deleteFieldApiMap[this.mode];
+      if (!api) return true;
+
+      let result = await api({ id : item.id });
       if(result.code) {
         this.$platform.alert(result.message);
         return false;
