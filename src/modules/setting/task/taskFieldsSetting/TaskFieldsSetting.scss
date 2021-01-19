@@ -19,7 +19,7 @@ html, body {
       color: #fff;
       background: linear-gradient(270deg, #1FDBB7 0%, #12C1D6 100%);
 
-      &-close {
+      .base-modal-header-close {
         color: #fff;
         font-weight: bold;
         margin-left: 20px;
