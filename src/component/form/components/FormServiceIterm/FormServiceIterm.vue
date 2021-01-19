@@ -69,7 +69,7 @@
                 @input="updateServiceItem"
                 placeholder="请选择">
                 <div class="service-template-option" slot="option" slot-scope="{ option }">
-                  <h3>{{ option.name }}</h3>
+                  <h3 v-html="option.name"></h3>
                   <p>
                     <span>
                       <label>编号：</label>
