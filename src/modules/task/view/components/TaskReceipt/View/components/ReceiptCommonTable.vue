@@ -11,7 +11,7 @@
       :label="column.label"
       :prop="column.field"
       show-overflow-tooltip
-      :min-width="column.minWidth || '148px'">
+      :width="column.width">
       <template slot-scope="scope">
 
         <!-- start 小计 -->

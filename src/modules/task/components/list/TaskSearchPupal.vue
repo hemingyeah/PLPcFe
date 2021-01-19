@@ -19,21 +19,13 @@
         </base-button>
       </div>
       <!-- 系统字段 -->
-      <el-checkbox :indeterminate="isIndeterminateSys" v-model="sysCheckAll" @change="handleCheckAllSysChange"><h3 class="task-mtb13">系统字段</h3></el-checkbox>
+      <el-checkbox :indeterminate="isIndeterminateSys" v-model="sysCheckAll" @change="handleCheckAllSysChange"><h3 class="task-mtb13" id="task-search-pupal-guide-dom">系统字段</h3></el-checkbox>
       <el-checkbox-group v-model="checkSystemList">
         <el-checkbox :label="item.fieldName" v-for="(item, index) in systemList" :key="index" class="wh150">{{item.displayName}}</el-checkbox>
       </el-checkbox-group>
-      <template v-if="guideSearchPupal">
-        <guide-compoment
-          :content="'①选中 ②保存，设置立刻生效'"
-          :only-one="true"
-          :have-step="false"
-          :finish-btn="'试一下'"
-          :style="'width:240px;top:250px;margin:auto;left:0;right:0;'"
-          :stop-step="guide_stopStep"
-          :finish-btn-fn="guide_finishBtnFn"
-        ></guide-compoment>
-      </template>
+
+      <div id="task-search-pupal-guide"></div>
+
       <!-- 自定义字段 -->
       <el-checkbox :indeterminate="isIndeterminateCus" v-model="cusCheckAll" @change="handleCheckAllCusChange" v-if="customizeList.length"><h3 class="task-mtb13">自定义字段</h3></el-checkbox>
       <el-checkbox-group v-model="checkCustomizeList">
@@ -47,12 +39,12 @@
   </base-modal>
 </template>
 <script>
-// import guideCompoment from '@src/component/guide/guide';
+
 import { storageGet, storageSet } from '@src/util/storage';
 
 const { TASK_GUIDE_SEARCH_PUPAL } = require('@src/component/guide/taskV2Store');
 export default {
-  name: "task-search-pupal",
+  name: 'task-search-pupal',
   props: {
     taskTypeFilterFields: { // 自定义
       type: Array,
@@ -66,9 +58,6 @@ export default {
       type: Array, // 用于判断
     }
   },
-  // components: {
-  //   [guideCompoment.name]: guideCompoment,
-  // },
   watch: {
     taskTypeFilterFields(v) {
       this.customizeList = v
@@ -93,12 +82,11 @@ export default {
       visible: false,
       isIndeterminateSys: false,
       isIndeterminateCus: false,
-      seoText: "",
+      seoText: '',
       checkSystemList: [], // 选中系统字段
       checkCustomizeList: [], // 选中自定义字段
       systemList: [], // 系统字段
       customizeList: this.taskTypeFilterFields, // 自定义字段
-      guideSearchPupal: false,
     }
   },
   mounted() {
@@ -106,20 +94,24 @@ export default {
     this.loc()
   },
   methods: {
-    guide_stopStep() {
-    },
-    guide_finishBtnFn() {
-      this.guide_stopStep();
-    },
     open() {
-      if (storageGet(TASK_GUIDE_SEARCH_PUPAL) && storageGet(TASK_GUIDE_SEARCH_PUPAL) > 0) this.guideSearchPupal = false;
-      else this.guideSearchPupal = true, storageSet(TASK_GUIDE_SEARCH_PUPAL, "1");
+      if (storageGet(TASK_GUIDE_SEARCH_PUPAL) && storageGet(TASK_GUIDE_SEARCH_PUPAL) > 0) this.$Guide().destroy('task-search-pupal-guide')
+      else this.$Guide([{
+        content:
+  '①选中 ②保存，设置立刻生效',
+        haveStep: false,
+        nowStep: 1,
+        gStyle: 'width:240px;top:250px;margin:auto;left:0;right:0;',
+        id: 'task-search-pupal-guide',
+        domId:'task-search-pupal-guide-dom',
+        finishBtn: '试一下',
+      }], 0).create().then(res_=>{if(res_)storageSet(TASK_GUIDE_SEARCH_PUPAL, '1')});
       this.visible = true;
       const searchField = localStorage.getItem('task-search-field')
       if (searchField) {
         this.checkSystemList = [...new Set(JSON.parse(searchField).checkSystemList)]
         this.checkCustomizeList = [...new Set(JSON.parse(searchField).checkCustomizeList)]
-      }  else {
+      } else {
         this.checkSystemList = []
         this.checkCustomizeList = []
       }
@@ -131,7 +123,7 @@ export default {
       this.checkCustomizeList = v ? this.customizeList.map(item => {return item.fieldName}) : []
     },
     loc() {
-      const searchField = localStorage.getItem("task-search-field")
+      const searchField = localStorage.getItem('task-search-field')
       if (searchField) {
         this.checkSystemList = [...new Set(JSON.parse(searchField).checkSystemList)]
         this.checkCustomizeList = [...new Set(JSON.parse(searchField).checkCustomizeList)]
@@ -182,7 +174,7 @@ export default {
     reset() {
       this.systemList = this.config
       this.customizeList = this.taskTypeFilterFields
-      this.seoText = ""
+      this.seoText = ''
     },
     onSubmit() {
       const {checkSystemList, checkCustomizeList, config, taskTypeFilterFields} = this
@@ -202,12 +194,12 @@ export default {
         list
       }
       this.visible = false
-      this.$emit("taskPupal", params)
+      this.$emit('taskPupal', params)
       if (!list.length) {
-        localStorage.removeItem("task-search-field")
+        localStorage.removeItem('task-search-field')
         return
       }
-      localStorage.setItem("task-search-field", JSON.stringify(params))
+      localStorage.setItem('task-search-field', JSON.stringify(params))
     }
   }
 }

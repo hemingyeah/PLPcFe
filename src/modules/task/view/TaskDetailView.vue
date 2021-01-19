@@ -25,7 +25,7 @@
 
         <!-- start 折叠时客户信息 -->
         <div class="customer-info-wrap" v-show="!collapse && customerField && customerField.id">
-          <div :class="['customer-name', {'link-text': allowOpenCustomerView}]" @click="openCustomerView">
+          <div :class="['customer-name', {'link-text': allowOpenCustomerView}]" @click="openCustomerView(false)">
             {{ customer.name }}
           </div>
 
@@ -55,27 +55,12 @@
         <!-- start 顶部按钮组 -->
         <div class="task-detail-header-top-btn">
           <template v-if="!isDelete">
-            <!-- start 当前工单状态操作按钮 -->
-            <div class="current-state-button" v-show="!collapse">
-              <template v-for="(item, index) in stateButtonData">
-                <el-button :key="index" :type="item.type" @click="item.event" :disabled="pending" v-if="item.show">
-                  {{ item.name }}
-                </el-button>
-              </template>
-            </div>
-            <!-- end 当前工单状态操作按钮 -->
-
-            <el-button @click="openDialog('cancel')" :disabled="pending" size="mini" v-if="allowCancelTask">取消
-            </el-button>
-            <el-button @click="redeploy" :disabled="pending" size="mini" v-if="allowRedeployTask">转派</el-button>
-            <el-button :class="{'once-printed': task.oncePrinted == 1}" @click="printTask" :disabled="pending" size="mini" v-if="allowPrintTask">打印</el-button>
-
             <!-- start 服务报告 -->
             <template v-if="allowServiceReport && isShowReport">
-              <el-button @click="createReport(true)" :disabled="pending" v-if="srSysTemplate || srSysTemplate == null" size="mini">服务报告</el-button>
+              <el-button @click="createReport(true)" :disabled="pending" v-if="srSysTemplate || srSysTemplate == null">服务报告</el-button>
 
               <el-dropdown trigger="click" v-if="!srSysTemplate && srSysTemplate != null">
-                <el-button :disabled="pending" size="mini">服务报告</el-button>
+                <el-button :disabled="pending">服务报告</el-button>
 
                 <el-dropdown-menu slot="dropdown">
                   <el-dropdown-item>
@@ -91,7 +76,40 @@
             </template>
             <!-- end 服务报告 -->
 
-            <el-button @click="ding" :disabled="pending" size="mini" v-if="allowDing">DING</el-button>
+            <el-button @click="openDialog('cancel')" :disabled="pending" v-if="allowCancelTask">取消</el-button>
+            <el-button @click="redeploy" :disabled="pending" v-if="allowRedeployTask">转派</el-button>
+
+            <!-- start 当前工单状态操作按钮 -->
+            <div class="current-state-button" v-show="!collapse">
+              <template v-for="(item, index) in stateButtonData">
+                <el-button :key="index" :type="item.type" @click="item.event" :disabled="pending" v-if="item.show">
+                  {{ item.name }}
+                </el-button>
+              </template>
+            </div>
+            <!-- end 当前工单状态操作按钮 -->
+
+            <!-- start icon按钮 -->
+            <div class="task-detail-btn-group" :class="nowGuideStep == 4 ? 'task-detail-btn-group-point' : ''" id="v-task-detail-step-3">
+              <div class="guide-disable-cover" v-if="nowGuideStep == 4"></div>
+              <el-tooltip :popper-options="popperOptions" content="打印工单" placement="top" v-if="allowPrintTask">
+                <i class="iconfont icon-printer icon-btn" @click="printTask"></i>
+              </el-tooltip>
+              <el-tooltip :popper-options="popperOptions" content="DING" placement="top" v-if="allowDing">
+                <i class="iconfont icon-thunderbolt icon-btn" @click="ding"></i>
+              </el-tooltip>
+              <el-tooltip :popper-options="popperOptions" content="复制工单" placement="top" v-if="allowCopyTask">
+                <i class="iconfont icon-file-copy icon-btn" @click="goCopyTask"></i>
+              </el-tooltip>
+              <el-tooltip :popper-options="popperOptions" content="删除工单" placement="top" v-if="allowDeleteTask">
+                <i class="iconfont icon-delete icon-btn" @click="deleteTask"></i>
+              </el-tooltip>
+              <el-tooltip :popper-options="popperOptions" content="编辑工单" placement="top" v-if="allowEditTask">
+                <i class="iconfont icon-edit-square icon-btn" @click="goEdit"></i>
+              </el-tooltip>
+            </div>
+            <!-- end icon按钮 -->
+
           </template>
         </div>
         <!-- end 顶部按钮组 -->
@@ -106,13 +124,13 @@
       <div class="task-detail-header-bottom" :class="{'active': !collapse, 'guide-point bg-w' : nowGuideStep == 2}" id="v-task-detail-step-1">
         <div class="guide-disable-cover" v-if="nowGuideStep == 2"></div>
         <div class="customer-info-wrap">
-          <div :class="['customer-name', {'link-text': allowOpenCustomerView}]" @click="openCustomerView">
+          <div :class="['customer-name', {'link-text': allowOpenCustomerView}]" @click="openCustomerView(false)">
             {{ customer.name }}
           </div>
           <el-tooltip v-if="showCustomerRelationTaskCount" placement="top">
             <div slot="content" v-html="`未完成工单：${customerRelationTaskCountData.unfinished} </br> 全部工单：${customerRelationTaskCountData.all}`">
             </div>
-            <div class="relation-count-button" @click="openCustomerView">
+            <div class="relation-count-button" @click="openCustomerView(true)">
               {{ `${customerRelationTaskCountData.unfinished}/${customerRelationTaskCountData.all}` }}
             </div>
           </el-tooltip>
@@ -195,34 +213,11 @@
     <!-- end 顶部操作区 -->
 
     <!-- start 工单详情折叠面板 -->
-    <base-collapse class="task-detail-main-content" @scroll="getScroll" :show-collapse="showCollapse" :direction.sync="collapseDirection" :style="`margin-top: ${collapse ? marTop - 4 : 60}px`">
+    <base-collapse class="task-detail-main-content" @scroll="getScroll" :direction.sync="collapseDirection">
       
       <!-- start 工单详情 -->
       <template slot="left">
         <div class="task-detail-main-content-left" v-show="collapseDirection != 'left'">
-          <div class="task-detail-btn-group" :class=" nowGuideStep == 4 ? 'task-detail-btn-group-point' : ''" id="v-task-detail-step-3">
-            <div class="guide-disable-cover" v-if="nowGuideStep == 4"></div>
-            <el-tooltip :popper-options="popperOptions" content="编辑工单" placement="top" v-if="allowEditTask">
-              <i class="iconfont icon-bianji1" @click="goEdit"></i>
-            </el-tooltip>
-            <el-tooltip :popper-options="popperOptions" content="复制工单" placement="top" v-if="allowCopyTask">
-              <i class="iconfont icon-fuzhi" @click="goCopyTask"></i>
-            </el-tooltip>
-            <el-tooltip :popper-options="popperOptions" content="删除工单" placement="top" v-if="allowDeleteTask">
-              <i class="iconfont icon-shanchu-copy" @click="deleteTask"></i>
-            </el-tooltip>
-          </div>
-
-          <div class="task-detail-step-2-box" :style="nowGuideStep == 3 ? 'width: 104px;height: 40px;background:#fff' : ''" id="v-task-detail-step-2">
-
-            <div class="task-detail-step-2" v-if="nowGuideStep == 3">
-              动态信息
-              <div style="position: relative;">
-                <div class="guide-disable-cover"></div>
-              </div>
-            </div>
-          </div>
-
           <el-tabs v-model="leftActiveTab">
             <el-tab-pane label="工单详情" name="task-view">
               <task-view :task="task" :fields="fields" :plan-time="planTime" :is-paused="isPaused" :state-text="stateText" :state-color="stateColor" :finished-state="finishedState" :customer-option="customerOption" :can-see-customer="canSeeCustomer" :allow-edit-synergy="allowEditSynergy" :allow-modify-plan-time="allowModifyPlanTime" @modifyPlanTime="openDialog('modifyPlanTime')" />
@@ -258,6 +253,15 @@
 
         <div class="collapse-right" v-show="collapseDirection == 'right'">
           {{ viewBalanceTab ? '审核结算' : viewFeedbackTab ? '客户评价' : '附加组件' }}
+        </div>
+        <div class="task-detail-step-2-box" :style="nowGuideStep == 3 ? 'width: 104px;height: 40px;background:#fff' : ''" id="v-task-detail-step-2">
+
+          <div class="task-detail-step-2" v-if="nowGuideStep == 3">
+            动态信息
+            <div style="position: relative;">
+              <div class="guide-disable-cover"></div>
+            </div>
+          </div>
         </div>
       </template>
       <!-- end 附加组件 -->
@@ -346,20 +350,20 @@
           <template v-for="(step, index) of tour.steps">
             <v-step v-if="tour.currentStep === index" :key="index" :step="step" :previous-step="tour.previousStep" :next-step="tour.nextStep" :stop="tour.stop" :is-first="tour.isFirst" :is-last="tour.isLast" :labels="tour.labels">
               <template>
-                <div slot="content" class="tour-content-box">
-                  <div class="tour-left-tips">
+                <div slot="content" class="v-tour-content-box">
+                  <div class="v-tour-left-tips">
                     {{ `${index + 1}/${detailSteps.length}` }}
                   </div>
-                  <div class="tour-content">
-                    <div class="flex-x tour-content-head">
+                  <div class="v-tour-content">
+                    <div class="flex-x v-tour-content-head">
                       {{detailSteps[index].title}}
                     </div>
-                    <div class="tour-content-con">
+                    <div class="v-tour-content-con">
                       {{ detailSteps[index].content }}
                     </div>
                   </div>
                 </div>
-                <div slot="actions" class="tour-bottom">
+                <div slot="actions" class="v-tour-bottom">
                   <!-- <div class="text" v-if="index > 0" @click="tour.previousStep">
                     上一步
                   </div> -->
@@ -406,96 +410,85 @@ export default TaskDetailView;
         border-left-color: transparent !important;
         border-right-color: transparent !important;
     }
-
-    .tour-content-box {
-        position: relative;
-        overflow: hidden;
-        padding: 0 20px;
-        border-radius: 4px;
-
-        .tour-left-tips {
-            width: 80px;
-            height: 32px;
-            background: $color-primary;
-            color: #fff;
-            position: absolute;
-            left: -40px;
-            top: 0px;
-            line-height: 40px;
-            font-size: 12px;
-            transform-origin: center top;
-            transform: rotateZ(-45deg);
-            text-align: center;
-        }
-
-        .tour-content {
-            .tour-content-head {
-                padding-top: 32px;
-                padding-bottom: 10px;
-
-                .iconfont {
-                    font-size: 10px;
-                    margin-bottom: 2px;
-                    color: #999;
-                    cursor: pointer;
-                }
-            }
-
-            .tour-content-con {
-                text-align: start;
-                padding-bottom: 12px;
-                color: #666;
-            }
-        }
+    .v-tour-content-box {
+    position: relative;
+    overflow: hidden;
+    padding: 0 20px;
+    border-radius: 4px;
+    .v-tour-left-tips {
+      width: 80px;
+      height: 32px;
+      background: $color-primary;
+      color: #fff;
+      position: absolute;
+      left: -40px;
+      top: 0px;
+      line-height: 40px;
+      font-size: 12px;
+      transform-origin: center top;
+      transform: rotateZ(-45deg);
+      text-align: center;
     }
-
-    .tour-bottom {
-        height: 52px;
-        padding: 0 20px;
-        display: flex;
-        justify-content: flex-end;
-        align-items: center;
-
-        .btns {
-            width: 60px;
-            height: 28px;
-            background: $color-primary;
-            color: #fff;
-            text-align: center;
-            line-height: 28px;
-            border-radius: 4px;
+    .v-tour-content {
+      .v-tour-content-head {
+        padding-top: 32px;
+        padding-bottom: 10px;
+        .iconfont {
+          font-size: 10px;
+          margin-bottom: 2px;
+          color: #999;
+          cursor: pointer;
         }
-
-        .text {
-            color: $color-primary;
-        }
-
-        :nth-child(n) {
-            cursor: pointer;
-        }
-
-        :not(:last-child) {
-            margin-right: 12px;
-        }
+      }
+      .v-tour-content-con {
+        text-align: start;
+        padding-bottom: 12px;
+      }
     }
+  }
 
-    /* 向上的箭头 */
-
-    .normal-arrow-top {
-        font-size: 0;
-        line-height: 0;
-        border-width: 0.5rem;
-        border-color: #fff;
-        width: 0;
-        border-top-width: 0;
-        border-style: dashed;
-        border-bottom-style: solid;
-        border-left-color: transparent;
-        border-right-color: transparent;
-        position: absolute;
-        top: -0.5rem;
+  .v-tour-bottom {
+    height: 52px;
+    padding: 0 20px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    .btns {
+      width: 60px;
+      height: 28px;
+      background: $color-primary;
+      color: #fff;
+      text-align: center;
+      line-height: 28px;
+      border-radius: 4px;
     }
+    .text {
+      color: $color-primary;
+    }
+    :nth-child(n) {
+      cursor: pointer;
+    }
+    :not(:last-child) {
+      margin-right: 12px;
+    }
+  }
 
+  /* 向上的箭头 */
+
+  .normal-arrow-top {
+    font-size: 0;
+    line-height: 0;
+    border-width: 0.5rem;
+    border-color: #fff;
+    width: 0;
+    border-top-width: 0;
+    border-style: dashed;
+    border-bottom-style: solid;
+    border-left-color: transparent;
+    border-right-color: transparent;
+    position: absolute;
+    top: -0.5rem;
+  }
     .guide-model-box {
         position: fixed;
         width: 100%;
@@ -518,7 +511,7 @@ export default TaskDetailView;
     .task-detail-step-2-box {
         position: absolute;
         top: 0;
-        left: 208px;
+        left: 0;
         z-index: 997;
 
         .task-detail-step-2 {

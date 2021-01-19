@@ -26,7 +26,7 @@
   align-items: stretch !important;
 }
 
-.al-center{
+.al-center {
   align-items: center !important;
 }
 
@@ -40,12 +40,13 @@
 
 .cur-point {
   cursor: pointer;
-  &:hover{
+
+  &:hover {
     color: $color-primary;
 
-  i{
-    color: $color-primary !important;
-  }
+    i {
+      color: $color-primary !important;
+    }
   }
 }
 
@@ -283,7 +284,7 @@
 }
 
 .font-18 {
-  font-size: 18px;
+  font-size: 18px !important;
 }
 
 .font-12 {
@@ -413,7 +414,7 @@
   color: $color-primary !important;
 }
 
-.color-danger{
+.color-danger {
   color: $color-danger;
 }
 
@@ -438,7 +439,7 @@
 .el-dialog__headerbtn {
   top: 0;
   bottom: 0;
-  margin: auto;
+  margin: 0;
 }
 
 .box-12-t-b {
@@ -481,9 +482,11 @@
 .jus-center {
   justify-content: center;
 }
+
 .jus-bet {
   justify-content: space-between;
 }
+
 .jus-end {
   justify-content: flex-end;
 }
@@ -506,29 +509,37 @@
   }
 }
 
-.size-160{
+.size-160 {
   width: 160px;
   height: 160px;
 }
 
-.normal-form-view-box{
+.normal-form-view-box {
   padding: 8px 20px;
 }
 
-.scroll-y{
+.scroll-y {
   overflow-y: scroll;
 }
 
-.scroll-box-y{
+.scroll-box-y {
   height: 100vh;
   overflow: hidden;
 }
-.normal-btn-box{
+
+.normal-btn-box {
   padding: 12px 0;
   display: flex;
   align-items: center;
 }
 
-.el-tooltip__popper{
+.el-tooltip__popper {
   max-width: 90%;
+}
+
+
+.guide-point {
+  z-index: 997 !important;
+  position: sticky !important;
+  position: -webkit-sticky !important;
 }

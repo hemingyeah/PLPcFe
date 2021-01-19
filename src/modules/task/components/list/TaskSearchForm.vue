@@ -291,7 +291,7 @@ export default {
         }`}
       >
         {this.fields.map(item => {
-          if (item.formType === 'datetime') {
+          if (item.formType === 'datetime' || item.formType === 'planTime') {
             item.formType = 'date'
           }
           return item

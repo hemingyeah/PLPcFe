@@ -343,12 +343,12 @@ export function getCountForCreate(params: {} | undefined) {
 }
 
 /**
- * @description 获取产品列表
+ * @description 根据手机号搜索客户
  * @param {Object} params - 参数
  * @param {String} params.phone - 手机号
  */
 export function getCustomerByPhone(params: {} | undefined) {
-  return http.get("task/getCustomerByPhone", params, false);
+  return http.get("/task/getCustomerByPhone", params, false);
 }
 
 /**

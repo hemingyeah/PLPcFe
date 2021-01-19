@@ -1,6 +1,7 @@
 <template>
   <div class="product-list-container"
        v-loading.fullscreen.lock="loading">
+    <div id="product-product-list"></div>
     <div class="product-list-search-group-container bg-w">
       <!-- <form class="base-search" onsubmit="return false;">
         <div class="product-list-base-search-group">
@@ -55,8 +56,8 @@
               重置
             </base-button>
             <div class="guide-box">
-              <div id="v-task-step-2"
-                   :class="['advanced-search-visible-btn', 'task-ml12']"
+              <div id="product-product-list-2"
+                   :class="['advanced-search-visible-btn', 'task-ml12', 'bg-w']"
                    @click.self="panelSearchAdvancedToggle">
                 <i class="iconfont icon-gaojisousuo task-font12 task-mr4"></i>
                 高级搜索
@@ -122,10 +123,11 @@
           </div>
         </div>
 
-        <div class="action-button-group flex-x">
+        <div class="action-button-group flex-x bg-w" id="product-product-list-3">
           <el-dropdown trigger="click"
                        v-if="exportPermission">
-            <div class="task-ai task-flex task-font14 task-c6 cur-point"
+            <div class="task-ai task-flex task-font14 task-c6 cur-point bg-w"
+                 
                  @click="trackEventHandler('moreAction')">
               <span class="task-mr4 task-ml4">更多操作</span>
               <i class="iconfont icon-triangle-down task-icon"></i>
@@ -156,7 +158,6 @@
                    'cur-point',
                    'task-width103',
                  ]"
-                 id="v-task-step-1"
                  @click="showAdvancedSetting">
               <span class="task-mr4 task-ml4">选择列</span>
               <i class="iconfont icon-triangle-down task-icon"></i>
@@ -171,210 +172,212 @@
                             @toggle-selection="toggleSelection"
                             @show-panel="() => (multipleSelectionPanelShow = true)" />
       </div>
-
-      <el-table stripe
-                :data="page.list"
-                :highlight-current-row="false"
-                :row-key="getRowKey"
-                :border="true"
-                @select="handleSelection"
-                @select-all="handleSelection"
-                @sort-change="sortChange"
-                @header-dragend="headerDragend"
-                :class="['task-list-table', 'common-list-table']"
-                header-row-class-name="common-list-table-header taks-list-table-header"
-                ref="multipleTable">
-        <el-table-column type="selection"
-                         width="48"
-                         align="center"
-                         class-name="flex-x jus-center"></el-table-column>
-        <template v-for="(column, index) in columns">
-          <el-table-column v-if="column.show"
-                           :key="`${column.field}_${index}`"
-                           :label="column.label"
-                           :prop="column.field"
-                           :width="column.width"
-                           :class-name="
-                             column.field == 'name' ? 'product-name-superscript-td' : ''
-                           "
-                           :min-width="column.minWidth || '120px'"
-                           :sortable="column.sortable"
-                           :show-overflow-tooltip="column.field !== 'name' && column.fieldName !== 'productPic'"
-                           :align="column.align">
-            <template slot-scope="scope">
-              <template v-if="column.field === 'name'">
-                <sample-tooltip :row="scope.row">
-                  <template slot="content"
-                            slot-scope="{ isContentTooltip }">
-                    <el-tooltip :content="scope.row[column.field]"
-                                placement="top-start"
-                                :disabled="!isContentTooltip">
-                      <a href=""
-                         class="view-detail-btn"
-                         @click.stop.prevent="openProductTab(scope.row.id)">
-                        {{ scope.row[column.field] }}
-                      </a>
-                    </el-tooltip>
-                  </template>
-                </sample-tooltip>
-              </template>
-              <template v-else-if="column.field === 'customer' && scope.row.customer">
-                <a href=""
-                   class="view-detail-btn"
-                   @click.stop.prevent="createCustomerTab(scope.row.customer.id)">
-                  {{ scope.row.customer.name }}
-                </a>
-              </template>
-              <template v-else-if="column.field === 'productTemplate'">
-                <a href=""
-                   class="view-detail-btn"
-                   @click.stop.prevent="createTemplateTab(scope.row.templateId)">
-                  {{ scope.row.templateName }}
-                </a>
-              </template>
-              <template v-else-if="column.field === 'tags'">
-                {{ scope.row | formatTags }}
-              </template>
-              <!-- 自定义的选择类型字段显示， 与type 区别-->
-              <template v-else-if="column.formType === 'cascader'">
-                {{ scope.row[column.field] | displaySelect }}
-              </template>
-              <template v-else-if="column.formType === 'select' && !column.isSystem">
-                {{ scope.row.attribute[column.field] | displaySelect }}
-              </template>
-              <template v-else-if="column.field === 'updateTime'">
-                <template v-if="scope.row.latesetUpdateRecord">
-                  <el-tooltip class="item"
-                              effect="dark"
-                              :content="scope.row.latesetUpdateRecord"
-                              placement="top-start">
-                    <div @mouseover="showLatestUpdateRecord(scope.row)">
-                      {{ scope.row.updateTime | formatDate }}
-                    </div>
-                  </el-tooltip>
-                </template>
-                <template v-else>
-                  <div @mouseover="showLatestUpdateRecord(scope.row)">
-                    {{ scope.row.updateTime | formatDate }}
-                  </div>
-                </template>
-              </template>
-              <template v-else-if="column.formType === 'address'">
-                {{ formatCustomizeAddress(scope.row.attribute[column.field]) }}
-              </template>
-              <template v-else-if="
-                column.formType === 'user' &&
-                  scope.row.attribute[column.field]
-              ">
-                {{ getUserName(column, scope.row.attribute[column.field]) }}
-              </template>
-              <template v-else-if="column.formType === 'location'">
-                {{
-                  scope.row.attribute[column.field] &&
-                    scope.row.attribute[column.field].address
-                }}
-              </template>
-              <template v-else-if="column.formType == 'related_task'">
-                {{ getRelatedTask(scope.row.attribute[column.field]) }}
-              </template>
-              <template v-else-if="column.field === 'createUser'">
-                {{ scope.row.createUser && scope.row.createUser.displayName }}
-              </template>
-              <template v-else-if="column.field === 'createTime'">
-                {{ scope.row.createTime | formatDate }}
-              </template>
-              <div v-else-if="column.formType === 'textarea'"
-                   v-html="buildTextarea(scope.row.attribute[column.field])"
-                   @click="openOutsideLink"></div>
-
-              <template v-else-if="column.fieldName == 'linkmanName'">
-                {{ scope.row.linkman.name }}
-              </template>
-
-              <template v-else-if="column.fieldName == 'phone'">
-                {{ scope.row.linkman.phone }}
-              </template>
-
-              <template v-else-if="column.fieldName == 'address'">
-                {{ getAddress(scope.row.address) }}
-              </template>
-
-              <template v-else-if="!column.isSystem">
-                {{ scope.row.attribute[column.field] }}
-              </template>
-
-
-              <!-- 移植自产品类型列表并同步更新 s -->
-
-              <template v-else-if="column.fieldName === 'pathName'">
-                <sample-tooltip :row="scope.row"
-                                v-if="scope.row[column.field]">
-                  <template slot="content"
-                            slot-scope="{ isContentTooltip }">
-
-                    <a href=""
-                       class="view-detail-btn"
-                       @click.stop.prevent="openProductMenuTab(scope.row.catalogId)">
-                      {{ (scope.row[column.field] && scope.row[column.field].replace(new RegExp("/","g") ,' / ')) || '' }}
-                    </a>
-                  </template>
-                </sample-tooltip>
-              </template>
-
-              <template v-else-if="column.fieldName === 'productPic'">
-                <div v-if="scope.row.productPic" class="flex-x goods-img-list" style="height:100%">
-                  <template v-for="(item, index) in scope.row.productPic">
-                    <img :key="index"
-                         v-if="index <= 4"
-                         class="cur-point"
-                         :src="
-                           item.url
-                             ? `${item.url}?x-oss-process=image/resize,m_fill,h_32,w_32`
-                             : defaultImg
-                         "
-                         @click.stop="previewImg(item.url)" />
-                  </template>
-                  <div>
-                    {{
-                      scope.row[column.field].length > 5
-                        ? `+${scope.row[column.field].length - 5}`
-                        : ''
-                    }}
-                  </div>
-                </div>
-              </template>
-
-              <template v-else-if="column.fieldName === 'productVideo'">
-                <template v-if="scope.row.productVideo">
+      <div id="product-product-list-1"
+           class="bg-w">
+        <el-table stripe
+                  :data="page.list"
+                  :highlight-current-row="false"
+                  :row-key="getRowKey"
+                  :border="true"
+                  @select="handleSelection"
+                  @select-all="handleSelection"
+                  @sort-change="sortChange"
+                  @header-dragend="headerDragend"
+                  :class="['task-list-table', 'common-list-table', 'bg-w']"
+                  header-row-class-name="common-list-table-header taks-list-table-header"
+                  ref="multipleTable">
+          <el-table-column type="selection"
+                           width="48"
+                           align="center"
+                           class-name="flex-x jus-center"></el-table-column>
+          <template v-for="(column, index) in columns">
+            <el-table-column v-if="column.show"
+                             :key="`${column.field}_${index}`"
+                             :label="column.label"
+                             :prop="column.field"
+                             :width="column.width"
+                             :class-name="
+                               column.field == 'name' ? 'product-name-superscript-td' : ''
+                             "
+                             :min-width="column.minWidth || '120px'"
+                             :sortable="column.sortable"
+                             :show-overflow-tooltip="column.field !== 'name' && column.fieldName !== 'productPic'"
+                             :align="column.align">
+              <template slot-scope="scope">
+                <template v-if="column.field === 'name'">
                   <sample-tooltip :row="scope.row">
                     <template slot="content"
                               slot-scope="{ isContentTooltip }">
+                      <el-tooltip :content="scope.row[column.field]"
+                                  placement="top-start"
+                                  :disabled="!isContentTooltip">
+                        <a href=""
+                           class="view-detail-btn"
+                           @click.stop.prevent="openProductTab(scope.row.id)">
+                          {{ scope.row[column.field] }}
+                        </a>
+                      </el-tooltip>
+                    </template>
+                  </sample-tooltip>
+                </template>
+                <template v-else-if="column.field === 'customer' && scope.row.customer">
+                  <a href=""
+                     class="view-detail-btn"
+                     @click.stop.prevent="createCustomerTab(scope.row.customer.id)">
+                    {{ scope.row.customer.name }}
+                  </a>
+                </template>
+                <template v-else-if="column.field === 'productTemplate'">
+                  <a href=""
+                     class="view-detail-btn"
+                     @click.stop.prevent="createTemplateTab(scope.row.templateId)">
+                    {{ scope.row.templateName }}
+                  </a>
+                </template>
+                <template v-else-if="column.field === 'tags'">
+                  {{ scope.row | formatTags }}
+                </template>
+                <!-- 自定义的选择类型字段显示， 与type 区别-->
+                <template v-else-if="column.formType === 'cascader'">
+                  {{ scope.row[column.field] | displaySelect }}
+                </template>
+                <template v-else-if="column.formType === 'select' && !column.isSystem">
+                  {{ scope.row.attribute[column.field] | displaySelect }}
+                </template>
+                <template v-else-if="column.field === 'updateTime'">
+                  <template v-if="scope.row.latesetUpdateRecord">
+                    <el-tooltip class="item"
+                                effect="dark"
+                                :content="scope.row.latesetUpdateRecord"
+                                placement="top-start">
+                      <div @mouseover="showLatestUpdateRecord(scope.row)">
+                        {{ scope.row.updateTime | formatDate }}
+                      </div>
+                    </el-tooltip>
+                  </template>
+                  <template v-else>
+                    <div @mouseover="showLatestUpdateRecord(scope.row)">
+                      {{ scope.row.updateTime | formatDate }}
+                    </div>
+                  </template>
+                </template>
+                <template v-else-if="column.formType === 'address'">
+                  {{ formatCustomizeAddress(scope.row.attribute[column.field]) }}
+                </template>
+                <template v-else-if="
+                  column.formType === 'user' &&
+                    scope.row.attribute[column.field]
+                ">
+                  {{ getUserName(column, scope.row.attribute[column.field]) }}
+                </template>
+                <template v-else-if="column.formType === 'location'">
+                  {{
+                    scope.row.attribute[column.field] &&
+                      scope.row.attribute[column.field].address
+                  }}
+                </template>
+                <template v-else-if="column.formType == 'related_task'">
+                  {{ getRelatedTask(scope.row.attribute[column.field]) }}
+                </template>
+                <template v-else-if="column.field === 'createUser'">
+                  {{ scope.row.createUser && scope.row.createUser.displayName }}
+                </template>
+                <template v-else-if="column.field === 'createTime'">
+                  {{ scope.row.createTime | formatDate }}
+                </template>
+                <div v-else-if="column.formType === 'textarea'"
+                     v-html="buildTextarea(scope.row.attribute[column.field])"
+                     @click="openOutsideLink"></div>
+
+                <template v-else-if="column.fieldName == 'linkmanName'">
+                  {{ scope.row.linkman.name }}
+                </template>
+
+                <template v-else-if="column.fieldName == 'phone'">
+                  {{ scope.row.linkman.phone }}
+                </template>
+
+                <template v-else-if="column.fieldName == 'address'">
+                  {{ getAddress(scope.row.address) }}
+                </template>
+
+                <template v-else-if="!column.isSystem">
+                  {{ scope.row.attribute[column.field] }}
+                </template>
+
+                <!-- 移植自产品类型列表并同步更新 s -->
+
+                <template v-else-if="column.fieldName === 'pathName'">
+                  <sample-tooltip :row="scope.row"
+                                  v-if="scope.row[column.field]">
+                    <template slot="content"
+                              slot-scope="{ isContentTooltip }">
+
                       <a href=""
                          class="view-detail-btn"
-                         @click.stop.prevent="
-                           previewVideo(scope.row.productVideo[0].url)
-                         ">
-                        {{
-                          scope.row.productVideo[0] &&
-                            scope.row.productVideo[0].filename
-                        }}
+                         @click.stop.prevent="openProductMenuTab(scope.row.catalogId)">
+                        {{ (scope.row[column.field] && scope.row[column.field].replace(new RegExp("/","g") ,' / ')) || '' }}
                       </a>
                     </template>
                   </sample-tooltip>
                 </template>
+
+                <template v-else-if="column.fieldName === 'productPic'">
+                  <div v-if="scope.row.productPic"
+                       class="flex-x goods-img-list"
+                       style="height:100%">
+                    <template v-for="(item, index) in scope.row.productPic">
+                      <img :key="index"
+                           v-if="index <= 4"
+                           class="cur-point"
+                           :src="
+                             item.url
+                               ? `${item.url}?x-oss-process=image/resize,m_fill,h_32,w_32`
+                               : defaultImg
+                           "
+                           @click.stop="previewImg(item.url)" />
+                    </template>
+                    <div>
+                      {{
+                        scope.row[column.field].length > 5
+                          ? `+${scope.row[column.field].length - 5}`
+                          : ''
+                      }}
+                    </div>
+                  </div>
+                </template>
+
+                <template v-else-if="column.fieldName === 'productVideo'">
+                  <template v-if="scope.row.productVideo">
+                    <sample-tooltip :row="scope.row">
+                      <template slot="content"
+                                slot-scope="{ isContentTooltip }">
+                        <a href=""
+                           class="view-detail-btn"
+                           @click.stop.prevent="
+                             previewVideo(scope.row.productVideo[0].url)
+                           ">
+                          {{
+                            scope.row.productVideo[0] &&
+                              scope.row.productVideo[0].filename
+                          }}
+                        </a>
+                      </template>
+                    </sample-tooltip>
+                  </template>
+                </template>
+
+                <!-- 移植自产品类型列表并同步更新 e -->
+
+                <template v-else>
+                  {{ scope.row[column.field] }}
+                </template>
+
               </template>
-
-              <!-- 移植自产品类型列表并同步更新 e -->
-
-              <template v-else>
-                {{ scope.row[column.field] }}
-              </template>
-
-
-            </template>
-          </el-table-column>
-        </template>
-      </el-table>
+            </el-table-column>
+          </template>
+        </el-table>
+      </div>
 
       <div class="table-footer">
         <div class="list-info">
@@ -502,38 +505,44 @@
 </template>
 
 <script>
-import _ from "lodash";
+import _ from 'lodash';
 
-import Page from "@model/Page";
-import { formatDate } from "@src/util/lang";
-import { getRootWindow } from "@src/util/dom";
-import SendMessageDialog from "@src/modules/productV2/productList/compoment/SendMessageDialog.vue";
-import BatchEditingDialog from "@src/modules/productV2/productList/compoment/BatchEditingDialog.vue";
-import BatchRemindingDialog from "@src/modules/productV2/productList/compoment/BatchRemindingDialog.vue";
-import BatchUpdateDialog from "@src/modules/productV2/productList/compoment/BatchUpdateDialog.vue";
-import SearchPanel from "@src/modules/productV2/productList/compoment/SearchPanel.vue";
-import { storageGet, storageSet } from "@src/util/storage";
+import Page from '@model/Page';
+import { formatDate } from '@src/util/lang';
+import { getRootWindow } from '@src/util/dom';
+import SendMessageDialog from '@src/modules/productV2/productList/compoment/SendMessageDialog.vue';
+import BatchEditingDialog from '@src/modules/productV2/productList/compoment/BatchEditingDialog.vue';
+import BatchRemindingDialog from '@src/modules/productV2/productList/compoment/BatchRemindingDialog.vue';
+import BatchUpdateDialog from '@src/modules/productV2/productList/compoment/BatchUpdateDialog.vue';
+import SearchPanel from '@src/modules/productV2/productList/compoment/SearchPanel.vue';
+import { storageGet, storageSet } from '@src/util/storage';
 
 import {
   getProductV2,
   deleteProductByIds,
   getUpdateRecord,
   getProductFields
-} from "@src/api/ProductApi";
+} from '@src/api/ProductApi';
 
-import { PRODUCT_LIST_LOCALSTORAGE_20_11_25 } from "@src/modules/productV2/storage.js"
+import { PRODUCT_LIST_LOCALSTORAGE_20_11_25 } from '@src/modules/productV2/storage.js'
 
-import { catalogFieldFixForProduct, productFieldFix } from "@src/modules/productV2/public.js";
-import { getListProductFields, getProductLinkCatalogCount } from "@src/api/ProductV2Api"
-import TeamMixin from "@src/mixins/teamMixin";
-import { isShowCustomerRemind } from "@src/util/version.ts";
+import { catalogFieldFixForProduct, productFieldFix } from '@src/modules/productV2/public.js';
+import { getListProductFields, getProductLinkCatalogCount } from '@src/api/ProductV2Api'
+import TeamMixin from '@src/mixins/teamMixin';
+import { isShowCustomerRemind } from '@src/util/version.ts';
+
+
+
+const {
+  PRODUCT_PRODUCT_LIST
+} = require('@src/component/guide/productV2Store');
 
 const link_reg = /((((https?|ftp?):(?:\/\/)?)(?:[-;:&=\+\$]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\?\+=&;:%!\/@.\w_]*)#?(?:[-\+=&;%!\?\/@.\w_]*))?)/g;
 
 export default {
-  name: "product-list",
+  name: 'product-list',
   mixins: [TeamMixin],
-  inject: ["initData"],
+  inject: ['initData'],
   // props: {
   //   initData: {
   //     type: Object,
@@ -551,11 +560,11 @@ export default {
       selectedLimit: 500,
       searchIncludeMoreConditions: false,
       searchModel: {
-        keyword: "",
+        keyword: '',
         pageSize: 10,
         pageNum: 1,
         orderDetail: {},
-        catalogState: "",
+        catalogState: '',
         moreConditions: {
           conditions: [],
         },
@@ -564,16 +573,16 @@ export default {
       dynamicFields: [],
       filterTeams: [],
       tableKey: (Math.random() * 1000) >> 2,
-      selectColumnState: "product_list_select",
+      selectColumnState: 'product_list_select',
       // 头部筛选列表 s
       selectList: [
-        { name: "全部", key: "", value: "" },
-        { name: "有产品类型", key: "buildCatalogNum", value: 1 },
-        { name: "无产品类型", key: "unBuildCatalogNum", value: 0 }
+        { name: '全部', key: '', value: '' },
+        { name: '有产品类型', key: 'buildCatalogNum', value: 1 },
+        { name: '无产品类型', key: 'unBuildCatalogNum', value: 0 }
       ],
       selectCount: null,
       navWidth: window.innerWidth - 120,
-      selectId: "",
+      selectId: '',
       // 头部筛选列表 e
     };
   },
@@ -602,48 +611,48 @@ export default {
       let fixedFields = _.cloneDeep(productFieldFix);
       if (this.initData.productConfig.qrcodeEnabled) {
         fixedFields.push({
-          displayName: "二维码编号",
-          fieldName: "qrcodeId",
-          formType: "text",
+          displayName: '二维码编号',
+          fieldName: 'qrcodeId',
+          formType: 'text',
           export: false,
           isSystem: 1,
-          placeholder: "请输入产品二维码",
+          placeholder: '请输入产品二维码',
           orderId: 10001,
-          tableName: "product",
+          tableName: 'product',
         });
       }
 
 
       let field = this.dynamicFields.filter(
-        (item) => item.formType == "customer"
+        (item) => item.formType == 'customer'
       )[0];
       if (field && field.setting.customerOption?.linkman) {
         fixedFields.push({
-          displayName: "联系人",
-          fieldName: "linkmanName",
-          formType: "text",
+          displayName: '联系人',
+          fieldName: 'linkmanName',
+          formType: 'text',
           export: true,
           isSystem: 0,
-          tableName: "product",
+          tableName: 'product',
         });
 
         fixedFields.push({
-          displayName: "电话",
-          fieldName: "phone",
+          displayName: '电话',
+          fieldName: 'phone',
           export: true,
           isSystem: 0,
-          tableName: "product",
+          tableName: 'product',
         });
       }
 
       if (field && field.setting.customerOption?.address) {
         fixedFields.push({
-          displayName: "地址",
-          fieldName: "address",
+          displayName: '地址',
+          fieldName: 'address',
           export: true,
-          formType: "text",
+          formType: 'text',
           isSystem: 0,
-          tableName: "product",
+          tableName: 'product',
         });
       }
 
@@ -651,87 +660,87 @@ export default {
       return this.dynamicFields.concat([...fixedFields])
         .filter(
           (f) =>
-            f.formType !== "separator"
-            && f.formType !== "info"
-            && f.formType !== "autograph"
+            f.formType !== 'separator'
+            && f.formType !== 'info'
+            && f.formType !== 'autograph'
         )
         .map((f) => {
           // 调整字段顺序
-          if (f.fieldName === "name") {
+          if (f.fieldName === 'name') {
             f.orderId = -13;
             f.show = true;
           }
 
-          if (f.fieldName === "customer") {
+          if (f.fieldName === 'customer') {
             f.orderId = -12;
             f.show = true;
           }
 
-          if (f.fieldName === "linkmanName") {
+          if (f.fieldName === 'linkmanName') {
             f.orderId = -11;
             f.show = true;
           }
 
-          if (f.fieldName === "phone") {
+          if (f.fieldName === 'phone') {
             f.orderId = -10;
             f.show = true;
           }
 
-          if (f.fieldName === "address") {
+          if (f.fieldName === 'address') {
             f.orderId = -9;
             f.show = true;
           }
 
-          if (f.fieldName === "serialNumber") {
+          if (f.fieldName === 'serialNumber') {
             f.orderId = -6;
             f.show = true;
           }
 
-          if (f.fieldName === "type") {
+          if (f.fieldName === 'type') {
             f.orderId = -5;
             f.show = true;
           }
 
-          if (f.fieldName === "tags") {
+          if (f.fieldName === 'tags') {
             f.orderId = -8;
           }
 
-          if (f.fieldName === "productTemplate") {
+          if (f.fieldName === 'productTemplate') {
             f.orderId = -7;
           }
 
-          if (f.fieldName === "remindCount") {
+          if (f.fieldName === 'remindCount') {
             f.orderId = -3;
           }
 
-          if (f.fieldName === "updateTime") {
+          if (f.fieldName === 'updateTime') {
             f.orderId = -2;
           }
 
-          if (f.fieldName === "createUser") {
+          if (f.fieldName === 'createUser') {
             f.orderId = -1;
             f.show = true;
           }
 
-          if (f.fieldName === "createTime") {
+          if (f.fieldName === 'createTime') {
             f.orderId = 0;
             f.show = true;
           }
-          if (f.fieldName === "catalogId" && f.tableName == "product") {
+          if (f.fieldName === 'catalogId' && f.tableName == 'product') {
             // 转换产品类型表单数据
-            f.fieldName = "pathName"
+            f.fieldName = 'pathName'
           }
 
           // 系统字段默认显示
-          f["show"] = f.isSystem ? true : f.show
+          f['show'] = f.isSystem ? true : f.show
 
           return f;
         })
         .sort((a, b) => a.orderId - b.orderId);
     },
     onlyProductFields () {
-      
-      return this.productFields.filter(item => item.tableName == "product").map(item => { if (item.formType == "related_catalog") { item.fieldName = "catalogId" } return item })
+
+      return this.productFields.filter(item => item.tableName == 'product').map(item => { if (item.formType == 'related_catalog') { item.fieldName = 'catalogId' } return item })
     },
     productTypes () {
       return this.initData.productConfig.productType || [];
@@ -745,38 +754,38 @@ export default {
     exportColumns () {
       let arr = [
         {
-          label: "产品系统编号",
-          field: "productId",
+          label: '产品系统编号',
+          field: 'productId',
           export: true,
         },
         {
-          label: "客户姓名",
-          field: "customerName",
+          label: '客户姓名',
+          field: 'customerName',
           export: true,
         },
         {
-          label: "客户编号",
-          field: "customerSN",
+          label: '客户编号',
+          field: 'customerSN',
           export: true,
         },
         ...this.columns,
       ].map((field) => {
         if (
-          ["customer", "productTemplate", "remindCount"].some(
+          ['customer', 'productTemplate', 'remindCount'].some(
             (key) => key === field.fieldName
           )
-          || field.formType === "info"
+          || field.formType === 'info'
         ) {
           field.export = false;
         } else {
           field.export = true;
         }
 
-        if ("qrcodeId" == field.fieldName) {
+        if ('qrcodeId' == field.fieldName) {
           field.export = Boolean(this.initData.productConfig.qrcodeEnabled);
         }
 
-        if ("qrcodeId" == field.fieldName) {
+        if ('qrcodeId' == field.fieldName) {
           field.export = Boolean(this.initData.productConfig.qrcodeEnabled);
         }
 
@@ -785,9 +794,9 @@ export default {
 
       let arr_ = [
         {
-          label: "产品信息",
-          value: "productExport",
-          columns: arr.filter(item => item.tableName == "product"),
+          label: '产品信息',
+          value: 'productExport',
+          columns: arr.filter(item => item.tableName == 'product'),
         },
         // {
         //   label: "产品类型信息",
@@ -806,21 +815,21 @@ export default {
   },
   filters: {
     formatTags ({ customer }) {
-      if (!customer) return "";
-      if (!customer.tags || !customer.tags.length) return "";
-      return customer.tags.map((t) => t.tagName).join(" ");
+      if (!customer) return '';
+      if (!customer.tags || !customer.tags.length) return '';
+      return customer.tags.map((t) => t.tagName).join(' ');
     },
     formatDate (val) {
-      if (!val) return "";
-      return formatDate(val, "YYYY-MM-DD HH:mm:ss");
+      if (!val) return '';
+      return formatDate(val, 'YYYY-MM-DD HH:mm:ss');
     },
     displaySelect (value) {
       if (!value) return null;
-      if (value && typeof value === "string") {
+      if (value && typeof value === 'string') {
         return value;
       }
       if (Array.isArray(value) && value.length) {
-        return value.join("，");
+        return value.join('，');
       }
       return null;
     },
@@ -831,18 +840,56 @@ export default {
     window.__exports__refresh = this.resetPage;
 
     this.$eventBus.$on(
-      "product_list.update_product_list_remind_count",
+      'product_list.update_product_list_remind_count',
       this.updateProductRemindCount
     );
+
+    this.$nextTick(() => {
+      if (storageGet(PRODUCT_PRODUCT_LIST) && storageGet(PRODUCT_PRODUCT_LIST) > 0) this.$Guide().destroy('product-product-list')
+      else this.$Guide([{
+        content:
+          '产品列表，可拖拽改变列表宽',
+        haveStep: true,
+        nowStep: 1,
+        id: 'product-product-list',
+        domObj:()=>{
+          return document.getElementById('product-product-list-1').getElementsByClassName('el-table__header-wrapper')[0]
+        },
+        needCover: true,
+        finishBtn: 'ok',
+      }, {
+        content:
+          '高级搜索支持自定义条件对目标数据搜索',
+        haveStep: true,
+        nowStep: 2,
+        id: 'product-product-list',
+        domId: 'product-product-list-2',
+        needCover: true,
+        finishBtn: 'ok',
+      }, {
+        content:
+          '选择自定义列展示、数据导出等功能',
+        haveStep: true,
+        nowStep: 3,
+        id: 'product-product-list',
+        domId: 'product-product-list-3',
+        needCover: true,
+        finishBtn: 'ok',
+      }], 0, '', (e) => {
+        return new Promise((resolve, reject) => {
+          resolve()
+        })
+      }).create().then(res_=>{if(res_)storageSet(PRODUCT_PRODUCT_LIST, '1')})
+    })
   },
   beforeDestroy () {
     this.$eventBus.$off(
-      "product_list.update_product_list_remind_count",
+      'product_list.update_product_list_remind_count',
       this.updateProductRemindCount
     );
   },
   methods: {
-    async resetPage(){
+    async resetPage () {
       // 获取产品动态字段
       try {
         let res = await getProductFields({ isFromSetting: true });
@@ -851,7 +898,7 @@ export default {
         this.getSelectCount();
       } catch (error) {
         this.buildColumns();
-        console.error("product-list fetch product fields error", error);
+        console.error('product-list fetch product fields error', error);
       }
       this.revertStorage();
       this.search();
@@ -861,28 +908,28 @@ export default {
       }
     },
     getAddress (field) {
-      return (field && field.province + field.city + field.dist + field.address) || "";
+      return (field && field.province + field.city + field.dist + field.address) || '';
     },
     getRelatedTask (field) {
       return Array.isArray(field)
-        ? field.map((item) => item.taskNo).join(",")
-        : "";
+        ? field.map((item) => item.taskNo).join(',')
+        : '';
     },
     // 处理人员显示
     getUserName (field, value) {
       // 多选
       if (Array.isArray(value)) {
-        return value.map((i) => i.displayName || i.name).join(",");
+        return value.map((i) => i.displayName || i.name).join(',');
       }
 
       let user = value || {};
       return user.displayName || user.name;
     },
     openOutsideLink (e) {
-      let url = e.target.getAttribute("url");
+      let url = e.target.getAttribute('url');
       if (!url) return;
       if (!/http/gi.test(url))
-        return this.$platform.alert("请确保输入的链接以http或者https开始");
+        return this.$platform.alert('请确保输入的链接以http或者https开始');
       this.$platform.openLink(url);
     },
     buildTextarea (value) {
@@ -890,7 +937,7 @@ export default {
         ? value.replace(link_reg, (match) => {
           return `<a href="javascript:;" target="_blank" url="${match}">${match}</a>`;
         })
-        : "";
+        : '';
     },
     powerfulSearch () {
       this.searchModel.pageNum = 1;
@@ -899,18 +946,18 @@ export default {
       this.search();
     },
     formatCustomizeAddress (ad) {
-      if (null == ad) return "";
+      if (null == ad) return '';
 
       const { province, city, dist, address } = ad;
-      return [province, city, dist, address].filter((d) => !!d).join("-");
+      return [province, city, dist, address].filter((d) => !!d).join('-');
     },
 
     openProductTab (productId) {
-      let fromId = window.frameElement.getAttribute("id");
+      let fromId = window.frameElement.getAttribute('id');
       console.log(productId)
       this.$platform.openTab({
         id: `product_view_${productId}`,
-        title: "产品详情",
+        title: '产品详情',
         close: true,
         url: `/customer/product/view/${productId}?noHistory=1`,
         fromId,
@@ -929,7 +976,7 @@ export default {
           if (content.length) content = content.map((item) => {
             if (item.catalog) {
               item = { ...item, ...item.catalog };
-              item["catalogId"] = item.catalogId || ""
+              item['catalogId'] = item.catalogId || ''
               if (item.catalog.catalogAttribute) {
                 item.attribute = { ...item.attribute, ...item.catalog.catalogAttribute }
               }
@@ -937,14 +984,14 @@ export default {
             return item
           })
 
-          this.page["list"] = content;
-          this.page["total"] = totalPages;
-          this.page["totalElements"] = totalElements
-          this.page["pageNum"] = number;
-          this.page["pageSize"] = size
+          this.page['list'] = content;
+          this.page['total'] = totalPages;
+          this.page['totalElements'] = totalElements
+          this.page['pageNum'] = number;
+          this.page['pageSize'] = size
           this.matchSelected();
         })
-        .catch((e) => console.error("fetch product catch an error", e));
+        .catch((e) => console.error('fetch product catch an error', e));
     },
     buildParams () {
       const sm = Object.assign({}, this.searchModel);
@@ -976,14 +1023,14 @@ export default {
       this.search();
     },
     resetParams () {
-      window.TDAPP.onEvent("pc：产品管理-重置事件");
+      window.TDAPP.onEvent('pc：产品管理-重置事件');
       this.searchIncludeMoreConditions = false;
       this.searchModel = {
-        keyword: "",
+        keyword: '',
         pageNum: 1,
         pageSize: this.page.pageSize,
         orderDetail: {},
-        catalogState: "",
+        catalogState: '',
         moreConditions: {
           conditions: [],
         },
@@ -993,26 +1040,26 @@ export default {
       this.search();
     },
     openDialog (action) {
-      if (action === "sendMessage") {
-        window.TDAPP.onEvent("pc：产品管理-发送短信事件");
+      if (action === 'sendMessage') {
+        window.TDAPP.onEvent('pc：产品管理-发送短信事件');
         this.$refs.messageDialog.openSendMessageDialog();
       }
 
-      if (action === "edit") {
-        window.TDAPP.onEvent("批量编辑	pc：产品管理-批量编辑事件");
+      if (action === 'edit') {
+        window.TDAPP.onEvent('批量编辑	pc：产品管理-批量编辑事件');
         this.$refs.batchEditingDialog.open();
       }
 
-      if (action === "remind") {
-        window.TDAPP.onEvent("批量提醒	pc：产品管理-批量提醒事件");
+      if (action === 'remind') {
+        window.TDAPP.onEvent('批量提醒	pc：产品管理-批量提醒事件');
         this.$refs.batchRemindingDialog.openBatchRemindingDialog();
       }
 
-      if (action === "importProduct") {
+      if (action === 'importProduct') {
         this.$refs.importProductModal.open();
       }
 
-      if (action === "update") {
+      if (action === 'update') {
         // if (!this.multipleSelection || !this.multipleSelection.length) {
         //   return this.$platform.alert('您尚未选择数据，请选择数据后点击批量更新');
         // }
@@ -1021,34 +1068,34 @@ export default {
     },
     // operation
     async deleteProducts () {
-      window.TDAPP.onEvent("pc：产品管理-删除事件");
+      window.TDAPP.onEvent('pc：产品管理-删除事件');
       if (!this.multipleSelection.length) {
-        return this.$platform.alert("请选择需要删除的产品");
+        return this.$platform.alert('请选择需要删除的产品');
       }
 
       try {
-        if (!(await this.$platform.confirm("确定要删除选择的产品？"))) return;
+        if (!(await this.$platform.confirm('确定要删除选择的产品？'))) return;
 
-        const ids = this.multipleSelection.map((p) => p.id).join(",");
+        const ids = this.multipleSelection.map((p) => p.id).join(',');
         this.loading = true;
         const res = await deleteProductByIds(ids);
         this.loading = false;
 
         if (!res || res.status)
           return this.$platform.notification({
-            title: "失败",
-            type: "error",
-            message: res.message || "发生未知错误",
+            title: '失败',
+            type: 'error',
+            message: res.message || '发生未知错误',
           });
         this.$platform.notification({
-          title: "删除成功",
-          type: "success",
+          title: '删除成功',
+          type: 'success',
         });
         this.multipleSelection = [];
         this.search();
       } catch (e) {
         this.loading = false;
-        console.error("e", e);
+        console.error('e', e);
       }
     },
     // 批量添加提醒成功后，更新产品的提醒数量
@@ -1115,7 +1162,7 @@ export default {
 
         let isSystem = 0;
 
-        if (prop === "createTime" || prop === "updateTime") {
+        if (prop === 'createTime' || prop === 'updateTime') {
           isSystem = 1;
         } else {
           isSystem = sortedField.isSystem;
@@ -1123,17 +1170,17 @@ export default {
 
         let sortModel = {
           isSystem,
-          sequence: order === "ascending" ? "ASC" : "DESC",
+          sequence: order === 'ascending' ? 'ASC' : 'DESC',
           column: isSystem ? `${prop}` : prop,
         };
 
         if (
-          prop === "createTime"
-          || prop === "updateTime"
-          || sortedField.formType === "date"
-          || sortedField.formType === "datetime"
+          prop === 'createTime'
+          || prop === 'updateTime'
+          || sortedField.formType === 'date'
+          || sortedField.formType === 'datetime'
         ) {
-          sortModel.type = "date";
+          sortModel.type = 'date';
         } else {
           sortModel.type = sortedField.formType;
         }
@@ -1142,11 +1189,11 @@ export default {
 
         this.search();
       } catch (e) {
-        console.error("e", e);
+        console.error('e', e);
       }
     },
     handleSizeChange (pageSize) {
-      this.saveDataToStorage("pageSize", pageSize);
+      this.saveDataToStorage('pageSize', pageSize);
       this.searchModel.pageSize = pageSize;
       this.searchModel.pageNum = 1;
       this.search();
@@ -1204,7 +1251,7 @@ export default {
             width: item.width,
           };
         });
-      this.modifyColumnStatus({ type: "column", data });
+      this.modifyColumnStatus({ type: 'column', data });
     },
 
     /**
@@ -1220,15 +1267,15 @@ export default {
       this.columns.forEach((col) => {
         let newCol = colMap[col.field];
         if (null != newCol) {
-          this.$set(col, "show", newCol.show);
-          this.$set(col, "width", newCol.width);
+          this.$set(col, 'show', newCol.show);
+          this.$set(col, 'width', newCol.width);
         }
       });
 
       this.saveColumnStatusToStorage();
     },
     showAdvancedSetting () {
-      window.TDAPP.onEvent("pc：产品管理-选择列事件");
+      window.TDAPP.onEvent('pc：产品管理-选择列事件');
       this.$refs.advanced.open(this.columns);
     },
     /**
@@ -1241,7 +1288,7 @@ export default {
       this.columns = [];
 
       this.$nextTick(() => {
-        this.$set(this, "columns", columns.slice());
+        this.$set(this, 'columns', columns.slice());
         this.saveColumnStatusToStorage();
       });
     },
@@ -1268,7 +1315,7 @@ export default {
         };
       }
 
-      this.saveDataToStorage("columnStatus", columnsStatus);
+      this.saveDataToStorage('columnStatus', columnsStatus);
     },
 
     // 选择列 e
@@ -1279,28 +1326,28 @@ export default {
       let columnStatus = localStorageData.columnStatus && localStorageData.columnStatus[this.selectColumnState];
       columnStatus = columnStatus || [];
       let localColumns = columnStatus
-        .map((i) => (typeof i == "string" ? { field: i, show: true } : i))
+        .map((i) => (typeof i == 'string' ? { field: i, show: true } : i))
         .reduce((acc, col) => (acc[col.field] = col) && acc, {});
 
       this.columns = this.productFields
         .filter(
           (f) =>
-            f.formType !== "attachment"
-            && f.formType !== "separator"
-            && f.formType !== "info"
-            && f.formType !== "autograph"
+            f.formType !== 'attachment'
+            && f.formType !== 'separator'
+            && f.formType !== 'info'
+            && f.formType !== 'autograph'
         )
         .map((field) => {
           let sortable = false;
           let minWidth = null;
 
-          if (["date", "datetime", "number"].indexOf(field.formType) >= 0) {
-            sortable = "custom";
+          if (['date', 'datetime', 'number'].indexOf(field.formType) >= 0) {
+            sortable = 'custom';
             minWidth = 100;
           }
 
-          if (field.fieldName === "type") {
-            sortable = "custom";
+          if (field.fieldName === 'type') {
+            sortable = 'custom';
           }
 
           if (field.displayName.length > 4) {
@@ -1312,9 +1359,9 @@ export default {
           }
 
           if (
-            field.formType === "datetime"
-            || field.fieldName === "updateTime"
-            || field.fieldName === "createTime"
+            field.formType === 'datetime'
+            || field.fieldName === 'updateTime'
+            || field.fieldName === 'createTime'
           ) {
             minWidth = 150;
           }
@@ -1324,7 +1371,7 @@ export default {
             label: field.displayName,
             field: field.fieldName,
             formType: field.formType,
-            minWidth: typeof minWidth == "number" ? minWidth : `${minWidth}px`,
+            minWidth: typeof minWidth == 'number' ? minWidth : `${minWidth}px`,
             sortable,
             isSystem: field.isSystem,
           };
@@ -1335,19 +1382,19 @@ export default {
           let localField = localColumns[col.field];
 
           if (null != localField) {
-            width = typeof localField.width == "number"
+            width = typeof localField.width == 'number'
               ? `${localField.width}px`
-              : "";
+              : '';
             show = localField.show !== false;
           }
 
 
           col.show = show;
-          if (col.formType == "related_catalog") {
+          if (col.formType == 'related_catalog') {
             col.show = true;
           }
           col.width = width;
-          col.type = "column";
+          col.type = 'column';
 
           return col;
         });
@@ -1399,10 +1446,10 @@ export default {
       // 产品类型信息
       // let export_catalog = this.exportData(1, catalogExport)
 
-      params["exportOneRow"] = exportOneRow
-      params["data"] = exportAll ? "" : this.selectedIds.join(",");
+      params['exportOneRow'] = exportOneRow
+      params['data'] = exportAll ? '' : this.selectedIds.join(',');
       // params["catalogExport"] = export_catalog.join(",");
-      params["productExport"] = export_product.join(",");
+      params['productExport'] = export_product.join(',');
 
       return params;
     },
@@ -1411,7 +1458,7 @@ export default {
      */
     exportData (number, list = []) {
       const export_list = this.exportColumns;
-      if(!list.length) return
+      if (!list.length) return
       if (number === 3) {
         let cardField = []
         export_list.filter((item, index) => {
@@ -1456,16 +1503,16 @@ export default {
     checkExportCount (ids, max) {
       let exportAll = !ids || !ids.length;
       return exportAll && this.page.totalElements > max
-        ? "为了保障响应速度，暂不支持超过5000条以上的数据导出，请您分段导出。"
+        ? '为了保障响应速度，暂不支持超过5000条以上的数据导出，请您分段导出。'
         : null;
     },
 
     exportProduct (exportAll) {
       let ids = [];
-      let fileName = `${formatDate(new Date(), "YYYY-MM-DD")}产品数据.xlsx`;
+      let fileName = `${formatDate(new Date(), 'YYYY-MM-DD')}产品数据.xlsx`;
       if (!exportAll) {
         if (!this.multipleSelection.length)
-          return this.$platform.alert("请选择要导出的数据");
+          return this.$platform.alert('请选择要导出的数据');
         ids = this.selectedIds;
       }
       this.$refs.exportPanel.open(ids, fileName);
@@ -1487,15 +1534,15 @@ export default {
 
           this.matchSelected();
         })
-        .catch((e) => console.error("e", e));
+        .catch((e) => console.error('e', e));
     },
 
     createCustomerTab (productId) {
-      let fromId = window.frameElement.getAttribute("id");
+      let fromId = window.frameElement.getAttribute('id');
 
       this.$platform.openTab({
         id: `customer_view_${productId}`,
-        title: "客户信息",
+        title: '客户信息',
         close: true,
         url: `/customer/view/${productId}?noHistory=1`,
         fromId,
@@ -1503,32 +1550,32 @@ export default {
     },
 
     createTemplateTab (templateId) {
-      let fromId = window.frameElement.getAttribute("id");
+      let fromId = window.frameElement.getAttribute('id');
 
       this.$platform.openTab({
         id: `product_template_view_${templateId}`,
-        title: "产品模板",
+        title: '产品模板',
         close: true,
         url: `/product/detail/${templateId}?noHistory=1`,
         fromId,
       });
     },
     goToCreate () {
-      window.TDAPP.onEvent("pc：产品管理-新建事件");
+      window.TDAPP.onEvent('pc：产品管理-新建事件');
       // window.location = '/customer/product/create';
-      let fromId = window.frameElement.getAttribute("id");
+      let fromId = window.frameElement.getAttribute('id');
 
       this.$platform.openTab({
-        id: "customer_product_create",
-        title: "新建产品",
-        url: "/customer/product/create",
+        id: 'customer_product_create',
+        title: '新建产品',
+        url: '/customer/product/create',
         reload: true,
         close: true,
         fromId,
       });
     },
     getLocalStorageData () {
-      const dataStr = localStorage.getItem(PRODUCT_LIST_LOCALSTORAGE_20_11_25) || "{}";
+      const dataStr = localStorage.getItem(PRODUCT_LIST_LOCALSTORAGE_20_11_25) || '{}';
       return JSON.parse(dataStr);
     },
     saveDataToStorage (key, value) {
@@ -1573,29 +1620,29 @@ export default {
       );
     },
     panelSearchAdvancedToggle () {
-      window.TDAPP.onEvent("pc：产品管理-高级搜索事件");
+      window.TDAPP.onEvent('pc：产品管理-高级搜索事件');
       this.$refs.searchPanel.open();
       this.$nextTick(() => {
-        let forms = document.getElementsByClassName("advanced-search-form");
+        let forms = document.getElementsByClassName('advanced-search-form');
         for (let i = 0; i < forms.length; i++) {
           let form = forms[i];
-          form.setAttribute("novalidate", true);
+          form.setAttribute('novalidate', true);
         }
       });
     },
     // TalkingData事件埋点
     trackEventHandler (type) {
-      if (type === "search") {
-        window.TDAPP.onEvent("pc：产品管理-搜索事件");
+      if (type === 'search') {
+        window.TDAPP.onEvent('pc：产品管理-搜索事件');
         return;
       }
-      if (type === "moreAction") {
-        window.TDAPP.onEvent("pc：产品管理-更多操作事件");
+      if (type === 'moreAction') {
+        window.TDAPP.onEvent('pc：产品管理-更多操作事件');
         return;
       }
     },
     getRowKey (row) {
-      return row.id || "";
+      return row.id || '';
     },
     /**
      * 创建视角
@@ -1639,7 +1686,7 @@ export default {
     openProductMenuTab (id) {
       this.$platform.openTab({
         id: `productV2_catalog_view_${id}`,
-        title: "产品类型详情",
+        title: '产品类型详情',
         close: true,
         url: `/productV2/catalog/view?id=${id}`
       });
@@ -1848,8 +1895,8 @@ body {
 }
 
 // table
-.el-table{
-  border:none;
+.el-table {
+  border: none;
 }
 .el-table--small th,
 .el-table--small td {

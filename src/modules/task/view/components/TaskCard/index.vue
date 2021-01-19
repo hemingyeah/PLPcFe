@@ -159,10 +159,8 @@ export default {
 
   // 附加组件名称
   .card-name-list {
-    padding: 12px;
+    padding: 12px 12px 8px;
     background-color: #fff;
-    border-bottom-left-radius: 4px;
-    border-bottom-right-radius: 4px;
     border-bottom: 1px solid $bg-color-l1;
 
     span {
@@ -186,9 +184,12 @@ export default {
     overflow: auto;
 
     .card-info-container {
-      margin-top: 12px;
       background-color: #fff;
       border-radius: 4px;
+
+      &:not(:first-child) {
+        margin-top: 12px;
+      }
 
       .card-name {
         padding: 12px 12px 0 34px;

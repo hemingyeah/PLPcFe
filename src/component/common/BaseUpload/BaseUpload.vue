@@ -136,14 +136,13 @@ export default {
       let _self = this;
       Uploader.batchUploadWithParse({files, action: this.action}).then(async (result = {}) => {
         let {success, error} = result;
-        console.log(result);
         if(error && Array.isArray(error) && error.length > 0){
           let message = error.map(item => item.message).join('\n');
           // 此处不能return
           platform.alert(message)
         }
 
-        if(success && Array.isArray(success) && success.length > 0 ){
+        if(success && Array.isArray(success) && success.length > 0 && this.isWaterMark){
           // 判断是否需要加水印
           for(let i = 0; i < success.length; i ++) {
             let file = success[i];
