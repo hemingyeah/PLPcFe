@@ -17,7 +17,7 @@
     <!--E 预览组件 -->
 
     <!--S 设置项 -->
-    <div class="flow-setting-right">
+    <div class="flow-setting-right" :key="compKey">
       <div class="setting-specific">
         <!--S 工单表单设置 -->
         <div v-if="showFormBuilder" class="setting-specific-form">
@@ -288,6 +288,7 @@ export default {
   },
   data() {
     return {
+      compKey: new Date().getTime(),
       taskTypeName: '', // 接口返回的工单类型名称
 
       fields: [],
@@ -464,6 +465,7 @@ export default {
         this.receiptList = res.data.receiptList;
 
         this.buildApproveOptions();
+        this.compKey = new Date().getTime();
       } catch (error) {
         console.error('fetch getFromUser => error', error);
       }

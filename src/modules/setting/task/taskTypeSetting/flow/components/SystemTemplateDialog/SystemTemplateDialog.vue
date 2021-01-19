@@ -199,7 +199,7 @@ export default {
     taskColumns() {
       return [
         ...this.taskFieldList.filter(item => {
-          return item.formType != 'attachment' && item.formType != 'customer' && item.enabled;
+          return !['attachment', 'customer', 'separator', 'info' ].includes(item.formType) && item.enabled;
         }),
         ...taskColumns
       ];
@@ -208,7 +208,7 @@ export default {
       return [
         ...receiptColumns,
         ...this.receiptFieldList.filter(item => {
-          return !['attachment', 'receiptAttachment', 'sparepart', 'serviceIterm', 'systemAutograph'].includes(item.formType);
+          return !['attachment', 'receiptAttachment', 'sparepart', 'serviceIterm', 'systemAutograph', 'separator', 'info'].includes(item.formType);
         })
       ];
     },
