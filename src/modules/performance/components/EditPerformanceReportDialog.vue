@@ -633,7 +633,8 @@ export default {
             } 
           : this.form.target
         ),
-        from: 'profermance' // 标示从"绩效报告里进去的，用于是否额外传参"
+        from: 'profermance', // 标示从"绩效报告里进去的，用于是否额外传参",
+        showDeleteUser: true
       }
 
       this.$fast.contact.choose(choose, options).then(res => {
