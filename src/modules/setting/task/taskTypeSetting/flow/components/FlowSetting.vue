@@ -366,6 +366,9 @@ export default {
       // 上一个启用流程的节点
       let name = '';
 
+      if(this.type === 'start') {
+        return '接受工单';
+      }
       for (const key in this.flowMap) {
         if(!!this.taskTypeConfig.flowSetting[key].state) {
           if(this.type !== 'create' && this.type === key) {
