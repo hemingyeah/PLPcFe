@@ -398,6 +398,9 @@ export default {
       .table-footer{
         margin-top: 17px;
       }
+      .el-table--border{
+        border-bottom: 1px solid #ebeef5;
+      }
     }
     
 
