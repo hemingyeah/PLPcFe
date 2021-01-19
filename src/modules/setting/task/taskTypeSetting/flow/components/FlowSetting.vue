@@ -366,7 +366,6 @@ export default {
       let name = '';
 
       for (const key in this.flowMap) {
-        debugger;
         if(!!this.taskTypeConfig.flowSetting[key].state) {
           if(this.type !== 'create' && this.type === key) {
             return name;
@@ -496,10 +495,10 @@ export default {
     changeApproveSetting(setting, key) {
       switch (key) {
       case 'pause':
-        this.taskTypeConfig.pauseApproveSetting = setting;
+        this.$set(this.taskTypeConfig, 'pauseApproveSetting', setting);
         break;
       case 'cancel':
-        this.taskTypeConfig.cancelApproveSetting = setting;
+        this.$set(this.taskTypeConfig, 'cancelApproveSetting', setting);
         break;
       default:
         this.$set(this.flowSetting, 'approveSetting', setting);

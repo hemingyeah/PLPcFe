@@ -354,9 +354,24 @@ export default {
       let message = [];
 
       let name = this.taskTypeConfig.name;
-      if (name === '') return this.$notify.error('工单类型名称为空');
-      if(name.length > 20) return this.$notify.error('工单类型名称超过20个字');
-      if(!/^[a-zA-Z0-9\u4e00-\u9fa5]+$/.test(name)) return this.$notify.error('工单类型名称只能输入中文、字母、数字');
+      if (name === '') {
+        return this.$platform.notification({
+          title: '工单类型名称为空',
+          type: 'error'
+        });
+      }
+      if(name.length > 20) {
+        return this.$platform.notification({
+          title: '工单类型名称超过20个字',
+          type: 'error'
+        });
+      };
+      if(!/^[a-zA-Z0-9\u4e00-\u9fa5]+$/.test(name)) {
+        return this.$platform.notification({
+          title: '工单类型名称只能输入中文、字母、数字',
+          type: 'error'
+        });
+      };
 
       let nameAndColor = {
         name: this.taskTypeConfig.name,

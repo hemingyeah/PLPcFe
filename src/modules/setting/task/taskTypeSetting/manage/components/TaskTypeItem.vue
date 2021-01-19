@@ -101,11 +101,17 @@ export default {
     /** 启用/禁用 */
     switchEnabled: _.debounce(function(value) {
       if(value === 1 && this.typeNum >= this.maxTypeNum) {
-        return this.$message.warning(`最多只能同时存在${this.maxTypeNum}种工单类型`);
+        return this.$platform.notification({
+          title: `最多只能同时存在${this.maxTypeNum}种工单类型`,
+          type: 'error'
+        });
       }
 
       if(value === 0 && this.typeNum <= 1) {
-        return this.$message.warning('无法禁用全部工单类型');
+        return this.$platform.notification({
+          title: `无法禁用全部工单类型`,
+          type: 'error'
+        });
       }
 
       let params = {

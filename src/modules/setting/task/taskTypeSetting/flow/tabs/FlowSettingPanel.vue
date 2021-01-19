@@ -172,9 +172,16 @@ export default {
                 
         let res = await SettingApi.saveProcess(params);
         if(res.status == 1) {
-          return this.$notify.error(res.message);
+          return this.$platform.notification({
+            title: res.message,
+            type: 'error'
+          });
         }
-        this.$notify.success('保存成功');
+
+        this.$platform.notification({
+          title: '保存成功',
+          type: 'success'
+        });
                 
       } catch (error) {
         console.error('sumbit saveProcess => error', error);

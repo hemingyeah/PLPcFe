@@ -252,9 +252,15 @@ export default {
       try {
         let res = await SettingApi.advancedSetting(params);
         if(res.status === 0) {
-          this.$notify.success('保存成功');
+          this.$platform.notification({
+            title: '保存成功',
+            type: 'success'
+          });
         }else {
-          this.$notify.error(res.message);
+          this.$platform.notification({
+            title: res.message,
+            type: 'error'
+          });
         }
       } catch (error) {
         console.error(error);

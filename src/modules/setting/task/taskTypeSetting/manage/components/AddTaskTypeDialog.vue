@@ -219,7 +219,10 @@ export default {
                   fromId
                 });
               }else{
-                this.$message.error(res.message);
+                this.$platform.notification({
+                  title: res.message,
+                  type: 'error'
+                });
               }
             }).catch(err => {
               console.error(err);
@@ -244,7 +247,7 @@ export default {
               let id = window.frameElement.dataset.id;
               this.$platform.refreshTab(id);
             }else{
-              this.$message.error(res.message);
+              this.$platform.alert(res.message);
             }
           }).catch(err => {
             console.error(err);
