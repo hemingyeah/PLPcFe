@@ -52,7 +52,6 @@
 import * as TaskApi from '@src/api/TaskApi.ts';
 // util
 import Uploader from '@src/util/uploader';
-import Platform from '@src/platform';
 
 export default {
   name: 'template-upload-dialog',
@@ -145,12 +144,13 @@ export default {
       return false;
     },
     /**
-         * 保存模板
-         */
+     * 保存模板
+     */
     async submit(){
+      let templatesAttr = this.type === 'reportSetting' ? 'templates' : 'p_templates';
       let params = {
         typeId: this.taskTypeId,
-        templates: this.templates.map(item => {
+        [templatesAttr]: this.templates.map(item => {
           return {
             id: item.id,
             filename: item.filename || item.fileName,
