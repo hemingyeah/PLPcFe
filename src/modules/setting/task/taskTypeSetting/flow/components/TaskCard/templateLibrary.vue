@@ -195,7 +195,7 @@ export default {
             display: flex;
             justify-content: flex-end;
             .btn{
-              width: 92px;
+              // width: 92px;
             }
             .el-button--small{
               padding: 7px 15px;

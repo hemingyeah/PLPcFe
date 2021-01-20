@@ -187,7 +187,7 @@ export default {
             justify-content: flex-end;
             .btn{
               padding: 7px 17px;
-              width: 92px;
+              // width: 92px;
             }
             .el-button--small{
               padding: 6px 15px;
@@ -206,17 +206,17 @@ export default {
 }
 @media screen and (max-width: 1920px) {
   .tabs-card-box {
-    width: calc(25% - 12px);
+    width: calc(25% - 12px) !important;
   }
 }
 @media screen and (max-width: 1680px) {
   .tabs-card-box {
-    width: calc(33.3% - 12px);
+    width: calc(33.3% - 12px) !important;
   }
 }
 @media screen and (max-width: 1440px) {
  .tabs-card-box {
-    width: 440px;
+    width: 440px !important;
   }
 }
 </style>

@@ -37,7 +37,7 @@
       <!-- end 已添加附加组件 -->
 
       <!-- start 从模版库添加 -->
-      <div class="task-type-list" v-show="activeTab=='task-import'">
+      <div class="task-type-list task-type-template" v-show="activeTab=='task-import'">
         <template-library :card-sys-list="cardSysList"></template-library>
       </div>
       <!-- end 从模版库添加 -->
