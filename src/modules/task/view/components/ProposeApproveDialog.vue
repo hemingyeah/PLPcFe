@@ -269,7 +269,7 @@ export default {
   padding: 0;
 }
 
-/deep/.el-step{
-  width: auto;
+/deep/.el-steps, .el-step{
+  width: auto !important;
 }
 </style>
