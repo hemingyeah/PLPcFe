@@ -35,7 +35,7 @@
               <i class="iconfont icon-nav-down"></i>
             </span>
             <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item>
+              <el-dropdown-item v-if="!isExperienceEdition">
                 <div @click="openDialog('importProduct')">导入产品</div>
               </el-dropdown-item>
               <el-dropdown-item>
@@ -44,7 +44,7 @@
               <el-dropdown-item>
                 <div @click="exportProduct(true)">导出全部</div>
               </el-dropdown-item>
-              <el-dropdown-item>
+              <el-dropdown-item v-if="!isExperienceEdition">
                 <div @click="openDialog('update')">批量更新</div>
               </el-dropdown-item>
             </el-dropdown-menu>
@@ -294,13 +294,14 @@ import {
   getUpdateRecord,
 } from '@src/api/ProductApi';
 import TeamMixin from '@src/mixins/teamMixin';
-import { isShowCustomerRemind } from '@src/util/version.ts'
+import { isShowCustomerRemind, isShowPlanTask } from '@src/util/version.ts'
+import VersionMixin from '@src/mixins/versionMixin'
 
 const link_reg = /((((https?|ftp?):(?:\/\/)?)(?:[-;:&=\+\$]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\?\+=&;:%!\/@.\w_]*)#?(?:[-\+=&;%!\?\/@.\w_]*))?)/g
 
 export default {
   name: 'product-list',
-  mixins: [TeamMixin],
+  mixins: [TeamMixin, VersionMixin],
   props: {
     initData: {
       type: Object,
