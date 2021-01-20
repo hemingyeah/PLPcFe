@@ -27,6 +27,7 @@ import { formatDate } from "@src/util/lang";
 import { getRootWindow } from "@src/util/dom";
 import * as FormUtil from "@src/component/form/util"
 import VersionMixin from '@src/mixins/versionMixin'
+import StorageUtil from '@src/util/storage.ts'
 
 /* mixin */
 import tourGuide from '@src/mixins/tourGuide'
