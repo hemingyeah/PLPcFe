@@ -30,6 +30,7 @@
                 action=""
                 :file-list="fileList"
                 :on-remove="removeFile"
+                :on-preview="handlePreview"
                 :before-upload="beforeUpload">
                 <el-button size="small" type="primary" :disabled="pending">点击上传</el-button>
                 <div slot="tip" class="template-upload-tip">*仅支持[xlsx]格式的文件</div>
@@ -109,9 +110,20 @@ export default {
       this.fileResult = {};
       this.templates = []
     },
+    /** 点击已上传文件 */
+    handlePreview(file) {
+      let id = this.templates[0]?.id;
+      if(!id) return;
+
+      let a = document.createElement('a');
+      a.download = file.name;
+      a.href = `/files/download?fileId=${id}`;
+      a.click();
+
+    },
     /**
-         * 文件上传
-         */
+     * 文件上传
+     */
     beforeUpload(file) {
       const isLt1M = file.size / 1024 / 1024 < 1;
 
