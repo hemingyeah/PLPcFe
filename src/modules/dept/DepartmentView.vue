@@ -28,7 +28,7 @@
               <!-- start 部门列表树 -->
               <div class="department-tree-view">
                 <div class="bc-dept" v-if="depts.length > 0">
-                  <base-tree-dept :data="depts" :selected="[selectedDept]" :show-checkbox="allowCheckDept" @node-selected="initDeptUser" @node-check="chooseDept" :node-render="nodeRender" />
+                  <base-tree-dept :expand="expand" :data="depts" :selected="[selectedDept]" :show-checkbox="allowCheckDept" @node-selected="initDeptUser" @node-check="chooseDept" :node-render="nodeRender" />
                 </div>
               </div>
               <!-- end 部门列表树 -->
@@ -559,13 +559,14 @@ import Platform from '@src/util/Platform'
 import tourGuide from '@src/mixins/tourGuide'
 import { storageGet, storageSet } from '@src/util/storage'
 const DEPT_GUIDE = 'dept_guide'
-let export_state, timeStart, timeEnd
+let export_state, timeStart, timeEnd, query
 export default {
   name: 'department-view',
   inject: ['initData'],
   mixins: [tourGuide],
   data() {
     return {
+      expand: false,
       isAllotByDept: false,
       nowGuideStep: 5,
       collapse: false,
@@ -763,8 +764,23 @@ export default {
       this.activeName = 'role'
       this.chooseRole(this.selectedRole)
     }
+    // 说明是部门编辑操作
+    query = qs.parse(window.location.search.substr(1)) || {};
+    console.log('query:', query, query.id);
+    // window.__exports__refresh = this.refreshDept;
   },
   methods: {
+    async refreshDept(){
+      try {
+        await this.initDeptUser(_.cloneDeep(this.selectedDept));
+        window.__exports__refresh = '';
+      } catch (error) {
+        console.log(error);
+      }
+      return new Promise((resolve, reject)=>{
+        resolve();
+      });
+    },
     nextStep() {
       this.nowGuideStep++
     },
@@ -1234,7 +1250,7 @@ export default {
           })
 
           if (result.status == 0) {
-            this.initialize(false)
+            this.initialize(true)
           }
         }
       } catch (e) {
@@ -1247,6 +1263,7 @@ export default {
     },
     /** 选择部门 */
     chooseDept(event) {
+      console.log('chooseDept event');
       let { node, value } = event
     },
     chooseUser(type) {
@@ -1563,7 +1580,14 @@ export default {
 
           this.deptUserCount = deptUserCount.data || {}
           this.depts = depts
-
+          // 说明是部门编辑
+          // query = qs.parse(window.location.search.substr(1)) || {};
+          // console.log('query:', query);
+          // if(query.id){ 
+          //   isInit = false;
+          //   this.expand = true;
+          //   this.selectedDept.id = query.id;
+          // } 
           this.initDeptUser(
             isInit ? this.depts[0] : _.cloneDeep(this.selectedDept)
           )
@@ -1668,6 +1692,7 @@ export default {
       // 部门编辑就是之前的团队编辑
       // window.location.href = `/security/tag/editTag/${this.selectedDept.id}`
       // id 有值说明是子部门编辑
+      window.__exports__refresh = this.refreshDept;
       let fromId = window.frameElement.getAttribute('id')
       platform.openTab({
         id: 'editTag',

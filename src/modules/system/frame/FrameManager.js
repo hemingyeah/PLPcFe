@@ -69,7 +69,7 @@ const FrameManager = {
       if (!eventData || !eventData.action) return;
 
       let action = eventData.action;
-
+     
       if (action == 'shb.system.openFrameTab') this.openForFrame(eventData.data);
       if (action == 'shb.system.realodFrameById') this.reloadFrameTabById(eventData.data);
       if (action == 'shb.system.closeFrameById') this.closeFrameTabById(eventData.data);
@@ -186,7 +186,11 @@ const FrameManager = {
       frameTab.show = true;
 
       this.$emit('input', frameTab.url)
-      if (frameTab.reload) this.reloadFrameTab(frameTab, frameTab.isUrlChange)
+      if (frameTab.noRedirect){
+        this.reloadFrameTab(frameTab, false)
+      }else if (frameTab.reload) {
+        this.reloadFrameTab(frameTab, frameTab.isUrlChange)
+      }  
 
       this.adjustFrameTabs(frameTab);
     },
@@ -242,13 +246,17 @@ const FrameManager = {
         if (redirect) return iframe.src = tab.url;
         // 如果页面由导出刷新方法，调用该方法
         if (typeof iframe.contentWindow.__exports__refresh == 'function') {
+
           return iframe.contentWindow.__exports__refresh().then(() => {
-            tab.loading = false;
-            if (iframe?.contentWindow?.document) {
-              tab.title = iframe.contentWindow.document.title;
-            }
+            console.log('__exports__refresh');
           })
-            .catch(err => console.error(err));
+            .catch(err => console.error(err))
+            .finally(() => {
+              tab.loading = false;
+              if (iframe?.contentWindow?.document) {
+                tab.title = iframe.contentWindow.document.title;
+              }
+            });
         }
         iframe.contentWindow.location.reload(true);
       }

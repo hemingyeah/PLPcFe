@@ -188,9 +188,17 @@ export default {
     },
     /* 返回 */
     goBack() {
-        window.parent.frameHistoryBack(window);
-        let id = window.frameElement.dataset.id;
-        this.$platform.closeTab(id);
+      let id = window.frameElement.dataset.id;
+      this.$platform.closeTab(id);
+      let fromId = window.frameElement.getAttribute('id')      
+      this.$platform.openTab({
+        id: 'M_ORG',
+        title: '组织架构',
+        close: true,
+        noRedirect: true,
+        url: `/security/department?id=${this.id}`,
+        fromId
+      })
     },
     /* 打包给服务端的数据 */
     packData(data) {
@@ -265,8 +273,6 @@ export default {
         })
 
         if(result.status == 0) {
-          let fromId = window.frameElement.getAttribute('fromid');
-          this.$platform.refreshTab(fromId);
           this.goBack(); 
         }
       } catch (error) {
@@ -306,9 +312,10 @@ export default {
     }
   },
   created () {
+    console.log(window.location);
     let query = qs.parse(window.location.search.substr(1));
     let tag = this.initData.tag || {};
-
+    console.log('tag:', tag); 
     this.action = tag.id ? 'edit' : 'create';
     this.id = tag.id || '';
     this.form = this.unPackData(tag)
