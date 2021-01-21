@@ -477,9 +477,7 @@ export default {
     },
     /** 是否显示devtool */
     showDevTool () {
-      return (
-        this.$appConfig.env != 'production' || this.initData.env != 'production'
-      );
+      return this.$appConfig.env != 'production';
     },
     /** 用户工作状态颜色配置 */
     userStateMap () {

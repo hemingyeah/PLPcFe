@@ -288,7 +288,7 @@ export default {
           return {
             ...item,
             ...overTimeSetting,
-            overTimeStatus: true,
+            overTimeStatus: false,
             remindType: overTimeSetting.remindType ? overTimeSetting.remindType : null,
             reminders: overTimeSetting.reminders || []
           }
