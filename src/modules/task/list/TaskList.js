@@ -2470,7 +2470,7 @@ export default {
         address_list = '',
         product_list = ''
       taskSelfFields = taskFields.filter(item => {
-        return item.formType !== 'attachment'
+        return item.formType !== 'attachment' && item.formType !== 'autograph'
       })
       if (taskFields.length) {
         let first = taskFields.filter(item => {
@@ -2611,7 +2611,7 @@ export default {
       taskReceiptSystemFields = [
         ...taskReceiptSystemFields,
         ...taskReceiptFields.filter(item => {
-          return (item.isSystem === 0 && item.formType !== 'attachment')
+          return item.isSystem === 0 && item.formType !== 'attachment' && item.formType !== 'autograph'
         })
       ].map((field) => {
         field.export = true;

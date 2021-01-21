@@ -8,7 +8,7 @@
     <div v-if="approveSetting.level >= 1" class="setting-approve-people">
       <!--S 一级审批设置 -->
       完成该节点时需要审批，{{ approveSetting.level > 1 ? "一级" : "" }}审批人
-      <el-tooltip :disabled="approveSetting.leader === '' || options.some(opt => approveSetting.leader === opt.value)" content="您设置的审批人员已被删除，请重新选择">
+      <el-tooltip :disabled="!approveSetting.leader || options.some(opt => approveSetting.leader === opt.value)" content="您设置的审批人员已被删除，请重新选择">
         <el-select
           class="w-200"
           :value="approveSetting.leader"
@@ -42,7 +42,7 @@
           :key="idx"
         >
           {{ (idx + 2) | formatNumToCN }}级审批人
-          <el-tooltip :disabled="approveSetting.multiApproverSetting[idx].leader === '' || options.some(opt => approveSetting.multiApproverSetting[idx].leader === opt.value)" content="您设置的审批人员已被删除，请重新选择">
+          <el-tooltip :disabled="!approveSetting.multiApproverSetting[idx].leader || options.some(opt => approveSetting.multiApproverSetting[idx].leader === opt.value)" content="您设置的审批人员已被删除，请重新选择">
             <el-select
               class="w-200"
               :value="setting.leader"

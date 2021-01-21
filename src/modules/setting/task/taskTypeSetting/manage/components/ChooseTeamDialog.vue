@@ -189,4 +189,9 @@ export default {
     width: 100%;
     line-height: 32px;
 }
+
+/** element-ui */
+/deep/.el-checkbox{
+  margin-bottom: 4px;
+}
 </style>
