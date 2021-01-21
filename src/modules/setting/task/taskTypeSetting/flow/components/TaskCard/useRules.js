@@ -43,7 +43,7 @@ export const flowState = [{
 }]
 export const flowMapState = {
   created:[{ // 待指派
-    value: 'assigned',
+    value: 'allot',
     label: '指派'
   }],
   allocated:[{// 已指派
