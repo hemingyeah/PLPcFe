@@ -207,7 +207,7 @@ export default {
 .setting-flow-container{
     width: 100%;
     min-height: calc(100vh - 48px);
-    padding: 16px 12px 24px 12px;
+    padding: 12px;
     .setting-flow-axis{
         width: 298px;
         min-height: 100%;
