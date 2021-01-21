@@ -464,6 +464,7 @@ export default {
      /** 抓取钉钉端用户数据 */
     fetchDingtalkUser(){      
       let params = this.params;
+      params.useStateBlackList = localStorage.getItem('useStateBlackList') || 0; 
       return http.get('/security/department/user', params).then(userPage => {
 
         return userPage;

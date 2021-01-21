@@ -270,7 +270,7 @@ function getApproversName(flowSetting: FlowSetting, task: Task | null, result: a
   
 	// 发起人团队主管
 	if (leader === LeaderEnum.Leader) {
-		approversName = '发起人团队主管'
+		approversName = '发起人部门主管'
 		return approversName
 	}
   

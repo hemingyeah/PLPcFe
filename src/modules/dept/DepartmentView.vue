@@ -28,7 +28,7 @@
               <!-- start 部门列表树 -->
               <div class="department-tree-view">
                 <div class="bc-dept" v-if="depts.length > 0">
-                  <base-tree-dept :expand="expand" :data="depts" :selected="[selectedDept]" :show-checkbox="allowCheckDept" @node-selected="initDeptUser" @node-check="chooseDept" :node-render="nodeRender" />
+                  <base-tree-dept expand :data="depts" :selected="[selectedDept]" :show-checkbox="allowCheckDept" @node-selected="initDeptUser" @node-check="chooseDept" :node-render="nodeRender" />
                 </div>
               </div>
               <!-- end 部门列表树 -->
@@ -152,6 +152,11 @@
                 <el-table-column label="个人备件库" width="120px">
                   <template v-if="scope.row.spareCount" slot-scope="scope">
                     <a href class="text-center" @click.stop.prevent="createTransTab('stock',scope.row.userId)">{{ scope.row.spareCount }}</a>
+                  </template>
+                </el-table-column>
+                <el-table-column label="待审批事项" width="120px">
+                  <template v-if="scope.row.unApproveCount" slot-scope="scope">
+                    <a href class="text-center" @click.stop.prevent="createTransTab('approve',scope.row.userId)">{{ scope.row.unApproveCount }}</a>
                   </template>
                 </el-table-column>
                 <el-table-column label="操作">
@@ -283,14 +288,14 @@
             <el-table class="team-table" :data="subDepartments" stripe header-row-class-name="team-detail-table-header">
               <el-table-column prop="tagName" label="部门名称" show-overflow-tooltip />
               <el-table-column label="部门主管" show-overflow-tooltip>
-                <template slot-scope="scope">{{scope.row.teamLeaders.map(i => (i && i.displayName) || '').join('，')}}</template>
+                <template slot-scope="scope" v-if="scope.row.teamLeaders">{{scope.row.teamLeaders.map(i => (i && i.displayName) || '').join('，')}}</template>
               </el-table-column>
               <el-table-column prop="phone" label="联系电话" />
               <el-table-column label="部门位置" show-overflow-tooltip>
-                <template slot-scope="scope">{{scope.row.tagAddress | fmt_address}}</template>
+                <template slot-scope="scope" v-if="scope.row.tagAddress">{{scope.row.tagAddress | fmt_address}}</template>
               </el-table-column>
               <el-table-column label="负责区域" show-overflow-tooltip>
-                <template slot-scope="scope">{{scope.row.tagPlaceList.map(p => p && `${p.province}${p.city ? `-${p.city}` : ''}${p.dist ? `-${p.dist}` : ''}`).join('，\n')}}</template>
+                <template slot-scope="scope" v-if="scope.row.tagPlaceList">{{scope.row.tagPlaceList.map(p => p && `${p.province}${p.city ? `-${p.city}` : ''}${p.dist ? `-${p.dist}` : ''}`).join('，\n')}}</template>
               </el-table-column>
 
               <el-table-column label="操作">
@@ -351,6 +356,17 @@
             </el-dropdown>
             <base-button type="primary" @event="chooseUser()">添加成员</base-button>
             <base-button v-if="canRemove" type="primary" @event="userDeleteConfirm('multiple')">移除成员</base-button>
+            <!-- <el-dropdown trigger="click">
+              <span class="el-dropdown-link el-dropdown-btn">更多操作</span>
+              <el-dropdown-menu slot="dropdown">
+                <el-dropdown-item>
+                  <div @click="exportAccount()">导出账号</div>
+                </el-dropdown-item>
+                <el-dropdown-item>
+                  <div @click="exportAccount('all')">导出全部</div>
+                </el-dropdown-item>
+              </el-dropdown-menu>
+            </el-dropdown> -->
             <!-- <base-button type="primary" @event="searchModel.pageNum=1;search();trackEventHandler('search')" native-type="submit">搜索</base-button> -->
           </div>
 
@@ -559,14 +575,13 @@ import Platform from '@src/util/Platform'
 import tourGuide from '@src/mixins/tourGuide'
 import { storageGet, storageSet } from '@src/util/storage'
 const DEPT_GUIDE = 'dept_guide'
-let export_state, timeStart, timeEnd, query
+let export_state, timeStart, timeEnd, mainTagId;
 export default {
   name: 'department-view',
   inject: ['initData'],
   mixins: [tourGuide],
   data() {
     return {
-      expand: false,
       isAllotByDept: false,
       nowGuideStep: 5,
       collapse: false,
@@ -764,16 +779,19 @@ export default {
       this.activeName = 'role'
       this.chooseRole(this.selectedRole)
     }
-    // 说明是部门编辑操作
-    query = qs.parse(window.location.search.substr(1)) || {};
-    console.log('query:', query, query.id);
-    // window.__exports__refresh = this.refreshDept;
+    window.__exports__refresh = this.refreshDept;
   },
   methods: {
     async refreshDept(){
       try {
-        await this.initDeptUser(_.cloneDeep(this.selectedDept));
-        window.__exports__refresh = '';
+        if(localStorage.getItem('dept-need-refresh') == 1) {
+          // 刷新整个tab
+          await this.initialize()
+          localStorage.setItem('dept-need-refresh', 0);
+        } else {
+          // 只刷新当前部门信息
+          await this.initDeptUser(_.cloneDeep(this.selectedDept));
+        }
       } catch (error) {
         console.log(error);
       }
@@ -870,8 +888,7 @@ export default {
     debounce: _.debounce(async function () {
       // 部门模糊搜索
       try {
-        this.depts = await this.fetchDept()
-        this.initDeptUser(this.depts[0])
+        this.initDeptUser(this.selectedDept)
       } catch (error) {
         console.log(error)
       }
@@ -917,6 +934,24 @@ export default {
         return this.$platform.alert('请至少选择一个用户！')
       export_state = type
       this.exportDialogvisible = true
+    },
+    // 导出账号
+    exportAccount(type) {
+      if (!type && !this.multipleSelection.length) return this.$platform.alert('请至少选择一个用户！')
+      export_state = type
+      if (export_state === 'all') {
+        // 导出全部
+        window.location.href = `/security/user/account/exportBatch?tagId=${this.selectedDept.id}`
+      } else {
+        // 导出选中的
+        let ids = []
+        for (const user of this.multipleSelection) {
+          ids.push(user.userId)
+        }
+        ids = ids.join(',')
+        window.location.href = `/security/user/account/exportBatch?userIdsStr=${ids}`
+      }
+      export_state = ''
     },
     exportData() {
       if (!this.selectdatetime) {
@@ -965,7 +1000,7 @@ export default {
         }
         let result = await TeamApi.usedAllot(params);
 
-        if (!setTag) {
+        if (setTag) {
           this.setSeeAllOrg();
         }
 
@@ -1107,11 +1142,7 @@ export default {
     async delRole(id) {
       try {
         if (await this.$platform.confirm('确定要删除该角色权限吗？')) {
-          const { status, message } = await http.post(
-            `/security/role/delete/${id}`,
-            { type: 'post' },
-            false
-          )
+          const { status, message } = await http.post(`/security/role/delete/${id}`, { type: 'post' }, false)
           // if(status !== 0) this.$message.error(message || '');
           let isSucc = status == 0
           this.$platform.notification({
@@ -1119,7 +1150,13 @@ export default {
             message: isSucc ? '角色权限删除成功' : message,
             type: isSucc ? 'success' : 'error',
           })
-          isSucc && this.chooseRole(this.selectedRole)
+          if(isSucc) {
+            // 角色删除成功后需要刷新角色列表
+            let index = this.roles.findIndex(v => v.id === id); 
+            this.roles.splice(index, 1);
+            this.selectedRole = this.roles[index - 1]
+            this.chooseRole(this.selectedRole)
+          } 
         }
       } catch (error) {
         console.error(error)
@@ -1580,14 +1617,8 @@ export default {
 
           this.deptUserCount = deptUserCount.data || {}
           this.depts = depts
-          // 说明是部门编辑
-          // query = qs.parse(window.location.search.substr(1)) || {};
-          // console.log('query:', query);
-          // if(query.id){ 
-          //   isInit = false;
-          //   this.expand = true;
-          //   this.selectedDept.id = query.id;
-          // } 
+          // 主tag的id
+          mainTagId = this.depts[0].id;
           this.initDeptUser(
             isInit ? this.depts[0] : _.cloneDeep(this.selectedDept)
           )
@@ -1612,7 +1643,12 @@ export default {
 
         // 查询用户
         this.params.keyword = this.keyword
-        this.params.tagId = dept.id
+        // 只有选择的不是主tag 搜索人员就不传tagid
+        if(dept.id != mainTagId) {
+          this.params.tagId = dept.id
+        }else {
+          this.params.tagId = ''
+        }
         // this.params.departmentId = dept.id;
         this.params.pageNum = 1
         this.params.seeAllOrg = this.isSeeAllOrg
@@ -1692,7 +1728,6 @@ export default {
       // 部门编辑就是之前的团队编辑
       // window.location.href = `/security/tag/editTag/${this.selectedDept.id}`
       // id 有值说明是子部门编辑
-      window.__exports__refresh = this.refreshDept;
       let fromId = window.frameElement.getAttribute('id')
       platform.openTab({
         id: 'editTag',
@@ -1882,8 +1917,6 @@ export default {
   min-width: 300px;
   overflow-x: hidden;
   overflow-y: auto;
-  // height: 740px;
-  height: calc(100% - 105px);
 }
 
 .collapse {
@@ -1958,12 +1991,12 @@ export default {
     margin-left: 8px;
   }
   .el-dropdown {
-    padding: 5px 15px;
+    padding: 4px 15px;
+    margin-left: 8px;
     background: #13c2c2;
     color: #fff;
     font-size: 14px;
-    border: none;
-    border-radius: 2px;
+    border-radius: 4px;
     outline: none;
     line-height: 24px;
     cursor: pointer;
@@ -2198,7 +2231,7 @@ body {
   }
 }
 .el-tabs {
-  height: calc(100% - 50px);
+  height: calc(100% - 105px);
 }
 .department-left {
   border-right: 1px solid #f2f2f2;

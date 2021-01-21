@@ -41,7 +41,7 @@ import qs from 'qs';
 import FormMixin from '@src/component/form/mixin/form'
 
 import { stringLen } from './../../../util/lang/index.js'
-
+let tag = {}
 export default {
   name: 'team-edit-view',
   props: {
@@ -189,16 +189,22 @@ export default {
     /* 返回 */
     goBack() {
       let id = window.frameElement.dataset.id;
-      this.$platform.closeTab(id);
-      let fromId = window.frameElement.getAttribute('id')      
-      this.$platform.openTab({
-        id: 'M_ORG',
-        title: '组织架构',
-        close: true,
-        noRedirect: true,
-        url: `/security/department?id=${this.id}`,
-        fromId
-      })
+      this.$platform.closeTab(id);      
+      let fromId = window.frameElement.getAttribute('fromid');
+      if(this.action == 'create' || tag.tagName != this.form.tagName) {
+        // 新建部门或者修改了部门名称 这时候需要刷新下部门树
+        localStorage.setItem('dept-need-refresh', 1);
+        this.$platform.openTab({
+          id: 'M_ORG',
+          title: '组织架构',
+          close: true,
+          reload: true,
+          url: '/security/department',
+          fromId
+        })
+      } else {
+        this.$platform.refreshTab(fromId);
+      }
     },
     /* 打包给服务端的数据 */
     packData(data) {
@@ -312,10 +318,8 @@ export default {
     }
   },
   created () {
-    console.log(window.location);
     let query = qs.parse(window.location.search.substr(1));
-    let tag = this.initData.tag || {};
-    console.log('tag:', tag); 
+    tag = this.initData.tag || {};
     this.action = tag.id ? 'edit' : 'create';
     this.id = tag.id || '';
     this.form = this.unPackData(tag)

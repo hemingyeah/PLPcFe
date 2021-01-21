@@ -1329,7 +1329,10 @@ export default {
   },
   async mounted () {
     localStorage.setItem('tenantType', this.initData.tenantType || 0);
-    if(this.initData.tenantType == 0) localStorage.setItem('allotByTag', this.initData.allotByTag ? 1 : 0);
+    if(this.initData.tenantType == 0) {
+      localStorage.setItem('allotByTag', this.initData.allotByTag ? 1 : 0);
+      localStorage.setItem('useStateBlackList', this.initData.stateBlackList?.length ? 1 : 0); 
+    } 
     await this.judgeCallCenterGray();
     let userGuide = this?.initData?.userGuide === true || false;
 
