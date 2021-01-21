@@ -254,7 +254,7 @@ export default {
     */
     showProductRelationCount(product) {
       let { id, name } = product;
-      let { all } = this.productRelationCount[id];
+      let { all } = this.productRelationCount[id] || {};
       return Number(all) > 0 && !this.isEncryptField(name);
     },
     /**
