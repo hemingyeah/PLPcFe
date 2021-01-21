@@ -88,9 +88,10 @@ export default {
           message: isSuccess ? null : result.message
         })
         if(isSuccess){
-          this.initFieldsData();
+          setTimeout(()=>{
+            this.back();
+          }, 500)
         }
-
       } catch (error) {
         console.error(error)
       }
