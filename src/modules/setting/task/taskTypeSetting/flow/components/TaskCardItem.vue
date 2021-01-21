@@ -24,7 +24,7 @@
               <i class="iconfont icon-bianji1 pointer"></i>
             </p>
             <p>
-              添加次数: 
+              添加次数：
               <span v-if="taskCard.inputType == 'single'">单次</span> <span v-if="taskCard.inputType == 'multiple'">多次</span>
             </p>
           </el-row>

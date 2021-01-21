@@ -13,7 +13,7 @@
               <div class="tabs_msg">附加组件是在服务工单中用于管理工单信息的辅助工具，可以让您分类记录工单的信息，附加组件可以从模块库中导入或创建。如需将关联组件应用在服务工单上，请在不同的工单类型中添加附加组件</div>
             </el-tab-pane>
             <el-tab-pane name="task-import" label="从模版库添加">
-              <div class="tabs_msg">附加组件库里，提供了丰富的模板，点击<span>预览</span>可查看使用案例。</div>
+              <div class="tabs_msg">附加组件库里提供了丰富的模板，点击<span>预览</span>可查看使用案例。</div>
             </el-tab-pane>
           </el-tabs>
         </div>

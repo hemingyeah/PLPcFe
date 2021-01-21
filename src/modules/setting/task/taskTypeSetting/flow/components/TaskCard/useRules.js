@@ -1,6 +1,9 @@
 import _ from 'lodash';
 
 export const flowRules = [{
+  value: 'allot',
+  label: '指派'
+}, {
   value: 'accept',
   label: '接受'
 }, {
@@ -9,9 +12,6 @@ export const flowRules = [{
 }, {
   value: 'finish',
   label: '完成'
-}, {
-  value: 'allot',
-  label: '指派'
 }, {
   value: 'cost',
   label: '结算'
