@@ -35,7 +35,10 @@
             >
               <el-input
                 class="type-name"
-                v-model="taskTypeConfig.name"
+                :value="taskTypeName"
+                @blur="taskTypeName = formatTaskTypeName(taskTypeName)"
+                @focus="taskTypeName = taskTypeConfig.name"
+                @input="changeTaskTypeName"
                 placeholder="请输入工单类型名称"
               ></el-input>
             </el-tooltip>
@@ -113,6 +116,7 @@ export default {
   data() {
     return {
       taskTypeId: '',
+      taskTypeName: '',
       taskTypeConfig: new TaskConfig(),
       currTab: 0,
 
@@ -161,6 +165,19 @@ export default {
       this.checkModified(() => {
         this.currTab = idx;
       });
+    },
+    /** 修改工单类型名称 */
+    changeTaskTypeName(val) {
+      this.taskTypeConfig.name = val;
+      this.taskTypeName = val;
+    },
+    /** 格式化工单类型名称 */
+    formatTaskTypeName(name) {
+      if(name.length > 9) {
+        return name.slice(0, 9) + '...';
+      }
+
+      return name;
     },
     /** 兼容旧审批结构 */
     compatibleOldApprove(setting) {
@@ -306,6 +323,7 @@ export default {
         // 转化获取到的结果
         this.taskTypeConfig = this.convertTaskTypeConfig(Object.assign(this.taskTypeConfig, res.data));
         this.initTaskTypeConfig = _.cloneDeep(this.taskTypeConfig);
+        this.taskTypeName = this.formatTaskTypeName(this.taskTypeConfig.name);
 
         // 传递给FlowSetting组件工单类型名称
         this.$eventBus.$emit('setting_task_type_name', this.taskTypeConfig.name);

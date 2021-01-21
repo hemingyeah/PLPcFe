@@ -148,3 +148,9 @@
 /deep/.el-switch{
     vertical-align: middle;
 }
+
+.type-name{
+    /deep/.el-input__inner{
+        padding-right: 0;
+    }
+}
