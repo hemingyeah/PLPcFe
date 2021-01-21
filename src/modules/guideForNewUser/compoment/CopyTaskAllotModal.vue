@@ -9,7 +9,8 @@
       </div>
 
       <div class='base-modal-content'>
-        <div class="flex-y" style="height:100%">
+        <div class="flex-y"
+             style="height:100%">
 
           <div class="type-box">
             <div class="flex-x mar-b-12">
@@ -24,7 +25,8 @@
                      :class="[typeDoing == 2 ? 'type-doing-item-check' : 'type-doing-item-normal']"
                      @click="typeDoing = 2">自动分配</div>
               </div>
-              <div class="flex-x type-show" v-if="typeDoing == 0">
+              <div class="flex-x type-show"
+                   v-if="typeDoing == 0">
                 <div class="type-show-item"
                      :class="[typeShow == 0 ? 'type-show-item-check' : 'type-show-item-normal']"
                      @click="typeShow = 0">列表</div>
@@ -33,12 +35,12 @@
                      @click="typeShow = 1">地图</div>
               </div>
 
-              <div class="flex-1 flex-x select-item mar-l-24" v-if="typeDoing != 0"><span>协同人:</span>
-                <el-select 
-                  v-model="value3"
-                  multiple
-                  collapse-tags
-                  placeholder="请选择">
+              <div class="flex-1 flex-x select-item mar-l-24"
+                   v-if="typeDoing != 0"><span>协同人:</span>
+                <el-select v-model="value3"
+                           multiple
+                           collapse-tags
+                           placeholder="请选择">
                   <el-option v-for="item in optionsSyman"
                              :key="item.value"
                              :label="item.label"
@@ -49,7 +51,8 @@
             </div>
 
             <!--  -->
-            <div class="flex-x select-box" v-if="typeDoing == 0">
+            <div class="flex-x select-box"
+                 v-if="typeDoing == 0">
               <div class="flex-1 flex-x mar-r-24 select-item"> <span>服务团队:</span>
                 <el-select class="flex-1"
                            v-model="value1"
@@ -91,8 +94,9 @@
             </div>
           </div>
           <!--  -->
-          <div class="flex-1" style="background:red">
-            <img src=""
+          <div class="flex-1">
+            <img class="change-background"
+                 :src="typeDoing == 0? changeBackground[typeDoing][typeShow]:changeBackground[typeDoing]"
                  alt="">
           </div>
 
@@ -110,11 +114,15 @@
 </template>
 
 <script>
+import img_1 from '@src/assets/img/userGuide/guide-allot-1.png';
+import img_2 from '@src/assets/img/userGuide/guide-allot-2.png';
+import img_3 from '@src/assets/img/userGuide/guide-allot-3.png';
+import img_4 from '@src/assets/img/userGuide/guide-allot-4.png';
 export default {
   name: 'task-allot-modal',
-  props:{
-    justGuide:{
-      type:Function
+  props: {
+    justGuide: {
+      type: Function
     }
   },
   data () {
@@ -153,7 +161,15 @@ export default {
       value2: '',
       value3: [],
       typeDoing: 0,
-      typeShow: 0
+      typeShow: 0,
+      changeBackground: {
+        0: {
+          0: img_1,
+          1: img_2,
+        },
+        1: img_3,
+        2: img_4
+      }
     }
   },
   created () {
@@ -167,6 +183,8 @@ export default {
 <style lang='scss' scoped>
 .type-box {
   padding: 16px;
+  position: sticky;
+  top: 0;
   .type-doing {
     border: 1px solid $color-border-l2;
     .type-doing-item {
@@ -215,5 +233,8 @@ export default {
       width: 70px;
     }
   }
+}
+.change-background {
+  width: 100%;
 }
 </style>

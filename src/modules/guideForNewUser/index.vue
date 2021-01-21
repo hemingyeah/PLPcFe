@@ -210,6 +210,9 @@ import FeedbackDialog from '@src/modules/task/view/components/TaskFeedback/Feedb
 import TaskProcessSteps from '@src/modules/task/components/TaskProcessSteps/TaskProcessSteps.tsx'
 import ProductEditForm from '@src/modules/product/components/ProductEditFormV2.vue';
 
+import { useDetail } from '@src/api/GuideForNewUser.ts'
+import _ from 'lodash'
+
 
 import {
   taskValue,
@@ -271,65 +274,78 @@ export default {
       nowStepCom: {
         menu: {
           0: {
-            background: guide_1
+            background: guide_1,
+            enum:'1-1'
           }
         },
         task: {
           0: {
-            background: guide_task_1
+            background: guide_task_1,
+            enum:'1-2'
           },
           1: {
-            background: guide_task_2
+            background: guide_task_2,
           },
           2: {
-            background: guide_task_3
+            background: guide_task_3,
+            enum:'1-3'
+            
           },
           3: {
-            background: guide_task_4
+            background: guide_task_4,
+            enum:'1-4'
           },
           4: {
-            background: guide_task_5
+            background: guide_task_5,
           },
           5: {
-            background: guide_task_6
+            background: guide_task_6,
           },
           6: {
-            background: guide_task_7
+            background: guide_task_7,
+            enum:'1-5'
           },
           7: {
-            background: guide_task_8
+            background: guide_task_8,
           },
           8: {
-            background: guide_task_9
+            background: guide_task_9,
+            enum:'1-6'
           },
           9: {
-            background: guide_task_10
+            background: guide_task_10,
           },
         },
         superQrCode: {
           0: {
-            background: guide_qrcode_1
+            background: guide_qrcode_1,
+            enum:'2-1'
           },
           1: {
-            background: guide_qrcode_2
+            background: guide_qrcode_2,
+            enum:'2-2'
           },
           2: {
-            background: guide_qrcode_3
+            background: guide_qrcode_3,
           },
           3: {
-            background: guide_qrcode_4
+            background: guide_qrcode_4,
           },
           4: {
-            background: guide_qrcode_5
+            background: guide_qrcode_5,
+            enum:'2-3'
           },
           5: {
-            background: guide_qrcode_6
+            background: guide_qrcode_6,
+            enum:'2-4'
           },
           6: {
-            background: guide_qrcode_7
+            background: guide_qrcode_7,
+            enum:'2-5'
           },
           7: {
-            background: guide_qrcode_8
+            background: guide_qrcode_8,
+            enum:'2-6'
           },
         }
       },
@@ -349,14 +365,15 @@ export default {
       productFields,
       productValue,
 
-      lastScends: 15,
+      lastScends: 9,
       interval_1: null
     }
   },
   created () {
-
+    
   },
   mounted () {
+    this.server();
   },
   watch: {
 
@@ -375,6 +392,7 @@ export default {
     changeSetp (type, step) {
       this.pageState.nowStepType = type;
       this.pageState.nowStep = step;
+      this.server()
     },
     backSetp () {
       this.pageState.nowStep == 0 ? this.pageState.nowStepType = 'menu' : this.pageState.nowStep--
@@ -387,8 +405,17 @@ export default {
     },
     stopLastScends () {
       clearInterval(this.interval_1)
-      this.lastScends = 15;
-    }
+      this.lastScends = 9;
+    },
+    server: _.debounce(function () {
+      if(!this.nowStepCom[this.pageState.nowStepType][this.pageState.nowStep].hasOwnProperty('enum')) return
+      useDetail(
+        {
+          phone:this.$getUrlObj(window)?.phone,
+          tryDetail:[this.nowStepCom[this.pageState.nowStepType][this.pageState.nowStep].enum]
+        }
+      )
+    }, 800),
   },
   destroyed () {
     this.stopLastScends();
@@ -406,6 +433,7 @@ export default {
     flex-direction: column;
     .base-modal-content {
       flex: 1;
+      overflow-y: scroll;
     }
   }
   .dialog-footer {
@@ -523,8 +551,8 @@ $window-height: 768px;
 }
 
 .guide-task-1-pos-2 {
-  $top: 124px;
-  $left: 308px;
+  $top: 113px;
+  $left: 383px;
   $width: 110px;
   $height: 32px;
   @extend .guide-pos;
@@ -569,9 +597,9 @@ $window-height: 768px;
 
 .guide-task-8-pos-1 {
   $top: 243px;
-  $left: 1310px;
-  $width: 63px;
-  $height: 32px;
+  $left: 1334px;
+  $width: 44px;
+  $height: 28px;
   @extend .guide-pos;
   @include position-cover($top, $left, $width, $height);
 }
@@ -617,8 +645,8 @@ $window-height: 768px;
 }
 
 .guide-qrcode-3-pos-1 {
-  $top: 191px;
-  $left: 225px;
+  $top: 171px;
+  $left: 221px;
   $width: 78px;
   $height: 35px;
   @extend .guide-pos;
