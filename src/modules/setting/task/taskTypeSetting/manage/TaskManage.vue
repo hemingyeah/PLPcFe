@@ -20,7 +20,7 @@
               <i class="el-icon-question" />
             </el-tooltip>
           </h2>
-          <p>工单支持多种工单类型，可以添加或配置不同类型的工单来分类处理服务台业务一个工单类型中可以定义表单、流程及附加组件</p>
+          <p>工单支持多种工单类型，可以添加或配置不同类型的工单来分类处理业务，一个工单类型中可以定义表单、流程及附加组件</p>
         </div>
         <div class="lh-52">
           <el-button type="primary" :loading="false" @click="addTaskType">
