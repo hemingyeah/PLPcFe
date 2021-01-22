@@ -844,9 +844,8 @@ export default {
     );
 
     this.$nextTick(() => {
-      // if (storageGet(PRODUCT_PRODUCT_LIST) && storageGet(PRODUCT_PRODUCT_LIST) > 0) this.$Guide().destroy('product-product-list')
-      console.log(12321312);
-      this.$Guide([{
+      if (storageGet(PRODUCT_PRODUCT_LIST) && storageGet(PRODUCT_PRODUCT_LIST) > 0) this.$Guide().destroy('product-product-list')
+      else this.$Guide([{
         content:
           '产品列表，可拖拽改变列表宽',
         haveStep: true,
