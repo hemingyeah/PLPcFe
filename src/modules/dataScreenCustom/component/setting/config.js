@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-01-19 13:47:54
- * @LastEditTime: 2021-01-20 16:09:44
+ * @LastEditTime: 2021-01-21 16:33:26
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /shb-fe-pc/src/modules/dataScreenCustom/component/setting/config.js
@@ -25,13 +25,13 @@ export const settingMap = {
   cycleTaskCount: { label: '周期内工单数量', value: true, belong: 'rightTop' },
   cycleCompleteEventCount: { label: '周期内完成事件总数', value: true, belong: 'rightTop' },
   // 右侧报表展示
-  cycleCompleteTaskCountAverageTime: { label: '人员周期内完成工单数量及平均工单用时', value: true, belong: 'rightHistogram' },
-  cycleCompleteTaskAndTagUserCount: { label: '周期内完成的工单+当前团队人数', value: false, belong: 'rightHistogram' },
+  cycleCompleteTaskCountAverageTime: { label: '人员周期内完成工单数量及平均工单用时', value: false, belong: 'rightHistogram' },
+  cycleCompleteTaskAndTagUserCount: { label: '周期内完成的工单+当前团队人数', value: true, belong: 'rightHistogram' },
   cycleServerContent: { label: '周期内服务内容排名及数量', value: false, belong: 'rightHistogram' },
-  cycleServerTypeRankingCount: { label: '周期内服务类型排名及数量', value: true, belong: 'rightHistogram' },
+  cycleServerTypeRankingCount: { label: '周期内服务类型排名及数量', value: false, belong: 'rightHistogram' },
   // 右侧饼状图展示
-  cycleCompleteTaskTypeCount: { label: '周期内完成工单的按照类型显示数量和比例', value: true, belong: 'rightPieChart' },
-  cycleCompleteTaskProductCount: { label: '周期内完成工单的按照产品类型显示数量和比例', value: true, belong: 'rightPieChart' },
+  workTypeCount: { label: '周期内完成工单的按照类型显示数量和比例', value: true, belong: 'rightPieChart' },
+  productTypeCount: { label: '周期内完成工单的按照产品类型显示数量和比例', value: true, belong: 'rightPieChart' },
   cycleEvaluateTaskCustomerSatisfied: { label: '周期内已评价工单的客户满意度比例', value: false, belong: 'rightPieChart' },
 }
 

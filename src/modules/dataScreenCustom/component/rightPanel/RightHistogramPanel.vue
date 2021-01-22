@@ -76,11 +76,9 @@ export default {
     },
 
     updateFeaturesHandler(update) {
-
       let data = update;
       let featureItems = this.config.items || [];
-
-      this.features = featureItems.filter(feature => feature.value).map(feature => {
+      this.features = featureItems.filter(feature => feature.value && feature.key).map(feature => {
         let base = { ...feature };
         let key = feature.key;
 
@@ -92,7 +90,6 @@ export default {
         // if (key === 'cycleServerTypeRankingCount') {
         //   base.data = [ ]
         // }
-
         return base;
       });
 
@@ -105,10 +102,9 @@ export default {
       this.broadcast();
 
     },
-
     broadcast() {
       this.$nextTick(() => {
-        this.$eventBus.$emit(EventMap.NEED_REFRESH_RIGHT_SEARCH_AT);
+        // this.$eventBus.$emit(EventMap.NEED_REFRESH_RIGHT_SEARCH_AT);
         this.$eventBus.$emit(EventMap.NEED_REFRESH_RIGHT_SEARCH_GS);
         this.$eventBus.$emit(EventMap.NEED_REFRESH_RIGHT_SEARCH_EC);
         this.$eventBus.$emit(EventMap.NEED_REFRESH_RIGHT_SEARCH_ET);
@@ -117,6 +113,7 @@ export default {
   },
   mounted() {
     this.$eventBus.$on(EventMap.NEED_UPDATE_RIGHT_HISTOGRAM, this.updateFeaturesHandler);
+
   },
   beforeDestroy() {
     this.$eventBus.$off(EventMap.NEED_UPDATE_RIGHT_HISTOGRAM, this.updateFeaturesHandler);

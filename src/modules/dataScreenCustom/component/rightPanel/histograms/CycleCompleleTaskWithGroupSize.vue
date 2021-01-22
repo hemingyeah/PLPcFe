@@ -6,13 +6,13 @@
         <span class="histogram-title-icon"></span>
         {{ mainTitle }}
       </div>
-      <div class="histogram-extend-title">
+      <!-- <div class="histogram-extend-title">
         <img
           :src="engineerIcon" 
           class="histogram-title-engineer-icon"
         />
         {{ extendTitleSuffix }}
-      </div>
+      </div> -->
     </div>
     <!-- 报表 报表与附属信息显示 -->
     <!-- <div id="sd-ctgs" class="histogram-container"></div> -->
@@ -54,11 +54,11 @@ export default {
     },
     titleSuffix: {
       type: String,
-      default: '完成的工单'
+      default: '工单完成情况'
     },
     extendTitleSuffix: {
       type: String,
-      default: '当前团队人数'
+      default: ''
     },
     engineerIcon: {
       type: [Object, String],

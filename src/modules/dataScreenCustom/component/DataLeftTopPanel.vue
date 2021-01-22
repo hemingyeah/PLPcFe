@@ -163,8 +163,8 @@ export default {
             base.change = featureData.thisMonthFulfilTaskCount - featureData.lastMonthFulfilTaskCount;
             base.last = featureData.lastMonthFulfilTaskCount;
            
-            base.changeYear = featureData.thisMonthFulfilTaskCount - (featureData.yoyMonthFulfilTaskCount || 2);
-            base.lastYear = featureData.yoyMonthFulfilTaskCount || 2;
+            base.changeYear = featureData.thisMonthFulfilTaskCount - featureData.yoyMonthFulfilTaskCount ;
+            base.lastYear = featureData.yoyMonthFulfilTaskCount ;
           }
           if (key === 'toDayCompleteTaskAndYesterdayCompare') {
             base.count = featureData.todayFinish;

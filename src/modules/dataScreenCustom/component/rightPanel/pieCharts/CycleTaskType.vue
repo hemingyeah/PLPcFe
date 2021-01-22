@@ -110,25 +110,25 @@ export default {
               position: 'outside',
               formatter(params) {
                 let {percent, data} = params;
-                let {change, value} = data
-                let bgName = '';
+                let { value} = data
+                // let bgName = '';
+                return `{name|${value}(${percent}%)}`
 
                 // label = (label && label.length > 4 ) ? 
                 //   `${label.substr(0, 4)}...` : label;
 
-                if (change === 0) {
-                  // return `{name|${label} ${percent}%} {number|${value}}`;
-                  return `{name|${value}(${percent}%)}`
-                }
-                if (change > 0) {
-                  bgName = 'bgUp';
-                }
-                if (change < 0) {
-                  bgName = 'bgDown';
-                }
-                // return `{name|${label} ${percent}%} {number|${value}} {${bgName}| }`;
-                // return `{name|${percent}%} {number|${value}} {${bgName}| }`;
-                return `{name|${value}(${percent}%)} {${bgName}| }`;
+                // if (change === 0) {
+                //   // return `{name|${label} ${percent}%} {number|${value}}`;
+                // }
+                // if (change > 0) {
+                //   bgName = 'bgUp';
+                // }
+                // if (change < 0) {
+                //   bgName = 'bgDown';
+                // }
+                // // return `{name|${label} ${percent}%} {number|${value}} {${bgName}| }`;
+                // // return `{name|${percent}%} {number|${value}} {${bgName}| }`;
+                // return `{name|${value}(${percent}%)} {${bgName}| }`;
               },
               rich: {
                 name: {

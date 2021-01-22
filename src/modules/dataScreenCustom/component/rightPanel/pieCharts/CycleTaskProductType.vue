@@ -106,22 +106,22 @@ export default {
               position: 'outside',
               formatter(params) {
                 let {percent, data} = params;
-                let {change, value} = data
-                let bgName = '';
+                let { value} = data
+                // let bgName = '';
                 
-                // change = Math.random() > 0.5 ? 3 : -100;
-                if (change === 0) {
-                  // return `{name|${label}}\n {number|${value}}`;
-                  return `{name|${percent}%} {number|${value}}`
-                }
-                if (change > 0) {
-                  bgName = 'bgUp';
-                }
-                if (change < 0) {
-                  bgName = 'bgDown';
-                }
+                // // change = Math.random() > 0.5 ? 3 : -100;
+                // if (change === 0) {
+                //   // return `{name|${label}}\n {number|${value}}`;
+                //   return `{name|${percent}%} {number|${value}}`
+                // }
+                // if (change > 0) {
+                //   bgName = 'bgUp';
+                // }
+                // if (change < 0) {
+                //   bgName = 'bgDown';
+                // }
 
-                return `{name|${value}(${percent}%)} {${bgName}| }`;
+                return `{name|${value}(${percent}%)}`;
                 // return `{name|${label}}\n {number|${value}} {${bgName}| }`;
               },
               rich: {

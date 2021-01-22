@@ -18,9 +18,9 @@ const config = {
   cycleCompleteEventCount: true,
   // 右侧报表展示
   cycleCompleteTaskCountAverageTime: true,
-  cycleCompleteTaskAndTagUserCount: false,
+  cycleCompleteTaskAndTagUserCount: true,
   cycleServerContent: false,
-  cycleServerTypeRankingCount: true,
+  cycleServerTypeRankingCount: false,
   // 右侧饼状图展示
   cycleCompleteTaskTypeCount: true,
   cycleCompleteTaskProductCount: false,

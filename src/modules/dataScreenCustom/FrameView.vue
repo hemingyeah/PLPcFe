@@ -91,8 +91,8 @@ const fixedHeight1 = 1080;
 const fixedHeight2 = 1280; // 1200 (16:10) 1280 (4:3)
 const maxRatio = (fixedWidth / fixedHeight1) - 0.02; 
 
-const refreshDataTimeInterval = 10 * 1000; // 定时刷新数据时间间隔
-const refreshCacheTimeInterval = 120 * 1000; // 定时发送心跳检测请求时间间隔
+let refreshDataTimeInterval = 10 * 1000; // 定时刷新数据时间间隔
+let refreshCacheTimeInterval = 12 * 1000; // 定时发送心跳检测请求时间间隔
 
 
 export default {
@@ -159,29 +159,139 @@ export default {
      */
     refreshFrameData () {
       this.settingParams.cycleEvaluateTaskCustomerSatisfied = false
-      this.settingParams.cycleCompleteTaskProductCount = true
-      this.settingParams.cycleCompleteTaskTypeCount = true
+      this.settingParams.cycleCompleteTaskProductCount = false
+      this.settingParams.productTypeCount = true
+      this.settingParams.cycleCompleteTaskTypeCount = false
+      this.settingParams.workTypeCount = true
+
       this.settingParams.cycleCompleteTaskCountAverageTime = true
-      this.settingParams.cycleServerTypeRankingCount = true
-      this.settingParams.cycleCompleteTaskAndTagUserCount = false
+      this.settingParams.cycleServerTypeRankingCount = false
+      this.settingParams.cycleCompleteTaskAndTagUserCount = true
       this.settingParams.cycleServerContent = false
-
+      
       let config = this.settingParams;
-
       // eslint-disable-next-line no-console
       console.time('dsApi耗时');
 
       DSApi.getScreenGroupData()
-        .then(res => {
+        .then(res1 => {
+          let res = {
+            'status': 0,
+            'message': 'ok',
+            'data': {
+              'tenantId': '7416b42a-25cc-11e7-a500-00163e12f748',
+              'leftTopData': {
+                'toDayCompleteTaskAndYesterdayCompare': {
+                  'todayFinish': 0,
+                  'yesterdayFinish': 0,
+                  'yesterdayTaskFinishScale': '0'
+                },
+                'notCompletedTaskCount': 9686,
+                'notCompletedTaskCustomerCount': 1136,
+                'thisMonthCompleteTaskAndLastMonthCompare': {
+                  'thisMonthFulfilTaskCount': 41,
+                  'lastMonthFulfilTaskCount': 10,
+                  'yoyMonthFulfilTaskCount': 23,
+                  'lastMonthFulfilTaskScale': '310.00',
+                  'yoyMonthFulfilTaskScale': '78.00'
+                },
+                'notCompletedServerEvent': 1077,
+                'serverInsertCustomerCount': 425
+              },
+              'rightFormData': {
+                'cycleCompleteTaskAndTagUserCount': [
+                  {
+                    'tagName': '附件测试团队勿动',
+                    'tagUserCount': 8,
+                    'completeCount': 40,
+                  },
+                  {
+                    'tagName': '杭州团队',
+                    'tagUserCount': 25,
+                    'completeCount': 38
+                  },
+                  {
+                    'tagName': '上海团队',
+                    'tagUserCount': 8,
+                    'completeCount': 37
+                  },
+                  {
+                    'tagName': '杨昌洋测试消息团队（勿删）',
+                    'tagUserCount': 4,
+                    'completeCount': 34
+                  },
+                  {
+                    'tagName': '服务位置团队',
+                    'tagUserCount': 3,
+                    'completeCount': 24
+                  },
+                  {
+                    'tagName': '大树团队',
+                    'tagUserCount': 18,
+                    'completeCount': 17
+                  },
+                  {
+                    'tagName': '无双2',
+                    'tagUserCount': 1,
+                    'completeCount': 12
+                  },
+                  {
+                    'tagName': '998',
+                    'tagUserCount': 3,
+                    'completeCount': 12
+                  },
+                  {
+                    'tagName': '水泊梁山服务团队',
+                    'tagUserCount': 5,
+                    'completeCount': 10
+                  },
+                  {
+                    'tagName': '众联成业测试用例企业',
+                    'tagUserCount': 439,
+                    'completeCount': 4
+                  }
+                ],
+              },
+              'rightTopData': {
+                'customerCount': 41258,
+                'cycleCompleteEventCount': 11,
+                'cycleServerCustomerCount': 45,
+                'cycleTaskCount': 1650
+              },
+              'rightPieChart': {
+                'workTypeCount': {
+                  '6A': 1,
+                  'Excel导入优化勿动': 2,
+                  'test工单': 14,
+                  'xuan新建测试': 5,
+                  '创建空白模板测试': 1,
+                  '千悦测试开始': 1,
+                  '千悦测试表单': 2,
+                  '卓尔测试': 2
+                },
+                'productTypeCount': {
+                  '无': 92,
+                  '1': 13,
+                  'C++': 2,
+                  '4': 1,
+                  '空调': 2,
+                  '液压机': 1,
+                  '电器': 3
+                }
+              },
+              'threadTag': null
+            },
+            'succ': true
+          }
           // res.succ 联调特殊服务用
-          if ((!res.succ) && (!res.success || !res.result)) {
+          if ((!res.succ) && (!res.success || (!res.result && !res.data))) {
             return res.message && platform.alert(res.message);
           }
 
           this.init = true;
 
           this.settingGroup = getSettingGroup(config);
-          this.screenData = res.result;
+          this.screenData = res.data || res.result;
 
           // 发送更新广播
           this.broadcast(this.screenData);
@@ -227,6 +337,7 @@ export default {
       }
       
       this.refreshFrameData();
+      this.refreshWorkTime();
     }, 100),
 
     rightTimeUpdateHandler: _.debounce(async function(time) {

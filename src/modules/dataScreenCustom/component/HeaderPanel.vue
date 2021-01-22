@@ -20,7 +20,8 @@
       <img :src="getImage('left')" class="top-center-img-left"/>
       <img :src="getImage('right')" class="top-center-img-right"/>
       <!-- 主标题 -->
-      <div class="app-title">{{ title || '' }}服务运营大屏</div>
+      <!-- <div class="app-title">{{ title || '' }}服务运营大屏</div> -->
+      <div class="app-title">库柏电气服务运营大屏</div>
     </div>
 
   </div>

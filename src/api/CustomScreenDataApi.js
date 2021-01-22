@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-01-20 14:52:17
- * @LastEditTime: 2021-01-20 15:25:40
+ * @LastEditTime: 2021-01-21 15:17:51
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /shb-fe-pc/src/api/CustomScreenDataApi.js
@@ -51,6 +51,15 @@ function getScreenGroupData() {
   //   return http.get(`${urlAppPrefix}/outside/screen/getScreenData`);
 //   return http.get(`http://30.40.58.102:10028${urlAppPrefix}/screen/getScreenData`); 
 }
+/**
+ * 
+ * 单独获取月度工时利用率接口，
+ * @param {*} params 
+ */
+function getWorkingHoursEfficiency() {
+  return http.get(`${urlAppPrefix}/screen/getWorkingHoursEfficiency`);
+}
+
 
 /**
  * 获取地图面板中 工单和人员 信息
@@ -88,6 +97,7 @@ export {
   getMapPanelCustomerInfo,
 
   getOpenWebCode,
-  getTestMapData
+  getTestMapData,
+  getWorkingHoursEfficiency
 }
 

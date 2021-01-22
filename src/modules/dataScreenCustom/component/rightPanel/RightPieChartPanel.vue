@@ -25,8 +25,8 @@ import CycleTaskType from './pieCharts/CycleTaskType.vue';
 import CycleTaskProductType from './pieCharts/CycleTaskProductType.vue';
 import CycleReviewedTaskSatisfact from './pieCharts/CycleReviewedTaskSatisfact.vue';
 
-const cycleTaskType = 'cycleCompleteTaskTypeCount';
-const cycleTaskProductType = 'cycleCompleteTaskProductCount';
+const cycleTaskType = 'workTypeCount';
+const cycleTaskProductType = 'productTypeCount';
 const cycleReviewedTaskSatisfact = 'cycleEvaluateTaskCustomerSatisfied';
 
 import UP_IMG from '@src/assets/img/screen-data-up.png';
@@ -79,8 +79,8 @@ export default {
      * @result 设置scope.features
      */
     setPieData (featureItems, response) {
-      let showData = response.taskProuctTypeAndDegteeCount || {};
-      let compareData = response.typeCountContrast || {};
+      let showData = response || {};
+      // let compareData = response.typeCountContrast || {};
 
       const taskTypeKey = cycleTaskType;
       const taskProductTypeKey = cycleTaskProductType;
@@ -90,11 +90,11 @@ export default {
         let base = { ...feature };
 
         if (feature.key === taskTypeKey) {
-          base.data = this.getFormatTaskData(showData[taskTypeKey], compareData[taskTypeKey]);
+          base.data = this.getFormatTaskData(showData[taskTypeKey]);
         } else if (feature.key === taskProductTypeKey) {
-          base.data = this.getFormatTaskData(showData[taskProductTypeKey], compareData[taskProductTypeKey]);
+          base.data = this.getFormatTaskData(showData[taskProductTypeKey]);
         } else if (feature.key === taskReviewedStatisfiedKey) {
-          base.data = this.getReviewedSatisfiedData(showData[taskReviewedStatisfiedKey], compareData[taskReviewedStatisfiedKey]);
+          base.data = this.getReviewedSatisfiedData(showData[taskReviewedStatisfiedKey]);
         }
         return base;
       })
@@ -112,18 +112,18 @@ export default {
      * @params {Object} compare 用户比较的数据
      * @return {Object} 供ECharts绑定的数据DTO
      */
-    getFormatTaskData(show, compare) {
+    getFormatTaskData(show) {
       let result = [];
       // 遍历属性
       for (let i in show) {
         let showValue = show[i] || 0;
-        let compareValue = compare[i] || 0;
-        let change = showValue - compareValue; // 相对于上次的比较
+        // let compareValue = compare[i] || 0;
+        // let change = showValue - compareValue; // 相对于上次的比较
 
         let item = {
           label: i || '',
           value: showValue,
-          change,
+          // change,
           name: i
         }
         result.push(item);

@@ -16,8 +16,11 @@
     <!-- 报表 报表与附属信息显示 -->
     <!-- <div class="histogram-container" id="sd-ctat"></div> -->
     <div class="histogram-container">
-      <div id="sd-ctat-p1" class="histogram-page" :class="{'hisgotram-page-animation-p1': chartsPage > 1}"></div>
-      <div v-if="chartsPage > 1" id="sd-ctat-p2" class="histogram-page" :class="{'hisgotram-page-animation-p2': chartsPage > 1}"></div>
+      <el-carousel direction="vertical" :interval="5000" arrow="nerver" @change="changeCarousel" indicator-position="none" style="height:100%">
+        <el-carousel-item v-for="index in Math.ceil(data.data.length/5)" :key="index">
+          <div :ref="`sd-ctgs-p`" class="histogram-page" :key="index">xxx</div>
+        </el-carousel-item>
+      </el-carousel>
     </div>
   </div>
 </template>
@@ -28,10 +31,13 @@ import echarts from 'echarts';
 import TIME_IMG from '@src/assets/img/screen-data-time.png';
 
 import EventMap from '../../../event';
-import HistogramMixins from './mixins';
+import WorkTimeMixins from './mixins';
+import * as DSApi from '@src/api/CustomScreenDataApi';
+import { Carousel, CarouselItem} from 'element-ui'
 
-let currChartsP1 = null;
-let currChartsP2 = null;
+
+let currChartsPList = []
+let refreshDataTimeInterval = 10 * 1000
 
 const baseStyleConfig = {
   itemColor: '#33FFCD', // 柱状图填充颜色
@@ -46,13 +52,13 @@ const baseStyleConfig = {
 
 export default {
   name: 'cycle-ct-at-histogram',
-  mixins: [HistogramMixins],
+  components:{
+    elCarousel:  Carousel,
+    elCarouselItem:CarouselItem
+  },
+  mixins: [WorkTimeMixins],
   props: {
     params: {
-      type: Object,
-      default: () => ({})
-    },
-    data: {
       type: Object,
       default: () => ({})
     },
@@ -75,10 +81,22 @@ export default {
     },
     max: { // 最多显示的条目
       type: Number,
-      default: 10
+      default: 100
     }
   },
-
+  data(){
+    return {
+      data:{
+        belong:'rightHistogram',
+        data:[],
+        key: 'cycleCompleteTaskCountAverageTime',
+        label: '人员周期内完成工单数量及平均工单用时',
+        name: 'cycleCompleteTaskCountAverageTime',
+        value: true
+      },
+      refreshInterval:null
+    }
+  },
   computed: {
     cycleRange() {
       let cyclerange = (this.params || {}).cycleRange || {};
@@ -97,13 +115,16 @@ export default {
     },
   },
   methods: {
-    initEChartsP1() {
-      currChartsP1 = echarts.init(document.querySelector('#sd-ctat-p1'));
+    changeCarousel (index) {
+      setTimeout(() => {
+        this.initEChartsP(index)
+      }, 300);
     },
-
-    initEChartsP2() {
-      if (!this.needPage) return;
-      currChartsP2 = echarts.init(document.querySelector('#sd-ctat-p2'));
+    initEChartsP (index = 0) {
+      if (!currChartsPList[index]) {
+        currChartsPList[index] = echarts.init(this.$refs['sd-ctgs-p'][index]);
+      }
+      this.updateCharts(index)
     },
     /**
      * 获取合并后的style配置，仅在更新chartsOptions时使用 无需computed
@@ -115,13 +136,13 @@ export default {
     },
 
 
-    getEChartsOption(data, data2) {
+    getEChartsOption(data) {
 
       const config = this.getCustomConfig();
-      const hasSupData = data2 && data2.length;
+      // const hasSupData = data2 && data2.length;
 
       const chartsData = this.getEChartsData(data);
-      const chartsDataSup = hasSupData && this.getEChartsData(data2);
+      // const chartsDataSup = hasSupData && this.getEChartsData(data2);
       const markPointData = this.getMarkPointData(data);
 
       const option = {
@@ -238,7 +259,7 @@ export default {
                     if (hidden) return '';
                     let hours = params.data.hours;
 
-                    return `{img| }{wrap| }{text|${hours}h}`;
+                    return `{wrap| }{text|${hours}%}`;
                   },
                   rich: {
                     img: {
@@ -271,19 +292,19 @@ export default {
         ]
       }
 
-      // 如果有辅助数据填充辅助数据
-      if (hasSupData) {
-        option.series.push({
-          type: 'bar',
-          stack: 'one',
-          data: chartsDataSup,
-          itemStyle: {
-            normal: {
-              color: 'none'
-            }
-          }
-        })
-      }
+      // // 如果有辅助数据填充辅助数据
+      // if (hasSupData) {
+      //   option.series.push({
+      //     type: 'bar',
+      //     stack: 'one',
+      //     data: chartsDataSup,
+      //     itemStyle: {
+      //       normal: {
+      //         color: 'none'
+      //       }
+      //     }
+      //   })
+      // }
 
       return option;
     }, 
@@ -293,13 +314,13 @@ export default {
      */
     getEChartsData(data) {
       return (data || []).slice().map(item => {
-        let averageTime = item.averageTime || 0;
-        let isInteger = averageTime % 1 === 0;
-        let hours = isInteger ? averageTime : item.averageTime.toFixed(2);
+        let efficiency = item.efficiency || 0;
+        let isInteger = efficiency % 1 === 0;
+        let hours = isInteger ? efficiency : item.efficiency.toFixed(2);
 
         return {
           name: item.userId,
-          value: item.finishedTask,
+          value: item.workDays,
           hours
         }
       });
@@ -309,12 +330,12 @@ export default {
      */
     getMarkPointData(data) {
       return (data || []).map((item, index) => {
-        let averageTime = item.averageTime || 0;
-        let isInteger = averageTime % 1 === 0;
-        let hours = isInteger ? averageTime : item.averageTime.toFixed(2);
+        let efficiency = item.efficiency || 0;
+        let isInteger = efficiency % 1 === 0;
+        let hours = isInteger ? efficiency : item.efficiency.toFixed(2);
 
-        let idx = item.idx;
-        let label = item.displayName;
+        let idx = item.no;
+        let label = item.userName;
         label = label ? label : item.tagUserCount ? '无' : '';
 
         return {
@@ -327,34 +348,101 @@ export default {
         }
       })
     },
-    updateCharts() {
-      let {dataP1, dataP2} = this.getFormatOriginData();
-
-      let optionP1 = this.getEChartsOption(dataP1);
-      currChartsP1.setOption(optionP1);
-      // .length > 0判断条件可优化
-      if (dataP2 && dataP2.length > 0 && this.needPage) {
-        !currChartsP2 && this.initEChartsP2();
-
-        let optionP2 = this.getEChartsOption(dataP2, dataP1);
-        currChartsP2.setOption(optionP2);
+    updateCharts(index = 0) {
+      let data = this.data.data.slice(index * 5, (index + 1) * 5)
+      console.log(data)
+      if(data.length < 5){
+        for(let i = 0;5 - data.length;i++){
+          data.push({hidden:true})
+        }
       }
-      // let data = this.getFormatOriginData();
-      // let option = this.getEChartsOption(data);
+      let optionP = this.getEChartsOption(data);
+      currChartsPList[index].setOption(optionP);
+    },
 
-      // currCharts.setOption(option);
-    }
+    /**
+     * 请求刷新工时利用率
+     */
+    refreshWorkTime(){
+      let res = {
+        'status': 0,
+        'message': 'ok',
+        'data': {
+          'cycleWorkingHoursEfficiencyCount': [
+            {
+              'no': 1,
+              'userId': 'efaabc18-ff0d-11ea-a442-00163e304a25',
+              'userName': '无双',
+              'workDays': 7,
+              'efficiency': '23.00'
+            },
+            {
+              'no': 2,
+              'userId': '2e95fcf6-f281-11ea-a442-00163e304a25',
+              'userName': '李超',
+              'workDays': 7,
+              'efficiency': '23.00'
+            },
+            {
+              'no': 3,
+              'userId': '0b39a72f-bc14-11ea-b0e9-00163e304a25',
+              'userName': '胡芝芝',
+              'workDays': 5,
+              'efficiency': '16.00'
+            },
+            {
+              'no': 4,
+              'userId': '63455334-7303-11ea-bfc9-00163e304a25',
+              'userName': '仇太俊',
+              'workDays': 1,
+              'efficiency': '3.00'
+            },
+            {
+              'no': 5,
+              'userId': '840b18b1-39e9-11eb-a442-00163e304a25',
+              'userName': '瓦力',
+              'workDays': 1,
+              'efficiency': '3.00'
+            },
+            {
+              'no': 6,
+              'userId': 'abd851e4-65f7-11e7-a318-00163e304a25',
+              'userName': '王越',
+              'workDays': 1,
+              'efficiency': '3.00'
+            },
+            {
+              'no': 7,
+              'userId': '9dd5344c-53d2-11eb-a442-00163e304a25',
+              'userName': '孙亚峰',
+              'workDays': 1,
+              'efficiency': '3.00'
+            }
+          ],
+          'nextRefresh': 11
+        },
+        'succ': true
+      }
+      this.data.data = res.data.cycleWorkingHoursEfficiencyCount
+      refreshDataTimeInterval = res.data.nextRefresh * 1000
+    },
+    registerLoop() {
+      if (this.refreshInterval) clearInterval(this.refreshInterval);
+      this.refreshInterval = setInterval(this.refreshWorkTime, refreshDataTimeInterval);
+    },
+  },
+  created(){
+    this.refreshWorkTime()
   },
   mounted() {
-    // this.initECharts();
-    this.initEChartsP1();
-    this.initEChartsP2();
-    this.$eventBus.$on(EventMap.NEED_REFRESH_RIGHT_SEARCH_AT, this.updateCharts);
+    this.registerLoop();
+    // this.$eventBus.$on(EventMap.NEED_REFRESH_RIGHT_SEARCH_AT, this.updateCharts);
+
   },
   beforeDestroy() {
-    currChartsP1 = null;
-    currChartsP2 = null;
-    this.$eventBus.$off(EventMap.NEED_REFRESH_RIGHT_SEARCH_AT, this.updateCharts);
+    clearInterval(this.refreshInterval);
+      this.refreshInterval= null,
+    // this.$eventBus.$off(EventMap.NEED_REFRESH_RIGHT_SEARCH_AT, this.updateCharts);
   }
 }
 </script>
@@ -366,4 +454,16 @@ export default {
       background-color: #32FFCD;
     }
   }
+</style>
+<style scoped lang="scss">
+/deep/.el-carousel{
+  overflow-y: hidden;
+  .el-carousel__container{
+  height: 100%;
+  }
+  .el-carousel__item.is-animating{
+    transition:transform .8s ease-in-out
+  }
+}
+
 </style>
