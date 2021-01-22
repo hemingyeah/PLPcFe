@@ -192,6 +192,7 @@ export default {
 <style lang="scss" scoped>
 .setting-approve {
   &-people {
+    line-height: 40px;
     margin-bottom: 12px;
     font-size: 14px;
     color: #999999;

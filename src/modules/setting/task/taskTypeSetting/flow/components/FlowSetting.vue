@@ -22,7 +22,7 @@
         <!--S 工单表单设置 -->
         <div v-if="showFormBuilder" class="setting-specific-form">
           <h2 class="mt-12">工单表单设置</h2>
-          <p style="color: #13C2C2" @click="openFormDesign">
+          <p style="color: #13C2C2;line-height: normal;" @click="openFormDesign">
             工单{{ type === "create" ? "新建" : "回执" }}表单设置
           </p>
         </div>
@@ -45,7 +45,7 @@
         <!--E 审批设置 -->
 
         <!--S 转派时也审批-->
-        <div v-if="type === 'allot'" class="mt-8">
+        <div v-if="type === 'allot' && (flowSetting.approveSetting.level && flowSetting.approveSetting.level > 0)" class="mt-8">
           <el-checkbox v-model="flowSetting.reallotAppr" true-label="" false-label="none"
           >转派时也审批</el-checkbox
           >
@@ -62,7 +62,7 @@
               @change="updateOvertimeSetting"
             />
           </h2>
-          <div>
+          <div style="line-height: 40px;">
             {{ preFlowName }}后超过
             <el-input
               class="w-87"
@@ -72,7 +72,7 @@
             小时后，标记为超时
           </div>
           <div>
-            <span>工单超时后提醒干系人（负责人、协同人、创建人）及</span>
+            工单超时后提醒干系人（负责人、协同人、创建人）及
             <el-select
               v-model="taskOverTimeModel.remindType"
               @change="updateOvertimeSetting"
@@ -592,6 +592,7 @@ export default {
     background: #ffffff;
     margin-right: 12px;
     border-radius: 0 0 4px 4px;
+    line-height: 40px;
     .flow-setting-form-preview {
       padding-top: 20px;
     }
@@ -626,6 +627,7 @@ export default {
         margin: 20px 0 8px 0;
       }
       p {
+        line-height: 40px;
         margin-bottom: 0;
       }
       &-form {
@@ -690,7 +692,7 @@ export default {
 
 /** element style */
 /deep/.el-input{
-    margin-top: 8px;
+  line-height: 40px;
 }
 /deep/.el-checkbox{
   margin-bottom: 0;
