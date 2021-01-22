@@ -98,7 +98,9 @@
           <div class="base-modal-content">
             <form-builder ref="form"
                           :fields="taskAccountFields"
-                          :value="{}"></form-builder>
+                          :value="taskAccountValue"
+                          @update="taskAccountUpdate"
+            ></form-builder>
           </div>
           <div slot="footer"
                class="dialog-footer flex-x jus-end">
@@ -268,7 +270,7 @@ export default {
   data () {
     return {
       pageState: {
-        nowStep: 0,
+        nowStep:0,
         nowStepType: 'menu',
       },
       nowStepCom: {
@@ -360,6 +362,7 @@ export default {
       taskAllotTask,
       taskAllotLoginUser,
       taskAccountFields,
+      taskAccountValue:{},
       taskfeedBackTask,
       taskfeedBackConfig,
       productFields,
@@ -416,6 +419,16 @@ export default {
         }
       )
     }, 800),
+    /**
+    * @description 更新表单数据
+    */
+    taskAccountUpdate({field, newValue, oldValue}) {
+      let {fieldName, displayName} = field;
+      if (this.$appConfig.debug) {
+        console.info(`[FormBuilder] => ${displayName}(${fieldName}) : ${JSON.stringify(newValue)}`);
+      }
+      this.$set(this.taskAccountValue, fieldName, newValue);
+    },
   },
   destroyed () {
     this.stopLastScends();
@@ -495,6 +508,7 @@ $window-height: 768px;
   height: 100vh;
   min-width: $window-width;
   min-height: $window-height;
+  background-color: rgba($color: #000000, $alpha: 0.5);
 }
 .page-guide-background {
   width: $window-width;

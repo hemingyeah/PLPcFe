@@ -129,34 +129,25 @@ export default {
     return {
       optionsTeam: [{
         value: '1',
-        label: '黄金糕'
+        label: '华东大区'
       }, {
         value: '2',
-        label: '双皮奶'
-      }, {
-        value: '3',
-        label: '蚵仔煎'
-      }, ],
+        label: '江浙沪大区'
+      }],
       optionsReman: [{
         value: '1',
-        label: '黄金糕'
+        label: '测试负责人1'
       }, {
         value: '2',
-        label: '双皮奶'
-      }, {
-        value: '3',
-        label: '蚵仔煎'
-      }, ],
+        label: '测试负责人2'
+      }],
       optionsSyman: [{
         value: '1',
-        label: '黄金糕'
+        label: '测试协同人1'
       }, {
         value: '2',
-        label: '双皮奶'
-      }, {
-        value: '3',
-        label: '蚵仔煎'
-      }, ],
+        label: '测试协同人2'
+      } ],
       value1: [],
       value2: '',
       value3: [],
