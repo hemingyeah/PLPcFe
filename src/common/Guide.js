@@ -55,7 +55,18 @@ class Guide {
       });
     };
     this.finishBtnFn = () => {
-      return this.stopStep();
+      return new Promise((resolve, reject) => {
+        if (watchStepFn)
+          return watchStepFn({ type: 'finish', nowStep: this.nowStep }).then(
+            (res) => {
+              if (storageKe) storageSet(storageKe, arr.length);
+              resolve();
+            }
+          );
+
+        if (storageKe) storageSet(storageKe, arr.length);
+        resolve();
+      });
     };
     this.previousStep = () => {
       return new Promise((resolve, reject) => {
@@ -116,6 +127,8 @@ class Guide {
               totalStep={_this.arr.length}
               canUse={obj.canUse}
               inside={obj.inside}
+              insideDom={obj.insideDom}
+              arrowDirection={obj.arrowDirection}
               nowStep={obj.nowStep}
               content={obj.content}
               needCover={obj.needCover}

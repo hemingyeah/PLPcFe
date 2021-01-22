@@ -11,11 +11,7 @@
          ref="guideCom"
          v-show="showGuide && guideDom.top >-1"
          :style="guideStyle">
-      <div v-if="arrowUp"
-           class="normal-arrow-top tour-arrow"
-           :style="arrowStyle"></div>
-      <div v-if="!arrowUp"
-           class="normal-arrow-down tour-arrow-down"
+      <div :class="`normal-arrow normal-arrow-${arrowDirection_} tour-arrow-${arrowDirection_}`"
            :style="arrowStyle"></div>
       <div class="tour-content-box">
         <div v-if="haveStep"
@@ -124,6 +120,13 @@ export default {
       type: Boolean,
       default: false
     },
+    insideDom: {
+      type: Function
+    },
+    arrowDirection: {
+      type: String,
+      default: 'top'
+    }
   },
   data () {
     return {
@@ -132,7 +135,7 @@ export default {
       arrowStyle: '',
       guideDom: {},
       loop: null,
-      arrowUp: true
+      arrowDirection_: this.arrowDirection
     };
   },
   methods: {
@@ -153,6 +156,31 @@ export default {
       if(!res_) return
       let style_ = '';
 
+      // TODO: 临时代码只为满足工单设置功能引导、待优化
+      if (this.arrowDirection_ == 'left') {
+        if (this.insideDom) {
+          let dom = this.insideDom();
+          let rect = dom.getBoundingClientRect();
+
+          style_ = `${style_};left:${res_.right + 12 || 0}px;top:${rect.top - (dom.clientHeight / 2) - 12 || 0}px;z-index:998`
+          this.arrowStyle = `top:${dom.clientHeight + 12}px`;
+        } else {
+          style_ = `${style_};left:${res_.right + 12 || 0}px;top:${res_.top + (res_.height / 4)}px;z-index:998`
+        }
+        
+        this.guideStyle = style_;
+        this.guideDom = res_;
+        return;
+      }
+
+      if (this.arrowDirection_ == 'right') {
+        style_ = `${style_};right:${document.documentElement.clientWidth - res_.left + 12 || 0}px;top:${res_.top + (res_.height / 4)}px;z-index:998`
+        
+        this.guideStyle = style_;
+        this.guideDom = res_;
+        return;
+      }
+
       if (document.documentElement.clientWidth - res_.left < 350) {
         style_ = `${style_};right:${document.documentElement.clientWidth - res_.left - res_.width || 0}px`;
         this.arrowStyle = `right:${((res_.width / 2) - 8) > 112 ? 112 : (res_.width / 2) - 8}px`;
@@ -163,14 +191,22 @@ export default {
       if (!this.inside) {
         if (document.documentElement.clientHeight - res_.top - res_.height < 400) {
           style_ = `${style_};bottom:${document.documentElement.clientHeight - res_.top + 12 || 0}px;`
-          this.arrowUp = false;
+          this.arrowDirection_ = 'bottom';
         } else {
           style_ = `${style_};top:${res_.top + res_.height + 12 || 0}px`
-          this.arrowUp = true;
+          this.arrowDirection_ = 'top';
         }
       } else {
-        style_ = `${style_};top:${res_.top + 12 || 0}px;z-index:998`
-        this.arrowUp = true;
+        if (this.insideDom) {
+          let dom = this.insideDom();
+          let rect = dom.getBoundingClientRect();
+
+          style_ = `left:${rect.left}px;top:${dom.clientHeight + rect.top || 0}px;z-index:998`
+        } else {
+          style_ = `${style_};top:${res_.top + 12 || 0}px;z-index:998`
+        }
+        
+        this.arrowDirection_ = 'top';
       }
 
       this.guideStyle = style_;
@@ -219,7 +255,7 @@ export default {
   min-width: 240px;
   max-width: 350px;
   max-height: 400px;
-  .tour-arrow {
+  .tour-arrow-top {
     position: absolute;
     top: -5px;
   }
@@ -294,8 +330,7 @@ export default {
 }
 
 /* 向上的箭头 */
-
-.normal-arrow-top {
+.normal-arrow {
   font-size: 0;
   line-height: 0;
   border-width: 0.5rem;
@@ -307,22 +342,28 @@ export default {
   border-left-color: transparent;
   border-right-color: transparent;
   position: absolute;
-  top: -0.5rem;
-}
 
-.normal-arrow-down {
-  font-size: 0;
-  line-height: 0;
-  border-width: 0.5rem;
-  border-color: #fff;
-  width: 0;
-  border-top-width: 0;
-  border-style: dashed;
-  border-bottom-style: solid;
-  border-left-color: transparent;
-  border-right-color: transparent;
-  transform: rotateZ(180deg);
-  position: absolute;
-  bottom: -0.5rem;
+  &-top {
+    top: -0.5rem;
+  }
+
+  &-bottom {
+    bottom: -0.5rem;
+    transform: rotateZ(180deg);
+  }
+
+  &-left {
+    left: -10px;
+    top: 50%;
+    margin-top: -8px;
+    transform: rotateZ(270deg);
+  }
+
+  &-right {
+    right: -10px;
+    top: 50%;
+    margin-top: -8px;
+    transform: rotateZ(90deg);
+  }
 }
 </style>
