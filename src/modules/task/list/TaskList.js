@@ -20,14 +20,14 @@ import { fields, selectIds, advancedList, allExport, Inquire } from './TaskField
 import { LINK_REG } from '@src/model/reg';
 
 /** utils */
-import _ from 'lodash';
-import Page from '@model/Page';
-import { storageGet, storageSet } from '@src/util/storage';
-import { formatDate } from '@src/util/lang';
-import { getRootWindow } from '@src/util/dom';
-import * as FormUtil from '@src/component/form/util'
-// 新存储工具方法
-import * as StorageUtil from '@src/util/storage.ts'
+import _ from "lodash";
+import Page from "@model/Page";
+import { storageGet, storageSet } from "@src/util/storage";
+import { formatDate } from "@src/util/lang";
+import { getRootWindow } from "@src/util/dom";
+import * as FormUtil from "@src/component/form/util"
+import VersionMixin from '@src/mixins/versionMixin'
+import StorageUtil from '@src/util/storage.ts'
 
 /* mixin */
 import tourGuide from '@src/mixins/tourGuide'
@@ -74,9 +74,9 @@ const Region = {
 }
 
 export default {
-  name: 'task-list',
-  inject: ['initData'],
-  mixins: [tourGuide],
+  name: "task-list",
+  inject: ["initData"],
+  mixins: [tourGuide, VersionMixin],
   data() {
     return {
       selectIds, // id

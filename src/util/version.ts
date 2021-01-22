@@ -25,6 +25,9 @@ function commonJudgeShow(): boolean {
   // 老版本vip版
   if(isOldVipEdition()) return true
   
+  // 体验版
+  if (isExperienceEdition()) return false
+  
   return false
 }
 
@@ -43,6 +46,11 @@ export function isEnterpriseEdition(): boolean {
   return getRootWindowEditionData() === 3
 }
 
+// 是否为体验版
+export function isExperienceEdition(): boolean {
+  return getRootWindowEditionData() === 4
+}
+
 /** 
  * 是否显示可以创建子团队
  * 1. 老版本vip版 根据 initData里面的 showNewTeam 判断
@@ -50,7 +58,17 @@ export function isEnterpriseEdition(): boolean {
  * 3. 企业版 原生支持
 */
 export function isShowCreateChildrenTeam(initData: any): boolean {
-  return true
+  // 标准版
+  if (isStandardEdition()) return false
+  
+  // 企业版
+  if (isEnterpriseEdition()) return true
+  
+  // 体验版
+  if (isExperienceEdition()) return false
+  
+  // 老版本vip版
+  return Boolean(isOldVipEdition() && initData?.showNewTeam === true)
 }
 
 /** 
