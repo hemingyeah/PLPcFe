@@ -4,21 +4,25 @@
     <!--S 工单流程轴 -->
     <div class="setting-flow-axis" id="setting-flow-axis-guide">
       <el-row
-        class="flow-axis-step"
-        :class="[currFlow === key && 'active', (!taskFlowData.taskTypeConfig.flowSetting[key].state && !flowMap[key].isSystem) && 'disabled']"
+        class="flow-axis-step-box"
+        type="flex"
+        justify="space-between"
         v-for="key in Object.keys(flowMap)"
         :key="key"
         @click.native="clickFlow(key)">
-        <el-row type="flex" justify="space-between">
+        <el-row
+          class="flow-axis-step"
+          :class="[currFlow === key && 'active', (!taskFlowData.taskTypeConfig.flowSetting[key].state && !flowMap[key].isSystem) && 'disabled']"
+          type="flex" justify="space-between">
           <div>
             <i :class="['iconfont', flowMap[key].icon]" :style="{color: key === 'close' && '#F56C6C'}"></i>
             {{flowMap[key].name}}
           </div>
           <div v-if="taskFlowData.taskTypeConfig.flowSetting[key].state || flowMap[key].isSystem" class="open-tag">已开启</div>
-          <div class="open-btn" @click.stop>
-            <el-switch v-model="taskFlowData.taskTypeConfig.flowSetting[key].state" v-if="!flowMap[key].isSystem"/>
-          </div>
         </el-row>
+        <div class="open-btn" @click.stop>
+          <el-switch v-model="taskFlowData.taskTypeConfig.flowSetting[key].state" v-if="!flowMap[key].isSystem"/>
+        </div>
       </el-row>
     </div>
     <!--E 工单流程轴 -->
@@ -285,6 +289,14 @@ export default {
         padding: 20px;
         background: #FFFFFF;
         border-radius: 4px;
+        .flow-axis-step-box{
+          width: 100%;
+          .open-btn{
+            position: absolute;
+            top: 40px;
+            right: 0;
+          }
+        }
         .flow-axis-step{
             cursor: pointer;
             position: relative;
@@ -309,12 +321,6 @@ export default {
                 background: #E1F3D8;
                 border-radius: 11px;
                 border: 1px solid #CFEDC0;
-            }
-            .open-btn{
-                position: absolute;
-                top: 50%;
-                right: -90px;
-                transform: translateY(-50%);
             }
             &.disabled{
                 color: #999999;
