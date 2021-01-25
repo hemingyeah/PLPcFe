@@ -57,7 +57,7 @@
               <i class="iconfont icon-nav-down"></i>
             </span>
             <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item>
+              <el-dropdown-item v-if="!isExperienceEdition">
                 <div @click="openDialog('importProduct')">导入产品模板</div>
               </el-dropdown-item>
               <el-dropdown-item>
@@ -251,8 +251,9 @@ import { formatDate } from "@src/util/lang";
 
 import { getProductTemplateList, productTemplateDelete, getProductFields } from "@src/api/ProductApi.js"
 
-import SearchPanel from "./component/SearchPanel.vue";
-import DialogBatchEditProductTemplate from "./component/DialogBatchEditProductTemplate.vue";
+import SearchPanel from './component/SearchPanel.vue';
+import DialogBatchEditProductTemplate from './component/DialogBatchEditProductTemplate.vue';
+import VersionMixin from '@src/mixins/versionMixin'
 
 /* 高级搜索面板 列数 */
 const PRODUCT_TEMPLATE_LIST_ADVANCE_SEARCH_COLUMN_NUMBER = "product_template_list_advance_search_column_number";
@@ -266,7 +267,8 @@ const PRODUCT_CHECK = "productCheck"
 const link_reg = /((((https?|ftp?):(?:\/\/)?)(?:[-;:&=\+\$]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\?\+=&;:%!\/@.\w_]*)#?(?:[-\+=&;%!\?\/@.\w_]*))?)/g
 
 export default {
-  name: "product-template-list-view",
+  name: 'product-template-list-view',
+  mixins: [VersionMixin],
   props: {
     initData: {
       type: Object,

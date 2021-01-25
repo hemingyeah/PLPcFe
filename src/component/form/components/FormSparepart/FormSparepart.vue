@@ -23,7 +23,8 @@
         :label="column.label"
         :prop="column.field"
         show-overflow-tooltip
-        :min-width="column.minWidth || '148px'">
+        :min-width="column.minWidth || '108px'"
+      >
         <template slot-scope="scope">
           <!-- start 数量 -->
           <template v-if="column.field === 'number' && !isPaySuccess">
@@ -185,15 +186,12 @@ export default {
       }, {
         label: '数量',
         field: 'number',
-        minWidth: '100px'
       }, {
         label: '单价',
         field: 'salePrice',
-        minWidth: '100px'
       }, {
         label: '小计',
         field: 'total',
-        minWidth: '128px'
       }]
 
       // 支付成功前可编辑

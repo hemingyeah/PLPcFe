@@ -97,7 +97,7 @@ function setFieldOperateHandler(field = {}) {
     || formType === 'relationCustomer'
   ) {
     field.operatorOptions = OperatorSelectOptionsMap.text.slice();
-  } else if (formType == 'date' || formType == 'datetime') {
+  } else if (formType == 'date' || formType == 'datetime' || formType === 'planTime') {
     field.operatorOptions = OperatorSelectOptionsMap.date.slice();
   } else if (formType == 'select' && !setting.isMulti) {
     field.operatorOptions = OperatorSelectOptionsMap.select.slice();
@@ -180,7 +180,7 @@ export default {
 
         let formType = f.formType;
 
-        if (formType === 'datetime') {
+        if (formType === 'datetime' || formType === 'planTime') {
           formType = 'date';
         }
 

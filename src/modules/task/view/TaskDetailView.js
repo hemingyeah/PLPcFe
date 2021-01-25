@@ -624,13 +624,6 @@ export default {
     stateColor() {
       return TaskStateEnum.getColorForTask(this.task);
     },
-    /**
-    * @description 显示折叠按钮
-    * 审核结算、客户评价、附加组件有任一存在即显示
-    */
-    showCollapse() {
-      return this.viewBalanceTab || this.viewFeedbackTab || this.viewTaskCardTab;
-    },
     messageConfig() {
       return this.initData?.messageConfig || {};
     },
@@ -1020,7 +1013,7 @@ export default {
     /** 
     * @description 打开客户详情
     */
-    openCustomerView() {
+    openCustomerView(openTaskTab) {
       if (!this.allowOpenCustomerView) return;
       
       let fromId = window.frameElement.getAttribute('id');
@@ -1028,11 +1021,15 @@ export default {
 
       if(!customerId) return;
 
+      let url = `/customer/view/${customerId}?noHistory=1`;
+
+      if (openTaskTab) url += '&active=task';
+
       this.$platform.openTab({
         id: `customer_view_${customerId}`,
         title: '客户详情',
         close: true,
-        url: `/customer/view/${customerId}?noHistory=1`,
+        url,
         fromId
       })
     },
@@ -1094,7 +1091,7 @@ export default {
       return value === ENCRYPT_FIELD_VALUE;
     },
     buildButtonData() {
-      return [
+      let buttonData = [
         { name: '指派', type: 'primary', show: this.allowAllotTask, event: this.allot },
         { name: '接单', type: 'primary', show: this.allowPoolTask, event: () => { this.openDialog('acceptFromPool') } },
         { name: '接受', type: 'primary', show: this.allowAcceptTask, event: () => { this.openDialog('accept') } },
@@ -1109,6 +1106,8 @@ export default {
         { name: '审批', type: 'primary', show: this.allowApprove, event: () => { this.openDialog('approve') } },
         { name: '撤回审批', type: 'default', show: this.allowoffApprove, event: this.offApprove }
       ]
+
+      return buttonData.reverse();
     },
     /** 
      * 关闭并打开新的Tab
@@ -1233,7 +1232,7 @@ export default {
       if (query.active == 'balance' && this.viewBalanceTab && this.allowBalanceTask) {
         this.openDialog('balance');
       } else {
-        this.rightActiveTab = this.viewBalanceTab ? 'balance-tab' : this.viewFeedbackTab ? 'feedback-tab' : 'record';
+        // this.rightActiveTab = this.viewBalanceTab ? 'balance-tab' : this.viewFeedbackTab ? 'feedback-tab' : 'record';
       }
       
       // 是否显示详情向导
