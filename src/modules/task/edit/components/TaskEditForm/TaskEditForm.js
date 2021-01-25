@@ -757,7 +757,8 @@ export default {
         // 判断客户是否存在
         if ((!isHaveCustomer || isForceUpdateCustomer) && product.value) {
           // 客户不存在时则下拉框隐藏
-          findComponentDownward(this.$refs.product, 'base-select').close();
+          const LinkmanSelectComponent = findComponentDownward(this.$refs.linkman, 'base-select')
+          LinkmanSelectComponent?.close()
           
           const result = await this.fetchCustomerByProduct({ id: product.value });
           
