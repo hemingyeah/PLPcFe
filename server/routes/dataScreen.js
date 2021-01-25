@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-01-18 09:25:33
- * @LastEditTime: 2021-01-22 15:31:58
+ * @LastEditTime: 2021-01-22 16:45:45
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /shb-fe-pc/server/routes/dataScreen.js
@@ -25,9 +25,10 @@ router.get('/data-screen', async ctx => {
 
   ctx.body = Template.renderWithHtml('数据大屏', body, script, modConfig.template);
 });
-router.get('/data-screen-custom', async ctx => {
-  let script = ['/dataScreenCustom.frame.js'];
-  let modConfig = modules['dataScreenCustom.frame'];
+
+router.get('/data-screen-kubai', async ctx => {
+  let script = ['/dataScreenKubai.frame.js'];
+  let modConfig = modules['dataScreenKubai.frame'];
   let reqHeaders = ctx.request.headers;
   let result = await HttpClient.request('/stats/screenData/screenDataView', 'get', null, { headers: reqHeaders });
   let body = result.body;
