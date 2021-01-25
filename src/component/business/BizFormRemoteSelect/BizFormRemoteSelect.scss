@@ -1,17 +1,38 @@
 .biz-form-remote-select {
   flex: 1;
   position: relative;
-
+  
   &-clear {
     position: absolute;
     right: 10px;
     top: 6px;
-
+  
     &:hover {
       cursor: pointer;
       color: #ed3f14;
     }
-
+  
   }
-
+  
+  .base-select-main-content {
+    .el-tag {
+      max-width: calc(100% - 30px);
+      padding-right: 30px;
+      @include text-ellipsis();
+    }
+  }
 }
+
+// .task-container {
+//   .biz-form-remote-select {
+//     width: calc(100% - 80px);
+//     .el-tag {
+//       position: relative;
+//       i {
+//         position: absolute;
+//         right: 5px;
+//         top: 3px;
+//       }
+//     }
+//   }
+// }

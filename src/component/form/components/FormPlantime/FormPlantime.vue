@@ -90,6 +90,14 @@ export default {
         display: none;
       }
     }
+    .el-time-spinner {
+      .el-time-spinner__wrapper {
+        width: 50%;
+        &:last-child {
+          display: none;
+        }
+      }
+    }
   }
 }
 </style>

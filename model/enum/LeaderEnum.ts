@@ -10,7 +10,7 @@ enum LeaderEnum {
   // 表单用户
   FormUser = 'formUser',
   // 指定人员列表
-  Users = 'Users',
+  Users = 'users',
   // 工单派单人
   AllotUser = 'allotUser',
   // 不需要审批

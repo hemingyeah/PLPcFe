@@ -111,3 +111,17 @@
     transform: rotateZ(360deg)
   }
 }
+
+// ----------------- select ----------------- 
+.el-zoom-in-top-enter-active,
+.el-zoom-in-top-leave-active {
+  opacity: 1;
+  transform: scaleY(1);
+  transition: $fade-transition;
+  transform-origin: center top;
+}
+.el-zoom-in-top-enter,
+.el-zoom-in-top-leave-active {
+  opacity: 0;
+  transform: scaleY(0);
+}

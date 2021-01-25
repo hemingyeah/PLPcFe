@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import { typeOf } from './assist'
 
 /** 
@@ -47,4 +48,18 @@ export function isFunction(func) {
  */
 export function isNull(value){
   return typeOf(value) === 'null'
+}
+
+/** 
+ * @description 是否为 undefined
+*/
+export function isUndefined(value) {
+  return typeOf(value) === 'undefined'
+}
+
+/** 
+ * @description 是否为 空
+*/
+export function isEmpty(value) {
+  return _.isEmpty(value)
 }

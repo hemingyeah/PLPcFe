@@ -7,6 +7,10 @@ export default {
   addProductDialog: false,
   // 客户初始化数据
   customerInitData: {},
+  // 客户地址数据列表
+  customerAddressOptions: [],
+  // 客户联系人数据地址
+  customerLinkmanOptions: [],
   // 是否创建客户
   isCreateCustomer: false,
   // 加载状态
