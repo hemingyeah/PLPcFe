@@ -10,7 +10,7 @@
       <el-table-column 
       v-if="this.type == 'team'"
       prop="teamName"
-      label="所属团队">
+      label="所属部门">
       </el-table-column>
       <el-table-column
         prop="taskNo"

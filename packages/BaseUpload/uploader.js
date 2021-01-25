@@ -1,5 +1,5 @@
-import { notification } from '../../src/util/Platform';
-import http from '../../src/util/http'
+import { notification } from '@src/util/Platform';
+import http from '@src/util/http'
 
 function getError(xhr, action) {
   let msg;

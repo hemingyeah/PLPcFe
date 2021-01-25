@@ -5,8 +5,8 @@
       :value="displayName"
       :placeholder="placeholder"
       readonly 
-      @click="choose">
-    <!-- @keydown.enter.prevent="choose" -->
+      @click="choose"
+    >
     <button type="button" class="btn-text form-user-clear" @click="clear" v-if="!isEmpty">
       <i class="iconfont icon-fe-close"></i>
     </button>
@@ -15,6 +15,7 @@
 
 <script>
 import FormMixin from '@src/component/form/mixin/form';
+import {isEnterprise} from '@src/util/Platform';
 
 export default {
   name: 'form-user',
@@ -94,7 +95,7 @@ export default {
         showDeleteUser: this.seeDeleteUser,
         max
       };
-      return this.$fast.contact.choose('dept', options).then(result => {
+      return this.$fast.contact.choose(isEnterprise ? 'team' : 'dept', options).then(result => {
         if(result.status == 0){
           let oldValue = null;
           let data = result.data || {};
@@ -127,9 +128,8 @@ export default {
     padding-right: 32px;
     width: 100%;
     cursor: pointer;
-    //background-color: #f6f9f7;
   }
-
+  
   &:hover .form-user-clear{
     display: block;
   }

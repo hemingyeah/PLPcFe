@@ -478,6 +478,7 @@ export default {
     // this.$eventBus.$on("product_view.update_detail", this.refreshProduct); // 更新详情
     this.$eventBus.$on('product_view_record_update', this.fetchStatisticalData); // 更新动态
     this.$eventBus.$on('product_view_remind_update', this.fetchStatisticalData); // 更新提醒
+    this.$eventBus.$on('product_view_plan_update', this.fetchStatisticalData); // 更新计划任务
     this.$eventBus.$on('product_view.select_tab', this.selectTab);
   },
   beforeDestroy() {

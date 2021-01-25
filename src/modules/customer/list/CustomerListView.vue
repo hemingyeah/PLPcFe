@@ -17,7 +17,6 @@
             native-type="submit"
           >搜索</base-button>
           <base-button type="ghost" @event="resetParams">重置</base-button>
-          <!-- <a href="/customer/oldList">返回旧版</a> -->
         </div>
         <span class="advanced-search-visible-btn" @click.self="panelSearchAdvancedToggle">
           <i class="iconfont icon-add"></i>
@@ -1098,7 +1097,7 @@ export default {
           show: true
         },
         {
-          label: '服务团队',
+          label: '服务部门',
           field: 'tags',
           // width: '110px',
           show: true

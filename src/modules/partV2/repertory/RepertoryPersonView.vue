@@ -81,7 +81,7 @@
             <div class="form-row">
               <div class="form-item">
                 <template v-if="personDataLevel > 1">
-                  <label>服务团队</label>
+                  <label>服务部门</label>
                   <div class="form-item-content">
                     <biz-team-select :value="tag" @input="chooseTeam"/>
                     <!-- <el-select placeholder="请选择备件类别" v-model="model.teamId" @change="chooseTeam">

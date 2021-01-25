@@ -162,6 +162,8 @@ export default {
 
         if (!reqRes.status) {
           this.fetchData();
+          // 更新下产品详情页面计划任务数量
+          this.$eventBus.$emit('product_view_plan_update');
         } else {
           platform.alert(reqRes.message);
         }

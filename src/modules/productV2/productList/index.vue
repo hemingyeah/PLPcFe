@@ -301,6 +301,10 @@
                   {{ getAddress(scope.row.address) }}
                 </template>
 
+                <template v-else-if="column.label=='购买日期' || column.label=='过保日期'">
+                  {{ scope.row.attribute[column.field] | formatDate2 }}
+                </template>
+
                 <template v-else-if="!column.isSystem">
                   {{ scope.row.attribute[column.field] }}
                 </template>
@@ -822,6 +826,10 @@ export default {
     formatDate (val) {
       if (!val) return '';
       return formatDate(val, 'YYYY-MM-DD HH:mm:ss');
+    },
+    formatDate2 (val) {
+      if (!val) return '';
+      return formatDate(val, 'YYYY-MM-DD');
     },
     displaySelect (value) {
       if (!value) return null;

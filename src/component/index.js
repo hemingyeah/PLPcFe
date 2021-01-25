@@ -5,6 +5,7 @@ import BaseModal from './common/BaseModal';
 import BasePanel from './common/BasePanel';
 import BaseUpload from './common/BaseUpload';
 import BaseTree from './common/BaseTree';
+import BaseTreeDept from './common/BaseTreeDept';
 import BaseImport from './common/BaseImport';
 import BaseExport from './common/BaseExport';
 import BaseExportGroup from './common/BaseExportGroup';
@@ -63,6 +64,7 @@ const components = [
   BasePanel,
   BaseUpload,
   BaseTree,
+  BaseTreeDept,
   BaseContact,
   BaseMapPicker,
   BaseDistPicker,

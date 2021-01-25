@@ -20,10 +20,12 @@ export default class Tab{
     this.loading = true;
 
     this.reload = options.reload === true; // 标记tab是否需要更新
+    this.noRedirect = options.noRedirect === true; // 标记tab是否不需要重定向
   }
 
   merge(other = {}){
     this.reload = other.reload === true || other.url != this.currentUrl;
+    this.noRedirect = other.noRedirect === true;
     this.url = other.url;
   }
 

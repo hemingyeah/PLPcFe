@@ -100,7 +100,7 @@ function dataTelevision(options) {
       name: 'lj'
     }
   }
-
+  
   win.postMessage(message)
 }
 
@@ -110,31 +110,26 @@ function dataTelevision(options) {
  * @param {*} imageDom - img dom
  * @param {*} imgUrl - 图片链接
  */
-function imagePreview({
-  imageDom,
-  urls,
-  currIndex = 0
-}) {
+function imagePreview({ imageDom, urls, currIndex = 0 }) {
   return BaseGallery.preview(imageDom, currIndex, urls.length > 1);
-  // return dingtalk.biz.previewImage(urls, urls[currIndex])
 }
 
 export const platform = {
   inDingTalk: dingtalk.inDingTalk,
-
+  
   alert,
   confirm,
   notification,
   toast,
-
+  
   openTab,
   refreshTab,
   closeTab,
   setTabLoadingStatus,
-
+  
   openLink,
   imagePreview,
-
+  
   changeWindowTitle,
   dataTelevision
 };

@@ -1,6 +1,7 @@
 const https = require('https');
 const chalk = require('chalk');
 const chalkError = chalk.red;
+const queryString = require('querystring');
 // model
 const MODEL_PATH = './../model';
 const { proxyConfig, isNotLocalEnv, envMap } = require(`${MODEL_PATH}/proxyConfigModel`);
@@ -137,24 +138,41 @@ function getCookie() {
     user,
     location
   } = envMapData;
-
-  let params = new URLSearchParams({
-    uid: user.userId,
-    tid: user.tenantId,
-    corpId: user.corpId
-  });
-  let url = `${location}/smlogin/login?${params.toString()}`;
-
-  const options = {
-    hostname: envMap[SHB_ENV].host,
-    port: '',
-    path: `/smlogin/login?${params.toString()}`,
-    method: 'GET',
-    headers: {
-      cookie: 'shbversion=shbvip;'
-    }
-  };
-
+  let params, options, post_data;
+  
+  if(location.endsWith('linker.ltd')){
+    // 多端环境
+    post_data = queryString.stringify({ account:user.account, password:user.password })
+    options = {
+      hostname: envMap[SHB_ENV].host,
+      port: '443',
+      path: '/account/login',
+      method: 'POST',
+      headers: {
+        cookie: 'shbversion=shbvip;',
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Content-Length': post_data.length,
+      }
+    };
+  } else {
+    params = new URLSearchParams({
+      uid: user.userId,
+      tid: user.tenantId,
+      corpId: user.corpId
+    });
+    let url = `${location}/smlogin/login?${params.toString()}`;
+  
+    options = {
+      hostname: envMap[SHB_ENV].host,
+      port: '',
+      path: `/smlogin/login?${params.toString()}`,
+      method: 'GET',
+      headers: {
+        cookie: 'shbversion=shbvip;'
+      }
+    };
+  } 
+ 
   return new Promise((resolve, reject) => {
     const req = https.request(options, (res) => {
       // console.log('状态码:', res.statusCode);
@@ -172,7 +190,10 @@ function getCookie() {
 
     });
 
-
+    if(options.method === 'POST') {
+      req.write(post_data); 
+    }
+      
     req.on('error', (e) => {
       console.log('nodeLoginErro', e);
     });

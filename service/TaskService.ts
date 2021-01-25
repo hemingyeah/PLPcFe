@@ -300,11 +300,11 @@ function getApproversName(flowSetting: FlowSetting, task: Task | null, result: a
     return approversName
   }
   
-  // 发起人团队主管
-  if (leader === LeaderEnum.Leader) {
-    approversName = '发起人团队主管'
-    return approversName
-  }
+	// 发起人团队主管
+	if (leader === LeaderEnum.Leader) {
+		approversName = '发起人部门主管'
+		return approversName
+	}
   
   // 工单创建人
   if (leader === LeaderEnum.CreateUser) {

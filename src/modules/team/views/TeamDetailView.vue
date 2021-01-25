@@ -6,13 +6,11 @@
       <div class="team-tool-bar">
         <div class="func-btn">
           <base-button type="only-text" icon="icon-arrow-left" @event="goBack" v-if="displayGoBackBtn">返回</base-button>
-          <!-- TODO: 编辑 需要权限 控制 -->
           <base-button type="only-text" icon="icon-edit" @event="teamEdit" v-if="allowEditTeam">编辑</base-button>
           <base-button type="only-text" icon="icon-fe-close" @event="teamDelete" v-if="allowEditTeam">删除</base-button>
         </div>
 
         <div class="action-btns">
-          <!-- TODO: 新建子团队 需要权限控制 -->
           <div class="action-btn-view" v-if="!teamData.parent && showNewTeam" @click="teamChildCreate">
             <span class="action-btn"> <i class="iconfont icon-add"> </i>新建子团队</span>
           </div>
@@ -52,20 +50,13 @@
             <div class="form-view-row">
               <label>负责区域</label>
               <div class="form-view-row-content">
-                <p v-for="place in teamData.tagPlaceList" :key="`${place.id}_index`">
-                  {{ place.province || '' }}
-                  {{ place.city ? `- ${place.city}` : '' }}
-                  {{ place.dist ? `- ${place.dist}` : '' }}
-                </p>
+                <p v-for="place in teamData.tagPlaceList" :key="`${place.id}_index`">{{ place.province || '' }}{{ place.city ? `- ${place.city}` : '' }} {{ place.dist ? `- ${place.dist}` : '' }}</p>
               </div>
             </div>
 
             <div class="form-view-row">
               <label>位置</label>
-              <div class="form-view-row-content" v-if="teamData.tagAddress">
-                {{ teamData.tagAddress | fmt_address }}
-                <i v-if="teamData.tagAddress.longitude && teamData.tagAddress.latitude" @click="openMap" class="iconfont icon-address team-address-icon link-text"></i>
-              </div>
+              <div class="form-view-row-content" v-if="teamData.tagAddress">{{ teamData.tagAddress | fmt_address }}<i v-if="teamData.tagAddress.longitude && teamData.tagAddress.latitude" @click="openMap" class="iconfont icon-address team-address-icon link-text"></i></div>
             </div>
 
             <div class="form-view-row" v-if="teamData.parent && showNewTeam">

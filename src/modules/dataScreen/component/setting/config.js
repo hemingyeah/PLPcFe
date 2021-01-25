@@ -18,7 +18,7 @@ export const settingMap = {
   cycleCompleteEventCount: { label: '周期内完成事件总数', value: true, belong: 'rightTop' },
   // 右侧报表展示
   cycleCompleteTaskCountAverageTime: { label: '人员周期内完成工单数量及平均工单用时', value: true, belong: 'rightHistogram' },
-  cycleCompleteTaskAndTagUserCount: { label: '周期内完成的工单+当前团队人数', value: true, belong: 'rightHistogram' },
+  cycleCompleteTaskAndTagUserCount: { label: '周期内完成的工单+当前部门人数', value: true, belong: 'rightHistogram' },
   cycleServerContent: { label: '周期内服务内容排名及数量', value: false, belong: 'rightHistogram' },
   cycleServerTypeRankingCount: { label: '周期内服务类型排名及数量', value: false, belong: 'rightHistogram' },
   // 右侧饼状图展示

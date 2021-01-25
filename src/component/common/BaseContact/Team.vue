@@ -45,14 +45,13 @@
 
         <!-- start 已选择团队 -->
         <template v-if="allowCheckTeam && chosenTeam.length > 0">
-          <h4>已选团队</h4>
+          <h4>已选部门</h4>
           <div 
             class="bc-chosen-team-user" 
-            v-for="team in chosenTeam" :key="team.id">
-            <!-- <el-tooltip class="item" popper-class="bc-team-tooltip" effect="dark" :content="team.name" placement="top"> -->
-              <span>{{team.name}}</span>
-              <i class="iconfont icon-fe-close" @click="chooseTeam({node: team, value: false})"></i>
-            <!-- </el-tooltip> -->
+            v-for="team in chosenTeam" :key="team.id"
+          >
+            <span>{{team.name}}</span>
+            <i class="iconfont icon-fe-close" @click="chooseTeam({node: team, value: false})"></i>
           </div>
         </template>
         <!-- end 已选择团队 -->
@@ -60,24 +59,16 @@
         <!-- start 已选择人员 -->
         <template v-if="chosen.length > 0">
           <h4 v-if="allowCheckTeam">已选人员</h4>
-            <div class="bc-chosen-team-user" :class="isHideTeam ? 'bc-chosen-team-user-row': ''" v-for="(user, index) in chosen" :key="`${user.userId}_${index}`">
-                <div class="bc-chosen-team-user-head" :style="{backgroundImage: 'url(' + head(user) + ')'}"></div>
-                <div class="bc-chosen-team-user-content" :ref="`bcChosenTeamUserContent${user.userId}_${user.tagId}`">
-                  <span class="bc-chosen-team-user-name">{{user.displayName}}</span>
-                  <!-- <el-tooltip 
-                    class="item" 
-                    popper-class="bc-user-tooltip" 
-                    effect="dark" 
-                    :content="user.tagName" 
-                    placement="top" 
-                    :disabled="!computedShowTooltip(user)"> -->
-                    <span v-if="!isHideTeam" class="bc-chosen-tema-user-tagname">
-                      {{ user.tagName }}
-                    </span>
-                  <!-- </el-tooltip> -->
-                </div>
-                <i class="iconfont icon-fe-close" @click="removeRepeatUser(user)"></i>
+          <div class="bc-chosen-team-user" :class="isHideTeam ? 'bc-chosen-team-user-row': ''" v-for="(user, index) in chosen" :key="`${user.userId}_${index}`">
+            <div class="bc-chosen-team-user-head" :style="{backgroundImage: 'url(' + head(user) + ')'}"></div>
+            <div class="bc-chosen-team-user-content" :ref="`bcChosenTeamUserContent${user.userId}_${user.tagId}`">
+              <span class="bc-chosen-team-user-name">{{user.displayName}}</span>
+              <span v-if="!isHideTeam" class="bc-chosen-tema-user-tagname">
+                {{ user.tagName }}
+              </span>
             </div>
+            <i class="iconfont icon-fe-close" @click="removeRepeatUser(user)"></i>
+          </div>
         </template>
         <!-- end 已选择人员 -->
 
@@ -97,6 +88,7 @@ import _ from 'lodash';
 import http from '@src/util/http';
 import Page from '@model/Page';
 import {alert} from '@src/platform/message';
+import { teamNameConversion } from '@src/util/conversionFunctionUtil.ts'
 
 import ContactUserItem from './ContactUserItem.vue';
 import DefaultHead from '@src/assets/img/avatar.png';
@@ -307,10 +299,10 @@ export default {
     
       this.$set(user, 'selected', true);
 
-      var index = -1;
-      var len = this.chosen.length;
+      let index = -1;
+      let len = this.chosen.length;
 
-      for(var i = 0; i < len;i++){
+      for(let i = 0; i < len;i++){
         if(user.userId == this.chosen[i].userId){
           index = i;
           break;
@@ -361,7 +353,7 @@ export default {
 
       this.toggleDeptCheckStatus(node, value);
 
-      this.chosenTeam = this.filterChosenTeam(this.teams);
+      this.chosenTeam = this.filterChosenTeam(this.teams).map(teamNameConversion)
     },
     /** 选中一个团队 */
     async initTeamUser(team){

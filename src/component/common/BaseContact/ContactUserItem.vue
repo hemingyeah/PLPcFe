@@ -21,8 +21,7 @@
             :class="{'base-tree-node-arrow-down': isExpandTagName}" 
             @click.stop="toggleTagName"
           >
-            <i class="iconfont icon-arrow-right">
-            </i>
+            <i class="iconfont icon-arrow-right"></i>
           </span>
         </p>
       </div>
@@ -91,7 +90,7 @@ export default {
   mounted() {
     this.$nextTick(() => {
       if(!this.showTag) return 
-
+      
       let height = this.$refs.tagName.scrollHeight;
       this.isToggleTagName = height > TEXT_HEIGHT;
     })

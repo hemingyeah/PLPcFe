@@ -1,3 +1,7 @@
+/* entity */
+import Tag from '@model/entity/Tag/Tag'
+import * as _ from 'lodash'
+
 /**
  * @description 客户地址select数据转换
 */
@@ -5,7 +9,7 @@ export function customerAddressSelectConversion(customerAddress: any): any {
   if(!customerAddress) return {};
   
   let { province, city, dist, address, id } = customerAddress;
-
+  
   return Object.freeze({
     label: `${province || ''}${city || ''}${dist || ''}${address || ''}`,
     value: id,
@@ -20,7 +24,7 @@ export function customerSelectConversion(customer: any): any {
   if(!customer) return {};
   
   let { name, id } = customer;
-
+  
   return Object.freeze({
     label: name,
     value: id,
@@ -63,7 +67,7 @@ export function linkmanSelectConversion(linkman: any): any {
 export function productSelectConversion(product: any): any {
   if(!product) return {};
 
-  let { id, name, phone } = product;
+  let { id, name } = product;
 
   return Object.freeze({
     label: name,
@@ -82,4 +86,22 @@ export function taskTypeSelectConversion(taskType: any): any {
     text: taskType.name,
     value: taskType.id
   })
+}
+
+/** 
+ * @description 团队名字转换
+ * @param {Tag} team 团队信息
+ * @returns {Tag} 新团队信息
+*/
+export function teamNameConversion(team: Tag): Tag {
+  // 转换名字
+  let conversionTeam = team
+  conversionTeam.name = conversionTeam.name || conversionTeam.tagName || ''
+  // 转换子级
+  let children = team.children || []
+  if (children.length > 0) {
+    children = children.map(child => teamNameConversion(child))
+  }
+  
+  return conversionTeam
 }

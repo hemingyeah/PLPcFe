@@ -13,6 +13,7 @@ const callcenter = require('./callcenter')
 
 const doMyself = require('./doMyself')
 const customerContact = require('./customerContact')
+const department = require('./department')
 
 const sparePart = require('./sparePart')
 const linkc = require('./linkc')
@@ -59,6 +60,8 @@ module.exports = {
   ...callcenter,
   ...doMyself,
   ...customerContact,
+  ...department,
+  ...sparePart,
   ...task,
   ...sparePart,
   ...linkc,

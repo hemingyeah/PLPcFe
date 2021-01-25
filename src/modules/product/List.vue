@@ -370,7 +370,7 @@ export default {
           isSystem: 0,
         },
         {
-          displayName: '服务团队',
+          displayName: '服务部门',
           fieldName: 'tags',
           isExport: true,
           isSystem: 0,
