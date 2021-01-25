@@ -356,7 +356,7 @@
             </el-dropdown>
             <base-button type="primary" @event="chooseUser()">添加成员</base-button>
             <base-button v-if="canRemove" type="primary" @event="userDeleteConfirm('multiple')">移除成员</base-button>
-            <!-- <el-dropdown trigger="click">
+            <el-dropdown trigger="click">
               <span class="el-dropdown-link el-dropdown-btn">更多操作</span>
               <el-dropdown-menu slot="dropdown">
                 <el-dropdown-item>
@@ -366,7 +366,7 @@
                   <div @click="exportAccount('all')">导出全部</div>
                 </el-dropdown-item>
               </el-dropdown-menu>
-            </el-dropdown> -->
+            </el-dropdown>
             <!-- <base-button type="primary" @event="searchModel.pageNum=1;search();trackEventHandler('search')" native-type="submit">搜索</base-button> -->
           </div>
 
@@ -941,7 +941,7 @@ export default {
       export_state = type
       if (export_state === 'all') {
         // 导出全部
-        window.location.href = `/security/user/account/exportBatch?tagId=${this.selectedDept.id}`
+        window.location.href = `/security/user/tag/exportBatch?tagId=${this.selectedDept.id}`
       } else {
         // 导出选中的
         let ids = []
@@ -949,7 +949,7 @@ export default {
           ids.push(user.userId)
         }
         ids = ids.join(',')
-        window.location.href = `/security/user/account/exportBatch?userIdsStr=${ids}`
+        window.location.href = `/security/user/tag/exportBatch?userIdsStr=${ids}`
       }
       export_state = ''
     },
@@ -1771,6 +1771,12 @@ export default {
       // 角色 批量移除成员
       if (this.roleMultipleSelection.length <= 0) {
         return this.$platform.alert('请先选择需要移除的成员')
+      }
+      let hasSuperAdmin = this.roleMultipleSelection.some((user)=> {
+        return user.superAdmin == 2
+      });
+      if (hasSuperAdmin) {
+        return this.$platform.alert('移除失败！主管理员不允许移除系统管理员角色')
       }
       if (await this.$platform.confirm('确定要把选中成员从该角色中移除吗？')) {
         this.roleUserDelete()
