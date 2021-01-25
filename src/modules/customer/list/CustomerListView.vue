@@ -55,10 +55,10 @@
               <i class="iconfont icon-nav-down"></i>
             </span>
             <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item>
+              <el-dropdown-item v-if="!isExperienceEdition">
                 <div @click="openDialog('importCustomer')">导入客户</div>
               </el-dropdown-item>
-              <el-dropdown-item>
+              <el-dropdown-item v-if="!isExperienceEdition">
                 <div @click="openDialog('importLinkman')">导入联系人</div>
               </el-dropdown-item>
               <el-dropdown-item>
@@ -67,7 +67,7 @@
               <el-dropdown-item>
                 <div @click="exportCustomer(true)">导出全部</div>
               </el-dropdown-item>
-              <el-dropdown-item>
+              <el-dropdown-item v-if="!isExperienceEdition">
                 <div @click="openDialog('update')">批量更新</div>
               </el-dropdown-item>
             </el-dropdown-menu>
@@ -377,12 +377,13 @@ import * as CustomerApi from '@src/api/CustomerApi.ts';
 // import {searchLinkman} from '@src/api/EcSearchApi.js';
 import TeamMixin from '@src/mixins/teamMixin';
 import { isShowCustomerRemind } from '@src/util/version.ts'
+import VersionMixin from '@src/mixins/versionMixin'
 
 const link_reg = /((((https?|ftp?):(?:\/\/)?)(?:[-;:&=\+\$]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\?\+=&;:%!\/@.\w_]*)#?(?:[-\+=&;%!\?\/@.\w_]*))?)/g;
 
 export default {
   name: 'customer-list-view',
-  mixins: [TeamMixin],
+  mixins: [TeamMixin, VersionMixin],
   props: {
     initData: {
       type: Object,

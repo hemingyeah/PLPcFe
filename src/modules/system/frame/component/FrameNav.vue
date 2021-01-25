@@ -129,9 +129,9 @@ export default {
     isCustomLogo(){
       return this.initData.logo
     },
-    isShowCardWorkTime () {
-      return isShowCardWorkTime()
-    },
+    // isShowCardWorkTime () {
+    //   return isShowCardWorkTime()
+    // },
     isColorScheme(){
       return this.initData.colorScheme
     }

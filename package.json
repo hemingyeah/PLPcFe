@@ -86,6 +86,7 @@
     "core-js": "^2.6.9",
     "echarts": "4.3.0",
     "element-ui": "2.11.1",
+    "entity-decode": "^2.0.2",
     "fecha": "^2.3.3",
     "koa2-origin-cors": "^1.0.2",
     "localforage": "^1.9.0",
