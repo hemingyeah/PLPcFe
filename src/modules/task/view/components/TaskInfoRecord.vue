@@ -510,7 +510,7 @@ export default {
     /* 渲染工单审批dom */
     renderTaskApproveDom(record = {}) {
       let { content, taskNo, address, userName, longitude, latitude } = record;
-      let { state } = content;
+      let { state, level } = content;
       // 工单审批状态
       let taskState = {
         unApproved: state == 'unapproved',
@@ -518,6 +518,8 @@ export default {
         fail: state == 'fail',
         offed: state == 'offed',
       }
+      // 工单审批等级
+      let levelName =  level >= 1 ? ['零', '一', '二', '三', '四', '五', '六', '七', '八', '九'][level] + '级': '';
       // 是否显示地址
       let isShowAddress = address && address != 'PC端';
       // 地址数据
@@ -539,15 +541,15 @@ export default {
       
       // 审批成功dom
       let isAutoApprove = userName == '自动审批';
-      let autoApproveDom = <h5>工单 #{ taskNo } { content.action }节点未设置审批人，流程自动审批通过</h5>;
+      let autoApproveDom = <h5>工单 #{ taskNo } { content.action }节点未设置{ levelName }审批人，流程自动审批通过</h5>;
       let notAutoApproveDom = [
-        <div><strong>{ userName }</strong> 通过了对工单 #{taskNo} { content.action } 操作的审批</div>,
+        <div><strong>{ userName }</strong> 通过了对工单 #{taskNo} { content.action } 操作的{ levelName }审批</div>,
         content.remark && <div>备注：{ content.remark }</div>
       ]
       let successDom = isAutoApprove ? autoApproveDom : notAutoApproveDom;
       // 审批失败dom
       let failDom = [
-        <div><strong>{ userName }</strong> 拒绝了对工单 #{taskNo} { content.action } 操作的审批</div>,
+        <div><strong>{ userName }</strong> 拒绝了对工单 #{taskNo} { content.action } 操作的{ levelName }审批</div>,
         content.remark && <div>备注：{ content.remark }</div>
       ];
       // 审批撤回dom

@@ -11,6 +11,7 @@ import _ from 'lodash';
 
 /* enum */
 import { TaskEventNameMappingEnum } from '@model/enum/EventNameMappingEnum.ts';
+import TableNameEnum from '@model/enum/TableNameEnum.ts';
 
 export default {
   name: 'task-receipt-edit-view',
@@ -26,7 +27,8 @@ export default {
       pending: false,
       visible: false,
       init: false,
-      action: ''
+      action: '',
+      mode: TableNameEnum.TaskReceipt
     }
   },
   computed: {
@@ -217,7 +219,7 @@ export default {
     */
     submit() {
       this.$refs.form
-        .validate()
+        .validate(false)
         .then(async valid => {
 
           if (!valid) return Promise.reject('validate fail.');

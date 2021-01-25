@@ -13,6 +13,8 @@ class FlowSetting {
   taskTemplateId: string = ''
   // 字段名字
   displayName: string = ''
+  // 审批层级
+  level: number = 0;
 }
 
 export default FlowSetting

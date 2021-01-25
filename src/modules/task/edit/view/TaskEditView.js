@@ -39,7 +39,7 @@ export default {
       // 初始化默认值
       let form = this.workTask;
 
-      this.fields = await TaskApi.getTaskTemplateFields({ templateId: this.genTemplateId(), tableName: 'task' });
+      this.fields = await TaskApi.getAllFields({ typeId: this.genTemplateId(), tableName: 'task', isFromSetting: true });
 
       form = util.packToForm(this.fields, form);
       this.form = FormUtil.initialize(this.fields, form);

@@ -793,6 +793,11 @@
                     {{ formatCustomizeAddress(scope.row[column.formType]) }}
                   </template>
 
+                  <!-- 表单设计器特殊控件 -->
+                  <template v-else-if="['cascader', 'select', 'user', 'related_task','relationProduct','location'].includes(column.formType)">
+                    {{ scope.row[column.field] | fmt_form_field(column.formType, column.fieldName, scope.row.attribute)}}
+                  </template>
+
                   <!-- 用户 -->
                   <template
                     v-else-if="

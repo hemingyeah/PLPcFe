@@ -14,7 +14,7 @@
 }
 
 /* 文字溢出 2行 (可以写成函数的) */
-@mixin text-ellipsis-2{
+@mixin text-ellipsis-2 {
   word-break: break-all;
   text-overflow: ellipsis;
   overflow: hidden;

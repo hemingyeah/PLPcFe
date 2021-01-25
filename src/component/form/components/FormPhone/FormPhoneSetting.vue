@@ -58,6 +58,13 @@
     <!-- end 字段权限 -->
 
     <!-- start 其他设置 -->
+    <div class="form-setting-group form-setting-item" v-if="allowPublicSet">
+      <h4 class="form-item-title">其他设置</h4>
+      <div class="form-item-box">
+        <!-- 设为公用字段 -->
+        <form-public-setting :field="field" @input="update"></form-public-setting>
+      </div>
+    </div>
     <!-- end 其他设置 -->
   </div>
 </template>

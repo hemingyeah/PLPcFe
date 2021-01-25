@@ -112,3 +112,33 @@
 .biz-form-remote-select {
   width: 100%;
 }
+// 产品关联字段
+.relation-product-list {
+  &-item {
+    padding-bottom: 8px;
+    margin-top: 8px;
+    background-color: #F0F2F5;
+    border-radius: $button-radius-base;
+
+    .product-name {
+      padding: 12px 12px 4px;
+    }
+
+    .product-relation-field-list {
+      .form-view-row {
+        padding: 4px 12px;
+        font-size: $font-size-small;
+
+        label {
+          width: 76px;
+          line-height: 16px;
+          padding: 0;
+        }
+
+        .form-view-row-content {
+          line-height: 16px;
+        }
+      }
+    }
+  }
+}

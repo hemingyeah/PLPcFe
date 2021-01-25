@@ -119,7 +119,11 @@ export default class TaskProcessSteps extends Vue {
     let taskApprove: TaskApprove | null = this.taskType ? checkApprove(this.taskType, value, { id: '' }, {}) : null
     // 超时时间
     let overTime: string | null = flow?.overTime ? flow.overTime : null
-    
+
+    let newOverTimeSetting: any = this.taskType?.config?.newOverTimeSetting;
+    let currOverTimeSetting = newOverTimeSetting.find((item: any) => item.overTimeState === value) || {};
+    let overTimeStatus = currOverTimeSetting.overTimeStatus && overTime;
+
     const scopedSlots = {
       icon: (props: any) => {
         return <i class={['iconfont', `icon-${icon}`]}></i>
@@ -133,7 +137,7 @@ export default class TaskProcessSteps extends Vue {
               && <div class='task-step-flow-approve'>需审批</div>
             }
             {
-              overTime
+              overTimeStatus
               && <div class='task-step-flow-overtime'>{overTime}小时超时</div>
             }
           </div>

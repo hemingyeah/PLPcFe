@@ -739,7 +739,7 @@ export default {
       
     },
     /**
-     * 请求 getTaskTemplateFields and fetchTaskFields 接口
+     * 请求 getAllFields and fetchTaskFields 接口
      */
     getTaskOpen(fn) {
       Promise.all([this.fetchTaskFields(), this.fetchTaskReceiptFields()])
@@ -1054,6 +1054,7 @@ export default {
       // this.advanceds = [...advancedList, ...this.taskTypeFilterFields];
       // E 高级搜索
       let columns = fields
+        .filter(f => !['attachment', 'separator', 'info', 'autograph'].includes(f.formType))
         .map((field) => {
           let sortable = false;
           let minWidth = 120;
@@ -1435,10 +1436,11 @@ export default {
      */
     fetchTaskFields() {
       let params = {
-        templateId: this.currentTaskType.id || '',
+        typeId: this.currentTaskType.id || '',
         tableName: 'task',
+        isFromSetting: false
       };
-      return TaskApi.getTaskTemplateFields(params).then((result) => {
+      return TaskApi.getAllFields(params).then((result) => {
         result.forEach((field) => {
           field.group = 'task';
           field.label = field.displayName;
@@ -1453,10 +1455,11 @@ export default {
      */
     fetchTaskReceiptFields() {
       let params = {
-        templateId: this.currentTaskType.id || '',
+        typeId: this.currentTaskType.id || '',
         tableName: 'task_receipt',
+        isFromSetting: false
       };
-      return TaskApi.getTaskTemplateFields(params).then((result) => {
+      return TaskApi.getAllFields(params).then((result) => {
         result.forEach((field) => {
           field.group = 'task_receipt';
           field.label = field.displayName;
@@ -2467,7 +2470,7 @@ export default {
         address_list = '',
         product_list = ''
       taskSelfFields = taskFields.filter(item => {
-        return item.formType !== 'attachment'
+        return item.formType !== 'attachment' && item.formType !== 'autograph'
       })
       if (taskFields.length) {
         let first = taskFields.filter(item => {
@@ -2608,7 +2611,7 @@ export default {
       taskReceiptSystemFields = [
         ...taskReceiptSystemFields,
         ...taskReceiptFields.filter(item => {
-          return (item.isSystem === 0 && item.formType !== 'attachment')
+          return item.isSystem === 0 && item.formType !== 'attachment' && item.formType !== 'autograph'
         })
       ].map((field) => {
         field.export = true;

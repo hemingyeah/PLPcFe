@@ -95,6 +95,9 @@ import TaskSearchForm from './TaskSearchForm.vue';
 import TaskSearchPupal from './TaskSearchPupal';
 import TaskInquire from './TaskInquire';
 
+import guideCompoment from '@src/component/guide/Guide';
+
+let guideCompoments = Vue.extend(guideCompoment);
 
 /* utils */
 import _ from 'lodash';
@@ -387,6 +390,7 @@ export default {
 
       // 自定义条件
       for (let i = 0; i < notSystemFields.length; i++) {
+        let key = null;
         tv = notSystemFields[i];
         fn = tv.fieldName;
         !tv.operator ? (tv['operator'] = this.matchOperator(tv)) : '';
@@ -450,10 +454,16 @@ export default {
           });
           continue;
         }
+
+        if (tv.formType === 'related_task') {
+          key = 'taskNo';
+        }
+
         params.conditions.push({
           property: fn,
           operator: tv.operator,
           value: form[fn],
+          key
         });
       }
       this.buildTaskInquireParams(params);
@@ -704,6 +714,8 @@ export default {
 
       // 自定义条件
       for (let i = 0; i < notSystemFields.length; i++) {
+        let key = null;
+
         tv = notSystemFields[i];
         fn = tv.fieldName;
         !tv.operator ? (tv['operator'] = this.matchOperator(tv)) : '';
@@ -767,7 +779,13 @@ export default {
           });
           continue;
         }
+
+        if(tv.formType === 'related_task') {
+          key = 'taskNo';
+        }
+
         params.conditions.push({
+          key,
           property: fn,
           operator: tv.operator,
           value: form[fn],
@@ -848,6 +866,14 @@ export default {
       }
       case 'location': {
         operator = 'location';
+        break;
+      }
+      case 'related_task': {
+        operator = 'array_eq';
+        break;
+      }
+      case 'formula': {
+        operator = 'eq';
         break;
       }
       default: {

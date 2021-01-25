@@ -36,29 +36,74 @@
         <label>发起人备注：</label>
         <div class="form-view-row-content">{{ approve.applyRemark }}</div>
       </div>
-      <div class="form-view-row">
-        <label>审批结果：</label>
-        <div class="form-view-row-content result-content">
-          <el-radio-group v-model="result">
-            <el-radio label="success">通过</el-radio>
-            <el-radio label="fail">拒绝</el-radio>
-          </el-radio-group>
+      <div class="dividing-line"></div>
+      <!--S 一级审批 -->
+      <template v-if="configLevel === 1">
+        <!-- <div class="form-view-row">
+          <label>审批结果：</label>
+          <div class="form-view-row-content result-content">
+            <el-radio-group v-model="result">
+              <el-radio label="success">通过</el-radio>
+              <el-radio label="fail">拒绝</el-radio>
+            </el-radio-group>
+          </div>
+        </div> -->
+        <div class="form-view-row">
+          <label>审批结果：</label>
+          <div class="form-view-row-content">
+            <textarea v-model="approveRemark" placeholder="请输入审批结果[最多500字]" rows="3" maxlength="500" />
+            <p class="tips">备注：审批后不能修改审批结果</p>
+          </div>
         </div>
-      </div>
-      <div class="form-view-row">
-        <label>审批结果：</label>
-        <div class="form-view-row-content">
-          <textarea v-model="approveRemark" placeholder="请输入审批结果[最多500字]" rows="3" maxlength="500" />
-        </div>
-      </div>
+      </template>
+      <!--E 一级审批 -->
+      <!-- S 多级审批 -->
+      <el-steps v-else class="approve-steps" direction="vertical">
+        <!--S 已经审批的步骤 -->
+        <el-step class="approve-step-item" v-for="(item, idx) in approve.approverResult" :key="idx">
+          <el-row slot="title" type="flex" justify="space-between">
+            <h2>{{formatNumToCN(idx + 1)}}级审批</h2>
+            <p>{{item.completeTime | fmt_datetime}}</p>
+          </el-row>
+          <div class="approve-step-item-desc" slot="description">
+            <label>审批人： </label>{{ item.approverName }}
+            <p>审批建议： {{item.approveRemark}}</p>
+          </div>
+        </el-step>
+        <!--E 已经审批的步骤 -->
+        <!--S 当前审批的步骤 -->
+        <el-step class="approve-step-item">
+          <el-row slot="title" type="flex" justify="space-between">
+            <h2>{{formatNumToCN(approve.approverResult.length + 1)}}级审批</h2>
+          </el-row>
+          <div class="approve-step-item-desc" slot="description">
+            <label>审批人： </label>{{ approve.approvers | formatApproveNames}}
+            <el-row type="flex">
+              <label>审批结果： </label>
+              <textarea v-model="approveRemark" placeholder="请输入审批结果[最多500字]" rows="3" maxlength="500" />
+            </el-row>
+            <span class="tips">审批后不能修改审批结果</span>
+          </div>
+        </el-step>
+        <!--E 当前审批的步骤 -->
+        <!--S 未到审批的步骤 -->
+        <el-step class="approve-step-item" v-for="(item, idx) in approve.multiApprover" :key="idx">
+          <el-row slot="title" type="flex" justify="space-between">
+            <h2>{{formatNumToCN(approve.approverResult.length + idx + 2)}}级审批</h2>
+          </el-row>
+          <div class="approve-step-item-desc" slot="description">
+            <label>审批人： </label>{{ item | formatApproveNames}}
+          </div>
+        </el-step>
+        <!--E 未到审批的步骤 -->
+      </el-steps>
+      <!-- E 多级审批 -->
     </div>
     <div slot="footer" class="dialog-footer">
-      <div class="dialog-footer-left">
-        <p class="tips">备注：审批后不能修改审批结果</p>
-      </div>
+      <div class="dialog-footer-left"></div>
       <div class="dialog-footer-right">
-        <el-button @click="visible = false">取 消</el-button>
-        <el-button type="primary" @click="submit" :disabled="pending">审 批</el-button>
+        <el-button type="danger" plain @click="submit('fail')" :disabled="pending">拒 绝</el-button>
+        <el-button type="primary" @click="submit('success')" :disabled="pending">同 意</el-button>
       </div>
     </div>
   </base-modal>
@@ -85,13 +130,26 @@ export default {
       visible: false,
       pending: false,
       approve: {},
-      result: 'success',
       approveRemark: '',
+      currLevel: 1 // 当前审批层级
     };
   },
+  computed: {
+    configLevel() {
+      return this.approve.otherInfo &&this.approve.otherInfo.params && this.approve.otherInfo.params.level || 1;
+    }
+  },
+  filters: {
+    formatApproveNames(approvers) {
+      return approvers.map(item => item.displayName).join(',') || '未找到审批人，将自动审批通过';
+    }
+  },
   methods: {
+    formatNumToCN(num) {
+      let changeNum = ['零', '一', '二', '三', '四', '五', '六', '七', '八', '九']; 
+      return changeNum[num];
+    },
     reset() {
-      this.result = 'success';
       this.approveRemark = '';
       this.approve = {};
     },
@@ -107,6 +165,7 @@ export default {
           if (res.status == 0) {
             this.approve = res.data;
             this.visible = true;
+            this.currLevel = res.data.approverLevel;
           } else {
             this.$platform.alert(res.message);
           }
@@ -116,11 +175,11 @@ export default {
           this.pending = false;
         })
     },
-    submit() {
+    submit(result) {
       this.pending = true;
 
-      let { approveId, result, approveRemark } = this;
-      TaskApi.saveApprove({ id: approveId, result, approveRemark })
+      let { approveId, approveRemark } = this;
+      TaskApi.saveApprove({ id: approveId, result, approveRemark, currLevel: this.currLevel || 1 })
         .then((res) => {
           if (res.status == 0) {
             this.$platform.notification({
@@ -211,6 +270,10 @@ export default {
 .task-approve-dialog {
   .form-view-row {
     padding: 6px 0px;
+    label{
+      min-width: 84px;
+      text-align: right;
+    }
 
     .result-content {
       height: 24px;
@@ -236,5 +299,43 @@ export default {
       text-align: right;
     }
   }
+}
+</style>
+
+<style lang="scss" scoped>
+.dividing-line{
+  width: calc(100% + 38px);
+  border-top: 1px #ddd dashed;
+  transform: translateX(-20px);
+}
+
+.tips {
+  color: $text-color-regular;
+}
+
+.approve-steps{
+  padding-top: 12px;
+  .approve-step-item{
+    color: #000000;
+    h2{
+      font-size: 14px;
+      color: #262626;
+    }
+    &-desc{
+      padding: 16px;
+      background: #FAFAFA;
+    }
+  }
+}
+
+label{
+  min-width: 64px;
+  text-align: right;
+}
+
+// element-ui
+/deep/.el-step__description{
+  color: #000000;
+  padding: 0
 }
 </style>

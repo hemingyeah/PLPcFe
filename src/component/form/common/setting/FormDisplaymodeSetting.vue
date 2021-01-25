@@ -5,9 +5,12 @@
         <span class="form-displaymode-setting-title-name">选项显示模式</span>
         <el-tooltip placement="top" popper-class="form-displaymode-setting-tooltip" >
           <div slot="content">
+            <template v-if="isMulti">
               <div>平铺</div>
               <div class="form-displaymode-setting-item">未勾选“多选”时，平铺的显示效果为：<span class="circle"></span>选项1  <span class="circle"></span>选项2</div>
               <div class="form-displaymode-setting-item">勾选“多选”时，平铺的显示效果为：<span class="square"></span>选项1  <span class="square"></span>选项2</div>
+            </template>
+            <template v-else>平铺的显示效果为：<span class="circle"></span>选项1  <span class="circle"></span>选项2</template>
           </div>
           <i class="iconfont icon-question"></i>
         </el-tooltip>
@@ -34,7 +37,10 @@ export default {
   name: 'form-displaymode-setting',
   props: {
     ...settingProps,
-
+    isMulti: {
+      type: Boolean,
+      default: true
+    }
   },
   data() {
     return{

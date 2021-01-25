@@ -52,6 +52,9 @@
     <div class="form-setting-group form-setting-item">
       <h4 class="form-item-title">其他设置</h4>
       <div class="form-item-box">
+        <!-- 设为公用字段 -->
+        <form-public-setting :field="field" @input="update" v-if="allowPublicSet"></form-public-setting>
+
         <el-checkbox :value="field.setting.isScanCode" @input="update($event, 'isScanCode', true)" :true-label="1" :false-label="0">
           支持扫码录入
           <el-tooltip content="支持扫码二维码/条形码，仅移动端可用" placement="top">

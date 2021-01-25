@@ -142,33 +142,26 @@
                   <a href="javascript:;" @click="goProductSetting">产品字段设置</a>
                   <a href="javascript:;" @click="goCustomerContact">客户联系人</a>
                   <a href="javascript:;" @click="goDoMyself">自助门户设置</a> -->
-                  <a href="javascript:;"
-                     @click="goTaskSetting">工单表单设置</a>
-                  <a href="javascript:;"
-                     @click="goTaskReceiptSetting">工单回执表单设置</a>
-                  <a href="javascript:;"
-                     @click="goCreateTask">新建工单</a>
-                  <a href="javascript:;"
-                     @click="goCreateTaskForCallcenter">新建工单呼叫中心</a>
-                  <a href="javascript:;"
-                     @click="goTaskList">工单列表</a>
-                  <a href="javascript:;"
-                     @click="goProductMenu">产品类型管理</a>
-                  <a href="javascript:;"
-                     @click="goProductMenuList">产品类型列表</a>
-                  <a href="javascript:;"
-                     @click="goProductMenuField">产品类型设置</a>
-                  <a href="javascript:;"
-                     @click="goProductList">产品列表</a>
-                  <a href="javascript:;"
-                     @click="goProductEdit">V2新建产品</a>
-                  <a href="javascript:;"
-                     @click="resetGuide('productV2')">重置超级二维码引导</a>
-                  <a href="javascript:;"
-                     @click="resetGuide('taskV2')">重置工单引导</a>
-                     <!-- <a href="javascript:;" @click="goCallCenterSetting">呼叫中心设置</a>
+                  <a href="javascript:;" @click="goCreateTask">新建工单</a>
+                  <a href="javascript:;" @click="goCreateTaskForCallcenter"
+                  >新建工单呼叫中心</a
+                  >
+                  <a href="javascript:;" @click="goTaskList">工单列表</a>
+                  <a href="javascript:;" @click="goProductMenu">产品类型管理</a>
+                  <a href="javascript:;" @click="goProductMenuList"
+                  >产品类型列表</a
+                  >
+                  <a href="javascript:;" @click="goProductMenuField"
+                  >产品类型设置</a
+                  >
+                  <a href="javascript:;" @click="goProductList">产品列表</a>
+                  <a href="javascript:;" @click="goProductEdit">V2新建产品</a>
+                  <!-- <a href="javascript:;" @click="goCallCenterSetting">呼叫中心设置</a>
                   <a href="javascript:;" @click="goCallCenterWorkbench">呼叫工作台</a>
                   <a href="javascript:;" @click="goCallCenter">呼叫中心</a> -->
+                  <a href="javascript:;" @click="goTaskType">工单类型设置</a>
+                  <a href="javascript:;" @click="goTaskFlow">工单流程设置</a>
+                  <a href="javascript:;" @click="goTaskAdditional">附加组件设置</a>
                 </div>
               </el-popover>
 
@@ -484,9 +477,7 @@ export default {
     },
     /** 是否显示devtool */
     showDevTool () {
-      return (
-        this.$appConfig.env != 'production' || this.initData.env != 'production'
-      );
+      return this.$appConfig.env != 'production';
     },
     /** 用户工作状态颜色配置 */
     userStateMap () {
@@ -867,23 +858,7 @@ export default {
         reload: true,
       });
     },
-    goTaskSetting () {
-      platform.openTab({
-        id: 'task_fields_setting',
-        title: '工单表单设置',
-        url: '/setting/task/field/task',
-        reload: true,
-      });
-    },
-    goTaskReceiptSetting () {
-      platform.openTab({
-        id: 'task_receipt_fields_setting',
-        title: '工单回执表单设置',
-        url: '/setting/task/field/taskReceipt',
-        reload: true,
-      });
-    },
-    goCreateTask () {
+    goCreateTask() {
       platform.openTab({
         id: 'task_create',
         title: '新建工单',
@@ -908,7 +883,31 @@ export default {
         reload: true,
       });
     },
-    goCallCenterSetting () {
+    goTaskType() {
+      platform.openTab({
+        id: 'task_type_setting',
+        title: '工单类型设置',
+        url: '/setting/taskType/manage',
+        reload: true,
+      });
+    },
+    goTaskFlow() {
+      platform.openTab({
+        id: 'task_flow_setting',
+        title: '工单流程设置',
+        url: '/setting/task/taskFormSet',
+        reload: true,
+      });
+    },
+    goTaskAdditional() {
+      platform.openTab({
+        id: 'task_additional_setting',
+        title: '附加组件设置',
+        url: '/setting/task/cardManage',
+        reload: true,
+      });
+    },
+    goCallCenterSetting() {
       platform.openTab({
         id: 'callcenter_setting',
         title: '呼叫中心设置',

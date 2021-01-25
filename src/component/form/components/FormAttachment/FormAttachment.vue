@@ -40,7 +40,7 @@ export default {
     let { setting } = this.field;
     setting = setting || {};
     // 图片是否添加水印
-    this.isWaterMark = !!setting.isAddWatermark;
+    this.isWaterMark = (setting && !!setting.isAddWatermark);
   }
 }
 </script>

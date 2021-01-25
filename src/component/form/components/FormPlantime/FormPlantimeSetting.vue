@@ -1,19 +1,40 @@
 <template>
   <div class="form-setting-panel">
-    <h3>系统字段 -- {{setting.name}}</h3>
-    <div class="form-setting-group">
-      <textarea placeholder="请在此添加描述信息" rows="3" data-prop="placeHolder" :value="field.placeHolder" @input="updateForDom" :maxlength="placeholderMaxLength"></textarea>
+    <!-- start 标题 -->
+    <div class="form-setting-group form-common-setting">
+      <h3 class="form-setting-panel-title">{{ field.displayName }}</h3>
+      <div class="form-design-warning">该字段为系统内置字段，暂不支持修改、删除。</div>
     </div>
-    <div class="form-setting-group">
-      <el-checkbox :value="field.isNull" @input="update($event, 'isNull')" :true-label="0" :false-label="1">必填</el-checkbox>
+    <!-- end 标题 -->
+
+    <!-- start 描述信息 -->
+    <form-describe-setting
+      :field="field"
+      @input="updateForDom"
+    ></form-describe-setting>
+    <!-- end 描述信息 -->
+
+    <!-- start 校验 -->
+    <div class="form-setting-group form-setting-item">
+      <h4 class="form-item-title">校验</h4>
+      <div class="form-item-box">
+        <!-- 必填 -->
+        <form-required-setting :field="field" @input="update"></form-required-setting>
+      </div>
     </div>
-    <h3>选项</h3>
-    <div class="form-setting-group"> 
-      <el-select v-model="field.setting.dateType"> 
-        <el-option label="日期" value="date"></el-option>
-        <el-option label="日期+时间" value="dateTime"></el-option>
-      </el-select>
+    <!-- end 校验 -->
+
+    <!-- start 选项 -->
+    <div class="form-setting-group form-setting-item">
+      <h4 class="form-item-title">选项</h4>
+      <div class="form-item-box form-date-type">
+        <el-select v-model="field.setting.dateType"> 
+          <el-option label="日期" value="date"></el-option>
+          <el-option label="日期+时间" value="dateTime"></el-option>
+        </el-select>
+      </div>
     </div>
+    <!-- end 选项 -->
   </div>
 </template>
 
@@ -33,8 +54,8 @@ export default {
       
       this.update(value, prop)
     },
-    update(value, prop){      
-      this.$emit('input', {value, prop})     
+    update(value, prop, isSetting = false) {
+      this.$emit('input', {value, prop, isSetting});
     }
   }
 }

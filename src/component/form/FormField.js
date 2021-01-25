@@ -1,6 +1,6 @@
 import {randomString} from '@src/util/lang';
 import Field from '@model/Field';
-import { isSelect, isMultiSelect ,isCascader} from './util';
+import { isSelect, isMultiSelect, isCascader} from './util';
 import * as FormInfoConfig from './components/FormInfo/config';
 
 /** 补全formType 为select时的所需字段 */
@@ -29,7 +29,23 @@ function fillPropForSelect(params){
     })
 
     // 没有选项，添加默认项
-    if(options.length == 0) options.push({value: '', isDefault: false},{value: '', isDefault: false},{value: '', isDefault: false});
+    if(options.length == 0) {
+      // 优先级
+      if(params.formType == 'level') {
+        options.push({value: '中', isDefault: false}, {value: '低', isDefault: false}, {value: '高', isDefault: false});
+      }
+      // 服务内容
+      else if(params.formType == 'serviceType') {
+        options.push({value: '保内免费', isDefault: false}, {value: '保内收费', isDefault: false}, {value: '保外免费', isDefault: false}, {value: '保外收费', isDefault: false});
+      }
+      // 服务类型
+      else if(params.formType == 'serviceContent') {
+        options.push({value: '安装', isDefault: false}, {value: '维修', isDefault: false}, {value: '保养', isDefault: false}, {value: '巡检', isDefault: false}, {value: '检查', isDefault: false});
+      }
+      else { 
+        options.push({value: '', isDefault: false}, {value: '', isDefault: false}, {value: '', isDefault: false});
+      }
+    }
     
   }
 
@@ -62,7 +78,7 @@ export default class FormField{
 
     // 是否允许搜索 0 - 不允许，1 - 允许
     this.isSearch = typeof params.isSearch == 'number' ? params.isSearch : 0; 
-    this.placeHolder = params.placeHolder; // 提示信息
+    this.placeHolder = params.placeHolder || ''; // 提示信息
     this.defaultValue = params.defaultValue; // 默认值
     // 是否为系统字段 0 - 非系统字段，1 - 系统字段
     this.isSystem = typeof params.isSystem == 'number' ? params.isSystem : 0;
@@ -70,6 +86,14 @@ export default class FormField{
     this.isAppShow = typeof params.isAppShow == 'number' ? params.isAppShow : 0;
     // 是否隐藏   1 - 隐藏，0 - 不隐藏
     this.isHidden = typeof params.isHidden == 'number' ? params.isHidden : 0; 
+    // 工单专属字段：是否是公用字段 1 - 是，0 - 否
+    this.isCommon = typeof params.isCommon == 'number' ? params.isCommon : 0;
+    // 公用字段: 1.设为公用字段设置 2.需判断是否是升级为公用字段而非拖拽进来的公共字段 而不能直接用isCommon
+    this.isPublic = this.isCommon;
+    // 是否是拖拽进来的公共字段 0 - 不是，1 - 是
+    this.isDragCommon = typeof params.isDragCommon == 'number' ? params.isDragCommon : 0;
+    // 是否曾经是公共字段 0 - 不是，1 - 是
+    this.isOnceCommon = typeof params.isOnceCommon == 'number' ? params.isOnceCommon : 0;
 
     // formType 为select时需要补全一下字段
     let {options, isMulti, dependencies} = fillPropForSelect(params)
@@ -91,10 +115,6 @@ export default class FormField{
   
     // 辅助字段
     this.dragging = false; // 当前字段时候正在被拖拽
-
-    if(params.relation_options) {
-      this.relation_options = params.relation_options;
-    }
 
   }
 
@@ -122,10 +142,10 @@ export default class FormField{
     option.isSystem = field.isSystem;
     option.isAppShow = field.isAppShow;
     option.isHidden = field.isHidden;
-
-    if(field.relation_options) {
-      option.relation_options = field.relation_options;
-    }
+    option.isCommon = field.isCommon;
+    option.isPublic = field.isPublic;
+    option.isDragCommon = field.isDragCommon;
+    option.isOnceCommon = field.isOnceCommon;
 
     let setting = {};
     let defaultValue = null;
