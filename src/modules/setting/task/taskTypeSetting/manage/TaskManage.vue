@@ -2,7 +2,8 @@
   <div class="task-manage">
     <task-nav-bar current="taskType"/>
     <div class="task-manage-main" v-loading="pendding">
-      <div class="task-manage-header">
+      <div id="task-manange-guide"></div>
+      <div class="task-manage-header" id="task-manage-header-guide">
         <div>
           <h2>
             工单类型
@@ -30,6 +31,7 @@
       </div>
       <div
         class="task-type-list"
+        id="task-type-list-guide"
       >
         <task-type-item
           class="task-type-item"
@@ -62,6 +64,9 @@ import * as SettingApi from '@src/api/SettingApi';
 import TaskNavBar from '../../components/TaskNavBar.vue';
 import TaskTypeItem from './components/TaskTypeItem.vue';
 import AddTaskTypeDialog from './components/AddTaskTypeDialog';
+
+import { storageGet, storageSet } from '@src/util/storage';
+const { TASK_TYPE_SETTING_GUIDE } = require('@src/component/guide/taskSettingStore');
 
 export default {
   name: 'task-manage',
@@ -108,7 +113,7 @@ export default {
     /** 获取工单类型列表 */
     fetchTaskTypeList() {
       this.pendding = true;
-      SettingApi.getTaskTypeManage().then((res) => {
+      return SettingApi.getTaskTypeManage().then((res) => {
         this.pendding = false;
         let {tagListJson, taskTypeListJson, maxTypeNum} = res;
 
@@ -127,8 +132,45 @@ export default {
         })
     },
   },
-  mounted() {
-    this.fetchTaskTypeList();
+  async mounted() {
+    await this.fetchTaskTypeList();
+
+    this.$nextTick(() => {
+      if (storageGet(TASK_TYPE_SETTING_GUIDE) > 0) return this.$Guide().destroy('task-manange-guide');
+
+      this.$Guide([{
+        id: 'task-manange-guide',
+        content: '工单类型以卡片的形式存在，单个卡片代表一个工单类型',
+        haveStep: true,
+        needCover: true,
+        nowStep: 1,
+        domObj: () => {
+          return document.getElementById('task-manage-header-guide')
+        },
+        finishBtn: 'ok',
+      }, {
+        id: 'task-manange-guide',
+        content: '可用编辑功能，调整可用团队。',
+        haveStep: true,
+        needCover: true,
+        inside: true,
+        nowStep: 2,
+        domObj: () => {
+          return document.getElementById('task-type-list-guide').getElementsByClassName('task-type-item')[0]
+        },
+        insideDom: () => {
+          return document.getElementById('task-type-list-guide').getElementsByClassName('task-type-item')[0].getElementsByClassName('task-type-team-setting')[0]
+        },
+        finishBtn: 'ok',
+      }], 0, '', (e) => {
+        return new Promise((resolve, reject) => {
+          resolve()
+        })
+      }).create()
+        .then(res_ => { 
+          if(res_) storageSet(TASK_TYPE_SETTING_GUIDE, '2');
+        })
+    })
   },
   components: {
     [TaskNavBar.name]: TaskNavBar,
