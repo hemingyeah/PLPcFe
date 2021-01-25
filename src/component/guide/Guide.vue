@@ -12,11 +12,17 @@
          ref="guideCom"
          v-show="showGuide && guideDom.top >-1"
          :style="guideStyle">
-      <div v-if="arrowUp"
+      <div v-if="arrowDirection == 'up'"
            class="normal-arrow-top tour-arrow"
            :style="arrowStyle"></div>
-      <div v-if="!arrowUp"
+      <div v-if="arrowDirection=='down'"
            class="normal-arrow-down tour-arrow-down"
+           :style="arrowStyle"></div>
+      <div v-if="arrowDirection == 'left'"
+           class="normal-arrow-left tour-arrow"
+           :style="arrowStyle"></div>
+      <div v-if="arrowDirection == 'right'"
+           class="normal-arrow-right tour-arrow"
            :style="arrowStyle"></div>
       <div class="tour-content-box">
         <div v-if="haveStep"
@@ -134,6 +140,10 @@ export default {
       type: Boolean,
       default: false
     },
+    direction:{
+      type:String,
+      default:'column'
+    }
   },
   data () {
     return {
@@ -142,7 +152,7 @@ export default {
       arrowStyle: '',
       guideDom: {},
       loop: null,
-      arrowUp: true
+      arrowDirection: 'up'
     };
   },
   methods: {
@@ -175,6 +185,43 @@ export default {
       if (!res_) return
       let style_ = '';
 
+      if(this.direction == 'row'){
+        if (document.documentElement.clientWidth - res_.left - res_.width >= 350) {
+          this.arrowDirection = 'left';
+          if (!this.inside) {
+            style_ = `${style_};left:${res_.left + res_.width + 8 || 0}px`;
+          }else {
+            style_ = `${style_};left:${res_.left + 8 || 0}px;z-index:998`;
+          }
+          style_ = `${style_};bottom:${document.documentElement.clientHeight - res_.top - res_.height - 4 || 0}px;`
+          this.arrowStyle = `bottom:${((res_.height / 2) - 4) > 116 ? 116 : (res_.height / 2) - 4}px`;
+
+
+          this.guideStyle = style_;
+          this.guideDom = res_;
+
+          return 
+        } else if (res_.left >= 350){
+
+          this.arrowDirection = 'right';
+
+          if (!this.inside) {
+            style_ = `${style_};right:${document.documentElement.clientWidth - res_.left + 12 || 0}px`;
+          }else {
+            style_ = `${style_};right:${document.documentElement.clientWidth - res_.left - res_.width + 8 || 0}px;z-index:998`;
+          }
+          style_ = `${style_};top:${res_.top || 0}px;`
+          this.arrowStyle = `top:${((res_.height / 2) - 4) > 116 ? 116 : (res_.height / 2) - 4}px`;
+
+
+          this.guideStyle = style_;
+          this.guideDom = res_;
+          return
+        }
+
+
+      }
+
       if (document.documentElement.clientWidth - res_.left < 350) {
         style_ = `${style_};right:${document.documentElement.clientWidth - res_.left - res_.width || 0}px`;
         this.arrowStyle = `right:${((res_.width / 2) - 8) > 112 ? 112 : (res_.width / 2) - 8}px`;
@@ -185,14 +232,14 @@ export default {
       if (!this.inside) {
         if (document.documentElement.clientHeight - res_.top - res_.height < 400) {
           style_ = `${style_};bottom:${document.documentElement.clientHeight - res_.top + 12 || 0}px;`
-          this.arrowUp = false;
+          this.arrowDirection = 'down';
         } else {
           style_ = `${style_};top:${res_.top + res_.height + 12 || 0}px`
-          this.arrowUp = true;
+          this.arrowDirection = 'up';
         }
       } else {
         style_ = `${style_};top:${res_.top + 12 || 0}px;z-index:998`
-        this.arrowUp = true;
+        this.arrowDirection = 'up';
       }
 
       this.guideStyle = style_;
@@ -284,7 +331,6 @@ export default {
   max-height: 400px;
   .tour-arrow {
     position: absolute;
-    top: -5px;
   }
   .tour-arrow-down {
     position: absolute;
@@ -386,5 +432,37 @@ export default {
   transform: rotateZ(180deg);
   position: absolute;
   bottom: -0.5rem;
+}
+
+.normal-arrow-left {
+  font-size: 0;
+  line-height: 0;
+  border-width: 0.5rem;
+  border-color: #fff;
+  width: 0;
+  border-top-width: 0;
+  border-style: dashed;
+  border-bottom-style: solid;
+  border-left-color: transparent;
+  border-right-color: transparent;
+  transform: rotateZ(-90deg);
+  position: absolute;
+  left: -0.7rem;
+}
+
+.normal-arrow-right {
+  font-size: 0;
+  line-height: 0;
+  border-width: 0.5rem;
+  border-color: #fff;
+  width: 0;
+  border-top-width: 0;
+  border-style: dashed;
+  border-bottom-style: solid;
+  border-left-color: transparent;
+  border-right-color: transparent;
+  transform: rotateZ(90deg);
+  position: absolute;
+  right: -0.7rem;
 }
 </style>

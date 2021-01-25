@@ -132,6 +132,7 @@ class Guide {
               watchContentClick={_this.watchContentClick}
               nextStep={_this.nextStep}
               copyDom={obj.copyDom}
+              direction={obj.direction}
             >
               <template slot="diyContent">
                 <Test />
