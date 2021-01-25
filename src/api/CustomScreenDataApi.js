@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-01-20 14:52:17
- * @LastEditTime: 2021-01-21 15:17:51
+ * @LastEditTime: 2021-01-25 09:51:47
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /shb-fe-pc/src/api/CustomScreenDataApi.js
@@ -13,13 +13,13 @@
 import http from '@src/util/http';
 
 let urlAppPrefix = '/api/app';
-
+let urlAppPreKubaifix = '/api/kubai';
 /**
  * 更新设置信息
  * @param {*} params 
  */
 function saveSettingConfig(params) {
-  return http.post('/setting/screen/save', params);
+  return http.post(`${urlAppPrefix}/setting/screen/save`, params);
 }
 
 /**
@@ -29,7 +29,7 @@ function saveSettingConfig(params) {
  * 所以在请求保存/更新配置前 从这个接口拿一下当前配置信息 去做merge后提交
  */
 function getSettingConfig() {
-  return http.get('/stats/screenData/screenDataConfig')
+  return http.get(`${urlAppPrefix}/stats/screenData/screenDataConfig`)
 }
 
 /**
@@ -45,7 +45,7 @@ function refreshCacheTime() {
  * @param {*} params 
  */
 function getScreenGroupData() {
-  return http.get(`${urlAppPrefix}/outside/screen/getScreenData`);
+  return http.get(`${urlAppPreKubaifix}/screen/getScreenData`);
 
   // 联调特殊部署，todo clear
   //   return http.get(`${urlAppPrefix}/outside/screen/getScreenData`);
@@ -57,7 +57,7 @@ function getScreenGroupData() {
  * @param {*} params 
  */
 function getWorkingHoursEfficiency() {
-  return http.get(`${urlAppPrefix}/screen/getWorkingHoursEfficiency`);
+  return http.get(`${urlAppPreKubaifix}/screen/getWorkingHoursEfficiency`);
 }
 
 

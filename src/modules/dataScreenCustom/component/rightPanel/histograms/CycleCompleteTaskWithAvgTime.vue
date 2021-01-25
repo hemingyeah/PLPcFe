@@ -34,6 +34,7 @@ import EventMap from '../../../event';
 import WorkTimeMixins from './mixins';
 import * as DSApi from '@src/api/CustomScreenDataApi';
 import { Carousel, CarouselItem} from 'element-ui'
+import platform from '@src/platform';
 
 
 let currChartsPList = []
@@ -364,67 +365,13 @@ export default {
      * 请求刷新工时利用率
      */
     refreshWorkTime(){
-      let res = {
-        'status': 0,
-        'message': 'ok',
-        'data': {
-          'cycleWorkingHoursEfficiencyCount': [
-            {
-              'no': 1,
-              'userId': 'efaabc18-ff0d-11ea-a442-00163e304a25',
-              'userName': '无双',
-              'workDays': 7,
-              'efficiency': '23.00'
-            },
-            {
-              'no': 2,
-              'userId': '2e95fcf6-f281-11ea-a442-00163e304a25',
-              'userName': '李超',
-              'workDays': 7,
-              'efficiency': '23.00'
-            },
-            {
-              'no': 3,
-              'userId': '0b39a72f-bc14-11ea-b0e9-00163e304a25',
-              'userName': '胡芝芝',
-              'workDays': 5,
-              'efficiency': '16.00'
-            },
-            {
-              'no': 4,
-              'userId': '63455334-7303-11ea-bfc9-00163e304a25',
-              'userName': '仇太俊',
-              'workDays': 1,
-              'efficiency': '3.00'
-            },
-            {
-              'no': 5,
-              'userId': '840b18b1-39e9-11eb-a442-00163e304a25',
-              'userName': '瓦力',
-              'workDays': 1,
-              'efficiency': '3.00'
-            },
-            {
-              'no': 6,
-              'userId': 'abd851e4-65f7-11e7-a318-00163e304a25',
-              'userName': '王越',
-              'workDays': 1,
-              'efficiency': '3.00'
-            },
-            {
-              'no': 7,
-              'userId': '9dd5344c-53d2-11eb-a442-00163e304a25',
-              'userName': '孙亚峰',
-              'workDays': 1,
-              'efficiency': '3.00'
-            }
-          ],
-          'nextRefresh': 11
-        },
-        'succ': true
-      }
-      this.data.data = res.data.cycleWorkingHoursEfficiencyCount
-      refreshDataTimeInterval = res.data.nextRefresh * 1000
+      DSApi.getWorkingHoursEfficiency().then(res=>{
+        if ((!res.succ) && (!res.success || (!res.data))) {
+          return res.message && platform.alert(res.message);
+        }
+        this.data.data = res.data.cycleWorkingHoursEfficiencyCount
+        refreshDataTimeInterval = res.data.nextRefresh * 1000
+      })
     },
     registerLoop() {
       if (this.refreshInterval) clearInterval(this.refreshInterval);
@@ -441,7 +388,7 @@ export default {
   },
   beforeDestroy() {
     clearInterval(this.refreshInterval);
-      this.refreshInterval= null,
+    this.refreshInterval = null
     // this.$eventBus.$off(EventMap.NEED_REFRESH_RIGHT_SEARCH_AT, this.updateCharts);
   }
 }
