@@ -95,7 +95,8 @@ export default {
         name: 'cycleCompleteTaskCountAverageTime',
         value: true
       },
-      refreshInterval:null
+      refreshInterval:null,
+      abc:21
     }
   },
   computed: {
@@ -137,8 +138,7 @@ export default {
     },
 
 
-    getEChartsOption(data) {
-
+    getEChartsOption(data, maxXAxis) {
       const config = this.getCustomConfig();
       // const hasSupData = data2 && data2.length;
 
@@ -152,11 +152,12 @@ export default {
         },
         xAxis: {
           show: false,
+          max:maxXAxis
         },
         yAxis: {
           type: 'category',
           show: false,
-          inverse: true
+          inverse: true,
         },
         grid: config.grid,
         series: [
@@ -349,15 +350,15 @@ export default {
         }
       })
     },
-    updateCharts(index = 0) {
+    updateCharts(index = 0) { 
       let data = this.data.data.slice(index * 5, (index + 1) * 5)
-      console.log(data)
       if(data.length < 5){
         for(let i = 0;5 - data.length;i++){
           data.push({hidden:true})
         }
       }
-      let optionP = this.getEChartsOption(data);
+
+      let optionP = this.getEChartsOption(data, this.data.data[0].workDays || 10);
       currChartsPList[index].setOption(optionP);
     },
 
