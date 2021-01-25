@@ -657,6 +657,7 @@
                   <template v-else-if="column.field === 'tlmPhone'">
                     <div>
                       {{ scope.row["linkMan"] && scope.row["linkMan"].phone }}
+                      <i v-if="customerSetting.linkmanOn" class="iconfont icon-fdn-phone" title="拨打电话" @click="makePhoneCall(scope.row['linkMan'].phone)"></i>
                     </div>
                   </template>
                   <!-- 自定义的选择类型字段显示， 与type 区别-->
