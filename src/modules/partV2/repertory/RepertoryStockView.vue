@@ -140,7 +140,7 @@
           </span>
 
           <el-dropdown-menu slot="dropdown" class="dropdown-more">
-            <el-dropdown-item>
+            <el-dropdown-item v-if="!isExperienceEdition">
               <span class="dropdown-item" @click="importStock">导入</span>
             </el-dropdown-item>
             <el-dropdown-item>
@@ -546,6 +546,7 @@ import AuthUtil from '@src/util/auth';
 import StorageUtil from '@src/util/storageUtil';
 
 import BaseGallery from 'packages/BaseGallery/index'
+import VersionMixin from '@src/mixins/versionMixin'
 
 import { isShowPartTransfer, isShowPartApply, isShowMoreSperaParts, isStandardEdition } from '@src/util/version.ts'
 
@@ -555,6 +556,7 @@ const STORAGE_PAGESIZE_KEY = 'repertory_list_pagesize';
 export default {
   name: 'part-stock-view',
   inject: ['initData'],
+  mixins: [VersionMixin],
   data(){
     let pageSize = StorageUtil.get(STORAGE_PAGESIZE_KEY) || 10;
     let originModel = {

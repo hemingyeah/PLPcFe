@@ -69,7 +69,7 @@
                 @input="updateServiceItem"
                 placeholder="请选择">
                 <div class="service-template-option" slot="option" slot-scope="{ option }">
-                  <h3>{{ option.name }}</h3>
+                  <h3>{{option.name}}</h3>
                   <p>
                     <span>
                       <label>编号：</label>
@@ -118,6 +118,8 @@
 <script>
 /* mixin */
 import FormMixin from '@src/component/form/mixin/form';
+
+import decode from 'entity-decode';
 
 export default {
   name: 'form-serviceterm',
@@ -312,9 +314,10 @@ export default {
           if (!res || !res.list) return;   
           res.list = res.list.map(template =>
             Object.freeze({
-              label: template.name,
+              label: decode(template.name),
               value: template.id,
-              ...template
+              ...template,
+              name: decode(template.name)
             })
           )     
           return res;

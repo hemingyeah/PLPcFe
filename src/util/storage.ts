@@ -98,3 +98,8 @@ export async function storageSet(key: string, value: StorageSetType, module: Sto
     console.error('storageSet -> error', error)
   }
 }
+
+export default {
+  storageGet,
+  storageSet
+}
