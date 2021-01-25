@@ -296,6 +296,19 @@ export default {
             top: 40px;
             right: 0;
           }
+          &:not(:last-child){
+              .flow-axis-step::after{
+                  content: "";
+                  position: absolute;
+                  left: 50%;
+                  bottom: -31px;
+                  display: block;
+                  transform: translateX(-50%);
+                  width: 1px;
+                  height: 30px;
+                  background: #E6E6E6;
+              }
+          }
         }
         .flow-axis-step{
             cursor: pointer;
@@ -333,19 +346,6 @@ export default {
             &.active{
                 background: #E9F9F9;
                 border: 1px solid $color-primary;
-            }
-            &:not(:last-child){
-                &::after{
-                    content: "";
-                    position: absolute;
-                    left: 50%;
-                    bottom: -30px;
-                    display: block;
-                    transform: translateX(-50%);
-                    width: 1px;
-                    height: 30px;
-                    background: #E6E6E6;
-                }
             }
         }
     }
