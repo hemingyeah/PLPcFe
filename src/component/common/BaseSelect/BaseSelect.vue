@@ -2,11 +2,11 @@
   <div class="base-select-container">
     <div class="content el-select el-input el-input--small el-input--suffix" v-clickoutside="closeList">
       <div class="base-select-main-content multiple-layout el-input el-input__inner" ref="normalInput"
-           @click.stop="focusInput" v-if="multiple"
-           :class="{'error': error, 'wrapper-is-focus': isFocus, 'clearable-layout': clearable}">
+        @click.stop="focusInput" v-if="multiple"
+        :class="{'error': error, 'wrapper-is-focus': isFocus, 'clearable-layout': clearable}">
 
         <el-tag size="mini" closable v-for="tag in (collapsed ? value[0] ? [value[0]] : [] : value)"
-                :key="getValueKey(tag)" @close="removeTag(tag)" disable-transitions type="info">
+          :key="getValueKey(tag)" @close="removeTag(tag)" disable-transitions type="info">
           {{tag.label || tag[valueKey]}}
         </el-tag>
 
@@ -45,7 +45,7 @@
       <i v-if="clearable && value.length" class="iconfont icon-minus-fill clear-btn" @click="clearValue"></i>
 
       <div class="list-wrapper" v-show="showList"
-           :style="selectCon ? `${topShow ? `top:${(selectCon.top -254)}px;` : `top:${(selectCon.top +selectCon.height +13)}px;`}left:${ selectCon.left}px;width:${selectCon.width}px` : ''">
+        :style="selectCon ? `${topShow ? `top:${(selectCon.top -254)}px;` : `top:${(selectCon.top +selectCon.height +13)}px;`}left:${ selectCon.left}px;width:${selectCon.width}px` : ''">
 
         <template v-if="!topShow">
           <div class="arrow"></div>
@@ -58,7 +58,7 @@
 
 
           <li v-for="(op, index) in optionList" :key="index" @click="selectTag(op)"
-              :class="{'selected': value.some(user => user[valueKey] ===op[valueKey])}">
+            :class="{'selected': value.some(user => user[valueKey] ===op[valueKey])}">
             <slot name="option" :option="op" v-if="optionSlot"> </slot>
             <template v-else>{{op.label}}</template>
             <div class="checked"></div>
@@ -79,12 +79,12 @@
 </template>
 
 <script>
-import Clickoutside from '@src/util/clickoutside';
-let timeInterval;
-import Page from '@model/Page';
-import _ from 'lodash';
+  import Clickoutside from '@src/util/clickoutside';
+  let timeInterval;
+  import Page from '@model/Page';
+  import _ from 'lodash';
 
-/**
+  /**
    * Todo
    * 1. 列表出现在上部还是下部。
    * 2. 点击空白隐藏列表。✅
@@ -97,225 +97,226 @@ import _ from 'lodash';
    * 9. 布局调整，搜索框和列表在一起
    * 10.
    */
-export default {
-  name: 'base-select',
-  props: {
-    remoteMethod: Function,
-    value: {
-      type: Array,
-      default: () => ([]),
-    },
-    valueKey: {
-      type: String,
-      default: 'value'
-    },
-    error: {
-      type: Boolean,
-      default: false,
-    },
-    multiple: {
-      type: Boolean,
-      default: false,
-    },
-    clearable: {
-      type: Boolean,
-    },
-    options: {
-      type: Array,
-      default: () => ([]),
-    },
-    placeholder: {
-      type: String,
-      default: ''
-    },
-    disabled: {
-      type: Boolean,
-      default: false
-    },
-    collapsed: {
-      type: Boolean,
-      default: false
-    }
-  },
-  data() {
-    return {
-      showList: false,
-      pending: false,
-      isFocus: false,
-      keyword: '',
-      loadmoreOptions: {
-        disabled: false,
-        callback: this.loadmore,
-        distance: 10,
+  export default {
+    name: 'base-select',
+    props: {
+      remoteMethod: Function,
+      value: {
+        type: Array,
+        default: () => ([]),
       },
-      page: new Page(),
-      selectCon: null,
-      topShow: false
-    }
-  },
-  watch: {
-    showList(newV, oldV) {
-      if (newV == true) {  
-        timeInterval = setInterval(() => {
+      valueKey: {
+        type: String,
+        default: 'value'
+      },
+      error: {
+        type: Boolean,
+        default: false,
+      },
+      multiple: {
+        type: Boolean,
+        default: false,
+      },
+      clearable: {
+        type: Boolean,
+      },
+      options: {
+        type: Array,
+        default: () => ([]),
+      },
+      placeholder: {
+        type: String,
+        default: ''
+      },
+      disabled: {
+        type: Boolean,
+        default: false
+      },
+      collapsed: {
+        type: Boolean,
+        default: false
+      }
+    },
+    data() {
+      return {
+        showList: false,
+        pending: false,
+        isFocus: false,
+        keyword: '',
+        loadmoreOptions: {
+          disabled: false,
+          callback: this.loadmore,
+          distance: 10,
+        },
+        page: new Page(),
+        selectCon: null,
+        topShow: false
+      }
+    },
+    watch: {
+      showList(newV, oldV) {
+        if (newV == true) {
+          timeInterval = setInterval(() => {
+
           let res_ = this.$refs['normalInput'].getBoundingClientRect()
-          let bottomH = window.innerHeight - res_.y - res_.height;
-          if (!this.topShow && bottomH < 370) {
-            this.topShow = true;
-          }else{
-            this.topShow = false;
-          }
-          if(!this.selectCon || (this.selectCon && (res_.x != this.selectCon.x || res_.y != this.selectCon.y))) {
+            let bottomH = window.innerHeight -
+              res_.y -
+              res_.height;
+            if (bottomH < 370) {
+              this.topShow = true;
+            }else{
+              this.topShow = false;
+            }
             this.selectCon = res_;
-          } 
-        }, 1000)
-      } else {
-        timeInterval && clearInterval(timeInterval)
-      }
-    }
-  },
-  beforeDestroy() {
-    timeInterval && clearInterval(timeInterval)
-  },
-  computed: {
-    optionList() {
-      if (this.options.length) return this.options;
-      return this.page.list;
-    },
-    optionSlot() {
-      return !!this.$scopedSlots.option;
-    },
-    labelSlot() {
-      return !!this.$scopedSlots.label;
-    },
-    message() {
-      const {
-        total,
-        hasNextPage,
-      } = this.page;
-      if (this.pending) {
-        return '载入更多结果......';
-      }
-      if (!total) {
-        return '未找到结果';
-      }
-      if (!hasNextPage) {
-        return '已加载全部结果';
-      }
-      return '载入更多结果......';
-    },
-  },
-  methods: {
-    getValueKey(op) {
-      return `${op[this.valueKey]}`;
-    },
-    focusInput() {
-      if (this.disabled) return
-      if (this.showList) return this.close()
-
-      this.isFocus = true
-      this.initList()
-    },
-    closeList(e) {
-      this.showList = false;
-      this.isFocus = false;
-      this.pending = true;
-      this.resetStatus('');
-    },
-    clearValue() {
-      this.$emit('input', []);
-    },
-    removeTag(tag) {
-      const newVal = this.value.filter(t => t[this.valueKey] !== tag[this.valueKey]);
-      this.$emit('input', newVal);
-    },
-    selectTag(tag) {
-      let newValue = this.value;
-
-      if (!this.multiple) {
-        newValue = [tag];
-        this.showList = false;
-        this.resetStatus();
-
-      } else {
-        if (this.value.every(t => t[this.valueKey] !== tag[this.valueKey])) {
-          newValue.push(tag);
+          }, 100)
         } else {
-          newValue = newValue.filter(t => t[this.valueKey] !== tag[this.valueKey]);
+          clearInterval(timeInterval)
         }
       }
-
-      this.$emit('input', newValue);
     },
-    async loadmore() {
-      this.loadmoreOptions.disabled = true;
-      this.loading = true;
+    beforeDestroy() {
+      clearInterval(timeInterval)
+    },
+    computed: {
+      optionList() {
+        if (this.options.length) return this.options;
+        return this.page.list;
+      },
+      optionSlot() {
+        return !!this.$scopedSlots.option;
+      },
+      labelSlot() {
+        return !!this.$scopedSlots.label;
+      },
+      message() {
+        const {
+          total,
+          hasNextPage,
+        } = this.page;
+        if (this.pending) {
+          return '载入更多结果......';
+        }
+        if (!total) {
+          return '未找到结果';
+        }
+        if (!hasNextPage) {
+          return '已加载全部结果';
+        }
+        return '载入更多结果......';
+      },
+    },
+    methods: {
+      getValueKey(op) {
+        return `${op[this.valueKey]}`;
+      },
+      focusInput() {
+        if (this.disabled) return
+        if (this.showList) return this.close()
 
-      try {
-        this.page.pageNum += 1;
-        const res = await this.search();
-        this.page.merge(res);
-      } catch (e) {
-        console.error('e', e);
+        this.isFocus = true
+        this.initList()
+      },
+      closeList(e) {
+        this.showList = false;
+        this.isFocus = false;
+        this.pending = true;
+        this.resetStatus('');
+      },
+      clearValue() {
+        this.$emit('input', []);
+      },
+      removeTag(tag) {
+        const newVal = this.value.filter(t => t[this.valueKey] !== tag[this.valueKey]);
+        this.$emit('input', newVal);
+      },
+      selectTag(tag) {
+        let newValue = this.value;
+
+        if (!this.multiple) {
+          newValue = [tag];
+          this.showList = false;
+          this.resetStatus();
+
+        } else {
+          if (this.value.every(t => t[this.valueKey] !== tag[this.valueKey])) {
+            newValue.push(tag);
+          } else {
+            newValue = newValue.filter(t => t[this.valueKey] !== tag[this.valueKey]);
+          }
+        }
+
+        this.$emit('input', newValue);
+      },
+      async loadmore() {
+        this.loadmoreOptions.disabled = true;
+        this.loading = true;
+
+        try {
+          this.page.pageNum += 1;
+          const res = await this.search();
+          this.page.merge(res);
+        } catch (e) {
+          console.error('e', e);
+        }
+      },
+      search() {
+        if (!this.remoteMethod) return;
+        const {
+          pageNum,
+          pageSize,
+        } = this.page;
+        return this.remoteMethod({
+            keyword: this.keyword,
+            pageNum,
+            pageSize,
+          })
+          .then(res => {
+            this.pending = false;
+            this.loadmoreOptions.disabled = res ? !res.hasNextPage : false;
+            return res;
+          })
+          .catch(err => console.error(err))
+      },
+      searchByKeyword: _.debounce(function (e) {
+        this.resetStatus(e.target.value);
+        this.pending = true;
+        this.search()
+          .then(res => {
+            if (!res || !res.list) return;
+            this.$refs.list.scrollTop = 0;
+            this.page = Page.as(res);
+          })
+          .catch(e => {
+            console.log('searchByKeyword catch e', e)
+          });
+      }, 800),
+      initList() {
+        this.pending = true;
+        this.showList = true;
+
+        this.search()
+          .then(res => {
+            if (!res || !res.list) return;
+            this.$refs.input.focus();
+
+            this.page = Page.as(res);
+          })
+          .catch(e => {
+            console.log('initList catch e', e)
+          });
+      },
+      resetStatus(keyword) {
+        this.keyword = keyword || '';
+        this.page = new Page();
+      },
+      close() {
+        this.showList = false;
       }
     },
-    search() {
-      if (!this.remoteMethod) return;
-      const {
-        pageNum,
-        pageSize,
-      } = this.page;
-      return this.remoteMethod({
-        keyword: this.keyword,
-        pageNum,
-        pageSize,
-      })
-        .then(res => {
-          this.pending = false;
-          this.loadmoreOptions.disabled = res ? !res.hasNextPage : false;
-          return res;
-        })
-        .catch(err => console.error(err))
+    directives: {
+      Clickoutside
     },
-    searchByKeyword: _.debounce(function (e) {
-      this.resetStatus(e.target.value);
-      this.pending = true;
-      this.search()
-        .then(res => {
-          if (!res || !res.list) return;
-          this.$refs.list.scrollTop = 0;
-          this.page = Page.as(res);
-        })
-        .catch(e => {
-          console.log('searchByKeyword catch e', e)
-        });
-    }, 800),
-    initList() {
-      this.pending = true;
-      this.showList = true;
-
-      this.search()
-        .then(res => {
-          if (!res || !res.list) return;
-          this.$refs.input.focus();
-
-          this.page = Page.as(res);
-        })
-        .catch(e => {
-          console.log('initList catch e', e)
-        });
-    },
-    resetStatus(keyword) {
-      this.keyword = keyword || '';
-      this.page = new Page();
-    },
-    close() {
-      this.showList = false;
-    }
-  },
-  directives: {
-    Clickoutside
-  },
-}
+  }
 </script>
 
 <style lang="scss">
