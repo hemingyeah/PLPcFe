@@ -206,7 +206,7 @@
             <span>{{ deptInfo.tagName }}</span>
             <div class="dept-edit-del" id="v-dept-step-1">
               <div class="guide-disable-cover" v-if="nowGuideStep == 1"></div>
-              <base-button type="ghost" @event="openDepartmentEditPanel()" v-if="!isRootDepartment(selectedDept)">编辑</base-button>
+              <base-button type="ghost" @event="openDepartmentEditPanel()">编辑</base-button>
               <base-button type="danger" @event="delDepartment()" v-if="!isRootDepartment(selectedDept)">删除</base-button>
             </div>
           </div>
@@ -259,14 +259,14 @@
         <!-- end 部门 header -->
 
         <!-- start 下级部门 -->
-        <div class="department-child-block" v-if="isShowCreateChildrenTeam">
+        <div class="department-child-block">
           <div class="department-child-block-header">
             <div class="department-child-block-header-text">
               <i class="iconfont icon-bumen"></i>
               <span>下级部门</span>
             </div>
 
-            <div class="department-child-block-header-btn dept-edit-del" v-if="isShowCreateChildrenTeam">
+            <div class="department-child-block-header-btn dept-edit-del">
               <base-button type="ghost" @event="addDepartment" id="v-dept-step-3">添加子部门</base-button>
               <div class="guide-disable-cover" v-if="nowGuideStep == 3"></div>
               <!-- <base-button type="danger" @event="delDepartment" v-if="subDepartments.length > 0"> 删除 </base-button> -->
@@ -564,7 +564,6 @@ import DepartmentEditPanel from './component/DepartmentEditPanel.vue'
 import ModifyName from './component/ModifyName'
 
 /* utils */
-import { isShowCreateChildrenTeam } from '@src/util/version.ts'
 import _ from 'lodash'
 import http from '@src/util/http'
 import Page from '@model/Page'
@@ -744,9 +743,6 @@ export default {
     canRemove() {
       // 主部门下面成员不能移除
       return this.selectedDept.parentId
-    },
-    isShowCreateChildrenTeam() {
-      return isShowCreateChildrenTeam(this.initData)
     },
     // 是否在钉钉环境
     isDingTalk() {
@@ -1729,12 +1725,13 @@ export default {
       // window.location.href = `/security/tag/editTag/${this.selectedDept.id}`
       // id 有值说明是子部门编辑
       let fromId = window.frameElement.getAttribute('id')
+      let isRoot = this.selectedDept.id == mainTagId // 判断是不是根部门，根部门编辑不能修改名称
       platform.openTab({
         id: 'editTag',
         title: '编辑部门',
         url: id
           ? `/security/tag/editDept/${id}`
-          : `/security/tag/editDept/${this.selectedDept.id}`,
+          : `/security/tag/editDept/${this.selectedDept.id}?isRoot=${isRoot}`,
         reload: true,
         fromId,
       })

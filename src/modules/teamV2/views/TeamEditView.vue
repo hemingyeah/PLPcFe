@@ -41,7 +41,7 @@ import qs from 'qs';
 import FormMixin from '@src/component/form/mixin/form'
 
 import { stringLen } from './../../../util/lang/index.js'
-let tag = {}
+let tag = {}, isRoot = false;
 export default {
   name: 'team-edit-view',
   props: {
@@ -61,7 +61,8 @@ export default {
           fieldName: 'tagName',
           formType: 'text',
           placeHolder: '最多20字',
-          isNull: 0
+          isNull: 0,
+          disabled: false
         },
         description: {
           displayName: '部门描述', 
@@ -244,6 +245,9 @@ export default {
       this.$platform.refreshTab(fromId);
     },
     submit() {
+      if(isRoot === 'true' && tag.tagName != this.form.tagName) {
+        return this.$platform.alert('根部门不能修改名称！')
+      }
       return this.$refs.form.validate()
         .then(valid => {
           if(!valid) return Promise.reject('validate fail.');
@@ -325,6 +329,9 @@ export default {
     this.form = this.unPackData(tag)
     this.parent.id = query.pid;
     this.parent.tagName = query.pname;
+    isRoot = query.isRoot;
+    // 根部门名称不能编辑
+    if(isRoot === 'true' && tag.id) this.filedMap.tagName.disabled = true
   },
   components: {
     'team-places': {
