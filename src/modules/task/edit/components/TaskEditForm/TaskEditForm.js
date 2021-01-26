@@ -232,6 +232,9 @@ export default {
      * @param {String} templateId 工单类型id
     */
     async chooseTemplate(templateId) {
+      // 切换类型时可选择
+      this.isCreateCustomer = false;
+      
       if(this.state.isCopyTask) {
         return this.copyTaskHandler(templateId);
       }
