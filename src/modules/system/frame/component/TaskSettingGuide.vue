@@ -33,7 +33,7 @@ export default {
   data() {
     return {
       pending: false,
-      visible: true,
+      visible: false,
       carouselData: [
         {
           img: TASK_SETTING_GUIDE_1,
