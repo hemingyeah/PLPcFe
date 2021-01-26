@@ -16,21 +16,21 @@ const { isNotLocalEnv } = require('./model/proxyConfigModel');
 const { getCookie } = require('./util/HttpUtil');
 
 server.init = async function(){
-
+  
   server.use(cors({allowAll: true}));
-
+  
   // 参数解析
   server.use(bodyParser());
-
+  
   // 静态资源
   server.use(koaStatic(path.resolve(__dirname, '../public'), {index: '_index.html'}));
-
+  
   // 获取 cookie
   let cookie = isNotLocalEnv ? await getCookie() : '';
-
+  
   // 售后宝环境中间件
   server.use(shbEnvMiddleware({ isNotLocalEnv, cookie }));
-
+  
   // 路由 -> 可通过 router.stack 查看堆栈信息
   server.use(router.routes())
   server.use(router.allowedMethods())
