@@ -2,6 +2,7 @@ import http from '@src/util/http';
 
 let fixedPrefixPath = '/api/customer';
 let fixedPrefixTaskPath = '/api/task';
+const ElASTICSEARCH = '/api/elasticsearch';
 
 /**
  * 客户自定义字段唯一校验
@@ -48,7 +49,7 @@ export function fieldRepeatProductTemplate(params: {} | undefined) {
  * @param {String} params params.isCommon - 是否是公共字段
  */
 export function fieldRepeatTask(params: {} | undefined) {
-  return http.post(`${fixedPrefixTaskPath}/outside/pc/task/fieldRepeat`, params);
+  return http.post(`${ElASTICSEARCH}/outside/es/task/taskFieldRepeat`, params);
 }
 
 /**

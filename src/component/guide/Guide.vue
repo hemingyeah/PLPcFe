@@ -6,12 +6,23 @@
     <div class="cover-dom"
          v-if="needCover && showGuide && !canUse"
          :style="`width:${guideDom.width || 0}px;height:${guideDom.height || 0}px;top:${guideDom.top || 0}px;left:${guideDom.left || 0}px;`"></div>
+    <div id="vmDom"></div>
     <div :id="id"
          class="tour-content-out-box"
          ref="guideCom"
          v-show="showGuide && guideDom.top >-1"
          :style="guideStyle">
-      <div :class="`normal-arrow normal-arrow-${arrowDirection_} tour-arrow-${arrowDirection_}`"
+      <div v-if="arrowDirection == 'up'"
+           class="normal-arrow-top tour-arrow"
+           :style="arrowStyle"></div>
+      <div v-if="arrowDirection=='down'"
+           class="normal-arrow-down tour-arrow-down"
+           :style="arrowStyle"></div>
+      <div v-if="arrowDirection == 'left'"
+           class="normal-arrow-left tour-arrow"
+           :style="arrowStyle"></div>
+      <div v-if="arrowDirection == 'right'"
+           class="normal-arrow-right tour-arrow"
            :style="arrowStyle"></div>
       <div class="tour-content-box">
         <div v-if="haveStep"
@@ -21,6 +32,7 @@
         <div class="tour-content"
              @click="watchContentClick($event)">
           <div class="flex-x tour-content-head">
+            <div class="flex-1 overHideCon-1">{{title}}</div>
             <i @click.prevent="stopStep().then(()=>{showGuide = false})"
                class="iconfont icon-fe-close"></i>
           </div>
@@ -64,6 +76,10 @@ export default {
     nowStep: {
       type: Number | String,
       default: 1
+    },
+    title: {
+      type: Number | String,
+      default: ''
     },
     content: {
       type: Number | String,
@@ -123,9 +139,17 @@ export default {
     insideDom: {
       type: Function
     },
-    arrowDirection: {
-      type: String,
-      default: 'top'
+    copyDom: {
+      type: Boolean,
+      default: false
+    },
+    direction:{
+      type:String,
+      default:'column'
+    },
+    outsideParent: {
+      type: Boolean,
+      default: false
     }
   },
   data () {
@@ -135,50 +159,82 @@ export default {
       arrowStyle: '',
       guideDom: {},
       loop: null,
-      arrowDirection_: this.arrowDirection
+      arrowDirection: 'up'
     };
   },
   methods: {
-    clearGuide(){
-      if (this.needCover) (this.domObj ? this.domObj() : document.getElementById(`${this.domId}`)).classList.remove('guide-point')
+    clearGuide () {
+      if (this.needCover) {
+        let dom_ = this.domObj ? this.domObj() : document.getElementById(`${this.domId}`)
+        dom_.classList.remove('guide-point')
+        if (this.copyDom) {
+          try {
+            document.getElementById('vmDom').children[0].remove();
+          } catch (error) {
+            console.warn(error, 'error try catch');
+          }
+        }
+      }
       clearInterval(this.loop)
     }
   },
   created () {
     this.loop = setInterval(() => {
-      let res_;
+
+      // console.log(this.domObj(), 321321);
+      let res_, parentRes_;
       try {
         let dom = this.domObj ? this.domObj() : document.getElementById(`${this.domId}`);
-        if(dom) res_ = dom.getBoundingClientRect();
+        parentRes_ = dom.getBoundingClientRect();
+        if (dom) res_ = dom.getBoundingClientRect();
+        if (this.insideDom) res_ = this.insideDom().getBoundingClientRect();
       } catch (error) {
         console.warn(error, 'error try catch');
       }
-      if(!res_) return
+      if (!res_) return
       let style_ = '';
 
-      // TODO: 临时代码只为满足工单设置功能引导、待优化
-      if (this.arrowDirection_ == 'left') {
-        if (this.insideDom) {
-          let dom = this.insideDom();
-          let rect = dom.getBoundingClientRect();
+      if(this.direction == 'row'){
+        if (document.documentElement.clientWidth - res_.left - res_.width >= 350) {
+          this.arrowDirection = 'left';
+          if (!this.inside) {
+            style_ = `${style_};left:${res_.left + res_.width + 8 || 0}px`;
+          }else {
+            if (this.outsideParent) {
+              style_ = `${style_};left:${parentRes_.left + parentRes_.width + 12 || 0}px;z-index:998`;
+            } else {
+              style_ = `${style_};left:${res_.left + 12 || 0}px;z-index:998`;
+            }
+          }
+          style_ = `${style_};top:${res_.top - 4 || 0}px;`
+          this.arrowStyle = `top:${((res_.height / 2) - 4) > 116 ? 116 : (res_.height / 2) - 4}px`;
+          if(this.guideStyle != style_) this.guideStyle = style_;
+          this.guideDom = res_;
 
-          style_ = `${style_};left:${res_.right + 12 || 0}px;top:${rect.top - (dom.clientHeight / 2) - 12 || 0}px;z-index:998`
-          this.arrowStyle = `top:${dom.clientHeight + 12}px`;
-        } else {
-          style_ = `${style_};left:${res_.right + 12 || 0}px;top:${res_.top + (res_.height / 4)}px;z-index:998`
+          return 
+        } else if (res_.left >= 350){
+
+          this.arrowDirection = 'right';
+
+          if (!this.inside) {
+            style_ = `${style_};right:${document.documentElement.clientWidth - res_.left + 12 || 0}px`;
+          }else {
+            if (this.outsideParent) {
+              style_ = `${style_};right:${document.documentElement.clientWidth - parentRes_.left + 12 || 0}px;z-index:998`;
+            } else {
+              style_ = `${style_};right:${document.documentElement.clientWidth - res_.left - res_.width + 8 || 0}px;z-index:998`;
+            }
+          }
+          style_ = `${style_};top:${res_.top || 0}px;`
+          this.arrowStyle = `top:${((res_.height / 2) - 4) > 116 ? 116 : (res_.height / 2) - 4}px`;
+
+
+          if(this.guideStyle != style_) this.guideStyle = style_;
+          this.guideDom = res_;
+          return
         }
-        
-        this.guideStyle = style_;
-        this.guideDom = res_;
-        return;
-      }
 
-      if (this.arrowDirection_ == 'right') {
-        style_ = `${style_};right:${document.documentElement.clientWidth - res_.left + 12 || 0}px;top:${res_.top + (res_.height / 4)}px;z-index:998`
-        
-        this.guideStyle = style_;
-        this.guideDom = res_;
-        return;
+
       }
 
       if (document.documentElement.clientWidth - res_.left < 350) {
@@ -189,32 +245,40 @@ export default {
         this.arrowStyle = `left:${((res_.width / 2) - 8) > 112 ? 112 : (res_.width / 2) - 8}px`;
       }
       if (!this.inside) {
-        if (document.documentElement.clientHeight - res_.top - res_.height < 400) {
+        if (document.documentElement.clientHeight - res_.top - res_.height < 200) {
           style_ = `${style_};bottom:${document.documentElement.clientHeight - res_.top + 12 || 0}px;`
-          this.arrowDirection_ = 'bottom';
+          this.arrowDirection = 'down';
         } else {
           style_ = `${style_};top:${res_.top + res_.height + 12 || 0}px`
-          this.arrowDirection_ = 'top';
+          this.arrowDirection = 'up';
         }
       } else {
-        if (this.insideDom) {
-          let dom = this.insideDom();
-          let rect = dom.getBoundingClientRect();
-
-          style_ = `left:${rect.left}px;top:${dom.clientHeight + rect.top || 0}px;z-index:998`
-        } else {
-          style_ = `${style_};top:${res_.top + 12 || 0}px;z-index:998`
-        }
-        
-        this.arrowDirection_ = 'top';
+        style_ = `${style_};top:${res_.top + res_.height || 0}px;z-index:998`
+        this.arrowDirection = 'up';
       }
 
-      this.guideStyle = style_;
+      if(this.guideStyle != style_) this.guideStyle = style_;
       this.guideDom = res_;
 
     }, 500)
-    if (this.needCover) {
-      (this.domObj ? this.domObj() : document.getElementById(`${this.domId}`)).classList.add('guide-point')
+
+
+  },
+  mounted () {
+    if (this.needCover && this.copyDom) {
+      // 针对部分无法sticky的父元素使用直接复制引导dom元素 需要引入css不推荐使用
+      let dom = this.domObj ? this.domObj() : document.getElementById(`${this.domId}`);
+      let res_;
+      if (dom) res_ = dom.getBoundingClientRect();
+
+      let dom_clone = dom.cloneNode(true);
+      dom_clone.setAttribute('id', '');
+      dom_clone.style.cssText = `position: fixed;z-index: 997;top:${res_.top}px;left:${res_.left}px;width:${res_.width}px;height:${res_.height}px;background:#fff;`;
+      document.getElementById('vmDom').appendChild(dom_clone);
+    }
+    if (this.needCover && !this.copyDom) {
+      let dom_ = this.domObj ? this.domObj() : document.getElementById(`${this.domId}`)
+      dom_.classList.add('guide-point');
     }
   },
   watch: {
@@ -229,6 +293,30 @@ export default {
   }
 };
 </script>
+<style lang="scss">
+.task-detail-btn-group {
+  position: absolute;
+  right: 12px;
+  top: 8px;
+
+  font-size: 0;
+  z-index: 991;
+
+  .iconfont {
+    margin-left: 16px;
+    color: $text-color-secondary;
+    cursor: pointer;
+
+    &.icon-bianji1 {
+      color: $color-primary;
+    }
+
+    &.icon-shanchu-copy {
+      margin-left: 13px;
+    }
+  }
+}
+</style>
 <style lang="scss" scoped>
 .cover {
   width: 100vw;
@@ -243,6 +331,7 @@ export default {
   position: fixed;
   z-index: 998;
   opacity: 0;
+  // background: #fff;
 }
 
 .tour-content-out-box {
@@ -255,9 +344,8 @@ export default {
   min-width: 240px;
   max-width: 350px;
   max-height: 400px;
-  .tour-arrow-top {
+  .tour-arrow {
     position: absolute;
-    top: -5px;
   }
   .tour-arrow-down {
     position: absolute;
@@ -272,13 +360,13 @@ export default {
   overflow: hidden;
   .tour-left-tips {
     width: 80px;
-    height: 32px;
+    height: 28px;
     background: $color-primary;
     color: #fff;
     position: absolute;
     left: -40px;
     top: 0px;
-    line-height: 40px;
+    line-height: 35px;
     font-size: 12px;
     transform-origin: center top;
     transform: rotateZ(-45deg);
@@ -286,7 +374,6 @@ export default {
   }
   .tour-content {
     .tour-content-head {
-      justify-content: flex-end;
       padding-bottom: 10px;
       padding-top: 16px;
       .iconfont {
@@ -330,7 +417,8 @@ export default {
 }
 
 /* 向上的箭头 */
-.normal-arrow {
+
+.normal-arrow-top {
   font-size: 0;
   line-height: 0;
   border-width: 0.5rem;
@@ -342,28 +430,54 @@ export default {
   border-left-color: transparent;
   border-right-color: transparent;
   position: absolute;
+  top: -0.5rem;
+}
 
-  &-top {
-    top: -0.5rem;
-  }
+.normal-arrow-down {
+  font-size: 0;
+  line-height: 0;
+  border-width: 0.5rem;
+  border-color: #fff;
+  width: 0;
+  border-top-width: 0;
+  border-style: dashed;
+  border-bottom-style: solid;
+  border-left-color: transparent;
+  border-right-color: transparent;
+  transform: rotateZ(180deg);
+  position: absolute;
+  bottom: -0.5rem;
+}
 
-  &-bottom {
-    bottom: -0.5rem;
-    transform: rotateZ(180deg);
-  }
+.normal-arrow-left {
+  font-size: 0;
+  line-height: 0;
+  border-width: 0.5rem;
+  border-color: #fff;
+  width: 0;
+  border-top-width: 0;
+  border-style: dashed;
+  border-bottom-style: solid;
+  border-left-color: transparent;
+  border-right-color: transparent;
+  transform: rotateZ(-90deg);
+  position: absolute;
+  left: -0.7rem;
+}
 
-  &-left {
-    left: -10px;
-    top: 50%;
-    margin-top: -8px;
-    transform: rotateZ(270deg);
-  }
-
-  &-right {
-    right: -10px;
-    top: 50%;
-    margin-top: -8px;
-    transform: rotateZ(90deg);
-  }
+.normal-arrow-right {
+  font-size: 0;
+  line-height: 0;
+  border-width: 0.5rem;
+  border-color: #fff;
+  width: 0;
+  border-top-width: 0;
+  border-style: dashed;
+  border-bottom-style: solid;
+  border-left-color: transparent;
+  border-right-color: transparent;
+  transform: rotateZ(90deg);
+  position: absolute;
+  right: -0.7rem;
 }
 </style>
