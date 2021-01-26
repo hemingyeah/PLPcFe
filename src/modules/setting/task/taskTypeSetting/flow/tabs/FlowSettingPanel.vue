@@ -1,23 +1,28 @@
 <template>
   <el-row type="flex" class="setting-flow-container">
+    <div id="task-flow-guide"></div>
     <!--S 工单流程轴 -->
-    <div class="setting-flow-axis">
+    <div class="setting-flow-axis" id="setting-flow-axis-guide">
       <el-row
-        class="flow-axis-step"
-        :class="[currFlow === key && 'active', (!taskFlowData.taskTypeConfig.flowSetting[key].state && !flowMap[key].isSystem) && 'disabled']"
+        class="flow-axis-step-box"
+        type="flex"
+        justify="space-between"
         v-for="key in Object.keys(flowMap)"
         :key="key"
         @click.native="clickFlow(key)">
-        <el-row type="flex" justify="space-between">
+        <el-row
+          class="flow-axis-step"
+          :class="[currFlow === key && 'active', (!taskFlowData.taskTypeConfig.flowSetting[key].state && !flowMap[key].isSystem) && 'disabled']"
+          type="flex" justify="space-between">
           <div>
             <i :class="['iconfont', flowMap[key].icon]" :style="{color: key === 'close' && '#F56C6C'}"></i>
             {{flowMap[key].name}}
           </div>
           <div v-if="taskFlowData.taskTypeConfig.flowSetting[key].state || flowMap[key].isSystem" class="open-tag">已开启</div>
-          <div class="open-btn" @click.stop>
-            <el-switch v-model="taskFlowData.taskTypeConfig.flowSetting[key].state" v-if="!flowMap[key].isSystem"/>
-          </div>
         </el-row>
+        <div class="open-btn" @click.stop>
+          <el-switch v-model="taskFlowData.taskTypeConfig.flowSetting[key].state" v-if="!flowMap[key].isSystem"/>
+        </div>
       </el-row>
     </div>
     <!--E 工单流程轴 -->
@@ -26,7 +31,7 @@
       <div class="setting-flow-main-title">
         {{flowMap[currFlow].desc}}
       </div>
-      <div class="setting-flow-main-content">
+      <div class="setting-flow-main-content" id="setting-flow-main-content-guide">
         <flow-setting
           :task-type-id="taskTypeId"
           :type="currFlow"
@@ -45,6 +50,9 @@ import _ from 'lodash';
 import * as SettingApi from '@src/api/SettingApi';
 /** components */
 import FlowSetting from '../components/FlowSetting.vue';
+
+import { storageGet, storageSet } from '@src/util/storage';
+const { TASK_FLOW_SETTING_GUIDE, getStyle } = require('@src/component/guide/taskSettingStore');
 
 import flowMap from '../flowMap';
 export default {
@@ -197,6 +205,81 @@ export default {
       this.taskFlowData.taskTypeConfig = _.cloneDeep(this.taskFlowData.initTaskTypeConfig);
     }
   },
+  mounted() {
+    this.$nextTick(() => {
+      if (storageGet(TASK_FLOW_SETTING_GUIDE) > 0) return this.$Guide().destroy('task-flow-guide');
+
+      this.$Guide([{
+        id: 'task-flow-guide',
+        content: '流程节点可被选中，选中后可设置每个节点的业务规则',
+        haveStep: true,
+        needCover: true,
+        direction: 'row',
+        outsideParent: true,
+        inside: true,
+        nowStep: 1,
+        domObj: () => {
+          return document.getElementById('setting-flow-axis-guide')
+        },
+        insideDom: () => {
+          return document.getElementById('setting-flow-axis-guide').getElementsByClassName('flow-axis-step')[0]
+        },
+        finishBtn: 'ok',
+      }, {
+        id: 'task-flow-guide',
+        content: '可以在新建工单节点，设置工单的表单，本次更新提升了表单控件的能力',
+        haveStep: true,
+        needCover: true,
+        direction: 'row',
+        outsideParent: true,
+        inside: true,
+        nowStep: 2,
+        domObj: () => {
+          return document.getElementById('setting-flow-main-content-guide').getElementsByClassName('form-design-center')[0]
+        },
+        finishBtn: 'ok',
+      }, {
+        id: 'task-flow-guide',
+        content: '流程中【通用规则】部分的设置，在所有节点均生效',
+        haveStep: true,
+        needCover: true,
+        direction: 'row',
+        outsideParent: true,
+        inside: true,
+        nowStep: 3,
+        domObj: () => {
+          return document.getElementById('setting-flow-main-content-guide').getElementsByClassName('setting-common')[0]
+        },
+        insideDom: () => {
+          return document.getElementById('setting-flow-main-content-guide').getElementsByClassName('setting-common')[0].getElementsByClassName('setting-specific-form')[1]
+        },
+        finishBtn: 'ok',
+      }, {
+        id: 'task-flow-guide',
+        content: '在【完成工单】环节设置回执表单',
+        haveStep: true,
+        needCover: true,
+        direction: 'row',
+        outsideParent: true,
+        inside: true,
+        nowStep: 4,
+        domObj: () => {
+          return document.getElementById('setting-flow-axis-guide')
+        },
+        insideDom: () => {
+          return document.getElementById('setting-flow-axis-guide').getElementsByClassName('flow-axis-step')[4]
+        },
+        finishBtn: 'ok',
+      }], 0, '', (e) => {
+        return new Promise((resolve, reject) => {
+          resolve()
+        })
+      }).create()
+        .then(res_ => { 
+          if(res_) storageSet(TASK_FLOW_SETTING_GUIDE, '4');
+        })
+    })
+  },
   components: {
     [FlowSetting.name]: FlowSetting
   }
@@ -214,6 +297,27 @@ export default {
         padding: 20px;
         background: #FFFFFF;
         border-radius: 4px;
+        .flow-axis-step-box{
+          width: 100%;
+          .open-btn{
+            position: absolute;
+            top: 40px;
+            right: 0;
+          }
+          &:not(:last-child){
+              .flow-axis-step::after{
+                  content: "";
+                  position: absolute;
+                  left: 50%;
+                  bottom: -31px;
+                  display: block;
+                  transform: translateX(-50%);
+                  width: 1px;
+                  height: 30px;
+                  background: #E6E6E6;
+              }
+          }
+        }
         .flow-axis-step{
             cursor: pointer;
             position: relative;
@@ -239,12 +343,6 @@ export default {
                 border-radius: 11px;
                 border: 1px solid #CFEDC0;
             }
-            .open-btn{
-                position: absolute;
-                top: 50%;
-                right: -90px;
-                transform: translateY(-50%);
-            }
             &.disabled{
                 color: #999999;
                 background: #F2F2F2;
@@ -256,19 +354,6 @@ export default {
             &.active{
                 background: #E9F9F9;
                 border: 1px solid $color-primary;
-            }
-            &:not(:last-child){
-                &::after{
-                    content: "";
-                    position: absolute;
-                    left: 50%;
-                    bottom: -30px;
-                    display: block;
-                    transform: translateX(-50%);
-                    width: 1px;
-                    height: 30px;
-                    background: #E6E6E6;
-                }
             }
         }
     }

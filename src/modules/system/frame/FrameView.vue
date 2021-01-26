@@ -514,6 +514,11 @@ export default {
       let isTaskGray = this.initData.isTaskGrayFunction;
       return isTaskGray && this.currentTaskListTab.id;
     },
+    /* 是否是系统管理员 */
+    isSystemAdmin() {
+      let roles = this.loginUser.roles || [];
+      return roles.some(role => role.id == '1');
+    }
   },
   methods: {
     openReason () {
@@ -1190,6 +1195,7 @@ export default {
     window.pushTaskListIds = this.pushTaskListIds;
     window.loginUser = this.loginUser;
     window.getUserTaskGray = this.getUserTaskGray;
+    window.isSystemAdmin = this.isSystemAdmin;
 
     window.resizeFrame = function () {
       console.warn('此方法只用于兼容旧页面，无实际效果，不推荐调用');

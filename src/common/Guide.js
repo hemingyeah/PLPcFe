@@ -55,7 +55,18 @@ class Guide {
       });
     };
     this.finishBtnFn = () => {
-      return this.stopStep();
+      return new Promise((resolve, reject) => {
+        if (watchStepFn)
+          return watchStepFn({ type: 'finish', nowStep: this.nowStep }).then(
+            (res) => {
+              if (storageKe) storageSet(storageKe, arr.length);
+              resolve();
+            }
+          );
+
+        if (storageKe) storageSet(storageKe, arr.length);
+        resolve();
+      });
     };
     this.previousStep = () => {
       return new Promise((resolve, reject) => {
@@ -116,7 +127,9 @@ class Guide {
               totalStep={_this.arr.length}
               canUse={obj.canUse}
               inside={obj.inside}
+              insideDom={obj.insideDom}
               nowStep={obj.nowStep}
+              title={obj.title}
               content={obj.content}
               needCover={obj.needCover}
               finishBtn={obj.finishBtn}
@@ -130,6 +143,9 @@ class Guide {
               finishBtnFn={_this.finishBtnFn}
               watchContentClick={_this.watchContentClick}
               nextStep={_this.nextStep}
+              copyDom={obj.copyDom}
+              direction={obj.direction}
+              outsideParent={obj.outsideParent}
             >
               <template slot="diyContent">
                 <Test />
@@ -158,6 +174,14 @@ class Guide {
 }
 
 function domGuide(arr = [], nowStep, storageKe, watchStepFn) {
+  if(!arr || arr.length <= 0){
+    return {
+      create: () => {
+        return Promise.resolve(false)
+      },
+      destroy: () => {},
+    };
+  }
   let productPreFixedPath = GrayUtil.getProductV2ApiPath();
   let guideType;
   try {
