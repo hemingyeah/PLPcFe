@@ -14,7 +14,7 @@
     <div
       :id="id"
       class="tour-content-out-box"
-      :class="[guideMounted ? 'have-mounted' : '']"
+      :class="[guideMounted ? 'have-mounted' : '', guideSizeClass[guideSize]]"
       ref="guideCom"
       v-show="showGuide && guideDom.top > -1"
       :style="guideStyle"
@@ -94,9 +94,14 @@
   <!-- tour-content-out-box end -->
 </template>
 <script>
-import { set } from 'lodash';
+import _ from 'lodash';
 export default {
   name: 'guide-compoment',
+  provide(){
+    return{
+      changeSlotMounted:this.changeSlotMounted
+    }
+  },
   props: {
     totalStep: {
       type: Number | String,
@@ -173,6 +178,10 @@ export default {
       type: String,
       default: 'column',
     },
+    guideSize:{
+      type: String,
+      default: 'size-1',
+    },
   },
   data() {
     return {
@@ -183,6 +192,13 @@ export default {
       loop: null,
       arrowDirection: 'up',
       guideMounted: false,
+      slotMounted:false,
+      guideSizeClass:{
+        'size-1':'size-240',
+        'size-2':'size-280',
+        'size-3':'size-320',
+        'size-4':'size-350',
+      }
     };
   },
   methods: {
@@ -202,115 +218,123 @@ export default {
       }
       clearInterval(this.loop);
     },
+    changeSlotMounted(e){
+      this.slotMounted = e;
+    }
   },
   created() {},
   mounted() {
     this.loop = setInterval(() => {
       // console.log(this.domObj(), 321321);
-      let res_;
-      let guideDom = {
-        width: 350,
-        height: 400,
-      };
-      try {
-        let dom = this.domObj
-          ? this.domObj()
-          : document.getElementById(`${this.domId}`);
-        if (dom) res_ = dom.getBoundingClientRect();
-        guideDom = this.$refs.guideCom.getBoundingClientRect();
-      } catch (error) {
-        console.warn(error, 'error try catch');
-      }
-      if (!res_) return;
-      let style_ = '';
+      this.$nextTick(()=>{
+        if(this.diyContent && !this.slotMounted) return 
+        let res_;
+        let guideDom = {
+          width: 350,
+          height: 400,
+        };
+        try {
+          let dom = this.domObj
+            ? this.domObj()
+            : document.getElementById(`${this.domId}`);
+          if (dom) res_ = dom.getBoundingClientRect();
+          guideDom = this.$refs.guideCom.getBoundingClientRect();
+        } catch (error) {
+          console.warn(error, 'error try catch');
+        }
+        if (!res_) return;
+        let style_ = '';
 
-      if (this.direction == 'row') {
-        if (
-          document.documentElement.clientWidth - res_.left - res_.width >= guideDom.width + 8
-        ) {
+        if (this.direction == 'row') {
+          if (
+            document.documentElement.clientWidth - res_.left - res_.width >= guideDom.width + 8
+          ) {
           // 右侧有足够的位置
-          this.arrowDirection = 'left';
-          if (!this.inside) {
-            style_ = `${style_};left:${res_.left + res_.width + 8 || 0}px`;
+            this.arrowDirection = 'left';
+            if (!this.inside) {
+              style_ = `${style_};left:${res_.left + res_.width + 8 || 0}px`;
+            } else {
+              style_ = `${style_};left:${res_.left + 8 || 0}px;z-index:998`;
+            }
           } else {
-            style_ = `${style_};left:${res_.left + 8 || 0}px;z-index:998`;
-          }
-        } else {
           // 左侧有足够的位置
-          this.arrowDirection = 'right';
+            this.arrowDirection = 'right';
 
-          if (!this.inside) {
-            style_ = `${style_};right:${document.documentElement.clientWidth
+            if (!this.inside) {
+              style_ = `${style_};right:${document.documentElement.clientWidth
               - res_.left
               + 12 || 0}px`;
-          } else {
-            style_ = `${style_};right:${document.documentElement.clientWidth
+            } else {
+              style_ = `${style_};right:${document.documentElement.clientWidth
               - res_.left
               - res_.width
               + 8 || 0}px;z-index:998`;
+            }
+          }
+          let top_guide = 0;
+          top_guide = res_.top + (res_.height - guideDom.height) / 2;
+          if (
+            top_guide + guideDom.height > document.documentElement.clientHeight
+          ) {
+            top_guide = res_.top + res_.height - guideDom.height - 4;
+          } 
+          else if (top_guide < 0) {
+            top_guide = 4;
+          }
+          style_ = `${style_};top:${top_guide}px;`;
+          this.arrowStyle = `top:${res_.height / 2 + res_.top - 4 - top_guide}px`;
+          if (this.guideStyle != style_)
+            (this.guideStyle = style_),
+            (this.guideDom = res_),
+            setTimeout(() => {
+              if(this.slotMounted)this.guideMounted = true;
+            }, 500);
+
+          return;
+        }
+
+        if (
+          document.documentElement.clientHeight - res_.top - res_.height >= guideDom.height + 8
+        ) {
+        // 底部有足够的位置
+          this.arrowDirection = 'up';
+          if (!this.inside) {
+            style_ = `${style_};top:${res_.top + res_.height + 8 || 0}px`;
+          } else {
+            style_ = `${style_};top:${res_.top + 8 || 0}px;z-index:998`;
+          }
+        } else {
+        // 顶部
+          this.arrowDirection = 'down';
+
+          if (!this.inside) {
+            style_ = `${style_};top:${res_.top - guideDom.height - 8}px`;
+          } else {
+            style_ = `${style_};right:${res_.top
+            + res_.height
+            - guideDom.height
+            - 8}px;z-index:998`;
           }
         }
-        let top_guide = 0;
-        top_guide = res_.top + (res_.height - guideDom.height) / 2;
-        if (
-          top_guide + guideDom.height > document.documentElement.clientHeight
-        ) {
-          top_guide = document.documentElement.clientHeight - guideDom.height - 4;
-        } else if (top_guide < 0) {
-          top_guide = 4;
+        let left_guide = 0;
+        left_guide = res_.left + (res_.width - guideDom.width) / 2;
+        if (left_guide < 0) {
+          left_guide = 4;
+        } 
+        if (left_guide > document.documentElement.clientWidth - guideDom.width) {
+          left_guide = res_.left + res_.width - guideDom.width - 4;
         }
-        style_ = `${style_};top:${top_guide}px;`;
-        this.arrowStyle = `top:${res_.height / 2 + res_.top - 4 - top_guide}px`;
+        style_ = `${style_};left:${left_guide}px;`;
+        this.arrowStyle = `left:${res_.width / 2 + res_.left - 4 - left_guide}px`;
         if (this.guideStyle != style_)
           (this.guideStyle = style_),
           (this.guideDom = res_),
           setTimeout(() => {
-            this.guideMounted = true;
+            if(this.slotMounted)this.guideMounted = true;
           }, 500);
 
         return;
-      }
-
-      if (
-        document.documentElement.clientHeight - res_.top - res_.height >= guideDom.height + 8
-      ) {
-        // 底部有足够的位置
-        this.arrowDirection = 'up';
-        if (!this.inside) {
-          style_ = `${style_};top:${res_.top + res_.height + 8 || 0}px`;
-        } else {
-          style_ = `${style_};top:${res_.top + 8 || 0}px;z-index:998`;
-        }
-      } else {
-        // 顶部
-        this.arrowDirection = 'down';
-
-        if (!this.inside) {
-          style_ = `${style_};top:${res_.top - guideDom.height - 8}px`;
-        } else {
-          style_ = `${style_};right:${res_.top
-            + res_.height
-            - guideDom.height
-            - 8}px;z-index:998`;
-        }
-      }
-      let left_guide = 0;
-      left_guide = res_.left + (res_.width - guideDom.width) / 2;
-      if (left_guide < 0) {
-        left_guide = 4;
-      } else if (left_guide > document.documentElement.clientWidth) {
-        left_guide = document.documentElement.clientWidth - guideDom.width - 4;
-      }
-      style_ = `${style_};left:${left_guide}px;`;
-      this.arrowStyle = `left:${res_.width / 2 + res_.left - 4 - left_guide}px`;
-      if (this.guideStyle != style_)
-        (this.guideStyle = style_),
-        (this.guideDom = res_),
-        setTimeout(() => {
-          this.guideMounted = true;
-        }, 500);
-
-      return;
+      })
     }, 500);
     if (this.needCover && this.copyDom) {
       // 针对部分无法sticky的父元素使用直接复制引导dom元素 需要引入css不推荐使用
@@ -396,8 +420,7 @@ export default {
   z-index: 996;
   border-radius: 4px;
   background: #fff;
-  min-width: 240px;
-  max-width: 350px;
+  width: 280px;
   opacity: 0;
   max-height: 400px;
   .tour-arrow {
@@ -405,7 +428,6 @@ export default {
   }
   .tour-arrow-down {
     position: absolute;
-    bottom: -5px;
   }
 }
 .tour-content-box {
@@ -539,5 +561,18 @@ export default {
 
 .have-mounted {
   opacity: 1;
+}
+
+.size-240{
+  width: 240px;
+}
+.size-280{
+  width: 280px;
+}
+.size-320{
+  width: 320px;
+}
+.size-350{
+  width: 350px;
 }
 </style>

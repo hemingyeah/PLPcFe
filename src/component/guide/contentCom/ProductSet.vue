@@ -6,6 +6,7 @@
 
 <script>
 export default {
+  inject:['changeSlotMounted'],
   data () {
     return {
 
@@ -15,6 +16,9 @@ export default {
     openLink (e) {
       this.$platform.openLink(e);
     },
+  },
+  mounted(){
+    this.changeSlotMounted(true)
   }
 }
 </script>
