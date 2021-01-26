@@ -23,12 +23,12 @@
                 <el-button @click="openReason"
                            class="task-version-btn"
                            type="primary"
-                           v-if="isUserTaskGray">返回旧版</el-button>
+                           v-if="isUserTaskGray && !confirmSetting">返回旧版</el-button>
 
                 <el-button @click="changeTaskVersion(true)"
                            class="task-version-btn task-new-version"
                            type="primary"
-                           v-else>切换新版</el-button>
+                           v-if="!isUserTaskGray">切换新版</el-button>
               </template>
               <!-- end 工单列表切换新旧版 -->
             </div>
@@ -347,6 +347,10 @@
     <reason-panel ref="reasonPanel"
                   @oldVersion="changeTaskVersion(false)" />
                   <!-- E 返回旧版原因弹框 -->
+
+    <!-- start 工单设置新版引导弹框 -->
+    <task-setting-guide ref="taskSettingGuide" />
+    <!-- end 工单设置新版引导弹框 -->
   </div>
 </template>
 
@@ -362,6 +366,7 @@ import SystemPopup from './component/SystemPopup.vue';
 import SaleManager from './component/SaleManager.vue';
 import UserGuide from './component/UserGuide.vue';
 import ReasonPanel from './component/ReasonPanel';
+import TaskSettingGuide from './component/TaskSettingGuide';
 
 import ImportAndExport from './component/ImportAndExport.vue';
 
@@ -457,6 +462,7 @@ export default {
       systemData: [],
       shbEdition: 1,
       taskListIds: ['M_TASK_ALL'],
+      confirmSetting: this.initData.confirmSetting // 通过工单设置升级为3.0后需隐藏返回旧版按钮
     };
   },
   computed: {
@@ -1186,6 +1192,12 @@ export default {
         console.warn(error, 'error try catch');
       }
     },
+    openTaskSettingGuide(url) {
+      this.$refs.taskSettingGuide.open(url);
+    },
+    changeConfirmSetting() {
+      this.confirmSetting = true;
+    }
   },
   created () {
     // TODO: 迁移完成后删除
@@ -1196,6 +1208,7 @@ export default {
     window.loginUser = this.loginUser;
     window.getUserTaskGray = this.getUserTaskGray;
     window.isSystemAdmin = this.isSystemAdmin;
+    window.openTaskSettingGuide = this.openTaskSettingGuide;
 
     window.resizeFrame = function () {
       console.warn('此方法只用于兼容旧页面，无实际效果，不推荐调用');
@@ -1268,6 +1281,7 @@ export default {
     [ImportAndExport.name]: ImportAndExport,
     [UserGuide.name]: UserGuide,
     [ReasonPanel.name]: ReasonPanel,
+    [TaskSettingGuide.name]: TaskSettingGuide
   },
 };
 </script>

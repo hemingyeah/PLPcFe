@@ -114,6 +114,15 @@ export function getCommonFieldList(params: {} | undefined) {
 }
 
 /**
+ * @description 确认开启工单设置灰度
+ * @param {Object} params-- params
+ * @param {String} params.isConfirm -- true为确认开启
+ */
+export function checkConfirmSettingGrayFunction(params: {} | undefined) {
+  return http.get('/setting/checkConfirmSettingGrayFunction', params);
+}
+
+/**
  * @description 查询客户产品关联字段
  * @param {Object} params -- 参数对象
  * @param {String} params.module -- 模块 customer/product
