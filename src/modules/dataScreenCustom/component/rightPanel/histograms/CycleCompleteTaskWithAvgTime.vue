@@ -108,7 +108,7 @@ export default {
     mainTitle() {
       let label = this.cycleRange.label || '';
 
-      return `${label}${this.titleSuffix}`;
+      return `${this.titleSuffix}`;
     },
     extendTitle() {
       let label = this.cycleRange.label || '';

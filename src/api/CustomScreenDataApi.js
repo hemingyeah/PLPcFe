@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-01-20 14:52:17
- * @LastEditTime: 2021-01-25 17:50:44
+ * @LastEditTime: 2021-01-26 10:36:33
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /shb-fe-pc/src/api/CustomScreenDataApi.js
@@ -19,7 +19,7 @@ let urlAppPreKubaifix = '/api/kubai';
  * @param {*} params 
  */
 function saveSettingConfig(params) {
-  return http.post(`${urlAppPrefix}/setting/screen/save`, params);
+  return http.post('/setting/screen/save', params);
 }
 
 /**
@@ -29,7 +29,7 @@ function saveSettingConfig(params) {
  * 所以在请求保存/更新配置前 从这个接口拿一下当前配置信息 去做merge后提交
  */
 function getSettingConfig() {
-  return http.get(`${urlAppPreKubaifix}/stats/screenData/screenDataConfig`)
+  return http.get('/stats/screenData/screenDataConfig')
 }
 
 /**
