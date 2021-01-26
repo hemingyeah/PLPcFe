@@ -195,9 +195,7 @@ export default {
           }
           style_ = `${style_};bottom:${document.documentElement.clientHeight - res_.top - res_.height - 4 || 0}px;`
           this.arrowStyle = `bottom:${((res_.height / 2) - 4) > 116 ? 116 : (res_.height / 2) - 4}px`;
-
-
-          this.guideStyle = style_;
+          if(this.guideStyle != style_) this.guideStyle = style_;
           this.guideDom = res_;
 
           return 
@@ -214,7 +212,7 @@ export default {
           this.arrowStyle = `top:${((res_.height / 2) - 4) > 116 ? 116 : (res_.height / 2) - 4}px`;
 
 
-          this.guideStyle = style_;
+          if(this.guideStyle != style_) this.guideStyle = style_;
           this.guideDom = res_;
           return
         }
@@ -242,7 +240,7 @@ export default {
         this.arrowDirection = 'up';
       }
 
-      this.guideStyle = style_;
+      if(this.guideStyle != style_) this.guideStyle = style_;
       this.guideDom = res_;
 
     }, 500)
