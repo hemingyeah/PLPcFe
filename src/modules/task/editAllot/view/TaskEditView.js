@@ -448,10 +448,8 @@ export default {
      * @description 关联显示项
     */
     relationFieldHandler() {
-      // 事件转工单/拷贝工单
-      if(!this.isFromEvent && !this.isCopyTask) return
-      // 从客户新建工单
-      if(this.isFromCustomer) return;
+      // 非编辑状态下 不重新查询关联显示项
+      if (!this.isTaskEdit && !this.isPlanTaskEdit) return
       
       // 子组件form
       this.$nextTick(() => {
