@@ -1,31 +1,48 @@
 <!--  -->
 <template>
-  <div class="page-guide-box flex-x jus-center">
-    <div class="page-guide-background pos-r">
-
-      <img :src="[nowStepCom[pageState.nowStepType][pageState.nowStep].background]"
-           alt="">
+  <div class="page-guide-box" :class="pageSize">
+    <div class="page-guide-background">
+      <img
+        :src="[nowStepCom[pageState.nowStepType][pageState.nowStep].background]"
+        alt=""
+      />
 
       <!--  -->
       <div v-show="pageState.nowStepType == 'menu' && pageState.nowStep == 0">
-        <div class="guide-menu-pos-1"
-             @click="changeSetp('task', 0)"></div>
-        <div class="guide-menu-pos-2"
-             @click="changeSetp('superQrCode', 0)"></div>
+        <div class="guide-menu-pos-1" @click="changeSetp('task', 0)"></div>
+        <div
+          class="guide-menu-pos-2"
+          @click="changeSetp('superQrCode', 0)"
+        ></div>
       </div>
       <!--  -->
 
-      <div class="guide-task-pos-back"
-           v-show="pageState.nowStepType != 'menu'"
-           @click="backSetp()"></div>
+      <div
+        class="guide-task-pos-back"
+        v-show="pageState.nowStepType != 'menu'"
+        @click="backSetp"
+      ></div>
+
+      <div
+        class="guide-big-size flex-x"
+        v-show="pageSize == 'page-1440-768'"
+        @click="changePageSize('page-1760-938')"
+      >
+        放大
+      </div>
+
+      <div
+        class="guide-big-size flex-x"
+        v-show="pageSize == 'page-1760-938'"
+        @click="changePageSize('page-1440-768')"
+      >
+        缩小
+      </div>
 
       <!--  -->
       <div v-show="pageState.nowStepType == 'task' && pageState.nowStep == 0">
-        <div class="guide-task-0-pos-1"
-             @click="changeSetp('task', 1)"></div>
-        <div class="guide-task-0-pos-2"
-             @click="changeSetp('task', 1)"></div>
-
+        <div class="guide-task-0-pos-1" @click="changeSetp('task', 1)"></div>
+        <div class="guide-task-0-pos-2" @click="changeSetp('task', 1)"></div>
       </div>
       <!--  -->
 
@@ -33,20 +50,21 @@
       <div v-show="pageState.nowStepType == 'task' && pageState.nowStep == 1">
         <!-- <div class="guide-task-1-pos-1"
              @click="changeSetp('task', 2)"></div> -->
-        <div class="guide-task-1-pos-2"
-             @click="changeSetp('task', 2)"></div>
+        <div class="guide-task-1-pos-2" @click="changeSetp('task', 2)"></div>
         <div class="guide-task-pos-editTask bg-w">
           <!-- start 工单流程步骤 -->
           <task-process-steps :just-guide="true"></task-process-steps>
           <!-- end 工单流程步骤 -->
-          <task-edit-form :task="taskTask"
-                          :fields.sync="taskFields"
-                          :state="taskState"
-                          :types="taskTypes"
-                          :url-params="taskUrlParams"
-                          :value.sync="taskValue"
-                          :just-guide="true"
-                          ref="form"></task-edit-form>
+          <task-edit-form
+            :task="taskTask"
+            :fields.sync="taskFields"
+            :state="taskState"
+            :types="taskTypes"
+            :url-params="taskUrlParams"
+            :value.sync="taskValue"
+            :just-guide="true"
+            ref="form"
+          ></task-edit-form>
         </div>
       </div>
       <!--  -->
@@ -61,29 +79,25 @@
 
       <!--  -->
       <div v-show="pageState.nowStepType == 'task' && pageState.nowStep == 3">
-        <div class="guide-task-3-pos-1"
-             @click="changeSetp('task', 4)"></div>
+        <div class="guide-task-3-pos-1" @click="changeSetp('task', 4)"></div>
       </div>
       <!--  -->
 
       <!--  -->
       <div v-show="pageState.nowStepType == 'task' && pageState.nowStep == 4">
-        <div class="guide-task-4-pos-1"
-             @click="changeSetp('task', 5)"></div>
+        <div class="guide-task-4-pos-1" @click="changeSetp('task', 5)"></div>
       </div>
       <!--  -->
 
       <!--  -->
       <div v-show="pageState.nowStepType == 'task' && pageState.nowStep == 5">
-        <div class="guide-task-5-pos-1"
-             @click="changeSetp('task', 6)"></div>
+        <div class="guide-task-5-pos-1" @click="changeSetp('task', 6)"></div>
       </div>
       <!--  -->
 
       <!--  -->
       <div v-show="pageState.nowStepType == 'task' && pageState.nowStep == 6">
-        <div class="guide-task-6-pos-1"
-             @click="changeSetp('task', 7)"></div>
+        <div class="guide-task-6-pos-1" @click="changeSetp('task', 7)"></div>
       </div>
       <!--  -->
 
@@ -96,16 +110,17 @@
             </h3>
           </div>
           <div class="base-modal-content">
-            <form-builder ref="form"
-                          :fields="taskAccountFields"
-                          :value="taskAccountValue"
-                          @update="taskAccountUpdate"
+            <form-builder
+              ref="form"
+              :fields="taskAccountFields"
+              :value="taskAccountValue"
+              @update="taskAccountUpdate"
             ></form-builder>
           </div>
-          <div slot="footer"
-               class="dialog-footer flex-x jus-end">
-            <el-button type="primary"
-                       @click="changeSetp('task', 8)">结 算</el-button>
+          <div slot="footer" class="dialog-footer flex-x jus-end">
+            <el-button type="primary" @click="changeSetp('task', 8)"
+            >结 算</el-button
+            >
           </div>
         </div>
       </div>
@@ -113,108 +128,154 @@
 
       <!--  -->
       <div v-show="pageState.nowStepType == 'task' && pageState.nowStep == 8">
-        <div class="guide-task-8-pos-1"
-             @click="changeSetp('task', 9)"></div>
+        <div class="guide-task-8-pos-1" @click="changeSetp('task', 9)"></div>
       </div>
       <!--  -->
 
       <!--  -->
       <div v-show="pageState.nowStepType == 'task' && pageState.nowStep == 9">
         <div class="guide-task-pos-feedTask">
-          <task-feedback-dialog ref="feedbackDialog"
-                                :task="taskfeedBackTask"
-                                :evaluate-config="taskfeedBackConfig"
-                                :just-guide="changeSetp" />
+          <task-feedback-dialog
+            ref="feedbackDialog"
+            :task="taskfeedBackTask"
+            :evaluate-config="taskfeedBackConfig"
+            :just-guide="changeSetp"
+          />
         </div>
-        <div class="guide-task-9-pos-1 flex-x"
-             @click="changeSetp('menu', 0)">
-          <div><i class="iconfont icon-home mar-r-8"></i>返回首页</div>{{lastScends}}
+        <div class="guide-task-9-pos-1 flex-x" @click="changeSetp('menu', 0)">
+          <div><i class="iconfont icon-home mar-r-8"></i>返回首页</div>
+          {{ lastScends }}
         </div>
       </div>
       <!--  -->
 
       <!--  -->
-      <div v-show="pageState.nowStepType == 'superQrCode' && pageState.nowStep == 0">
-        <div class="guide-qrcode-0-pos-1"
-             @click="changeSetp('superQrCode', 1)"></div>
+      <div
+        v-show="
+          pageState.nowStepType == 'superQrCode' && pageState.nowStep == 0
+        "
+      >
+        <div
+          class="guide-qrcode-0-pos-1"
+          @click="changeSetp('superQrCode', 1)"
+        ></div>
       </div>
       <!--  -->
 
       <!--  -->
-      <div v-show="pageState.nowStepType == 'superQrCode' && pageState.nowStep == 1">
-        <div class="guide-qrcode-1-pos-1"
-             @click="changeSetp('superQrCode', 2)"></div>
+      <div
+        v-show="
+          pageState.nowStepType == 'superQrCode' && pageState.nowStep == 1
+        "
+      >
+        <div
+          class="guide-qrcode-1-pos-1"
+          @click="changeSetp('superQrCode', 2)"
+        ></div>
       </div>
       <!--  -->
 
       <!--  -->
-      <div v-show="pageState.nowStepType == 'superQrCode' && pageState.nowStep == 2">
-        <div class="guide-qrcode-2-pos-1"
-             @click="changeSetp('superQrCode', 3)"></div>
+      <div
+        v-show="
+          pageState.nowStepType == 'superQrCode' && pageState.nowStep == 2
+        "
+      >
+        <div
+          class="guide-qrcode-2-pos-1"
+          @click="changeSetp('superQrCode', 3)"
+        ></div>
       </div>
       <!--  -->
 
       <!--  -->
-      <div v-show="pageState.nowStepType == 'superQrCode' && pageState.nowStep == 3">
-        <div class="guide-qrcode-3-pos-1"
-             @click="changeSetp('superQrCode', 4)"></div>
+      <div
+        v-show="
+          pageState.nowStepType == 'superQrCode' && pageState.nowStep == 3
+        "
+      >
+        <div
+          class="guide-qrcode-3-pos-1"
+          @click="changeSetp('superQrCode', 4)"
+        ></div>
       </div>
       <!--  -->
 
       <!--  -->
-      <div v-show="pageState.nowStepType == 'superQrCode' && pageState.nowStep == 4">
-        <div class="guide-qrcode-4-pos-1"
-             @click="changeSetp('superQrCode', 5)"></div>
+      <div
+        v-show="
+          pageState.nowStepType == 'superQrCode' && pageState.nowStep == 4
+        "
+      >
+        <div
+          class="guide-qrcode-4-pos-1"
+          @click="changeSetp('superQrCode', 5)"
+        ></div>
         <div class="guide-qrcode-pos-editProduct bg-w">
-          <product-edit-form :fields="productFields"
-                             v-model="productValue"
-                             :just-guide="true">
+          <product-edit-form
+            :fields="productFields"
+            v-model="productValue"
+            :just-guide="true"
+          >
           </product-edit-form>
         </div>
       </div>
       <!--  -->
 
       <!--  -->
-      <div v-show="pageState.nowStepType == 'superQrCode' && pageState.nowStep == 5">
-        <div class="guide-qrcode-5-pos-1"
-             @click="changeSetp('superQrCode', 6)"></div>
+      <div
+        v-show="
+          pageState.nowStepType == 'superQrCode' && pageState.nowStep == 5
+        "
+      >
+        <div
+          class="guide-qrcode-5-pos-1"
+          @click="changeSetp('superQrCode', 6)"
+        ></div>
       </div>
       <!--  -->
 
       <!--  -->
-      <div v-show="pageState.nowStepType == 'superQrCode' && pageState.nowStep == 6">
-        <div class="guide-qrcode-6-pos-1"
-             @click="changeSetp('superQrCode', 7)"></div>
+      <div
+        v-show="
+          pageState.nowStepType == 'superQrCode' && pageState.nowStep == 6
+        "
+      >
+        <div
+          class="guide-qrcode-6-pos-1"
+          @click="changeSetp('superQrCode', 7)"
+        ></div>
       </div>
       <!--  -->
 
       <!--  -->
-      <div v-show="pageState.nowStepType == 'superQrCode' && pageState.nowStep == 7">
-        <div class="guide-task-7-pos-1 flex-x"
-             @click="changeSetp('menu', 0)">
-          <div><i class="iconfont icon-home mar-r-8"></i>返回首页</div>{{lastScends}}
+      <div
+        v-show="
+          pageState.nowStepType == 'superQrCode' && pageState.nowStep == 7
+        "
+      >
+        <div class="guide-task-7-pos-1 flex-x" @click="changeSetp('menu', 0)">
+          <div><i class="iconfont icon-home mar-r-8"></i>返回首页</div>
+          {{ lastScends }}
         </div>
       </div>
       <!--  -->
 
       <!--  弹窗管理 -->
       <!-- <base-modal title="导出列选择" :show.sync="visible" width="680px" class="base-export-modal"></base-modal> -->
-
     </div>
   </div>
 </template>
 
 <script>
-
-import TaskEditForm from '@src/modules/task/edit/components/TaskEditForm/TaskEditForm.vue'
-import TaskAllotModal from '@src/modules/guideForNewUser/compoment/CopyTaskAllotModal.vue'
-import FeedbackDialog from '@src/modules/task/view/components/TaskFeedback/FeedbackDialogNot.vue'
-import TaskProcessSteps from '@src/modules/task/components/TaskProcessSteps/TaskProcessSteps.tsx'
+import TaskEditForm from '@src/modules/task/edit/components/TaskEditForm/TaskEditForm.vue';
+import TaskAllotModal from '@src/modules/guideForNewUser/compoment/CopyTaskAllotModal.vue';
+import FeedbackDialog from '@src/modules/task/view/components/TaskFeedback/FeedbackDialogNot.vue';
+import TaskProcessSteps from '@src/modules/task/components/TaskProcessSteps/TaskProcessSteps.tsx';
 import ProductEditForm from '@src/modules/product/components/ProductEditFormV2.vue';
 
-import { useDetail } from '@src/api/GuideForNewUser.ts'
-import _ from 'lodash'
-
+import { useDetail } from '@src/api/GuideForNewUser.ts';
+import _ from 'lodash';
 
 import {
   taskValue,
@@ -234,9 +295,8 @@ import {
   taskfeedBackConfig,
   // 产品表单
   productFields,
-  productValue
-
-} from './initData'
+  productValue,
+} from './initData';
 
 import guide_1 from '@src/assets/img/userGuide/guide-1.png';
 import guide_task_1 from '@src/assets/img/userGuide/guide-2.png';
@@ -267,35 +327,34 @@ export default {
     TaskProcessSteps,
     [ProductEditForm.name]: ProductEditForm,
   },
-  data () {
+  data() {
     return {
       pageState: {
-        nowStep:0,
+        nowStep: 0,
         nowStepType: 'menu',
       },
       nowStepCom: {
         menu: {
           0: {
             background: guide_1,
-            enum:'1-1'
-          }
+            enum: '1-1',
+          },
         },
         task: {
           0: {
             background: guide_task_1,
-            enum:'1-2'
+            enum: '1-2',
           },
           1: {
             background: guide_task_2,
           },
           2: {
             background: guide_task_3,
-            enum:'1-3'
-            
+            enum: '1-3',
           },
           3: {
             background: guide_task_4,
-            enum:'1-4'
+            enum: '1-4',
           },
           4: {
             background: guide_task_5,
@@ -305,14 +364,14 @@ export default {
           },
           6: {
             background: guide_task_7,
-            enum:'1-5'
+            enum: '1-5',
           },
           7: {
             background: guide_task_8,
           },
           8: {
             background: guide_task_9,
-            enum:'1-6'
+            enum: '1-6',
           },
           9: {
             background: guide_task_10,
@@ -321,11 +380,11 @@ export default {
         superQrCode: {
           0: {
             background: guide_qrcode_1,
-            enum:'2-1'
+            enum: '2-1',
           },
           1: {
             background: guide_qrcode_2,
-            enum:'2-2'
+            enum: '2-2',
           },
           2: {
             background: guide_qrcode_3,
@@ -335,21 +394,21 @@ export default {
           },
           4: {
             background: guide_qrcode_5,
-            enum:'2-3'
+            enum: '2-3',
           },
           5: {
             background: guide_qrcode_6,
-            enum:'2-4'
+            enum: '2-4',
           },
           6: {
             background: guide_qrcode_7,
-            enum:'2-5'
+            enum: '2-5',
           },
           7: {
             background: guide_qrcode_8,
-            enum:'2-6'
+            enum: '2-6',
           },
-        }
+        },
       },
       // 工单相关
       taskValue,
@@ -362,78 +421,95 @@ export default {
       taskAllotTask,
       taskAllotLoginUser,
       taskAccountFields,
-      taskAccountValue:{},
+      taskAccountValue: {},
       taskfeedBackTask,
       taskfeedBackConfig,
       productFields,
       productValue,
 
       lastScends: 9,
-      interval_1: null
-    }
+      interval_1: null,
+      pageSize: 'page-1440-768',
+    };
   },
-  created () {
-    
-  },
-  mounted () {
+  created() {},
+  mounted() {
     this.server();
   },
   watch: {
-
     pageState: {
       deep: true,
-      handler (newVal, oldVal) {
-        if ((newVal.nowStepType == 'task' && newVal.nowStep == 9) || (newVal.nowStepType == 'superQrCode' && newVal.nowStep == 7)) {
+      handler(newVal, oldVal) {
+        if (
+          (newVal.nowStepType == 'task' && newVal.nowStep == 9)
+          || (newVal.nowStepType == 'superQrCode' && newVal.nowStep == 7)
+        ) {
           this.begainLastScends();
         } else {
           this.stopLastScends();
         }
-      }
-    }
+      },
+    },
   },
   methods: {
-    changeSetp (type, step) {
+    changeSetp(type, step) {
       this.pageState.nowStepType = type;
       this.pageState.nowStep = step;
-      this.server()
+      this.server();
     },
-    backSetp () {
-      this.pageState.nowStep == 0 ? this.pageState.nowStepType = 'menu' : this.pageState.nowStep--
+    backSetp() {
+      this.pageState.nowStep == 0
+        ? (this.pageState.nowStepType = 'menu')
+        : this.pageState.nowStep--;
     },
-    begainLastScends () {
+    begainLastScends() {
       this.interval_1 = setInterval(() => {
-        if (this.lastScends < 1) return this.changeSetp('menu', 0), this.stopLastScends();
+        if (this.lastScends < 1)
+          return this.changeSetp('menu', 0), this.stopLastScends();
         this.lastScends--;
-      }, 1000)
+      }, 1000);
     },
-    stopLastScends () {
-      clearInterval(this.interval_1)
+    stopLastScends() {
+      clearInterval(this.interval_1);
       this.lastScends = 9;
     },
-    server: _.debounce(function () {
-      if(!this.nowStepCom[this.pageState.nowStepType][this.pageState.nowStep].hasOwnProperty('enum')) return
-      useDetail(
-        {
-          phone:this.$getUrlObj(window)?.phone,
-          tryDetail:[this.nowStepCom[this.pageState.nowStepType][this.pageState.nowStep].enum]
-        }
+    server: _.debounce(function() {
+      if (
+        !this.nowStepCom[this.pageState.nowStepType][
+          this.pageState.nowStep
+        ].hasOwnProperty('enum')
       )
+        return;
+      useDetail({
+        phone: this.$getUrlObj(window)?.phone,
+        tryDetail: [
+          this.nowStepCom[this.pageState.nowStepType][this.pageState.nowStep]
+            .enum,
+        ],
+      });
     }, 800),
     /**
-    * @description 更新表单数据
-    */
-    taskAccountUpdate({field, newValue, oldValue}) {
-      let {fieldName, displayName} = field;
+     * @description 更新表单数据
+     */
+    taskAccountUpdate({ field, newValue, oldValue }) {
+      let { fieldName, displayName } = field;
       if (this.$appConfig.debug) {
-        console.info(`[FormBuilder] => ${displayName}(${fieldName}) : ${JSON.stringify(newValue)}`);
+        console.info(
+          `[FormBuilder] => ${displayName}(${fieldName}) : ${JSON.stringify(
+            newValue
+          )}`
+        );
       }
       this.$set(this.taskAccountValue, fieldName, newValue);
     },
+    changePageSize(e) {
+      this.pageSize = e;
+    },
   },
-  destroyed () {
+  destroyed() {
     this.stopLastScends();
-  }
-}
+  },
+};
 </script>
 <style lang="scss">
 .form-builder {
@@ -478,10 +554,11 @@ export default {
   height: 666px;
 }
 </style>
-<style lang='scss' scoped>
+<style lang="scss" scoped>
 $window-width: 1440px;
 $window-height: 768px;
-
+$window-width-1: 1760px;
+$window-height-1: 938px;
 @mixin position-cover($top: 0px, $left: 0px, $width: 0px, $height: 0px) {
   & {
     width: ($width/$window-width) * 100%;
@@ -504,18 +581,31 @@ $window-height: 768px;
 }
 .page-guide-box {
   position: relative;
-  width: 100vw;
-  height: 100vh;
-  min-width: $window-width;
-  min-height: $window-height;
-  background-color: rgba($color: #000000, $alpha: 0.5);
+  min-width: 100vw;
+  min-height: 100vh;
+  background-color: rgba($color: #000000, $alpha: 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
-.page-guide-background {
-  width: $window-width;
-  height: $window-height;
-  img {
-    width: 100%;
-    height: 100%;
+.page-1440-768 {
+  .page-guide-background {
+    width: $window-width;
+    height: $window-height;
+    img {
+      width: 100%;
+      height: 100%;
+    }
+  }
+}
+.page-1760-938 {
+  .page-guide-background {
+    width: $window-width-1;
+    height: $window-height-1;
+    img {
+      width: 100%;
+      height: 100%;
+    }
   }
 }
 
@@ -705,6 +795,19 @@ $window-height: 768px;
   border: 1px solid #ffffff;
   color: #fff;
   justify-content: space-evenly;
+}
+
+.guide-big-size {
+  $top: 29px;
+  $left: 1267px;
+  $width: 60px;
+  $height: 30px;
+  @extend .guide-pos;
+  @include position-cover($top, $left, $width, $height);
+  border-radius: 15px;
+  border: 1px solid #ffffff;
+  color: #fff;
+  justify-content: center;
 }
 
 .guide-task-pos-editTask {

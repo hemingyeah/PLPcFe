@@ -1101,7 +1101,7 @@ export default {
 
   },
   async mounted() {
-    console.log(this.initData, 'initData')
+    console.log(JSON.stringify(this.initData), 'initData')
     try {
       this.loading = true;
 
