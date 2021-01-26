@@ -214,7 +214,9 @@ export default {
         content: '流程节点可被选中，选中后可设置每个节点的业务规则',
         haveStep: true,
         needCover: true,
-        arrowDirection: 'left',
+        direction: 'row',
+        outsideParent: true,
+        inside: true,
         nowStep: 1,
         domObj: () => {
           return document.getElementById('setting-flow-axis-guide')
@@ -228,7 +230,9 @@ export default {
         content: '可以在新建工单节点，设置工单的表单，本次更新提升了表单控件的能力',
         haveStep: true,
         needCover: true,
-        arrowDirection: 'left',
+        direction: 'row',
+        outsideParent: true,
+        inside: true,
         nowStep: 2,
         domObj: () => {
           return document.getElementById('setting-flow-main-content-guide').getElementsByClassName('form-design-center')[0]
@@ -239,7 +243,9 @@ export default {
         content: '流程中【通用规则】部分的设置，在所有节点均生效',
         haveStep: true,
         needCover: true,
-        arrowDirection: 'right',
+        direction: 'row',
+        outsideParent: true,
+        inside: true,
         nowStep: 3,
         domObj: () => {
           return document.getElementById('setting-flow-main-content-guide').getElementsByClassName('setting-common')[0]
@@ -253,7 +259,9 @@ export default {
         content: '在【完成工单】环节设置回执表单',
         haveStep: true,
         needCover: true,
-        arrowDirection: 'left',
+        direction: 'row',
+        outsideParent: true,
+        inside: true,
         nowStep: 4,
         domObj: () => {
           return document.getElementById('setting-flow-axis-guide')
