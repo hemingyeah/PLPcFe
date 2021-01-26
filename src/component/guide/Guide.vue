@@ -1,48 +1,65 @@
 <template>
   <!-- tour-content-out-box start -->
   <div>
-    <div class="cover"
-         v-if="needCover && showGuide"></div>
-    <div class="cover-dom"
-         v-if="needCover && showGuide && !canUse"
-         :style="`width:${guideDom.width || 0}px;height:${guideDom.height || 0}px;top:${guideDom.top || 0}px;left:${guideDom.left || 0}px;`"></div>
+    <div class="cover" v-if="needCover && showGuide"></div>
+    <div
+      class="cover-dom"
+      v-if="needCover && showGuide && !canUse"
+      :style="
+        `width:${guideDom.width || 0}px;height:${guideDom.height ||
+        0}px;top:${guideDom.top || 0}px;left:${guideDom.left || 0}px;`
+      "
+    ></div>
     <div id="vmDom"></div>
-    <div :id="id"
-         class="tour-content-out-box"
-         ref="guideCom"
-         v-show="showGuide && guideDom.top >-1"
-         :style="guideStyle">
-      <div v-if="arrowDirection == 'up'"
-           class="normal-arrow-top tour-arrow"
-           :style="arrowStyle"></div>
-      <div v-if="arrowDirection=='down'"
-           class="normal-arrow-down tour-arrow-down"
-           :style="arrowStyle"></div>
-      <div v-if="arrowDirection == 'left'"
-           class="normal-arrow-left tour-arrow"
-           :style="arrowStyle"></div>
-      <div v-if="arrowDirection == 'right'"
-           class="normal-arrow-right tour-arrow"
-           :style="arrowStyle"></div>
+    <div
+      :id="id"
+      class="tour-content-out-box"
+      :class="[guideMounted ? 'have-mounted' : '']"
+      ref="guideCom"
+      v-show="showGuide && guideDom.top > -1"
+      :style="guideStyle"
+    >
+      <div
+        v-if="arrowDirection == 'up'"
+        class="normal-arrow-top tour-arrow"
+        :style="arrowStyle"
+      ></div>
+      <div
+        v-if="arrowDirection == 'down'"
+        class="normal-arrow-down tour-arrow-down"
+        :style="arrowStyle"
+      ></div>
+      <div
+        v-if="arrowDirection == 'left'"
+        class="normal-arrow-left tour-arrow"
+        :style="arrowStyle"
+      ></div>
+      <div
+        v-if="arrowDirection == 'right'"
+        class="normal-arrow-right tour-arrow"
+        :style="arrowStyle"
+      ></div>
       <div class="tour-content-box">
-        <div v-if="haveStep"
-             class="tour-left-tips">
+        <div v-if="haveStep" class="tour-left-tips">
           {{ `${nowStep}/${totalStep}` }}
         </div>
-        <div class="tour-content"
-             @click="watchContentClick($event)">
+        <div class="tour-content" @click="watchContentClick($event)">
           <div class="flex-x tour-content-head">
-            <div class="flex-1 overHideCon-1">{{title}}</div>
-            <i @click.prevent="stopStep().then(()=>{showGuide = false})"
-               class="iconfont icon-fe-close"></i>
+            <div class="flex-1 overHideCon-1">{{ title }}</div>
+            <i
+              @click.prevent="
+                stopStep().then(() => {
+                  showGuide = false;
+                })
+              "
+              class="iconfont icon-fe-close"
+            ></i>
           </div>
-          <div class="tour-content-con"
-               v-if="!diyContent">{{ content }}</div>
+          <div class="tour-content-con" v-if="!diyContent">{{ content }}</div>
           <slot name="diyContent"></slot>
         </div>
       </div>
-      <div slot="actions"
-           class="tour-bottom">
+      <div slot="actions" class="tour-bottom">
         <!-- <div
         v-if="totalStep > 1 && nowStep > 1"
         class="text"
@@ -50,13 +67,25 @@
       >
         上一步
       </div> -->
-        <div v-if="totalStep > 1 && nowStep > 0 && nowStep < totalStep"
-             class="btns"
-             @click.prevent="nextStep(nowStep).then(()=>{showGuide = false})">
+        <div
+          v-if="totalStep > 1 && nowStep > 0 && nowStep < totalStep"
+          class="btns"
+          @click.prevent="
+            nextStep(nowStep).then(() => {
+              showGuide = false;
+            })
+          "
+        >
           下一步
         </div>
-        <div class="btns"
-             @click.prevent="finishBtnFn().then(()=>{showGuide = false})">
+        <div
+          class="btns"
+          @click.prevent="
+            finishBtnFn().then(() => {
+              showGuide = false;
+            })
+          "
+        >
           {{ finishBtn }}
         </div>
       </div>
@@ -71,95 +100,98 @@ export default {
   props: {
     totalStep: {
       type: Number | String,
-      default: 1
+      default: 1,
     },
     nowStep: {
       type: Number | String,
-      default: 1
+      default: 1,
     },
     title: {
       type: Number | String,
-      default: ''
+      default: '',
     },
     content: {
       type: Number | String,
-      default: ''
+      default: '',
     },
     needCover: {
       type: Boolean,
-      default: false
+      default: false,
     },
     canUse: {
       type: Boolean,
-      default: false
+      default: false,
     },
     finishBtn: {
       type: Number | String,
-      default: 'ok'
+      default: 'ok',
     },
     gStyle: {
       type: Number | String,
-      default: ''
+      default: '',
     },
     id: {
       type: Number | String,
-      default: ''
+      default: '',
     },
     domId: {
       type: Number | String,
-      default: ''
+      default: '',
     },
     domObj: {
-      type: Function
+      type: Function,
     },
     stopStep: {
-      type: Function
+      type: Function,
     },
     finishBtnFn: {
-      type: Function
+      type: Function,
     },
     watchContentClick: {
-      type: Function
+      type: Function,
     },
     diyContent: {
       type: Boolean,
-      default: false
+      default: false,
     },
     nextStep: {
-      type: Function
+      type: Function,
     },
     haveStep: {
       type: Boolean,
-      default: false
+      default: false,
     },
     inside: {
       type: Boolean,
-      default: false
+      default: false,
     },
     copyDom: {
       type: Boolean,
-      default: false
+      default: false,
     },
-    direction:{
-      type:String,
-      default:'column'
-    }
+    direction: {
+      type: String,
+      default: 'column',
+    },
   },
-  data () {
+  data() {
     return {
       showGuide: true,
       guideStyle: '',
       arrowStyle: '',
       guideDom: {},
       loop: null,
-      arrowDirection: 'up'
+      arrowDirection: 'up',
+      guideMounted: false,
     };
   },
   methods: {
-    clearGuide () {
+    clearGuide() {
       if (this.needCover) {
-        let dom_ = this.domObj ? this.domObj() : document.getElementById(`${this.domId}`)
-        dom_.classList.remove('guide-point')
+        let dom_ = this.domObj
+          ? this.domObj()
+          : document.getElementById(`${this.domId}`);
+        dom_.classList.remove('guide-point');
         if (this.copyDom) {
           try {
             document.getElementById('vmDom').children[0].remove();
@@ -168,112 +200,152 @@ export default {
           }
         }
       }
-      clearInterval(this.loop)
-    }
+      clearInterval(this.loop);
+    },
   },
-  created () {
+  created() {},
+  mounted() {
     this.loop = setInterval(() => {
-
       // console.log(this.domObj(), 321321);
       let res_;
+      let guideDom = {
+        width: 350,
+        height: 400,
+      };
       try {
-        let dom = this.domObj ? this.domObj() : document.getElementById(`${this.domId}`);
+        let dom = this.domObj
+          ? this.domObj()
+          : document.getElementById(`${this.domId}`);
         if (dom) res_ = dom.getBoundingClientRect();
+        guideDom = this.$refs.guideCom.getBoundingClientRect();
       } catch (error) {
         console.warn(error, 'error try catch');
       }
-      if (!res_) return
+      if (!res_) return;
       let style_ = '';
 
-      if(this.direction == 'row'){
-        if (document.documentElement.clientWidth - res_.left - res_.width >= 350) {
+      if (this.direction == 'row') {
+        if (
+          document.documentElement.clientWidth - res_.left - res_.width >= guideDom.width + 8
+        ) {
+          // 右侧有足够的位置
           this.arrowDirection = 'left';
           if (!this.inside) {
             style_ = `${style_};left:${res_.left + res_.width + 8 || 0}px`;
-          }else {
+          } else {
             style_ = `${style_};left:${res_.left + 8 || 0}px;z-index:998`;
           }
-          style_ = `${style_};bottom:${document.documentElement.clientHeight - res_.top - res_.height - 4 || 0}px;`
-          this.arrowStyle = `bottom:${((res_.height / 2) - 4) > 116 ? 116 : (res_.height / 2) - 4}px`;
-          if(this.guideStyle != style_) this.guideStyle = style_;
-          this.guideDom = res_;
-
-          return 
-        } else if (res_.left >= 350){
-
+        } else {
+          // 左侧有足够的位置
           this.arrowDirection = 'right';
 
           if (!this.inside) {
-            style_ = `${style_};right:${document.documentElement.clientWidth - res_.left + 12 || 0}px`;
-          }else {
-            style_ = `${style_};right:${document.documentElement.clientWidth - res_.left - res_.width + 8 || 0}px;z-index:998`;
+            style_ = `${style_};right:${document.documentElement.clientWidth
+              - res_.left
+              + 12 || 0}px`;
+          } else {
+            style_ = `${style_};right:${document.documentElement.clientWidth
+              - res_.left
+              - res_.width
+              + 8 || 0}px;z-index:998`;
           }
-          style_ = `${style_};top:${res_.top || 0}px;`
-          this.arrowStyle = `top:${((res_.height / 2) - 4) > 116 ? 116 : (res_.height / 2) - 4}px`;
-
-
-          if(this.guideStyle != style_) this.guideStyle = style_;
-          this.guideDom = res_;
-          return
         }
+        let top_guide = 0;
+        top_guide = res_.top + (res_.height - guideDom.height) / 2;
+        if (
+          top_guide + guideDom.height > document.documentElement.clientHeight
+        ) {
+          top_guide = document.documentElement.clientHeight - guideDom.height - 4;
+        } else if (top_guide < 0) {
+          top_guide = 4;
+        }
+        style_ = `${style_};top:${top_guide}px;`;
+        this.arrowStyle = `top:${res_.height / 2 + res_.top - 4 - top_guide}px`;
+        if (this.guideStyle != style_)
+          (this.guideStyle = style_),
+          (this.guideDom = res_),
+          setTimeout(() => {
+            this.guideMounted = true;
+          }, 500);
 
-
+        return;
       }
 
-      if (document.documentElement.clientWidth - res_.left < 350) {
-        style_ = `${style_};right:${document.documentElement.clientWidth - res_.left - res_.width || 0}px`;
-        this.arrowStyle = `right:${((res_.width / 2) - 8) > 112 ? 112 : (res_.width / 2) - 8}px`;
-      } else {
-        style_ = `${style_};left:${res_.left || 0}px`
-        this.arrowStyle = `left:${((res_.width / 2) - 8) > 112 ? 112 : (res_.width / 2) - 8}px`;
-      }
-      if (!this.inside) {
-        if (document.documentElement.clientHeight - res_.top - res_.height < 400) {
-          style_ = `${style_};bottom:${document.documentElement.clientHeight - res_.top + 12 || 0}px;`
-          this.arrowDirection = 'down';
-        } else {
-          style_ = `${style_};top:${res_.top + res_.height + 12 || 0}px`
-          this.arrowDirection = 'up';
-        }
-      } else {
-        style_ = `${style_};top:${res_.top + 12 || 0}px;z-index:998`
+      if (
+        document.documentElement.clientHeight - res_.top - res_.height >= guideDom.height + 8
+      ) {
+        // 底部有足够的位置
         this.arrowDirection = 'up';
+        if (!this.inside) {
+          style_ = `${style_};top:${res_.top + res_.height + 8 || 0}px`;
+        } else {
+          style_ = `${style_};top:${res_.top + 8 || 0}px;z-index:998`;
+        }
+      } else {
+        // 顶部
+        this.arrowDirection = 'down';
+
+        if (!this.inside) {
+          style_ = `${style_};top:${res_.top - guideDom.height - 8}px`;
+        } else {
+          style_ = `${style_};right:${res_.top
+            + res_.height
+            - guideDom.height
+            - 8}px;z-index:998`;
+        }
       }
+      let left_guide = 0;
+      left_guide = res_.left + (res_.width - guideDom.width) / 2;
+      if (left_guide < 0) {
+        left_guide = 4;
+      } else if (left_guide > document.documentElement.clientWidth) {
+        left_guide = document.documentElement.clientWidth - guideDom.width - 4;
+      }
+      style_ = `${style_};left:${left_guide}px;`;
+      this.arrowStyle = `left:${res_.width / 2 + res_.left - 4 - left_guide}px`;
+      if (this.guideStyle != style_)
+        (this.guideStyle = style_),
+        (this.guideDom = res_),
+        setTimeout(() => {
+          this.guideMounted = true;
+        }, 500);
 
-      if(this.guideStyle != style_) this.guideStyle = style_;
-      this.guideDom = res_;
-
-    }, 500)
-
-
-  },
-  mounted () {
+      return;
+    }, 500);
     if (this.needCover && this.copyDom) {
       // 针对部分无法sticky的父元素使用直接复制引导dom元素 需要引入css不推荐使用
-      let dom = this.domObj ? this.domObj() : document.getElementById(`${this.domId}`);
+      let dom = this.domObj
+        ? this.domObj()
+        : document.getElementById(`${this.domId}`);
       let res_;
       if (dom) res_ = dom.getBoundingClientRect();
 
       let dom_clone = dom.cloneNode(true);
       dom_clone.setAttribute('id', '');
-      dom_clone.style.cssText = `position: fixed;z-index: 997;top:${res_.top}px;left:${res_.left}px;width:${res_.width}px;height:${res_.height}px;background:#fff;`;
+      dom_clone.style.cssText = `position: fixed;z-index: 997;top:${
+        res_.top
+      }px;left:${res_.left}px;width:${res_.width}px;height:${
+        res_.height
+      }px;background:#fff;`;
       document.getElementById('vmDom').appendChild(dom_clone);
     }
     if (this.needCover && !this.copyDom) {
-      let dom_ = this.domObj ? this.domObj() : document.getElementById(`${this.domId}`)
+      let dom_ = this.domObj
+        ? this.domObj()
+        : document.getElementById(`${this.domId}`);
       dom_.classList.add('guide-point');
     }
   },
   watch: {
-    showGuide (newVal, oldVal) {
+    showGuide(newVal, oldVal) {
       if (!newVal) {
-        this.clearGuide()
+        this.clearGuide();
       }
     },
   },
-  destroyed () {
-    this.clearGuide()
-  }
+  destroyed() {
+    this.clearGuide();
+  },
 };
 </script>
 <style lang="scss">
@@ -326,6 +398,7 @@ export default {
   background: #fff;
   min-width: 240px;
   max-width: 350px;
+  opacity: 0;
   max-height: 400px;
   .tour-arrow {
     position: absolute;
@@ -462,5 +535,9 @@ export default {
   transform: rotateZ(90deg);
   position: absolute;
   right: -0.7rem;
+}
+
+.have-mounted {
+  opacity: 1;
 }
 </style>
