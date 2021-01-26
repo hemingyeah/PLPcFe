@@ -206,7 +206,7 @@
             <span>{{ deptInfo.tagName }}</span>
             <div class="dept-edit-del" id="v-dept-step-1">
               <div class="guide-disable-cover" v-if="nowGuideStep == 1"></div>
-              <base-button type="ghost" @event="openDepartmentEditPanel()" v-if="!isRootDepartment(selectedDept)">编辑</base-button>
+              <base-button type="ghost" @event="openDepartmentEditPanel()">编辑</base-button>
               <base-button type="danger" @event="delDepartment()" v-if="!isRootDepartment(selectedDept)">删除</base-button>
             </div>
           </div>
@@ -1729,12 +1729,13 @@ export default {
       // window.location.href = `/security/tag/editTag/${this.selectedDept.id}`
       // id 有值说明是子部门编辑
       let fromId = window.frameElement.getAttribute('id')
+      let isRoot = this.selectedDept.id == mainTagId // 判断是不是根部门，根部门编辑不能修改名称
       platform.openTab({
         id: 'editTag',
         title: '编辑部门',
         url: id
           ? `/security/tag/editDept/${id}`
-          : `/security/tag/editDept/${this.selectedDept.id}`,
+          : `/security/tag/editDept/${this.selectedDept.id}?isRoot=${isRoot}`,
         reload: true,
         fromId,
       })
