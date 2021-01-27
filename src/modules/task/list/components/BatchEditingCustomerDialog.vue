@@ -10,22 +10,22 @@
     <div slot="footer" class="dialog-footer">
       <el-button @click="visible = false">取 消</el-button>
       <el-button type="primary" @click="onSubmit" :disabled="pending"
-        >确 定</el-button
+      >确 定</el-button
       >
     </div>
   </base-modal>
 </template>
 
 <script>
-import { formatDate } from "@src/util/lang";
-import { FormFieldMap } from "@src/component/form/components";
-import * as Utils from "@src/component/form/util";
+import { formatDate } from '@src/util/lang';
+import { FormFieldMap } from '@src/component/form/components';
+import * as Utils from '@src/component/form/util';
 /* Api */
-import * as TaskApi from "@src/api/TaskApi.ts";
-import FormItem from "@src/component/form/FormItem.vue";
+import * as TaskApi from '@src/api/TaskApi.ts';
+import FormItem from '@src/component/form/FormItem.vue';
 
 export default {
-  name: "batch-editing-customer-dialog",
+  name: 'batch-editing-customer-dialog',
   props: {
     config: {
       type: Object,
@@ -48,14 +48,14 @@ export default {
       const list = [];
       fields.map((item) => {
         if (
-          item.enabled &&
-          item.field != "taskNo" &&
-          item.field != "attachment" &&
-          item.field != "customer" &&
-          item.field != "relationProduct" &&
-          item.field != "relationCustomer" &&
-          item.formType !== "relationCustomer" && 
-          item.formType !== "relationProduct"
+          item.enabled
+          && item.field != 'taskNo'
+          && item.field != 'attachment'
+          && item.field != 'customer'
+          && item.field != 'relationProduct'
+          && item.field != 'relationCustomer'
+          && item.formType !== 'relationCustomer' 
+          && item.formType !== 'relationProduct'
         ) {
           list.push(item);
         }
@@ -75,11 +75,11 @@ export default {
         mapJson: JSON.stringify({
           [sf.fieldName]: form[sf.fieldName],
         }),
-        ids: this.selectedIds.join(","),
+        ids: this.selectedIds.join(','),
         fieldType: sf.isSystem,
       };
 
-      if (sf.fieldName === "tags") {
+      if (sf.fieldName === 'tags') {
         params.mapJson = JSON.stringify({
           [sf.fieldName]: form[sf.fieldName].map(({ id, tagName }) => ({
             id,
@@ -87,7 +87,7 @@ export default {
           })),
         });
       }
-      if (sf.formType === "user") {
+      if (sf.formType === 'user') {
         tv = form[sf.fieldName];
 
         params.mapJson = JSON.stringify({
@@ -99,7 +99,7 @@ export default {
           },
         });
       }
-      if (sf.fieldName === "manager") {
+      if (sf.fieldName === 'manager') {
         tv = form[sf.fieldName];
 
         params.mapJson = JSON.stringify({
@@ -110,14 +110,14 @@ export default {
           },
         });
       }
-      if (sf.formType === "datetime") {
+      if (sf.formType === 'datetime') {
         tv = form[sf.fieldName];
 
         params.mapJson = JSON.stringify({
           [sf.fieldName]: tv,
         });
       }
-      if (sf.formType === "date") {
+      if (sf.formType === 'date') {
         tv = form[sf.fieldName];
 
         params.mapJson = JSON.stringify({
@@ -125,14 +125,14 @@ export default {
         });
       }
 
-      if (sf.formType === "address") {
+      if (sf.formType === 'address') {
         tv = form[sf.fieldName];
         params.mapJson = JSON.stringify({
           [sf.fieldName]: {
             ...tv,
             all: [tv.province, tv.city, tv.dist, tv.address]
               .filter((str) => !!str)
-              .join(""),
+              .join(''),
           },
         });
       }
@@ -146,17 +146,15 @@ export default {
         taskIds: selectedIds,
         templateId: config.currentTaskType.id,
         fieldType: buildParams.fieldType ? 0 : 1,
-        fieldName: "",
-        value: "",
+        fieldName: '',
+        value: '',
       };
-      // console.log(JSON.parse(buildParams.mapJson))
-      // return
       for (let key in JSON.parse(buildParams.mapJson)) {
         params.fieldName = key;
         params.value = JSON.parse(buildParams.mapJson)[key];
       }
       if (!params.value) {
-        this.$platform.alert("值不能为空");
+        this.$platform.alert('值不能为空');
         return;
       }
       const { status, message, data } = await TaskApi.editBatchTask(params);
@@ -164,26 +162,26 @@ export default {
         let msg = message;
         if (data) {
           const { fail, succ } = data;
-          msg += "： ";
+          msg += '： ';
           fail.forEach((item, index) => {
             msg += item.taskNo;
             if (index !== fail.length - 1) {
-              msg += ",";
+              msg += ',';
             }
           });
-          msg += "。成功修改" + succ.length + "个";
+          msg += `。成功修改${ succ.length }个`;
         }
         this.$platform.alert(msg);
       } else {
         this.$platform.alert(message);
       }
       this.visible = false;
-      this.$emit("update");
+      this.$emit('update');
     },
   },
   components: {
     BatchForm: {
-      name: "batch-form",
+      name: 'batch-form',
       props: {
         fields: {
           type: Array,
@@ -225,7 +223,7 @@ export default {
           this.form = Utils.initialize(this.fields);
 
           this.fields.forEach((f) => {
-            if (f.fieldName === "tags" && f.formType === "select") {
+            if (f.fieldName === 'tags' && f.formType === 'select') {
               this.form[f.fieldName] = [];
             }
           });
@@ -234,7 +232,7 @@ export default {
           /**
            * 选择团队使用的是单独的组件，不是统一的form组件，所以更新时的返回值不同，需要特殊处理
            */
-          if (this.selectedField.fieldName === "tags") {
+          if (this.selectedField.fieldName === 'tags') {
             this.form[this.selectedField.fieldName] = event;
             return;
           }
@@ -263,7 +261,7 @@ export default {
           // }
 
           this.dispatch({
-            type: "form.add.field",
+            type: 'form.add.field',
             params: {
               value: () => this.form[this.selectedField.fieldName],
               field: this.selectedField,
@@ -272,7 +270,7 @@ export default {
           });
 
           this.dispatch({
-            type: "form.clear.validate",
+            type: 'form.clear.validate',
           });
         },
         renderSelector() {
@@ -299,8 +297,8 @@ export default {
 
           if (!sf.formType) return null;
 
-          if (sf.fieldName === "tags") {
-            return h("biz-team-select", {
+          if (sf.fieldName === 'tags') {
+            return h('biz-team-select', {
               props: {
                 multiple: true,
                 value: this.form[sf.fieldName],
@@ -337,7 +335,7 @@ export default {
               <label class="form-name">修改字段</label>
               <div>{this.renderSelector()}</div>
             </div>
-            <form-item label={"修改为"}>{this.renderInput(h)}</form-item>
+            <form-item label={'修改为'}>{this.renderInput(h)}</form-item>
           </div>
         );
       },

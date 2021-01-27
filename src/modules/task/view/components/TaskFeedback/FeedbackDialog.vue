@@ -120,8 +120,6 @@ export default {
       }
     },
     openDialog() {
-      console.log(JSON.stringify(this.task), 1);
-      console.log(JSON.stringify(this.evaluateConfig), 2);
       // 初始化数据
       this.starValue = {};
       this.tagValue = [];

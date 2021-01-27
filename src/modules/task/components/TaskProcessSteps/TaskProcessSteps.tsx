@@ -177,7 +177,6 @@ export default class TaskProcessSteps extends Vue {
       && StepMap[flow]
       && this.steps.push({ ...StepMap[flow],  flow: currentFlow})
     }
-    console.log(JSON.stringify(this.steps),3);
     
   }
   
