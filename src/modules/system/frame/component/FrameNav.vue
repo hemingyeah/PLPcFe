@@ -70,6 +70,10 @@ import MiniLogo from '@src/assets/svg/logo.svg';
 import { storageGet, storageSet } from '@src/util/storage';
 import { isShowCardWorkTime } from '@src/util/version.ts';
 import GuideContent from '@src/component/guide/contentCom/ProductFrameNav.vue';
+// 新存储工具方法
+import * as StorageUtil from '@src/util/storage.ts';
+/* enum */
+import StorageModuleEnum from '@model/enum/StorageModuleEnum';
 
 const {
   PRODUCT_FRAME_NAV
@@ -240,7 +244,7 @@ export default {
   },
   mounted () {
     this.init()
-    this.$nextTick(() => {
+    this.$nextTick(async() => {
       if (storageGet(PRODUCT_FRAME_NAV) && storageGet(PRODUCT_FRAME_NAV) > 0) this.$Guide().destroy('product-product-nav')
       else this.$Guide([{
         content:
@@ -262,7 +266,8 @@ export default {
       // 工单设置新功能引导，只针对灰度内且【系统管理员】开发
       let { restructSetting, confirmSetting } = this.$parent.initData || {};
       if ((restructSetting || confirmSetting) && window.isSystemAdmin) {
-        if (storageGet(TASK_SETTING_FRAME_NAV) > 0) return this.$Guide().destroy('task-setting-nav');
+        const guideStore = await StorageUtil.storageGet(TASK_SETTING_FRAME_NAV, 0, StorageModuleEnum.Task);
+        if (guideStore > 0) return this.$Guide().destroy('task-setting-nav');
 
         this.$Guide([{
           domId: 'M_SYSTEM-a',
@@ -282,7 +287,7 @@ export default {
           })
         }).create()
           .then(res => {
-            if(res) storageSet(TASK_SETTING_FRAME_NAV, '1');
+            if(res) StorageUtil.storageSet(TASK_SETTING_FRAME_NAV, '1', StorageModuleEnum.Task);
           })
       }
     })

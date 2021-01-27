@@ -51,8 +51,12 @@ import * as SettingApi from '@src/api/SettingApi';
 /** components */
 import FlowSetting from '../components/FlowSetting.vue';
 
-import { storageGet, storageSet } from '@src/util/storage';
-const { TASK_FLOW_SETTING_GUIDE, getStyle } = require('@src/component/guide/taskSettingStore');
+// 新存储工具方法
+import { storageGet, storageSet } from '@src/util/storage.ts';
+/* enum */
+import StorageModuleEnum from '@model/enum/StorageModuleEnum';
+
+const { TASK_FLOW_SETTING_GUIDE } = require('@src/component/guide/taskSettingStore');
 
 import flowMap from '../flowMap';
 export default {
@@ -206,8 +210,9 @@ export default {
     }
   },
   mounted() {
-    this.$nextTick(() => {
-      if (storageGet(TASK_FLOW_SETTING_GUIDE) > 0) return this.$Guide().destroy('task-flow-guide');
+    this.$nextTick(async() => {
+      const guideStore = await storageGet(TASK_FLOW_SETTING_GUIDE, 0, StorageModuleEnum.Task);
+      if (guideStore > 0) return this.$Guide().destroy('task-flow-guide');
 
       this.$Guide([{
         id: 'task-flow-guide',
@@ -276,7 +281,7 @@ export default {
         })
       }).create()
         .then(res_ => { 
-          if(res_) storageSet(TASK_FLOW_SETTING_GUIDE, '4');
+          if(res_) storageSet(TASK_FLOW_SETTING_GUIDE, '4', StorageModuleEnum.Task);
         })
     })
   },

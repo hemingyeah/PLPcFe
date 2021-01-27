@@ -127,7 +127,6 @@ class Guide {
               totalStep={_this.arr.length}
               canUse={obj.canUse}
               inside={obj.inside}
-              insideDom={obj.insideDom}
               nowStep={obj.nowStep}
               title={obj.title}
               content={obj.content}
@@ -145,6 +144,8 @@ class Guide {
               nextStep={_this.nextStep}
               copyDom={obj.copyDom}
               direction={obj.direction}
+              lastFinish={obj.lastFinish}
+              insideDom={obj.insideDom}
               outsideParent={obj.outsideParent}
             >
               <template slot="diyContent">
@@ -179,7 +180,9 @@ function domGuide(arr = [], nowStep, storageKe, watchStepFn) {
       create: () => {
         return Promise.resolve(false)
       },
-      destroy: () => {},
+      destroy: () => {
+        return Promise.resolve(false)
+      },
     };
   }
   let productPreFixedPath = GrayUtil.getProductV2ApiPath();
@@ -196,8 +199,12 @@ function domGuide(arr = [], nowStep, storageKe, watchStepFn) {
     create: () => {
       return Promise.resolve(false)
     },
-    destroy: () => {},
+    destroy: () => {
+      return Promise.resolve(false)
+    },
   };
+  
+  
 }
 
 export default domGuide;
