@@ -16,6 +16,7 @@
       class="tour-content-out-box"
       :class="[guideMounted && showGuide && guideDom.top > -1 ? 'have-mounted' : '', guideSizeClass[guideSize]]"
       ref="guideCom"
+      v-show="showGuide"
       :style="guideStyle"
     >
       <div
@@ -232,6 +233,7 @@ export default {
       } catch (error) {
         console.warn(error, 'error try catch');
       }
+      // 被引导的元素位置不变化的话停止引导组件的渲染
       if (!res_ || ( this.guideDom && res_ && this.guideDom.top == res_.top && this.guideDom.left == res_.left )) return;
       let style_ = '';
 
