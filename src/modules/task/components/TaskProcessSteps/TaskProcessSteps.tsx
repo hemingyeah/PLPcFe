@@ -187,8 +187,6 @@ export default class TaskProcessSteps extends Vue {
   mounted() {
     if(this.justGuide) this.steps = taskSteps;
     this.fetchTaskType()
-    
-    
   }
   
   render(h: CreateElement) {    
