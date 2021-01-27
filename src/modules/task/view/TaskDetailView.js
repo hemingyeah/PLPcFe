@@ -847,6 +847,9 @@ export default {
     allot() {
       // 新工单新指派
       if (this.isRestructAllot) {
+        console.log( JSON.stringify(this.fields), 1);
+        console.log( JSON.stringify(this.task), 2);
+        console.log( JSON.stringify(this.allowRedeployTask), 3);
         this.$refs.TaskAllotModal.outsideShow()
       } else {
         this.pending = true;
@@ -1099,7 +1102,6 @@ export default {
 
   },
   async mounted() {
-    console.log(this.initData, 'initData')
     try {
       this.loading = true;
 

@@ -29,6 +29,8 @@ import { searchAllcatalog } from '@src/api/ProductV2Api';
 /** mixin */
 import FormMixin from '@src/component/form/mixin/form';
 
+import {productSearchCatalog} from '@src/modules/guideForNewUser/initData.js'
+
 import _ from 'lodash';
 
 export default {
@@ -67,6 +69,8 @@ export default {
       }
     },
     remoteMethod(params) {
+      console.log(productSearchCatalog);
+      if(this.field.justGuide) return Promise.resolve(productSearchCatalog)
       let { keyword, pageNum, pageSize } = params;
       params = {
         page: pageNum,

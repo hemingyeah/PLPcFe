@@ -36,6 +36,9 @@ const RELATION_TYPE_MAP = {
   product: 'relationProduct'
 }
 
+import { taskFields } from '@src/modules/guideForNewUser/initData.js'
+import { searchLinkman } from './methods/initData'
+
 export default {
   name: 'task-edit-form',
   inject: ['initData'],
@@ -62,6 +65,14 @@ export default {
     
     this.$eventBus.$on('task_create_or_edit.update_linkman', this.updateLinkman);
     this.$eventBus.$on('task_create_or_edit.update_address', this.bindAddress);
+
+    console.log( JSON.stringify(this.fields), 1);
+    console.log( JSON.stringify(this.state), 2);
+    console.log( JSON.stringify(this.types), 3);
+    console.log( JSON.stringify(this.urlParams), 4);
+    console.log( JSON.stringify(this.value), 5);
+    console.log( JSON.stringify(this.task), 6);
+    
   },
   beforeDestroy() {
     this.$eventBus.$off('task_create_or_edit.update_linkman', this.updateLinkman);
@@ -244,7 +255,8 @@ export default {
 
       let loading = this.$loading();
       try {
-        this.taskFields = await this.fetchTaskTemplateFields({ typeId: templateId, tableName: 'task', isFromSetting: true });
+        if(this.justGuide) this.taskFields = taskFields;
+        else this.taskFields = await this.fetchTaskTemplateFields({ typeId: templateId, tableName: 'task', isFromSetting: true });
         this.taskValue = FormUtil.initialize(this.taskFields, {});
 
         // 表单初始化
@@ -626,7 +638,6 @@ export default {
     */
     async searchLinkmanOuterHandler(params = {}) {
       let customerId = this.selectedCustomer?.value || '';
-      
       params.customerId = this.selectedCustomer?.value || '';
       
       return customerId ? this.searchLinkman(params) : this.searchCustomerByPhone(params);

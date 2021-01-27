@@ -1270,6 +1270,7 @@ export default {
     this.checkExports();
     this.getShbEdition();
     this.getSystemPopup();
+
   },
   components: {
     [FrameNav.name]: FrameNav,

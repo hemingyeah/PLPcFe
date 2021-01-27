@@ -1,6 +1,6 @@
 <template>
   <div class="product-edit-form">
-    <div class="normal-title-1">
+    <div class="normal-title-1" v-if="!justGuide">
       <div class="flex-1">{{productId? '编辑' : '新建'}}产品</div>
       <el-button @click="changeVisibleProp(true)">
         <i class="iconfont icon-fujiazujian font-12"></i>
@@ -149,23 +149,25 @@
 </template>
 
 <script>
-import * as FormUtil from "@src/component/form/util";
-import FormMixin from "@src/component/form/mixin/form";
+import * as FormUtil from '@src/component/form/util';
+import FormMixin from '@src/component/form/mixin/form';
 
 // import {searchCustomer} from '@src/api/EcSearchApi.js';
 import {
   checkSerialNumber,
   getProductTemplateList,
   searchCustomerAddressForProduct,
-} from "@src/api/ProductApi";
-import _ from "lodash";
+} from '@src/api/ProductApi';
+import _ from 'lodash';
 
-import EditContactDialog from "./EditContactDialog.vue";
-import EditAddressDialog from "./EditAddressDialog.vue";
-import CloneProductDialog from "@src/modules/product/components/CloneProductDialog.vue";
+import EditContactDialog from './EditContactDialog.vue';
+import EditAddressDialog from './EditAddressDialog.vue';
+import CloneProductDialog from '@src/modules/product/components/CloneProductDialog.vue';
+
+import {productSerachCustomer, productSearchTemplate} from '@src/modules/guideForNewUser/initData.js'
 
 export default {
-  name: "product-edit-form",
+  name: 'product-edit-form',
   props: {
     fields: {
       type: Array,
@@ -177,14 +179,18 @@ export default {
     },
     productId: {
       type: String,
-      default: "",
+      default: '',
     },
     customerIsReadonly: {
       type: Boolean,
       default: false,
     },
+    justGuide: {
+      type: Boolean,
+      default: false,
+    },
   },
-  inject: ["initData", "cloneProduct"],
+  inject: ['initData', 'cloneProduct'],
   data() {
     return {
       validation: this.buildValidation(),
@@ -193,9 +199,13 @@ export default {
       visibleProp:false
     };
   },
+  mounted(){
+    console.log( JSON.stringify(this.fields), 1 );
+    console.log( JSON.stringify(this.value), 2 );
+  },
   computed: {
     customerField() {
-      return this.fields.filter((f) => f.fieldName === "customer")[0];
+      return this.fields.filter((f) => f.fieldName === 'customer')[0];
     },
 
     isPhoneUnique() {
@@ -209,16 +219,16 @@ export default {
       return customer || {};
     },
     customerId() {
-      return (this.customer && (this.customer.id || this.customer.value)) || "";
+      return (this.customer && (this.customer.id || this.customer.value)) || '';
     },
   },
   methods: {
     getField(tag, field) {
       let tv = Object.assign({}, field);
       tv.fieldName = tag;
-      tv.formType = "extend";
-      tv.displayName = tag == "linkman" ? "联系人" : "地址";
-      tv.isNull = tag == "linkman"
+      tv.formType = 'extend';
+      tv.displayName = tag == 'linkman' ? '联系人' : '地址';
+      tv.isNull = tag == 'linkman'
         ? !tv.setting.customerOption.linkmanNotNull
         : !tv.setting.customerOption.addressNotNull;
 
@@ -233,11 +243,11 @@ export default {
           ? template[f.fieldName]
           : template.attribute[f.fieldName];
 
-        if (f.formType === "address") {
+        if (f.formType === 'address') {
           console.log(nv);
         }
 
-        if (!!nv && f.fieldName != "customer" && f.fieldName != "template") {
+        if (!!nv && f.fieldName != 'customer' && f.fieldName != 'template') {
           this.update({
             field: f,
             newValue: nv,
@@ -246,6 +256,7 @@ export default {
       });
     },
     buildValidation() {
+      if(this.justGuide) return 
       const serialNumberUnique = this.initData.productConfig.serialNumberUnique;
 
       let checkSerialNumberFn = _.debounce(function(
@@ -272,7 +283,7 @@ export default {
           ? true
           : function(value, field, changeStatus) {
             let params = {
-              id: that.productId || "",
+              id: that.productId || '',
               serialNumber: value,
             };
 
@@ -296,13 +307,14 @@ export default {
           )}`
         );
       }
-      if (fieldName === "serialNumber") {
-        if (newValue) {
+      if (fieldName === 'serialNumber') {
+        if (newValue && !this.justGuide) {
+
           checkSerialNumber(
             { id: this.productId, serialNumber: newValue },
             false
           ).then((res) => {
-            if (res.hasOwnProperty("ok")) {
+            if (res.hasOwnProperty('ok')) {
               this.serialNumberExist = false;
             } else {
               this.serialNumberExist = true;
@@ -315,10 +327,10 @@ export default {
       let value = this.value;
 
       this.$set(value, fieldName, newValue);
-      this.$emit("input", value);
+      this.$emit('input', value);
     },
     updateCustomer(value) {
-      const cf = this.fields.filter((f) => f.fieldName === "customer")[0];
+      const cf = this.fields.filter((f) => f.fieldName === 'customer')[0];
       this.update({
         field: cf,
         newValue: value,
@@ -327,8 +339,8 @@ export default {
     },
     updateLinkman(value) {
       let field = {
-        fieldName: "linkman",
-        displayName: "联系人",
+        fieldName: 'linkman',
+        displayName: '联系人',
       };
       this.update({
         field,
@@ -338,8 +350,8 @@ export default {
     },
     updateCustomerAddress(value) {
       let field = {
-        fieldName: "customerAddress",
-        displayName: "地址",
+        fieldName: 'customerAddress',
+        displayName: '地址',
       };
       this.update({
         field,
@@ -348,8 +360,8 @@ export default {
     },
     clearLinkman() {
       let field = {
-        fieldName: "linkman",
-        displayName: "联系人",
+        fieldName: 'linkman',
+        displayName: '联系人',
       };
       this.update({
         field,
@@ -358,8 +370,8 @@ export default {
     },
     clearCustomerAddress() {
       let field = {
-        fieldName: "customerAddress",
-        displayName: "地址",
+        fieldName: 'customerAddress',
+        displayName: '地址',
       };
       this.update({
         field,
@@ -376,10 +388,12 @@ export default {
     },
     searchCustomer(params) {
       // params has three properties include keyword、pageSize、pageNum.
+
+      if(this.justGuide) return Promise.resolve(productSerachCustomer)
       const pms = params || {};
 
       return this.$http
-        .post("/customer/list", pms)
+        .post('/customer/list', pms)
         .then((res) => {
           if (!res || !res.list) return;
           if (res.list) {
@@ -395,7 +409,6 @@ export default {
               })
             );
           }
-
           return res;
         })
         .catch((e) => console.error(e));
@@ -404,13 +417,13 @@ export default {
       const pms = {
         customerId: params[0].id,
         notNull: true,
-        productId: "",
+        productId: '',
       };
 
       this.clearLinkman();
       this.clearCustomerAddress();
       return this.$http
-        .get("/task/defaultInfo", pms)
+        .get('/task/defaultInfo', pms)
         .then((res) => {
           if (!res) return;
           let linkman = [
@@ -426,14 +439,14 @@ export default {
             {
               label:
                 res.address
-                && (res.address.province || "")
-                  + (res.address.city || "")
-                  + (res.address.dist || "")
-                  + (res.address.address || ""),
+                && (res.address.province || '')
+                  + (res.address.city || '')
+                  + (res.address.dist || '')
+                  + (res.address.address || ''),
               value: res.address && res.address.id,
             },
           ];
-          res.address ? this.updateCustomerAddress(address) : "";
+          res.address ? this.updateCustomerAddress(address) : '';
 
           return res;
         })
@@ -447,25 +460,26 @@ export default {
       };
       this.clearCustomerAddress();
       return this.$http
-        .get("/task/getLmBindAddress", pms)
+        .get('/task/getLmBindAddress', pms)
         .then((res) => {
           if (!res) return;
           let address = [
             {
               label:
                 res.data
-                && `${res.data.province || ""}${res.data.city || ""}${res.data
-                  .dist || ""}${res.data.address || ""}`,
+                && `${res.data.province || ''}${res.data.city || ''}${res.data
+                  .dist || ''}${res.data.address || ''}`,
               value: res.data && res.data.id,
             },
           ];
-          res.data && res.data.id ? this.updateCustomerAddress(address) : "";
+          res.data && res.data.id ? this.updateCustomerAddress(address) : '';
           return res;
         })
         .catch((e) => console.error(e));
     },
     searchTemplate(params) {
       // params has three properties include keyword、pageSize、pageNum.
+      if(this.justGuide) return Promise.resolve(productSearchTemplate)
       const pms = params || {};
 
       return getProductTemplateList(pms)
@@ -480,7 +494,6 @@ export default {
               })
             );
           }
-
           return res;
         })
         .catch((e) => console.error(e));
@@ -497,7 +510,7 @@ export default {
       pms.customerId = customer.value;
 
       return this.$http
-        .get("/customer/linkman/list", pms)
+        .get('/customer/linkman/list', pms)
         .then((res) => {
           if (!res || !res.list) return;
           if (res.list) {
@@ -547,18 +560,18 @@ export default {
     },
     createInfo(type) {
       if (!this.value.customer.length) {
-        this.$platform.alert("请先选择客户");
+        this.$platform.alert('请先选择客户');
         return;
       }
-      if (type == "linkman") this.$refs.EditContactDialog.openDialog();
-      if (type == "address") this.$refs.EditAddressDialog.openDialog();
+      if (type == 'linkman') this.$refs.EditContactDialog.openDialog();
+      if (type == 'address') this.$refs.EditAddressDialog.openDialog();
     },
     changeVisibleProp(e) {
       this.visibleProp = e;
     },
     dialogConfirm(e){
       if(e){
-        console.log(e, "dialogConfirm")
+        console.log(e, 'dialogConfirm')
         this.cloneProduct(e.nowChooseData)
         this.changeVisibleProp(false)
       }
@@ -569,8 +582,8 @@ export default {
     [EditAddressDialog.name]: EditAddressDialog,
     CloneProductDialog,
 
-    "customer-select": {
-      name: "customer-select",
+    'customer-select': {
+      name: 'customer-select',
       mixins: [FormMixin],
       props: {
         value: {
@@ -583,7 +596,7 @@ export default {
       },
       methods: {
         input(value) {
-          this.$emit("input", value);
+          this.$emit('input', value);
         },
       },
 
@@ -624,10 +637,10 @@ export default {
       },
     },
 
-    "form-customer-select": {
-      name: "form-customer-select",
+    'form-customer-select': {
+      name: 'form-customer-select',
       mixins: [FormMixin],
-      inject: ["initData"],
+      inject: ['initData'],
       props: {
         value: {
           type: Array,
@@ -650,11 +663,11 @@ export default {
       },
       methods: {
         input(value) {
-          this.$emit("input", value);
+          this.$emit('input', value);
         },
 
         createInfo(type, event) {
-          this.$emit("createInfo", type);
+          this.$emit('createInfo', type);
         },
 
         renderBtn() {
@@ -685,7 +698,7 @@ export default {
                     let value = props.value || [];
                     let linkman = value[0] || {};
                     let nameAndPhone = `${linkman.label
-                      || ""} ${linkman.phone || ""}`;
+                      || ''} ${linkman.phone || ''}`;
                     return <span>{nameAndPhone}</span>;
                   },
                   option: (props) => {
@@ -711,10 +724,10 @@ export default {
       },
     },
 
-    "form-customer-select-address": {
-      name: "form-customer-select-address",
+    'form-customer-select-address': {
+      name: 'form-customer-select-address',
       mixins: [FormMixin],
-      inject: ["initData"],
+      inject: ['initData'],
       props: {
         value: {
           type: Array,
@@ -738,11 +751,11 @@ export default {
       },
       methods: {
         input(value) {
-          this.$emit("input", value);
+          this.$emit('input', value);
         },
 
         createInfo(type, event) {
-          this.$emit("createInfo", type);
+          this.$emit('createInfo', type);
         },
 
         renderBtn() {
