@@ -333,8 +333,8 @@ export default {
 
     this.$nextTick(() => {
       setTimeout(() => {
-        if (storageGet(TASK_GUIDE_LIST) && storageGet(TASK_GUIDE_LIST) > 0) this.$Guide().destroy('task-task-list-view')
-        else this.$Guide([{
+        if (storageGet(TASK_GUIDE_LIST) && storageGet(TASK_GUIDE_LIST) > 0) return this.$Guide().destroy('task-task-list-view')
+        this.$Guide([{
           content:
             '可拖拽改变列宽',
           haveStep: true,
@@ -343,6 +343,7 @@ export default {
           domObj:()=>{
             return document.getElementById('v-task-step-0').getElementsByClassName('el-table__header-wrapper')[0]
           },
+          lastFinish:true,
           needCover: true,
         }, {
           content:
@@ -351,6 +352,7 @@ export default {
           nowStep: 2,
           id: 'task-task-list-view',
           domId: 'v-task-step-1',
+          lastFinish:true,
           needCover: true,
         }, {
           content:
@@ -359,6 +361,7 @@ export default {
           nowStep: 3,
           id: 'task-task-list-view',
           domId: 'v-task-step-2',
+          lastFinish:true,
           needCover: true,
         }], 0, '', (e) => {
           return new Promise((resolve, reject) => {

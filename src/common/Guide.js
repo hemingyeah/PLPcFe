@@ -133,6 +133,7 @@ class Guide {
               nextStep={_this.nextStep}
               copyDom={obj.copyDom}
               direction={obj.direction}
+              lastFinish={obj.lastFinish}
             >
               <template slot="diyContent">
                 <Test />

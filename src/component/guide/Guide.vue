@@ -80,6 +80,7 @@
         </div>
         <div
           class="btns"
+          v-if="lastFinish ? nowStep == totalStep : true"
           @click.prevent="
             finishBtnFn().then(() => {
               showGuide = false;
@@ -176,6 +177,10 @@ export default {
     guideSize: {
       type: String,
       default: 'size-1',
+    },
+    lastFinish:{
+      type: Boolean,
+      default: false,
     },
   },
   data() {
