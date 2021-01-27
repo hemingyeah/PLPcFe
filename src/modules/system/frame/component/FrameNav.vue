@@ -259,8 +259,9 @@ export default {
         })
       }).create().then(res_=>{if(res_)storageSet(PRODUCT_FRAME_NAV, '1')})
 
-      // 工单设置新功能引导，只针对【系统管理员】开发
-      if (window.isSystemAdmin) {
+      // 工单设置新功能引导，只针对灰度内且【系统管理员】开发
+      let { restructSetting, confirmSetting } = this.$parent.initData || {};
+      if ((restructSetting || confirmSetting) && window.isSystemAdmin) {
         if (storageGet(TASK_SETTING_FRAME_NAV) > 0) return this.$Guide().destroy('task-setting-nav');
 
         this.$Guide([{
