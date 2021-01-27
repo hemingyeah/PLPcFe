@@ -303,7 +303,7 @@ export default {
         if (
           top_guide + guideDom.height > document.documentElement.clientHeight
         ) {
-          top_guide = res_.top + res_.height - guideDom.height - 4;
+          top_guide = res_.top + res_.height - guideDom.height + 4;
         } else if (top_guide < 0) {
           top_guide = 4;
         }
@@ -325,7 +325,11 @@ export default {
         if (!this.inside) {
           style_ = `${style_};top:${res_.top + res_.height + 8 || 0}px`;
         } else {
-          style_ = `${style_};top:${res_.top + 8 || 0}px;z-index:998`;
+          if(this.outsideParent){
+            style_ = `${style_};top:${guidePartentDom.top + guidePartentDom.height + 8 || 0}px;z-index:998`;
+          }else{
+            style_ = `${style_};top:${res_.top + 8 || 0}px;z-index:998`;
+          }
         }
       } else {
         // 顶部
@@ -334,11 +338,21 @@ export default {
         if (!this.inside) {
           style_ = `${style_};top:${res_.top - guideDom.height - 8}px`;
         } else {
-          style_ = `${style_};right:${res_.top
-            + res_.height
+          style_ = `${style_};right:${guidePartentDom.top
+            + guidePartentDom.height
             - guideDom.height
             - 8}px;z-index:998`;
         }
+        if (!this.inside) {
+          style_ = `${style_};top:${res_.top - guideDom.height - 8 || 0}px`;
+        } else {
+          if(this.outsideParent){
+            style_ = `${style_};top:${guidePartentDom.top - guideDom.height - 8 || 0}px;z-index:998`;
+          }else{
+            style_ = `${style_};top:${res_.top - guideDom.height - 8 || 0}px;z-index:998`;
+          }
+        }
+        
       }
       let left_guide = 0;
       left_guide = res_.left + (res_.width - guideDom.width) / 2;
@@ -346,7 +360,7 @@ export default {
         left_guide = 4;
       }
       if (left_guide > document.documentElement.clientWidth - guideDom.width) {
-        left_guide = res_.left + res_.width - guideDom.width - 4;
+        left_guide = res_.left + res_.width - guideDom.width + 4;
       }
       style_ = `${style_};left:${left_guide}px;`;
       this.arrowStyle = `left:${res_.width / 2 + res_.left - 4 - left_guide}px`;
