@@ -85,9 +85,8 @@
 
       <!-- 组织架构伸缩 -->
       <div class="collapse">
-        <span @click="collapse = !collapse">
-          <i :class="['iconfont', collapse ? 'icon-open' : 'icon-Takeup']"></i>
-        </span>
+        <div @click="btnCollapse('left')" v-show="collapseLeft" class="base-collapse-btn-left"><i class="iconfont icon-mianbanjiantou"></i></div>
+        <div @click="btnCollapse('rigth')" v-show="collapseRight" class="base-collapse-btn-right"><i class="iconfont icon-mianbanjiantou"></i></div>
       </div>
       
       <!-- start 右侧角色列表 -->
@@ -327,9 +326,9 @@
             <div class="department-user-block-header-text">
               <i class="iconfont icon-renyuan"></i>
               <span id="v-dept-step-2">成员信息</span>
-              <div class="guide-disable-cover" v-if="nowGuideStep == 1"></div>
+              <div class="guide-disable-cover" v-if="nowGuideStep == 2"></div>
             </div>
-            <base-button type="primary" @event="openCreateUserPanel" v-if="tenantType==1">新建成员账号</base-button>
+            <base-button type="primary" @event="openCreateUserPanel" v-if="tenantType==2">新建成员账号</base-button>
             <!-- <div class="department-user-block-header-btn">
               <base-button type="primary" @event="openCreateUserPanel" v-if="allowAddUser"> 添加成员 </base-button>
               <base-button type="primary" @event="chooseDepartmentMulti"> 调整部门 </base-button>
@@ -533,6 +532,17 @@
       </template>
     </v-tour>
     <!-- tour end -->
+     
+    <el-dialog
+      :visible.sync="guideDialogVisible"
+      width="300px"
+      top="38vh"
+      :show-close="false">
+      <span>售后宝账号权限功能更新啦！</span>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="handleGuideClose">确 定</el-button>
+      </span>
+    </el-dialog> 
 
   </div>
   <!-- end 选择组织架构页面 -->
@@ -573,7 +583,7 @@ import url from 'url'
 import Platform from '@src/util/Platform'
 import tourGuide from '@src/mixins/tourGuide'
 import { storageGet, storageSet } from '@src/util/storage'
-const DEPT_GUIDE = 'dept_guide'
+const DEPT_GUIDE = 'dept_guide', DEPT_GUIDE_DIALOG = 'dept_guide_dialog'
 let export_state, timeStart, timeEnd, mainTagId;
 export default {
   name: 'department-view',
@@ -581,9 +591,12 @@ export default {
   mixins: [tourGuide],
   data() {
     return {
+      guideDialogVisible: false,
       isAllotByDept: false,
       nowGuideStep: 5,
       collapse: false,
+      collapseLeft: true,
+      collapseRight: true,
       showModifynameDialog: false,
       deptKeyword: '',
       activeName: 'tag',
@@ -755,11 +768,14 @@ export default {
       // 钉钉端
       this.isAllotByDept = !this.initData.allotByTag;
       setTimeout(()=>{
-        if (!storageGet(DEPT_GUIDE) || storageGet(DEPT_GUIDE) < this.deptSteps.length) {
+        if (storageGet(DEPT_GUIDE_DIALOG) != 1) {
+          this.guideDialogVisible = true;
+        }
+        if (storageGet(DEPT_GUIDE_DIALOG) == 1 && storageGet(DEPT_GUIDE) < this.deptSteps.length) {
           this.$tours['myTour'].start()
           this.nowGuideStep = 0
         } 
-      }, 500)
+      }, 100)
     }
     this.initialize()
     this.dept_role_data = this.initData.rolesJson || []
@@ -778,6 +794,25 @@ export default {
     window.__exports__refresh = this.refreshDept;
   },
   methods: {
+    handleGuideClose(){
+      this.guideDialogVisible = false;
+      storageSet(DEPT_GUIDE_DIALOG, 1)
+      if (!storageGet(DEPT_GUIDE) || storageGet(DEPT_GUIDE) < this.deptSteps.length) {
+        this.$tours['myTour'].start()
+        this.nowGuideStep = 0
+      } 
+    },
+    btnCollapse(dir){
+      if (dir === 'left') {
+        this.collapse = true;
+        this.collapseLeft = !this.collapseLeft;
+        this.collapseRight = true;
+      } else {
+        this.collapse = false;
+        this.collapseRight = !this.collapseRight;
+        this.collapseLeft = true;
+      }
+    },
     async refreshDept(){
       try {
         if(localStorage.getItem('dept-need-refresh') == 1) {
@@ -936,8 +971,8 @@ export default {
       if (!type && !this.multipleSelection.length) return this.$platform.alert('请至少选择一个用户！')
       export_state = type
       if (export_state === 'all') {
-        // 导出全部
-        window.location.href = `/security/user/tag/exportBatch?tagId=${this.selectedDept.id}`
+        // 导出全部        
+        window.location.href = this.selectedDept.id == mainTagId ? '/security/user/tag/exportBatch' : `/security/user/tag/exportBatch?tagId=${this.selectedDept.id}`
       } else {
         // 导出选中的
         let ids = []
@@ -959,7 +994,7 @@ export default {
       }
       if (export_state === 'all') {
         // 导出全部
-        window.location.href = `/security/user/workState/exportBatch?tagId=${this.selectedDept.id}&timeStart=${timeStart}&timeEnd=${timeEnd}`
+        window.location.href = this.selectedDept.id == mainTagId ? `/security/user/workState/exportBatch?timeStart=${timeStart}&timeEnd=${timeEnd}` : `/security/user/workState/exportBatch?tagId=${this.selectedDept.id}&timeStart=${timeStart}&timeEnd=${timeEnd}`
       } else {
         // 导出选中的
         let ids = []
@@ -1924,7 +1959,8 @@ export default {
 
 .collapse {
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  justify-content: center;
   span {
     padding: 5px;
     cursor: pointer;
