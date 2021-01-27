@@ -69,7 +69,11 @@ import EditCardnameDialog from './components/EditCardnameDialog';
 import templateLibrary from './components/templateLibrary';
 import NoDataViewNew from '@src/component/common/NoDataViewNew';
 
-import { storageGet, storageSet } from '@src/util/storage';
+// 新存储工具方法
+import { storageGet, storageSet } from '@src/util/storage.ts';
+/* enum */
+import StorageModuleEnum from '@model/enum/StorageModuleEnum';
+
 const { TASK_CARD_SETTING_GUIDE } = require('@src/component/guide/taskSettingStore');
 
 export default {
@@ -95,8 +99,9 @@ export default {
     this.initCard();
     this.initCardSysList();
 
-    this.$nextTick(() => {
-      if (storageGet(TASK_CARD_SETTING_GUIDE) > 0) return this.$Guide().destroy('task-additional-guide');
+    this.$nextTick(async() => {
+      const guideStore = await storageGet(TASK_CARD_SETTING_GUIDE, 0, StorageModuleEnum.Task);
+      if (guideStore > 0) return this.$Guide().destroy('task-additional-guide');
 
       this.$Guide([{
         id: 'task-additional-guide',
@@ -122,7 +127,7 @@ export default {
         })
       }).create()
         .then(res_ => {
-          if(res_) storageSet(TASK_CARD_SETTING_GUIDE, '2');
+          if(res_) storageSet(TASK_CARD_SETTING_GUIDE, '2', StorageModuleEnum.Task);
         })
     })
   },
