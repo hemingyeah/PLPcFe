@@ -64,13 +64,6 @@ export default {
 
     this.$eventBus.$on('task_create_or_edit.update_linkman', this.updateLinkman);
     this.$eventBus.$on('task_create_or_edit.update_address', this.bindAddress);
-
-    console.log( JSON.stringify(this.fields), 1);
-    console.log( JSON.stringify(this.state), 2);
-    console.log( JSON.stringify(this.types), 3);
-    console.log( JSON.stringify(this.urlParams), 4);
-    console.log( JSON.stringify(this.value), 5);
-    console.log( JSON.stringify(this.task), 6);
     
   },
   beforeDestroy() {
