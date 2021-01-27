@@ -182,6 +182,14 @@ export default {
       type: Boolean,
       default: false,
     },
+    // 拓展
+    insideDom:{
+      type: Function,
+    },
+    outsideParent:{
+      type: Boolean,
+      default: false,
+    }
   },
   data() {
     return {
@@ -227,12 +235,14 @@ export default {
         width: 350,
         height: 400,
       };
+      let guidePartentDom;
       let dom
       try {
         dom = this.domObj
           ? this.domObj()
           : document.getElementById(`${this.domId}`);
-        if (dom) res_ = dom.getBoundingClientRect();
+        if (dom) res_ = dom.getBoundingClientRect(), guidePartentDom = dom.getBoundingClientRect();
+        if(this.inside && this.insideDom) res_ = this.insideDom().getBoundingClientRect();
         guideDom = this.$refs.guideCom.getBoundingClientRect();
        
       } catch (error) {
@@ -268,21 +278,24 @@ export default {
           if (!this.inside) {
             style_ = `${style_};left:${res_.left + res_.width + 8 || 0}px`;
           } else {
-            style_ = `${style_};left:${res_.left + 8 || 0}px;z-index:998`;
+            if(this.outsideParent){
+              style_ = `${style_};left:${guidePartentDom.left + guidePartentDom.width + 8 || 0}px;z-index:998`;
+            }else{
+              style_ = `${style_};left:${res_.left + 8 || 0}px;z-index:998`;
+            }
           }
         } else {
           // 左侧有足够的位置
           this.arrowDirection = 'right';
 
           if (!this.inside) {
-            style_ = `${style_};right:${document.documentElement.clientWidth
-              - res_.left
-              + 12 || 0}px`;
+            style_ = `${style_};left:${res_.left - guideDom.width - 8}px`;
           } else {
-            style_ = `${style_};right:${document.documentElement.clientWidth
-              - res_.left
-              - res_.width
-              + 8 || 0}px;z-index:998`;
+            if(this.outsideParent){
+              style_ = `${style_};left:${guidePartentDom.left - guideDom.width - 8 }px;z-index:998`;
+            }else{
+              style_ = `${style_};left:${res_.left + res_.width - guideDom.width - 8 || 0}px;z-index:998`;
+            }
           }
         }
         let top_guide = 0;

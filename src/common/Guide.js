@@ -134,6 +134,8 @@ class Guide {
               copyDom={obj.copyDom}
               direction={obj.direction}
               lastFinish={obj.lastFinish}
+              insideDom={obj.insideDom}
+              outsideParent={obj.outsideParent}
             >
               <template slot="diyContent">
                 <Test />

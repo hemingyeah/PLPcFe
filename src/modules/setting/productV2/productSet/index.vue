@@ -553,14 +553,15 @@ export default {
   mounted () {
     this.productConfig();
     this.$nextTick(() => {
-      if (storageGet(PRODUCT_PRODUCT_SET) && storageGet(PRODUCT_PRODUCT_SET) > 0) this.$Guide().destroy('product-set-guide')
-      else this.$Guide([{
+      if (storageGet(PRODUCT_PRODUCT_SET) && storageGet(PRODUCT_PRODUCT_SET) > 0) return this.$Guide().destroy('product-set-guide')
+      this.$Guide([{
         content:
           '',
         haveStep: false,
         gStyle: 'top:35px',
         id: 'product-set-guide',
         domId: 'product-set-guide-1',
+        direction:'row',
         finishBtn: 'OK',
         diyContent: true,
         diyContentDom: GuideContent
