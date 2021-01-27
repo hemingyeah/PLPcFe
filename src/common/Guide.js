@@ -167,7 +167,9 @@ function domGuide(arr = [], nowStep, storageKe, watchStepFn) {
       create: () => {
         return Promise.resolve(false)
       },
-      destroy: () => {},
+      destroy: () => {
+        return Promise.resolve(false)
+      },
     };
   }
   let productPreFixedPath = GrayUtil.getProductV2ApiPath();
@@ -180,6 +182,15 @@ function domGuide(arr = [], nowStep, storageKe, watchStepFn) {
   if ((productPreFixedPath && guideType == 'product') || guideType != 'product') {
     return new Guide(arr, nowStep, storageKe, watchStepFn);
   }
+  return {
+    create: () => {
+      return Promise.resolve(false)
+    },
+    destroy: () => {
+      return Promise.resolve(false)
+    },
+  };
+  
   
 }
 
