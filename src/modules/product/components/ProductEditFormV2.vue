@@ -494,7 +494,6 @@ export default {
               })
             );
           }
-          console.log(JSON.stringify(res), 321);
           return res;
         })
         .catch((e) => console.error(e));
