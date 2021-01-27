@@ -14,9 +14,8 @@
     <div
       :id="id"
       class="tour-content-out-box"
-      :class="[guideMounted ? 'have-mounted' : '', guideSizeClass[guideSize]]"
+      :class="[guideMounted && showGuide && guideDom.top > -1 ? 'have-mounted' : '', guideSizeClass[guideSize]]"
       ref="guideCom"
-      v-show="showGuide && guideDom.top > -1"
       :style="guideStyle"
     >
       <div
@@ -173,7 +172,7 @@ export default {
       type: String,
       default: 'column',
     },
-    guideSize:{
+    guideSize: {
       type: String,
       default: 'size-1',
     },
@@ -187,12 +186,12 @@ export default {
       loop: null,
       arrowDirection: 'up',
       guideMounted: false,
-      guideSizeClass:{
-        'size-1':'size-240',
-        'size-2':'size-280',
-        'size-3':'size-320',
-        'size-4':'size-350',
-      }
+      guideSizeClass: {
+        'size-1': 'size-240',
+        'size-2': 'size-280',
+        'size-3': 'size-320',
+        'size-4': 'size-350',
+      },
     };
   },
   methods: {
@@ -222,17 +221,36 @@ export default {
         width: 350,
         height: 400,
       };
+      let dom
       try {
-        let dom = this.domObj
+        dom = this.domObj
           ? this.domObj()
           : document.getElementById(`${this.domId}`);
         if (dom) res_ = dom.getBoundingClientRect();
         guideDom = this.$refs.guideCom.getBoundingClientRect();
+       
       } catch (error) {
         console.warn(error, 'error try catch');
       }
-      if (!res_) return;
+      if (!res_ || ( this.guideDom && res_ && this.guideDom.top == res_.top && this.guideDom.left == res_.left )) return;
       let style_ = '';
+
+      if (this.needCover && this.copyDom) {
+        // 针对部分无法sticky的父元素使用直接复制引导dom元素 需要引入css不推荐使用
+        try {
+          document.getElementById('vmDom').children[0].remove();
+        } catch (error) {
+          console.warn(error, 'error try catch');
+        }
+        let dom_clone = dom.cloneNode(true);
+        dom_clone.setAttribute('id', '');
+        dom_clone.style.cssText = `position: fixed;z-index: 997;top:${
+          res_.top
+        }px;left:${res_.left}px;width:${res_.width}px;height:${
+          res_.height
+        }px;background:#fff;`;
+        document.getElementById('vmDom').appendChild(dom_clone);
+      }
 
       if (this.direction == 'row') {
         if (
@@ -266,8 +284,7 @@ export default {
           top_guide + guideDom.height > document.documentElement.clientHeight
         ) {
           top_guide = res_.top + res_.height - guideDom.height - 4;
-        } 
-        else if (top_guide < 0) {
+        } else if (top_guide < 0) {
           top_guide = 4;
         }
         style_ = `${style_};top:${top_guide}px;`;
@@ -275,9 +292,7 @@ export default {
         if (this.guideStyle != style_)
           (this.guideStyle = style_),
           (this.guideDom = res_),
-          setTimeout(() => {
-            this.guideMounted = true;
-          }, 500);
+          this.guideMounted = true;
 
         return;
       }
@@ -309,7 +324,7 @@ export default {
       left_guide = res_.left + (res_.width - guideDom.width) / 2;
       if (left_guide < 0) {
         left_guide = 4;
-      } 
+      }
       if (left_guide > document.documentElement.clientWidth - guideDom.width) {
         left_guide = res_.left + res_.width - guideDom.width - 4;
       }
@@ -318,29 +333,11 @@ export default {
       if (this.guideStyle != style_)
         (this.guideStyle = style_),
         (this.guideDom = res_),
-        setTimeout(() => {
-          this.guideMounted = true;
-        }, 500);
+        this.guideMounted = true;
 
       return;
     }, 500);
-    if (this.needCover && this.copyDom) {
-      // 针对部分无法sticky的父元素使用直接复制引导dom元素 需要引入css不推荐使用
-      let dom = this.domObj
-        ? this.domObj()
-        : document.getElementById(`${this.domId}`);
-      let res_;
-      if (dom) res_ = dom.getBoundingClientRect();
 
-      let dom_clone = dom.cloneNode(true);
-      dom_clone.setAttribute('id', '');
-      dom_clone.style.cssText = `position: fixed;z-index: 997;top:${
-        res_.top
-      }px;left:${res_.left}px;width:${res_.width}px;height:${
-        res_.height
-      }px;background:#fff;`;
-      document.getElementById('vmDom').appendChild(dom_clone);
-    }
     if (this.needCover && !this.copyDom) {
       let dom_ = this.domObj
         ? this.domObj()
@@ -551,16 +548,16 @@ export default {
   opacity: 1;
 }
 
-.size-240{
+.size-240 {
   width: 240px;
 }
-.size-280{
+.size-280 {
   width: 280px;
 }
-.size-320{
+.size-320 {
   width: 320px;
 }
-.size-350{
+.size-350 {
   width: 350px;
 }
 </style>
