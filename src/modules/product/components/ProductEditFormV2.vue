@@ -200,8 +200,6 @@ export default {
     };
   },
   mounted(){
-    console.log( JSON.stringify(this.fields), 1 );
-    console.log( JSON.stringify(this.value), 2 );
   },
   computed: {
     customerField() {

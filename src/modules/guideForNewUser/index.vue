@@ -581,7 +581,8 @@ $window-height-1: 938px;
 }
 .page-guide-box {
   position: relative;
-  min-width: 100vw;
+  min-width: $window-width;
+  width: 100vw;
   min-height: 100vh;
   background-color: rgba($color: #000000, $alpha: 0.8);
   display: flex;
@@ -618,7 +619,6 @@ $window-height-1: 938px;
   $height: 40px;
   @extend .guide-pos;
   @include position-cover($top, $left, $width, $height);
-  background: red;
 }
 
 .guide-menu-pos-2 {
