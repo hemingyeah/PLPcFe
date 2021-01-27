@@ -592,6 +592,7 @@ $window-height-1: 938px;
   .page-guide-background {
     width: $window-width;
     height: $window-height;
+    position: relative;
     img {
       width: 100%;
       height: 100%;
@@ -602,6 +603,7 @@ $window-height-1: 938px;
   .page-guide-background {
     width: $window-width-1;
     height: $window-height-1;
+    position: relative;
     img {
       width: 100%;
       height: 100%;
@@ -616,6 +618,7 @@ $window-height-1: 938px;
   $height: 40px;
   @extend .guide-pos;
   @include position-cover($top, $left, $width, $height);
+  background: red;
 }
 
 .guide-menu-pos-2 {
