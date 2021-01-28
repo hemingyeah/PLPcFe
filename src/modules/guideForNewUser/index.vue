@@ -917,10 +917,3 @@ $window-height-1: 938px;
   @include position-cover($top, $left, $width, $height);
 }
 </style>
-<style lang="scss">
-.page-1440-768 {
-  .list-wrapper {
-    top: 90px !important;
-  }
-}
-</style>
