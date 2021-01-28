@@ -145,17 +145,17 @@ export default {
 
       this.$Guide([{
         id: 'task-manange-guide',
-        content: '工单类型以卡片的形式存在，单个卡片代表一个工单类型',
+        content: '工单类型以卡片的形式显示，一个卡片代表一个工单类型',
         haveStep: true,
         needCover: true,
         nowStep: 1,
         domObj: () => {
           return document.getElementById('task-manage-header-guide')
         },
-        finishBtn: 'ok',
+        lastFinish: true
       }, {
         id: 'task-manange-guide',
-        content: '可用编辑功能，调整可用团队。',
+        content: '可用「编辑」功能修改该工单类型的「可用团队」',
         haveStep: true,
         needCover: true,
         inside: true,
@@ -166,7 +166,7 @@ export default {
         insideDom: () => {
           return document.getElementById('task-type-list-guide').getElementsByClassName('task-type-item')[0].getElementsByClassName('task-type-team-setting')[0]
         },
-        finishBtn: 'ok',
+        lastFinish: true
       }], 0, '', (e) => {
         return new Promise((resolve, reject) => {
           resolve()

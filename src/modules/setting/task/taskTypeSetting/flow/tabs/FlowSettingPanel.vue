@@ -229,10 +229,10 @@ export default {
         insideDom: () => {
           return document.getElementById('setting-flow-axis-guide').getElementsByClassName('flow-axis-step')[0]
         },
-        finishBtn: 'ok',
+        lastFinish: true
       }, {
         id: 'task-flow-guide',
-        content: '可以在新建工单节点，设置工单的表单，本次更新提升了表单控件的能力',
+        content: '可在新建工单节点设置工单表单，本次更新提升了表单控件的能力',
         haveStep: true,
         needCover: true,
         direction: 'row',
@@ -242,10 +242,10 @@ export default {
         domObj: () => {
           return document.getElementById('setting-flow-main-content-guide').getElementsByClassName('form-design-center')[0]
         },
-        finishBtn: 'ok',
+        lastFinish: true
       }, {
         id: 'task-flow-guide',
-        content: '流程中【通用规则】部分的设置，在所有节点均生效',
+        content: '流程中「通用规则」部分的设置，在所有节点均生效',
         haveStep: true,
         needCover: true,
         direction: 'row',
@@ -258,10 +258,10 @@ export default {
         insideDom: () => {
           return document.getElementById('setting-flow-main-content-guide').getElementsByClassName('setting-common')[0].getElementsByClassName('setting-specific-form')[1]
         },
-        finishBtn: 'ok',
+        lastFinish: true
       }, {
         id: 'task-flow-guide',
-        content: '在【完成工单】环节设置回执表单',
+        content: '在「完成工单」节点设置回执表单',
         haveStep: true,
         needCover: true,
         direction: 'row',
@@ -274,7 +274,7 @@ export default {
         insideDom: () => {
           return document.getElementById('setting-flow-axis-guide').getElementsByClassName('flow-axis-step')[4]
         },
-        finishBtn: 'ok',
+        lastFinish: true
       }], 0, '', (e) => {
         return new Promise((resolve, reject) => {
           resolve()

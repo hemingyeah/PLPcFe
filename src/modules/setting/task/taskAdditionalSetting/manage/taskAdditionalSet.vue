@@ -111,7 +111,7 @@ export default {
         domObj: () => {
           return document.getElementById('task-additional-tabs-guide').getElementsByClassName('el-tabs__item')[0]
         },
-        finishBtn: 'ok'
+        lastFinish: true
       }, {
         id: 'task-additional-guide',
         content: '可以在模板库中选择系统已经定义好的附加组件，快速创建。',
@@ -120,7 +120,7 @@ export default {
         domObj: () => {
           return document.getElementById('task-additional-tabs-guide').getElementsByClassName('el-tabs__item')[1]
         },
-        finishBtn: 'ok'
+        lastFinish: true
       }], 0, '', (e) => {
         return new Promise((resolve, reject) => {
           resolve()
