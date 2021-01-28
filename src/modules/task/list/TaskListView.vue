@@ -14,11 +14,10 @@
           <form onsubmit="return false;">
             <div class="seach task-span1 guide-box">
               <div style="position: relative;" >
-                <div class="guide-disable-cover" v-if="nowGuideStep == 4"></div>
                 <div itemid="" @mouseenter="guideDropdownMenu_enter" class="task-flex task-ai task-jend">  
                   <el-dropdown id="v-task-step-3" >
                     <div
-                      :class="['task-list-customize', 'task-font14', 'task-c3', 'task-flex', 'task-ai', 'task-pointer', nowGuideStep == 4? 'guide-point bg-w':'']"
+                      :class="['task-list-customize', 'task-font14', 'task-c3', 'task-flex', 'task-ai', 'task-pointer','bg-w']"
                     >
                       <img
                         src="../../../assets/img/customize.png"
@@ -103,10 +102,9 @@
                     重置
                   </base-button>
                   <div class="guide-box">
-                    <div class="guide-disable-cover" v-if="nowGuideStep == 3"></div>
                     <div
                       id="v-task-step-2"
-                      :class="['advanced-search-visible-btn', 'task-ml12', nowGuideStep == 3? 'guide-point':'']"
+                      :class="['advanced-search-visible-btn', 'task-ml12']"
                       @click.self="panelSearchAdvancedToggle"
                     >
                       <i class="iconfont icon-gaojisousuo task-font12 task-mr4"></i>
@@ -460,7 +458,6 @@
             </el-dropdown>
             <!-- 选择列 -->
             <div class="guide-box">
-              <div class="guide-disable-cover" v-if="nowGuideStep == 2"></div>
               <div
                 :class="['task-ai', 'task-flex', 'task-font14', 'task-c6', 'task-pointer', 'task-width103', 'bg-w' ]"
                 id="v-task-step-1"
@@ -537,10 +534,8 @@
           <span class="task-c2 task-pointer" @click="toggleSelection">清空</span>
         </div>
         <!-- start content 列表表格 -->
-        <div class="guide-box">
-          <div class="guide-disable-cover" v-if="nowGuideStep == 1"></div>
+        <div class="guide-box" id="v-task-step-0">
           <div
-            id="v-task-step-0"
             class="task-list-section common-list-table-view"
             v-if="columns.length"
           >

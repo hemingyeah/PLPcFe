@@ -15,7 +15,7 @@
         <div class="task-delete-status" v-if="isDelete">已删除</div>
 
         <!-- start 工单流程信息 -->
-        <div class="progress-wrap" v-show="collapse" id="v-task-detail-step-0">
+        <div class="progress-wrap bg-w" v-show="collapse" id="v-task-detail-step-0">
           <div class="guide-disable-cover" v-if="nowGuideStep == 1"></div>
           <biz-process :value="task.state" :class="nowGuideStep == 1 ? 'guide-point bg-w':''" :data="task" :flow-setting="initData.taskType.flowSetting" @change="changeTaskProcessState"></biz-process>
         </div>
@@ -119,7 +119,7 @@
       </div>
       <!-- end 审批中icon -->
 
-      <div class="task-detail-header-bottom" :class="{'active': !collapse, 'guide-point bg-w' : nowGuideStep == 2}" id="v-task-detail-step-1">
+      <div class="task-detail-header-bottom bg-w" :class="{'active': !collapse}" id="v-task-detail-step-1">
         <div class="guide-disable-cover" v-if="nowGuideStep == 2"></div>
         <div class="customer-info-wrap">
           <div :class="['customer-name', {'link-text': allowOpenCustomerView}]" @click="openCustomerView(false)">

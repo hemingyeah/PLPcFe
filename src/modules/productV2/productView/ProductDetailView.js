@@ -62,7 +62,6 @@ export default {
       leftActiveTab: 'product-view',
       rightActiveTab: 'info-record',
       collapseDirection: '',
-      nowGuideStep: 5,
       guideSearchModelSave: false,
       guideDropdownMenu: false,
       isGuide: false,
