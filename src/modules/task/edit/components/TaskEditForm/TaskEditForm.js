@@ -250,7 +250,7 @@ export default {
       try {
         if(this.justGuide) this.taskFields = taskFields;
         else this.taskFields = await this.fetchTaskTemplateFields({ typeId: templateId, tableName: 'task', isFromSetting: true });
-        this.taskValue = FormUtil.initialize(this.taskFields, {});
+        this.taskValue = FormUtil.initialize(this.taskFields, { templateId });
 
         // 表单初始化
         this.$emit('update:value', this.taskValue);

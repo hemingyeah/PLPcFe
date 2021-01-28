@@ -43,6 +43,7 @@ export default {
 
       form = util.packToForm(this.fields, form);
       this.form = FormUtil.initialize(this.fields, form);
+      this.form.templateId = this.genTemplateId();
 
       // 呼叫中心需求处理
       this.callCenterWithTaskDataHandler();
