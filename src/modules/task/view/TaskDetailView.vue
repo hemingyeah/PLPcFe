@@ -1,9 +1,6 @@
 <template>
   <div class="task-detail-container" v-loading="loading" ref="container">
     <div id="task-task-detail-view"></div>
-    <div class="guide-model-box" v-if="nowGuideStep < 5">
-
-    </div>
     <!-- start 顶部操作区 -->
     <div class="task-detail-header" ref="header">
       <div class="task-detail-header-top" :class="{'active': !collapse}">
