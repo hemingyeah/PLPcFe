@@ -404,7 +404,7 @@ const BizSelectColumn = {
           finishBtn: 'OK',
         }], 0, null, (e)=>{
           return new Promise((resolve, reject)=>{
-            if(e.type == 'stop') this['guideSelectColumn'] = false;
+            if(e.type == 'stop' || e.type == 'finish') this['guideSelectColumn'] = false;
             resolve()
           })
         }).create().then(res_=>{if(res_)storageSet(TASK_GUIDE_SELECT_COLUMN, '1')})
