@@ -66,7 +66,6 @@ export default {
       rightActiveTab: 'part',
       collapseDirection: '',
       statistics:{},
-      nowGuideStep: 5,
       guideSearchModelSave: false,
       guideDropdownMenu: false,
       isGuide: false,

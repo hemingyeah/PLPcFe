@@ -78,7 +78,6 @@ export default {
         boundariesElement: 'viewport',
         removeOnDestroy: true
       },
-      nowGuideStep: 5,
       guideSearchModelSave: false,
       guideDropdownMenu: false,
       isGuide: false,
@@ -1233,6 +1232,11 @@ export default {
             finishBtn:'知道了'
           }], 0, '', (e) => {
             return new Promise((resolve, reject) => {
+              if(e.type == 'stop' || e.type == 'finish'){
+                if ( this.showTaskDetailGuide && this.showAllotModal) {
+                  this.allot()
+                }
+              }
               resolve()
             })
           }).create().then(res_=>{if(res_)storageSet(TASK_GUIDE_DETAIL, '4')})
@@ -1249,11 +1253,6 @@ export default {
     },
     collapseDirection(newValue) {
       sessionStorage.setItem(`task_collapseDirection_${this.task.id}`, newValue);
-    },
-    nowGuideStep(newValue) {
-      if (newValue == 5 && this.showTaskDetailGuide && this.showAllotModal) {
-        this.allot()
-      }
     }
   },
   components: {
