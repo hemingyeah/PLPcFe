@@ -43,7 +43,9 @@ enum ComponentNameEnum {
   // UIInput
   UiInput = 'ui-input',
   // 工单状态
-  UiTaskState = 'ui-task-state'
+  UiTaskState = 'ui-task-state',
+  // 业务远程搜索
+  BizRemoteSelect = 'biz-remote-select',
 }
 
 export default ComponentNameEnum

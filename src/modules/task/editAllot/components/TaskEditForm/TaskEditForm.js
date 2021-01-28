@@ -9,6 +9,7 @@ import { findComponentDownward } from '@src/util/assist'
 import { getFieldValue2string } from '@service/TaskService.ts'
 import ObjectUtil from '@src/util/object';
 import Filter from '@src/filter/filter.js';
+import { isEmpty } from '@src/util/type';
 import { 
   customerAddressSelectConversion,
   linkmanSelectConversion,
@@ -177,6 +178,32 @@ export default {
           })
         }
       });
+    },
+    /**
+     * @description: 绑定地址select数据
+     * @param {Object | null} address 地址信息
+     * @return {void}
+    */    
+    bindAddressOptions(address) {
+      if (isEmpty(address)) return
+      
+      this.customerAddressOptions = [customerAddressSelectConversion(address)]
+      this.$nextTick(() => {
+        this.bindAddress(address)
+      })
+    },
+    /**
+     * @description: 绑定联系人select数据
+     * @param {Object | null} address 地址信息
+     * @return {void}
+    */    
+    bindLinkmanOptions(linkman) {
+      if (isEmpty(linkman)) return
+      
+      this.customerLinkmanOptions = [linkmanSelectConversion(linkman)]
+      this.$nextTick(() => {
+        this.bindLinkman(linkman)
+      })
     },
     /** 
      * @description 绑定地址
@@ -635,11 +662,11 @@ export default {
       try {
         const result = await this.fetchTaskDefaultInfo({ customerId: selectedCustomerId });
         let { linkman, address } = result;
-
+        
         // 重置联系人和地址
         this.updateLinkmanValue([]);
         this.updateAddressValue([]);
-
+        
         // 绑定联系人和地址
         linkman && this.bindLinkman(linkman);
         address && this.bindAddress(address);
@@ -676,8 +703,9 @@ export default {
         // 判断客户是否存在
         if (!isHaveCustomer) {
           // 客户不存在时则下拉框隐藏
-          findComponentDownward(this.$refs.linkman, 'base-select').close();
-        
+          const LinkmanSelectComponent = findComponentDownward(this.$refs.linkman, 'base-select')
+          LinkmanSelectComponent?.close()
+          
           const customerData = [{
             label: linkmanCustomer.name,
             value: linkmanCustomer.id,

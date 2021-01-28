@@ -111,39 +111,6 @@ router.use('/temp', (ctx) =>
     },
   })
 )
-router.use('/api/customer/outside/pc', (ctx) =>
-  HttpClient.proxy(ctx, {
-    host: '30.40.58.216',
-    port: 10013,
-  })
-);
-
-router.use('/api/linkc', (ctx) =>
-  HttpClient.proxy(ctx, {
-    host: '30.40.63.238',
-    port: 10016,
-  })
-);
-
-router.use('/setting/product/productConfig', (ctx) =>
-  HttpClient.proxy(ctx, {
-    host: '30.40.63.238',
-    port: 8080,
-  })
-);
-
-router.use('/api/elasticsearch/outside/es', (ctx) =>
-  HttpClient.proxy(ctx, {
-    host: '30.40.58.216',
-    port: 10006,
-  })
-);
-router.use('/files', (ctx) =>
-  HttpClient.proxy(ctx, {
-    host: '30.40.58.216',
-    port: 8083,
-  })
-);
 
 router.use('/webregister/outside/register', (ctx) =>
   HttpClient.proxy(ctx, {
@@ -177,7 +144,6 @@ router.use('', linkcRouter.routes(), sparePartRouter.allowedMethods());
 router.use('', productV2Router.routes(), sparePartRouter.allowedMethods());
 router.use('', superQrcodeRouter.routes(), sparePartRouter.allowedMethods());
 router.use('', guideForNewUser.routes(), sparePartRouter.allowedMethods());
-
 
 
 router.all('/*', (ctx) => {

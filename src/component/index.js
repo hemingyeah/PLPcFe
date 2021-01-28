@@ -46,6 +46,7 @@ import BizSearchProductSelect from './business/BizSearchProductSelect';
 import BizProcess from './business/BizProcess';
 import BizProcessTime from './business/BizProcessTime';
 import BizSelectColumn from './business/BizSelectColumn';
+import BizRemoteSelect from '@src/component/business/BizRemoteSelect'
 
 import SampleTooltip from './common/SampleTooltip';
 
@@ -96,6 +97,7 @@ const components = [
   BizProcess,
   BizProcessTime,
   BizSelectColumn,
+  BizRemoteSelect,
   
   BaseWindow,
   SampleTooltip,
