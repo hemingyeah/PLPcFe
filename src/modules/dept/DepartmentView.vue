@@ -1994,11 +1994,12 @@ export default {
   }
 }
 .dept-del-role-item {
+  flex: 1;
   position: absolute;
   bottom: 0;
-  min-width: 300px;
+  width: 100%;
   margin-top: 10px;
-  border: 1px solid #eee;
+  border-top: 1px solid #eee;
 }
 .dept-del-role-item-expand {
   min-width: 400px;
@@ -2273,6 +2274,7 @@ body {
   height: calc(100% - 105px);
 }
 .department-left {
+  position: relative;
   border-right: 1px solid #f2f2f2;
   .base-button {
     margin: 10px 20px;
