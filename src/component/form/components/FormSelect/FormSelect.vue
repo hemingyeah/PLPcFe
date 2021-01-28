@@ -103,6 +103,7 @@ export default {
   methods: {
     input(newValue){
       let oldValue = null;
+      console.log(12313123);
       if(this.selectType == 1) this.$refs.elSelect.blur();      
       this.$emit('update', {newValue, oldValue, field: this.field});
       this.$emit('input', newValue);

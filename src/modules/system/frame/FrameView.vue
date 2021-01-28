@@ -1385,6 +1385,7 @@ export default {
     }
     this.getShbEdition()
     this.getSystemPopup();
+
   },
   components: {
     [FrameNav.name]: FrameNav,
