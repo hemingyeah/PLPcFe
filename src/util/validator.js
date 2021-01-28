@@ -77,7 +77,8 @@ let repeatRemoteValidate = (mode, field, value, id, changeStatus, resolve, isSam
   
   const remoteFunc = (value, resolve) => {
     let api = fieldValidateMap[mode];
-    let params = { fieldName: field.fieldName, fieldValue: value, id, templateId, isCommon: field.isCommon};
+    let params = { fieldName: field.fieldName, fieldValue: value, id};
+    if(!field.isCommon) params.templateId = templateId;
     
     // api不存在
     if (!api) return;
