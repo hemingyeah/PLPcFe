@@ -462,7 +462,7 @@
             <div class="guide-box">
               <div class="guide-disable-cover" v-if="nowGuideStep == 2"></div>
               <div
-                :class="['task-ai', 'task-flex', 'task-font14', 'task-c6', 'task-pointer', 'task-width103', 'bg-w']"
+                :class="['task-ai', 'task-flex', 'task-font14', 'task-c6', 'task-pointer', 'task-width103', 'bg-w' ]"
                 id="v-task-step-1"
                 @click="showAdvancedSetting"
               >
@@ -554,8 +554,8 @@
               @select-all="handleSelection"
               @sort-change="sortChange"
               @header-dragend="headerDragend"
-              :class="['task-list-table', 'common-list-table', nowGuideStep == 1 ? 'guide-point' : '']"
-              header-row-class-name="common-list-table-header taks-list-table-header"
+              :class="['task-list-table', 'common-list-table']"
+              header-row-class-name="common-list-table-header taks-list-table-header bg-w"
               ref="multipleTable"
             >
               <el-table-column
