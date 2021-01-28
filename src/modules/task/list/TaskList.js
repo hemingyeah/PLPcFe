@@ -149,7 +149,6 @@ export default {
       showBj: false,
       typeHeight: '',
       stateHeight: '',
-      nowGuideStep:5,
       guideSearchModelSave: false,
       guideDropdownMenu: false,
       isGuide:false,
@@ -344,13 +343,6 @@ export default {
     guideDropdownMenu_enter(){
       // if (storageGet(TASK_GUIDE_DROPDOWN_MENU) == '1') return this['guideDropdownMenu'] = false;
       // storageSet(TASK_GUIDE_DROPDOWN_MENU, '1')
-    },
-    previousStep() {},
-    nextStep() {
-      this.nowGuideStep ++;
-    },
-    stopStep() {
-      this.nowGuideStep = 5;
     },
     /**
      * 获取附件

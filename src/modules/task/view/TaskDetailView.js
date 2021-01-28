@@ -31,7 +31,7 @@ import TaskTimeDialog from './components/TaskTimeDialog.vue';
 import TaskAllotModal from '@src/modules/task/components/TaskAllotModal/TaskAllotModal.tsx'
 
 /* enum */
-import { TaskEventNameMappingEnum } from "@model/enum/EventNameMappingEnum.ts";
+import { TaskEventNameMappingEnum } from '@model/enum/EventNameMappingEnum.ts';
 import TableNameEnum from '@model/enum/TableNameEnum.ts';
 /* mixin */
 import tourGuide from '@src/mixins/tourGuide'
@@ -82,7 +82,6 @@ export default {
         boundariesElement: 'viewport',
         removeOnDestroy: true
       },
-      nowGuideStep: 5,
       guideSearchModelSave: false,
       guideDropdownMenu: false,
       isGuide: false,
@@ -1196,11 +1195,60 @@ export default {
       
       this.$nextTick(() => {
         setTimeout(() => {
-          if (this.showTaskDetailGuide) {
-            this.$tours['myTour'].start();
-            this.nowGuideStep = 1;
-            storageSet(TASK_GUIDE_DETAIL, '4');
-          }
+          if (storageGet(TASK_GUIDE_DETAIL) && storageGet(TASK_GUIDE_DETAIL) > 0) return this.$Guide().destroy('task-task-detail-view')
+          this.$Guide([{
+            content:'清晰展示当前工单进度',
+            title:'工单进度',
+            domId:'v-task-detail-step-0',
+            haveStep: true,
+            nowStep: 1,
+            id: 'task-task-detail-view',
+            needCover: true,
+            lastFinish:true,
+            finishBtn:'知道了'
+          }, {
+            content:
+            '工单重要信息展示',
+            haveStep: true,
+            nowStep: 2,
+            id: 'task-task-detail-view',
+            domId: 'v-task-detail-step-1',
+            needCover: true,
+            lastFinish:true,
+            finishBtn:'知道了'
+          }, {
+            content:
+            '「工单动态」搬到这里了',
+            haveStep: true,
+            nowStep: 3,
+            id: 'task-task-detail-view',
+            domId: 'tab-record',
+            needCover: true,
+            lastFinish:true,
+            copyDom:true,
+            finishBtn:'知道了'
+          }, {
+            content:
+            '编辑、复制及删除',
+            title:'工单操作',
+            haveStep: true,
+            nowStep: 4,
+            id: 'task-task-detail-view',
+            domId: 'v-task-detail-step-3',
+            needCover: true,
+            lastFinish:true,
+            copyDom:true,
+            finishBtn:'知道了'
+          }], 0, '', (e) => {
+            return new Promise((resolve, reject) => {
+              if(e.type == 'stop' || e.type == 'finish'){
+                if ( this.showTaskDetailGuide && this.showAllotModal) {
+                  this.allot()
+                }
+              }
+              resolve()
+            })
+          }).create().then(res_=>{if(res_)storageSet(TASK_GUIDE_DETAIL, '4')})
         }, 1000)
       })
 
@@ -1214,11 +1262,6 @@ export default {
     },
     collapseDirection(newValue) {
       sessionStorage.setItem(`task_collapseDirection_${this.task.id}`, newValue);
-    },
-    nowGuideStep(newValue) {
-      if (newValue == 5 && this.showTaskDetailGuide && this.showAllotModal) {
-        this.allot()
-      }
     }
   },
   components: {
