@@ -3,6 +3,7 @@ enum EventNameEnum {
   Clear = 'clear',
   Input = 'input',
   MouseOver = 'mouseover',
+  Resize = 'resize',
 }
 
 export default EventNameEnum
