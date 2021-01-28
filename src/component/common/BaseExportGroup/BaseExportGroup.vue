@@ -224,7 +224,7 @@ export default {
         let checkedArr = [];
 
         if (value.indexOf(key) > -1) {
-          let columns = filterColumnsMap[key];
+          let columns = filterColumnsMap[key] || [];
 
           checkedArr = columns.map((item) =>
             item.exportAlias ? item.exportAlias : item.field
