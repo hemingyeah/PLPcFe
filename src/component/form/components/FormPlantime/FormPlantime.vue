@@ -11,6 +11,7 @@
       @focus="dateTimePickerFocusHandler"
       @blur="dateTimePickerBlurHandler"
       @input="choose"
+      format='yyyy-MM-dd HH:mm'
     />
   </div>
 </template>

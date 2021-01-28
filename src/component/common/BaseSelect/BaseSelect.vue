@@ -83,14 +83,22 @@
           <template v-if="!topShow">
             <div class="arrow"></div>
             <div class="input-container" v-if="!options.length">
-              <input type="text" v-model="keyword" @input="searchByKeyword" ref="input" :placeholder="placeholder">
+              <input 
+                type="text" 
+                ref="input" 
+                v-model="keyword" 
+                :placeholder="placeholder"
+                @mousedown="stopMouseDownHandler($event)" 
+                @input="searchByKeyword" 
+              >
             </div>
           </template>
           <ul class="option-list" v-loadmore="loadmoreOptions" ref="list" v-if="showList">
             <li
               v-for="(op) in optionList"
               :key="op.value" 
-              @click="selectTag(op)"
+              @click.stop="selectTag(op, $event)"
+              @mousedown="stopMouseDownHandler($event)"
               :class="{'selected': value.some(user => user[valueKey] ===op[valueKey])}"
             >
               <slot name="option" :option="op" v-if="optionSlot"></slot>
@@ -101,8 +109,16 @@
             <li class="list-message" v-if="message">{{message}}</li>
           </ul>
           <template v-if="topShow">
-            <div class="input-container" v-if="!options.length">
-              <input type="text" v-model="keyword" @input="searchByKeyword" ref="input" :placeholder="placeholder">
+            <div v-if="!options.length" class="input-container">
+              <input
+                id="stopEvent"
+                type="text" 
+                v-model="keyword" 
+                @input="searchByKeyword" 
+                @mousedown="stopMouseDownHandler($event)" 
+                ref="input" 
+                :placeholder="placeholder"
+              >
             </div>
             
             <div class="arrow-bottom"></div>
@@ -297,7 +313,11 @@ export default {
       const newVal = this.value.filter(t => t[this.valueKey] !== tag[this.valueKey]);
       this.$emit('input', newVal);
     },
-    selectTag(tag) {
+    stopMouseDownHandler(event) {
+      event.stopPropagation()
+      event.preventDefault()
+    },
+    selectTag(tag, event) {
       let newValue = this.value;
       
       if (!this.multiple) {
@@ -314,6 +334,10 @@ export default {
       }
       
       this.$emit('input', newValue);
+      
+      this.$nextTick(() => {
+        this.$data.$popper.scheduleUpdate()
+      })
     },
     async loadmore() {
       this.loadmoreOptions.disabled = true;
@@ -402,7 +426,7 @@ export default {
       let rectData = this.$el.getBoundingClientRect()
       let y = rectData.y
       let windowHeight = document.body.innerHeight
-      let isOverflow = windowHeight - y < 400
+      let isOverflow = windowHeight - y < 200
       
       return isOverflow ? 'top-start' : 'bottom-start'
     },
@@ -578,6 +602,7 @@ export default {
   left: 0;
   top: calc(100% + 13px);
   width: 100%;
+  height: 240px;
   // padding-top: 34px;
   box-shadow: 1px 1px 8px rgba(0, 0, 0, 0.15);
   background: #fff;
@@ -624,7 +649,7 @@ export default {
   }
     
   .option-list {
-    max-height: 400px;
+    max-height: 200px;
     overflow: auto;
     padding: 0;
     margin: 0;
@@ -643,6 +668,7 @@ export default {
       padding: 0 10px;
       line-height: 34px;
       position: relative;
+      cursor: pointer;
       
       &:hover {
         background: $color-primary-light-9;
@@ -679,6 +705,13 @@ export default {
     .list-message {
       color: $text-color-secondary;
     }
+  }
+}
+
+.list-wrapper[x-placement="bottom-start"] {
+  .arrow-bottom {
+    top: -7px;
+    transform: rotateZ(0deg);
   }
 }
 </style>
