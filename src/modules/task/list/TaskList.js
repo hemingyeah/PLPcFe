@@ -29,8 +29,6 @@ import * as FormUtil from '@src/component/form/util'
 // 新存储工具方法
 import * as StorageUtil from '@src/util/storage.ts'
 
-/* mixin */
-import tourGuide from '@src/mixins/tourGuide'
 
 /* constants */
 import {
@@ -77,7 +75,6 @@ const Region = {
 export default {
   name: 'task-list',
   inject: ['initData'],
-  mixins: [tourGuide],
   data() {
     return {
       selectIds, // id
@@ -368,10 +365,7 @@ export default {
             resolve()
           })
         }).create().then(res_=>{if(res_)storageSet(TASK_GUIDE_LIST, '4')})
-      
 
-        
-      //   if (!storageGet(TASK_GUIDE_LIST)) this.$tours['myTour'].start(), this.nowGuideStep = 1, storageSet(TASK_GUIDE_LIST, '4');
       }, 1000)
     })
 

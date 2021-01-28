@@ -20,8 +20,8 @@
     </h3>
     <!--  -->
     <div id="v-task-step"></div>
-    <div class="task-search-panel-title task-pointer task-flex task-ai" id="v-task-step-6-dom" @click="show =!show">
-      <span class="task-font16">常用查询条件</span>
+    <div class="task-search-panel-title task-pointer task-flex task-ai" @click="show =!show">
+      <span class="task-font16" id="v-task-step-6-dom">常用查询条件</span>
       <span slot="reference" class="task-font14 task-c2 task-ml12 task-mr4" @click.stop="$refs.taskSearchPupal.open()">设置</span>
       <span class="task-span1">
         <el-tooltip content="常用查询条件可以通过“设置”功能，进行添加和修改" placement="top">
@@ -49,9 +49,9 @@
         :column-num="columnNum"
       >
       </task-search-form>
-      <div style="position: relative" id="v-task-step-7-dom">
+      <div style="position: relative" >
         <div class="task-pointer task-flex task-ai">
-          <span class="task-font16 task-mr4">添加查询条件</span>
+          <span class="task-font16 task-mr4" id="v-task-step-7-dom">添加查询条件</span>
           <span>
             <el-tooltip content="您可以通过“添加”按钮设置更多的查询条件" placement="top">
               <i class="iconfont icon-question task-icon"></i>

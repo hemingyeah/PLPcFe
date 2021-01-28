@@ -32,8 +32,6 @@ import TaskAllotModal from '@src/modules/task/components/TaskAllotModal/TaskAllo
 
 /* enum */
 import { TaskEventNameMappingEnum } from '@model/enum/EventNameMappingEnum.ts';
-/* mixin */
-import tourGuide from '@src/mixins/tourGuide'
 
 const ENCRYPT_FIELD_VALUE = '***';
 
@@ -42,7 +40,6 @@ const { TASK_GUIDE_DETAIL } = require('@src/component/guide/taskV2Store');
 export default {
   name: 'task-detail-view',
   inject: ['initData'],
-  mixins: [tourGuide],
   data() {
     return {
       loading: false,
@@ -644,12 +641,6 @@ export default {
     }
   },
   methods: {
-    nextStep() {
-      this.nowGuideStep++;
-    },
-    stopStep() {
-      this.nowGuideStep = this.detailSteps.length + 1;
-    },
     /**
      * 折叠
      */
@@ -1245,11 +1236,6 @@ export default {
               resolve()
             })
           }).create().then(res_=>{if(res_)storageSet(TASK_GUIDE_DETAIL, '4')})
-          // if (this.showTaskDetailGuide) {
-          //   this.$tours['myTour'].start();
-          //   this.nowGuideStep = 1;
-          //   storageSet(TASK_GUIDE_DETAIL, '4');
-          // }
         }, 1000)
       })
 
