@@ -103,6 +103,9 @@ export default {
         line-height: 24px;
         margin: 0;
       }
+      p, img {
+        width: 120px;
+      }
     }
 
     dl {
