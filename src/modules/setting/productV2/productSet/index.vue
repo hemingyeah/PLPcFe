@@ -561,7 +561,6 @@ export default {
         gStyle: 'top:35px',
         id: 'product-set-guide',
         domId: 'product-set-guide-1',
-        direction:'row',
         finishBtn: 'OK',
         diyContent: true,
         diyContentDom: GuideContent
