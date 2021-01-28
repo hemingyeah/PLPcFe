@@ -266,7 +266,7 @@ const BizTeamSelect = {
         </div>
       )
     },
-    placementrenderSubItem(h, items = []){
+    renderSubItem(h, items = []){
       return items.map((item, index) => {
         let clazz = ['biz-team-select-item biz-team-select-subItem'];
         if(!index && index !== items.length - 1) clazz.push('biz-team-select-subItem-start');
