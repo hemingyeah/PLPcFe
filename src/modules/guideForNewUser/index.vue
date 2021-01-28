@@ -318,6 +318,7 @@ import guide_qrcode_5 from '@src/assets/img/userGuide/guide-qrcode-5.png';
 import guide_qrcode_6 from '@src/assets/img/userGuide/guide-qrcode-6.png';
 import guide_qrcode_7 from '@src/assets/img/userGuide/guide-qrcode-7.png';
 import guide_qrcode_8 from '@src/assets/img/userGuide/guide-qrcode-8.png';
+import { addClass, removeClass } from '@src/util/dom'
 
 export default {
   components: {
@@ -450,6 +451,13 @@ export default {
         }
       },
     },
+    pageSize: {
+      immediate: true,
+      handler(newValue, oldValue) {
+        removeClass(document.body, `${oldValue} `)
+        addClass(document.body, `${document.body.className} ${newValue}`)
+      }
+    }
   },
   methods: {
     changeSetp(type, step) {
@@ -907,5 +915,12 @@ $window-height-1: 938px;
   $height: 30px;
   @extend .guide-pos;
   @include position-cover($top, $left, $width, $height);
+}
+</style>
+<style lang="scss">
+.page-1440-768 {
+  .list-wrapper {
+    top: 90px !important;
+  }
 }
 </style>
