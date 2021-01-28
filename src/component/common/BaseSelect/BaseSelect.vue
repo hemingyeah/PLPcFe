@@ -650,6 +650,7 @@ export default {
     
   .option-list {
     max-height: 200px;
+    width: 100%;
     overflow: auto;
     padding: 0;
     margin: 0;
@@ -712,6 +713,14 @@ export default {
   .arrow-bottom {
     top: -7px;
     transform: rotateZ(0deg);
+  }
+  .input-container {
+    position: absolute;
+    top: 0;
+  }
+  .option-list {
+    position: absolute;
+    top: 40px;
   }
 }
 </style>
