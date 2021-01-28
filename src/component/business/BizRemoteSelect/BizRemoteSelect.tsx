@@ -14,11 +14,9 @@ import { Component, Emit, Prop } from 'vue-property-decorator'
 /* scss */
 import '@src/component/business/BizRemoteSelect/BizRemoteSelect.scss'
 /* util */
-import * as _ from 'lodash'
 import Log from '@src/util/log.ts'
 import { uuid } from '@src/util/string'
 import { isEmpty, isObject, isUndefined } from '@src/util/type'
-import { magneticConstantDependencies } from 'mathjs'
 
 interface LoadmoreOptions {
   // 是否禁用
@@ -28,11 +26,6 @@ interface LoadmoreOptions {
   // 触发距离
   distance: number,
 }
-
-/* 下拉选择面板类名 */
-const BizRemoteSelectPanelClassName = 'biz-form-remote-select-panel'
-/* 下拉选择面板类名箭头 */
-const BizRemoteSelectPanelArrowClassName = 'popper__arrow'
 
 /* @deprecated 已弃用 */
 @Component({
@@ -142,57 +135,6 @@ class BizRemoteSelect extends VC<{}> {
     return Boolean(this.cleared && this.value && this.value?.length > 0 && !this.inputDisabled)
   }
   
-  
-  /**
-   * @description: 计算选择下面面板定位
-   * @return {*}
-  */  
-  private computedSelectDropdownPanelPosition() {
-    // 当前显示的选择面板元素
-    let visibleSelectPanelElement: HTMLElement | null = this.getVisibleSelectPanelElement()
-    if (!visibleSelectPanelElement) {
-      return Log.warn('Caused: visibleSelectPanelElement is null', this.computedSelectDropdownPanelPosition.name)
-    }
-    
-    // body宽度
-    const BodyClientWidth = this.getBodyClientWidth()
-    // 当前显示的选择面板元素宽度
-    const VisibleSelectPanelElementClientWidth = visibleSelectPanelElement.clientWidth
-    // select元素的宽度
-    const SelectElementClientWidth = this.$el.clientWidth
-    // 选择面板元素宽度 小于等于 select元素的宽度 则不计算
-    if (VisibleSelectPanelElementClientWidth <= SelectElementClientWidth) return
-    
-    // 剩余的宽度
-    const SurplusWidth = BodyClientWidth - VisibleSelectPanelElementClientWidth
-    // 箭头元素
-    const VisibleSelectPanelArrowElement: any | null = this.getgetVisibleSelectPanelArrowElement(visibleSelectPanelElement)
-    
-    const SetVisibleSelectPanelAndArrowElementStyle = () => {
-      if (!visibleSelectPanelElement) return
-      
-      // 设置显示的选择面板元素的定位
-      visibleSelectPanelElement.style.left = `${SurplusWidth / 2}px`
-      
-      if (!VisibleSelectPanelArrowElement) return
-      
-      // 显示的选择面板元素下的箭头元素之前的左定位
-      const VisibleSelectPanelArrowElementOldLeft: string = VisibleSelectPanelArrowElement.style.left.replace('px', '')
-      // 显示的选择面板元素下的箭头元素新的左定位
-      const VisibleSelectPanelArrowElementNewLeft: number = (
-        Number(VisibleSelectPanelArrowElementOldLeft)
-        + (SurplusWidth / 2)
-      )
-      //  设置显示的选择面板元素下的箭头元素的定位
-      VisibleSelectPanelArrowElement.style.left = `${VisibleSelectPanelArrowElementNewLeft}px`
-    }
-    
-    // 设置定位左侧位置
-    this.$nextTick(() => {
-      SetVisibleSelectPanelAndArrowElementStyle()
-    })
-  }
-  
   /**
    * @description: 获取远程数据
    * @param {string} keyword 搜索关键字
@@ -235,64 +177,6 @@ class BizRemoteSelect extends VC<{}> {
   }
   
   /**
-   * @description: 获取body宽度
-   * @return {Number} body宽度
-  */  
-  private getBodyClientWidth(): number {
-    return document.body.clientWidth
-  }
-  
-  /**
-   * @description: 获取可见的选择面板元素
-   * @return {Element | null}
-  */  
-  private getVisibleSelectPanelElement(): HTMLElement | null {
-    // 选择面板元素列表
-    const SelectPanelElements: NodeListOf<HTMLElement> = document.querySelectorAll(`.${BizRemoteSelectPanelClassName}`)
-    // 选择面板元素列表为空
-    if (SelectPanelElements.length === 0) {
-      Log.warn(
-        `Caused: ${BizRemoteSelectPanelClassName} element is empty`,
-        this.getVisibleSelectPanelElement.name
-      )
-      return null
-    }
-    
-    let visibleSelectPanelElement: HTMLElement | null = null
-    let isVisible: boolean = false
-    
-    for (let i = 0; i < SelectPanelElements.length; i++) {
-      visibleSelectPanelElement = SelectPanelElements[i]
-      isVisible = visibleSelectPanelElement?.style?.display !== 'none'
-      
-      if (isVisible) break
-    }
-    
-    return visibleSelectPanelElement
-  }
-  
-  /**
-   * @description: 获取可见的选择面板元素下的箭头元素
-   * @return {Element | null}
-  */  
-  private getgetVisibleSelectPanelArrowElement(visibleSelectPanelElement: Element | null) {
-    if (!visibleSelectPanelElement) return
-    
-    const VisibleSelectPanelChildElements: HTMLCollection = visibleSelectPanelElement.children
-    let visibleSelectPanelChildElement: Element | null = null
-    
-    for (let i = 0; i < VisibleSelectPanelChildElements.length; i++) {
-      visibleSelectPanelChildElement = VisibleSelectPanelChildElements[i]
-      
-      if (visibleSelectPanelChildElement.className.indexOf(BizRemoteSelectPanelArrowClassName) > -1) {
-        return visibleSelectPanelChildElement
-      }
-    }
-    
-    return null
-  }
-  
-  /**
    * @description: 加载更多
   */  
   private async loadmore() {
@@ -305,26 +189,9 @@ class BizRemoteSelect extends VC<{}> {
       this.page.pageNum += 1
       const result = await this.fetchRemoteData()
       this.page.merge(result)
-      
-      this.$nextTick(() => {
-        this.computedSelectDropdownPanelPosition()
-      })
-      
     } catch (error) {
       Log.error(error, this.loadmore.name)
     }
-  }
-  
-  /**
-   * @description: 屏幕改变事件操作
-   * @return {void}
-  */  
-  private resizeEventHandler() {
-    this.$nextTick(() => {
-      _.debounce(() => {
-        this.computedSelectDropdownPanelPosition()
-      }, 250)()
-    })
   }
   
   /**
@@ -343,9 +210,6 @@ class BizRemoteSelect extends VC<{}> {
     // 获取远程数据
     this.fetchRemoteData(keyword).then((data: Page) => {
       this.page.cover(data)
-      this.$nextTick(() => {
-        this.computedSelectDropdownPanelPosition()
-      })
     })
   }
   
@@ -377,14 +241,6 @@ class BizRemoteSelect extends VC<{}> {
     )
   }
   
-  mounted(){
-    window.addEventListener(EventNameEnum.Resize, this.resizeEventHandler)
-  }
-  
-  destroyed(){
-    window.removeEventListener(EventNameEnum.Resize, this.resizeEventHandler)
-  }
-  
   render(h: CreateElement) {
     const attrs = this.getAttributes()
     
@@ -404,7 +260,6 @@ class BizRemoteSelect extends VC<{}> {
           remote
           reserve-keyword
           remoteMethod={this.search}
-          popper-class={BizRemoteSelectPanelClassName}
           placeholder={this.placeholder}
           scopedSlots={this.$scopedSlots}
           value={this.selectValue}
