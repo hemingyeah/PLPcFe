@@ -10,7 +10,7 @@
       完成该节点时需要审批，{{ approveSetting.level > 1 ? "一级" : "" }}审批人
       <el-tooltip :disabled="!approveSetting.leader || options.some(opt => approveSetting.leader === opt.value)" content="您设置的审批人员已被删除，请重新选择">
         <el-select
-          class="w-200"
+          class="w-187"
           :value="approveSetting.leader"
           placeholder="请选择"
           @change="(val) => updateApproveSetting('leader', val, 1)"
@@ -26,7 +26,7 @@
       </el-tooltip>
       <template v-if="approveSetting.leader === 'users'" class="mt-12">
         <el-input
-          class="w-200"
+          class="w-187"
           placeholder="请选择审批人"
           readonly
           :value="getApproverNames(approveSetting.approvers)"
@@ -44,7 +44,7 @@
           {{ (idx + 2) | formatNumToCN }}级审批人
           <el-tooltip :disabled="!approveSetting.multiApproverSetting[idx].leader || options.some(opt => approveSetting.multiApproverSetting[idx].leader === opt.value)" content="您设置的审批人员已被删除，请重新选择">
             <el-select
-              class="w-200"
+              class="w-187"
               :value="setting.leader"
               placeholder="请选择"
               @change="(val) => updateApproveSetting('leader', val, idx + 2)"
@@ -60,7 +60,7 @@
           </el-tooltip>
           <el-input
             v-if="setting.leader === 'users'"
-            class="w-200 mt-12"
+            class="w-187 mt-12"
             placeholder="请选择审批人"
             readonly
             :value="getApproverNames(setting.approvers)"
@@ -192,6 +192,7 @@ export default {
 <style lang="scss" scoped>
 .setting-approve {
   &-people {
+    line-height: 40px;
     margin-bottom: 12px;
     font-size: 14px;
     color: #999999;
@@ -210,7 +211,7 @@ export default {
   margin-bottom: 12px;
 }
 
-.w-200 {
-  width: 200px;
+.w-187 {
+  width: 187px;
 }
 </style>

@@ -8,6 +8,7 @@
     </div>
 
     <div id="product-product-nav"></div>
+    <div id="task-setting-nav"></div>
     <div class="frame-menu-scroll">
       <ul class="frame-menu">
         <template v-for="(menu, index) in menus">
@@ -69,10 +70,18 @@ import MiniLogo from '@src/assets/svg/logo.svg';
 import { storageGet, storageSet } from '@src/util/storage';
 import { isShowCardWorkTime } from '@src/util/version.ts';
 import GuideContent from '@src/component/guide/contentCom/ProductFrameNav.vue';
+// 新存储工具方法
+import * as StorageUtil from '@src/util/storage.ts';
+/* enum */
+import StorageModuleEnum from '@model/enum/StorageModuleEnum';
 
 const {
   PRODUCT_FRAME_NAV
 } = require('@src/component/guide/productV2Store');
+
+const {
+  TASK_SETTING_FRAME_NAV
+} = require('@src/component/guide/taskSettingStore');
 export default {
   name: 'frame-nav',
   props: {
@@ -235,7 +244,7 @@ export default {
   },
   mounted () {
     this.init()
-    this.$nextTick(() => {
+    this.$nextTick(async() => {
       if (storageGet(PRODUCT_FRAME_NAV) && storageGet(PRODUCT_FRAME_NAV) > 0) this.$Guide().destroy('product-product-nav')
       else this.$Guide([{
         content:
@@ -253,6 +262,34 @@ export default {
           resolve()
         })
       }).create().then(res_=>{if(res_)storageSet(PRODUCT_FRAME_NAV, '1')})
+
+      // 工单设置新功能引导，只针对灰度内且【系统管理员】开发
+      let { restructSetting, confirmSetting } = this.$parent.initData || {};
+      if ((restructSetting || confirmSetting) && window.isSystemAdmin) {
+        const guideStore = await StorageUtil.storageGet(TASK_SETTING_FRAME_NAV, 0, StorageModuleEnum.Task);
+        if (guideStore > 0) return this.$Guide().destroy('task-setting-nav');
+
+        this.$Guide([{
+          domId: 'M_SYSTEM-a',
+          id: 'task-setting-nav',
+          content: '工单设置有新功能更新',
+          finishBtn: '去查看'
+        }], 0, '', (e) => {
+          return new Promise((resolve, reject) => {
+            if(e.type == 'finish') {
+              this.$platform.openTab({
+                id: 'M_SYSTEM',
+                title: '系统管理',
+                url: '/setting'
+              })
+            }
+            resolve();
+          })
+        }).create()
+          .then(res => {
+            if(res) StorageUtil.storageSet(TASK_SETTING_FRAME_NAV, '1', StorageModuleEnum.Task);
+          })
+      }
     })
   }
 }

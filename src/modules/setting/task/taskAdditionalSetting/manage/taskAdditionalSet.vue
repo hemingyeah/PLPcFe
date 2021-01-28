@@ -6,9 +6,10 @@
 
     <!-- start 附加组件设置 -->
     <div class="task-additional-right" v-loading="loading" >
+      <div id="task-additional-guide"></div>
       <div class="task-tab-header">
         <div class="task-tabs">
-          <el-tabs v-model="activeTab" @tab-click="switchTab">
+          <el-tabs v-model="activeTab" @tab-click="switchTab" id="task-additional-tabs-guide">
             <el-tab-pane name="task-added" label="已添加的组件">
               <div class="tabs_msg">附加组件是在服务工单中用于管理工单信息的辅助工具，可以让您分类记录工单的信息，附加组件可以从模块库中导入或创建。如需将关联组件应用在服务工单上，请在不同的工单类型中添加附加组件</div>
             </el-tab-pane>
@@ -67,6 +68,14 @@ import TaskCardItem from './components/TaskCardItem';
 import EditCardnameDialog from './components/EditCardnameDialog';
 import templateLibrary from './components/templateLibrary';
 import NoDataViewNew from '@src/component/common/NoDataViewNew';
+
+// 新存储工具方法
+import { storageGet, storageSet } from '@src/util/storage.ts';
+/* enum */
+import StorageModuleEnum from '@model/enum/StorageModuleEnum';
+
+const { TASK_CARD_SETTING_GUIDE } = require('@src/component/guide/taskSettingStore');
+
 export default {
   name: 'task-manage',
   data() {
@@ -89,6 +98,38 @@ export default {
   mounted() {
     this.initCard();
     this.initCardSysList();
+
+    this.$nextTick(async() => {
+      const guideStore = await storageGet(TASK_CARD_SETTING_GUIDE, 0, StorageModuleEnum.Task);
+      if (guideStore > 0) return this.$Guide().destroy('task-additional-guide');
+
+      this.$Guide([{
+        id: 'task-additional-guide',
+        content: '在此显示已经创建的附件组件',
+        haveStep: true,
+        nowStep: 1,
+        domObj: () => {
+          return document.getElementById('task-additional-tabs-guide').getElementsByClassName('el-tabs__item')[0]
+        },
+        lastFinish: true
+      }, {
+        id: 'task-additional-guide',
+        content: '可以在模板库中选择系统已经定义好的附加组件，快速创建。',
+        haveStep: true,
+        nowStep: 2,
+        domObj: () => {
+          return document.getElementById('task-additional-tabs-guide').getElementsByClassName('el-tabs__item')[1]
+        },
+        lastFinish: true
+      }], 0, '', (e) => {
+        return new Promise((resolve, reject) => {
+          resolve()
+        })
+      }).create()
+        .then(res_ => {
+          if(res_) storageSet(TASK_CARD_SETTING_GUIDE, '2', StorageModuleEnum.Task);
+        })
+    })
   },
   methods: {
     switchTab(tab){

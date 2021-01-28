@@ -1,5 +1,5 @@
 /* api */
-import * as TaskApi from '@src/api/TaskApi.ts';
+import * as TaskApi from "@src/api/TaskApi.ts";
 
 
 
@@ -8,40 +8,43 @@ import {
   getPageInfo,
   delTreeList,
   productMenuStatistics
-} from '@src/api/ProductV2Api.js';
+} from "@src/api/ProductV2Api.js";
 
 /* util */
-import AuthUtil from '@src/util/auth';
-import Filter from '@src/filter/filter.js';
+import AuthUtil from "@src/util/auth";
+import Filter from "@src/filter/filter.js";
 import {
   parse
-} from '@src/util/querystring';
+} from "@src/util/querystring";
 import {
   isShowReport,
   isShowCustomerRemind,
   isShowPlanTask
-} from '@src/util/version.ts'
+} from "@src/util/version.ts"
 
 
 /* component */
-import ProductMenuView from '@src/modules/productV2/productMenuView/components/ProductMenuView.vue';
-import ProductMenuInfoRecord from '@src/modules/productV2/productMenuView/components/ProductMenuInfoRecord.vue';
-import MiniTable from '@src/modules/productV2/productMenu/WorkTree/compoment/MiniTable';
+import ProductMenuView from "@src/modules/productV2/productMenuView/components/ProductMenuView.vue";
+import ProductMenuInfoRecord from "@src/modules/productV2/productMenuView/components/ProductMenuInfoRecord.vue";
+import MiniTable from "@src/modules/productV2/productMenu/WorkTree/compoment/MiniTable";
 
 
 
+/* mixin */
+import tourGuide from "@src/mixins/tourGuide"
 
-const ENCRYPT_FIELD_VALUE = '***';
+const ENCRYPT_FIELD_VALUE = "***";
 
 const {
   TASK_GUIDE_DETAIL
-} = require('@src/component/guide/taskV2Store');
+} = require("@src/component/guide/taskV2Store");
 
 let getUrlObj;
 
 export default {
-  name: 'product-detail-view',
-  inject: ['initData'],
+  name: "product-detail-view",
+  inject: ["initData"],
+  mixins: [tourGuide],
   data() {
     getUrlObj = this.$getUrlObj(window);
     let id = getUrlObj.id;
@@ -55,13 +58,13 @@ export default {
       },
       fieldHideIdArr: [],
       taskState: {
-        value: this.initData?.task?.state || ''
+        value: this.initData?.task?.state || ""
       },
       fields: [], // 工单表单字段
-      hasCallCenterModule: localStorage.getItem('call_center_module') == 1,
-      leftActiveTab: 'product-view',
-      rightActiveTab: 'part',
-      collapseDirection: '',
+      hasCallCenterModule: localStorage.getItem("call_center_module") == 1,
+      leftActiveTab: "product-view",
+      rightActiveTab: "part",
+      collapseDirection: "",
       statistics:{},
       nowGuideStep: 5,
       guideSearchModelSave: false,
@@ -74,7 +77,7 @@ export default {
      * @description 客户字段 
      */
     customerField() {
-      return this.fields.filter(f => f.fieldName === 'customer')[0];
+      return this.fields.filter(f => f.fieldName === "customer")[0];
     },
     /** 
      * @description 客户字段配置 
@@ -102,7 +105,7 @@ export default {
     },
     /* 工单编辑权限 */
     editAuth() {
-      return this.hasAuth('TASK_EDIT');
+      return this.hasAuth("TASK_EDIT");
     },
     /** 
      * @description 允许打开客户详情
@@ -118,7 +121,7 @@ export default {
 
       if (lmName) return this.isEncryptField(lmName) ? ENCRYPT_FIELD_VALUE : lmName;
 
-      return '';
+      return "";
     },
     /** 
      * @description 联系电话
@@ -128,7 +131,7 @@ export default {
 
       if (this.lmName) return this.isEncryptField(this.lmName) ? ENCRYPT_FIELD_VALUE : lmPhone;
 
-      return '';
+      return "";
     },
     /** 
      * @description 显示拨打电话
@@ -151,7 +154,7 @@ export default {
 
       if (validAddress) return isEncryptTaddress ? ENCRYPT_FIELD_VALUE : Filter.prettyAddress(taddress);
 
-      return '';
+      return "";
     },
     /**
      * @description 显示折叠按钮
@@ -175,6 +178,13 @@ export default {
 
   },
   methods: {
+    previousStep() {},
+    nextStep() {
+      this.nowGuideStep++;
+    },
+    stopStep() {
+      this.nowGuideStep = this.detailSteps.length + 1;
+    },
     // 是否含有某一指定权限
     hasAuth(keys) {
       // return AuthUtil.hasAuth(this.permission, keys);
@@ -209,14 +219,14 @@ export default {
     openCustomerView() {
       if (!this.allowOpenCustomerView) return;
 
-      let fromId = window.frameElement.getAttribute('id');
+      let fromId = window.frameElement.getAttribute("id");
       const customerId = this.customer.id;
 
       if (!customerId) return;
 
       this.$platform.openTab({
         id: `customer_view_${customerId}`,
-        title: '客户详情',
+        title: "客户详情",
         close: true,
         url: `/customer/view/${customerId}?noHistory=1`,
         fromId
@@ -234,14 +244,14 @@ export default {
       if (!phone) return;
 
       const result = await TaskApi.dialout({
-        taskType: 'task',
+        taskType: "task",
         phone
       });
       if (result.code != 0) {
         return this.$platform.notification({
-          title: '呼出失败',
-          message: result.message || '',
-          type: 'error',
+          title: "呼出失败",
+          message: result.message || "",
+          type: "error",
         })
       }
     },
@@ -253,25 +263,25 @@ export default {
     },
 
     dleteData() {
-      this.$confirm('此操作将删除该类型以及类型下所有的内容?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning',
+      this.$confirm("此操作将删除该类型以及类型下所有的内容?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
       }).then(() => {
         delTreeList({
           ids: [this.dataInfo.id]
         }).then((res) => {
           if (res.code != 0) {
             this.$notify.error({
-              title: '网络错误',
+              title: "网络错误",
               message: res.message,
               duration: 2000,
             });
           } else {
-            let fromId = window.frameElement.getAttribute('fromid') || '';
+            let fromId = window.frameElement.getAttribute("fromid") || "";
             window.parent.flashSomePage([{
-              type: 'productV2_catalog_edit'
-            }, ...(fromId ? [{type:fromId.replace('frame_tab_', '')}] : [])])
+              type: "productV2_catalog_edit"
+            }, ...(fromId ? [{type:fromId.replace("frame_tab_", "")}] : [])])
             window.location.reload()
           }
         }).catch()
@@ -279,18 +289,18 @@ export default {
     },
     alterData() {
       this.$platform.openTab({
-        id: 'productV2_catalog_edit',
-        title: '产品类型编辑',
+        id: "productV2_catalog_edit",
+        title: "产品类型编辑",
         close: true,
         url: `/productV2/catalog/edit?id=${this.dataInfo.id}`,
       })
     },
     creatData() {
       this.$platform.openTab({
-        id: 'productV2_catalog_edit',
-        title: '产品类型编辑',
+        id: "productV2_catalog_edit",
+        title: "产品类型编辑",
         close: true,
-        url: '/productV2/catalog/edit',
+        url: "/productV2/catalog/edit",
       })
     }
 
@@ -307,7 +317,7 @@ export default {
       if (res.code == 0) {
         res.result.catalogInfo.productVideo = res.result.catalogInfo.productVideo || []
         res.result.catalogInfo.productExplain = res.result.catalogInfo.productExplain || []
-        this.$set(this, 'dataInfo', res.result.catalogInfo || {})
+        this.$set(this, "dataInfo", res.result.catalogInfo || {})
         this.fieldHideIdArr = res.result.selectField || [];
         this.$refs.producMmenuInfoRecord.initRecord(res.result.catalogInfo.id);
         getProductMenuField().then(res_ => {
@@ -315,16 +325,16 @@ export default {
 
             let fields = res_.result || [];
             fields = fields.map((item) => {
-              if ((res.result.selectField.length && !item.isSystem && res.result.selectField.some(item_=>item_ == item.id)) || item.fieldName == 'product_menu_part' || item.fieldName == 'product_menu_wiki')
-                item['isHidden'] = true;
-              else item['isHidden'] = false;
+              if ((res.result.selectField.length && !item.isSystem && res.result.selectField.some(item_=>item_ == item.id)) || item.fieldName == "product_menu_part" || item.fieldName == "product_menu_wiki")
+                item["isHidden"] = true;
+              else item["isHidden"] = false;
               return item;
             })
             this.fields = [...fields];
 
             this.fields.forEach(field => {
 
-              if (field.fieldName == 'attachment') {
+              if (field.fieldName == "attachment") {
                 let {
                   isEncryptAttachment,
                   attachment
@@ -346,13 +356,13 @@ export default {
           try {
             this.statistics = res_.result
           } catch (error) {
-            console.warn(error, 'error try catch');
+            console.warn(error, "error try catch");
           }
 
         })
       } else {
         this.$notify.error({
-          title: '网络错误',
+          title: "网络错误",
           message: res.message,
           duration: 2000,
         });
@@ -365,8 +375,20 @@ export default {
     // 折叠面板缓存
     let collapse = sessionStorage.getItem(`product_menu_collapse_${getUrlObj.id}`);
     let collapseDirection = sessionStorage.getItem(`product_collapseDirection_${getUrlObj.id}`);
-    this.collapse = JSON.parse(collapse || 'true');
-    this.collapseDirection = collapseDirection || '';
+    this.collapse = JSON.parse(collapse || "true");
+    this.collapseDirection = collapseDirection || "";
+  },
+  async mounted() {
+
+
+
+    // this.$nextTick(() => {
+    //   setTimeout(() => {
+    //     if (!storageGet(TASK_GUIDE_DETAIL)) this.$tours['myTour'].start(), this.nowGuideStep = 1, storageSet(TASK_GUIDE_DETAIL, '4');
+    //   }, 1000)
+
+    // })
+
   },
   beforeDestroy() {
 

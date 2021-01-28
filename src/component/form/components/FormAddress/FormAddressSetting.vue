@@ -76,9 +76,9 @@ export default {
     defaultValueConfig() {
       return this.field.setting.defaultValueConfig || {}
     },
-    // 是否是工单或者回执表单模块
+    // 是否是工单或者回执表单模块或者附加组件表单
     isTaskForm() {
-      return [TableNameEnum.Task, TableNameEnum.TaskReceipt].indexOf(this.mode) > -1;
+      return [TableNameEnum.Task, TableNameEnum.TaskReceipt, TableNameEnum.TaskCard ].indexOf(this.mode) > -1;
     }
   },
   methods: {

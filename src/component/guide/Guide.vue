@@ -281,7 +281,7 @@ export default {
             if(this.outsideParent){
               style_ = `${style_};left:${guidePartentDom.left + guidePartentDom.width + 8 || 0}px;z-index:998`;
             }else{
-              style_ = `${style_};left:${res_.left + res_.width + 8 || 0}px;z-index:998`;
+              style_ = `${style_};left:${res_.left + 8 || 0}px;z-index:998`;
             }
           }
         } else {
@@ -294,7 +294,7 @@ export default {
             if(this.outsideParent){
               style_ = `${style_};left:${guidePartentDom.left - guideDom.width - 8 }px;z-index:998`;
             }else{
-              style_ = `${style_};left:${res_.left - guideDom.width - 8 || 0}px;z-index:998`;
+              style_ = `${style_};left:${res_.left + res_.width - guideDom.width - 8 || 0}px;z-index:998`;
             }
           }
         }

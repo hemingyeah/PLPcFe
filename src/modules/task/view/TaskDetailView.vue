@@ -1,6 +1,8 @@
 <template>
   <div class="task-detail-container" v-loading="loading" ref="container">
-    <div id="task-task-detail-view"></div>
+    <div class="guide-model-box" v-if="nowGuideStep < 5">
+
+    </div>
     <!-- start 顶部操作区 -->
     <div class="task-detail-header" ref="header">
       <div class="task-detail-header-top" :class="{'active': !collapse}">
@@ -15,7 +17,7 @@
         <div class="task-delete-status" v-if="isDelete">已删除</div>
 
         <!-- start 工单流程信息 -->
-        <div class="progress-wrap bg-w" v-show="collapse" id="v-task-detail-step-0">
+        <div class="progress-wrap" v-show="collapse" id="v-task-detail-step-0">
           <div class="guide-disable-cover" v-if="nowGuideStep == 1"></div>
           <biz-process :value="task.state" :class="nowGuideStep == 1 ? 'guide-point bg-w':''" :data="task" :flow-setting="initData.taskType.flowSetting" @change="changeTaskProcessState"></biz-process>
         </div>
@@ -23,7 +25,7 @@
 
         <!-- start 折叠时客户信息 -->
         <div class="customer-info-wrap" v-show="!collapse && customerField && customerField.id">
-          <div :class="['customer-name', {'link-text': allowOpenCustomerView}]" @click="openCustomerView">
+          <div :class="['customer-name', {'link-text': allowOpenCustomerView}]" @click="openCustomerView(false)">
             {{ customer.name }}
           </div>
 
@@ -119,7 +121,7 @@
       </div>
       <!-- end 审批中icon -->
 
-      <div class="task-detail-header-bottom bg-w" :class="{'active': !collapse}" id="v-task-detail-step-1">
+      <div class="task-detail-header-bottom" :class="{'active': !collapse, 'guide-point bg-w' : nowGuideStep == 2}" id="v-task-detail-step-1">
         <div class="guide-disable-cover" v-if="nowGuideStep == 2"></div>
         <div class="customer-info-wrap">
           <div :class="['customer-name', {'link-text': allowOpenCustomerView}]" @click="openCustomerView(false)">
@@ -341,6 +343,44 @@
     />
     <!-- end 分配弹窗 -->
     
+    <!-- tour s -->
+    <v-tour v-if="showTour" name="myTour" :steps="detailSteps" :options="detailOptions" :callbacks="myCallbacks">
+      <template slot-scope="tour">
+        <transition name="fade">
+          <template v-for="(step, index) of tour.steps">
+            <v-step v-if="tour.currentStep === index" :key="index" :step="step" :previous-step="tour.previousStep" :next-step="tour.nextStep" :stop="tour.stop" :is-first="tour.isFirst" :is-last="tour.isLast" :labels="tour.labels">
+              <template>
+                <div slot="content" class="v-tour-content-box">
+                  <div class="v-tour-left-tips">
+                    {{ `${index + 1}/${detailSteps.length}` }}
+                  </div>
+                  <div class="v-tour-content">
+                    <div class="flex-x v-tour-content-head">
+                      {{detailSteps[index].title}}
+                    </div>
+                    <div class="v-tour-content-con">
+                      {{ detailSteps[index].content }}
+                    </div>
+                  </div>
+                </div>
+                <div slot="actions" class="v-tour-bottom">
+                  <!-- <div class="text" v-if="index > 0" @click="tour.previousStep">
+                    上一步
+                  </div> -->
+                  <div class="btns" v-if="index < detailSteps.length - 1" @click="tour.nextStep">
+                    下一步
+                  </div>
+                  <div v-if="index == detailSteps.length - 1" class="btns" @click="tour.stop">
+                    知道啦
+                  </div>
+                </div>
+              </template>
+            </v-step>
+          </template>
+        </transition>
+      </template>
+    </v-tour>
+    <!-- tour e -->
   </div>
 </template>
 

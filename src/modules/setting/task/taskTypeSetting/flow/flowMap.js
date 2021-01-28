@@ -25,7 +25,7 @@ const FLOW_MAP = {
   },
   finish: {
     name: '完成工单',
-    desc: '工单负责人分完成工单，状态为【已完成】	',
+    desc: '工单负责人完成工单，状态为【已完成】	',
     icon: 'icon-wancheng',
     isSystem: true
   },

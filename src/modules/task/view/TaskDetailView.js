@@ -13,7 +13,6 @@ import {
   storageGet,
   storageSet
 } from '@src/util/storage';
-import Platform from '@src/util/Platform'
 
 /* component */
 import CancelTaskDialog from './components/CancelTaskDialog.vue';
@@ -32,8 +31,10 @@ import TaskTimeDialog from './components/TaskTimeDialog.vue';
 import TaskAllotModal from '@src/modules/task/components/TaskAllotModal/TaskAllotModal.tsx'
 
 /* enum */
-import { TaskEventNameMappingEnum } from '@model/enum/EventNameMappingEnum.ts';
+import { TaskEventNameMappingEnum } from "@model/enum/EventNameMappingEnum.ts";
 import TableNameEnum from '@model/enum/TableNameEnum.ts';
+/* mixin */
+import tourGuide from '@src/mixins/tourGuide'
 
 const ENCRYPT_FIELD_VALUE = '***';
 
@@ -42,6 +43,7 @@ const { TASK_GUIDE_DETAIL } = require('@src/component/guide/taskV2Store');
 export default {
   name: 'task-detail-view',
   inject: ['initData'],
+  mixins: [tourGuide],
   data() {
     return {
       loading: false,
@@ -475,13 +477,14 @@ export default {
       let { state, executor } = this.task;
       let hasExecutor = executor && executor.userId;
       let allowDing = false;
-      
+
       try {
-        allowDing = this.initData.canViewTask && Platform.isDingDingDesktop() && state != 'closed' && hasExecutor;
+        let rootWindow = getRootWindow(window);
+        allowDing = this.initData.canViewTask && rootWindow.inDingTalkPC() && state != 'closed' && hasExecutor;
       } catch (error) {
         console.warn('Caused: TaskView allowDing -> error', error) 
       }
-      
+
       return allowDing;
     },
     /** 
@@ -635,6 +638,12 @@ export default {
     }
   },
   methods: {
+    nextStep() {
+      this.nowGuideStep++;
+    },
+    stopStep() {
+      this.nowGuideStep = this.detailSteps.length + 1;
+    },
     /**
      * 折叠
      */
@@ -894,7 +903,7 @@ export default {
     // DING
     ding(all = true) {
       let { id, taskNo, executor, synergies } = this.task;
-      
+
       let users = [];
       users.push(executor.staffId);
       
@@ -1090,6 +1099,7 @@ export default {
 
   },
   async mounted() {
+    console.log(this.initData, 'initData')
     try {
       this.loading = true;
 
@@ -1186,55 +1196,11 @@ export default {
       
       this.$nextTick(() => {
         setTimeout(() => {
-          if (storageGet(TASK_GUIDE_DETAIL) && storageGet(TASK_GUIDE_DETAIL) > 0) return this.$Guide().destroy('task-task-detail-view')
-          this.$Guide([{
-            content:'清晰展示当前工单进度',
-            title:'工单进度',
-            domId:'v-task-detail-step-0',
-            haveStep: true,
-            nowStep: 1,
-            id: 'task-task-detail-view',
-            needCover: true,
-            lastFinish:true,
-            finishBtn:'知道了'
-          }, {
-            content:
-            '工单重要信息展示',
-            haveStep: true,
-            nowStep: 2,
-            id: 'task-task-detail-view',
-            domId: 'v-task-detail-step-1',
-            needCover: true,
-            lastFinish:true,
-            finishBtn:'知道了'
-          }, {
-            content:
-            '「工单动态」搬到这里了',
-            haveStep: true,
-            nowStep: 3,
-            id: 'task-task-detail-view',
-            domId: 'tab-record',
-            needCover: true,
-            lastFinish:true,
-            copyDom:true,
-            finishBtn:'知道了'
-          }, {
-            content:
-            '编辑、复制及删除',
-            title:'工单操作',
-            haveStep: true,
-            nowStep: 4,
-            id: 'task-task-detail-view',
-            domId: 'v-task-detail-step-3',
-            needCover: true,
-            lastFinish:true,
-            copyDom:true,
-            finishBtn:'知道了'
-          }], 0, '', (e) => {
-            return new Promise((resolve, reject) => {
-              resolve()
-            })
-          }).create().then(res_=>{if(res_)storageSet(TASK_GUIDE_DETAIL, '4')})
+          if (this.showTaskDetailGuide) {
+            this.$tours['myTour'].start();
+            this.nowGuideStep = 1;
+            storageSet(TASK_GUIDE_DETAIL, '4');
+          }
         }, 1000)
       })
 

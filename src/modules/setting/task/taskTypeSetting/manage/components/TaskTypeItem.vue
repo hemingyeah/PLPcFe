@@ -8,7 +8,7 @@
             {{taskType.name}}
           </h2>
           <el-row class="task-type-others">
-            <el-row type="flex">
+            <el-row type="flex" class="task-type-team-setting">
               <p @click="chooseTeam" class="pointer"> 
                 <span style="color: #666666;">可用团队: </span>
                 <el-tooltip v-if="formatTeamName.length>28" trigger="hover">
@@ -109,7 +109,7 @@ export default {
 
       if(value === 0 && this.typeNum <= 1) {
         return this.$platform.notification({
-          title: `无法禁用全部工单类型`,
+          title: '无法禁用全部工单类型',
           type: 'error'
         });
       }

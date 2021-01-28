@@ -272,4 +272,9 @@ export default {
 /deep/.el-steps, .el-step{
   width: auto !important;
 }
+
+/deep/.el-step__head.is-process{
+  color: #BFBFBF;
+  border-color: #BFBFBF;
+}
 </style>

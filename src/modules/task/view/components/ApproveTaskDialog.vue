@@ -60,10 +60,10 @@
       <!-- S 多级审批 -->
       <el-steps v-else class="approve-steps" direction="vertical">
         <!--S 已经审批的步骤 -->
-        <el-step class="approve-step-item" v-for="(item, idx) in approve.approverResult" :key="idx">
+        <el-step class="approve-step-item" v-for="(item, idx) in approve.approverResult" :key="idx" status="success">
           <el-row slot="title" type="flex" justify="space-between">
-            <h2>{{formatNumToCN(idx + 1)}}级审批</h2>
-            <p>{{item.completeTime | fmt_datetime}}</p>
+            <h2 class="pass">{{formatNumToCN(idx + 1)}}级审批  </h2>
+            <p style="color: rgba(0, 0, 0, 0.45)">{{item.completeTime | fmt_datetime}}</p>
           </el-row>
           <div class="approve-step-item-desc" slot="description">
             <label>审批人： </label>{{ item.approverName }}
@@ -72,22 +72,22 @@
         </el-step>
         <!--E 已经审批的步骤 -->
         <!--S 当前审批的步骤 -->
-        <el-step class="approve-step-item">
+        <el-step class="approve-step-item" status="process">
           <el-row slot="title" type="flex" justify="space-between">
-            <h2>{{formatNumToCN(approve.approverResult.length + 1)}}级审批</h2>
+            <h2>{{formatNumToCN(approve.approverResult.length + 1)}}级审批  （审批中）</h2>
           </el-row>
           <div class="approve-step-item-desc" slot="description">
             <label>审批人： </label>{{ approve.approvers | formatApproveNames}}
             <el-row type="flex">
               <label>审批结果： </label>
-              <textarea v-model="approveRemark" placeholder="请输入审批结果[最多500字]" rows="3" maxlength="500" />
             </el-row>
-            <span class="tips">审批后不能修改审批结果</span>
+            <textarea v-model="approveRemark" placeholder="请输入审批结果[最多500字]" rows="3" maxlength="500" />
+            <p class="tips">审批后不能修改审批结果</p>
           </div>
         </el-step>
         <!--E 当前审批的步骤 -->
         <!--S 未到审批的步骤 -->
-        <el-step class="approve-step-item" v-for="(item, idx) in approve.multiApprover" :key="idx">
+        <el-step class="approve-step-item" v-for="(item, idx) in approve.multiApprover" :key="idx" status="wait">
           <el-row slot="title" type="flex" justify="space-between">
             <h2>{{formatNumToCN(approve.approverResult.length + idx + 2)}}级审批</h2>
           </el-row>
@@ -272,7 +272,7 @@ export default {
     padding: 6px 0px;
     label{
       min-width: 84px;
-      text-align: right;
+      text-align: left;
     }
 
     .result-content {
@@ -289,10 +289,6 @@ export default {
     .dialog-footer-left {
       flex: 1;
       font-size: 12px;
-
-      .tips {
-        color: $text-color-regular;
-      }
     }
 
     .dialog-footer-right {
@@ -304,36 +300,42 @@ export default {
 
 <style lang="scss" scoped>
 .dividing-line{
+  margin-top: 4px;
   width: calc(100% + 38px);
   border-top: 1px #ddd dashed;
   transform: translateX(-20px);
 }
 
 .tips {
-  color: $text-color-regular;
+  margin-bottom: 0!important;
+  margin-top: 12px;
+  color: rgba(0, 0, 0, 0.45);
 }
 
 .approve-steps{
-  padding-top: 12px;
+  padding-top: 20px;
   .approve-step-item{
     color: #000000;
     h2{
       font-size: 14px;
       color: #262626;
+      &.pass::after{
+        content: "  通过";
+        color: #52C41A;
+        font-size: 14px;
+      }
     }
     &-desc{
-      padding: 16px;
+      padding: 12px;
       background: #FAFAFA;
     }
   }
 }
 
-label{
-  min-width: 64px;
-  text-align: right;
-}
-
 // element-ui
+/deep/.el-step__main{
+  margin-bottom: 20px;
+}
 /deep/.el-step__description{
   color: #000000;
   padding: 0
