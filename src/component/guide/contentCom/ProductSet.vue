@@ -15,7 +15,7 @@ export default {
     openLink (e) {
       this.$platform.openLink(e);
     },
-  }
+  },
 }
 </script>
 <style lang='scss' scoped>
