@@ -20,17 +20,15 @@ import { fields, selectIds, advancedList, allExport, Inquire } from './TaskField
 import { LINK_REG } from '@src/model/reg';
 
 /** utils */
-import _ from "lodash";
-import Page from "@model/Page";
-import { storageGet, storageSet } from "@src/util/storage";
-import { formatDate } from "@src/util/lang";
-import { getRootWindow } from "@src/util/dom";
-import * as FormUtil from "@src/component/form/util"
+import _ from 'lodash';
+import Page from '@model/Page';
+import { storageGet, storageSet } from '@src/util/storage';
+import { formatDate } from '@src/util/lang';
+import { getRootWindow } from '@src/util/dom';
+import * as FormUtil from '@src/component/form/util'
 import VersionMixin from '@src/mixins/versionMixin'
 import StorageUtil from '@src/util/storage.ts'
 
-/* mixin */
-import tourGuide from '@src/mixins/tourGuide'
 
 /* constants */
 import {
@@ -73,10 +71,11 @@ const Region = {
   closeViewId: '2a53a0ff-4141-11e7-a318-00163e304a25'
 }
 
+
 export default {
-  name: "task-list",
-  inject: ["initData"],
-  mixins: [tourGuide, VersionMixin],
+  name: 'task-list',
+  inject: ['initData'],
+  mixins: [ VersionMixin],
   data() {
     return {
       selectIds, // id
@@ -332,8 +331,42 @@ export default {
 
     this.$nextTick(() => {
       setTimeout(() => {
-        if (!storageGet(TASK_GUIDE_LIST)) this.$tours['myTour'].start(), this.nowGuideStep = 1, storageSet(TASK_GUIDE_LIST, '4');
-        // if (!storageGet(TASK_GUIDE_DROPDOWN_MENU)) this['guideDropdownMenu'] = true;
+        if (storageGet(TASK_GUIDE_LIST) && storageGet(TASK_GUIDE_LIST) > 0) return this.$Guide().destroy('task-task-list-view')
+        this.$Guide([{
+          content:
+            '可拖拽改变列宽',
+          haveStep: true,
+          nowStep: 1,
+          id: 'task-task-list-view',
+          domObj:()=>{
+            return document.getElementById('v-task-step-0').getElementsByClassName('el-table__header-wrapper')[0]
+          },
+          lastFinish:true,
+          needCover: true,
+        }, {
+          content:
+            '可自定义组合查询条',
+          haveStep: true,
+          nowStep: 2,
+          id: 'task-task-list-view',
+          domId: 'v-task-step-1',
+          lastFinish:true,
+          needCover: true,
+        }, {
+          content:
+            '可自定义列表显示项',
+          haveStep: true,
+          nowStep: 3,
+          id: 'task-task-list-view',
+          domId: 'v-task-step-2',
+          lastFinish:true,
+          needCover: true,
+        }], 0, '', (e) => {
+          return new Promise((resolve, reject) => {
+            resolve()
+          })
+        }).create().then(res_=>{if(res_)storageSet(TASK_GUIDE_LIST, '4')})
+
       }, 1000)
     })
 
