@@ -425,7 +425,7 @@ export default {
     getPlacement() {
       let rectData = this.$el.getBoundingClientRect()
       let y = rectData.y
-      let windowHeight = document.body.innerHeight
+      let windowHeight = document.body.clientHeight
       let isOverflow = windowHeight - y < 200
       
       return isOverflow ? 'top-start' : 'bottom-start'
