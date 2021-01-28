@@ -16,7 +16,9 @@
 
         <!-- start 工单流程信息 -->
         <div class="progress-wrap bg-w" v-show="collapse" id="v-task-detail-step-0">
+
           <biz-process :value="task.state" class="bg-w" :data="task" :flow-setting="initData.taskType.flowSetting" @change="changeTaskProcessState"></biz-process>
+          
         </div>
         <!-- end 工单流程信息 -->
 
