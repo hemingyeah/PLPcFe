@@ -900,7 +900,7 @@ export default {
     async resetPage () {
       // 获取产品动态字段
       try {
-        let res = await getProductFields({ isFromSetting: true });
+        let res = await getProductFields({ isFromSetting: false });
         this.dynamicFields = res.data || [];
         this.buildColumns();
         this.getSelectCount();

@@ -35,6 +35,9 @@ const RELATION_TYPE_MAP = {
   product: 'relationProduct'
 }
 
+import { taskFields } from '@src/modules/guideForNewUser/initData.js'
+import { searchLinkman } from './methods/initData'
+
 export default {
   name: 'task-edit-form',
   inject: ['initData'],
@@ -61,6 +64,7 @@ export default {
 
     this.$eventBus.$on('task_create_or_edit.update_linkman', this.updateLinkman);
     this.$eventBus.$on('task_create_or_edit.update_address', this.bindAddress);
+    
   },
   beforeDestroy() {
     this.$eventBus.$off('task_create_or_edit.update_linkman', this.updateLinkman);
@@ -205,6 +209,9 @@ export default {
      * @param {String} templateId 工单类型id
     */
     async chooseTemplate(templateId) {
+      // 切换类型时可选择
+      this.isCreateCustomer = false;
+      
       if(this.state.isCopyTask) {
         return this.copyTaskHandler(templateId);
       }
@@ -214,7 +221,8 @@ export default {
 
       let loading = this.$loading();
       try {
-        this.taskFields = await this.fetchTaskTemplateFields({ typeId: templateId, tableName: 'task', isFromSetting: true });
+        if(this.justGuide) this.taskFields = taskFields;
+        else this.taskFields = await this.fetchTaskTemplateFields({ typeId: templateId, tableName: 'task', isFromSetting: true });
         this.taskValue = FormUtil.initialize(this.taskFields, {});
 
         // 表单初始化
@@ -596,9 +604,7 @@ export default {
     */
     async searchLinkmanOuterHandler(params = {}) {
       let customerId = this.selectedCustomer?.value || '';
-      
       params.customerId = this.selectedCustomer?.value || '';
-
       return customerId ? this.searchLinkman(params) : this.searchCustomerByPhone(params);
     },
     /** 

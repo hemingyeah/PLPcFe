@@ -20,6 +20,7 @@ const linkc = require('./linkc')
 const productV2 = require('./productV2')
 
 const superQrcode = require('./superQrcode')
+const guideForNewUser = require('./guideForNewUser')
 
 /** 
  * 定义各个模块的配置，路径相对于项目根路径 
@@ -66,5 +67,6 @@ module.exports = {
   ...sparePart,
   ...linkc,
   ...productV2,
-  ...superQrcode
+  ...superQrcode,
+  ...guideForNewUser
 }

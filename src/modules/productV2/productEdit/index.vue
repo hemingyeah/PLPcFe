@@ -103,6 +103,12 @@ export default {
       // 获取产品自定义字段
       let res = await getProductFields({isFromSetting: true});
       this.dynamicProductFields = res.data || [];
+      // 产品编号限制字数最大长度为100
+      this.dynamicProductFields.forEach(field => {
+        if (field.fieldName == 'serialNumber') {
+          field.maxlength = 100
+        }
+      })
     } catch (e) {
       console.error('product-add_edit fetch product fields error', e);
     }
