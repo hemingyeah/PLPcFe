@@ -1195,7 +1195,7 @@ export default {
       
       this.$nextTick(() => {
         setTimeout(() => {
-          if (storageGet(TASK_GUIDE_DETAIL) && storageGet(TASK_GUIDE_DETAIL) > 0) return this.$Guide().destroy('task-task-detail-view')
+          // if (storageGet(TASK_GUIDE_DETAIL) && storageGet(TASK_GUIDE_DETAIL) > 0) return this.$Guide().destroy('task-task-detail-view')
           this.$Guide([{
             content:'清晰展示当前工单进度',
             title:'工单进度',
@@ -1237,9 +1237,8 @@ export default {
             domId: 'v-task-detail-step-3',
             needCover: true,
             lastFinish:true,
-            copyDom:true,
             finishBtn:'知道了'
-          }], 0, '', (e) => {
+          }], 3, '', (e) => {
             return new Promise((resolve, reject) => {
               if(e.type == 'stop' || e.type == 'finish'){
                 if ( this.showTaskDetailGuide && this.showAllotModal) {

@@ -87,8 +87,7 @@
             <!-- end 当前工单状态操作按钮 -->
 
             <!-- start icon按钮 -->
-            <div class="task-detail-btn-group" :class="nowGuideStep == 4 ? 'task-detail-btn-group-point' : ''" id="v-task-detail-step-3">
-              <div class="guide-disable-cover" v-if="nowGuideStep == 4"></div>
+            <div class="task-detail-btn-group bg-w" id="v-task-detail-step-3">
               <el-tooltip :popper-options="popperOptions" content="打印工单" placement="top" v-if="allowPrintTask">
                 <i class="iconfont icon-printer icon-btn" @click="printTask"></i>
               </el-tooltip>

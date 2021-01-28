@@ -391,30 +391,6 @@ export default {
   },
 };
 </script>
-<style lang="scss">
-.task-detail-btn-group {
-  position: absolute;
-  right: 12px;
-  top: 8px;
-
-  font-size: 0;
-  z-index: 991;
-
-  .iconfont {
-    margin-left: 16px;
-    color: $text-color-secondary;
-    cursor: pointer;
-
-    &.icon-bianji1 {
-      color: $color-primary;
-    }
-
-    &.icon-shanchu-copy {
-      margin-left: 13px;
-    }
-  }
-}
-</style>
 <style lang="scss" scoped>
 .cover {
   width: 100vw;
