@@ -436,7 +436,7 @@ export default {
         removeOnDestroy: true,
         onUpdate: this.updatePopperWidth,
         modifiers: {
-          preventOverflow: { enabled: true },
+          preventOverflow: { enabled: true }
         },
       }
       
