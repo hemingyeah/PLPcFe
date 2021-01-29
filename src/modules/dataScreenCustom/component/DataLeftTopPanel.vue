@@ -25,8 +25,8 @@
               {{ getChangeTitle(feature) }}
             </span>
             <span v-if="feature.hasChange && feature.key === 'thisMonthCompleteTaskAndLastMonthCompare'" class="grow-title">
-              <span @click="selectCompare(false,feature)" :style="{color:monthCompare?'#00FBFF':'#004791'}">同比</span>
-              <span @click="selectCompare(true,feature)" :style="{color:monthCompare?'#004791':'#00FBFF'}">环比</span>
+              <span @click="selectCompare(false,feature)" :style="{color:monthCompare?'#00FBFF':'#fff'}">同比</span>
+              <span @click="selectCompare(true,feature)" :style="{color:monthCompare?'#fff':'#00FBFF'}">环比</span>
             </span>
           </div>
           <div class="content-row">

@@ -65,7 +65,7 @@ export default {
     },
     titleSuffix: {
       type: String,
-      default: '月度工时利用率'
+      default: '月度工时利用率（本月）'
     },
     extendTitleSuffix: {
       type: String,
