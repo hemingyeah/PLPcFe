@@ -42,10 +42,11 @@ export function packToReceipt(fields, form) {
         o.modifiedPrice = part.salePrice - part.oldPrice;
         
         // 安装产品和安装位置
-        if (part.installProductId) {
-          o.installProductId = part.installProductId
-        } else if (part.installPosition) {
-          o.installPosition = part.installPosition
+        if (part.installProductId || part.installPosition) {
+          o.attribute = {
+            installProductId: part.installProductId,
+            installPosition: part.installPosition
+          }
         }
 
         expenseSheet.sparePartsExpense.push(o);
