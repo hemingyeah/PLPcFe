@@ -493,6 +493,18 @@
               </template>
             </el-table-column>
             <el-table-column
+              v-else-if="column.field === 'attribute.installProductId'"
+              :key="column.field"
+              :label="column.label"
+              :width="column.width"
+              :min-width="column.minWidth"
+              show-overflow-tooltip
+            >
+              <template slot-scope="scope">
+                {{ getProductName(scope.row) }}
+              </template>
+            </el-table-column>
+            <el-table-column
               v-else
               :key="column.field"
               :label="column.label"
@@ -654,6 +666,8 @@ import PartReceiveRejectFom from './form/PartReceiveRejectFom.vue';
 
 import { isShowPartBack } from '@src/util/version.ts'
 
+import { getExpensePartField } from '@src/api/TaskApi.ts'
+
 const STORAGE_PART_COLNUM_KEY = 'repe_person_part_list_column';
 const STORAGE_STOCK_COLNUM_KEY = 'repe_person_stock_list_column';
 const STORAGE_USE_COLNUM_KEY = 'repe_person_use_list_column';
@@ -691,6 +705,7 @@ export default {
       typeSpec: ''
     }
     return {
+      partField: [],
       multipleSelectionPanelShow: false,
       selectedLimit: 500,
       tag: [],
@@ -821,6 +836,47 @@ export default {
     // },
   },
   methods: {
+    // 根据产品id获取产品名称
+    getProductName(row) {
+      console.log(this.initData, 'init')
+      if (!row.attribute) return ''
+      const id = row.attribute.installProductId
+      if (!id) return ''
+      let name = ''
+      this.initData.task.products.forEach(product => {
+        if (id == product.id) {
+          name = product.name
+        }
+      })
+      return name
+    },
+    // 获取安装产品和安装位置
+    getPartField(select, columns) {
+      if (select == 'useRecord') {
+        getExpensePartField().then(res => {
+          if (res.code == 0) {
+            if (res.result.length) {
+              this.partField = res.result
+              this.partField.forEach((part, index) => {
+                let _field = ''
+                if (part.fieldName == 'installProductId') {
+                  _field = 'attribute.installProductId'
+                } else if(part.fieldName == 'installPosition') {
+                  _field = 'attribute.installPosition'
+                }
+                columns.splice(index + 8, 0, {
+                  label: part.displayName,
+                  field: _field,
+                  show: true,
+                  width: 150
+                })
+              })
+              this.$set(this, 'columns', columns);
+            }
+          }
+        })
+      }
+    },
     toReApply(){
       let fromId = window.frameElement.getAttribute('id');
       this.$platform.openTab({
@@ -1052,6 +1108,9 @@ export default {
       let pageSize = StorageUtil.get(key) || 10;
       this.model.pageSize = pageSize;
       this.originModel.pageSize = pageSize;
+
+      // 获取安装产品和安装位置 博立定制 后续可能通用
+      this.getPartField(value, columns)
 
       this.loadData();
     },
@@ -1797,6 +1856,9 @@ export default {
 
 
     this.model.pageSize = StorageUtil.get(key) || 10;
+
+    // 获取安装产品和安装位置 博立定制 后续可能通用
+    this.getPartField(select, columns)
 
     this.initialize()
   },
