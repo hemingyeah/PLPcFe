@@ -201,9 +201,9 @@ export default {
           this.form.sparepart.forEach(_sparepart => {
             _sparepart.products = this.form.products
             if (part.fieldName == 'installProductId') {
-              _sparepart.installProductId = _sparepart.attribute.installProductId
+              _sparepart.installProductId = _sparepart.attribute ? _sparepart.attribute.installProductId : ''
             } else if (part.fieldName == 'installPosition') {
-              _sparepart.installPosition = _sparepart.attribute.installPosition
+              _sparepart.installPosition = _sparepart.attribute ? _sparepart.attribute.installPosition : ''
             }
           })
           // 更新sparepartColums
