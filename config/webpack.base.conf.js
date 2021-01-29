@@ -8,6 +8,10 @@ const util = require('./util')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const VueLoaderPlugin = require('vue-loader/lib/plugin')
 
+const HappyPack = require('happypack');
+const os = require('os');
+const happyThreadPool = HappyPack.ThreadPool({ size: os.cpus().length });
+
 module.exports = {
   mode: 'development',
   entry: util.genEntry(),
@@ -16,10 +20,10 @@ module.exports = {
   },
   module: {
     rules: [
-      { 
+      {
         test: /\.tsx?$/,
         use: [
-          'babel-loader',
+          'happypack/loader?id=happyBabel',
           {
             loader: 'ts-loader',
             options: {
@@ -30,19 +34,25 @@ module.exports = {
           }
         ]
       },
-      { 
+      {
         test: /\.vue$/,
-        loader: 'vue-loader',
-        options: {
-          loaders: {
-            ts: [ 
-              'babel-loader!ts-loader'
-            ],
-            tsx: [
-              'babel-loader!ts-loader'
-            ]
+        use: [
+          'cache-loader',
+          {
+            loader: 'vue-loader',
+            options: {
+              loaders: {
+                ts: [
+                  'babel-loader!ts-loader'
+                ],
+                tsx: [
+                  'babel-loader!ts-loader'
+                ]
+              }
+            }
           }
-        }
+        ],
+        exclude: /node_modules/
       },
       // {
       //   test: /\.vue$/,
@@ -67,24 +77,26 @@ module.exports = {
       // },
       {
         test: /\.m?js$/,
-        loader: 'babel-loader',
+        use: ['cache-loader', 'happypack/loader?id=happyBabel'],
         exclude: /node_modules/
       },
       {
         test: /\.scss$/,
         use: [
+          'cache-loader',
           IS_PRODUCTION ? MiniCssExtractPlugin.loader : 'vue-style-loader',
-          'css-loader',
+          'happypack/loader?id=happyCss',
           'postcss-loader',
-          'sass-loader',
+          'happypack/loader?id=happySass',
           util.genSassResourceLoader()
         ]
       },
       {
         test: /\.css$/,
         use: [
+          'cache-loader',
           IS_PRODUCTION ? MiniCssExtractPlugin.loader : 'vue-style-loader',
-          'css-loader',
+          'happypack/loader?id=happyCss',
           'postcss-loader'
         ]
       },
@@ -126,9 +138,29 @@ module.exports = {
     ]
   },
   plugins: [
-    new VueLoaderPlugin()
+    new VueLoaderPlugin(),
+    new HappyPack(
+      {
+        id:'happyBabel',
+        threadPool: happyThreadPool,
+        loaders:[{loader:'babel-loader'}]
+      }
+    ),
+    new HappyPack(
+      {
+        id:'happyCss',
+        threadPool: happyThreadPool,
+        loaders:[{loader:'css-loader'}]
+      }
+    ),
+    new HappyPack(
+      {
+        id:'happySass',
+        threadPool: happyThreadPool,
+        loaders:[{loader:'sass-loader'}]
+      }
+    ),
   ],
-  
   resolve: {
     extensions: ['.js', '.json', '.vue', '.scss', '.css', '.ts', 'tsx'],
     alias: {
@@ -142,7 +174,9 @@ module.exports = {
     }
   },
   externals: {
-    jQuery: 'jQuery'
+    jQuery: 'jQuery',
+    _: 'lodash',
+    Vue: 'vue'
   },
   performance: {
     maxEntrypointSize: 2097152
