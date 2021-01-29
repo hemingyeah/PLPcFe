@@ -1307,5 +1307,12 @@ export function getTaskPoolList(params: TaskPoolSearchModel): Promise<getTaskSea
   return http.post(`${ElASTICSEARCH}/outside/es/task/taskPool`, params)
 }
 
+/**
+ * @description 获取工单安装产品和安装位置字段 目前用于博立定制 后续可能通用
+ */
+export function getExpensePartField(params: {} | undefined) {
+  return http.get(`${fixedPrefixTaskPath}/outside/pc/task/getExpensePartField`, params);
+}
+
 
 /* -------------  end  新工单api ---------------- */

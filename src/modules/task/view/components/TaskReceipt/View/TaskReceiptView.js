@@ -1,3 +1,5 @@
+/* api */
+import * as TaskApi from '@src/api/TaskApi.ts';
 /* mixin */
 import ReceiptMixin from '../TaskReceiptMixin';
 
@@ -13,6 +15,7 @@ export default {
   mixins: [ReceiptMixin],
   data() {
     return {
+      partField: [], // 安装产品和安装位置字段 博立定制
       sparepartColums: [{
         label: '编号',
         field: 'serialNumber'
@@ -143,7 +146,7 @@ export default {
       
       // 初始化默认值
       this.form = this.receiptData;
-
+      
       // 处理回执信息
       this.fields.forEach(field => {
         let { fieldName } = field;
@@ -188,6 +191,33 @@ export default {
       // 折扣费用
       this.form.disExpense = discountExpense?.salePrice || 0;
 
+      // 获取是否有安装产品和安装位置 目前只有博立有数据 其它的数据为空
+      const result = await TaskApi.getExpensePartField()
+      if (result.code == 0) {
+        this.partField = result.result
+      }
+      if (this.partField.length) {
+        this.partField.forEach((part, ind) => {
+          this.form.sparepart.forEach(_sparepart => {
+            _sparepart.products = this.form.products
+            if (part.fieldName == 'installProductId') {
+              _sparepart.installProductId = _sparepart.attribute.installProductId
+            } else if (part.fieldName == 'installPosition') {
+              _sparepart.installPosition = _sparepart.attribute.installPosition
+            }
+          })
+          // 更新sparepartColums
+          let index = 2
+          if (part.fieldName == 'installPosition') {
+            index = 3
+          }
+          this.sparepartColums.splice(index, 0, {
+            label: part.displayName,
+            field: part.fieldName
+          })
+        })
+      }
+      
     } catch (e) {
       console.error('error ', e)
     }

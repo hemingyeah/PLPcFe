@@ -20,6 +20,12 @@
         </template>
         <!-- end 小计 -->
 
+        <!-- start 安装产品id获取安装产品名称 -->
+        <template v-else-if="column.field === 'installProductId'">
+          {{ getProductName(scope.row[column.field]) }}
+        </template>
+        <!-- end  安装产品id获取安装产品名称 -->
+
         <template v-else>{{ scope.row[column.field] }}</template>
       </template>
     </el-table-column>
@@ -29,6 +35,7 @@
 <script>
 export default {
   name: 'receipt-view-common-table',
+  inject: ['initData'],
   props: {
     data: {
       type: Array,
@@ -37,6 +44,18 @@ export default {
     colums: {
       type: Array,
       default: () => ([])
+    }
+  },
+  methods: {
+    // 根据产品id获取产品名称
+    getProductName(id) {
+      let name = ''
+      this.initData.task.products.forEach(product => {
+        if (id == product.id) {
+          name = product.name
+        }
+      })
+      return name
     }
   }
 }

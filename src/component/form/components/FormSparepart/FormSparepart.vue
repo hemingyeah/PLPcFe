@@ -49,6 +49,12 @@
           </template>
           <!-- end 操作 -->
 
+          <!-- start 安装产品id获取安装产品名称 -->
+          <template v-else-if="column.field === 'installProductId'">
+            {{ getProductName(scope.row[column.field]) }}
+          </template>
+          <!-- end  安装产品id获取安装产品名称 -->
+
           <template v-else>{{ scope.row[column.field] }}</template>
         </template>
       </el-table-column>
@@ -142,6 +148,7 @@ import * as math from 'mathjs';
 export default {
   name: 'form-sparepart',
   mixins: [FormMixin],
+  inject: ['initData'],
   props: {
     field: {
       type: Object,
@@ -154,12 +161,14 @@ export default {
   },
   data() {
     return {
+      partField: [],
+      products: this.initData.task.products,
       visible: false,
       showRepertory: true,
       repertoryId: 0, // 仓库ID
       repertoryList: [], // 仓库列表数据
       selectedSparepart: [], // 当前选中的备件
-      sparepart: this.initData(), // 备件信息
+      sparepart: this._initData(), // 备件信息
       config: {}, // 备件配置
       editUnitPrice: false, // 是否可以修改单品价格
       isPaySuccess: false // 是否支付成功
@@ -204,14 +213,21 @@ export default {
           minWidth: '70px'
         })
       }
-
+      
+      // 增加安装产品和安装位置
+      this.partField.forEach((_part, _ind) => {
+        colums.splice(_ind + 1, 0, {
+          label: _part.displayName,
+          field: _part.fieldName
+        })
+      })
       return colums;
     },
     /**
     * @description 备件字段
     */
     fields() {
-      return [{
+      let fields = [{
         formType: 'select',
         fieldName: 'repertory',
         displayName: '仓库',
@@ -265,6 +281,12 @@ export default {
         isNull: 1,
         disabled: true
       }]
+
+      // 增加安装产品和安装位置
+      this.partField.forEach((_part, _ind) => {
+        fields.splice(_ind + 2, 0, _part)
+      })
+      return fields
     },
     /**
     * @description 小计
@@ -281,11 +303,21 @@ export default {
     }
   },
   methods: {
+    // 根据产品id获取产品名称
+    getProductName(id) {
+      let name = ''
+      this.products.forEach(product => {
+        if (id == product.id) {
+          name = product.name
+        }
+      })
+      return name
+    },
     /**
     * @description 初始化备件默认值
     */
-    initData() {
-      return {
+    _initData() {
+      let _initData = {
         id: '',
         name: '',
         serialNumber: '',
@@ -299,6 +331,17 @@ export default {
         repertoryCount: '',
         description: ''
       }
+      // 安装产品和安装位置有数据时 增加这两个字段
+      this.value.forEach(val => {
+        for (let v in val) {
+          if (v == 'installProductId') {
+            _initData.installProductId = ''
+          } else if (v == 'installPosition') {
+            _initData.installPosition = ''
+          }
+        }
+      })
+      return _initData
     },
     /**
     * @description 修改列表备件数量
@@ -347,7 +390,7 @@ export default {
     */
     reset() {
       this.repertoryId = this.repertoryList[0]?.value || 0;
-      this.sparepart = this.initData();
+      this.sparepart = this._initData();
       this.selectedSparepart = [];
 
       // 清空校验结果
@@ -375,7 +418,7 @@ export default {
     updateRepertory() {
       // 重置备件信息
       this.selectedSparepart = [];
-      this.sparepart = this.initData();
+      this.sparepart = this._initData();
     },
     /**
     * @description 搜索备件
@@ -521,6 +564,43 @@ export default {
       // 设置仓库默认值
       this.repertoryId = this.repertoryList[0]?.value || 0;
       
+      // 获取是否有安装产品和安装位置 目前只有博立有数据 其它的数据为空
+      const result = await TaskApi.getExpensePartField()
+      if (result.code == 0) {
+        result.result.forEach((res, ind) => {
+          if (res.fieldName == 'installProductId') {
+            // 设置安装产品的下拉数据
+            let _res = Object.assign({}, res)
+            let products = this.products
+            products.forEach(product => {
+              product.text = product.name
+              product.value = product.id
+            })
+            _res.setting = {
+              isMulti: false,
+              dataSource: products
+            }
+            result.result.splice(ind, 1, _res)
+          } else if (res.fieldName == 'installPosition') {
+            // 设置安装位置的下拉数据
+            res.setting = JSON.parse(res.setting)
+            let dataSource = res.setting.dataSource
+            let _res = Object.assign({}, res)
+            _res.setting = {
+              isMulti: res.setting.isMulti,
+              dataSource: []
+            }
+            dataSource.forEach(s => {
+              _res.setting.dataSource.push({
+                text: s,
+                value: s
+              })
+            })
+            result.result.splice(ind, 1, _res)
+          }
+        })
+        this.partField = result.result
+      }
     } catch (err) {
       console.error('err', err);
     }
