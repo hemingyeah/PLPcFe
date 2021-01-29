@@ -1,6 +1,6 @@
 <template>
   <!-- tour-content-out-box start -->
-  <div>
+  <div :id="id">
     <div class="cover" v-if="needCover && showGuide"></div>
     <div
       class="cover-dom"
@@ -12,7 +12,6 @@
     ></div>
     <div id="vmDom"></div>
     <div
-      :id="id"
       class="tour-content-out-box"
       :class="[guideMounted && showGuide && guideDom.top > -1 ? 'have-mounted' : '', guideSizeClass[guideSize]]"
       ref="guideCom"
