@@ -248,7 +248,7 @@ export default {
         console.warn(error, 'error try catch');
       }
       // 被引导的元素位置不变化的话停止引导组件的渲染
-      if (!res_ || ( this.guideDom && res_ && this.guideDom.top == res_.top && this.guideDom.left == res_.left )) return;
+      if (!res_ || ( this.guideDom && res_ && this.guideDom.top == res_.top && this.guideDom.left == res_.left && this.guideDom.height == res_.height && this.guideDom.width == res_.width )) return;
       let style_ = '';
 
       if (this.needCover && this.copyDom) {
