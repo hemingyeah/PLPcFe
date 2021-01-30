@@ -501,7 +501,7 @@
               show-overflow-tooltip
             >
               <template slot-scope="scope">
-                {{ getProductName(scope.row) }}
+                {{ scope.row.attribute ? scope.row.attribute.installProductName : '' }}
               </template>
             </el-table-column>
             <el-table-column
@@ -836,20 +836,6 @@ export default {
     // },
   },
   methods: {
-    // 根据产品id获取产品名称
-    getProductName(row) {
-      console.log(this.initData, 'init')
-      if (!row.attribute) return ''
-      const id = row.attribute.installProductId
-      if (!id) return ''
-      let name = ''
-      this.initData.task.products.forEach(product => {
-        if (id == product.id) {
-          name = product.name
-        }
-      })
-      return name
-    },
     // 获取安装产品和安装位置
     getPartField(select, columns) {
       if (select == 'useRecord') {
