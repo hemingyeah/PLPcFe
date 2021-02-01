@@ -139,16 +139,6 @@
                     <label>产品类型：</label>
                     <span>{{ option.type }}</span>
                   </span>
-                  <span>
-                    <label>联系人：</label>
-                    <span>{{ option.linkman && option.linkman.name }}</span>
-                  </span>
-                </p>
-                <p>
-                  <span>
-                    <label>产品地址：</label>
-                    <span>{{ option.address | fmt_address }}</span>
-                  </span>
                 </p>
               </div>
             </biz-remote-select>
