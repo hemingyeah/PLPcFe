@@ -58,6 +58,9 @@ export default {
   .form-preview-task-customer{
     display: flex;
     flex-direction: column;
+    .form-preview-group{
+      border-bottom: 1px solid  #F5F5F5;
+    }
   }
 </style>
 

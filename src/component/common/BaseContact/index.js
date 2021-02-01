@@ -60,7 +60,8 @@ function dept(options) {
       action,
       showDeptCheckbox: options.showDeptCheckbox === true,
       seeAllOrg: options.seeAllOrg || false, /** 是否 只可见本团队成员 */
-      departShow: options.departShow
+      departShow: options.departShow,
+      showDeleteUser: options.showDeleteUser || false, // 是否显示离职人员
     }
   });
 
@@ -98,6 +99,7 @@ function team(options = {}) {
   let selectedUser = [];
   let selectedTeam = [];
   let max = options.max;
+  let from = options.from;
   let action = '/security/tag/tagComponet/getUserList';
   let selectTypes = ['universal', 'performance'];
   let selectType = 'universal';
@@ -161,25 +163,26 @@ function team(options = {}) {
       },
       render() {
         return (
-          <base-contact-team
-            action={ action }
-            dataFunc={ typeof options.dataFunc == 'function' ? options.dataFunc : undefined }
-            lat={ options.lat }
-            lng={ options.lng }
-            isRepeatUser={ options.isRepeatUser === true }
-            isGroup={ options.isGroup === true }
-            isHideTeam={ options.isHideTeam === true }
-            max={ max }
-            selectType={ selectType }
-            selectedTeam={ selectedTeam }
-            selectedUser={ selectedUser }
-            showTeamCheckbox={ options.showTeamCheckbox === true }
-            showTaskCount={ options.showTaskCount === true }
-            showUserState={ options.showUserState === true }
-            title={ options.title }
-            onDestroy={ this.destroy.bind(this) }
-            onCancel={ this.cancel.bind(this) }
-            onInput={ this.input.bind(this) }
+          <base-contact-team 
+            action={action}
+            from={from}
+            dataFunc={typeof options.dataFunc == 'function' ? options.dataFunc : undefined}
+            lat={options.lat}
+            lng={options.lng}
+            isRepeatUser={options.isRepeatUser === true}
+            isGroup={options.isGroup === true}
+            isHideTeam={options.isHideTeam === true}
+            max={max}
+            selectType={selectType}
+            selectedTeam={selectedTeam}
+            selectedUser={selectedUser}
+            showTeamCheckbox={ options.showTeamCheckbox === true}
+            showTaskCount={options.showTaskCount === true}
+            showUserState={options.showUserState === true}
+            title={options.title}
+            onDestroy={this.destroy.bind(this)}
+            onCancel={this.cancel.bind(this)}
+            onInput={this.input.bind(this)}
           >
           </base-contact-team>
         )

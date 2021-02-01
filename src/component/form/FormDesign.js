@@ -12,7 +12,7 @@ import {
 
 import {
   cloneDeep, 
-  isEmpty 
+  isEmpty
 } from 'lodash';
 
 import { 
@@ -37,9 +37,11 @@ function createPreviewComp(h, field){
   }
 
   // 根据字段配置创建预览内容
-  
   // todo 临时解决
   if (!previewComp) return;
+
+  //TODO 隐藏字段不渲染
+  if(field.isHidden == 1) return;
   
   let fieldPreview = h(previewComp.preview, {
     'class': 'form-design__ghost',
@@ -56,10 +58,20 @@ function createPreviewComp(h, field){
     <div class={previewClass} key={currFieldId}
       onMousedown={e => this.beginSort(field, e)}>
       {fieldPreview}
-      {(field.isSystem == 0 || previewComp.forceDelete) && <button type="button" class="form-design-preview-delete"
-        onClick={e => this.deleteField(field)}>
-        <i class="iconfont icon-fe-close"></i>
-      </button>}
+      {(field.isSystem == 0 || previewComp.forceDelete) && 
+      <div class="form-design-operation">
+        <div class="form-design-preview-hidden form-design-preview-btn" onClick={e => this.hiddenField(field)}>
+          <el-tooltip class="item" effect="dark" content="隐藏" placement="top">
+            <i class="iconfont icon-fdn-hidden"></i>
+          </el-tooltip>
+        </div>
+        <div class="form-design-divider-separator" role="separator"></div>
+        <div class="form-design-preview-delete form-design-preview-btn" onClick={e => this.deleteField(field)}>
+          <el-tooltip class="item" effect="dark" content="删除" placement="top">
+            <i class="iconfont icon-shanchu-copy"></i>
+          </el-tooltip>
+        </div>
+      </div>}
       <div class="form-design-cover"></div>
     </div>
   )
@@ -84,6 +96,7 @@ function getSettingComp(field, comp){
 /** 创建字段设置组件 */
 function createSettingComp(h, field){
   if(null == field) return null;
+  if(field.isHidden == 1) return null;
   
   let formType = field.formType;
   let comp = FieldManager.findField(formType);
@@ -93,7 +106,7 @@ function createSettingComp(h, field){
   
   if(null == compName) return (
     <div class="form-setting-panel">
-      <h3>系统字段 -- {field.displayName}</h3>   
+      <h3 class="form-setting-panel-title">{field.displayName}</h3>   
       <p class="form-design-warning">该字段为系统内置字段，暂不支持修改、删除。</p>
       {SHOW_IS_NULL_FIELD_COMP.includes(field.fieldName) && createRequired(h, field)}
     </div> 
@@ -219,6 +232,8 @@ const FormDesign = {
     })
 
     return {
+      //角色列表
+      roleList:[],
       // 当前模式下可用字段
       availableFields,
       // 是否显示系统字段tab
@@ -244,7 +259,9 @@ const FormDesign = {
       // 插入的字段
       insertedField: null,
       // 插入前的值
-      originValue: null
+      originValue: null,
+      autographMax: config.AUTOGRAPH_MAX_LENGTH_MAX,
+      show:false
     }
   },
   computed: {
@@ -256,12 +273,46 @@ const FormDesign = {
       if(this.fieldGroup == 1){
         groupFields = groupFields.filter(f => this.value.findIndex(v => v.formType == f.formType) == -1);
       }
-    
+
       return groupFields;
+    },
+    fieldControls(){
+      let fieldArr = [];
+      let groupFields = this.availableFields.filter(item => item.isSystem == 0 && item.formType != 'info' && item.formType != 'separator');
+      let layoutFields = this.availableFields.filter(item => item.formType == 'info' || item.formType == 'separator');
+      let sysFields = this.availableFields.filter(f => f.isSystem == 1);
+      sysFields = sysFields.filter(f => this.value.findIndex(v => v.formType == f.formType) == -1);
+      if(groupFields.length){
+        let basisObj = {};
+        basisObj.name = "基础"
+        basisObj.field = groupFields;
+        fieldArr.push(basisObj)
+      }
+      if(sysFields.length){
+        let sysObj = {};
+        sysObj.name = "系统"
+        sysObj.field = sysFields;
+        fieldArr.push(sysObj)
+      }
+      if(layoutFields.length){
+        let layoutObj = {};
+        layoutObj.name = "布局"
+        layoutObj.field = layoutFields;
+        fieldArr.push(layoutObj)
+      }
+      return fieldArr
     },
     // 是否为空
     isEmpty(){
       return !Array.isArray(this.value) || this.value.length == 0;
+    },
+    //已隐藏字段
+    hiddenFields() {
+     return this.value.filter(item => item.isHidden == 1);
+    },
+    //未隐藏字段
+    unHiddenFields() {
+      return this.value.filter(item => item.isHidden !== 1);
     }
   },
   methods: {
@@ -386,6 +437,12 @@ const FormDesign = {
       if (this.value.length >= this.max) {
         return Platform.alert(`单个表单最多支持${ this.max }个字段`)
       }
+
+      // 限制电子签名字段数量
+      let autographFields = this.value.filter(field => field.formType == 'autograph');
+      if(autographFields.length >= this.autographMax) {
+        return Platform.alert(`电子签名自定义字段暂时不予许超过${ this.autographMax }个`);
+      }
       
       let dragEvent = this.$data.$dragEvent;
       let target = event.target.closest('.form-design-field');
@@ -462,7 +519,7 @@ const FormDesign = {
       
       if (dragEvent.mode == 'sort') {
         if (inContainer) {
-          let dragIndex = this.value.findIndex(item => item._id == this.currField._id);
+          let dragIndex = this.unHiddenFields.findIndex(item => item._id == this.currField._id);
           let enterIndex = this.calcIndex(y, dragIndex);
           this.sort(dragIndex, enterIndex);
         }
@@ -481,7 +538,7 @@ const FormDesign = {
         if (inContainer) {
           // 如果已经插入，对字段进行排序
           if (this.insertedField) {
-            let dragIndex = this.value.findIndex(item => item._id == this.insertedField._id);
+            let dragIndex = this.unHiddenFields.findIndex(item => item._id == this.insertedField._id);
             let enterIndex = this.calcIndex(y, dragIndex);
             this.sort(dragIndex, enterIndex);
             return;
@@ -541,7 +598,7 @@ const FormDesign = {
         
         for (let i = 0; i < previewDoms.length; i++) {
           let dom = previewDoms[i];
-          if (dom.offsetTop + (dom.offsetHeight / 2) < offsetTop) {
+          if (dom.offsetTop + (dom.offsetHeight / 2) < offsetTop + dragEvent.offsetY) {
             index = i;
           }
         }
@@ -554,8 +611,8 @@ const FormDesign = {
     /** 字段排序 */
     sort(dragIndex, enterIndex) {
       if (dragIndex < 0 || enterIndex < 0 || dragIndex == enterIndex) return;
-      
-      let arr = cloneDeep(this.value);
+
+      let arr = cloneDeep(this.unHiddenFields);
       
       let distance = dragIndex < enterIndex ? 1 : 0
       let dragField = arr[dragIndex]; // 拖拽的字段
@@ -565,7 +622,8 @@ const FormDesign = {
       let insertIndex = arr.indexOf(enterField);
       arr.splice(insertIndex + distance, 0, dragField);
       
-      this.emitInput(arr)
+      let newArr = [...arr,...this.hiddenFields]
+      this.emitInput(newArr)
       this.chooseField(dragField)
     },
     /** 选中字段 */
@@ -624,6 +682,17 @@ const FormDesign = {
         this.deleteDependencies(item);
         this.emitInput(value)
       }
+    },
+    /** 隐藏字段 */
+    async hiddenField(item) {
+      let tip = item.isSystem == 0 ? '隐藏后该字段将不在页面上展示，请确认是否隐藏？' : '该字段为系统内置字段，请确认是否隐藏？'
+      if (!await Platform.confirm(tip)) return;
+
+      let value = this.value;
+      let index = value.indexOf(item);
+      value[index].isHidden = value[index].isHidden == 1 ? 0 : 1;
+
+      this.emitInput(value)
     },
     async deleteUser(item, callback) {
       let result = await checkUser({ id : item.id })
@@ -687,23 +756,30 @@ const FormDesign = {
       let {pixelY} = normalizeWheel(e);
       containerEl.scrollTop += pixelY;
     },
-    renderTabHeader(){
-      if(!this.hasSystemField) return (
+    //获取角色列表
+    getRoleListreq() {
+      this.$http.get('/setting/role/list', {pageSize: 0 }).then(res => {
+        const { list } = res;
+        this.roleList = list;
+      }).catch(err => console.error('err', err));
+    },
+    renderTabHeader(name){
+      return (
         <div class="form-design-tabs">
-          <div class="form-design-tab">基础字段</div>
+          <div class="form-design-tab">{name}控件</div>
         </div>
       );
 
-      return (
-        <div class="form-design-tabs form-design-withSys">
-          <div class={['form-design-tab', this.fieldGroup == 0 ? 'form-design-tab-active' : null]} onClick={e => this.fieldGroup = 0}>基础字段</div>
-          <div class={['form-design-tab', this.fieldGroup == 1 ? 'form-design-tab-active' : null]} onClick={e => this.fieldGroup = 1}>系统字段</div>
-        </div>
-      )
+      // return (
+      //   <div class="form-design-tabs form-design-withSys">
+      //     <div class={['form-design-tab', this.fieldGroup == 0 ? 'form-design-tab-active' : null]} onClick={e => this.fieldGroup = 0}>基础控件</div>
+      //     <div class={['form-design-tab', this.fieldGroup == 1 ? 'form-design-tab-active' : null]} onClick={e => this.fieldGroup = 1}>系统控件</div>
+      //   </div>
+      // )
     },
     renderFieldList(fields){
       if(fields.length == 0){
-        return <div class="form-design-field-empty">暂无可添加的{this.fieldGroup == 0 ? '基础' : '系统'}字段</div>
+        return <div class="form-design-field-empty">暂无可添加的{this.fieldGroup == 0 ? '基础' : '系统'}控件</div>
       }
 
       return fields.map(field => {
@@ -711,8 +787,9 @@ const FormDesign = {
           <div class="form-design-field-wrap"
             onMousedown={e => this.beginInsert(field, e)}
             onClick={e => this.immediateInsert(field, e)}>
-            <div class="form-design-field form-design__ghost">
-              {field.name} <i class={['iconfont', `icon-fd-${field.formType}`]}></i>
+            <div class="form-design-field form-design__ghost"> 
+              <span class="anticon"><i class={['iconfont', `icon-fdn-${field.formType}`]}></i></span>
+              <span>{field.name}</span>
             </div>
           </div>
         )
@@ -729,7 +806,7 @@ const FormDesign = {
     },
     renderSettingPanel(h){
       let fieldSetting = createSettingComp.call(this, h, this.currField);
-      if(null == fieldSetting) return null;
+      // if(null == fieldSetting) return null;
 
       return (
         <div class="form-design-setting" key="form-design-setting">
@@ -737,36 +814,107 @@ const FormDesign = {
         </div>
       )
     },
+    //渲染已隐藏字段弹窗dom
+    renderBaseModal(h){
+      if(!this.show) return null;
+      const scopedSlots = {
+        default:({row,column})=>{
+          return  <el-button type="text" size="small" onClick={()=>this.onRestoreField(row)}>恢复</el-button>
+        }
+      }
+      return (
+        <base-modal
+         appendToBody={ true }
+         class="base-hidden-modal"
+         title="已隐藏字段" 
+         show={ this.show } 
+         onClose={ this.onCloseBaseModal }
+         width="400px"
+        >
+          <el-table data={this.hiddenFields} header-row-class-name="base-table-header-v3" row-class-name="base-table-row-v3" border>
+            <el-table-column prop="displayName" label="已隐藏字段"/>
+            <el-table-column label="操作" width="100" scopedSlots={ scopedSlots }/> 
+         </el-table>
+        </base-modal>
+      );
+    },
     updateOptions(field, event) {
       if(!field.setting.customerOption) return;
       field.setting.customerOption[event.prop] = event.value;
+    },
+    /** 
+     * @description 恢复已隐藏字段
+    */
+    async onRestoreField(row) {
+      let value = this.value;
+      let index = value.indexOf(row);
+      value[index].isHidden = value[index].isHidden == 1 ? 0 : 1;
+
+      this.emitInput(this.value)
+      this.$platform.notification({
+        title: '操作成功',
+        type: 'success',
+      }); 
+    },
+    /** 
+     * @description 关闭弹窗
+    */
+    onCloseBaseModal() {
+      this.show = false;
+    },
+    /** 
+     * @description 显示弹窗
+    */
+    onShowBaseModal() {
+      if(this.hiddenFields.length==0) return this.$platform.confirm('暂无隐藏字段');
+      this.show = true;
     }
   },
   render(h){
     return (
       <div class="form-design">
         <div class="form-design-panel">
-          { this.renderTabHeader() }
-          <div class="form-design-tabs-content">
-            { this.renderFieldList(this.filterFields) }
+          <div class="form-design-left"> 
+            {
+              this.fieldControls.map(field => {
+                return(
+                <div class="form-design-widget">
+                  { this.renderTabHeader(field.name) }
+                  <div class="form-design-tabs-content">
+                    { this.renderFieldList(field.field) }
+                  </div>
+                </div>
+                )
+              })
+            }
           </div>
         </div>
-        <div class="form-design-main">
-          <div class={['form-design-list', this.silence ? 'form-design-silence' : null]}>
-            { this.renderPreviewList(h) }
-          </div>
+        <div class="form-design-main">  
+         <div class="form-design-box">
+            <div class="form-design-hidden">
+            { this.hiddenFields.length > 0 && (
+              <p onClick={this.onShowBaseModal }><i class="iconfont icon-fdn-hidden"></i>查看已隐藏字段</p> )} 
+            </div>
+            <div class="form-design-center">
+              <div class={['form-design-phone', this.silence ? 'form-design-silence' : null]}>
+                { this.renderPreviewList(h) }
+              </div>
+            </div>
+          </div>  
         </div>
         { this.renderSettingPanel(h) }
         <div class="form-design-ghost" key="form-design-ghost" onWheel={this.scrollPreviewList}>
           <div class="form-design__template"></div>
           <div class="form-design-cover"></div>
         </div>
+        { this.renderBaseModal(h) }
       </div>
     );
   },
   mounted(){
     this.$data.$dragEvent.ghostEl = this.$el.querySelector('.form-design-ghost');
-    this.$data.$dragEvent.containerEl = this.$el.querySelector('.form-design-list');
+    this.$data.$dragEvent.containerEl = this.$el.querySelector('.form-design-phone');
+    this.getRoleListreq();
   },
   components: {...PreviewComponents, ...SettingComponents}
 };

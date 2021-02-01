@@ -103,7 +103,7 @@ export default {
       } else if (index === 3) {
         window.location.href = "/setting/doMyself/toastList";
       }
-      this.nowMenu === index;
+      this.nowMenu = index;
     },
   },
   components: {
@@ -134,9 +134,6 @@ export default {
 }
 .font-16 {
   font-size: 16px;
-}
-.font-w-600 {
-  font-weight: 500;
 }
 .al-c {
   align-items: center !important;

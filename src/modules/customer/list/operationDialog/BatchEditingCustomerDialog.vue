@@ -13,7 +13,7 @@
 <script>
 
 import {formatDate} from '@src/util/lang';
-import { FormFieldMap,  } from '@src/component/form/components';
+import { FormFieldMap } from '@src/component/form/components';
 import * as Utils from '@src/component/form/util';
 import * as CustomerApi from '@src/api/CustomerApi.ts';
 import FormItem from '@src/component/form/FormItem.vue';
@@ -41,13 +41,14 @@ export default {
     fields() {
       let tv = null;
 
-      let formTypes = ['attachment', 'separator', 'location', 'info'];
+      let formTypes = ['attachment', 'separator', 'location', 'info', 'autograph', 'formula', 'related_task'];
+      let isNotModify = ['text', 'textarea', 'number'];
+      let isRepeat = ['text', 'textarea', 'number','phone'];
 
       let fields = (this.config.fields || [])
-        .filter(f => (
-          f.fieldName !== 'serialNumber' &&
-          formTypes.indexOf(f.formType) < 0
-        ))
+        .filter(f => f.fieldName !== 'serialNumber' && formTypes.indexOf(f.formType) < 0)
+        .filter(f => !(isNotModify.indexOf(f.formType) > -1 && f.setting.defaultValueConfig && !!f.setting.defaultValueConfig.isNotModify))
+        .filter(f => !(isRepeat.indexOf(f.formType) > -1 && f.setting.isRepeat == 1))
         .map(f => {
           tv = Object.assign({}, f);
 
@@ -60,16 +61,21 @@ export default {
             tv.fieldName = 'cusName';
           }
 
+          if (tv.formType === 'select') { 
+            if(tv.setting.selectType == 2){ 
+              tv.setting.selectType = 1
+            }          
+          }
+
           if (tv.isSystem) {
             tv.orderId -= 100;
           }
-
+          
           // tv.isNull = 0;
           return Object.freeze(tv);
         })
 
       if (!fields || !fields.length) return [];
-
       return fields.sort((a, b) => a.orderId - b.orderId);
     },
   },
@@ -121,6 +127,7 @@ export default {
         return this.$platform.alert('请选择需要批量编辑的客户');
       }
 
+      this.reset()
       this.visible = true;
     },
     buildParams() {
@@ -139,17 +146,17 @@ export default {
           [sf.fieldName]: form[sf.fieldName].map(({id, tagName}) => ({id, tagName}))
         })
       }
-      if (sf.formType === 'user') {
-        tv = form[sf.fieldName];
+      // if (sf.formType === 'user') {
+      //   tv = form[sf.fieldName];
 
-        params.mapJson = JSON.stringify({
-          [sf.fieldName]: {
-            userId: tv.userId,
-            displayName: tv.displayName,
-            staffId: tv.staffId
-          },
-        })
-      }
+      //   params.mapJson = JSON.stringify({
+      //     [sf.fieldName]: {
+      //       userId: tv.userId,
+      //       displayName: tv.displayName,
+      //       staffId: tv.staffId
+      //     },
+      //   })
+      // }
       if (sf.fieldName === 'manager') {
         tv = form[sf.fieldName];
 
@@ -210,7 +217,7 @@ export default {
         }
       },
       mounted() {
-        this.reset();
+        // this.reset();
         this.buildForm();
       },
       methods: {
@@ -222,6 +229,7 @@ export default {
         },
         reset() {
           this.form = {};
+          if (!this.fields.length) return
           this.selectField(this.fields[0].fieldName)
         },
         dispatch({type, bubbles = false, params = {}}) {

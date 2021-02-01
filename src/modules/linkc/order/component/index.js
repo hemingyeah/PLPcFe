@@ -1,10 +1,7 @@
 import GoodsDialog from './GoodsDialog.vue'
 import OutStockDialog from './OutStockDialog.vue'
 
-import BaseGallery from '../../../../../packages/BaseGallery';
-import {
-  method
-} from 'lodash';
+// import BaseGallery from '../../../../../packages/BaseGallery';
 
 
 
@@ -39,10 +36,11 @@ export default {
   methods: {
 
     previewImg(url) {
-      if (!url) return
-      let imgDom = document.createElement('img');
-      imgDom.src = url;
-      BaseGallery.preview(imgDom);
+      this.$previewImg(url)
+      // if (!url) return
+      // let imgDom = document.createElement('img');
+      // imgDom.src = url;
+      // BaseGallery.preview(imgDom);
     },
   }
 }

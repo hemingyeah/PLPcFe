@@ -49,7 +49,7 @@
               :remote-method="searchCustomer"
               @input="updateCustomer"
               placeholder="请输入关键字搜索客户"
-              :disabled="isCreateCustomer"
+              :input-disabled="isCreateCustomer"
             >
               <div class="customer-template-option" slot="option" slot-scope="{ option }">
                 <h3>{{ option.name }}</h3>
@@ -87,7 +87,7 @@
               :remote-method="searchLinkmanOuterHandler"
               @input="updateLinkman(value.linkman[0])"
               placeholder="请输入关键字搜索联系人"
-              :disabled="isCreateCustomer"
+              :input-disabled="isCreateCustomer"
               :cleared="true"
             >
             </biz-form-remote-select>

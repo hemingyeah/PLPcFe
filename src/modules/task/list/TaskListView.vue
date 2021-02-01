@@ -1020,20 +1020,20 @@
               :labels="tour.labels"
             >
               <template>
-                <div slot="content" class="tour-content-box">
-                  <div class="tour-left-tips">
+                <div slot="content" class="v-tour-content-box">
+                  <div class="v-tour-left-tips">
                     {{ `${index + 1}/${listSteps.length}` }}
                   </div>
-                  <div class="tour-content">
-                    <div class="flex-x tour-content-head">
+                  <div class="v-tour-content">
+                    <div class="flex-x v-tour-content-head">
                       <i @click="tour.stop" class="iconfont icon-fe-close"></i>
                     </div>
-                    <div class="tour-content-con">
+                    <div class="v-tour-content-con">
                       {{ listSteps[index].content }}
                     </div>
                   </div>
                 </div>
-                <div slot="actions" class="tour-bottom">
+                <div slot="actions" class="v-tour-bottom">
                   <!-- <div class="text" v-if="index > 0" @click="tour.previousStep">
                     上一步
                   </div> -->
@@ -1098,12 +1098,12 @@ export default TaskList;
     border-left-color: transparent !important;
     border-right-color: transparent !important;
   }
-  .tour-content-box {
+  .v-tour-content-box {
     position: relative;
     overflow: hidden;
     padding: 0 20px;
     border-radius: 4px;
-    .tour-left-tips {
+    .v-tour-left-tips {
       width: 80px;
       height: 32px;
       background: $color-primary;
@@ -1117,10 +1117,11 @@ export default TaskList;
       transform: rotateZ(-45deg);
       text-align: center;
     }
-    .tour-content {
-      .tour-content-head {
-        justify-content: flex-end;
+    .v-tour-content {
+      .v-tour-content-head {
         padding-top: 16px;
+        padding-bottom: 10px;
+        justify-content: flex-end;
         .iconfont {
           font-size: 10px;
           margin-bottom: 2px;
@@ -1128,14 +1129,14 @@ export default TaskList;
           cursor: pointer;
         }
       }
-      .tour-content-con {
+      .v-tour-content-con {
         text-align: start;
         padding-bottom: 12px;
       }
     }
   }
 
-  .tour-bottom {
+  .v-tour-bottom {
     height: 52px;
     padding: 0 20px;
     display: flex;

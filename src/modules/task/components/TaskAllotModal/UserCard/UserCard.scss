@@ -1,29 +1,9 @@
 .user-card {
+  height: 100%;
   width: 470px;
-  padding: 30px 0 20px 20px;
+  padding: 30px 20px 0px 20px;
   position: relative;
-  .excutor-button {
-    border-color: $color-primary;
-    color: $color-primary;
-    height: 32px;
-    width: 88px;
-    padding: 0 3px !important;
-    &:hover {
-      color: #fff;
-    }
-  }
-  .synergy-button {
-    border-color: $color-warning;
-    color: $color-warning;
-    margin-left: 8px;
-    height: 32px;
-    width: 88px;
-    padding: 0 3px !important;
-    &:hover {
-      background-color: $color-warning;
-      color: #fff;
-    }
-  }
+  overflow-y: auto;
 }
 
 .user-card-close {
@@ -38,12 +18,13 @@
 }
 
 .user-card-header {
-  border-bottom: 1px solid $border-color-base;
   display: flex;
   padding: 0 12px 12px 0;
+  min-height: 106px;
   &-head {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
+    padding-top: 10px;
     img {
       border-radius: 50%;
       height: 40px;
@@ -51,14 +32,14 @@
     }
   }
   &-head,
-  &-content,
-  &-button-group {
+  &-content {
     margin-left: 10px;
   }
 }
 
 .user-card-header-content {
   color: $text-color-regular;
+  flex-wrap: wrap;
   &-name {
     cursor: pointer;
     font-size: $font-size-base;
@@ -80,10 +61,17 @@
       width: 12px;
     }
   }
+  &-team {
+    display: flex;
+  }
   &-name, &-state, &-team {
     line-height: 20px;
+    margin: 2px 0;
   }
   .user-card-header-content-team {
+    span {
+      @include text-ellipsis-2();
+    }
     i {
       cursor: pointer;
       color: #FFB302;
@@ -95,32 +83,101 @@
 .user-card-header-content {
   &-top {
     display: flex;
+    flex-wrap: wrap;
+    & > div {
+      align-items: center;
+      width: 100%;
+    }
     &-left {
       flex: 1;
     }
-    .user-card-header-button-group {
-      width: 200px;
-    }
   }
+}
+
+.user-card-time {
+  height: 40px;
 }
 
 .user-card-time,
 .user-card-detail {
   color: $text-color-primary;
-  margin-top: 12px;
+  padding-top: 12px;
   margin-right: 30px;
 }
 
 .user-card-detail {
+  min-height: 120px;
   &-row {
     display: flex;
-    justify-content: space-between;
-    line-height: 30px;
+    margin-bottom: 20px;
+  }
+  &-chunk {
+    display: flex;
+    flex-wrap: wrap;
+    flex: 1;
+    &-content {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 500;
+      height: 40px;
+      width: 100%;
+    }
+    &-label {
+      color: $text-color-regular;
+      font-weight: 400;
+      text-align: center;
+      width: 100%;
+    }
+  }
+}
+
+.user-card-header-content-labels {
+  display: flex;
+  padding: 4px 0;
+}
+
+.user-label {
+  background-color: rgb(249, 129, 22);
+  border-radius: 2px;
+  color: #fff;
+  font-size: $font-size-small;
+  height: 16px;
+  line-height: 16px;
+  width: 29px;
+  margin-right: 4px;
+  padding: 0 2px;
+  text-align: center;
+  &-manager {
+    background-color: $color-primary;
+  }
+}
+
+.user-card-footer {
+  background-color: $bg-color-l2;
+  
+  display: flex;
+  align-items: center;
+  
+  height: 40px;
+  width: calc(100% + 40px);
+  padding: 0 20px;
+
+  position: relative;
+  left: -20px;
+
+  .el-checkbox {
+    display: flex;
     align-items: center;
-    &-item {
-      text-align: left;
-      width: 180px;
-      @include text-ellipsis();
+    height: 40px;
+    margin-bottom: 0;
+  }
+
+  .el-radio-group {
+    display: flex;
+    justify-content: space-around;
+    label {
+      margin-right: 30px;
     }
   }
 }

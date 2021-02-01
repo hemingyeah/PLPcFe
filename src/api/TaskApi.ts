@@ -39,7 +39,8 @@ import {
   getTaskPoolSubscriptionUsersResult,
   getCustomerTagTaskPoolCountResult,
   getTaskAllotTaskPollApproveResult,
-  getTaskTypeResult
+  getTaskTypeResult,
+  getTaskTypesResult
 } from '@model/param/out/Task'
 
 import GrayUtil from '@src/util/gray'
@@ -322,12 +323,12 @@ export function getCountForCreate(params: {} | undefined) {
 }
 
 /**
- * @description 获取产品列表
+ * @description 根据手机号搜索客户
  * @param {Object} params - 参数
  * @param {String} params.phone - 手机号
  */
 export function getCustomerByPhone(params: {} | undefined) {
-  return http.get("task/getCustomerByPhone", params, false);
+  return http.get("/task/getCustomerByPhone", params, false);
 }
 
 /**
@@ -1305,6 +1306,13 @@ export function getCustomerTagTaskPoolCount(params: CustomerTahTaskPoolCountGetM
  */
 export function getTaskPoolList(params: TaskPoolSearchModel): Promise<getTaskSearchListResult> {
   return http.post(`${ElASTICSEARCH}/outside/es/task/taskPool`, params)
+}
+
+/**
+ * @description 查询所有工单类型
+ */
+export function getTaskTypesMap(): Promise<getTaskTypesResult> {
+  return http.get('/api/task/outside/task/list/taskTypeMap')
 }
 
 

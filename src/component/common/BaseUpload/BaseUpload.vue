@@ -5,8 +5,9 @@
     <div class="base-file-list base-file__preview" >
       <base-file-item v-for="file in value" :key="file.id" :file="file" @delete="deleteFile"></base-file-item>        
     </div>
-    <div class="base-upload-operation">
-      <button type="button" class="btn btn-primary base-upload-btn" @click="chooseFile" :disabled="pending" :id="forId" v-if="allowUpload">
+
+    <div class="base-upload-operation" v-if="allowUpload">
+      <button type="button" class="btn btn-primary base-upload-btn" @click="chooseFile" :disabled="pending" :id="forId" >
         <i class="iconfont icon-loading" v-if="pending"></i>
         <span>{{pending ? '正在上传' : '点击上传'}}</span>
       </button>
@@ -18,6 +19,9 @@
 <script>
 import Uploader from '@src/util/uploader';
 import platform from '@src/platform';
+
+const IMG_TYPE = ['png', 'bmp', 'gif', 'jpg', 'jpeg', 'tiff'];
+const WATERMARK_DEFAULT_POSTION = 'bottomRight'; // 图片水印位置默认右下
 
 export default {
   name: 'base-upload',
@@ -63,9 +67,13 @@ export default {
       type : String,
       default: null
     },
+    isWaterMark: { // 加上水印
+      type: Boolean,
+      default: false
+    },
     accept: {
       type: String,
-      default: ""
+      default: ''
     }
   },
   computed: {
@@ -80,8 +88,8 @@ export default {
     chooseFile(){
       if(!this.allowUpload) return console.warn('Caused: dont chooseFile, because of this.allowUpload is false');
       if(this.pending) return platform.alert('请等待文件上传完成');
-      if(this.value.length >= Uploader.FILE_MAX_NUM) {
-        return platform.alert(`上传文件数量不能超过${Uploader.FILE_MAX_NUM}个`);
+      if(this.value.length >= this.limit) {
+        return platform.alert(`上传文件数量不能超过${this.limit}个`);
       }
 
       this.$refs.input.value = null;
@@ -93,11 +101,11 @@ export default {
       
       let allFilesLength = this.value.length + files.length;
 
-      if(allFilesLength > Uploader.FILE_MAX_NUM) {
-        let message = `上传文件数量不能超过${Uploader.FILE_MAX_NUM}个`;
-        let max = Uploader.FILE_MAX_NUM - this.value.length;
+      if(allFilesLength > this.limit) {
+        let message = `上传文件数量不能超过${this.limit}个`;
+        let max = this.limit - this.value.length;
 
-        if(max > 0 && files.length < Uploader.FILE_MAX_NUM){
+        if(max > 0 && files.length < this.limit){
           message += `, 您还能上传${max}个文件`;
         }
 
@@ -105,14 +113,14 @@ export default {
       }
 
       if(this.fileType) {
-        //需要做文件类型校验
+        // 需要做文件类型校验
         for (let item of files) {
           let _fileName = item.name;
-          if (!_fileName.includes(Uploader.fileTypeObj[this.fileType]["fileName"])) {
-            //没有匹配到
+          if (!_fileName.includes(Uploader.fileTypeObj[this.fileType]['fileName'])) {
+            // 没有匹配到
             this.$platform.notification({
               title: '文件上传失败',
-              message: Uploader.fileTypeObj[this.fileType]["errMsg"],
+              message: Uploader.fileTypeObj[this.fileType]['errMsg'],
               type: 'error',
             })
             return false;
@@ -125,19 +133,36 @@ export default {
       }
 
       this.pending = true;
-      Uploader.batchUploadWithParse({files, action: this.action}).then((result = {}) => {
+      let _self = this;
+      Uploader.batchUploadWithParse({files, action: this.action}).then(async (result = {}) => {
         let {success, error} = result;
-
         if(error && Array.isArray(error) && error.length > 0){
           let message = error.map(item => item.message).join('\n');
           // 此处不能return
           platform.alert(message)
         }
 
-        if(success && Array.isArray(success) && success.length > 0){
-          let value = this.value.concat(success);
-          this.$emit('input', value);
+        if(success && Array.isArray(success) && success.length > 0 && this.isWaterMark){
+          // 判断是否需要加水印
+          for(let i = 0; i < success.length; i ++) {
+            let file = success[i];
+            let currExt = this.getExt(file.filename);
+
+            let params = {};
+            if(IMG_TYPE.indexOf(currExt) > -1 && !!file.url) {
+              params.urls = [file.url];
+              params.position = WATERMARK_DEFAULT_POSTION;
+              let waterMarkResult = await _self.$http.post('/dd/file/upload/watermark/position', params);
+              if(waterMarkResult.length > 0 && waterMarkResult[0].data) {
+                success[i] = waterMarkResult[0].data;
+              }
+            }
+          }
+          
         }
+        let value = this.value.concat(success);
+        this.$emit('input', value);
+
       })
         .catch(err => console.error(err))
         .then(() => this.pending = false)
@@ -148,7 +173,16 @@ export default {
         this.value.splice(index, 1);
         this.$emit('input', this.value);
       }
-    }
+    },
+    // 返回小写后缀
+    getExt(fileName){
+      if(!fileName) return '';
+
+      let index = fileName.lastIndexOf('.');
+      if(index < 0) return '';
+
+      return fileName.substring(index + 1).toLowerCase();
+    },
   }
 }
 </script>

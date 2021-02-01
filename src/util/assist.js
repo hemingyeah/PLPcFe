@@ -27,10 +27,10 @@ function findComponentsUpward(context, componentName) {
 
 /* 向下找到最近指定组件 */
 function findComponentDownward(context, componentName) {
-  const childrens = context.$children
+  const childrens = context?.$children
   let children = null
   
-  if (!childrens.length) return children
+  if (!childrens || !childrens.length) return children
   
   for (const child of childrens) {
     // 判断当前的子元素 名字是否相同

@@ -1,5 +1,5 @@
 /* api */
-import * as TaskApi from "@src/api/TaskApi.ts";
+import * as TaskApi from '@src/api/TaskApi.ts';
 
 /* util */
 import AuthUtil from '@src/util/auth';
@@ -12,7 +12,7 @@ import { isShowReport } from '@src/util/version.ts'
 import {
   storageGet,
   storageSet
-} from "@src/util/storage";
+} from '@src/util/storage';
 
 /* component */
 import CancelTaskDialog from './components/CancelTaskDialog.vue';
@@ -31,17 +31,17 @@ import TaskTimeDialog from './components/TaskTimeDialog.vue';
 import TaskAllotModal from '@src/modules/task/components/TaskAllotModal/TaskAllotModal.tsx'
 
 /* enum */
-import { TaskEventNameMappingEnum } from "@model/enum/EventNameMappingEnum.ts";
+import { TaskEventNameMappingEnum } from '@model/enum/EventNameMappingEnum.ts';
 /* mixin */
-import tourGuide from "@src/mixins/tourGuide"
+import tourGuide from '@src/mixins/tourGuide'
 
-const ENCRYPT_FIELD_VALUE = "***";
+const ENCRYPT_FIELD_VALUE = '***';
 
-const { TASK_GUIDE_DETAIL } = require("@src/component/guide/taskV2Store");
+const { TASK_GUIDE_DETAIL } = require('@src/component/guide/taskV2Store');
 
 export default {
-  name: "task-detail-view",
-  inject: ["initData"],
+  name: 'task-detail-view',
+  inject: ['initData'],
   mixins: [tourGuide],
   data() {
     return {
@@ -49,22 +49,22 @@ export default {
       pending: false,
       collapse: true,
       task: this.initData?.task || {},
-      taskState: { value: this.initData?.task?.state || "" },
+      taskState: { value: this.initData?.task?.state || '' },
       fields: [], // 工单表单字段
       // 回退工单弹窗
       backDialog: {
         visible: false,
-        reason: ""
+        reason: ''
       },
       // 暂停工单弹窗
       pauseDialog: {
         visible: false,
-        reason: ""
+        reason: ''
       },
       // 拒绝工单弹窗
       refuseDialog: {
         visible: false,
-        reason: ""
+        reason: ''
       },
       // 时间轴弹窗
       timeDialog: {
@@ -72,20 +72,19 @@ export default {
       },
       receiptFields: [], // 自定义回执字段
       customerRelationTaskCountData: {}, // 客户关联工单数量
-      hasCallCenterModule: localStorage.getItem("call_center_module") == 1,
+      hasCallCenterModule: localStorage.getItem('call_center_module') == 1,
       stateButtonData: [], // 工单当前状态下主操作按钮
-      leftActiveTab: "task-view",
-      rightActiveTab: "record",
-      collapseDirection: "",
+      leftActiveTab: 'task-view',
+      rightActiveTab: 'record',
+      collapseDirection: '',
       popperOptions: {
-        boundariesElement: "viewport",
+        boundariesElement: 'viewport',
         removeOnDestroy: true
       },
       nowGuideStep: 5,
       guideSearchModelSave: false,
       guideDropdownMenu: false,
       isGuide: false,
-      marTop: 197,
       // 显示详情向导
       showTaskDetailGuide: false,
       // 是否显示指派弹窗
@@ -97,7 +96,7 @@ export default {
     * @description 客户字段 
     */
     customerField() {
-      return this.fields.filter(f => f.fieldName === "customer")[0];
+      return this.fields.filter(f => f.fieldName === 'customer')[0];
     },
     /** 
     * @description 客户字段配置 
@@ -111,7 +110,7 @@ export default {
     },
     /* 计划时间字段 */
     planTimeField() {
-      return this.fields.filter(f => f.fieldName === "planTime")[0];
+      return this.fields.filter(f => f.fieldName === 'planTime')[0];
     },
     /* 计划时间 */
     planTime() {
@@ -122,16 +121,16 @@ export default {
         if (isEncryptPlanTime) return ENCRYPT_FIELD_VALUE;
 
         // 计划时间格式为日期时需格式化
-        if (dateType == "date") return planTime.slice(0, 10);
+        if (dateType == 'date') return planTime.slice(0, 10);
 
         return planTime;
       }
 
-      return "";
+      return '';
     },
     /* 服务内容字段 */
     serviceContentField() {
-      return this.fields.filter(f => f.fieldName === "serviceContent")[0];
+      return this.fields.filter(f => f.fieldName === 'serviceContent')[0];
     },
     /** 工单设置 */
     taskConfig() {
@@ -161,7 +160,7 @@ export default {
     },
     /* 工单编辑权限 */
     editAuth() {
-      return this.hasAuth("TASK_EDIT");
+      return this.hasAuth('TASK_EDIT');
     },
     /** 
     * @description 工单是否被删除
@@ -181,12 +180,12 @@ export default {
     },
     /* 工单是否是未完成状态 */
     unFinishedState() {
-      let unfinishedStateArr = ["created", "allocated", "taskPool", "accepted", "refused", "processing"];
+      let unfinishedStateArr = ['created', 'allocated', 'taskPool', 'accepted', 'refused', 'processing'];
       return unfinishedStateArr.indexOf(this.task.state) >= 0;
     },
     /* 工单是否是完成状态 */
     finishedState() {
-      let finishedStateArr = ["finished", "costed", "closed"];
+      let finishedStateArr = ['finished', 'costed', 'closed'];
       return finishedStateArr.indexOf(this.task.state) >= 0;
     },
     /** 
@@ -208,7 +207,7 @@ export default {
     * 4. 且 工单允许删除 canDeleteTask
     */
     allowDeleteTask() {
-      return !this.isApproving && !this.isPaused && this.hasAuth("TASK_DELETE") && this.initData.canDeleteTask && !this.isDelete;
+      return !this.isApproving && !this.isPaused && this.hasAuth('TASK_DELETE') && this.initData.canDeleteTask && !this.isDelete;
     },
     /** 
     * @description 是否显示回退工单按钮
@@ -218,7 +217,7 @@ export default {
     * 4. 且 允许回退工单 canRollBack
     */
     allowBackTask() {
-      return !this.isApproving && this.task.state === "finished" && this.taskConfig.taskRollBack && this.initData.canRollBack;
+      return !this.isApproving && this.task.state === 'finished' && this.taskConfig.taskRollBack && this.initData.canRollBack;
     },
     /** 
     * @description 是否显示取消工单按钮
@@ -237,7 +236,7 @@ export default {
     * 2. 且 工单状态是工单池
     */
     allowPoolTask() {
-      return !this.isApproving && this.task.state === "taskPool";
+      return !this.isApproving && this.task.state === 'taskPool';
     },
     /** 
     * @description 是否显示暂停按钮
@@ -247,7 +246,7 @@ export default {
     * 4. 且 允许暂停工单 canPause
     */
     allowPauseTask() {
-      let stateArr = ["created", "allocated", "accepted", "processing"];
+      let stateArr = ['created', 'allocated', 'accepted', 'processing'];
       return !this.isApproving && !this.isPaused && this.initData.canPause && stateArr.indexOf(this.task.state) >= 0;
     },
     /** 
@@ -267,7 +266,7 @@ export default {
     * 4. 且 工单是已指派状态
     */
     allowAcceptTask() {
-      return this.isExecutor && !this.isApproving && !this.isPaused && this.task.state === "allocated";
+      return this.isExecutor && !this.isApproving && !this.isPaused && this.task.state === 'allocated';
     },
     /** 
     * @description 是否显示拒绝按钮
@@ -286,7 +285,7 @@ export default {
     * 5. 且 工单类型设置中流程设置开启了开始流程节点
     */
     allowStartTask() {
-      return this.isExecutor && !this.isApproving && !this.isPaused && this.task.state === "accepted" && this.taskType?.flowSetting?.start?.state;
+      return this.isExecutor && !this.isApproving && !this.isPaused && this.task.state === 'accepted' && this.taskType?.flowSetting?.start?.state;
     },
     /** 
     * @description 是否显示指派按钮
@@ -296,8 +295,8 @@ export default {
     * 4. 且 工单状态是created/refused/taskPool其中一种
     */
     allowAllotTask() {
-      let stateArr = ["created", "refused", "taskPool"];
-      return this.hasAuth("TASK_DISPATCH") && !this.isApproving && !this.isPaused && stateArr.indexOf(this.task.state) >= 0;
+      let stateArr = ['created', 'refused', 'taskPool'];
+      return this.hasAuth('TASK_DISPATCH') && !this.isApproving && !this.isPaused && stateArr.indexOf(this.task.state) >= 0;
     },
     /** 
     * @description 是否显示转派按钮
@@ -307,7 +306,7 @@ export default {
     * 4. 允许转派 canRedeploy
     */
     allowRedeployTask() {
-      let stateArr = ["allocated", "accepted", "processing"];
+      let stateArr = ['allocated', 'accepted', 'processing'];
       return !this.isApproving && !this.isPaused && this.initData.canRedeploy && stateArr.indexOf(this.task.state) >= 0;
     },
     /** 
@@ -366,7 +365,7 @@ export default {
       let startFlow = this.taskType?.flowSetting?.start?.state;
       let { state } = this.task;
 
-      return this.isExecutor && !this.isApproving && !this.isPaused && ((state === "accepted" && !startFlow) || (state === "processing" && startFlow));
+      return this.isExecutor && !this.isApproving && !this.isPaused && ((state === 'accepted' && !startFlow) || (state === 'processing' && startFlow));
     },
     /** 
      * @description 是否显示 [审核结算]tab
@@ -384,9 +383,9 @@ export default {
       return (
         this.finishedState
         && (isSettled == 0 || isSettled == 1)
-        && ((balanceViewAuthiroty === "onlyHasBalanceAuthiroty" && this.hasAuth("TASK_AUDIT"))
-          || (balanceViewAuthiroty === "hasTaskViewAuthiroty" && this.hasAuth(["TASK_AUDIT", "TASK_VIEW"]))
-          || (balanceViewAuthiroty === "hasTaskEditAuthiroty" && this.hasAuth(["TASK_AUDIT", "TASK_EDIT"])))
+        && ((balanceViewAuthiroty === 'onlyHasBalanceAuthiroty' && this.hasAuth('TASK_AUDIT'))
+          || (balanceViewAuthiroty === 'hasTaskViewAuthiroty' && this.hasAuth(['TASK_AUDIT', 'TASK_VIEW']))
+          || (balanceViewAuthiroty === 'hasTaskEditAuthiroty' && this.hasAuth(['TASK_AUDIT', 'TASK_EDIT'])))
       );
     },
     /** 
@@ -403,9 +402,9 @@ export default {
       
       return (
         (reviewTime != null || isEvaluated == 0 || isReviewed == 0)
-        && ((reviewViewAuthiroty === "onlyHasReviewAuthiroty" && this.hasAuth("TASK_FEEDBACK"))
-          || (reviewViewAuthiroty === "hasTaskViewAuthiroty" && this.hasAuth(["TASK_FEEDBACK", "TASK_VIEW"]))
-          || (reviewViewAuthiroty === "hasTaskEditAuthiroty" && this.hasAuth(["TASK_FEEDBACK", "TASK_EDIT"])))
+        && ((reviewViewAuthiroty === 'onlyHasReviewAuthiroty' && this.hasAuth('TASK_FEEDBACK'))
+          || (reviewViewAuthiroty === 'hasTaskViewAuthiroty' && this.hasAuth(['TASK_FEEDBACK', 'TASK_VIEW']))
+          || (reviewViewAuthiroty === 'hasTaskEditAuthiroty' && this.hasAuth(['TASK_FEEDBACK', 'TASK_EDIT'])))
       );
     },
     /** 
@@ -414,7 +413,7 @@ export default {
     */
     notCustom() {
       let receiptConfig = this.initData.receiptConfig || {};
-      return !receiptConfig?.customReceipt && this.task.templateId == "1";
+      return !receiptConfig?.customReceipt && this.task.templateId == '1';
     },
     /** 
     * @description 显示回执
@@ -439,7 +438,7 @@ export default {
       let { canEditTask } = this.initData;
       let canLookCompleteReceipt = canEditTask || this.permission.VIP_APPROVE == 3;
 
-      return this.isApproving && this.unFinishedAppr && this.unFinishedAppr.action == "完成" && (this.isExecutor || this.initData.canApprove || canLookCompleteReceipt);
+      return this.isApproving && this.unFinishedAppr && this.unFinishedAppr.action == '完成' && (this.isExecutor || this.initData.canApprove || canLookCompleteReceipt);
     },
     /** 
     * @description 允许修改协同人
@@ -448,7 +447,7 @@ export default {
     * 3. 工单创建人或者允许编辑工单
     */
     allowEditSynergy() {
-      let state = ["allocated", "accepted", "processing", "taskPool"];
+      let state = ['allocated', 'accepted', 'processing', 'taskPool'];
       let allowModify = this.taskConfig.taskSynergy;
 
       return state.indexOf(this.task.state) >= 0 && ((allowModify && this.isExecutor) || this.isCreator || this.editAuth);
@@ -460,7 +459,7 @@ export default {
     * 3. 工单设置允许修改计划时间
     */
     allowModifyPlanTime() {
-      let stateArr = ["accepted", "processing"];
+      let stateArr = ['accepted', 'processing'];
       let { state } = this.task;
 
       return this.isExecutor && this.taskConfig.taskPlanTime && stateArr.indexOf(state) >= 0;
@@ -480,9 +479,9 @@ export default {
 
       try {
         let rootWindow = getRootWindow(window);
-        allowDing = this.initData.canViewTask && rootWindow.inDingTalkPC() && state != "closed" && hasExecutor;
+        allowDing = this.initData.canViewTask && rootWindow.inDingTalkPC() && state != 'closed' && hasExecutor;
       } catch (error) {
-        console.warn("Caused: TaskView allowDing -> error", error) 
+        console.warn('Caused: TaskView allowDing -> error', error) 
       }
 
       return allowDing;
@@ -493,7 +492,7 @@ export default {
     * 2. 允许复制工单 canCopyTask
     */
     allowCopyTask() {
-      return this.hasAuth("TASK_EDIT") && this.initData.canCopyTask;
+      return this.hasAuth('TASK_EDIT') && this.initData.canCopyTask;
     },
     /** 
     * @description 是否显示回访按钮
@@ -503,7 +502,7 @@ export default {
     */
     allowReviewTask() {
       let { inApprove, isReviewed, isReview } = this.task;
-      let feedbackAuth = this.hasAuth("TASK_FEEDBACK");
+      let feedbackAuth = this.hasAuth('TASK_FEEDBACK');
 
       return feedbackAuth && inApprove != 1 && isReviewed == 0 && isReview == 0;
     },
@@ -517,7 +516,7 @@ export default {
     allowBalanceTask() {
       let { state, inApprove, isSettled } = this.task;
 
-      return state === "finished" && inApprove != 1 && isSettled == 0 && this.initData.canRollBack;
+      return state === 'finished' && inApprove != 1 && isSettled == 0 && this.initData.canRollBack;
     },
     /** 
     * @description 是否显示附加组件tab
@@ -559,7 +558,7 @@ export default {
 
       if (lmName) return this.isEncryptField(lmName) ? ENCRYPT_FIELD_VALUE : lmName;
 
-      return "";
+      return '';
     },
     /** 
     * @description 联系电话
@@ -569,7 +568,7 @@ export default {
 
       if (this.lmName) return this.isEncryptField(this.lmName) ? ENCRYPT_FIELD_VALUE : lmPhone;
 
-      return "";
+      return '';
     },
     /** 
     * @description 显示拨打电话
@@ -588,7 +587,7 @@ export default {
 
       if (validAddress) return isEncryptTaddress ? ENCRYPT_FIELD_VALUE : Filter.prettyAddress(taddress);
 
-      return "";
+      return '';
     },
     /** 
     * @description 显示查看地图icon
@@ -622,13 +621,6 @@ export default {
     stateColor() {
       return TaskStateEnum.getColorForTask(this.task);
     },
-    /**
-    * @description 显示折叠按钮
-    * 审核结算、客户评价、附加组件有任一存在即显示
-    */
-    showCollapse() {
-      return this.viewBalanceTab || this.viewFeedbackTab || this.viewTaskCardTab;
-    },
     messageConfig() {
       return this.initData?.messageConfig || {};
     },
@@ -656,22 +648,13 @@ export default {
      */
     collapseBtn() {
       this.$refs.container.scrollTop = 0; 
-      this.collapse = !this.collapse; 
-      
-      this.$nextTick(() => {
-        setTimeout(() => {
-          this.marTop = this.$refs.header.clientHeight + 25
-        }, 200)
-      })
+      this.collapse = !this.collapse;
     },
     /**
      * 滚动的距离
      */
-    getScroll({target}) {
-      const scrollTop = target.scrollTop;
-      if (scrollTop >= 80) {
-        this.collapse = false
-      }
+    getScroll() {
+      this.collapse = false
     },
     // 是否含有某一指定权限
     hasAuth(keys) {
@@ -691,7 +674,7 @@ export default {
       this.pending = true;
 
       try {
-        let warningMsg = "确定要删除吗？";
+        let warningMsg = '确定要删除吗？';
 
         /** 
         * 如果工单为未完成状态，则需要判断工单是否曾回退，而且在最后一次完成时是否使用了备件
@@ -700,9 +683,9 @@ export default {
         if (this.unFinishedState) {
           const res = await TaskApi.finishedWithPart({ taskId: this.task.id });
           if (!res.success) {
-            warningMsg = "获取工单的结算单失败，无法判断工单是否添加了备件，确定要删除所选工单吗？";
+            warningMsg = '获取工单的结算单失败，无法判断工单是否添加了备件，确定要删除所选工单吗？';
           } else if (res.success && res.result) {
-            warningMsg = "工单已添加备件，确定要删除吗？";
+            warningMsg = '工单已添加备件，确定要删除吗？';
           }
         }
 
@@ -711,7 +694,7 @@ export default {
 
         TaskApi.deleteTask([this.task.id]).then(res => {
           if (res.success) {
-            let fromId = window.frameElement.getAttribute("fromid");
+            let fromId = window.frameElement.getAttribute('fromid');
             // this.$platform.refreshTab(fromId);
 
             this.closeAndOpenTab('/task');
@@ -724,7 +707,7 @@ export default {
         })
 
       } catch (e) {
-        console.error("deleteTask error", e);
+        console.error('deleteTask error', e);
       }
     },
     // 回退工单
@@ -732,28 +715,28 @@ export default {
       try {
         // 工单上备件用的库和当前租户备件库配置不同
         if (this.initData.isRepertoryDiff) {
-          if (!await this.$platform.confirm("回执备件来源与当前备件库配置不同，回退工单将会把已使用的备件退回到原仓库，是否继续？")) return;
+          if (!await this.$platform.confirm('回执备件来源与当前备件库配置不同，回退工单将会把已使用的备件退回到原仓库，是否继续？')) return;
         }
         
-        this.openDialog("back");
+        this.openDialog('back');
       } catch (e) {
-        console.error("backTask error", e);
+        console.error('backTask error', e);
       }
     },
     // 回退工单
     back() {
       let reason = this.backDialog.reason.trim();
-      if (!reason) return this.$platform.alert("请填写回退说明");
+      if (!reason) return this.$platform.alert('请填写回退说明');
 
       this.pending = true;
 
       // 判断是完成回退还是结算回退
-      const API = this.task.state == "finished" ? "rollBackTask" : "rollBackBalance";
+      const API = this.task.state == 'finished' ? 'rollBackTask' : 'rollBackBalance';
       
       const params = { taskId: this.task.id, reason };
       TaskApi[API](params).then(res => {
         if (res.success) {
-          let fromId = window.frameElement.getAttribute("fromid");
+          let fromId = window.frameElement.getAttribute('fromid');
           // this.$platform.refreshTab(fromId);
 
           window.location.href = `/task/view/${this.task.id}`;
@@ -775,7 +758,7 @@ export default {
 
       // 暂停是否需要审批
       const result = await TaskApi.pauseApproveCheck({ id: taskId, reason });
-      if (!result.succ && result.message == "需要审批") {
+      if (!result.succ && result.message == '需要审批') {
         this.pauseDialog.visible = false;
         this.proposeApprove(result.data);
         this.pending = false;
@@ -811,16 +794,16 @@ export default {
     // 拒绝工单
     async refuse() {
       let reason = this.refuseDialog.reason.trim();
-      if (!reason) return this.$platform.alert("请填写拒绝原因");
+      if (!reason) return this.$platform.alert('请填写拒绝原因');
 
-      if (!await this.$platform.confirm("确认拒绝此工单吗？")) return;
+      if (!await this.$platform.confirm('确认拒绝此工单吗？')) return;
 
       this.pending = true;
 
       const params = { taskId: this.task.id, reason };
       TaskApi.refuseTask(params).then(res => {
         if (res.success) {
-          let fromId = window.frameElement.getAttribute("fromid");
+          let fromId = window.frameElement.getAttribute('fromid');
           // this.$platform.refreshTab(fromId);
 
           this.closeAndOpenTab('/task?viewId=12fcb144-1ea3-11e7-8d4e-00163e304a25&mySearch=execute');
@@ -839,7 +822,7 @@ export default {
 
       // 开始是否需要审批
       const result = await TaskApi.startApproveCheck({ id: this.task.id });
-      if (!result.succ && result.message == "需要审批") {
+      if (!result.succ && result.message == '需要审批') {
         this.proposeApprove(result.data);
         this.pending = false;
         return;
@@ -847,7 +830,7 @@ export default {
 
       TaskApi.startTask({ taskId: this.task.id }).then(res => {
         if (res.success) {
-          let fromId = window.frameElement.getAttribute("fromid");
+          let fromId = window.frameElement.getAttribute('fromid');
           // this.$platform.refreshTab(fromId);
 
           window.location.href = `/task/view/${this.task.id}`;
@@ -901,7 +884,7 @@ export default {
     },
     // 撤回审批
     async offApprove() {
-      const result = await this.$platform.confirm("确定要撤回审批吗？");
+      const result = await this.$platform.confirm('确定要撤回审批吗？');
       if (!result) return;
       
       this.pending = true;
@@ -934,28 +917,28 @@ export default {
     openDialog(action) {
       if (action === 'cancel') {
         this.$refs.cancelTaskDialog.openDialog();
-      } else if (action === "acceptFromPool" || action === "accept" || action === "modifyPlanTime") {
+      } else if (action === 'acceptFromPool' || action === 'accept' || action === 'modifyPlanTime') {
         this.$refs.planTimeDialog.openDialog(action);
-      } else if (action === "approve") {
+      } else if (action === 'approve') {
         this.$refs.approveTaskDialog.openDialog();
-      } else if (action === "pause") {
-        this.pauseDialog.reason = "";
+      } else if (action === 'pause') {
+        this.pauseDialog.reason = '';
         this.pauseDialog.visible = true;
-      } else if (action === "refuse") {
-        this.refuseDialog.reason = "";
+      } else if (action === 'refuse') {
+        this.refuseDialog.reason = '';
         this.refuseDialog.visible = true;
-      } else if (action === "back") {
-        this.backDialog.reason = "";
+      } else if (action === 'back') {
+        this.backDialog.reason = '';
         this.backDialog.visible = true;
-      } else if (action === "finish") {
+      } else if (action === 'finish') {
         this.$refs.taskReceiptEdit.openDialog();
-      } else if (action === "balance") {
-        this.rightActiveTab = "balance-tab";
-        this.$refs.taskAccount.openDialog("create");
-      } else if (action === "feedback") {
-        this.rightActiveTab = "feedback-tab";
+      } else if (action === 'balance') {
+        this.rightActiveTab = 'balance-tab';
+        this.$refs.taskAccount.openDialog('create');
+      } else if (action === 'feedback') {
+        this.rightActiveTab = 'feedback-tab';
         this.$refs.taskFeedback.feedback();
-      } else if (action === "timeAxis") {
+      } else if (action === 'timeAxis') {
         this.$refs.timeAxis.openDialog();
       }
     },
@@ -970,7 +953,7 @@ export default {
     * @description 获取客户关联的工单数量
     */
     getCountForCreate() {
-      const params = { module: "customer", id: this.customer.id };
+      const params = { module: 'customer', id: this.customer.id };
       TaskApi.getCountForCreate(params).then((result = {}) => {
         this.customerRelationTaskCountData = result;
       })
@@ -978,19 +961,23 @@ export default {
     /** 
     * @description 打开客户详情
     */
-    openCustomerView() {
+    openCustomerView(openTaskTab) {
       if (!this.allowOpenCustomerView) return;
       
-      let fromId = window.frameElement.getAttribute("id");
+      let fromId = window.frameElement.getAttribute('id');
       const customerId = this.customer.id;
 
       if(!customerId) return;
 
+      let url = `/customer/view/${customerId}?noHistory=1`;
+
+      if (openTaskTab) url += '&active=task';
+
       this.$platform.openTab({
         id: `customer_view_${customerId}`,
-        title: "客户详情",
+        title: '客户详情',
         close: true,
-        url: `/customer/view/${customerId}?noHistory=1`,
+        url,
         fromId
       })
     },
@@ -1005,12 +992,12 @@ export default {
 
       if (!phone) return;
 
-      const result = await TaskApi.dialout({ taskType:"task", phone });
+      const result = await TaskApi.dialout({ taskType:'task', phone });
       if (result.code != 0) {
         return this.$platform.notification({
-          title: "呼出失败",
-          message: result.message || "",
-          type: "error",
+          title: '呼出失败',
+          message: result.message || '',
+          type: 'error',
         })
       }
     },
@@ -1029,10 +1016,10 @@ export default {
       
       this.$fast.map
         .display({ ...address }, {}, markerDom, infoDom)
-        .catch(err => console.error("openMap catch an err: ", err));
+        .catch(err => console.error('openMap catch an err: ', err));
     },
     buildMapMarkerContent() {
-      return "<i class=\"bm-location-dot\"></i><div class=\"map-address-title\">客户地址</div>";
+      return '<i class="bm-location-dot"></i><div class="map-address-title">客户地址</div>';
     },
     buildMapInfoContent() {
       return `
@@ -1052,21 +1039,23 @@ export default {
       return value === ENCRYPT_FIELD_VALUE;
     },
     buildButtonData() {
-      return [
-        { name: "指派", type: "primary", show: this.allowAllotTask, event: this.allot },
-        { name: "接单", type: "primary", show: this.allowPoolTask, event: () => { this.openDialog("acceptFromPool") } },
-        { name: "接受", type: "primary", show: this.allowAcceptTask, event: () => { this.openDialog("accept") } },
-        { name: "开始", type: "primary", show: this.allowStartTask, event: this.start },
-        { name: "完成回执", type: "primary", show: this.allowFinishTask, event: () => { this.openDialog("finish") } },
-        { name: "回退", type: "primary", show: this.allowBackTask, event: this.backTask },
-        { name: "结算", type: "primary", show: this.viewBalanceTab && this.allowBalanceTask, event: () => { this.openDialog("balance") } },
-        { name: "回访", type: "primary", show: this.viewFeedbackTab && this.allowReviewTask, event: () => { this.openDialog("feedback") } },
-        { name: "拒绝", type: "danger", show: this.allowRefuseTask, event: () => { this.openDialog("refuse") } },
-        { name: "暂停", type: "default", show: this.allowPauseTask, event: () => { this.openDialog("pause") } },
-        { name: "继续", type: "primary", show: this.allowGoOnTask, event: this.unpause },
-        { name: "审批", type: "primary", show: this.allowApprove, event: () => { this.openDialog("approve") } },
-        { name: "撤回审批", type: "default", show: this.allowoffApprove, event: this.offApprove }
+      let buttonData = [
+        { name: '指派', type: 'primary', show: this.allowAllotTask, event: this.allot },
+        { name: '接单', type: 'primary', show: this.allowPoolTask, event: () => { this.openDialog('acceptFromPool') } },
+        { name: '接受', type: 'primary', show: this.allowAcceptTask, event: () => { this.openDialog('accept') } },
+        { name: '开始', type: 'primary', show: this.allowStartTask, event: this.start },
+        { name: '完成回执', type: 'primary', show: this.allowFinishTask, event: () => { this.openDialog('finish') } },
+        { name: '回退', type: 'primary', show: this.allowBackTask, event: this.backTask },
+        { name: '结算', type: 'primary', show: this.viewBalanceTab && this.allowBalanceTask, event: () => { this.openDialog('balance') } },
+        { name: '回访', type: 'primary', show: this.viewFeedbackTab && this.allowReviewTask, event: () => { this.openDialog('feedback') } },
+        { name: '拒绝', type: 'danger', show: this.allowRefuseTask, event: () => { this.openDialog('refuse') } },
+        { name: '暂停', type: 'default', show: this.allowPauseTask, event: () => { this.openDialog('pause') } },
+        { name: '继续', type: 'primary', show: this.allowGoOnTask, event: this.unpause },
+        { name: '审批', type: 'primary', show: this.allowApprove, event: () => { this.openDialog('approve') } },
+        { name: '撤回审批', type: 'default', show: this.allowoffApprove, event: this.offApprove }
       ]
+
+      return buttonData.reverse();
     },
     /** 
      * 关闭并打开新的Tab
@@ -1091,6 +1080,12 @@ export default {
         close: true,
         fromId
       });
+    },
+    outsideUpdateTask(task = {}) {
+      this.task = task
+    },
+    outsideUpdateRecords() {
+      this.$eventBus.$emit(TaskEventNameMappingEnum.UpdateRecord);
     }
   },
   created() {
@@ -1098,11 +1093,12 @@ export default {
     let collapse = sessionStorage.getItem(`task_customer_collapse_${this.task.id}`);
     let collapseDirection = sessionStorage.getItem(`task_collapseDirection_${this.task.id}`);
 
-    this.collapse = JSON.parse(collapse || "true");
-    this.collapseDirection = collapseDirection || "";
+    this.collapse = JSON.parse(collapse || 'true');
+    this.collapseDirection = collapseDirection || '';
 
   },
   async mounted() {
+    console.log(this.initData, 'initData')
     try {
       this.loading = true;
 
@@ -1112,48 +1108,48 @@ export default {
       let { templateId } = this.task;
 
       let subtask = [
-        TaskApi.getTaskTemplateFields({ templateId, tableName: "task" })
+        TaskApi.getTaskTemplateFields({ templateId, tableName: 'task' })
       ];
 
       // 显示回执时获取回执字段信息
-      if (this.allowFinishTask || this.showReceipt) subtask.push(TaskApi.getTaskTemplateFields({ templateId, tableName: "task_receipt" }));
+      if (this.allowFinishTask || this.showReceipt) subtask.push(TaskApi.getTaskTemplateFields({ templateId, tableName: 'task_receipt' }));
 
       const result = await Promise.all(subtask);
 
       const fields = result[0] || [];
       this.fields = [...fields, {
-        displayName: "负责人",
-        fieldName: "executor",
-        formType: "user",
+        displayName: '负责人',
+        fieldName: 'executor',
+        formType: 'user',
         isSystem: 1,
       }, {
-        displayName: "协同人",
-        fieldName: "synergies",
+        displayName: '协同人',
+        fieldName: 'synergies',
         isSystem: 1
       }, {
-        displayName: "完成时间",
-        fieldName: "completeTime",
-        formType: "timestamp",
+        displayName: '完成时间',
+        fieldName: 'completeTime',
+        formType: 'timestamp',
       }, {
-        displayName: "满意度",
-        fieldName: "degree"
+        displayName: '满意度',
+        fieldName: 'degree'
       }, {
-        displayName: "工单状态",
-        fieldName: "state"
+        displayName: '工单状态',
+        fieldName: 'state'
       }, {
-        displayName: "创建人",
-        fieldName: "createUser",
-        formType: "user",
+        displayName: '创建人',
+        fieldName: 'createUser',
+        formType: 'user',
         isSystem: 1,
       }, {
-        displayName: "创建时间",
-        fieldName: "createTime",
-        formType: "timestamp",
+        displayName: '创建时间',
+        fieldName: 'createTime',
+        formType: 'timestamp',
         isSystem: 1,
       }, {
-        displayName: "派单人",
-        fieldName: "allotUser",
-        formType: "user",
+        displayName: '派单人',
+        fieldName: 'allotUser',
+        formType: 'user',
         isSystem: 1,
       }, {
         displayName: '创建方式',
@@ -1163,7 +1159,7 @@ export default {
       }];
 
       this.fields.forEach(field => {
-        if (field.fieldName == "attachment") {
+        if (field.fieldName == 'attachment') {
           let { isEncryptAttachment, attachment } = this.task
           
           // 系统附件加密
@@ -1181,10 +1177,10 @@ export default {
       let query = parse(window.location.search) || {};
       
       // 来自审核结算列表的结算操作
-      if (query.active == "balance" && this.viewBalanceTab && this.allowBalanceTask) {
-        this.openDialog("balance");
+      if (query.active == 'balance' && this.viewBalanceTab && this.allowBalanceTask) {
+        this.openDialog('balance');
       } else {
-        this.rightActiveTab = this.viewBalanceTab ? "balance-tab" : this.viewFeedbackTab ? "feedback-tab" : "record";
+        // this.rightActiveTab = this.viewBalanceTab ? 'balance-tab' : this.viewFeedbackTab ? 'feedback-tab' : 'record';
       }
       
       // 是否显示详情向导
@@ -1208,10 +1204,8 @@ export default {
       })
 
     } catch (e) {
-      console.error("error ", e)
+      console.error('error ', e)
     }
-
-    this.marTop = this.$refs.header.clientHeight + 12
   },
   watch: {
     collapse(newValue) {

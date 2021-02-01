@@ -82,7 +82,11 @@ export default {
           this.$emit('success');
         }else{
           let data = result.data || [];
+          if(data.length===0 && result.message){
+            data=[result.message];
+          }
           this.errors = data;
+          this.$emit('fail',result.message);
         }
       })
         .catch(err => {

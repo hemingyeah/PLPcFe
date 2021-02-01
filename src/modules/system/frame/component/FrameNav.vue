@@ -1,39 +1,54 @@
 <template>
-  <nav class="frame-nav" :class="{'frame-nav-expand': !collapse}" @transitionend="navTransitionEnd">
+  <nav class="frame-nav"
+       :class="{'frame-nav-expand': !collapse}"
+       @transitionend="navTransitionEnd">
     <div class="frame-logo">
-      <a href="javascript:;" @click="openHome"><img :src="logoImg"></a>
+      <a href="javascript:;"
+         @click="openHome"><img :src="logoImg"></a>
     </div>
+
+    <div id="product-product-nav"></div>
     <div class="frame-menu-scroll">
       <ul class="frame-menu">
         <template v-for="(menu, index) in menus">
-          <li 
-            :class="{
-              'frame-menu-item': true, 
-              'frame-menu-active': menu == currMenu,
-              'frame-menu-expand': menu == currMenu
-            }" 
-            :key="`${menu.url}_${index}`"
-            :id="menu.menuKey">
-            <a 
-              :href="menu.url ? menu.url : 'javascript:;'" 
-              @click.prevent="open(menu)" 
-              :class="{'': menu.active}"> 
+          <!-- <div :key="index" class="pos-r">
+           
+          </div> -->
+
+          <li :class="{
+                'frame-menu-item': true, 
+                'frame-menu-active': menu == currMenu,
+                'frame-menu-expand': menu == currMenu
+              }"
+              :key="`${menu.url}_${index}`"
+              :id="menu.menuKey">
+            <a :href="menu.url ? menu.url : 'javascript:;'"
+               @click.prevent="open(menu)"
+               :id="`${menu.menuKey}-a`"
+               :class="{'': menu.active}">
               <span class="frame-menu-icon"><i :class="['iconfont', menu.menuIcon]"></i></span>
               <template v-if="!collapse">
                 <span class="frame-menu-name">{{menu.name}}</span>
-                <i class="iconfont icon-caidanjiantou-zhankai" v-if="menu.children && menu.children.length > 0"></i>
-                <i class="red-dot" id="worktime_dot" v-if="menu.menuKey==='M_SYSTEM' && worktimeNoEnter && isShowCardWorkTime"></i>
+                <i class="iconfont icon-caidanjiantou-zhankai"
+                   v-if="menu.children && menu.children.length > 0"></i>
+                <i class="red-dot"
+                   id="worktime_dot"
+                   v-if="menu.menuKey==='M_SYSTEM' && worktimeNoEnter && isShowCardWorkTime"></i>
               </template>
             </a>
 
-            <ul 
-              :class="{'frame-subMenu': true,'frame-float-menu': collapse}"
-              v-show="!collapse && menu == currMenu">
-              <li class="frame-float-menu-title"><h3>{{menu.name}}</h3></li>
-              <div class="frame-subMenu-item-wrap" :style="getMenuItemWrapStyle(menu)">
+            <ul :class="{'frame-subMenu': true,'frame-float-menu': collapse}"
+                v-show="!collapse && menu == currMenu">
+              <li class="frame-float-menu-title">
+                <h3>{{menu.name}}</h3>
+              </li>
+              <div class="frame-subMenu-item-wrap"
+                   :style="getMenuItemWrapStyle(menu)">
                 <template v-for="menu in menu.children">
-                  <li :class="{'frame-subMenu-item': true, 'frame-subMenu-active': menu.active}" :key="menu.menuKey">
-                    <a :href="menu.url ? menu.url : 'javascript:;'" @click.prevent="open(menu)">{{menu.name}}</a>
+                  <li :class="{'frame-subMenu-item': true, 'frame-subMenu-active': menu.active}"
+                      :key="menu.menuKey">
+                    <a :href="menu.url ? menu.url : 'javascript:;'"
+                       @click.prevent="open(menu)">{{menu.name}}</a>
                   </li>
                 </template>
               </div>
@@ -51,8 +66,13 @@ import MenuIcon from '../model/MenuIcon';
 
 import Logo from '@src/assets/img/logo.png';
 import MiniLogo from '@src/assets/svg/logo.svg';
-import { storageGet } from '@src/util/storage';
-import { isShowCardWorkTime } from '@src/util/version.ts'
+import { storageGet, storageSet } from '@src/util/storage';
+import { isShowCardWorkTime } from '@src/util/version.ts';
+import GuideContent from '@src/component/guide/contentCom/ProductFrameNav.vue';
+
+const {
+  PRODUCT_FRAME_NAV
+} = require('@src/component/guide/productV2Store');
 export default {
   name: 'frame-nav',
   props: {
@@ -69,7 +89,7 @@ export default {
       default: () => []
     }
   },
-  data(){
+  data () {
     let originMenus = _.cloneDeep(this.source);
     let { menus } = this.buildMenus(originMenus, null);
 
@@ -79,42 +99,39 @@ export default {
       menuIcon: MenuIcon,
       currMenu: null,
       bodyHeight: 0,
-      worktimeNoEnter:true
+      worktimeNoEnter: true
     };
   },
   computed: {
-    isShowCardWorkTime() {
+    isShowCardWorkTime () {
       return isShowCardWorkTime()
     },
-    logoImg(){
+    logoImg () {
       return this.collapse ? MiniLogo : Logo;
-    },
-    isShowCardWorkTime() {
-      return isShowCardWorkTime()
     }
   },
   methods: {
-    navTransitionEnd(event){
+    navTransitionEnd (event) {
       // 只监听nav宽段变化
-      if(event.target != this.$el || event.propertyName != 'width') return;
+      if (event.target != this.$el || event.propertyName != 'width') return;
       this.$emit('collapse-changed')
     },
     /** 将后端返回的菜单，重整为多根树形结构 */
-    buildMenus(source, parent){
+    buildMenus (source, parent) {
       let menus = [];
       let otherMenus = [];
 
-      for(let i = 0; i < source.length; i++){
+      for (let i = 0; i < source.length; i++) {
         let menu = source[i]
-        if(menu.parent == parent){
+        if (menu.parent == parent) {
           menus.push(menu);
-        }else{
+        } else {
           otherMenus.push(menu)
         }
       }
 
-      if(menus.length > 0){
-        for(let j = 0; j < menus.length; j++){
+      if (menus.length > 0) {
+        for (let j = 0; j < menus.length; j++) {
           let subMenu = menus[j];
           let subRes = this.buildMenus(otherMenus, subMenu.menuKey);
 
@@ -123,23 +140,23 @@ export default {
         }
       }
 
-      return {menus, otherMenus};
+      return { menus, otherMenus };
     },
-    open(menu){
+    open (menu) {
       // 如果有子菜单，展开子菜单
-      if(menu.children && menu.children.length > 0) {
+      if (menu.children && menu.children.length > 0) {
         this.currMenu = this.currMenu?.menuKey == menu.menuKey ? null : menu;
         this.$emit('update:collapse', false);
         return
       }
 
-      if(!menu.url) return;
+      if (!menu.url) return;
 
       let parentMenu = null;
 
       this.originMenus.forEach(item => {
         item.active && (item.active = false)
-        if(item.menuKey == menu.parent) parentMenu = item;
+        if (item.menuKey == menu.parent) parentMenu = item;
       });
 
       this.currMenu = parentMenu;
@@ -147,13 +164,13 @@ export default {
 
       this.$emit('open', menu)
     },
-    openHome(){
-      this.$emit('open', {menuKey: 'HOME', url: '/home', title: '首页'})
+    openHome () {
+      this.$emit('open', { menuKey: 'HOME', url: '/home', title: '首页' })
     },
     /**
      * 为menus的每个条目设置y轴占用高度数据 供计算
      */
-    setMenuOffsetData() {
+    setMenuOffsetData () {
       const baseTitleHeight = 51; // 菜单栏标题的高度
       const baseItemHeight = 40; // 菜单栏每个条目的高度
 
@@ -178,23 +195,23 @@ export default {
     /**
      * 注册窗口大小变更监听器
      */
-    registerResizeListener() {
+    registerResizeListener () {
       try {
         let _scope = this;
         let dom = document.body;
         this.bodyHeight = dom.offsetHeight;
 
-        window.addEventListener('resize', _.debounce(function() {
+        window.addEventListener('resize', _.debounce(function () {
           _scope.bodyHeight = dom.offsetHeight || 0;
         }, 167));
-      } catch(e) {
+      } catch (e) {
         console.error(e);
       }
     },
     /**
      * 获取菜单条目外围容器的样式，来确保显示不会被裁减
      */
-    getMenuItemWrapStyle(menu) {
+    getMenuItemWrapStyle (menu) {
       let totalHeight = menu.__totalHeight || 0;
       let bottomToTop = menu.__bottomToTop || 0;
       // 如果该菜单的子条目显示不会被当前屏幕裁剪
@@ -203,21 +220,40 @@ export default {
       let remindHeight = this.bodyHeight - bottomToTop;
       const minHeight = 40; // 菜单条目的高度
       // 看不到一个半完整的条目停止计算
-      if (remindHeight < (minHeight / 2)) return ''; 
+      if (remindHeight < (minHeight / 2)) return '';
 
       return `max-height: ${remindHeight}px; overflow-y: auto;`;
     },
-    init() {
+    init () {
       this.setMenuOffsetData();
       this.registerResizeListener();
       let hasEntered = storageGet('worktime_guid');
-      if(hasEntered){
+      if (hasEntered) {
         this.worktimeNoEnter = false;
       }
     }
   },
-  mounted() {
+  mounted () {
     this.init()
+    this.$nextTick(() => {
+      if (storageGet(PRODUCT_FRAME_NAV) && storageGet(PRODUCT_FRAME_NAV) > 0) this.$Guide().destroy('product-product-nav')
+      else this.$Guide([{
+        content:
+          '',
+        haveStep: false,
+        gStyle: 'top:35px',
+        id: 'product-product-nav',
+        domId: 'M_PRODUCT_MANAGE-a',
+        arrowStyle: 'left:-300px',
+        finishBtn: 'OK',
+        diyContent: true,
+        diyContentDom: GuideContent
+      }], 0, '', (e) => {
+        return new Promise((resolve, reject) => {
+          resolve()
+        })
+      }).create().then(res_=>{if(res_)storageSet(PRODUCT_FRAME_NAV, '1')})
+    })
   }
 }
 </script>
@@ -225,35 +261,35 @@ export default {
 <style lang="scss">
 $frame-nav-width: 190px;
 
-.frame-nav{
+.frame-nav {
   width: 50px;
   height: 100%;
   background-color: $color-nav-primary;
-  box-shadow: 1px 0 8px rgba(0,0,0,.125);
-  transition: width ease .2s;
+  box-shadow: 1px 0 8px rgba(0, 0, 0, 0.125);
+  transition: width ease 0.2s;
   position: relative;
   z-index: 9;
 
-  a{
+  a {
     text-decoration: none !important;
   }
 }
 
-.frame-nav.frame-nav-expand{
+.frame-nav.frame-nav-expand {
   width: $frame-nav-width;
   overflow: hidden;
 
-  .frame-menu-scroll{
+  .frame-menu-scroll {
     overflow: auto;
     height: calc(100% - 44px);
     margin-right: -40px;
   }
 
-  .frame-menu{
+  .frame-menu {
     width: $frame-nav-width;
   }
 
-  .frame-menu-item{
+  .frame-menu-item {
     width: $frame-nav-width;
     overflow: hidden;
   }
@@ -261,7 +297,7 @@ $frame-nav-width: 190px;
   .frame-subMenu-item {
     color: #fff;
 
-    & > a{
+    & > a {
       padding: 13px 15px 13px 46px;
     }
 
@@ -270,16 +306,16 @@ $frame-nav-width: 190px;
     }
   }
 
-  .frame-float-menu-title{
+  .frame-float-menu-title {
     display: none;
   }
 }
 
-.frame-logo{
+.frame-logo {
   height: 50px;
-  border-bottom: 1px solid rgba(0,0,0,0.1);
-  
-  a{
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+
+  a {
     height: 49px;
     width: 100%;
 
@@ -290,33 +326,33 @@ $frame-nav-width: 190px;
     overflow: hidden;
   }
 
-  img{
+  img {
     display: block;
     margin: 0;
     height: 34px;
   }
 }
 
-.frame-menu{
+.frame-menu {
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.frame-menu-item{
+.frame-menu-item {
   position: relative;
   margin: 0;
   padding: 0;
   min-height: 50px;
-  transition: background-color ease .3s;
+  transition: background-color ease 0.3s;
 
-  &:hover{
-    .frame-float-menu{
+  &:hover {
+    .frame-float-menu {
       display: block !important;
     }
   }
-  
-  & > a{
+
+  & > a {
     position: relative;
     display: flex;
     flex-flow: row nowrap;
@@ -328,7 +364,7 @@ $frame-nav-width: 190px;
       background-color: $color-nav-hover;
     }
 
-    i.iconfont{
+    i.iconfont {
       font-size: 16px;
     }
 
@@ -336,7 +372,7 @@ $frame-nav-width: 190px;
       margin-right: 16px;
     }
 
-    i.red-dot{
+    i.red-dot {
       margin-right: 20px;
       width: 8px;
       height: 8px;
@@ -346,8 +382,8 @@ $frame-nav-width: 190px;
   }
 }
 
-.frame-menu-active > a:before{
-  content: '';
+.frame-menu-active > a:before {
+  content: "";
   position: absolute;
   width: 3px;
   height: 30px;
@@ -360,7 +396,7 @@ $frame-nav-width: 190px;
   transform: rotateZ(180deg);
 }
 
-.frame-menu-icon{
+.frame-menu-icon {
   width: 50px;
   height: 50px;
 
@@ -370,11 +406,11 @@ $frame-nav-width: 190px;
   justify-content: center;
 }
 
-.frame-menu-name{
+.frame-menu-name {
   flex: 1;
 }
 
-.frame-subMenu{
+.frame-subMenu {
   background-color: $color-nav-secondary;
   margin: 0;
   padding: 0;
@@ -384,24 +420,23 @@ $frame-nav-width: 190px;
   position: relative;
 }
 
-.frame-subMenu-item{
+.frame-subMenu-item {
   display: block;
   position: relative;
   width: 100%;
-  transition: background-color ease .3s,
-              color ease .3s;
-  
+  transition: background-color ease 0.3s, color ease 0.3s;
+
   &:hover {
     background-color: $color-td-hover;
   }
 
-  &.frame-subMenu-active{
+  &.frame-subMenu-active {
     // background: mix(#fff, $color-primary, 89.88%);
     background-color: $color-primary !important;
     color: #fff !important;
   }
-  
-  & > a{
+
+  & > a {
     width: 100%;
     display: block;
     padding: 10px 25px;
@@ -410,7 +445,7 @@ $frame-nav-width: 190px;
   }
 }
 
-.frame-float-menu{
+.frame-float-menu {
   display: none;
   position: absolute;
   left: 50px;
@@ -418,10 +453,10 @@ $frame-nav-width: 190px;
   overflow: hidden;
   width: 176px;
   background-color: #fff;
-  box-shadow: 1px 1px 4px 0 rgba(0,0,0,.1);
+  box-shadow: 1px 1px 4px 0 rgba(0, 0, 0, 0.1);
 }
 
-.frame-float-menu-title h3{
+.frame-float-menu-title h3 {
   margin: 0;
   font-size: 16px;
   padding: 13px 25px;
@@ -429,8 +464,8 @@ $frame-nav-width: 190px;
   color: #303133;
   border-bottom: 1px solid #ebeef5;
   cursor: default;
-  
-  a{
+
+  a {
     color: $text-color-primary;
     width: 100%;
     display: block;

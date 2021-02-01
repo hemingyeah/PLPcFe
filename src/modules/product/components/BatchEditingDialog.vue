@@ -42,24 +42,33 @@ export default {
   computed: {
     fields() {
       let tv = null;
-      let formTypes = ['attachment', 'separator', 'location', 'info'];
+      let formTypes = ['attachment', 'separator', 'location', 'info', 'autograph', 'formula', 'related_task'];
       let fieldNames = ['createUser', 'createTime', 'updateTime', 'productTemplate', 'tags', 'remindCount', 'qrcodeId', 'linkmanName', 'phone', 'address'];
+      let isNotModify = ['text', 'textarea', 'number'];
+      let isRepeat = ['text', 'textarea', 'number','phone'];
 
       let fields = (this.config.fields || [])
         .filter(f => formTypes.indexOf(f.formType) < 0 && !fieldNames.some(key => key === f.fieldName))
+        .filter(f => !(isNotModify.indexOf(f.formType) > -1 && f.setting.defaultValueConfig && !!f.setting.defaultValueConfig.isNotModify))
+        .filter(f => !(isRepeat.indexOf(f.formType) > -1 && f.setting.isRepeat == 1))
         .map(f => {
           tv = Object.assign({}, f);
 
+          if (tv.formType === 'select') { 
+            if(tv.setting.selectType == 2){ 
+              tv.setting.selectType = 1
+            }          
+          }
+          
           if (tv.isSystem) {
             tv.orderId -= 100;
           }
-
+         
           // tv.isNull = 0;
           return Object.freeze(tv);
         });
 
       if (!fields || !fields.length) return [];
-
       return fields.sort((a, b) => a.orderId - b.orderId);
     },
     productTypes() {
@@ -111,6 +120,7 @@ export default {
         return this.$platform.alert('请选择需要批量编辑的产品');
       }
 
+      this.reset();
       this.visible = true;
     },
     buildParams() {
@@ -129,17 +139,17 @@ export default {
           [sf.fieldName]: form[sf.fieldName].map(({id, tagName}) => ({id, tagName}))
         })
       }
-      if (sf.formType === 'user') {
-        tv = form[sf.fieldName];
+      // if (sf.formType === 'user') {
+      //   tv = form[sf.fieldName];
 
-        params.mapJson = JSON.stringify({
-          [sf.fieldName]: {
-            userId: tv.userId,
-            displayName: tv.displayName,
-            staffId: tv.staffId
-          },
-        })
-      }
+      //   params.mapJson = JSON.stringify({
+      //     [sf.fieldName]: {
+      //       userId: tv.userId,
+      //       displayName: tv.displayName,
+      //       staffId: tv.staffId
+      //     },
+      //   })
+      // }
       if (sf.fieldName === 'manager') {
         tv = form[sf.fieldName];
 
@@ -204,7 +214,6 @@ export default {
         }
       },
       mounted() {
-        this.reset();
         this.buildForm();
       },
       methods: {
@@ -216,6 +225,9 @@ export default {
         },
         reset() {
           this.form = {};
+          if(this.fields.length == 0) {
+            return;
+          }
           this.selectField(this.fields[0].fieldName)
         },
         dispatch({type, bubbles = false, params = {}}) {

@@ -5,10 +5,14 @@ const Template = require('../util/Template')
 const router = new KoaRouter();
 const modules = require('../../modules');
 
+// 产品灰度 本地测试用 productV2  打包 上线需改为product
+const productGray = 'productV2'
 /** start 产品 */
 router.get('/customer/product', async ctx => {
-  let script = ['/product.list.js'];
-  let modConfig = modules['product.list'];
+  // let script = ['/product.list.js'];
+  // let modConfig = modules['product.list'];
+  let script = [`/${productGray}.list.js`];
+  let modConfig = modules[`${productGray}.list`];
   let reqHeaders = ctx.request.headers;
   let result = await HttpClient.request('/customer/product', 'get', null, {headers: reqHeaders});
   let body = result.body;
@@ -17,8 +21,10 @@ router.get('/customer/product', async ctx => {
 });
 
 router.get('/customer/product/view/:id', async ctx => {
-  let script = ['/product.view.js'];
-  let modConfig = modules['product.view'];
+  // let script = ['/product.view.js'];
+  // let modConfig = modules['product.view'];
+  let script = [`/${productGray}.view.js`];
+  let modConfig = modules[`${productGray}.view`];
   let reqHeaders = ctx.request.headers;
   
   let result = await HttpClient.request(`/customer/product/view/${ctx.params.id}`, 'get', null, {headers: reqHeaders});
@@ -28,8 +34,14 @@ router.get('/customer/product/view/:id', async ctx => {
 });
 
 router.get('/customer/product/create', async ctx => {
-  let modConfig = modules['product.edit'];
-  let script = ['/product.edit.js'];
+  
+  // let modConfig = modules['product.edit'];
+  // let script = ['/product.edit.js'];
+
+  let script = [`/${productGray}.edit.js`];
+  let modConfig = modules[`${productGray}.edit`];
+
+  
   let reqHeaders = ctx.request.headers;
   
   const customerId = ctx.request.query.customerId;
@@ -41,8 +53,10 @@ router.get('/customer/product/create', async ctx => {
 });
 
 router.get('/customer/product/edit/:id', async ctx => {
-  let modConfig = modules['product.edit'];
-  let script = ['/product.edit.js'];
+  // let modConfig = modules['product.edit'];
+  // let script = ['/product.edit.js'];
+  let script = [`/${productGray}.edit.js`];
+  let modConfig = modules[`${productGray}.edit`];
   let reqHeaders = ctx.request.headers;
   let result = await HttpClient.request(`/customer/product/edit/${ctx.params.id}`, 'get', null, {headers: reqHeaders});
   let body = result.body;
@@ -51,8 +65,10 @@ router.get('/customer/product/edit/:id', async ctx => {
 });
 
 router.get('/product/createOnTask', async ctx => {
-  let modConfig = modules['product.edit.modal'];
-  let script = ['/product.edit.modal.js'];
+  // let modConfig = modules['product.edit'];
+  // let script = ['/product.edit.js'];
+  let script = [`/${productGray}.edit.js`];
+  let modConfig = modules[`${productGray}.edit`];
   let reqHeaders = ctx.request.headers;
   // let result = await HttpClient.request(`/customer/product/edit/${ctx.params.id}`, 'get', null, {headers: reqHeaders});
   let result = await HttpClient.request('/product/createOnTask', 'get', null, {headers: reqHeaders});
@@ -62,8 +78,11 @@ router.get('/product/createOnTask', async ctx => {
 });
 
 router.get('/product/createOnEvent', async ctx => {
-  let modConfig = modules['product.edit.modal'];
-  let script = ['/product.edit.modal.js'];
+  // let modConfig = modules['product.edit.modal'];
+  // let script = ['/product.edit.modal.js'];
+  let script = [`/${productGray}.edit.modal.js`];
+  let modConfig = modules[`${productGray}.edit.modal`];
+  
   let reqHeaders = ctx.request.headers;
   // let result = await HttpClient.request(`/customer/product/edit/${ctx.params.id}`, 'get', null, {headers: reqHeaders});
   let result = await HttpClient.request('/product/createOnTask', 'get', null, {headers: reqHeaders});

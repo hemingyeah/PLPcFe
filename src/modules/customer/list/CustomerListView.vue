@@ -190,8 +190,11 @@
             <template v-else-if="column.formType === 'select' && scope.row.attribute[column.field]">
               {{scope.row.attribute[column.field] | displaySelect}}
             </template>
+            <template v-else-if="column.formType === 'cascader' && scope.row.attribute[column.field]">
+              {{scope.row.attribute[column.field] | displayCascader}}
+            </template>
             <template v-else-if="column.formType === 'user' && scope.row.attribute[column.field]">
-              {{scope.row.attribute[column.field].displayName || scope.row.attribute[column.field].name}}
+              {{ getUserName(column, scope.row.attribute[column.field]) }}
             </template>
             <template v-else-if="column.formType === 'location'">
               {{ scope.row.attribute[column.field] && scope.row.attribute[column.field].address}}
@@ -199,6 +202,9 @@
 
             <template v-else-if="column.formType === 'address'">
               {{formatCustomizeAddress(scope.row.attribute[column.field])}}
+            </template>
+            <template v-else-if="column.formType == 'related_task'">
+              {{ getRelatedTask(scope.row.attribute[column.field]) }}
             </template>
 
             <div class="pre-text" v-else-if="column.formType === 'textarea'" v-html="buildTextarea(scope.row.attribute[column.field])" @click="openOutsideLink"></div>
@@ -248,7 +254,7 @@
     <send-message-dialog ref="messageDialog" :selected-ids="selectedIds" :sms-rest="smsRest"></send-message-dialog>
     <batch-editing-customer-dialog
       ref="batchEditingCustomerDialog"
-      :config="{fields: initData.fieldInfo, defaultAddress: defaultAddress}"
+      :config="{fields: fieldInfo, defaultAddress: defaultAddress}"
       :callback="search"
       :selected-ids="selectedIds"
     ></batch-editing-customer-dialog>
@@ -348,7 +354,7 @@
     <base-table-advanced-setting ref="advanced" @save="modifyColumnStatus" />
 
     <search-panel :config="{
-      fields: this.initData.fieldInfo,
+      fields: fieldInfo,
     }" ref="searchPanel">
       <div class="advanced-search-btn-group" slot="footer">
         <base-button type="ghost" @event="resetParams">重置</base-button>
@@ -408,7 +414,8 @@ export default {
       selectedLimit: 500,
       columnNum: 1,
       tableKey: (Math.random() * 1000) >> 2,
-      hasCallCenterModule:localStorage.getItem('call_center_module') == 1
+      hasCallCenterModule:localStorage.getItem('call_center_module') == 1,
+      fieldInfo: []
     };
   },
   computed: {
@@ -445,6 +452,7 @@ export default {
           && c.field !== 'remindCount'
           && c.field !== 'updateTime'
           && c.formType !== 'info'
+          && c.formType !== 'autograph'
         ) {
           c.export = true;
         }
@@ -476,7 +484,7 @@ export default {
       return {
         customerAddressConfig: initData.customerAddressConfig,
         customerConfig: initData.customerConfig,
-        fieldInfo: (initData.fieldInfo || []).sort(
+        fieldInfo: (this.fieldInfo || []).sort(
           (a, b) => a.orderId - b.orderId
         )
       };
@@ -509,9 +517,30 @@ export default {
         return value.join('，');
       }
       return null;
+    },
+    displayCascader(value) {
+      if (!value) return null;
+      if (value && typeof value === 'string') {
+        return value;
+      }
+      if (Array.isArray(value) && value.length) {
+        return value.join('/');
+      }
+      return null;
     }
   },
-  mounted() {
+  async mounted() {
+    try {
+      // 获取客户表单字段列表
+      let result = await CustomerApi.getCustomerFields({isFromSetting: false});
+      if (result.succ) {
+        this.fieldInfo = result.data;
+      }
+
+    } catch(err) {
+      console.error('customer list get fields error', err);
+    }
+
     const {
       adProvince,
       adCity,
@@ -525,9 +554,21 @@ export default {
     // 对外开放刷新方法，用于其他tab刷新本tab数据
     // TODO: [tab_spec]标准化刷新方式
     window.__exports__refresh = this.search;
-    console.log('onEvent', this.initData.fieldInfo);
   },
   methods: {
+    getRelatedTask(field) {
+      return Array.isArray(field) ? field.map(item => item.taskNo).join(',') : '';
+    },
+    // 处理人员显示
+    getUserName(field, value) {
+      // 多选
+      if(Array.isArray(value)) {
+        return value.map(i => i.displayName || i.name).join(',');
+      }
+
+      let user = value || {};
+      return user.displayName || user.name;
+    },
     async makePhoneCall(phone){
       if(!this.hasCallCenterModule) return
       try {
@@ -977,6 +1018,7 @@ export default {
             && f.formType !== 'attachment'
             && f.formType !== 'separator'
             && f.formType !== 'info'
+            && f.formType !== 'autograph'
         )
         .map(field => {
           let sortable = false;
@@ -1000,6 +1042,7 @@ export default {
           }
 
           return {
+            ...field,
             label: field.displayName,
             field: field.fieldName,
             formType: field.formType,

@@ -80,7 +80,7 @@ import url from 'url';
 import AuthUtil from '@src/util/auth';
 import platform from '@src/platform';
 
-import { getProductTemplate, productTemplateDelete } from '@src/api/ProductApi.js';
+import { getProductTemplate, productTemplateDelete ,getProductFields} from '@src/api/ProductApi.js';
 
 import ProductTemplateInfoRecord from './component/ProductTemplateInfoRecord.vue';
 import ProductTemplateRelatedProductTable from './component/ProductTemplateRelatedProductTable.vue';
@@ -104,6 +104,7 @@ export default {
       recordCount: 0,
       showWholeName: -1, // -1 代表不显示展开icon 0 代表收起 1 代表展开
       tabs: [],
+      fieldsInfo: []
     }
   },
   computed: {
@@ -136,7 +137,7 @@ export default {
     },
     // 字段列表
     fields() {
-      let fields = (this.initData.productFields || []).sort((a, b) => a.orderId - b.orderId).filter(field => {
+      let fields = (this.fieldsInfo || []).sort((a, b) => a.orderId - b.orderId).filter(field => {
         return field.fieldName !== 'customer'
       });
 
@@ -234,8 +235,10 @@ export default {
 
     this.productCount = (this.initData && this.initData.productCount) || 0;
     this.loginUser = (this.initData && this.initData.loginUser) || {};
-
+    
+    this.getProductFieldsReq();
     this.fetchProductTemplate();
+    
   },
   methods: {
     // 构建tab
@@ -310,6 +313,15 @@ export default {
     selectTab(tab) {
       this.currentTab = tab;
     },
+    //获取产品表单属性列表
+    getProductFieldsReq() {
+      getProductFields({isFromSetting:false}).then((res)=>{
+        const { status, data, message } = res;
+        if( status == 0 ){
+          this.fieldsInfo = data;
+        }
+      }).catch(error=>{});
+    }
   },
   components: {
     [ProductTemplateInfoRecord.name]: ProductTemplateInfoRecord,

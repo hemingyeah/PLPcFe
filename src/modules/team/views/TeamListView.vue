@@ -1,33 +1,47 @@
 <template>
-  <div class="full-page" v-loading.fullscreen.lock="loadingPage">
+  <div class="full-page"
+       v-loading.fullscreen.lock="loadingPage">
+    <div id="product-team-list"></div>
     <header class="team-list-header">
-      <form class="base-search team-list-header-search" @submit.prevent="search">
-        <el-input placeholder="输入团队信息进行搜索" v-model="model.keyword" class="input-with-select" v-trim:blur>
-          <i slot="prefix" class="el-input__icon el-icon-search"></i>
+      <form class="base-search team-list-header-search"
+            @submit.prevent="search">
+        <el-input placeholder="输入团队信息进行搜索"
+                  v-model="model.keyword"
+                  class="input-with-select"
+                  v-trim:blur>
+          <i slot="prefix"
+             class="el-input__icon el-icon-search"></i>
         </el-input>
-        <button type="submit" class="btn btn-primary">搜索</button>
-        <button type="button" class="btn btn-ghost" @click="resetParams">重置</button>
+        <button type="submit"
+                class="btn btn-primary">搜索</button>
+        <button type="button"
+                class="btn btn-ghost"
+                @click="resetParams">重置</button>
       </form>
 
       <!-- start 团队选项 -->
       <div class="team-list-checkbox-view">
         <!-- start 按服务团队派单 -->
-        <el-checkbox v-model="isAllotByTag" @change="setUsedAllot">启用按服务团队派单</el-checkbox>
-        <el-popover
-          placement="bottom-end"
-          width="300"
-          trigger="hover"
-          content="开启后，指派工单将按照团队查询人员；禁用时，按通讯录方式查询人员">
-          <i class="iconfont icon-help" slot="reference"></i>
+        <el-checkbox v-model="isAllotByTag"
+                     @change="setUsedAllot">启用按服务团队派单</el-checkbox>
+        <el-popover placement="bottom-end"
+                    width="300"
+                    trigger="hover"
+                    content="开启后，指派工单将按照团队查询人员；禁用时，按通讯录方式查询人员">
+          <i class="iconfont icon-help"
+             slot="reference"></i>
         </el-popover>
         <!-- end 按服务团队派单 -->
-        <el-checkbox v-model="isSeeAllOrg" @change="setSeeAllOrg" :disabled="!isAllotByTag" class="team-list-header-see">选择人员时隐藏非团队内成员</el-checkbox>
-        <el-popover
-          placement="bottom-end"
-          width="300"
-          trigger="hover"
-          content="开启本选项后，在选择协同人等调用钉钉通讯录时只可见自己所属服务团队的成员，管理员除外">
-          <i class="iconfont icon-help" slot="reference"></i>
+        <el-checkbox v-model="isSeeAllOrg"
+                     @change="setSeeAllOrg"
+                     :disabled="!isAllotByTag"
+                     class="team-list-header-see">选择人员时隐藏非团队内成员</el-checkbox>
+        <el-popover placement="bottom-end"
+                    width="300"
+                    trigger="hover"
+                    content="开启本选项后，在选择协同人等调用钉钉通讯录时只可见自己所属服务团队的成员，管理员除外">
+          <i class="iconfont icon-help"
+             slot="reference"></i>
         </el-popover>
       </div>
       <!-- end 团队选项 -->
@@ -38,65 +52,78 @@
         <!-- start 按钮 -->
         <div class="manage-operate-btns">
           <!-- TODO: 是否有权限 新建 删除 -->
-          <base-button type="primary" icon="icon-add" @event="teamCreate">新建</base-button>
-          <base-button type="primary" icon="icon-add" @event="teamChildCreate" v-if="showNewTeam">新建子团队</base-button>
-          <base-button type="ghost" icon="icon-fe-close" @event="teamDelete">删除团队</base-button>
+          <base-button type="primary"
+                       icon="icon-add"
+                       @event="teamCreate">新建</base-button>
+          <base-button type="primary"
+                       icon="icon-add"
+                       @event="teamChildCreate"
+                       v-if="showNewTeam">新建子团队</base-button>
+          <base-button type="ghost"
+                       icon="icon-fe-close"
+                       @event="teamDelete">删除团队</base-button>
         </div>
         <!-- end 按钮 -->
         <!-- start 服务电话 -->
         <div class="team-service-btn">
-          <base-button type="primary" @event="openTelDialog">
+          <base-button type="success"
+                       v-if="productV2Gray"
+                       id="product-team-list-1"
+                       @event="openWxDialog">
+            维护服务微信
+          </base-button>
+          <base-button type="primary"
+                       @event="openTelDialog">
             维护服务电话
           </base-button>
         </div>
         <!-- end 服务电话 -->
       </div>
       <div class="team-table-list">
-        <base-table 
-          class="team-list" 
-          max-height="100vh - 205px"
-          row-key="id"
-          ref="teamTable"
-          :rows="page.list" 
-          :columns="columns"
-          @select="selectTeamList"
-          @update="updateTableColumns"
-          multiple 
-          advanced/>
+        <base-table class="team-list"
+                    max-height="100vh - 205px"
+                    row-key="id"
+                    ref="teamTable"
+                    :rows="page.list"
+                    :columns="columns"
+                    @select="selectTeamList"
+                    @update="updateTableColumns"
+                    multiple
+                    advanced />
       </div>
       <!-- start 表格底部 -->
       <div class="full-page-footer">
         <div class="list-info">
           共<span class="level-padding">{{ page.total || 0 }}</span>记录，已选中
-          <span class="selectedCount" @click="multipleSelectionPanelShow = true">{{multipleSelection.length}}</span>条
-          <span class="selectedCount select-init-text" @click="selectionInit">清空</span>
+          <span class="selectedCount"
+                @click="multipleSelectionPanelShow = true">{{multipleSelection.length}}</span>条
+          <span class="selectedCount select-init-text"
+                @click="selectionInit">清空</span>
         </div>
-        <el-pagination
-          class="customer-table-pagination"
-          background
-          @current-change="jump"
-          @size-change="handleSizeChange"
-          :page-sizes="[10, 20, 50]"
-          :page-size="page.pageSize"
-          :current-page="page.pageNum"
-          layout="prev, pager, next, sizes, jumper"
-          :total="page.total"/>
+        <el-pagination class="customer-table-pagination"
+                       background
+                       @current-change="jump"
+                       @size-change="handleSizeChange"
+                       :page-sizes="[10, 20, 50]"
+                       :page-size="page.pageSize"
+                       :current-page="page.pageNum"
+                       layout="prev, pager, next, sizes, jumper"
+                       :total="page.total" />
       </div>
     </div>
 
     <!-- start 导入服务电话 -->
-    <base-import
-      title="维护服务电话"
-      ref="serviceTelModal"
-      :is-import-now="isImportNow"
-      @success="importServiceSuccess"
-      action="/security/user/import/cellPhone">
+    <base-import title="维护服务电话"
+                 ref="serviceTelModal"
+                 :is-import-now="isImportNow"
+                 @success="importServiceSuccess"
+                 action="/security/user/import/cellPhone">
       <div slot="tip">
         <div class="base-import-warn">
           请先下载<a :href="`/security/user/import/template?tagId=${serviceTelItemId}`">导入模版 </a>，填写完成后再上传导入。<br>
           这里维护服务电话仅用于给客户发送预约短信时显示服务人员电话；<br>
           如果没有维护服务人员电话将会发送短信设置中统一服务电话；<br>
-          此数据为非必填项。  <br>
+          此数据为非必填项。 <br>
           <br>
           短信示例<br>
           <br>
@@ -106,32 +133,57 @@
     </base-import>
     <!-- end 导入服务电话 -->
 
+    <!-- start 导入服务微信 -->
+    <base-import title="维护服务微信"
+                
+                 ref="serviceWxModal"
+                 :is-import-now="isImportNow"
+                 @success="importServiceSuccess"
+                 action="/security/user/import/importWeChat">
+      <div slot="tip">
+        <div class="base-import-warn"
+        >
+          请先下载<a :href="`/security/user/import/weChatTemplate?tagId=${serviceTelItemId}`">导入模版 </a>，填写完成后再上传导入。<br>
+          微信号仅用于客户联系服务人员；<br>
+          如果微信号未填写，客户将无法获取服务人员微信号；<br>
+          此数据为非必填项。<br>
+        </div>
+      </div>
+    </base-import>
+    <!-- end 导入服务微信 -->
+
     <!-- start 右侧选择团队弹窗 -->
-    <base-panel :show.sync="multipleSelectionPanelShow" width="420px">
+    <base-panel :show.sync="multipleSelectionPanelShow"
+                width="420px">
       <h3 slot="title">
         <span>已选中数据({{multipleSelection.length}})</span>
-        <i 
-          v-if="multipleSelection.length > 0"
-          class="iconfont icon-qingkongshanchu team-panel-btn" 
-          @click="selectionInit" 
-          title="清空已选中数据" 
-          data-placement="right" 
-          v-tooltip/>
+        <i v-if="multipleSelection.length > 0"
+           class="iconfont icon-qingkongshanchu team-panel-btn"
+           @click="selectionInit"
+           title="清空已选中数据"
+           data-placement="right"
+           v-tooltip />
       </h3>
 
       <div class="team-selected-panel">
-        <div class="team-selected-tip" v-if="multipleSelection.length <= 0">
+        <div class="team-selected-tip"
+             v-if="multipleSelection.length <= 0">
           <img src="../../../assets/img/no-data.png">
           <p>暂无选中的数据，请从列表中选择。</p>
         </div>
 
-        <div class="team-selected-list" v-else>
+        <div class="team-selected-list"
+             v-else>
           <div class="team-selected-row team-selected-head">
             <span class="team-selected-name">团队名称</span>
           </div>
-          <div class="team-selected-row" v-for="(team, index) in multipleSelection" :key="team.id" >
+          <div class="team-selected-row"
+               v-for="(team, index) in multipleSelection"
+               :key="team.id">
             <span class="team-selected-name">{{team.tagName}}</span>
-            <button type="button" class="team-selected-delete" @click="selectCancelTeam(team, index)">
+            <button type="button"
+                    class="team-selected-delete"
+                    @click="selectCancelTeam(team, index)">
               <i class="iconfont icon-fe-close"></i>
             </button>
           </div>
@@ -148,8 +200,14 @@ import qs from 'qs';
 
 import Page from '@model/Page';
 import * as TeamApi from '@src/api/TeamApi';
-import {fmt_address} from '@src/filter/fmt';
+import { fmt_address } from '@src/filter/fmt';
 import { isShowCreateChildrenTeam } from '@src/util/version.ts'
+
+import { storageGet, storageSet } from '@src/util/storage';
+
+const {
+  PRODUCT_TEAM_LIST_VIEW
+} = require('@src/component/guide/productV2Store');
 
 export default {
   name: 'team-list-view',
@@ -159,7 +217,7 @@ export default {
       default: () => ({})
     }
   },
-  data(){
+  data () {
     return {
       columns: this.buildColumns(),
       loadingPage: false,
@@ -176,12 +234,15 @@ export default {
     }
   },
   computed: {
-    showNewTeam() {
+    showNewTeam () {
       return isShowCreateChildrenTeam(this.initData)
+    },
+    productV2Gray(){
+      return this.initData.openSuperCode;
     }
   },
   methods: {
-    buildColumns(){
+    buildColumns () {
       let that = this;
       return [
         {
@@ -189,9 +250,9 @@ export default {
           label: '团队名称',
           expandProp: 'children',
           width: 250,
-          render(h, col, row){
+          render (h, col, row) {
             return (
-              <a class="team-view-detail-btn" 
+              <a class="team-view-detail-btn"
                 href={`/security/tag/view/${row.id}?noHistory=1`}
                 onClick={e => that.openTeamView(e, row.id)}>
                 {row.tagName}
@@ -204,7 +265,7 @@ export default {
           label: '团队主管',
           width: 180,
           overflow: 'tooltip',
-          formatter(col, row){
+          formatter (col, row) {
             return row.teamLeaders.map(i => i.displayName).join('，')
           },
         },
@@ -218,7 +279,7 @@ export default {
           label: '负责区域',
           width: 250,
           overflow: 'tooltip',
-          formatter(col, row){
+          formatter (col, row) {
             return row.tagPlaceList.map(p => `${p.province}${p.city ? `-${p.city}` : ''}${p.dist ? `-${p.dist}` : ''}`).join('，\n')
           }
         },
@@ -226,13 +287,13 @@ export default {
           field: 'tagAddress',
           label: '所在位置',
           overflow: 'tooltip',
-          formatter(col, row){
+          formatter (col, row) {
             return fmt_address(row.tagAddress);
           }
         }
       ]
     },
-    buildModel() {
+    buildModel () {
       let model = {
         keyword: '',
       };
@@ -240,7 +301,7 @@ export default {
       return model
     },
     /* 获取列表 */
-    async fetchPageList(pageNum = 1){
+    async fetchPageList (pageNum = 1) {
       this.loadingPage = true;
       try {
         let params = {
@@ -251,7 +312,7 @@ export default {
         }
         let page = await TeamApi.tagList(params);
         this.page.merge(page);
-        
+
         this.$nextTick(() => {
           this.selectionToggle(this.page.list);
         })
@@ -263,7 +324,7 @@ export default {
       }
     },
     /* 页码数 切换 */
-    handleSizeChange(pageSize) {
+    handleSizeChange (pageSize) {
       this.page.pageSize = pageSize;
       this.page.list = [];
 
@@ -271,19 +332,19 @@ export default {
       this.fetchPageList();
     },
     /* 初始化 */
-    initialize(){
+    initialize () {
       this.page.pageNum = 1;
       this.page.list = [];
       this.multipleSelection = [];
 
       return this.fetchPageList(this.page.pageNum)
     },
-    jump(pageNum) {
+    jump (pageNum) {
       this.page.list = [];
       this.fetchPageList(pageNum);
     },
     /* 判断是否是主团队 */
-    isParent(item) {
+    isParent (item) {
       let bool = (
         !item.parent
         && Array.isArray(item.children)
@@ -292,27 +353,27 @@ export default {
       return bool
     },
     /* 导入维护服务电话成功 */
-    importServiceSuccess() {
+    importServiceSuccess () {
       // 
     },
     /* 获取本地数据 */
-    localStorageGet() {
+    localStorageGet () {
       try {
         const dataStr = localStorage.getItem('teamListData') || '{}'
-        return JSON.parse(dataStr); 
+        return JSON.parse(dataStr);
       } catch (error) {
         console.log('error: ', error);
         return {}
       }
     },
     /* 设置本地数据 */
-    localStorageSet(key, value) {
+    localStorageSet (key, value) {
       const data = this.localStorageGet();
 
       data[key] = value;
       localStorage.setItem('teamListData', JSON.stringify(data));
     },
-    openTeamView(e, id){
+    openTeamView (e, id) {
       e.preventDefault();
       let fromId = window.frameElement.getAttribute('id');
 
@@ -326,8 +387,8 @@ export default {
       });
     },
     /* 打开服务电话弹出框 */
-    openTelDialog() {
-      if(this.multipleSelection.length != 1) {
+    openTelDialog () {
+      if (this.multipleSelection.length != 1) {
         return this.$platform.alert('请您先选择一个团队');
       }
       let item = this.multipleSelection[0];
@@ -335,21 +396,30 @@ export default {
       this.serviceTelItemId = item.id;
       this.$refs.serviceTelModal.open();
     },
+    openWxDialog () {
+      if (this.multipleSelection.length != 1) {
+        return this.$platform.alert('请您先选择一个团队');
+      }
+      let item = this.multipleSelection[0];
+
+      this.serviceTelItemId = item.id;
+      this.$refs.serviceWxModal.open();
+    },
     /** 复原搜索参数 */
-    revertSearchParams() {
+    revertSearchParams () {
       const localStorageData = this.localStorageGet();
 
-      if(localStorageData.pageSize) {
+      if (localStorageData.pageSize) {
         this.page.pageSize = localStorageData.pageSize;
       }
     },
     /** 复原表格列 数据 */
-    revertTableColumns() {
+    revertTableColumns () {
       try {
         let data = this.localStorageGet();
         let columns = data.columns ? JSON.parse(data.columns) : [];
 
-        if(Array.isArray(columns) && columns.length > 0) {
+        if (Array.isArray(columns) && columns.length > 0) {
           this.columns = this.columns.map((col, index) => {
             return Object.assign(col, columns[index])
           })
@@ -359,26 +429,26 @@ export default {
       }
     },
     /* 复原搜索 参数 */
-    resetParams() {
+    resetParams () {
       this.model = this.buildModel();
       this.page.list = [];
 
       this.fetchPageList()
-    },  
+    },
     /* 搜索 */
-    search() {
+    search () {
       this.page.pageNum = 1;
       this.page.list = [];
 
       this.fetchPageList();
     },
     /* 清空已选择的团队 */
-    selectionInit() {
+    selectionInit () {
       this.multipleSelection = [];
       this.$refs.teamTable.clearSelection();
     },
     /* 选择的团队 */
-    selectTeamList(selection) {
+    selectTeamList (selection) {
       let tv = this.computeSelection(selection);
 
       let original = this.multipleSelection
@@ -396,11 +466,11 @@ export default {
       this.multipleSelection = tv;
     },
     /* 删除某项已选择的团队 */
-    selectCancelTeam(row, index) {
+    selectCancelTeam (row, index) {
       this.multipleSelection.splice(index, 1);
       this.$refs.teamTable.toggleRowSelection(row, false);
     },
-    computeSelection(selection) {
+    computeSelection (selection) {
       let allTeam = [];
       let tv = [];
 
@@ -410,7 +480,7 @@ export default {
           allTeam.push(child)
         })
       })
-      
+
       tv = this.multipleSelection
         .filter(ms => allTeam.every(l => l.id !== ms.id));
       tv = _.uniqWith([...tv, ...selection], _.isEqual);
@@ -420,7 +490,7 @@ export default {
      * 切换团队选择状态
      * @param {Array} list -表格列表
     */
-    selectionToggle(list) {
+    selectionToggle (list) {
       let allTeam = [];
       list.forEach(l => {
         allTeam.push(l);
@@ -429,19 +499,19 @@ export default {
         })
       })
       this.multipleSelection.forEach(selection => {
-        for(let i = 0; i < allTeam.length; i++){
+        for (let i = 0; i < allTeam.length; i++) {
           let item = allTeam[i];
 
-          if(selection.id == item.id) {
+          if (selection.id == item.id) {
             this.$refs.teamTable.toggleRowSelection(item, true);
           }
         }
       })
     },
     /* 设置是否按 服务团队派单 */
-    async setUsedAllot(setTag) {
+    async setUsedAllot (setTag) {
       let _setTag = 'dep';
-      if(setTag) {
+      if (setTag) {
         _setTag = 'tag'
       }
       try {
@@ -450,11 +520,11 @@ export default {
         }
         let result = await TeamApi.usedAllot(params);
 
-        if(!setTag) {
+        if (!setTag) {
           this.setSeeAllOrg();
         }
 
-        if(result.status != 0) {
+        if (result.status != 0) {
           this.$platform.alert(result.message);
         }
       } catch (error) {
@@ -462,13 +532,13 @@ export default {
       }
     },
     /* 是否开启 降低组织架构 */
-    async setSeeAllOrg(state = false) {
+    async setSeeAllOrg (state = false) {
       try {
         let params = {
           state,
         }
         let result = await TeamApi.saveSeeAllOrg(params);
-        if(result.status != 0) {
+        if (result.status != 0) {
           this.$platform.alert(result.message);
         } else {
           this.isSeeAllOrg = state;
@@ -478,7 +548,7 @@ export default {
       }
     },
     /* 新建团队 */
-    teamCreate() {
+    teamCreate () {
       let fromId = window.frameElement.getAttribute('id');
 
       this.$platform.openTab({
@@ -491,15 +561,15 @@ export default {
       });
     },
     /* 新建子团队 */
-    teamChildCreate() {
+    teamChildCreate () {
       window.TDAPP.onEvent('pc：访问团队管理-新建子团队');
       let len = this.multipleSelection.length;
-      if(len != 1) {
+      if (len != 1) {
         return this.$platform.alert('请您选择一个团队');
       }
       let item = this.multipleSelection[0];
 
-      if(!this.isParent(item)) {
+      if (!this.isParent(item)) {
         return this.$platform.alert('请您选择一个主团队')
       }
 
@@ -509,7 +579,7 @@ export default {
         pname: item.tagName,
       }
       let fromId = window.frameElement.getAttribute('id');
-      
+
       this.$platform.openTab({
         id: 'team_create',
         title: '新建子团队',
@@ -520,9 +590,9 @@ export default {
       });
     },
     /* 删除团队 */
-    async teamDelete() {
+    async teamDelete () {
       window.TDAPP.onEvent('pc：团队管理-删除团队事件');
-      if(this.multipleSelection.length <= 0) {
+      if (this.multipleSelection.length <= 0) {
         return this.$platform.alert('请您先选择至少一个团队');
       }
       // 判断是否 删除含有主团队
@@ -533,10 +603,10 @@ export default {
       hasParent = select.some(s => {
         return this.isParent(s)
       })
-      
-      if(hasParent && this.showNewTeam) {
+
+      if (hasParent && this.showNewTeam) {
         confirm = await this.$platform.confirm('您删除的团队，如果包含子团队将会一并删除，是否继续？');
-        if(!confirm) return;
+        if (!confirm) return;
       } else {
         confirm = await this.$platform.confirm('是否确定删除您所选中的团队？');
         if (!confirm) return;
@@ -554,7 +624,7 @@ export default {
           message: result.status == 0 ? null : result.message
         })
 
-        if(result.status == 0) {
+        if (result.status == 0) {
           this.initialize();
           this.selectionInit();
         } else {
@@ -566,7 +636,7 @@ export default {
       }
     },
     /* 更新表格列宽 */
-    updateTableColumns(columns) {
+    updateTableColumns (columns) {
       this.columns = this.columns.map((col, index) => {
         return Object.assign(col, columns.data[index]);
       })
@@ -574,10 +644,28 @@ export default {
       this.localStorageSet('columns', JSON.stringify(columns.data));
     }
   },
-  mounted(){
+  mounted () {
     this.revertSearchParams();
     this.revertTableColumns();
     this.initialize();
+
+    this.$nextTick(() => {
+      if (storageGet(PRODUCT_TEAM_LIST_VIEW) && storageGet(PRODUCT_TEAM_LIST_VIEW) > 0) this.$Guide().destroy('product-team-list')
+      else this.$Guide([{
+        content:
+          '在这里设置超级二维码首页服务人员微信',
+        haveStep: false,
+        gStyle: 'top:35px',
+        id: 'product-team-list',
+        domId: 'product-team-list-1',
+        arrowStyle: 'left:-140px',
+        finishBtn: 'OK',
+      }], 0, '', (e) => {
+        return new Promise((resolve, reject) => {
+          resolve()
+        })
+      }).create().then(res_=>{if(res_)storageSet(PRODUCT_TEAM_LIST_VIEW, '1')})
+    })
 
     this.isAllotByTag = (this.initData.taskConfig && this.initData.taskConfig.allotByTag !== false);
     this.isSeeAllOrg = this.initData.seeAllOrg !== false;
@@ -621,8 +709,8 @@ export default {
       margin-left: 5px;
     }
   }
-  
-  .team-list-header-search .btn{
+
+  .team-list-header-search .btn {
     margin-left: 7px;
   }
 
@@ -632,7 +720,6 @@ export default {
       line-height: 34px;
     }
   }
-    
 }
 
 .full-page-main {
@@ -647,19 +734,18 @@ export default {
 }
 
 .manage-operate-btns,
-.team-service-btn{
+.team-service-btn {
   background-color: #fff;
   display: flex;
   padding: 10px 0;
   flex: 1;
-  
+
   .danger-button {
     margin-left: 20px;
   }
   button {
     margin-right: 10px;
   }
-
 }
 
 .team-service-btn {
@@ -697,78 +783,78 @@ export default {
 }
 
 // -------- team selected panel --------
-.team-selected-panel{
+.team-selected-panel {
   font-size: 14px;
   height: calc(100% - 51px);
 }
 
-.team-selected-list{
+.team-selected-list {
   height: 100%;
   padding: 10px;
   overflow-y: auto;
 }
 
-.team-selected-row{
+.team-selected-row {
   display: flex;
   flex-flow: row nowrap;
   line-height: 36px;
   border-bottom: 1px solid #ebeef5;
   font-size: 13px;
 
-  &:hover{
+  &:hover {
     background-color: #f5f7fa;
 
-    .team-selected-delete{
+    .team-selected-delete {
       visibility: visible;
     }
   }
 }
 
-.team-selected-head{
-  background-color: #F0F5F5;
+.team-selected-head {
+  background-color: #f0f5f5;
   color: #333;
   font-size: 14px;
 }
 
-.team-selected-name{
+.team-selected-name {
   padding-left: 10px;
   flex: 1;
   @include text-ellipsis;
 }
 
-.team-selected-delete{
+.team-selected-delete {
   width: 36px;
 }
 
-.team-selected-row button.team-selected-delete{
+.team-selected-row button.team-selected-delete {
   padding: 0;
   width: 36px;
   height: 36px;
   border: none;
   background-color: transparent;
   outline: none;
-  color: #646B78;
+  color: #646b78;
   visibility: hidden;
 
-  i{
+  i {
     font-size: 14px;
   }
 
-  &:hover{
+  &:hover {
     color: #e84040;
   }
 }
 
-.team-selected-tip{
+.team-selected-tip {
   padding-top: 80px;
 
-  img{
+  img {
     display: block;
     width: 240px;
     margin: 0 auto;
   }
 
-  p{
+  p {
     text-align: center;
     color: #9a9a9a;
     margin: 30px 0 0 0;
@@ -776,13 +862,13 @@ export default {
   }
 }
 
-.team-panel-btn{
+.team-panel-btn {
   float: right;
   cursor: pointer;
   font-size: 14px;
   margin-right: 5px;
 
-  &:hover{
+  &:hover {
     color: $color-primary;
   }
 }
@@ -817,13 +903,13 @@ export default {
       height: 42px;
       padding: 6px 0;
     }
-    .base-table-hover-row{
+    .base-table-hover-row {
       background-color: #f5f7fa;
     }
   }
 
   .team-view-detail-btn {
-    color: #55B7B4;
+    color: #55b7b4;
   }
 }
 
@@ -843,7 +929,7 @@ export default {
   }
 
   .base-table__table {
-    .base-table-hover-col{
+    .base-table-hover-col {
       background-color: #f5f7fa;
     }
   }

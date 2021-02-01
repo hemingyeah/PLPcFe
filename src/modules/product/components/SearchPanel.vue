@@ -74,12 +74,13 @@ export default {
           if (formType === 'updateTime') {
             f.displayName = '更新时间';
           }
+
           return Object.freeze({
             ...f,
             isNull: 1,
             formType,
             originalFormType: f.formType,
-            operator: this.matchOperator(f)
+            operator: this.matchOperator(f),
           });
         })
         .sort((a, b) => a.orderId - b.orderId);
@@ -258,6 +259,10 @@ export default {
         }
         break;
       }
+      case 'cascader': {
+        operator = 'cascader';
+        break;
+      }
       case 'user': {
         operator = 'user';
         break;
@@ -268,6 +273,14 @@ export default {
       }
       case 'location': {
         operator = 'location';
+        break;
+      }
+      case 'related_task': {
+        operator = 'array_eq';
+        break;
+      }
+      case 'formula': {
+        operator = 'eq';
         break;
       }
       default: {
@@ -349,6 +362,7 @@ export default {
       }
 
       for (let i = 0; i < notSystemFields.length; i++) {
+        let key = null;
         tv = notSystemFields[i];
         fn = tv.fieldName;
 
@@ -385,6 +399,15 @@ export default {
           continue;
         }
 
+        if (tv.formType === 'cascader') {
+          params.conditions.push({
+            property: fn,
+            operator: tv.operator,
+            inValue: form[fn]
+          });
+          continue;
+        }
+        
         if (tv.formType === 'address') {
           let address = {
             property: fn,
@@ -403,10 +426,15 @@ export default {
           continue;
         }
 
+        if (tv.originalFormType === 'related_task') {
+          key = "taskNo";
+        }
+
         params.conditions.push({
           property: fn,
           operator: tv.operator,
-          value: form[fn]
+          value: form[fn],
+          key
         });
       }
       // 返回接口数据
@@ -481,7 +509,9 @@ export default {
             if (field.formType === 'area') {
               tv = []
             }
-
+            if (field.formType === 'cascader' ) {
+              tv = []
+            }
             form[field.fieldName] = this.formBackup[field.fieldName] || tv;
 
             this.$set(
@@ -494,16 +524,15 @@ export default {
           return form;
         },
         update(event, action) {
-          console.log('update::', event, action);
           if (action === 'tags') {
-            return (this.form.tags = event);
+            return this.$set(this.form,'tags',event);
           }
 
           if (action === 'dist') {
-            return (this.form.area = event);
+            return this.$set(this.form,'area',event);
           }
           const f = event.field;
-          this.form[f.fieldName] = event.newValue;
+          this.$set(this.form,f.fieldName,event.newValue);
         },
         createUserInput(event, isTags) {
           if (isTags) {

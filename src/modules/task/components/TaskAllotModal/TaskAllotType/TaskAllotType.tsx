@@ -7,6 +7,9 @@ import ComponentNameEnum from '@model/enum/ComponentNameEnum'
 /* types */
 import TaskConfig from '@model/types/TaskConfig'
 
+/** 
+ * @deprecated 已弃用
+*/
 @Component({ 
   name: ComponentNameEnum.TaskAllotType
 })
