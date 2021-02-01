@@ -222,6 +222,9 @@ export default {
         let cusRes = await CustomerApi.getForEdit(this.initData.id)
         this.loadingPage = false
         if (cusRes.status === 0) form = cusRes.data
+      } else {
+        // 检查版本数量限制
+        this.checkNumExceedLimitBeforeHandler && this.checkNumExceedLimitBeforeHandler()
       }
       
       if (this.initData.action === 'createFromEvent') {

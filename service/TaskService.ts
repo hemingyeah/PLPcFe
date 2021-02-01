@@ -24,7 +24,7 @@ import Log from '@src/util/log.ts'
 /** 
  * @description 获取初始化数据
 */
-function getInitData(): any | null {  
+function getInitData(): any | null {
   try {
     const RootWindow: any = getRootWindow(window)
     const RootWindowInitData = JSON.parse(RootWindow._init)

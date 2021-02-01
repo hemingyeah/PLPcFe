@@ -99,7 +99,7 @@ export function saveSettingDispatchRule(params) {
  * @description 检测版本某些功能数量是否超过限制
 */
 export function checkNumExceedLimit(params) {
-  // return http.post('/setting/dispatchRule/task/save', params)
+  // return http.post('/setting/checkDataCount', params)
   return new Promise((resolve, reject) => {
     resolve({
       success: true,

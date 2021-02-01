@@ -15,10 +15,9 @@ import Vue, { VueConstructor } from 'vue'
 
 /**
  * @description: 初始化版本限制弹窗
- * @param {*}
- * @return {*}
+ * @return {Vue} vue组件实例
 */
-function initVersionLimitDialog(): Vue {
+export function initVersionLimitDialog(): Vue {
   
   @Component({
     components: {

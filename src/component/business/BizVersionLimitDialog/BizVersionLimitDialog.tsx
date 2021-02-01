@@ -1,8 +1,14 @@
+/* component */
+import SaleManager from '@src/modules/system/frame/component/SaleManager.vue';
 /* enum */
 import ComponentNameEnum from '@model/enum/ComponentNameEnum'
 /* image */
 // @ts-ignore
 import VersionLimitImage from '@src/assets/img/version_limit.png'
+/* scss */
+import '@src/component/business/BizVersionLimitDialog/BizVersionLimitDialog.scss'
+/* types */
+import RootWindowInitData from '@model/types/RootWindowInitData'
 /* vue */
 import VC from '@model/VC'
 import { Component, Emit, Prop, Ref } from 'vue-property-decorator'
@@ -10,18 +16,33 @@ import { CreateElement } from 'vue'
 /* util */
 import Log from '@src/util/log.ts'
 import Platform from '@src/util/Platform'
-/* scss */
-import '@src/component/business/BizVersionLimitDialog/BizVersionLimitDialog.scss'
+import { getRootWindowInitData } from '@src/util/window'
 
-@Component({ 
-  name: ComponentNameEnum.BizVersionLimitDialog
+// @ts-ignore
+@Component({
+  name: ComponentNameEnum.BizVersionLimitDialog,
+  components: {
+    [SaleManager.name]: SaleManager
+  }
 })
-export default class BizVersionLimitDialog extends VC {
+class BizVersionLimitDialog extends VC {
   
   /* 等待状态 */
   private pending: boolean = false
   /* 是否显示版本数量限制弹窗 */
   private showBizVersionLimitDialog: boolean = false
+  /* 是否显示专属客服 */
+  private visibleSaleManager: boolean = false
+  
+  get rootWindowInitData(): RootWindowInitData {
+    return getRootWindowInitData()
+  }
+  /**
+   * @description 联系客户
+   */
+  private contactServiceManager() {
+    this.visibleSaleManager = true
+  }
   
   /**
    * @description 获取属性
@@ -42,6 +63,19 @@ export default class BizVersionLimitDialog extends VC {
           value: this.pending
         }
       ]
+    }
+  }
+  
+  private getSaleManagerAttributes() {
+    return {
+      props: {
+        show: this.visibleSaleManager
+      },
+      on: {
+        'update:show': (value: boolean) => {
+          this.visibleSaleManager = value
+        }
+      }
     }
   }
   
@@ -75,7 +109,7 @@ export default class BizVersionLimitDialog extends VC {
               体验版最多可创建10条数据，升级至正式版可解锁更多权益
             </div>
             <div class='biz-version-limit-dialog-body-btn-group'>
-              <el-button class='service-button' type='ghost' onClick={() => this.submit()}>
+              <el-button class='service-button' type='ghost' onClick={() => this.contactServiceManager()}>
                 联系专属客服
               </el-button>
               <el-button class='upgrade-button' type='primary' onClick={() => this.upgrade()}>
@@ -84,9 +118,14 @@ export default class BizVersionLimitDialog extends VC {
             </div>
           </div>
         </base-modal>
-        <sale-manager/>
+        <sale-manager
+          serviceGroupUrl={this.rootWindowInitData.serviceGroupUrl}
+          qrcode={this.rootWindowInitData.saleManagerQRCode}
+          {...this.getSaleManagerAttributes()}
+        />
       </div>
     )
   }
 }
 
+export default BizVersionLimitDialog

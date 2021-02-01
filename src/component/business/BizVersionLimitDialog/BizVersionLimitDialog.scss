@@ -1,0 +1,35 @@
+.biz-version-limit-dialog {
+  .base-modal-header {
+    display: none;
+  }
+}
+
+.biz-version-limit-dialog-header {
+  height: 174px;
+  width: 100%;
+  img {
+    height: 100%;
+    width: 100%;
+  }
+}
+
+.biz-version-limit-dialog-body {
+  height: 134px;
+  &-text {
+    color: $text-color-regular;
+    line-height: 32px;
+    padding-top: 7px;
+    text-align: center;
+  }
+  &-btn-group {
+    display: flex;
+    justify-content: center;
+    margin-top: 48px;
+    button {
+      width: 150px;
+    }
+    .service-button {
+      color: $color-primary;
+    }
+  }
+}

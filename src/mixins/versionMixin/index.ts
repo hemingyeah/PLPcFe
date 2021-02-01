@@ -4,6 +4,9 @@ import * as SettingApi from '@src/api/SettingApi'
 import BizVersionLimitDialog from '@src/component/business/BizVersionLimitDialog/BizVersionLimitDialog'
 /* enum */
 import ComponentNameEnum from '@model/enum/ComponentNameEnum'
+import TenantDataLimitSourceEnum from '@model/enum/TenantDataLimitSourceEnum'
+/* model */
+import MsgModel from '@model/MsgModel'
 /* vue */
 import VC from '@model/VC'
 import { CreateElement } from 'vue'
@@ -13,6 +16,8 @@ import Log from '@src/util/log.ts'
 import Platform from '@src/util/Platform'
 import { isExperienceEdition } from '@src/util/version'
 import { isFunction } from '@src/util/type'
+import Result from '@model/Result'
+import ErrorCodeEnum from '@model/enum/ErrorCodeEnum'
 
 @Component({ 
   name: ComponentNameEnum.VersionMixin,
@@ -38,12 +43,12 @@ export default class VersionMixin extends VC {
   
   /**
    * @description: 检查数量是否超过上限 (仅限体验版)
-   * @param {*}
+   * @param {TenantDataLimitSourceEnum} source 需要检查的模块名称
    * @return {Boolean} 是否超过上限
   */
-  private async fetchCheckNumExceedLimit(mode: string): Promise<boolean> {
+  private async fetchCheckNumExceedLimit(source: TenantDataLimitSourceEnum): Promise<boolean> {
     // 非体验版无需效验
-    // if (!this.isExperienceEdition) return false
+    if (!this.isExperienceEdition) return false
     
     // 参数
     let params: any = {}
@@ -62,15 +67,15 @@ export default class VersionMixin extends VC {
   }
   
   /**
-   * @description: 检查数量是否超过上限 (仅限体验版)之前的事件操作
-   * @param {String} 需要检查的模块名称
+   * @description: 初始化检查数量是否超过上限 (仅限体验版)之前的事件操作
+   * @param {TenantDataLimitSourceEnum} source 需要检查的模块名称
    * @param {Function} successCallback 成功回调函数
    * @param {Function} errorCallback 失败回调函数
    * @return {*}
   */
   private async checkNumExceedLimitBeforeHandler(
-    mode: string = '', 
-    successCallback: Function, 
+    source: TenantDataLimitSourceEnum,
+    successCallback: Function,
     errorCallback: Function
   ) {
     try {
@@ -78,7 +83,8 @@ export default class VersionMixin extends VC {
       this.pending = true
       
       // 是否超出上限
-      let isExceed = await this.fetchCheckNumExceedLimit(mode)
+      let isExceed = await this.fetchCheckNumExceedLimit(source)
+      isExceed = true
       if (isExceed) {
         // 打开版本数量限制弹窗
         // @ts-ignore
@@ -99,5 +105,36 @@ export default class VersionMixin extends VC {
       this.pending = false
     }
   }
+  
+  /**
+   * @description: 提交后 检查数量是否超过上限 (仅限体验版) 的事件操作
+   * @param {TenantDataLimitSourceEnum} source 需要检查的模块名称
+   * @param {Function} successCallback 成功回调函数
+   * @param {Function} errorCallback 失败回调函数
+   * @return {*}
+  */
+  private async checkNumExceedLimitAfterHandler<T = MsgModel<any> | Result<any>>(submitEventPromise: Promise<T>) {
+    try {
+      submitEventPromise.then((responseData: any) => {
+        // 是否超出上限
+        let isExceed = (
+          responseData?.code == ErrorCodeEnum.DataLimit 
+          || responseData?.status == ErrorCodeEnum.DataLimit
+        )
+        
+        if (isExceed) {
+          
+        }
+        
+      })
+      
+    } catch (error) {
+      // Log
+      Log.error(error, this.checkNumExceedLimitAfterHandler.name)
+    } finally {
+      this.pending = false
+    }
+  }
+
 }
 
