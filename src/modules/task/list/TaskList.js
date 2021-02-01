@@ -301,7 +301,7 @@ export default {
     }
   },
   mounted() {
-    console.log(this.initData);
+
     // 
     if (localStorage.getItem('task_list')) {
       if (JSON.parse(localStorage.getItem('task_list')).columnStatus && !Array.isArray(JSON.parse(localStorage.getItem('task_list')).columnStatus)) {
