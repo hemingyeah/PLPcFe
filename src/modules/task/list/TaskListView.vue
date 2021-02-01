@@ -501,7 +501,7 @@
                 </el-dropdown-item>
                 <el-dropdown-item
                   v-if="
-                    exportPermissionTaskEdit ||
+                    exportPermissionTaskEdit &&
                       exportPermissionTaskBatchDispatch
                   "
                 >
