@@ -79,6 +79,12 @@ export default {
         // 过滤新的产品类型
         item.formType != "related_catalog"
       ) || [];
+      // 产品编号限制字数最大长度为100
+      this.dynamicProductFields.forEach(field => {
+        if (field.fieldName == 'serialNumber') {
+          field.maxlength = 100
+        }
+      })
     } catch (e) {
       console.error("product-add_edit fetch product fields error", e);
     }

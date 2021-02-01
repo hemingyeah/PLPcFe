@@ -1,16 +1,28 @@
 <template>
   <div class="form-setting-panel">
-    <h3>系统字段 -- {{setting.name}}</h3>
-    <div class="form-setting-group">
-      <p class="form-separator-setting-tips">服务项目组件可以在工单完成时选择已维护的标准服务项目，并生成价格。</p>
-      <div class="form-setting-group">
-        <textarea placeholder="请在此添加描述信息" rows="3" data-prop="placeHolder" :value="field.placeHolder" @input="updateForDom" :maxlength="placeholderMaxLength"></textarea>
-      </div>
-      <div class="form-setting-group">
-        <el-checkbox :value="field.isNull" @input="update($event, 'isNull')" :true-label="0" :false-label="1">必填</el-checkbox>
+    <!-- start 标题 -->
+    <div class="form-setting-group form-common-setting">
+      <h3 class="form-setting-panel-title">{{ field.displayName }}</h3>
+      <div class="form-design-warning">服务项目组件可以在工单完成时选择已维护的标准服务项目，并生成价格。</div>
+    </div>
+    <!-- end 标题 -->
+
+    <!-- start 描述信息 -->
+    <form-describe-setting
+      :field="field"
+      @input="updateForDom"
+    ></form-describe-setting>
+    <!-- end 描述信息 -->
+
+    <!-- start 校验 -->
+    <div class="form-setting-group form-setting-item">
+      <h4 class="form-item-title">校验</h4>
+      <div class="form-item-box">
+        <!-- 必填 -->
+        <form-required-setting :field="field" @input="update"></form-required-setting>
       </div>
     </div>
-    
+    <!-- end 校验 -->
   </div>
 </template>
 
@@ -30,19 +42,9 @@ export default {
       
       this.update(value, prop)
     },
-    update(value, prop){
-      this.$emit('input', {value, prop});
+    update(value, prop, isSetting = false) {
+      this.$emit('input', {value, prop, isSetting});
     }
   }
 }
 </script>
-
-<style lang="scss">
-.form-separator-setting-tips{
-  margin-top: 10px;
-  padding: 10px;
-  border-radius: 2px;
-  background-color: #fdf6ec;
-  color: #e6a23c;
-}
-</style>

@@ -23,12 +23,12 @@
                 <el-button @click="openReason"
                            class="task-version-btn"
                            type="primary"
-                           v-if="isUserTaskGray">返回旧版</el-button>
+                           v-if="isUserTaskGray && !confirmSetting">返回旧版</el-button>
 
                 <el-button @click="changeTaskVersion(true)"
                            class="task-version-btn task-new-version"
                            type="primary"
-                           v-else>切换新版</el-button>
+                           v-if="!isUserTaskGray">切换新版</el-button>
               </template>
               <!-- end 工单列表切换新旧版 -->
             </div>
@@ -142,33 +142,26 @@
                   <a href="javascript:;" @click="goProductSetting">产品字段设置</a>
                   <a href="javascript:;" @click="goCustomerContact">客户联系人</a>
                   <a href="javascript:;" @click="goDoMyself">自助门户设置</a> -->
-                  <a href="javascript:;"
-                     @click="goTaskSetting">工单表单设置</a>
-                  <a href="javascript:;"
-                     @click="goTaskReceiptSetting">工单回执表单设置</a>
-                  <a href="javascript:;"
-                     @click="goCreateTask">新建工单</a>
-                  <a href="javascript:;"
-                     @click="goCreateTaskForCallcenter">新建工单呼叫中心</a>
-                  <a href="javascript:;"
-                     @click="goTaskList">工单列表</a>
-                  <a href="javascript:;"
-                     @click="goProductMenu">产品类型管理</a>
-                  <a href="javascript:;"
-                     @click="goProductMenuList">产品类型列表</a>
-                  <a href="javascript:;"
-                     @click="goProductMenuField">产品类型设置</a>
-                  <a href="javascript:;"
-                     @click="goProductList">产品列表</a>
-                  <a href="javascript:;"
-                     @click="goProductEdit">V2新建产品</a>
-                  <a href="javascript:;"
-                     @click="resetGuide('productV2')">重置超级二维码引导</a>
-                  <a href="javascript:;"
-                     @click="resetGuide('taskV2')">重置工单引导</a>
-                     <!-- <a href="javascript:;" @click="goCallCenterSetting">呼叫中心设置</a>
+                  <a href="javascript:;" @click="goCreateTask">新建工单</a>
+                  <a href="javascript:;" @click="goCreateTaskForCallcenter"
+                  >新建工单呼叫中心</a
+                  >
+                  <a href="javascript:;" @click="goTaskList">工单列表</a>
+                  <a href="javascript:;" @click="goProductMenu">产品类型管理</a>
+                  <a href="javascript:;" @click="goProductMenuList"
+                  >产品类型列表</a
+                  >
+                  <a href="javascript:;" @click="goProductMenuField"
+                  >产品类型设置</a
+                  >
+                  <a href="javascript:;" @click="goProductList">产品列表</a>
+                  <a href="javascript:;" @click="goProductEdit">V2新建产品</a>
+                  <!-- <a href="javascript:;" @click="goCallCenterSetting">呼叫中心设置</a>
                   <a href="javascript:;" @click="goCallCenterWorkbench">呼叫工作台</a>
                   <a href="javascript:;" @click="goCallCenter">呼叫中心</a> -->
+                  <a href="javascript:;" @click="goTaskType">工单类型设置</a>
+                  <a href="javascript:;" @click="goTaskFlow">工单流程设置</a>
+                  <a href="javascript:;" @click="goTaskAdditional">附加组件设置</a>
                 </div>
               </el-popover>
 
@@ -354,6 +347,10 @@
     <reason-panel ref="reasonPanel"
                   @oldVersion="changeTaskVersion(false)" />
                   <!-- E 返回旧版原因弹框 -->
+
+    <!-- start 工单设置新版引导弹框 -->
+    <task-setting-guide ref="taskSettingGuide" />
+    <!-- end 工单设置新版引导弹框 -->
   </div>
 </template>
 
@@ -369,6 +366,7 @@ import SystemPopup from './component/SystemPopup.vue';
 import SaleManager from './component/SaleManager.vue';
 import UserGuide from './component/UserGuide.vue';
 import ReasonPanel from './component/ReasonPanel';
+import TaskSettingGuide from './component/TaskSettingGuide';
 
 import ImportAndExport from './component/ImportAndExport.vue';
 
@@ -464,6 +462,7 @@ export default {
       systemData: [],
       shbEdition: 1,
       taskListIds: ['M_TASK_ALL'],
+      confirmSetting: this.initData.confirmSetting // 通过工单设置升级为3.0后需隐藏返回旧版按钮
     };
   },
   computed: {
@@ -484,9 +483,7 @@ export default {
     },
     /** 是否显示devtool */
     showDevTool () {
-      return (
-        this.$appConfig.env != 'production' || this.initData.env != 'production'
-      );
+      return this.$appConfig.env != 'production';
     },
     /** 用户工作状态颜色配置 */
     userStateMap () {
@@ -523,6 +520,11 @@ export default {
       let isTaskGray = this.initData.isTaskGrayFunction;
       return isTaskGray && this.currentTaskListTab.id;
     },
+    /* 是否是系统管理员 */
+    isSystemAdmin() {
+      let roles = this.loginUser.roles || [];
+      return roles.some(role => role.id == '1');
+    }
   },
   methods: {
     openReason () {
@@ -867,23 +869,7 @@ export default {
         reload: true,
       });
     },
-    goTaskSetting () {
-      platform.openTab({
-        id: 'task_fields_setting',
-        title: '工单表单设置',
-        url: '/setting/task/field/task',
-        reload: true,
-      });
-    },
-    goTaskReceiptSetting () {
-      platform.openTab({
-        id: 'task_receipt_fields_setting',
-        title: '工单回执表单设置',
-        url: '/setting/task/field/taskReceipt',
-        reload: true,
-      });
-    },
-    goCreateTask () {
+    goCreateTask() {
       platform.openTab({
         id: 'task_create',
         title: '新建工单',
@@ -908,7 +894,31 @@ export default {
         reload: true,
       });
     },
-    goCallCenterSetting () {
+    goTaskType() {
+      platform.openTab({
+        id: 'task_type_setting',
+        title: '工单类型设置',
+        url: '/setting/taskType/manage',
+        reload: true,
+      });
+    },
+    goTaskFlow() {
+      platform.openTab({
+        id: 'task_flow_setting',
+        title: '工单流程设置',
+        url: '/setting/task/taskFormSet',
+        reload: true,
+      });
+    },
+    goTaskAdditional() {
+      platform.openTab({
+        id: 'task_additional_setting',
+        title: '附加组件设置',
+        url: '/setting/task/cardManage',
+        reload: true,
+      });
+    },
+    goCallCenterSetting() {
       platform.openTab({
         id: 'callcenter_setting',
         title: '呼叫中心设置',
@@ -1182,6 +1192,12 @@ export default {
         console.warn(error, 'error try catch');
       }
     },
+    openTaskSettingGuide(url) {
+      this.$refs.taskSettingGuide.open(url);
+    },
+    changeConfirmSetting() {
+      this.confirmSetting = true;
+    }
   },
   created () {
     // TODO: 迁移完成后删除
@@ -1191,6 +1207,8 @@ export default {
     window.pushTaskListIds = this.pushTaskListIds;
     window.loginUser = this.loginUser;
     window.getUserTaskGray = this.getUserTaskGray;
+    window.isSystemAdmin = this.isSystemAdmin;
+    window.openTaskSettingGuide = this.openTaskSettingGuide;
 
     window.resizeFrame = function () {
       console.warn('此方法只用于兼容旧页面，无实际效果，不推荐调用');
@@ -1252,6 +1270,7 @@ export default {
     this.checkExports();
     this.getShbEdition();
     this.getSystemPopup();
+
   },
   components: {
     [FrameNav.name]: FrameNav,
@@ -1263,6 +1282,7 @@ export default {
     [ImportAndExport.name]: ImportAndExport,
     [UserGuide.name]: UserGuide,
     [ReasonPanel.name]: ReasonPanel,
+    [TaskSettingGuide.name]: TaskSettingGuide
   },
 };
 </script>

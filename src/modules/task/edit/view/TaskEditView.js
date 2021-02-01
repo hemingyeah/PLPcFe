@@ -39,10 +39,11 @@ export default {
       // 初始化默认值
       let form = this.workTask;
 
-      this.fields = await TaskApi.getTaskTemplateFields({ templateId: this.genTemplateId(), tableName: 'task' });
+      this.fields = await TaskApi.getAllFields({ typeId: this.genTemplateId(), tableName: 'task', isFromSetting: true });
 
       form = util.packToForm(this.fields, form);
       this.form = FormUtil.initialize(this.fields, form);
+      this.form.templateId = this.genTemplateId();
 
       // 呼叫中心需求处理
       this.callCenterWithTaskDataHandler();
@@ -409,11 +410,9 @@ export default {
      * @description 关联显示项
     */
     relationFieldHandler() {
-      // 事件转工单/拷贝工单
-      if(!this.isFromEvent && !this.isCopyTask) return
-      // 从客户新建工单
-      if(this.isFromCustomer) return;
-
+      // 非编辑状态下 不重新查询关联显示项
+      if (!this.isTaskEdit && !this.isPlanTaskEdit) return
+      
       // 子组件form
       this.$nextTick(() => {
         let form = this.$refs.form;

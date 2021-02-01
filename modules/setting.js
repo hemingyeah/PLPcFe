@@ -8,13 +8,22 @@ module.exports = {
   'setting.performance.rule': {
     entry: './src/modules/setting/performance/index.js'
   },
-  'setting.task.fields': {
-    entry: './src/modules/setting/task/fields.js'
+  'setting.task.manage': {
+    entry: './src/modules/setting/task/taskTypeSetting/manage/index.js'
   },
-  'setting.task.receipt_fields': {
-    entry: './src/modules/setting/task/receipt_fields.js',
+  'setting.task.flow': {
+    entry: './src/modules/setting/task/taskTypeSetting/flow/index.js'
+  },
+  'setting.task.additional': {
+    entry: './src/modules/setting/task/taskAdditionalSetting/manage/index.js'
+  },
+  'setting.task.addcard_fields': {
+    entry: './src/modules/setting/task/taskAdditionalSetting/taskAddcardFormView/index.js',
+  },
+  'setting.task.hoursrecord': {
+    entry: './src/modules/setting/task/taskAdditionalSetting/taskHoursRecordView/index.js',
   },
   'system.mall.index' : {
-    entry: "./src/modules/system/mall/index.js"
+    entry: './src/modules/system/mall/index.js'
   }
 }

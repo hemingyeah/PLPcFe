@@ -11,6 +11,7 @@
       @focus="dateTimePickerFocusHandler"
       @blur="dateTimePickerBlurHandler"
       @input="choose"
+      format='yyyy-MM-dd HH:mm'
     />
   </div>
 </template>
@@ -88,6 +89,14 @@ export default {
     .el-picker-panel__footer {
       button:nth-child(1) {
         display: none;
+      }
+    }
+    .el-time-spinner {
+      .el-time-spinner__wrapper {
+        width: 50%;
+        &:last-child {
+          display: none;
+        }
       }
     }
   }

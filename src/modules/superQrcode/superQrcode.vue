@@ -428,8 +428,8 @@ export default {
     this.getCatalogList();
 
     this.$nextTick(() => {
-      if (storageGet(PRODUCT_SUPERQRCODE_SET) && storageGet(PRODUCT_SUPERQRCODE_SET) > 0) this.$Guide().destroy('product-superqrcode-set')
-      else this.$Guide([{
+      if (storageGet(PRODUCT_SUPERQRCODE_SET) && storageGet(PRODUCT_SUPERQRCODE_SET) > 0) return this.$Guide().destroy('product-superqrcode-set')
+      this.$Guide([{
         content:
           '选择产品类型，产品可关联对应的产品类型，丰富产品内容',
         haveStep: true,

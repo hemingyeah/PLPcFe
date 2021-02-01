@@ -1,7 +1,7 @@
 <template>
   <base-modal class="task-receipt-edit-container" :title="title" :show.sync="visible" width="700px" @closed="reset">
     <div class="base-modal-content" v-if="init">
-      <form-builder ref="form" :fields="fields" :value="form" @update="update"></form-builder>
+      <form-builder ref="form" :fields="fields" :value="form" :mode="mode" @update="update"></form-builder>
 
       <!-- start 合计 -->
       <div class="form-item" v-if="showSparepart || showService">

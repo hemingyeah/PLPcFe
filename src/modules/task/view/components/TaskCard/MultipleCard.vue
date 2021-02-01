@@ -62,7 +62,8 @@ export default {
   },
   computed: {
     columns() {
-      return [
+      let formTypes = ['autograph', 'attachment', 'separator', 'info'];
+      let fields = [
         ...this.card.fields,
         {
           displayName: '操作人',
@@ -80,6 +81,8 @@ export default {
           minWidth: '140px'
         }
       ]
+      
+      return fields.filter(field => !field.isHidden && (field.isVisible == undefined || field.isVisible) && formTypes.indexOf(field.formType) < 0);
     }
   },
   components: {

@@ -9,13 +9,15 @@ const directive = {
   bind(el, binding, vnode){
     let eventName = binding.arg;
     let instance = vnode.componentInstance;
-
     if(!!instance.$listeners[eventName]){
-        return;
+      return;
     }
 
     instance.$on(eventName, function(e) {
-        this.$emit('input', this.value.trim());
+      if(typeof this.value === 'undefined') {
+        return;
+      }
+      this.$emit('input', this.value.trim());
     })
   },
 };

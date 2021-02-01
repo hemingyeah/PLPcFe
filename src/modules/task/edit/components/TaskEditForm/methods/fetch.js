@@ -65,7 +65,7 @@ export default {
    * @description 关联显示项数据查询
   */
   fetchRelatedInfo(params) {
-    return TaskApi.getRelatedInfo(params);
+    return TaskApi.getRelatedInfos(params);
   },
   /** 
    * @description 获取工单类型数据
@@ -81,7 +81,7 @@ export default {
    * @description 获取工单类型字段列表
   */
   fetchTaskTemplateFields(params) {
-    return TaskApi.getTaskTemplateFields(params);
+    return TaskApi.getAllFields(params);
   },
   /** 
    * @description 获取工单客户默认数据

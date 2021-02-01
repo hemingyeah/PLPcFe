@@ -34,6 +34,7 @@ const linkcRouter = require('./linkc')
 const productV2Router = require('./productV2')
 
 const superQrcodeRouter = require('./superQrcode')
+const guideForNewUser = require('./guideForNewUser')
 
 router.get('/', async (ctx) => {
   let modConfig = modules['system.frame'];
@@ -103,44 +104,22 @@ router.use('/temp', (ctx) =>
     // 主机地址
     host: '127.0.0.1',
     // 端口
-    port: 10006,
+    port: 10012,
     // 头信息
     headers: {
       cookie: 'VIPPUBLINKJSESSIONID=a644d918-3065-4760-b2a4-a47d50230230',
     },
   })
 )
-router.use('/api/customer/outside/pc', (ctx) =>
-  HttpClient.proxy(ctx, {
-    host: '30.40.58.216',
-    port: 10013,
-  })
-);
 
-router.use('/api/linkc', (ctx) =>
+router.use('/webregister/outside/register', (ctx) =>
   HttpClient.proxy(ctx, {
-    host: '30.40.63.238',
-    port: 10016,
-  })
-);
-
-router.use('/setting/product/productConfig', (ctx) =>
-  HttpClient.proxy(ctx, {
-    host: '30.40.63.238',
+    // 是否强制使用当前配置
+    force: true,
+    // http协议，非 http 则为 https
+    httpProtocol: 'http',
+    host: '30.40.62.5',
     port: 8080,
-  })
-);
-
-router.use('/api/elasticsearch/outside/es', (ctx) =>
-  HttpClient.proxy(ctx, {
-    host: '30.40.58.216',
-    port: 10006,
-  })
-);
-router.use('/files', (ctx) =>
-  HttpClient.proxy(ctx, {
-    host: '30.40.58.216',
-    port: 8083,
   })
 );
 
@@ -163,6 +142,7 @@ router.use('', sparePartRouter.routes(), sparePartRouter.allowedMethods());
 router.use('', linkcRouter.routes(), sparePartRouter.allowedMethods());
 router.use('', productV2Router.routes(), sparePartRouter.allowedMethods());
 router.use('', superQrcodeRouter.routes(), sparePartRouter.allowedMethods());
+router.use('', guideForNewUser.routes(), sparePartRouter.allowedMethods());
 
 
 router.all('/*', (ctx) => {

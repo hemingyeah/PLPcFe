@@ -11,7 +11,7 @@ function shbEnvMiddleware(options = defaultOption) {
 
 async function shbEnvMiddlewareHandler(ctx, next, options) {
   let request = ctx.request;
-
+  
   // 判断是否是本地环境
   if (options.isNotLocalEnv) {
     let headers = request.headers;
@@ -20,7 +20,7 @@ async function shbEnvMiddlewareHandler(ctx, next, options) {
   } else {
     // 设置地址
     let originalUrl = request.originalUrl;
-
+    
     originalUrl = (
       originalUrl.replace('/api/app', '')
         .replace('/api/search', '')
@@ -31,12 +31,12 @@ async function shbEnvMiddlewareHandler(ctx, next, options) {
         .replace('/api/part', '')
         .replace('/api/customer', '')
         .replace('/api/weixin', '')
-        .replace('/api/linkc','')
+        .replace('/api/linkc', '')
     )
-
+    
     request.originalUrl = originalUrl;
   }
-
+  
   await next();
 }
 

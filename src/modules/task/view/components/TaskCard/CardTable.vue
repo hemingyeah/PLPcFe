@@ -70,7 +70,7 @@
         <!-- end 操作 -->
 
         <template v-else>
-          {{ scope.row[column.fieldName] }}
+          {{ scope.row[column.fieldName] | fmt_form_field(column.formType, column.fieldName, scope.row)}}
         </template>
       </template>
     </el-table-column>

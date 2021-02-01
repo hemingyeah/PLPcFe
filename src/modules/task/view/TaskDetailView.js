@@ -32,8 +32,7 @@ import TaskAllotModal from '@src/modules/task/components/TaskAllotModal/TaskAllo
 
 /* enum */
 import { TaskEventNameMappingEnum } from '@model/enum/EventNameMappingEnum.ts';
-/* mixin */
-import tourGuide from '@src/mixins/tourGuide'
+import TableNameEnum from '@model/enum/TableNameEnum.ts';
 
 const ENCRYPT_FIELD_VALUE = '***';
 
@@ -42,7 +41,6 @@ const { TASK_GUIDE_DETAIL } = require('@src/component/guide/taskV2Store');
 export default {
   name: 'task-detail-view',
   inject: ['initData'],
-  mixins: [tourGuide],
   data() {
     return {
       loading: false,
@@ -81,7 +79,6 @@ export default {
         boundariesElement: 'viewport',
         removeOnDestroy: true
       },
-      nowGuideStep: 5,
       guideSearchModelSave: false,
       guideDropdownMenu: false,
       isGuide: false,
@@ -637,12 +634,6 @@ export default {
     }
   },
   methods: {
-    nextStep() {
-      this.nowGuideStep++;
-    },
-    stopStep() {
-      this.nowGuideStep = this.detailSteps.length + 1;
-    },
     /**
      * 折叠
      */
@@ -1098,7 +1089,6 @@ export default {
 
   },
   async mounted() {
-    console.log(this.initData, 'initData')
     try {
       this.loading = true;
 
@@ -1108,11 +1098,11 @@ export default {
       let { templateId } = this.task;
 
       let subtask = [
-        TaskApi.getTaskTemplateFields({ templateId, tableName: 'task' })
+        TaskApi.getAllFields({ typeId: templateId, tableName: TableNameEnum.Task, isFromSetting: false })
       ];
 
       // 显示回执时获取回执字段信息
-      if (this.allowFinishTask || this.showReceipt) subtask.push(TaskApi.getTaskTemplateFields({ templateId, tableName: 'task_receipt' }));
+      if (this.allowFinishTask || this.showReceipt) subtask.push(TaskApi.getAllFields({ typeId: templateId, tableName: TableNameEnum.TaskReceipt, isFromSetting: false }));
 
       const result = await Promise.all(subtask);
 
@@ -1195,11 +1185,59 @@ export default {
       
       this.$nextTick(() => {
         setTimeout(() => {
-          if (this.showTaskDetailGuide) {
-            this.$tours['myTour'].start();
-            this.nowGuideStep = 1;
-            storageSet(TASK_GUIDE_DETAIL, '4');
-          }
+          if (storageGet(TASK_GUIDE_DETAIL) && storageGet(TASK_GUIDE_DETAIL) > 0) return this.$Guide().destroy('task-task-detail-view')
+          this.$Guide([{
+            content:'清晰展示当前工单进度',
+            title:'工单进度',
+            domId:'v-task-detail-step-0',
+            haveStep: true,
+            nowStep: 1,
+            id: 'task-task-detail-view',
+            needCover: true,
+            lastFinish:true,
+            finishBtn:'知道了'
+          }, {
+            content:
+            '工单重要信息展示',
+            haveStep: true,
+            nowStep: 2,
+            id: 'task-task-detail-view',
+            domId: 'v-task-detail-step-1',
+            needCover: true,
+            lastFinish:true,
+            finishBtn:'知道了'
+          }, {
+            content:
+            '「工单动态」搬到这里了',
+            haveStep: true,
+            nowStep: 3,
+            id: 'task-task-detail-view',
+            domId: 'tab-record',
+            needCover: true,
+            lastFinish:true,
+            copyDom:true,
+            finishBtn:'知道了'
+          }, {
+            content:
+            '编辑、复制及删除',
+            title:'工单操作',
+            haveStep: true,
+            nowStep: 4,
+            id: 'task-task-detail-view',
+            domId: 'v-task-detail-step-3',
+            needCover: true,
+            lastFinish:true,
+            finishBtn:'知道了'
+          }], 3, '', (e) => {
+            return new Promise((resolve, reject) => {
+              if(e.type == 'stop' || e.type == 'finish'){
+                if ( this.showTaskDetailGuide && this.showAllotModal) {
+                  this.allot()
+                }
+              }
+              resolve()
+            })
+          }).create().then(res_=>{if(res_)storageSet(TASK_GUIDE_DETAIL, '4')})
         }, 1000)
       })
 
@@ -1213,11 +1251,6 @@ export default {
     },
     collapseDirection(newValue) {
       sessionStorage.setItem(`task_collapseDirection_${this.task.id}`, newValue);
-    },
-    nowGuideStep(newValue) {
-      if (newValue == 5 && this.showTaskDetailGuide && this.showAllotModal) {
-        this.allot()
-      }
     }
   },
   components: {

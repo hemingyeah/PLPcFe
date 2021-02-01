@@ -37,6 +37,11 @@ const BizFormRemoteSelect = {
     collapsed: {
       type: Boolean,
       default: false
+    },
+    /* 计算宽度的属性 */
+    computedWidthKeys: {
+      type: Array,
+      default: () => []
     }
   },
   methods: {
@@ -54,7 +59,7 @@ const BizFormRemoteSelect = {
         <i class="el-icon-error" style="color:rgba(211, 214, 217, 0.69);"></i>
       </div>
     )
-
+    
     return (
       <div class="biz-form-remote-select">
         <base-select
@@ -67,6 +72,7 @@ const BizFormRemoteSelect = {
           multiple={ this.multiple }
           disabled={ this.inputDisabled }
           collapsed={ this.collapsed }
+          computedWidthKeys={this.computedWidthKeys}
         >
         </base-select>
         { this.cleared && this.value.length > 0 && !this.inputDisabled && clearButton }

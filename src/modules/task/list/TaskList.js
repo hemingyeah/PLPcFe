@@ -20,17 +20,15 @@ import { fields, selectIds, advancedList, allExport, Inquire } from './TaskField
 import { LINK_REG } from '@src/model/reg';
 
 /** utils */
-import _ from "lodash";
-import Page from "@model/Page";
-import { storageGet, storageSet } from "@src/util/storage";
-import { formatDate } from "@src/util/lang";
-import { getRootWindow } from "@src/util/dom";
-import * as FormUtil from "@src/component/form/util"
+import _ from 'lodash';
+import Page from '@model/Page';
+import { storageGet, storageSet } from '@src/util/storage';
+import { formatDate } from '@src/util/lang';
+import { getRootWindow } from '@src/util/dom';
+import * as FormUtil from '@src/component/form/util'
 import VersionMixin from '@src/mixins/versionMixin'
 import StorageUtil from '@src/util/storage.ts'
 
-/* mixin */
-import tourGuide from '@src/mixins/tourGuide'
 
 /* constants */
 import {
@@ -74,9 +72,9 @@ const Region = {
 }
 
 export default {
-  name: "task-list",
-  inject: ["initData"],
-  mixins: [tourGuide, VersionMixin],
+  name: 'task-list',
+  inject: ['initData'],
+  mixins: [VersionMixin],
   data() {
     return {
       selectIds, // id
@@ -149,7 +147,6 @@ export default {
       showBj: false,
       typeHeight: '',
       stateHeight: '',
-      nowGuideStep:5,
       guideSearchModelSave: false,
       guideDropdownMenu: false,
       isGuide:false,
@@ -332,8 +329,42 @@ export default {
 
     this.$nextTick(() => {
       setTimeout(() => {
-        if (!storageGet(TASK_GUIDE_LIST)) this.$tours['myTour'].start(), this.nowGuideStep = 1, storageSet(TASK_GUIDE_LIST, '4');
-        // if (!storageGet(TASK_GUIDE_DROPDOWN_MENU)) this['guideDropdownMenu'] = true;
+        if (storageGet(TASK_GUIDE_LIST) && storageGet(TASK_GUIDE_LIST) > 0) return this.$Guide().destroy('task-task-list-view')
+        this.$Guide([{
+          content:
+            '可拖拽改变列宽',
+          haveStep: true,
+          nowStep: 1,
+          id: 'task-task-list-view',
+          domObj:()=>{
+            return document.getElementById('v-task-step-0').getElementsByClassName('el-table__header-wrapper')[0]
+          },
+          lastFinish:true,
+          needCover: true,
+        }, {
+          content:
+            '可自定义组合查询条',
+          haveStep: true,
+          nowStep: 2,
+          id: 'task-task-list-view',
+          domId: 'v-task-step-1',
+          lastFinish:true,
+          needCover: true,
+        }, {
+          content:
+            '可自定义列表显示项',
+          haveStep: true,
+          nowStep: 3,
+          id: 'task-task-list-view',
+          domId: 'v-task-step-2',
+          lastFinish:true,
+          needCover: true,
+        }], 0, '', (e) => {
+          return new Promise((resolve, reject) => {
+            resolve()
+          })
+        }).create().then(res_=>{if(res_)storageSet(TASK_GUIDE_LIST, '4')})
+
       }, 1000)
     })
 
@@ -341,16 +372,23 @@ export default {
     window.__exports__refresh = this.searchList;
   },
   methods: {
+    /** 工单列表拨打电话 */
+    async makePhoneCall(phone) {
+      if(!this.customerSetting.linkmanOn) return;
+      try {
+        const { code, message } = await this.$http.post('/api/callcenter/outside/callcenter/api/dialout', {phone, taskType:'customer'}, false)
+        if (code !== 0) return this.$platform.notification({
+          title: '呼出失败',
+          message: message || '',
+          type: 'error',
+        }) 
+      } catch (error) {
+        console.error(error);
+      }
+    },
     guideDropdownMenu_enter(){
       // if (storageGet(TASK_GUIDE_DROPDOWN_MENU) == '1') return this['guideDropdownMenu'] = false;
       // storageSet(TASK_GUIDE_DROPDOWN_MENU, '1')
-    },
-    previousStep() {},
-    nextStep() {
-      this.nowGuideStep ++;
-    },
-    stopStep() {
-      this.nowGuideStep = 5;
     },
     /**
      * 获取附件
@@ -739,7 +777,7 @@ export default {
       
     },
     /**
-     * 请求 getTaskTemplateFields and fetchTaskFields 接口
+     * 请求 getAllFields and fetchTaskFields 接口
      */
     getTaskOpen(fn) {
       Promise.all([this.fetchTaskFields(), this.fetchTaskReceiptFields()])
@@ -1054,6 +1092,7 @@ export default {
       // this.advanceds = [...advancedList, ...this.taskTypeFilterFields];
       // E 高级搜索
       let columns = fields
+        .filter(f => !['attachment', 'separator', 'info', 'autograph'].includes(f.formType))
         .map((field) => {
           let sortable = false;
           let minWidth = 120;
@@ -1435,10 +1474,11 @@ export default {
      */
     fetchTaskFields() {
       let params = {
-        templateId: this.currentTaskType.id || '',
+        typeId: this.currentTaskType.id || '',
         tableName: 'task',
+        isFromSetting: false
       };
-      return TaskApi.getTaskTemplateFields(params).then((result) => {
+      return TaskApi.getAllFields(params).then((result) => {
         result.forEach((field) => {
           field.group = 'task';
           field.label = field.displayName;
@@ -1453,10 +1493,11 @@ export default {
      */
     fetchTaskReceiptFields() {
       let params = {
-        templateId: this.currentTaskType.id || '',
+        typeId: this.currentTaskType.id || '',
         tableName: 'task_receipt',
+        isFromSetting: false
       };
-      return TaskApi.getTaskTemplateFields(params).then((result) => {
+      return TaskApi.getAllFields(params).then((result) => {
         result.forEach((field) => {
           field.group = 'task_receipt';
           field.label = field.displayName;
@@ -2467,7 +2508,7 @@ export default {
         address_list = '',
         product_list = ''
       taskSelfFields = taskFields.filter(item => {
-        return item.formType !== 'attachment'
+        return item.formType !== 'attachment' && item.formType !== 'autograph'
       })
       if (taskFields.length) {
         let first = taskFields.filter(item => {
@@ -2608,7 +2649,7 @@ export default {
       taskReceiptSystemFields = [
         ...taskReceiptSystemFields,
         ...taskReceiptFields.filter(item => {
-          return (item.isSystem === 0 && item.formType !== 'attachment')
+          return item.isSystem === 0 && item.formType !== 'attachment' && item.formType !== 'autograph'
         })
       ].map((field) => {
         field.export = true;
