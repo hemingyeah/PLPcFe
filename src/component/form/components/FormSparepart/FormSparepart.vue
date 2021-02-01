@@ -583,7 +583,6 @@ export default {
             result.result.splice(ind, 1, _res)
           } else if (res.fieldName == 'installPosition') {
             // 设置安装位置的下拉数据
-            res.setting = JSON.parse(res.setting)
             let dataSource = res.setting.dataSource
             let _res = Object.assign({}, res)
             _res.setting = {
