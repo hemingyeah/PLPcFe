@@ -226,7 +226,7 @@ export default {
     * @description 获取客户关联查询字段关联项数据
     */
     getCustomerFields() {
-      CustomerApi.getCustomerFields({ isFromSetting: true })
+      CustomerApi.getCustomerFields({ isFromSetting: false })
         .then(res => {
           if (res.succ) {
             // 过滤自定义字段且非禁用类型
@@ -270,7 +270,7 @@ export default {
     * @description 获取产品关联查询字段关联项数据
     */
     getProductFields() {
-      ProductApi.getProductFields({ isFromSetting: true })
+      ProductApi.getProductFields({ isFromSetting: false })
         .then(res => {
           if (res.succ) {
             // 过滤自定义字段且非禁用类型
