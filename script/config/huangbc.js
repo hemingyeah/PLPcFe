@@ -1,6 +1,5 @@
 module.exports = {
   targetRootPath: '/Users/huangbaocheng/SHB/backend/web',
-  webResourcePath: '/Users/huangbaocheng/shb/backend/web-resource',
   loginUser: {
     test: {
       corpId: 'ding73b203abd39ac5e935c2f4657eb6378f',
