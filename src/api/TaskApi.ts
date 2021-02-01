@@ -554,7 +554,6 @@ export function reviewTask(params: {} | undefined) {
  * @param {String} params.taskId - 工单id
  * @param {String} params.suggestion - 回访备注
  * @param {Object} params.evaluate - 自定义回访信息
- * @param {String} params.degree - 满意度
  * @param {Boolean} params.autoClosed - 回访并关闭true，光回访传false
  */
 export function reviewTaskBoli(params: {} | undefined) {
