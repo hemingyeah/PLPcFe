@@ -117,6 +117,9 @@
   }
 }
 
+.biz-form-remote-select {
+  width: 100%;
+}
 // 产品关联字段
 .relation-product-list {
   &-item {
@@ -146,8 +149,4 @@
       }
     }
   }
-}
-
-.biz-form-remote-select {
-  width: 100%;
 }

@@ -1,6 +1,6 @@
 <template>
   <!-- tour-content-out-box start -->
-  <div>
+  <div :id="id">
     <div class="cover" v-if="needCover && showGuide"></div>
     <div
       class="cover-dom"
@@ -12,7 +12,6 @@
     ></div>
     <div id="vmDom"></div>
     <div
-      :id="id"
       class="tour-content-out-box"
       :class="[guideMounted && showGuide && guideDom.top > -1 ? 'have-mounted' : '', guideSizeClass[guideSize]]"
       ref="guideCom"
@@ -249,7 +248,7 @@ export default {
         console.warn(error, 'error try catch');
       }
       // 被引导的元素位置不变化的话停止引导组件的渲染
-      if (!res_ || ( this.guideDom && res_ && this.guideDom.top == res_.top && this.guideDom.left == res_.left )) return;
+      if (!res_ || ( this.guideDom && res_ && this.guideDom.top == res_.top && this.guideDom.left == res_.left && this.guideDom.height == res_.height && this.guideDom.width == res_.width )) return;
       let style_ = '';
 
       if (this.needCover && this.copyDom) {
@@ -281,7 +280,7 @@ export default {
             if(this.outsideParent){
               style_ = `${style_};left:${guidePartentDom.left + guidePartentDom.width + 8 || 0}px;z-index:998`;
             }else{
-              style_ = `${style_};left:${res_.left + 8 || 0}px;z-index:998`;
+              style_ = `${style_};left:${res_.left + res_.width + 8 || 0}px;z-index:998`;
             }
           }
         } else {
@@ -294,7 +293,7 @@ export default {
             if(this.outsideParent){
               style_ = `${style_};left:${guidePartentDom.left - guideDom.width - 8 }px;z-index:998`;
             }else{
-              style_ = `${style_};left:${res_.left + res_.width - guideDom.width - 8 || 0}px;z-index:998`;
+              style_ = `${style_};left:${res_.left - guideDom.width - 8 || 0}px;z-index:998`;
             }
           }
         }

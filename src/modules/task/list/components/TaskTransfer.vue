@@ -9,7 +9,7 @@
       <div class="dialog-body-content">
         工单转派适用于批量修改负责人和协同人等工作交接场景
         <el-tooltip
-          content="只能处理已指派、已接受、进行中且没有处于暂停或审批状态的工单"
+          content="只能处理已指派、已接受、进行中及工单池中，目前没有处于暂停或审批状态的工单"
           placement="top"
         >
           <i class="iconfont icon-question task-icon"></i> </el-tooltip

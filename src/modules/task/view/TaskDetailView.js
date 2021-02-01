@@ -33,8 +33,6 @@ import TaskAllotModal from '@src/modules/task/components/TaskAllotModal/TaskAllo
 /* enum */
 import { TaskEventNameMappingEnum } from '@model/enum/EventNameMappingEnum.ts';
 import TableNameEnum from '@model/enum/TableNameEnum.ts';
-/* mixin */
-import tourGuide from '@src/mixins/tourGuide'
 
 const ENCRYPT_FIELD_VALUE = '***';
 
@@ -43,7 +41,6 @@ const { TASK_GUIDE_DETAIL } = require('@src/component/guide/taskV2Store');
 export default {
   name: 'task-detail-view',
   inject: ['initData'],
-  mixins: [tourGuide],
   data() {
     return {
       loading: false,

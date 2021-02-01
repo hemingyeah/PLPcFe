@@ -26,11 +26,9 @@ import { storageGet, storageSet } from '@src/util/storage';
 import { formatDate } from '@src/util/lang';
 import { getRootWindow } from '@src/util/dom';
 import * as FormUtil from '@src/component/form/util'
-// 新存储工具方法
-import * as StorageUtil from '@src/util/storage.ts'
+import VersionMixin from '@src/mixins/versionMixin'
+import StorageUtil from '@src/util/storage.ts'
 
-/* mixin */
-import tourGuide from '@src/mixins/tourGuide'
 
 /* constants */
 import {
@@ -76,7 +74,7 @@ const Region = {
 export default {
   name: 'task-list',
   inject: ['initData'],
-  mixins: [tourGuide],
+  mixins: [VersionMixin],
   data() {
     return {
       selectIds, // id
@@ -331,8 +329,42 @@ export default {
 
     this.$nextTick(() => {
       setTimeout(() => {
-        if (!storageGet(TASK_GUIDE_LIST)) this.$tours['myTour'].start(), this.nowGuideStep = 1, storageSet(TASK_GUIDE_LIST, '4');
-        // if (!storageGet(TASK_GUIDE_DROPDOWN_MENU)) this['guideDropdownMenu'] = true;
+        if (storageGet(TASK_GUIDE_LIST) && storageGet(TASK_GUIDE_LIST) > 0) return this.$Guide().destroy('task-task-list-view')
+        this.$Guide([{
+          content:
+            '可拖拽改变列宽',
+          haveStep: true,
+          nowStep: 1,
+          id: 'task-task-list-view',
+          domObj:()=>{
+            return document.getElementById('v-task-step-0').getElementsByClassName('el-table__header-wrapper')[0]
+          },
+          lastFinish:true,
+          needCover: true,
+        }, {
+          content:
+            '可自定义组合查询条',
+          haveStep: true,
+          nowStep: 2,
+          id: 'task-task-list-view',
+          domId: 'v-task-step-1',
+          lastFinish:true,
+          needCover: true,
+        }, {
+          content:
+            '可自定义列表显示项',
+          haveStep: true,
+          nowStep: 3,
+          id: 'task-task-list-view',
+          domId: 'v-task-step-2',
+          lastFinish:true,
+          needCover: true,
+        }], 0, '', (e) => {
+          return new Promise((resolve, reject) => {
+            resolve()
+          })
+        }).create().then(res_=>{if(res_)storageSet(TASK_GUIDE_LIST, '4')})
+
       }, 1000)
     })
 
@@ -340,6 +372,20 @@ export default {
     window.__exports__refresh = this.searchList;
   },
   methods: {
+    /** 工单列表拨打电话 */
+    async makePhoneCall(phone) {
+      if(!this.customerSetting.linkmanOn) return;
+      try {
+        const { code, message } = await this.$http.post('/api/callcenter/outside/callcenter/api/dialout', {phone, taskType:'customer'}, false)
+        if (code !== 0) return this.$platform.notification({
+          title: '呼出失败',
+          message: message || '',
+          type: 'error',
+        }) 
+      } catch (error) {
+        console.error(error);
+      }
+    },
     guideDropdownMenu_enter(){
       // if (storageGet(TASK_GUIDE_DROPDOWN_MENU) == '1') return this['guideDropdownMenu'] = false;
       // storageSet(TASK_GUIDE_DROPDOWN_MENU, '1')

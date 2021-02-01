@@ -1,8 +1,6 @@
 <template>
   <div class="task-box">
-    <div class="guide-model-box" v-if="nowGuideStep < listSteps.length + 1">
-      
-    </div>
+    <div id="task-task-list-view"></div>
     <!-- s 列表展示 -->
     <div
       class="task-list-view common-list-container"
@@ -652,6 +650,7 @@
                   <template v-else-if="column.field === 'tlmPhone'">
                     <div>
                       {{ scope.row["linkMan"] && scope.row["linkMan"].phone }}
+                      <i v-if="customerSetting.linkmanOn" class="iconfont icon-fdn-phone" title="拨打电话" @click="makePhoneCall(scope.row['linkMan'].phone)"></i>
                     </div>
                   </template>
                   <!-- 自定义的选择类型字段显示， 与type 区别-->
