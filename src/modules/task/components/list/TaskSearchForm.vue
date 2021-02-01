@@ -94,7 +94,6 @@ export default {
         } 
         if (field.formType === 'select' && !field.isSystem && !field.setting.isMulti) {
           tv = []
-          console.log(field)
         }
         form[field.fieldName] = this.formBackup[field.fieldName] || tv;
         this.$set(
@@ -104,10 +103,17 @@ export default {
         );
       });
 
+      if (!fields.length) this.form = {}
+
+      for(let key in this.form) {
+        if (fields.map(item => {return item.fieldName}).indexOf(key) === -1) {
+          delete this.form[key]
+        }
+      }
+
       let backUp = this.formBackup.backUp || {};
       this.$set(this, 'customer', backUp.customer || {});
       this.$set(this, 'product', backUp.product || {});
-
       return form;
     },
 
