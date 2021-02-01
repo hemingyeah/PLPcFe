@@ -1,7 +1,7 @@
 /** 
  * 构建外部组件库，用于兼容旧有页面, PC端改造完成后删除
  * @author dongls 
- */
+*/
 
 process.env.NODE_ENV = 'production';
 
@@ -18,7 +18,7 @@ const webpackConfig = require('../config/webpack.comp.conf');
 // 编译
 webpack(webpackConfig, function (err, stats) {
   if (err) throw err;
-
+  
   process.stdout.write(`${stats.toString({
     colors: true,
     modules: false,
@@ -26,21 +26,21 @@ webpack(webpackConfig, function (err, stats) {
     chunks: false,
     chunkModules: false
   })} \n`);
-
-  // 读取html生成 jsp
+  
+  // 拷贝资源
   copy();
 });
 
 function copy(){
   // 复制文件
   let distOriginPath = path.resolve(__dirname, '../dist/component');
-  let distTargetPath = `${ config.targetRootPath }/shb-web/src/main/webapp/resource/component`;
+  let distTargetPath = `${ config.webResourcePath }/component`;
   let pcTargetPath = '/Users/dongls/Desktop/work/sm4-pc/resource/component';
   
   // 复制静态资源
   shell.cp('-r', `${ distOriginPath }/*`, distTargetPath);
   shell.cp('-r', `${ distOriginPath }/*`, pcTargetPath);
-
+  
   console.log(`build on ${new Date().toLocaleString()}`)
 }
 
