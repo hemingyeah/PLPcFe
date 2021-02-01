@@ -4,7 +4,14 @@
     <div class="task-account-main-content">
       <!-- start 审批中 -->
       <template v-if="isApproving">
+        <task-feedback-detail-boli
+          :evaluate-config="initData.evaluateConfig"
+          :evaluate-content="task.evaluateContent"
+          :evaluate="evaluateJson"
+          v-if="isBoli"
+        />
         <task-feedback-detail
+          v-else
           :evaluate-config="initData.evaluateConfig"
           :evaluate-content="task.evaluateContent"
           :evaluate="evaluateJson"
@@ -26,10 +33,17 @@
 
       <!-- start 已回访 -->
       <template v-else>
+        <task-feedback-detail-boli
+          :evaluate-config="initData.evaluateConfig"
+          :evaluate-content="task.evaluateContent"
+          :evaluate="task"
+          v-if="isBoli"
+        />
         <task-feedback-detail
           :evaluate-config="initData.evaluateConfig"
           :evaluate-content="task.evaluateContent"
           :evaluate="task"
+          v-else
         />
       </template>
       <!-- end 已回访 -->
@@ -61,6 +75,7 @@ import * as TaskApi from '@src/api/TaskApi.ts';
 /* components */
 import FeedbackDialog from './FeedbackDialog';
 import FeedbackDetail from './FeedbackDetail';
+import FeedbackDetailBoLi from './FeedbackDetailBoLi';
 import NoDataViewNew from '@src/component/common/NoDataViewNew';
 
 /* image */
@@ -77,7 +92,8 @@ export default {
   },
   data() {
     return {
-      pending: false
+      pending: false,
+      isBoli:true
     }
   },
   computed: {
@@ -141,6 +157,7 @@ export default {
   components: {
     [NoDataViewNew.name]: NoDataViewNew,
     [FeedbackDetail.name]: FeedbackDetail,
+    [FeedbackDetailBoLi.name]: FeedbackDetailBoLi,
     [FeedbackDialog.name]: FeedbackDialog
   }
 }
