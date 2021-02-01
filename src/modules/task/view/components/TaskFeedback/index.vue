@@ -5,10 +5,10 @@
       <!-- start 审批中 -->
       <template v-if="isApproving">
         <task-feedback-detail-boli
-          :evaluate-config="initData.evaluateConfig"
           :evaluate-content="task.evaluateContent"
-          :evaluate="evaluateJson"
-          v-if="isBoli"
+          :evaluate.sync="evaluateJson"
+          :task-evaluate.sync="initData.taskEvaluate"
+          v-if="initData.isBoli "
         />
         <task-feedback-detail
           v-else
@@ -34,10 +34,10 @@
       <!-- start 已回访 -->
       <template v-else>
         <task-feedback-detail-boli
-          :evaluate-config="initData.evaluateConfig"
           :evaluate-content="task.evaluateContent"
+          :task-evaluate.sync="initData.taskEvaluate"
           :evaluate="task"
-          v-if="isBoli"
+          v-if="initData.isBoli"
         />
         <task-feedback-detail
           :evaluate-config="initData.evaluateConfig"
@@ -58,11 +58,20 @@
     <!-- end 操作 -->
 
     <!-- start 回访弹窗 -->
+    <task-feedback-dialog-boli
+      ref="feedbackDialog"
+      :task="task"
+      :task-evaluate="initData.taskEvaluate"
+      :evaluate-config="initData.evaluateConfig"
+      @proposeApprove="proposeApprove"
+      v-if="initData.isBoli"
+    />
     <task-feedback-dialog
       ref="feedbackDialog"
       :task="task"
       :evaluate-config="initData.evaluateConfig"
       @proposeApprove="proposeApprove"
+      v-else
     />
     <!-- end 回访弹窗 -->
   </div>
@@ -74,6 +83,7 @@ import * as TaskApi from '@src/api/TaskApi.ts';
 
 /* components */
 import FeedbackDialog from './FeedbackDialog';
+import FeedbackDialogBoLi from './FeedbackDialogBoLi';
 import FeedbackDetail from './FeedbackDetail';
 import FeedbackDetailBoLi from './FeedbackDetailBoLi';
 import NoDataViewNew from '@src/component/common/NoDataViewNew';
@@ -154,11 +164,15 @@ export default {
       this.$emit('proposeApprove', data);
     }
   },
+  mounted(){
+    console.log(this.initData, 'dde')
+  },
   components: {
     [NoDataViewNew.name]: NoDataViewNew,
     [FeedbackDetail.name]: FeedbackDetail,
     [FeedbackDetailBoLi.name]: FeedbackDetailBoLi,
-    [FeedbackDialog.name]: FeedbackDialog
+    [FeedbackDialog.name]: FeedbackDialog,
+    [FeedbackDialogBoLi.name]: FeedbackDialogBoLi
   }
 }
 </script>
