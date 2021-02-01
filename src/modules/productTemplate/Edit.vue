@@ -203,7 +203,7 @@ export default {
         let value = form[fieldName];
         let tv = null;
 
-        if (field.formType === 'location') {
+        if ((field.formType === 'location') && !value.isHaveLocation) {
           value = {};
         }
         if (field.formType === 'address' && !field.isSystem) {

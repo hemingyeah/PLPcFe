@@ -70,7 +70,7 @@ export function packToTask(fields, form){
       }
     }
     
-    if (field.formType === TaskFieldNameMappingEnum.Location) {
+    if ((field.formType === TaskFieldNameMappingEnum.Location) && !value.isHaveLocation) {
       value = {};
     }
 
