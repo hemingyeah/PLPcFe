@@ -70,7 +70,7 @@
     <div v-if="nowOption === 'service'" class="common-wrapper">
       <span>是否启用自助服务模块</span>
       <div class="fright">
-        <el-switch v-model="doorOpenState"></el-switch>
+        <el-switch v-model="doorOpenState" @change="changeState"></el-switch>
         <span>{{doorOpenState?'启用':'禁用'}}</span>
       </div>
       <h4 style="margin-top:20px;">关联事件模板</h4>
@@ -384,6 +384,9 @@ export default {
       }else if(option==='intro'){
         params.productIntroduction=this.copyForm.productIntroduction;
       }else if(option==='service'){
+        if(this.doorOpenState && this.copyEventTypeIdList.length===0){
+          return this.$platform.alert('请选择关联事件模板');
+        }
         params.doorOpenState=this.doorOpenState?1:0;
         params.doorEventType=this.copyEventTypeIdList;
       }else if(option==='proInfo'){

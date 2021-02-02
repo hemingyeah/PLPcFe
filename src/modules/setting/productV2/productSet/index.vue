@@ -54,7 +54,7 @@
     <div class="flex-x box-12 bg-w"
          v-if="qrcodeEnabled">
       <div class="flex-1">
-        <div class="font-w-600">分配规则</div>
+        <div class="font-w-600">服务人员分配规则</div>
       </div>
       <el-button id="product-set-guide-1"
                  type="primary"
