@@ -194,7 +194,7 @@ export default {
       return this.auth.TASK_EDIT === 3;
     },
     exportPermissionTaskBatchDispatch() {
-      return this.auth.TASK_BATCH_DISPATCH;
+      return this.auth.TASK_BATCH_DISPATCH === 3;
     },
     /** 高级搜索面板宽度 */
     panelWidth() {
