@@ -22,9 +22,10 @@ const BizTeamSelectComp = Vue.extend(BizTeamSelect);
  * @param {Function} options.fetchFunc - 数据源
  * @param {Function} options.serializer - 数据序列化方法，用于表单形式提交
  * @param {Boolean} options.popperOptions - popper.js的配置项
+ * @param {String} options.popperClassName - popper 类名
  * @returns {VueComponent} 返回组件实例
- */
-function initTeamSelect(options = {}){
+*/
+export function initTeamSelect(options = {}){
   // 获取定位元素
   let refEl = getReferenceEl(options.reference);
   if(null == refEl) return console.error(`[${BizTeamSelect.name}]: need a reference element.`);
@@ -32,7 +33,7 @@ function initTeamSelect(options = {}){
 
   let className = refEl.className ? refEl.className.split(' ') : [];
   if(Array.isArray(options.className)) className = options.className;
-
+  
   // 创建实例
   let instance = new BizTeamSelectComp({
     propsData: {
@@ -62,7 +63,7 @@ const component = {
     Vue.component(BizCategorySelect.name, BizCategorySelect);
     Vue.component(BizTeamSelect.name, BizTeamSelect);
     // 注册快速调用方法
-    fastCall(Vue, 'biz', {initTeamSelect})
+    fastCall(Vue, 'biz', { initTeamSelect })
   },
   namespace: 'biz',
   props: { initTeamSelect }

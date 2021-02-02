@@ -26,14 +26,14 @@ export const updateIsShowOrIsShopWindows = (params = {}) => {
 /**
  * 商品服务列表
  */
-export const serviceList= (params = {}) => {
+export const serviceList = (params = {}) => {
   return http.get('/setting/market/service/list', params)
 }
 
 /**
  * 是否发布
  */
-export const marketItem= (params = {}) => {
+export const marketItem = (params = {}) => {
   return http.post('/setting/marketItem/save', params, false)
 } 
 
