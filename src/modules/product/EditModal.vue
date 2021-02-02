@@ -9,20 +9,27 @@
 </template>
 
 <script>
-
+/* api */
 import {
   getProductFields,
   createProduct
-} from '@src/api/ProductApi';
-import * as FormUtil from '@src/component/form/util';
-import ProductEditForm from './components/ProductEditForm.vue';
-
-import * as util from './utils/ProductMapping';
-
+} from '@src/api/ProductApi'
+/* component */
+import ProductEditForm from './components/ProductEditForm.vue'
+/* enum */
+import TenantDataLimitSourceEnum from '@model/enum/TenantDataLimitSourceEnum'
+import TenantDataLimitTypeEnum from '@model/enum/TenantDataLimitTypeEnum'
+/* mixin */
+import VersionMixin from '@src/mixins/versionMixin/index.ts'
+/* util */
+import * as FormUtil from '@src/component/form/util'
+import * as util from '@src/modules/product/utils/ProductMapping'
+import { isFunction } from '@src/util/type'
 
 export default {
   name: 'product-edit',
   inject: ['initData'],
+  mixins: [VersionMixin],
   data() {
     return {
       loadingPage: false,
@@ -30,7 +37,6 @@ export default {
       init: false,
       submitting: false,
       form: {},
-
       dynamicFields: []
     }
   },
@@ -55,9 +61,16 @@ export default {
     } catch (error) {
       console.error('product-edit-modal fetch product fields error',error);
     }
-
+    
     window.submit = this.submit;
-
+    
+    // 检查版本数量限制
+    this.checkNumExceedLimitBeforeHandler 
+    && this.checkNumExceedLimitBeforeHandler(
+      TenantDataLimitSourceEnum.Product,
+      TenantDataLimitTypeEnum.Product
+    )
+    
     try {
       // 初始化默认值
       this.initFormData();
@@ -71,63 +84,71 @@ export default {
     initFormData() {
       let form = {};
       form = util.packToForm(this.productFields, form);
-
+      
       // 客户详情新建产品，会带的客户信息
       /**
-         * 初始化所有字段的初始值
-         * @param {*} fields 字段
-         * @param {*} origin 原始值
-         * @param {*} target 待合并的值
-         */
-
+       * 初始化所有字段的初始值
+       * @param {*} fields 字段
+       * @param {*} origin 原始值
+       * @param {*} target 待合并的值
+      */
       this.form = FormUtil.initialize(this.productFields, form);
     },
     submit(customer, callBack) {
       this.submitting = true;
-
+      
       this.$refs.productEditForm.validate()
         .then(valid => {
-          this.submitting = false;
-          if (!valid) return Promise.reject('validate fail.');
-          const params = util.packToProduct(this.productFields, this.form);
-
-          this.pending = true;
-          this.loadingPage = true;
-
+          this.submitting = false
+          
+          if (!valid) return Promise.reject('validate fail.')
+          
+          const params = util.packToProduct(this.productFields, this.form)
+          
+          this.toggleLoading()
+          
           params.customerId = customer.id;
-
-          createProduct(params)
+          
+          this.checkNumExceedLimitAfterHandler(createProduct(params))
             .then(res => {
-              this.pending = false;
-              this.loadingPage = false;
-
-              if (res.status) return this.$platform.notification({
-                title: '新建产品失败',
-                message: res.message || '',
-                type: 'error',
-              });
-
-              callBack && typeof callBack === 'function' && callBack({
-
+              
+              if (!res.succ) {
+                return (
+                  this.$platform.notification({
+                    title: '新建产品失败',
+                    message: res.message || '',
+                    type: 'error',
+                  })
+                )
+              }
+              
+              isFunction(callBack) && callBack({
                 productId: res.data,
                 productName: params.name,
                 serialNumber: params.serialNumber,
                 type: params.type
-              });
-
+              })
+              
             })
             .catch(err => {
               console.error(err);
-            });
+            })
+            .finally(() => {
+              this.toggleLoading(false)
+            })
+            
         })
         .catch(err => {
           console.error(err);
-          this.pending = false;
-          this.loadingPage = false;
+          this.toggleLoading(false)
         })
     },
     goBack() {
       parent.frameHistoryBack(window);
+    },
+    toggleLoading(loading = true) {
+      this.pending = loading
+      this.loadingPage = loading
     }
   },
   components: {

@@ -75,14 +75,13 @@ export default {
           if (!valid) return Promise.reject('validate fail.');
           
           const params = util.packToCustomer(this.fields, this.form, this.initData.tags);
-          this.pending = true;
-          this.loadingPage = true;
+          
+          this.toggleLoading()
           this.createMethod(params, callBack);
         })
         .catch(err => {
-          console.error(err);
-          this.pending = false;
-          this.loadingPage = false;
+          console.error(err)
+          this.toggleLoading(false)
         });
     },
     createMethod(params, callBack) {
@@ -127,14 +126,17 @@ export default {
           console.error('editForModal CustomerEditView createMethod error', err)
         })
         .finally(() => {
-          this.pending = false
-          this.loadingPage = false
+          this.toggleLoading(false)
         })
     },
     initFormData() {
       let form = util.packToForm(this.fields, {}, this.initData.customerAddress);
       this.form = FormUtil.initialize(this.fields, form);
       this.addressBackup = this.form.customerAddress;
+    },
+    toggleLoading(loading = true) {
+      this.pending = loading
+      this.loadingPage = loading
     }
   },
   async mounted() {

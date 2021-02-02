@@ -102,8 +102,8 @@ export default {
             this.initData.tags
           )
           
-          this.pending = true
-          this.loadingPage = true
+          this.toggleLoading()
+          
           if (this.action === 'edit') {
             return this.updateMethod(params)
           }
@@ -115,14 +115,11 @@ export default {
         })
         .catch(err => {
           console.error(err)
-          this.pending = false
-          this.loadingPage = false
+          this.toggleLoading(false)
         })
     },
     createCustomerForEvent(params) {
-      const CreateCustomerForEventPromise = this.$http.post('/event/customer/create', params)
-      
-      this.checkNumExceedLimitAfterHandler(CreateCustomerForEventPromise)
+      this.$http.post('/event/customer/create', params)
         .then(res => {
           let isSucc = res.succ
           
@@ -156,8 +153,7 @@ export default {
           console.error('edit CustomerEditView createCustomerForEvent error', error)
         )
         .finally(() => {
-          this.pending = false
-          this.loadingPage = false
+          this.toggleLoading(false)
         })
     },
     createMethod(params) {
@@ -183,8 +179,7 @@ export default {
           console.error('err', err)
         })
         .finally(() => {
-          this.pending = false
-          this.loadingPage = false
+          this.toggleLoading(false)
         })
     },
     updateMethod(params) {
@@ -212,14 +207,16 @@ export default {
           console.error('CustomerEditView ~ updateMethod ~ error', err)
         })
         .finally(() => {
-          this.pending = false
-          this.loadingPage = false
+          this.toggleLoading(false)
         })
     },
     reloadTab() {
       let fromId = window.frameElement.getAttribute('fromid')
-
       this.$platform.refreshTab(fromId)
+    },
+    toggleLoading(loading = true) {
+      this.pending = loading
+      this.loadingPage = loading
     }
   },
   async mounted() {
@@ -259,6 +256,7 @@ export default {
       this.init = true
       
     } catch (error) {
+      this.toggleLoading(false)
       console.error('CustomerEditView mounted error ', error)
     }
   },
