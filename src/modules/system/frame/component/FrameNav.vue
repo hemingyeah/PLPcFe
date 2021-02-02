@@ -1,6 +1,7 @@
 <template>
   <nav class="frame-nav"
        :class="{'frame-nav-expand': !collapse}"
+       :style="{'backgroundColor':isColorScheme ? isColorScheme.colorMain : ''}"
        @transitionend="navTransitionEnd">
     <div class="frame-logo">
       <a href="javascript:;"
@@ -39,6 +40,7 @@
             </a>
 
             <ul :class="{'frame-subMenu': true,'frame-float-menu': collapse}"
+                :style="{'backgroundColor':isColorScheme && !collapse? isColorScheme.colorExpand : ''}"
                 v-show="!collapse && menu == currMenu">
               <li class="frame-float-menu-title">
                 <h3>{{menu.name}}</h3>
@@ -47,6 +49,8 @@
                    :style="getMenuItemWrapStyle(menu)">
                 <template v-for="menu in menu.children">
                   <li :class="{'frame-subMenu-item': true, 'frame-subMenu-active': menu.active}"
+                      :style="{'background':isColorScheme && menu.active ? `${isColorScheme.colorSelected} !important`: '',
+                               color:isColorScheme && menu.active ? `${isColorScheme.colorMain} !important`: ''}"
                       :key="menu.menuKey">
                     <a :href="menu.url ? menu.url : 'javascript:;'"
                        @click.prevent="open(menu)">{{menu.name}}</a>
@@ -98,6 +102,7 @@ export default {
       default: () => []
     }
   },
+  inject: ['initData'],
   data () {
     let originMenus = _.cloneDeep(this.source);
     let { menus } = this.buildMenus(originMenus, null);
@@ -116,7 +121,28 @@ export default {
       return isShowCardWorkTime()
     },
     logoImg () {
-      return this.collapse ? MiniLogo : Logo;
+      let logoImage;
+      if(this.initData.logo && this.collapse){
+        logoImage = this.initData.logo.smallLogo
+      }else if(this.initData.logo && !this.collapse){
+        logoImage = this.initData.logo.bigLogo
+      }
+      else if(!this.initData.logo && !this.collapse){
+        logoImage = Logo
+      }
+      else if(!this.initData.logo && this.collapse){
+        logoImage = MiniLogo
+      }
+      return logoImage;
+    },
+    isCustomLogo(){
+      return this.initData.logo
+    },
+    // isShowCardWorkTime () {
+    //   return isShowCardWorkTime()
+    // },
+    isColorScheme(){
+      return this.initData.colorScheme
     }
   },
   methods: {
