@@ -160,6 +160,7 @@ export default {
         timeInterval = setInterval(() => {
           let search_dom = this.$refs['searchDom'].getBoundingClientRect()
           let res_ = this.$refs['normalInput'].getBoundingClientRect()
+          if(this.selectCon && this.selectCon.top == res_.top && this.selectCon.width == res_.width && this.selectCon.left == res_.left && this.selectCon.height == res_.height  ) return
           let bottomH = window.innerHeight
               - res_.y
               - res_.height;
