@@ -837,7 +837,9 @@ export default {
     allot() {
       // 新工单新指派
       if (this.isRestructAllot) {
-        this.$refs.TaskAllotModal.outsideShow()
+        this.checkNotNullForCard('allot', () => {
+          this.$refs.TaskAllotModal.outsideShow();
+        })
       } else {
         this.pending = true;
         location.href = `/task/allotTask?id=${this.task.id}`;
@@ -922,10 +924,14 @@ export default {
         this.backDialog.reason = '';
         this.backDialog.visible = true;
       } else if (action === 'finish') {
-        this.$refs.taskReceiptEdit.openDialog();
+        this.checkNotNullForCard('finish', () => {
+          this.$refs.taskReceiptEdit.openDialog()
+        })
       } else if (action === 'balance') {
-        this.rightActiveTab = 'balance-tab';
-        this.$refs.taskAccount.openDialog('create');
+        this.checkNotNullForCard('cost', () => {
+          this.rightActiveTab = 'balance-tab';
+          this.$refs.taskAccount.openDialog('create');
+        })
       } else if (action === 'feedback') {
         this.rightActiveTab = 'feedback-tab';
         this.$refs.taskFeedback.feedback();
@@ -1034,7 +1040,7 @@ export default {
         { name: '指派', type: 'primary', show: this.allowAllotTask, event: this.allot },
         { name: '接单', type: 'primary', show: this.allowPoolTask, event: () => { this.openDialog('acceptFromPool') } },
         { name: '接受', type: 'primary', show: this.allowAcceptTask, event: () => { this.openDialog('accept') } },
-        { name: '开始', type: 'primary', show: this.allowStartTask, event: this.start },
+        { name: '开始', type: 'primary', show: this.allowStartTask, event: () => { this.checkNotNullForCard('start', this.start) } },
         { name: '完成回执', type: 'primary', show: this.allowFinishTask, event: () => { this.openDialog('finish') } },
         { name: '回退', type: 'primary', show: this.allowBackTask, event: this.backTask },
         { name: '结算', type: 'primary', show: this.viewBalanceTab && this.allowBalanceTask, event: () => { this.openDialog('balance') } },
@@ -1077,6 +1083,23 @@ export default {
     },
     outsideUpdateRecords() {
       this.$eventBus.$emit(TaskEventNameMappingEnum.UpdateRecord);
+    },
+    // 检验附加组件是否必填
+    checkNotNullForCard(flow, callback) {
+      this.pending = true;
+      TaskApi.checkNotNullForCard({ id: this.task.id, flow })
+        .then(res => {
+          this.pending = false;
+
+          if (res.status == 0) {
+            callback();
+          } else {
+            this.$platform.alert(res.message);
+          }
+        })
+        .catch(err => {
+          this.pending = false;
+        })
     }
   },
   created() {
