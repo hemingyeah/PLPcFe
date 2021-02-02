@@ -410,9 +410,6 @@ export default {
      * @description 关联显示项
     */
     relationFieldHandler() {
-      // 非编辑状态下 不重新查询关联显示项
-      if (!this.isTaskEdit && !this.isPlanTaskEdit) return
-      
       // 子组件form
       this.$nextTick(() => {
         let form = this.$refs.form;
