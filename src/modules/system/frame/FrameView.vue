@@ -370,7 +370,7 @@ import TaskSettingGuide from './component/TaskSettingGuide';
 
 import ImportAndExport from './component/ImportAndExport.vue';
 
-import DefaultHead from '@src/assets/img/user-avatar.png';
+import DefaultHead from '@src/assets/img/avatar.png';
 import NotificationCenter from './component/NotificationCenter.vue';
 import * as NotificationApi from '@src/api/NotificationApi';
 import * as CallCenterApi from '@src/api/CallCenterApi';
@@ -496,7 +496,7 @@ export default {
     },
     /** 用户头像 */
     userAvatar () {
-      return this.loginUser.head || DefaultHead;
+      return DefaultHead;
     },
     releaseVersion () {
       return (
