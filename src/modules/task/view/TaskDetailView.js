@@ -46,6 +46,7 @@ export default {
   mixins: [tourGuide],
   data() {
     return {
+      partField: [], // 安装产品和安装位置字段 博立定制
       loading: false,
       pending: false,
       collapse: true,
@@ -1207,6 +1208,11 @@ export default {
         }, 1000)
       })
 
+      // 获取是否有安装产品和安装位置 目前只有博立有数据 其它的数据为空
+      const _res = await TaskApi.getExpensePartField()
+      if (_res.code == 0) {
+        this.partField = _res.result || []
+      }
     } catch (e) {
       console.error("error ", e)
     }

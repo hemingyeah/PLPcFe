@@ -194,7 +194,7 @@ export default {
       // 获取是否有安装产品和安装位置 目前只有博立有数据 其它的数据为空
       const result = await TaskApi.getExpensePartField()
       if (result.code == 0) {
-        this.partField = result.result
+        this.partField = result.result || []
       }
       if (this.partField.length) {
         this.partField.forEach((part, ind) => {

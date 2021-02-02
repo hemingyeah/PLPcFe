@@ -598,7 +598,7 @@ export default {
             result.result.splice(ind, 1, _res)
           }
         })
-        this.partField = result.result
+        this.partField = result.result || []
       }
     } catch (err) {
       console.error('err', err);

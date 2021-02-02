@@ -319,7 +319,7 @@
     <!-- end 工单发起审批弹窗 -->
 
     <!-- start 完成回执弹窗 -->
-    <task-receipt-edit-view ref="taskReceiptEdit" :init-data="initData" :receipt-fields="receiptFields" @proposeApprove="proposeApprove" />
+    <task-receipt-edit-view ref="taskReceiptEdit" :init-data="initData" :receipt-fields="receiptFields" @proposeApprove="proposeApprove" :part-field="partField" />
     <!-- end 完成回执弹窗 -->
 
     <!-- start 查看全部时间点 -->

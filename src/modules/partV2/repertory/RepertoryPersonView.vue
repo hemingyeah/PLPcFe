@@ -842,7 +842,7 @@ export default {
         getExpensePartField().then(res => {
           if (res.code == 0) {
             if (res.result.length) {
-              this.partField = res.result
+              this.partField = res.result || []
               this.partField.forEach((part, index) => {
                 let _field = ''
                 if (part.fieldName == 'installProductId') {
