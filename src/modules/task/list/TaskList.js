@@ -1419,6 +1419,13 @@ export default {
      * @description 工单类型改变
      */
     changeTaskType(taskType) {
+
+      if (localStorage.getItem('checkedMap')) {
+        localStorage.removeItem('checkedMap')
+        localStorage.removeItem('checkedGroupArr')
+        localStorage.removeItem('isCheckedAll')
+      }
+
       this.searchParams = {...this.searchParams_spare, ...{templateId: taskType.id}}
       this.currentTaskType = taskType;
       // this.selectId = 'all'
