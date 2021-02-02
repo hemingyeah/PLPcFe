@@ -386,16 +386,13 @@ import {
 
 /* util */
 import _ from 'lodash';
-import Axios from 'axios';
 
 const newTaskGuideStore = require('@src/component/guide/taskV2Store');
 const GuideStoreObj = {
   newTaskGuideStore,
 };
-
 const NOTIFICATION_TIME = 1000 * 60 * 10;
 
-// const wsUrl = 'ws://30.40.56.211:8080/websocket/asset/7416b42a-25cc-11e7-a500-00163e12f748_dd4531bf-7598-11ea-bfc9-00163e304a25'
 let webSocketClient = null,
   lockReconnect = false,
   reconnectTimmer = null;
@@ -496,7 +493,7 @@ export default {
     },
     /** 用户头像 */
     userAvatar () {
-      return DefaultHead;
+      return this.loginUser.head || DefaultHead;
     },
     releaseVersion () {
       return (
