@@ -180,7 +180,7 @@ export default {
       const {checkSystemList, checkCustomizeList, config, taskTypeFilterFields} = this
       let sySet = new Set(checkSystemList)
       let CuSet = new Set(checkCustomizeList)
-      let list = [];
+      let list = localStorage.getItem('task-search-field') ? JSON.parse(localStorage.getItem('task-search-field')).list : [];
       [...config, ...taskTypeFilterFields].forEach(item => {
         [...sySet, ...CuSet].forEach(v => {
           if (v === item.fieldName) {
@@ -191,7 +191,7 @@ export default {
       let params = {
         checkSystemList,
         checkCustomizeList,
-        list
+        list: [...new Set(list.map(item => {item = JSON.stringify(item); return item}))].map(item => {item = JSON.parse(item); return item})
       }
       this.visible = false
       this.$emit('taskPupal', params)
