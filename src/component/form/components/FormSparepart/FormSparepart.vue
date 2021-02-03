@@ -73,6 +73,17 @@
           </template>
           <!-- end 仓库 -->
 
+          <!-- start 安装产品 只有一个产品默认选中-->
+          <template v-if="partField.length && products.length == 1">
+            <template slot="installProductId" slot-scope="{ field }" >
+              <form-item :label="field.displayName">
+                <form-select :field="field" v-model="installProductId" />
+              </form-item>
+            </template>
+          </template>
+          
+          <!-- end 安装产品 -->
+
           <!-- start 备件 -->
           <template slot="part" slot-scope="{ field }">
             <form-item :label="field.displayName">
@@ -162,6 +173,7 @@ export default {
   data() {
     return {
       partField: [],
+      installProductId: '',
       products: this.initData.task.products,
       visible: false,
       showRepertory: true,
@@ -302,6 +314,15 @@ export default {
       return this.editUnitPrice && !this.isPaySuccess;
     }
   },
+  watch: {
+    visible(n) {
+      // 只有一个产品时默认选中
+      if (this.products.length && this.products.length == 1) {
+        this.installProductId = this.products[0].id
+        this.$set(this.sparepart, 'installProductId', this.installProductId)
+      }
+    }
+  },
   methods: {
     // 根据产品id获取产品名称
     getProductName(id) {
@@ -392,6 +413,7 @@ export default {
       this.repertoryId = this.repertoryList[0]?.value || 0;
       this.sparepart = this._initData();
       this.selectedSparepart = [];
+      this.installProductId = ''
 
       // 清空校验结果
       setTimeout(() => {
