@@ -172,7 +172,7 @@ export default {
       const checkParams = {
         id: this.task.id,
         suggestion: this.form.suggestion,
-        evaluate: this.form.evaluate
+        // evaluate: this.form.evaluate
       }
       // 回访是否需要审批
       const result = await this.$http.post(`/task/approve/degreeForView?autoClosed=${autoClosed}`, checkParams);
