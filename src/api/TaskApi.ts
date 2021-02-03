@@ -557,7 +557,7 @@ export function reviewTask(params: {} | undefined) {
  * @param {Boolean} params.autoClosed - 回访并关闭true，光回访传false
  */
 export function reviewTaskBoli(params: {} | undefined) {
-  return http.post(`${fixedPrefixTaskPath}/outside/pc/taskBoli/review`, params);
+  return http.post(`${fixedPrefixTaskPath}/outside/pc/task/boLi/review`, params);
 }
 
 /**
