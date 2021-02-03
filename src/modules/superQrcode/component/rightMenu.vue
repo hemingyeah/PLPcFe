@@ -629,7 +629,6 @@ ul {
     span{
       font-weight: bold;
       display: inline-block;
-      height: 25px;
     }
     .fright{
       float: right;
