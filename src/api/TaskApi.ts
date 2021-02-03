@@ -45,6 +45,7 @@ import {
 import GrayUtil from '@src/util/gray'
 
 const fixedPrefixTaskPath = "/api/task";
+
 const ElASTICSEARCH = "/api/elasticsearch";
 const fixedPrefixPaymentPath = "/api/payment";
 const CUSTOMER = 'api/customer'
@@ -545,6 +546,18 @@ export function rollBackBalance(params: {} | undefined) {
  */
 export function reviewTask(params: {} | undefined) {
   return http.post(`${fixedPrefixTaskPath}/outside/pc/task/review`, params);
+}
+
+/**
+ * 回访工单-博立
+ * @param {Object} params - 参数对象
+ * @param {String} params.taskId - 工单id
+ * @param {String} params.suggestion - 回访备注
+ * @param {Object} params.evaluate - 自定义回访信息
+ * @param {Boolean} params.autoClosed - 回访并关闭true，光回访传false
+ */
+export function reviewTaskBoli(params: {} | undefined) {
+  return http.post(`${fixedPrefixTaskPath}/outside/pc/taskBoli/review`, params);
 }
 
 /**
