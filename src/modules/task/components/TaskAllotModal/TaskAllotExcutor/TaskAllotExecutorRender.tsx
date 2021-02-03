@@ -226,7 +226,7 @@ class TaskAllotExecutorRender extends TaskAllotExecutorMethods {
   public renderTaskAllotExecutorHeader(): VNode {
     return (
       <div class='task-allot-executor-header'>
-        { this.isAllotByTag && this.renderTaskAllotExecutorHeaderRow('服务团队：', this.renderTeamSelect()) }
+        { this.isAllotByTag && this.renderTaskAllotExecutorHeaderRow('服务部门：', this.renderTeamSelect()) }
         { this.isAllotByTag && this.renderTaskAllotExecutorHeaderRow('负责人：', this.renderTeamUserSelect()) }
         { !this.isAllotByTag && this.renderTaskAllotExecutorHeaderRow('负责人：', this.renderDepartmentUserSelect()) }
         { this.isShowSynergy && this.renderTaskAllotExecutorHeaderRow('协同人：', this.renderSynergySelect()) }

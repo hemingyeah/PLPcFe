@@ -245,7 +245,7 @@ export default {
               'fieldId':'tags',
               'tableName':'customer',
               'fieldName':'tags',
-              'displayName':'服务团队',
+              'displayName':'服务部门',
               'isSystem':'0',
               'isSearch':'1',
               'isAppShow':'0',

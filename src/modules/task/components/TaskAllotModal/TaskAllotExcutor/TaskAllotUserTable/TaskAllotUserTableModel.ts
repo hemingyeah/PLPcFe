@@ -88,7 +88,7 @@ const TaskAllotUserTableLastColumns = [
     "type": "column"
   },
   {
-    "label": "所在团队",
+    "label": "所在部门",
     "field": "tags",
     "show": true,
     "fixed": false,
@@ -134,7 +134,7 @@ export const TaskAllotUserTableStandEditionColumns = [
 export enum TaskAllotTableColumnFieldEnum {
   // 负责人
   Excutor = 'excutor',
-  // 所在团队
+  // 所在部门
   Tags = 'tags',
   // 名称
   DisplayName = 'displayName',

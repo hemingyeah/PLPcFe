@@ -12,7 +12,7 @@
 
         <div class="action-btns">
           <div class="action-btn-view" v-if="!teamData.parent && showNewTeam" @click="teamChildCreate">
-            <span class="action-btn"> <i class="iconfont icon-add"> </i>新建子团队</span>
+            <span class="action-btn"> <i class="iconfont icon-add"> </i>新建子部门</span>
           </div>
           <div class="action-btn-view" @click="personAddChoose">
             <span class="action-btn"><i class="iconfont icon-add"></i>添加成员</span>
@@ -31,7 +31,7 @@
 
           <div class="team-detail-form-group">
             <div class="form-view-row">
-              <label>团队描述</label>
+              <label>部门描述</label>
               <div class="form-view-row-content">{{ teamData.description }}</div>
             </div>
 
@@ -60,7 +60,7 @@
             </div>
 
             <div class="form-view-row" v-if="teamData.parent && showNewTeam">
-              <label>主团队</label>
+              <label>主部门</label>
               <div class="form-view-row-content">
                 <span @click="goTeamDetail(teamData.parent.id)" class="link-text">
                   {{ teamData.parent.tagName }}
@@ -69,7 +69,7 @@
             </div>
 
             <div class="form-view-row" v-else-if="!teamData.parent && showNewTeam">
-              <label>子团队</label>
+              <label>子部门</label>
               <div class="form-view-row-content">
                 <span @click="goTeamDetail(child.id)" v-for="(child, index) in teamData.children" :key="index + 'detail'" class="link-text">
                   {{ child.tagName }}
@@ -80,9 +80,9 @@
               </div>
             </div>
 
-            <!-- TODO: 暂时隐藏 团队技能 -->
+            <!-- TODO: 暂时隐藏 部门技能 -->
             <!-- <div class="form-view-row">
-              <label>团队技能：</label>
+              <label>部门技能：</label>
               <div class="form-view-row-content">传动机，发电机</div>
             </div> -->
           </div>
@@ -196,7 +196,7 @@ export default {
     displayGoBackBtn() {
       return !this.urlParams.query.noHistory;
     },
-    /* 编辑团队权限 */
+    /* 编辑部门权限 */
     allowEditTeam() {
       return true
     },
@@ -289,7 +289,7 @@ export default {
         url: `/security/user/view/${el.dataset.id}`,
       });
     },
-    /* 判断是否是主团队 */
+    /* 判断是否是主部门 */
     isParent(item) {
       return (
         !item.parent
@@ -297,7 +297,7 @@ export default {
       );
     },
     openMap() {
-      this.$fast.map.display(this.teamData.tagAddress, {title: '团队位置'})
+      this.$fast.map.display(this.teamData.tagAddress, {title: '部门位置'})
         .catch(err => console.error('openMap catch an err: ', err));
     },
     /** 缓存  get */
@@ -330,7 +330,7 @@ export default {
       this.fetchTableData();
       this.storageSetData();
     },
-    /** 新建子团队 */
+    /** 新建子部门 */
     teamChildCreate() {
       let parent = {
         pid: this.teamData.id,
@@ -339,14 +339,14 @@ export default {
 
       window.location.href = `/security/tag/createTag?${qs.stringify(parent)}`;
     },
-    /** 删除团队 */
+    /** 删除部门 */
     async teamDelete() {
       let confirm = false;
 
       if(!this.teamData.parent && this.isParent(this.teamData) && this.showNewTeam) {
-        confirm = await this.$platform.confirm('您删除的团队，如果包含子团队将会一并删除，是否继续？');
+        confirm = await this.$platform.confirm('您删除的部门，如果包含子部门将会一并删除，是否继续？');
       } else {
-        confirm = await this.$platform.confirm('您确定要删除该团队？');
+        confirm = await this.$platform.confirm('您确定要删除该部门？');
       }
 
       try {
@@ -362,7 +362,7 @@ export default {
 
         this.$platform.notification({
           type: result.status == 0 ? 'success' : 'error',
-          title: `团队删除${result.status == 0 ? '成功' : '失败'}`,
+          title: `部门删除${result.status == 0 ? '成功' : '失败'}`,
           message: result.status == 0 ? null : result.message
         })
 
@@ -384,7 +384,7 @@ export default {
         console.error('teamDelete catch error', e);
       }
     },
-    /** 编辑团队 */
+    /** 编辑部门 */
     teamEdit() {
       window.location.href = `/security/tag/editTag/${this.teamData.id}`
     },

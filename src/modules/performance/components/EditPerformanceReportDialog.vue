@@ -274,7 +274,7 @@ export default {
           value: 0,
         },
         {
-          label: '按团队',
+          label: '按部门',
           value: 1,
         },
       ],

@@ -22,7 +22,7 @@ import { Emit } from 'vue-property-decorator'
 const RuleAccordingMap = {
   [RuleTypeEnum.Type]: '工单类型',
   [RuleTypeEnum.Select]: '选择项',
-  [RuleTypeEnum.Tag]: '客户团队'
+  [RuleTypeEnum.Tag]: '客户部门'
 }
 
 class AllotRuleModalMethods extends AllotRuleModalComputed {

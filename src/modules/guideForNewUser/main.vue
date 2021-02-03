@@ -459,7 +459,7 @@ export default {
           parent: 'M_USER',
           menuKey: 'M_EE_TAG',
           menuIcon: 'fa fa-files-o',
-          name: '团队管理',
+          name: '部门管理',
           url: '/security/tag',
           order: 702,
         },

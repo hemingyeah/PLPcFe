@@ -734,7 +734,7 @@
                     {{ allotTypeText(scope.row.allotType) }}
                   </template>
 
-                  <!-- 服务团队(负责人所在的团队) -->
+                  <!-- 服务部门(负责人所在的部门) -->
                   <template v-else-if="column.field === 'executorTags'">
                     {{ formatExecutorTags(scope.row[column.field]) }}
                   </template>

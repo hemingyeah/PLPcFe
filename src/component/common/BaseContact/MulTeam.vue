@@ -267,7 +267,7 @@ export default {
       let text = `当前已选${this.chosen.length}人`;
 
       if(this.allowCheckTeam) {
-        text += `, 团队${this.chosenTeam.length}个`;
+        text += `, 部门${this.chosenTeam.length}个`;
       }
       return text;
     },

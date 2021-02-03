@@ -5,7 +5,7 @@
     <header class="team-list-header">
       <form class="base-search team-list-header-search"
             @submit.prevent="search">
-        <el-input placeholder="输入团队信息进行搜索"
+        <el-input placeholder="输入部门信息进行搜索"
                   v-model="model.keyword"
                   class="input-with-select"
                   v-trim:blur>
@@ -19,32 +19,32 @@
                 @click="resetParams">重置</button>
       </form>
 
-      <!-- start 团队选项 -->
+      <!-- start 部门选项 -->
       <div class="team-list-checkbox-view">
-        <!-- start 按服务团队派单 -->
+        <!-- start 按服务部门派单 -->
         <el-checkbox v-model="isAllotByTag"
-                     @change="setUsedAllot">启用按服务团队派单</el-checkbox>
+                     @change="setUsedAllot">启用按服务部门派单</el-checkbox>
         <el-popover placement="bottom-end"
                     width="300"
                     trigger="hover"
-                    content="开启后，指派工单将按照团队查询人员；禁用时，按通讯录方式查询人员">
+                    content="开启后，指派工单将按照部门查询人员；禁用时，按通讯录方式查询人员">
           <i class="iconfont icon-help"
              slot="reference"></i>
         </el-popover>
-        <!-- end 按服务团队派单 -->
+        <!-- end 按服务部门派单 -->
         <el-checkbox v-model="isSeeAllOrg"
                      @change="setSeeAllOrg"
                      :disabled="!isAllotByTag"
-                     class="team-list-header-see">选择人员时隐藏非团队内成员</el-checkbox>
+                     class="team-list-header-see">选择人员时隐藏非部门内成员</el-checkbox>
         <el-popover placement="bottom-end"
                     width="300"
                     trigger="hover"
-                    content="开启本选项后，在选择协同人等调用钉钉通讯录时只可见自己所属服务团队的成员，管理员除外">
+                    content="开启本选项后，在选择协同人等调用钉钉通讯录时只可见自己所属服务部门的成员，管理员除外">
           <i class="iconfont icon-help"
              slot="reference"></i>
         </el-popover>
       </div>
-      <!-- end 团队选项 -->
+      <!-- end 部门选项 -->
     </header>
     <!-- end header -->
     <div class="full-page-main team-list-view">
@@ -58,10 +58,10 @@
           <base-button type="primary"
                        icon="icon-add"
                        @event="teamChildCreate"
-                       v-if="showNewTeam">新建子团队</base-button>
+                       v-if="showNewTeam">新建子部门</base-button>
           <base-button type="ghost"
                        icon="icon-fe-close"
-                       @event="teamDelete">删除团队</base-button>
+                       @event="teamDelete">删除部门</base-button>
         </div>
         <!-- end 按钮 -->
         <!-- start 服务电话 -->
@@ -152,7 +152,7 @@
     </base-import>
     <!-- end 导入服务微信 -->
 
-    <!-- start 右侧选择团队弹窗 -->
+    <!-- start 右侧选择部门弹窗 -->
     <base-panel :show.sync="multipleSelectionPanelShow"
                 width="420px">
       <h3 slot="title">
@@ -175,7 +175,7 @@
         <div class="team-selected-list"
              v-else>
           <div class="team-selected-row team-selected-head">
-            <span class="team-selected-name">团队名称</span>
+            <span class="team-selected-name">部门名称</span>
           </div>
           <div class="team-selected-row"
                v-for="(team, index) in multipleSelection"
@@ -190,7 +190,7 @@
         </div>
       </div>
     </base-panel>
-    <!-- end 右侧选择团队弹窗 -->
+    <!-- end 右侧选择部门弹窗 -->
   </div>
 </template>
 
@@ -222,10 +222,10 @@ export default {
       columns: this.buildColumns(),
       loadingPage: false,
       isImportNow: true, // 是否是导入立刻刷新
-      isAllotByTag: false, // 是否开始 按服务团队派单选项
+      isAllotByTag: false, // 是否开始 按服务部门派单选项
       isSeeAllOrg: false, // 是否开启降低组织架构可见性选项
       multipleSelectionPanelShow: false,
-      multipleSelection: [], // 已选择的团队
+      multipleSelection: [], // 已选择的部门
       // TODO: 单独的model对象维护所有搜索条件
       model: this.buildModel(),
       page: new Page(),
@@ -247,7 +247,7 @@ export default {
       return [
         {
           field: 'tagName',
-          label: '团队名称',
+          label: '部门名称',
           expandProp: 'children',
           width: 250,
           render (h, col, row) {
@@ -262,7 +262,7 @@ export default {
         },
         {
           field: 'teamLeaders',
-          label: '团队主管',
+          label: '部门主管',
           width: 180,
           overflow: 'tooltip',
           formatter (col, row) {
@@ -343,7 +343,7 @@ export default {
       this.page.list = [];
       this.fetchPageList(pageNum);
     },
-    /* 判断是否是主团队 */
+    /* 判断是否是主部门 */
     isParent (item) {
       let bool = (
         !item.parent
@@ -379,7 +379,7 @@ export default {
 
       this.$platform.openTab({
         id: `team_view_${id}`,
-        title: '团队详情',
+        title: '部门详情',
         url: `/security/tag/view/${id}?noHistory=1`,
         reload: true,
         close: true,
@@ -389,7 +389,7 @@ export default {
     /* 打开服务电话弹出框 */
     openTelDialog () {
       if (this.multipleSelection.length != 1) {
-        return this.$platform.alert('请您先选择一个团队');
+        return this.$platform.alert('请您先选择一个部门');
       }
       let item = this.multipleSelection[0];
 
@@ -398,7 +398,7 @@ export default {
     },
     openWxDialog () {
       if (this.multipleSelection.length != 1) {
-        return this.$platform.alert('请您先选择一个团队');
+        return this.$platform.alert('请您先选择一个部门');
       }
       let item = this.multipleSelection[0];
 
@@ -442,12 +442,12 @@ export default {
 
       this.fetchPageList();
     },
-    /* 清空已选择的团队 */
+    /* 清空已选择的部门 */
     selectionInit () {
       this.multipleSelection = [];
       this.$refs.teamTable.clearSelection();
     },
-    /* 选择的团队 */
+    /* 选择的部门 */
     selectTeamList (selection) {
       let tv = this.computeSelection(selection);
 
@@ -465,7 +465,7 @@ export default {
       }
       this.multipleSelection = tv;
     },
-    /* 删除某项已选择的团队 */
+    /* 删除某项已选择的部门 */
     selectCancelTeam (row, index) {
       this.multipleSelection.splice(index, 1);
       this.$refs.teamTable.toggleRowSelection(row, false);
@@ -487,7 +487,7 @@ export default {
       return tv;
     },
     /** 
-     * 切换团队选择状态
+     * 切换部门选择状态
      * @param {Array} list -表格列表
     */
     selectionToggle (list) {
@@ -508,7 +508,7 @@ export default {
         }
       })
     },
-    /* 设置是否按 服务团队派单 */
+    /* 设置是否按 服务部门派单 */
     async setUsedAllot (setTag) {
       let _setTag = 'dep';
       if (setTag) {
@@ -547,30 +547,30 @@ export default {
         console.log('setUsedAllot error: ', error);
       }
     },
-    /* 新建团队 */
+    /* 新建部门 */
     teamCreate () {
       let fromId = window.frameElement.getAttribute('id');
 
       this.$platform.openTab({
         id: 'team_create',
-        title: '新建团队',
+        title: '新建部门',
         url: '/security/tag/createTag?noHistory=1',
         reload: true,
         close: true,
         fromId
       });
     },
-    /* 新建子团队 */
+    /* 新建子部门 */
     teamChildCreate () {
-      window.TDAPP.onEvent('pc：访问团队管理-新建子团队');
+      window.TDAPP.onEvent('pc：访问部门管理-新建子部门');
       let len = this.multipleSelection.length;
       if (len != 1) {
-        return this.$platform.alert('请您选择一个团队');
+        return this.$platform.alert('请您选择一个部门');
       }
       let item = this.multipleSelection[0];
 
       if (!this.isParent(item)) {
-        return this.$platform.alert('请您选择一个主团队')
+        return this.$platform.alert('请您选择一个主部门')
       }
 
       let parent = {
@@ -582,20 +582,20 @@ export default {
 
       this.$platform.openTab({
         id: 'team_create',
-        title: '新建子团队',
+        title: '新建子部门',
         url: `/security/tag/createTag?${qs.stringify(parent)}`,
         reload: true,
         close: true,
         fromId
       });
     },
-    /* 删除团队 */
+    /* 删除部门 */
     async teamDelete () {
-      window.TDAPP.onEvent('pc：团队管理-删除团队事件');
+      window.TDAPP.onEvent('pc：部门管理-删除部门事件');
       if (this.multipleSelection.length <= 0) {
-        return this.$platform.alert('请您先选择至少一个团队');
+        return this.$platform.alert('请您先选择至少一个部门');
       }
-      // 判断是否 删除含有主团队
+      // 判断是否 删除含有主部门
       let hasParent = false;
       let select = this.multipleSelection;
       let confirm = false;
@@ -605,10 +605,10 @@ export default {
       })
 
       if (hasParent && this.showNewTeam) {
-        confirm = await this.$platform.confirm('您删除的团队，如果包含子团队将会一并删除，是否继续？');
+        confirm = await this.$platform.confirm('您删除的部门，如果包含子部门将会一并删除，是否继续？');
         if (!confirm) return;
       } else {
-        confirm = await this.$platform.confirm('是否确定删除您所选中的团队？');
+        confirm = await this.$platform.confirm('是否确定删除您所选中的部门？');
         if (!confirm) return;
       }
 
@@ -620,7 +620,7 @@ export default {
 
         this.$platform.notification({
           type: result.status == 0 ? 'success' : 'error',
-          title: `团队删除${result.status == 0 ? '成功' : '失败'}`,
+          title: `部门删除${result.status == 0 ? '成功' : '失败'}`,
           message: result.status == 0 ? null : result.message
         })
 

@@ -2,9 +2,9 @@
   <div>
     <div style="height: 100px"></div>
     <div class="form-item" style="width: 60%;">
-      <label for="team">服务团队</label>
+      <label for="team">服务部门</label>
       <div class="form-item-control">
-        <input type="text" id="team" class="custom-class" placeholder="请选择服务团队"/>
+        <input type="text" id="team" class="custom-class" placeholder="请选择服务部门"/>
       </div>
     </div>
     <button type="button" @click="show = !show">显示</button>
@@ -36,7 +36,7 @@ export default {
           phone: null,
           tagAddress: null,
           tagColor: null,
-          tagName: '测试团队',
+          tagName: '测试部门',
           tagPlaceList: [],
           tenantId: '7416b42a-25cc-11e7-a500-00163e12f748'
         }

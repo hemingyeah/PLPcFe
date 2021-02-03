@@ -53,7 +53,7 @@
             <!--  -->
             <div class="flex-x select-box"
                  v-if="typeDoing == 0">
-              <div class="flex-1 flex-x mar-r-24 select-item"> <span>服务团队:</span>
+              <div class="flex-1 flex-x mar-r-24 select-item"> <span>服务部门:</span>
                 <el-select class="flex-1"
                            v-model="value1"
                            multiple

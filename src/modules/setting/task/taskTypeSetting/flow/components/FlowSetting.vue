@@ -307,7 +307,7 @@ export default {
         },
         {
           value: 1,
-          label: '通知负责人团队主管',
+          label: '通知负责人部门主管',
         },
         {
           value: null,
@@ -322,7 +322,7 @@ export default {
         },
         {
           value: '1',
-          label: '通知负责人团队主管',
+          label: '通知负责人部门主管',
         },
         {
           value: '2',

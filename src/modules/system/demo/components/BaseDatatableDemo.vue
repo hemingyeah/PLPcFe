@@ -24,7 +24,7 @@
       <dl class="selected-team-list">
         <dt>
           <span class="id-team">编号</span>
-          <span class="name-team">团队</span>
+          <span class="name-team">部门</span>
           <i></i>
         </dt>
         <dd v-for="(team, index) in multipleSelection" :key="team.id" >

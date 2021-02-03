@@ -1,6 +1,6 @@
 <template>
   <base-modal
-    title="选择可用团队"
+    title="选择可用部门"
     width="344px"
     @cancel="cancel"
     :show.sync="isShow"
