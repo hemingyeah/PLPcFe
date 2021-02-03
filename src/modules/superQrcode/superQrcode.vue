@@ -75,11 +75,11 @@
             </div>
 
             <ul class="two-panel">
-              <li @click="changeType('contact')">
+              <li @click="changeType('contact')" :style="!doorOpenState?'width:100%;':''">
                 <img src="../../assets/img/customer_ser.png" />
                 <span>马上联系</span>
               </li>
-              <li @click="changeType('service')">
+              <li @click="changeType('service')" v-if="doorOpenState">
                 <img src="../../assets/img/selfService.png" />
                 <span>自助服务</span>
               </li>
@@ -370,6 +370,7 @@ export default {
         productVideo: [],
         knowledge: []
       },
+      doorOpenState:false,
       quickInfos: [],
       rules: [],
 
@@ -616,6 +617,8 @@ export default {
         this.settingInfo.knowledgeOpenState = val ? 1 : 0;
       } else if (option === 'part') {
         this.settingInfo.partOpenState = val ? 1 : 0;
+      }else if(option === 'service'){
+        this.doorOpenState=val;
       }
     },
     // 保存成功
@@ -786,6 +789,9 @@ export default {
       let res = await queryProductSetting(params);
       if (res.code === '200') {
         this.settingInfo = res.data;
+        if(this.settingInfo.doorOpenState===1 && this.settingInfo.doorEventType && this.settingInfo.doorEventType.length>0){
+          this.doorOpenState=true;
+        }
 
         this.queryEventType();
       } else {
