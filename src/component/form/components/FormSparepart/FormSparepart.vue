@@ -174,7 +174,6 @@ export default {
     return {
       partField: [],
       installProductId: '',
-      installPosition: '',
       products: this.initData.task.products,
       visible: false,
       showRepertory: true,
@@ -357,11 +356,9 @@ export default {
       this.value.forEach(val => {
         for (let v in val) {
           if (v == 'installProductId') {
-            this.installProductId = this.sparepart?.installProductId || ''
-            _initData.installProductId = ''
+            _initData.installProductId = this.sparepart?.installProductId || ''
           } else if (v == 'installPosition') {
-            this.installPosition = this.sparepart?.installPosition || ''
-            _initData.installPosition = ''
+            _initData.installPosition = this.sparepart?.installPosition || ''
           }
         }
       })
@@ -417,7 +414,6 @@ export default {
       this.sparepart = this._initData();
       this.selectedSparepart = [];
       this.installProductId = ''
-      this.installPosition = ''
 
       // 清空校验结果
       setTimeout(() => {
@@ -445,11 +441,6 @@ export default {
       // 重置备件信息
       this.selectedSparepart = [];
       this.sparepart = this._initData();
-      // 如果有安装产品和安装位置 不改变选中的值
-      if (this.partField.length) {
-        this.sparepart.installProductId = this.installProductId
-        this.sparepart.installPosition = this.installPosition
-      }
     },
     /**
     * @description 搜索备件
@@ -480,11 +471,6 @@ export default {
     */
     updatePart(value) {
       let newValue = value[0];
-      // 选中备件后 如果有安装产品和安装位置 不改变已经选中的值
-      if (this.partField.length) {
-        newValue.installProductId = this.sparepart?.installProductId || ''
-        newValue.installPosition = this.sparepart?.installPosition || ''
-      }
 
       for (let key in this.sparepart) {
         if (key == 'salePrice') {
@@ -492,7 +478,14 @@ export default {
         } else if (key == 'number') {
           this.sparepart.number = newValue.availableNum > 1 ? 1 : newValue.availableNum;
         } else {
-          this.sparepart[key] = newValue[key];
+          // 选中备件后 如果有安装产品和安装位置 不改变已经选中的值
+          if(this.partField.length) {
+            if (key != 'installProductId' || key != 'installPosition') {
+              this.sparepart[key] = newValue[key];
+            }
+          } else {
+            this.sparepart[key] = newValue[key];
+          }
         }
       }
     },
