@@ -54,6 +54,18 @@
 
             <!-- profile -->
             <div class="frame-quick-right">
+
+              <button v-if="initData.from && initData.from == 'ddcrm'"
+                      type="button"
+                      class="btn-text frame-header-btn frame-header-btn-bg"
+                      @click="goback"
+                      title="返回"
+                      v-tooltip>
+                <i class="iconfont icon-left"></i>
+                返回
+              </button>
+
+
               <button v-if="has_call_center_module"
                       type="button"
                       class="btn-text frame-header-btn"
@@ -123,15 +135,6 @@
                 </template>
                 <p class="last">{{ callData.message }}</p>
               </div>
-
-              <button v-if="initData.from && initData.from == 'ddcrm'"
-                      type="button"
-                      class="btn-text frame-header-btn frame-header-btn-bg"
-                      @click="goback"
-                      title="返回"
-                      v-tooltip>
-                <i class="iconfont icon-left"></i>
-              </button>
 
               <el-popover v-if="showDevTool">
                 <button type="button"
