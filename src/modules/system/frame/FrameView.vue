@@ -124,6 +124,15 @@
                 <p class="last">{{ callData.message }}</p>
               </div>
 
+              <button v-if="initData.from && initData.from == 'ddcrm'"
+                      type="button"
+                      class="btn-text frame-header-btn frame-header-btn-bg"
+                      @click="goback"
+                      title="返回"
+                      v-tooltip>
+                <i class="iconfont icon-left"></i>
+              </button>
+
               <el-popover v-if="showDevTool">
                 <button type="button"
                         class="btn-text frame-header-btn dev-tool"
@@ -664,6 +673,9 @@ export default {
     openHelpDoc (event) {
       platform.openLink('https://www.yuque.com/shb/help');
       this.profilePopperVisible = false;
+    },
+    goback (){
+      history.back(-1);return false;
     },
     openUserView (event) {
       this.openForFrame({
