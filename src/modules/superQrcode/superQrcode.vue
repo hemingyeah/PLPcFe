@@ -581,6 +581,8 @@ export default {
           this.eventTypeList = res.data;
           if (res.data) {
             this.eventTypeIdList = res.data.map(item => item.id);
+          }else{
+            this.eventTypeIdList=[];
           }
         }
       } else {
