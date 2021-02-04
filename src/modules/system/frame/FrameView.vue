@@ -678,7 +678,7 @@ export default {
       this.profilePopperVisible = false;
     },
     goback (){
-      history.back(-1);return false;
+      history.back(-2);return false;
     },
     openUserView (event) {
       this.openForFrame({
