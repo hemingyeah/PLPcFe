@@ -174,6 +174,7 @@ export default {
     return {
       partField: [],
       installProductId: '',
+      installPosition: '',
       products: this.initData.task.products,
       visible: false,
       showRepertory: true,
@@ -356,9 +357,11 @@ export default {
       this.value.forEach(val => {
         for (let v in val) {
           if (v == 'installProductId') {
-            _initData.installProductId = this.sparepart?.installProductId || ''
+            this.installProductId = this.sparepart?.installProductId || ''
+            _initData.installProductId = ''
           } else if (v == 'installPosition') {
-            _initData.installPosition = this.sparepart?.installPosition || ''
+            this.installPosition = this.sparepart?.installPosition || ''
+            _initData.installPosition = ''
           }
         }
       })
@@ -414,8 +417,7 @@ export default {
       this.sparepart = this._initData();
       this.selectedSparepart = [];
       this.installProductId = ''
-      this.sparepart.installProductId ? this.sparepart.installProductId = '' : ''
-      this.sparepart.installPosition ? this.sparepart.installPosition = '' : ''
+      this.installPosition = ''
 
       // 清空校验结果
       setTimeout(() => {
@@ -443,6 +445,11 @@ export default {
       // 重置备件信息
       this.selectedSparepart = [];
       this.sparepart = this._initData();
+      // 如果有安装产品和安装位置 不改变选中的值
+      if (this.partField.length) {
+        this.sparepart.installProductId = this.installProductId
+        this.sparepart.installPosition = this.installPosition
+      }
     },
     /**
     * @description 搜索备件
