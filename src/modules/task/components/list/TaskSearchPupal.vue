@@ -28,7 +28,7 @@
 
       <!-- 自定义字段 -->
       <el-checkbox :indeterminate="isIndeterminateCus" v-model="cusCheckAll" @change="handleCheckAllCusChange" v-if="customizeList.length"><h3 class="task-mtb13">自定义字段</h3></el-checkbox>
-      <el-checkbox-group v-model="checkCustomizeList">
+      <el-checkbox-group v-model="checkCustomizeList" @change="checkList">
         <el-checkbox :label="item.fieldName" v-for="(item, index) in customizeList" :key="index" class="wh150" v-if="item.isSearch">{{item.displayName}}</el-checkbox>
       </el-checkbox-group>
     </div>
@@ -69,11 +69,8 @@ export default {
       this.loc()
     },
     checkSystemList() {
-      this.checkList()
+      this._systemList()
     },
-    checkCustomizeList() {
-      this.checkList()
-    }
   },
   data() {
     return {
@@ -116,22 +113,63 @@ export default {
         this.checkCustomizeList = []
       }
     },
+    // 系统全选
     handleCheckAllSysChange(v) {
       this.checkSystemList = v ? this.systemList.map(item => {return item.fieldName}) : []
     },
+    // 自定义全选
     handleCheckAllCusChange(v) {
-      this.checkCustomizeList = v ? this.customizeList.map(item => {return item.fieldName}) : []
+      const searchField = localStorage.getItem('task-search-field')
+      if (v) {
+        if (searchField) {
+          let spare = [...this.customizeList.map(item => {return item.fieldName}), ...JSON.parse(searchField).checkCustomizeList].map(item => {return JSON.stringify(item)})
+          this.checkCustomizeList = [...new Set(spare)].map(item => {return JSON.parse(item)})
+        } else {
+          this.checkCustomizeList = this.customizeList.map(item => {return item.fieldName})
+        }
+        this.cusCheckAll = true
+        this.isIndeterminateCus = false
+      } else {
+        if (searchField) {
+          let spare = this.taskTypeFilterFields.filter(item => {
+            return this.checkCustomizeList.indexOf(item.fieldName) !== -1
+          }).map(item => {return item.fieldName})
+          this.checkCustomizeList = JSON.parse(searchField).checkCustomizeList.filter(item => {return spare.indexOf(item) === -1})
+        } else {
+          this.checkCustomizeList = []
+        }
+        this.isIndeterminateCus = false
+        this.cusCheckAll = false
+      }
     },
     loc() {
       const searchField = localStorage.getItem('task-search-field')
       if (searchField) {
+        this.cusCheckAll = false
         this.checkSystemList = [...new Set(JSON.parse(searchField).checkSystemList)]
-        this.checkCustomizeList = [...new Set(JSON.parse(searchField).checkCustomizeList)]
+        this.checkCustomizeList = this.taskTypeFilterFields.filter(item => {
+          return [...new Set(JSON.parse(searchField).checkCustomizeList)].indexOf(item.fieldName) !== -1
+        }).map(item => {return item.fieldName})
+
+        if (this.checkCustomizeList.length === this.taskTypeFilterFields.length) {
+          this.cusCheckAll = true
+          this.isIndeterminateCus = false
+        } else if (this.checkCustomizeList.length) {
+          this.isIndeterminateCus = true
+          this.cusCheckAll = false
+        } else {
+          this.cusCheckAll = false
+          this.isIndeterminateCus = false
+        }
+
       }
+
+
       this.$emit('visible', false)
     },
 
-    checkList() {
+    // 系统单选
+    _systemList() {
       if (!this.checkSystemList.length || this.systemList.length === this.checkSystemList.length) {
         this.isIndeterminateSys = false
       } else {
@@ -142,19 +180,26 @@ export default {
       } else {
         this.sysCheckAll = false
       }
+    },
 
-      if (this.customizeList.length === this.checkCustomizeList.length) {
+    // 自定义单选
+    checkList(v) {
+      let customize = this.taskTypeFilterFields.filter(item => {
+        return this.checkCustomizeList.indexOf(item.fieldName) !== -1
+      }).map(item => {return item.fieldName})
+      
+      if (customize.length === this.customizeList.length && customize.length) {
         this.cusCheckAll = true
+        this.isIndeterminateCus = false
+      } else if (customize.length) {
+        this.isIndeterminateCus = true
+        this.cusCheckAll = false
       } else {
         this.cusCheckAll = false
-      }
-
-      if (!this.checkCustomizeList.length || this.customizeList.length === this.checkCustomizeList.length) {
         this.isIndeterminateCus = false
-      } else {
-        this.isIndeterminateCus = true
       }
     },
+    // 关键字搜索
     taskSearch() {
       if (!this.seoText) {
         this.reset()
@@ -171,16 +216,20 @@ export default {
         }
       })
     },
+    // 重置
     reset() {
       this.systemList = this.config
       this.customizeList = this.taskTypeFilterFields
       this.seoText = ''
     },
+
+    // 确定
     onSubmit() {
       const {checkSystemList, checkCustomizeList, config, taskTypeFilterFields} = this
+      let task_search_field = localStorage.getItem('task-search-field')
       let sySet = new Set(checkSystemList)
       let CuSet = new Set(checkCustomizeList)
-      let list = localStorage.getItem('task-search-field') ? JSON.parse(localStorage.getItem('task-search-field')).list : [];
+      let list = task_search_field ? JSON.parse(task_search_field).list : [];
       [...config, ...taskTypeFilterFields].forEach(item => {
         [...sySet, ...CuSet].forEach(v => {
           if (v === item.fieldName) {
@@ -188,10 +237,16 @@ export default {
           } 
         })
       })
+      
+      console.log(CuSet)
+      let filterList = list.filter(item => {
+        return [...sySet, ...CuSet].indexOf(item.fieldName) !== -1
+      });
+
       let params = {
         checkSystemList,
         checkCustomizeList,
-        list: [...new Set(list.map(item => {item = JSON.stringify(item); return item}))].map(item => {item = JSON.parse(item); return item})
+        list:  [...new Set(filterList.map(item => {return JSON.stringify(item)}))].map(item => {return JSON.parse(item)})
       }
       this.visible = false
       this.$emit('taskPupal', params)
