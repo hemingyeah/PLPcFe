@@ -649,23 +649,7 @@ export default {
     this.revertTableColumns();
     this.initialize();
 
-    this.$nextTick(() => {
-      if (storageGet(PRODUCT_TEAM_LIST_VIEW) && storageGet(PRODUCT_TEAM_LIST_VIEW) > 0) this.$Guide().destroy('product-team-list')
-      else this.$Guide([{
-        content:
-          '在这里设置超级二维码首页服务人员微信',
-        haveStep: false,
-        gStyle: 'top:35px',
-        id: 'product-team-list',
-        domId: 'product-team-list-1',
-        arrowStyle: 'left:-140px',
-        finishBtn: 'OK',
-      }], 0, '', (e) => {
-        return new Promise((resolve, reject) => {
-          resolve()
-        })
-      }).create().then(res_=>{if(res_)storageSet(PRODUCT_TEAM_LIST_VIEW, '1')})
-    })
+    
 
     this.isAllotByTag = (this.initData.taskConfig && this.initData.taskConfig.allotByTag !== false);
     this.isSeeAllOrg = this.initData.seeAllOrg !== false;
@@ -673,6 +657,25 @@ export default {
     // 对外开放刷新方法，用于其他tab刷新本tab数据
     // TODO: [tab_spec]标准化刷新方式
     window.__exports__refresh = this.initialize;
+    this.$nextTick(() => {
+      setTimeout(() => {
+        if (storageGet(PRODUCT_TEAM_LIST_VIEW) && storageGet(PRODUCT_TEAM_LIST_VIEW) > 0) this.$Guide().destroy('product-team-list')
+        else this.$Guide([{
+          content:
+          '在这里设置超级二维码首页服务人员微信',
+          haveStep: false,
+          gStyle: 'top:35px',
+          id: 'product-team-list',
+          domId: 'product-team-list-1',
+          arrowStyle: 'left:-140px',
+          finishBtn: 'OK',
+        }], 0, '', (e) => {
+          return new Promise((resolve, reject) => {
+            resolve()
+          })
+        }).create().then(res_=>{if(res_)storageSet(PRODUCT_TEAM_LIST_VIEW, '1')})
+      }, 1000);
+    })
   }
 }
 </script>
