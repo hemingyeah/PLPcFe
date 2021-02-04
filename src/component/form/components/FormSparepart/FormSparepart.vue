@@ -473,6 +473,11 @@ export default {
     */
     updatePart(value) {
       let newValue = value[0];
+      // 选中备件后 如果有安装产品和安装位置 不改变已经选中的值
+      if (this.partField.length) {
+        newValue.installProductId = this.sparepart?.installProductId || ''
+        newValue.installPosition = this.sparepart?.installPosition || ''
+      }
 
       for (let key in this.sparepart) {
         if (key == 'salePrice') {
