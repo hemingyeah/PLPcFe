@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2021-02-01 10:13:09
- * @LastEditTime: 2021-02-01 18:54:43
+ * @LastEditTime: 2021-02-04 14:22:50
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /shb-fe-pc/src/modules/task/view/components/TaskFeedback/FeedbackDetailBoLi.vue
@@ -42,6 +42,12 @@
           <span :class="['evaluate-degree-img', getDegreeImg(item, baseEvaluateInfo.boliOnTime == item)]"></span>
           <span class="degree-text">{{ item }}</span>
         </label>
+      </div>
+    </div>
+    <div class="form-view-row" v-if="evaluateConfig.useTagEvaluate && tagEvaluates.length">
+      <label>服务标签</label>
+      <div class="form-view-row-content evaluate-tag">
+        <span class="evaliate-tag-item evaliate-tag-active" v-for="name in tagEvaluates" :key="name">{{ name }}</span>
       </div>
     </div>
     <div class="form-view-row">
@@ -103,6 +109,9 @@ export default {
   computed:{
     baseEvaluateInfo(){
       return this.taskEvaluate ? this.taskEvaluate?.attribute : this.evaluate.baseEvaluateInfo?.attribute
+    },
+    tagEvaluates(){
+      return (this.taskEvaluate ? this.taskEvaluate?.attribute.tagEvaluates : this.evaluate.baseEvaluateInfo?.attribute.tagEvaluates) || []
     }
   },
   methods: {
