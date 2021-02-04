@@ -356,9 +356,9 @@ export default {
       this.value.forEach(val => {
         for (let v in val) {
           if (v == 'installProductId') {
-            _initData.installProductId = ''
+            _initData.installProductId = this.sparepart?.installProductId || ''
           } else if (v == 'installPosition') {
-            _initData.installPosition = ''
+            _initData.installPosition = this.sparepart?.installPosition || ''
           }
         }
       })
@@ -414,6 +414,8 @@ export default {
       this.sparepart = this._initData();
       this.selectedSparepart = [];
       this.installProductId = ''
+      this.sparepart.installProductId ? this.sparepart.installProductId = '' : ''
+      this.sparepart.installPosition ? this.sparepart.installPosition = '' : ''
 
       // 清空校验结果
       setTimeout(() => {
