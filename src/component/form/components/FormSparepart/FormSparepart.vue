@@ -414,6 +414,8 @@ export default {
       this.sparepart = this._initData();
       this.selectedSparepart = [];
       this.installProductId = ''
+      this.sparepart.installProductId = ''
+      this.sparepart.installPosition = ''
 
       // 清空校验结果
       setTimeout(() => {
