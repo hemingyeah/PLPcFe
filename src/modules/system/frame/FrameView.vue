@@ -6,7 +6,7 @@
                  :callcenter="has_call_center_module"
                  @open="openForNav"
                  @collapse-changed="adjustOpenTab"
-                 v-if="(showNavBar && !initData.from) || (initData && initData.from != 'ddcrm')" />
+                 v-if="(showNavBar && !initData.from) || (showNavBar && initData && initData.from != 'ddcrm')" />
 
       <div class="frame-content">
         <header class="frame-header">
@@ -1152,6 +1152,7 @@ export default {
     },
     buildNavbarMenus () {
       let menus = this.initData?.menus || [];
+      debugger
       // 需要被过滤掉的菜单key对象
       let filterMeunKeyMap = {
         M_DASHBOARD_SCREEN: isShowDashboardScreen(),
@@ -1185,6 +1186,7 @@ export default {
       }
 
       this.navBarMenus = menus;
+
       this.showNavBar = true;
     },
     pushTaskListIds (id) {
