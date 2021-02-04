@@ -3,7 +3,7 @@
     <div class="base-modal-content">
       <div class="form-view-row">
         <label>服务满意度：</label>
-        <div class="form-view-row-content">
+        <div class="star-evaluate-row" >
           <label class="degree-item">
             <base-service-star :value="form.evaluate.attribute.boliDegree" @input="marks($event)" :handle="allowModify"></base-service-star>
           </label>
@@ -41,6 +41,15 @@
             <input type="radio" class="hidden" name="boliOnTime" :value="item" v-model="form.evaluate.attribute.boliOnTime" :disabled="!allowModify" />
             <span :class="['evaluate-degree-img', getDegreeImg(item, form.evaluate.attribute.boliOnTime == item)]"></span>
             <span class="degree-text">{{ item }}</span>
+          </label>
+        </div>
+      </div>
+      <div class="form-view-row" v-if="evaluateConfig.useTagEvaluate && tagEvaluates.length">
+        <label>服务标签：</label>
+        <div class="form-view-row-content evaluate-tag">
+          <label class="tag-item" v-for="name in tagEvaluates" :key="name">
+            <input type="checkbox" class="hidden" :value="name" v-model="form.evaluate.attribute.tagEvaluates" :disabled="!allowModify">
+            <span class="evaliate-tag-item">{{ name }}</span>
           </label>
         </div>
       </div>
@@ -124,7 +133,8 @@ export default {
             boliDegree:0,
             boliServiceAttitude:'',
             boliMaintenanceResults:'',
-            boliOnTime:''
+            boliOnTime:'',
+            tagEvaluates:[]
           }
         }
       }
@@ -149,7 +159,10 @@ export default {
     },
     async submit(autoClosed) {
       const {boliDegree, boliServiceAttitude, boliMaintenanceResults, boliOnTime} = this.form.evaluate.attribute
-     
+      if(!boliDegree){
+        this.$platform.alert('请填写服务满意度')
+        return false
+      }
       // 满意度小于5时服务态度必填校验
       if(boliDegree < 5) {
         let message = [];
