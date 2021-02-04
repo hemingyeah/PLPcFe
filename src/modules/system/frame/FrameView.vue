@@ -6,7 +6,7 @@
                  :callcenter="has_call_center_module"
                  @open="openForNav"
                  @collapse-changed="adjustOpenTab"
-                 v-if="showNavBar" />
+                 v-if="(showNavBar && !initData.from) || (initData && initData.from != 'ddcrm')" />
 
       <div class="frame-content">
         <header class="frame-header">
