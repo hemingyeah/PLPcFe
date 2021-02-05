@@ -36,6 +36,7 @@
         <task-feedback-detail-boli
           :evaluate-content="task.evaluateContent"
           :task-evaluate.sync="initData.taskEvaluate"
+          :evaluate-config="initData.evaluateConfig"
           :evaluate="task"
           v-if="initData.isBoli"
         />
