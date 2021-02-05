@@ -811,6 +811,7 @@ export default {
     },
     updateProductForProductSelect(value = []) {
       this.updateProduct(value, { isForceUpdateCustomer: true })
+      this.$refs.product.$refs.BaseRemoteSelect.query='';
     },
     /** 
      * @description 效验
