@@ -185,10 +185,10 @@ export default {
       const checkParams = {
         id: this.task.id,
         suggestion: this.form.suggestion,
-        // evaluate: this.form.evaluate
+        baseEvaluateInfo: this.form.evaluate
       }
       // 回访是否需要审批
-      const result = await this.$http.post(`/task/approve/degreeForView?autoClosed=${autoClosed}`, checkParams);
+      const result = await this.$http.post(`/task/approve/boli/degreeForView?autoClosed=${autoClosed}`, checkParams);
       if (!result.succ && result.message == '需要审批') {
         this.visible = false;
         this.pending = false;
