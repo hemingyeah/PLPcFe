@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2021-02-01 10:13:09
- * @LastEditTime: 2021-02-04 14:22:50
+ * @LastEditTime: 2021-02-05 12:52:12
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /shb-fe-pc/src/modules/task/view/components/TaskFeedback/FeedbackDetailBoLi.vue
@@ -99,7 +99,11 @@ export default {
     taskEvaluate:{
       type:Object,
       default: () => ({})
-    }
+    },
+    evaluateConfig: {
+      type: Object,
+      default: () => ({})
+    },
   },
   data() {
     return {
