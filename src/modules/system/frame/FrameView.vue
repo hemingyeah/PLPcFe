@@ -858,7 +858,7 @@ export default {
     async getSystemPopup() {
       try {
         let info = await http.get("/api/app/outside/message/v1/getSysMsgAlert");
-        if (info.status == 0 && info.data.length > 0) {
+        if (info.status == 0 && info.data?.length > 0) {
           this.loadedSystemPopup = true;
           this.systemData = info.data;
         }
