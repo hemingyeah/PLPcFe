@@ -316,11 +316,7 @@ export default {
   },
   watch: {
     visible(n) {
-      // 只有一个产品时默认选中
-      if (this.products.length && this.products.length == 1) {
-        this.installProductId = this.products[0].id
-        this.$set(this.sparepart, 'installProductId', this.installProductId)
-      }
+      this.chooseDefaultProduct()
     }
   },
   methods: {
@@ -333,6 +329,13 @@ export default {
         }
       })
       return name
+    },
+    // 只有一个产品时默认选中
+    chooseDefaultProduct() {
+      if (this.partField.length && this.products.length && this.products.length == 1) {
+        this.installProductId = this.products[0].id
+        this.$set(this.sparepart, 'installProductId', this.installProductId)
+      }
     },
     /**
     * @description 初始化备件默认值
@@ -356,11 +359,7 @@ export default {
       this.value.forEach(val => {
         for (let v in val) {
           if (v == 'installProductId') {
-            if (this.products.length && this.products.length == 1) {
-              _initData.installProductId = this.products[0].id
-            } else {
-              _initData.installProductId = ''
-            }
+            _initData.installProductId = ''
           } else if (v == 'installPosition') {
             _initData.installPosition = ''
           }
@@ -445,6 +444,7 @@ export default {
       // 重置备件信息
       this.selectedSparepart = [];
       this.sparepart = this._initData();
+      this.chooseDefaultProduct()
     },
     /**
     * @description 搜索备件
@@ -485,6 +485,7 @@ export default {
           this.sparepart[key] = newValue[key];
         }
       }
+      this.chooseDefaultProduct()
     },
     /**
     * @description 数量校验
