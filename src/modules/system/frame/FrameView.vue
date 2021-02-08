@@ -358,7 +358,7 @@
     <!-- S 返回旧版原因弹框 -->
     <reason-panel ref="reasonPanel"
                   @oldVersion="changeTaskVersion(false)" />
-                  <!-- E 返回旧版原因弹框 -->
+    <!-- E 返回旧版原因弹框 -->
 
     <!-- start 工单设置新版引导弹框 -->
     <task-setting-guide ref="taskSettingGuide" />
@@ -1152,7 +1152,6 @@ export default {
     },
     buildNavbarMenus () {
       let menus = this.initData?.menus || [];
-      debugger
       // 需要被过滤掉的菜单key对象
       let filterMeunKeyMap = {
         M_DASHBOARD_SCREEN: isShowDashboardScreen(),
