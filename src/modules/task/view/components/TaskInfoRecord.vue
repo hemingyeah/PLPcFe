@@ -45,6 +45,19 @@ function createAttachmentDom(h, attachments){
     : ''
 }
 
+function createLinkDom(h,s){
+  const reg = /((((https?|ftp?):(?:\/\/)?)(?:[-;:&=\+\$]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\?\+=&;:%!\/@.\w_]*)#?(?:[-\+=&;%!\?\/@.\w_]*))?)/g;
+  const str=s.replace(reg,str=>`@@${str}@@`);
+  const arr=str.split('@@');
+  return <p class="pre-line secondary-info">{arr.map(item=>{
+    if(item.indexOf('http')===0){
+      return <a href={item} target='_blank'>{item}</a>
+    }else{
+      return <span>{item}</span>
+    }
+  })}</p>
+}
+
 export default {
   name: 'task-info-record',
   inject: ['initData'],
@@ -398,7 +411,7 @@ export default {
         </h5>,
         content.isDelete == 'true'
           ? <p class="text-danger">{content.deleteUserName}于{content.deleteTime}删除了该备注。</p> 
-          : [<p class="pre-line secondary-info">{content.updateContent}</p>, createAttachmentDom(h, attachments)]
+          : [createLinkDom(h,content.updateContent), createAttachmentDom(h, attachments)]
       ]
     },
     /* 渲染api新建 */
