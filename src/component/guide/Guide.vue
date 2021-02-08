@@ -6,8 +6,8 @@
       class="cover-dom"
       v-if="needCover && showGuide && !canUse"
       :style="
-        `width:${guideDom.width || 0}px;height:${guideDom.height ||
-        0}px;top:${guideDom.top || 0}px;left:${guideDom.left || 0}px;`
+        `width:${guideCoverDom.width || 0}px;height:${guideCoverDom.height ||
+        0}px;top:${guideCoverDom.top || 0}px;left:${guideCoverDom.left || 0}px;`
       "
     ></div>
     <div id="vmDom"></div>
@@ -196,6 +196,7 @@ export default {
       guideStyle: '',
       arrowStyle: '',
       guideDom: {},
+      guideCoverDom:{},
       loop: null,
       arrowDirection: 'up',
       guideMounted: false,
@@ -228,6 +229,9 @@ export default {
   created() {},
   mounted() {
     this.loop = setInterval(() => {
+
+      if(!document.getElementById(this.domId) && !this.domObj) return this.showGuide = false;
+      this.showGuide = true;
       // console.log(this.domObj(), 321321);
       let res_;
       let guideDom = {
@@ -249,6 +253,8 @@ export default {
       }
       // 被引导的元素位置不变化的话停止引导组件的渲染
       if (!res_ || ( this.guideDom && res_ && this.guideDom.top == res_.top && this.guideDom.left == res_.left && this.guideDom.height == res_.height && this.guideDom.width == res_.width )) return;
+      // 默认遮挡needCover的引导元素的父元素
+      this.guideCoverDom = dom.getBoundingClientRect();
       let style_ = '';
 
       if (this.needCover && this.copyDom) {

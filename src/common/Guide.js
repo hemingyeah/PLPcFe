@@ -160,13 +160,11 @@ class Guide {
         },
       };
       let GuideCompoments = Vue.extend(guideDom);
-      if(!document.getElementById(obj.domId) && !obj.domObj) return
       new GuideCompoments().$mount(`#${obj.id}`);
       resolve(true);
     });
   }
   destroy(id) {
-    console.log(123);
     try {
       let dom = document.getElementById(`${id}`);
       dom.remove();

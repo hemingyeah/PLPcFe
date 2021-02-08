@@ -31,11 +31,11 @@
   </div>
 </template>
 <script>
-import toastList from "../toastList/toastList";
-import wxSet from "../wxSet/wxSet";
-import doMyselfSet from "../setting/index";
+import toastList from '../toastList/toastList';
+import wxSet from '../wxSet/wxSet';
+import doMyselfSet from '../setting/index';
 export default {
-  name: "do-myself-view",
+  name: 'do-myself-view',
   props: {
     initData: {
       type: Object,
@@ -51,23 +51,23 @@ export default {
     return {
       menuList: [
         {
-          name: "客户自助门户",
-          icon: "icon-Gateway",
-          comName: "do-myself-set",
+          name: '客户自助门户',
+          icon: 'icon-Gateway',
+          comName: 'do-myself-set',
         },
         {
-          name: "公众号设置",
-          icon: "icon-weixin2",
-          comName: "wx-set",
+          name: '公众号设置',
+          icon: 'icon-weixin2',
+          comName: 'wx-set',
         },
         {
-          name: "短信消息设置",
-          icon: "icon-duanxin3",
+          name: '短信消息设置',
+          icon: 'icon-duanxin3',
         },
         {
-          name: "消息记录",
-          icon: "icon-message",
-          comName: "toast-list",
+          name: '消息记录',
+          icon: 'icon-message',
+          comName: 'toast-list',
         },
       ],
       nowMenu: 1, // 0 客户自助门户 1 公众号设置 2 短信消息设置 3 消息记录
@@ -79,9 +79,11 @@ export default {
     },
   },
   created() {
-    let type = window.location.href.split("/")[
-      window.location.href.split("/").length - 1
+    let type = window.location.href.split('/')[
+      window.location.href.split('/').length - 1
     ];
+    // 带锚点的链接
+    if(type.indexOf('#') > -1) type = type.split('#')[0]
     let typeObj = {
       wxSet: 1,
       toastList: 3,
@@ -95,13 +97,13 @@ export default {
         return;
       }
       if (index === 2) {
-        window.location.href = "/setting/message/smsmessage";
+        window.location.href = '/setting/message/smsmessage';
       } else if (index === 0) {
-        window.location.href = "/setting/serviceStation/customerPortal";
+        window.location.href = '/setting/serviceStation/customerPortal';
       } else if (index === 1) {
-        window.location.href = "/setting/doMyself/wxSet";
+        window.location.href = '/setting/doMyself/wxSet';
       } else if (index === 3) {
-        window.location.href = "/setting/doMyself/toastList";
+        window.location.href = '/setting/doMyself/toastList';
       }
       this.nowMenu = index;
     },
