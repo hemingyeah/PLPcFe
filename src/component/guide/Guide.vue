@@ -231,6 +231,7 @@ export default {
     this.loop = setInterval(() => {
 
       if(!document.getElementById(this.domId) && !this.domObj) return this.showGuide = false;
+      this.showGuide = true;
       // console.log(this.domObj(), 321321);
       let res_;
       let guideDom = {
