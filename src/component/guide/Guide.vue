@@ -273,6 +273,12 @@ export default {
         }px;background:#fff;`;
         document.getElementById('vmDom').appendChild(dom_clone);
       }
+      if (this.needCover && !this.copyDom) {
+        let dom_ = this.domObj
+          ? this.domObj()
+          : document.getElementById(`${this.domId}`);
+        dom_.classList.add('guide-point');
+      }
 
       if (this.direction == 'row') {
         if (
