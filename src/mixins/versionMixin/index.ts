@@ -44,7 +44,8 @@ export default class VersionMixin extends VC {
   
   /**
    * @description: 检查数量是否超过上限 (仅限体验版)
-   * @param {TenantDataLimitSourceEnum} source 需要检查的模块名称
+   * @param {TenantDataLimitSourceEnum} source 需要检查的模块来源名称
+   * @param {TenantDataLimitTypeEnum} type 需要检查的模块类型
    * @return {Boolean} 是否超过上限
   */
   private async fetchCheckNumExceedLimit(source: TenantDataLimitSourceEnum, type: TenantDataLimitTypeEnum): Promise<boolean> {
@@ -71,7 +72,8 @@ export default class VersionMixin extends VC {
   
   /**
    * @description: 初始化检查数量是否超过上限 (仅限体验版)之前的事件操作
-   * @param {TenantDataLimitSourceEnum} source 需要检查的模块名称
+   * @param {TenantDataLimitSourceEnum} source 需要检查的模块来源名称
+   * @param {TenantDataLimitTypeEnum} type 需要检查的模块类型
    * @param {Function} successCallback 成功回调函数
    * @param {Function} errorCallback 失败回调函数
    * @return {*}
@@ -110,17 +112,14 @@ export default class VersionMixin extends VC {
   
   /**
    * @description: 提交后 检查数量是否超过上限 (仅限体验版) 的事件操作
-   * @param {TenantDataLimitSourceEnum} source 需要检查的模块名称
-   * @param {Function} successCallback 成功回调函数
-   * @param {Function} errorCallback 失败回调函数
-   * @return {*}
+   * @param {Promise} submitEventPromise 提交事件promise
+   * @return {void}
   */
   private async checkNumExceedLimitAfterHandler<T = MsgModel<any> | Result<any>>(submitEventPromise: Promise<T>) {
     return new Promise<T>((resolve, reject) => {
       
       try {
         submitEventPromise.then((responseData: any) => {
-          responseData = { code: ErrorCodeEnum.DataLimit, status: ErrorCodeEnum.DataLimit  }
           // 是否超出上限
           let isExceed = (
             responseData?.code == ErrorCodeEnum.DataLimit 

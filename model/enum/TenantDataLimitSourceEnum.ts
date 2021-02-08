@@ -1,4 +1,4 @@
-// // 租户数据限制来源枚举
+// 租户数据限制来源枚举
 enum TenantDataLimitSourceEnum {
   // 工单
   Task = 0,
