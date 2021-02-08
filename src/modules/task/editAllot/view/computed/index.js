@@ -45,9 +45,9 @@ export default {
     let path = this.path;
     return (
       (path.startsWith('/task/edit/') && path != '/task/edit')
-          || path.startsWith('/task/noFilterEdit/')
-          || path.startsWith('/task/copyTask')
-          || path.startsWith('/event/convent2Task/jump')
+        || path.startsWith('/task/noFilterEdit/')
+        || path.startsWith('/task/copyTask')
+        || path.startsWith('/event/convent2Task/jump')
     )
   },
   /** 

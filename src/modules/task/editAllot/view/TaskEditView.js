@@ -24,6 +24,10 @@ import computed from './computed'
 import methods from './methods'
 /* enum */
 import { TaskFieldNameMappingEnum } from '@model/enum/FieldMappingEnum.ts'
+import TenantDataLimitSourceEnum from '@model/enum/TenantDataLimitSourceEnum'
+import TenantDataLimitTypeEnum from '@model/enum/TenantDataLimitTypeEnum'
+/* mixin */
+import VersionMixin from '@src/mixins/versionMixin/index.ts'
 /* constant */
 import { PLATN_TASK_PLAN_TIME_REQUIRES_MESSAGE } from '@src/model/const/Alert.ts'
 
@@ -32,6 +36,7 @@ let taskTemplate = {};
 export default {
   name: 'task-edit-view',
   inject: ['initData'],
+  mixins: [VersionMixin],
   data() {
     data.template = taskTemplate
     return data
@@ -69,7 +74,11 @@ export default {
         if(query.openAllotSetting) {
           await this.planTaskEditDialogOpen();
         }
-      });
+      })
+      
+      // 版本数量限制
+      this.checkNumExceedLimitHandler()
+      
     } catch (error) {
       console.warn('error ', error)
     }
@@ -137,7 +146,9 @@ export default {
      * @description 创建工单方法
     */
     createTaskMethod(params, isAllot) {
-      TaskApi.createTask(params)
+      const CreateTaskPromise = TaskApi.createTask(params)
+      
+      this.checkNumExceedLimitAfterHandler(CreateTaskPromise)
         .then(res => {
           let isSucc = res.success;
           
@@ -175,6 +186,30 @@ export default {
           this.togglePending();
           console.error('err', err)
         })
+    },
+    /** 
+     * @description 检查版本数量限制
+    */
+    checkNumExceedLimitHandler() {
+      if (!this.checkNumExceedLimitBeforeHandler) return
+      // 检测新建计划任务
+      if (this.isFromPlan) {
+        return (
+          this.checkNumExceedLimitBeforeHandler(
+            TenantDataLimitSourceEnum.PlanTask,
+            TenantDataLimitTypeEnum.PlanTask
+          )
+        )
+      }
+      // 检测新建工单
+      if (this.isTaskCreate) {
+        return (
+          this.checkNumExceedLimitBeforeHandler(
+            TenantDataLimitSourceEnum.Task,
+            TenantDataLimitTypeEnum.Task
+          )
+        )
+      }
     },
     /** 
      * @description 从客户新建工单处理
@@ -364,9 +399,11 @@ export default {
      * @description 新建计划任务提交
     */
     planTaskCreateSubmit(params = {}) {
-      TaskApi.createPlanTask(params)
+      const PlanTaskCreatePromise = TaskApi.createPlanTask(params)
+      
+      this.checkNumExceedLimitAfterHandler(PlanTaskCreatePromise)
         .then(res => {
-          let isSucc = res.success;
+          let isSucc = res.success
           
           platform.notification({
             type: isSucc ? 'success' : 'error',
