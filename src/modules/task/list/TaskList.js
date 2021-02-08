@@ -1419,6 +1419,13 @@ export default {
      * @description 工单类型改变
      */
     changeTaskType(taskType) {
+
+      if (localStorage.getItem('checkedMap')) {
+        localStorage.removeItem('checkedMap')
+        localStorage.removeItem('checkedGroupArr')
+        localStorage.removeItem('isCheckedAll')
+      }
+
       this.searchParams = {...this.searchParams_spare, ...{templateId: taskType.id}}
       this.currentTaskType = taskType;
       // this.selectId = 'all'
@@ -1942,7 +1949,7 @@ export default {
         
         if (!storageGet(TASK_GUIDE_SEARCH_MODEL) || storageGet(TASK_GUIDE_SEARCH_MODEL) * 1 < 2) {
           this.$refs.searchPanel.createGuide([{
-            content: '高级搜索的“空白”，由您来填充。通过“设置”功能，定制您专属的“常用查询条件',
+            content: '高级搜索的“空白”，由您来填充。通过“设置”功能，定制您专属的“常用查询条件”',
             haveStep: true,
             nowStep: 1,
             id: 'v-task-step',

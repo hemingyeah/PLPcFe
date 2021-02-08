@@ -6,7 +6,7 @@
                  :callcenter="has_call_center_module"
                  @open="openForNav"
                  @collapse-changed="adjustOpenTab"
-                 v-if="showNavBar" />
+                 v-if="(showNavBar && !initData.from) || (showNavBar && initData && initData.from != 'ddcrm')" />
 
       <div class="frame-content">
         <header class="frame-header">
@@ -54,6 +54,18 @@
 
             <!-- profile -->
             <div class="frame-quick-right">
+
+              <button v-if="initData.from && initData.from == 'ddcrm'"
+                      type="button"
+                      class="btn-text frame-header-btn frame-header-btn-bg"
+                      @click="goback"
+                      title="返回"
+                      v-tooltip>
+                <i class="iconfont icon-left"></i>
+                返回
+              </button>
+
+
               <button v-if="has_call_center_module"
                       type="button"
                       class="btn-text frame-header-btn"
@@ -427,7 +439,7 @@ import TaskSettingGuide from './component/TaskSettingGuide';
 
 import ImportAndExport from './component/ImportAndExport.vue';
 
-import DefaultHead from '@src/assets/img/user-avatar.png';
+import DefaultHead from '@src/assets/img/avatar.png';
 import NotificationCenter from './component/NotificationCenter.vue';
 import * as NotificationApi from '@src/api/NotificationApi';
 import * as CallCenterApi from '@src/api/CallCenterApi';
@@ -443,16 +455,13 @@ import {
 
 /* util */
 import _ from 'lodash';
-import Axios from 'axios';
 
 const newTaskGuideStore = require('@src/component/guide/taskV2Store');
 const GuideStoreObj = {
   newTaskGuideStore,
 };
-
 const NOTIFICATION_TIME = 1000 * 60 * 10;
 
-// const wsUrl = 'ws://30.40.56.211:8080/websocket/asset/7416b42a-25cc-11e7-a500-00163e12f748_dd4531bf-7598-11ea-bfc9-00163e304a25'
 let webSocketClient = null,
   lockReconnect = false,
   reconnectTimmer = null;
@@ -772,6 +781,9 @@ export default {
     openHelpDoc(event) {
       platform.openLink(!platform.inDingTalk ? 'https://www.yuque.com/shb/help2' : 'https://www.yuque.com/shb/help');
       this.profilePopperVisible = false;
+    },
+    goback (){
+      history.go(-2);return false;
     },
     openUserView (event) {
       this.openForFrame({
@@ -1264,6 +1276,7 @@ export default {
     },
     buildNavbarMenus () {
       let menus = this.initData?.menus || [];
+      debugger
       // 需要被过滤掉的菜单key对象
       let filterMeunKeyMap = {
         M_DASHBOARD_SCREEN: isShowDashboardScreen(),
@@ -1297,6 +1310,7 @@ export default {
       }
 
       this.navBarMenus = menus;
+
       this.showNavBar = true;
     },
     pushTaskListIds (id) {
