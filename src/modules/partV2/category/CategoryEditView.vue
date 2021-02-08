@@ -64,10 +64,16 @@ import BaseGallery from 'packages/BaseGallery/index';
 import qs from '@src/util/querystring2';
 import AuthUtil from '@src/util/auth';
 import _ from 'lodash';
-        
+/* enum */
+import TenantDataLimitSourceEnum from '@model/enum/TenantDataLimitSourceEnum'
+import TenantDataLimitTypeEnum from '@model/enum/TenantDataLimitTypeEnum'
+/* mixin */
+import VersionMixin from '@src/mixins/versionMixin/index.ts'
+
 export default {
   name: 'partV2-edit-view',
   inject: ['initData'],
+  mixins: [VersionMixin],
   data() {
     return {
       auths: {},
@@ -224,13 +230,14 @@ export default {
             part.image = this.partImg;
           }
         }
-
+        
         let url = this.action == 'edit' ? '/partV2/category/update' : '/partV2/category/create';
-        let result = await this.$http.post(url, part);
+        const SubmitPromise = this.$http.post(url, part)
+        let result = await this.checkNumExceedLimitAfterHandler(SubmitPromise)
         
         if(result.status == 0){
           window.location.href = '/partV2/category/list'
-        }else{
+        } else{
           this.$platform.alert(result.message)
         }
       } catch (error) {
@@ -294,6 +301,13 @@ export default {
           });
         }
         part = result || {};
+      } else {
+        // 检查版本数量限制
+        this.checkNumExceedLimitBeforeHandler 
+        && this.checkNumExceedLimitBeforeHandler(
+          TenantDataLimitSourceEnum.SparePart,
+          TenantDataLimitTypeEnum.SparePart
+        )
       }
 
       this.initialize(part);
