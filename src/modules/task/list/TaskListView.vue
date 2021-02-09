@@ -997,65 +997,6 @@
 
     <div class="task-bj" v-show="showBj"></div>
 
-    <v-tour
-      v-if="showTour"
-      name="myTour"
-      :steps="listSteps"
-      :options="listOptions"
-      :callbacks="myCallbacks"
-    >
-      <template slot-scope="tour">
-        <transition name="fade">
-          <template v-for="(step, index) of tour.steps">
-            <v-step
-              v-if="tour.currentStep === index"
-              :key="index"
-              :step="step"
-              :previous-step="tour.previousStep"
-              :next-step="tour.nextStep"
-              :stop="tour.stop"
-              :is-first="tour.isFirst"
-              :is-last="tour.isLast"
-              :labels="tour.labels"
-            >
-              <template>
-                <div slot="content" class="v-tour-content-box">
-                  <div class="v-tour-left-tips">
-                    {{ `${index + 1}/${listSteps.length}` }}
-                  </div>
-                  <div class="v-tour-content">
-                    <div class="flex-x v-tour-content-head">
-                      <i @click="tour.stop" class="iconfont icon-fe-close"></i>
-                    </div>
-                    <div class="v-tour-content-con">
-                      {{ listSteps[index].content }}
-                    </div>
-                  </div>
-                </div>
-                <div slot="actions" class="v-tour-bottom">
-                  <!-- <div class="text" v-if="index > 0" @click="tour.previousStep">
-                    上一步
-                  </div> -->
-                  <div
-                    class="btns"
-                    v-if="index < listSteps.length - 1"
-                    @click="tour.nextStep"
-                  >
-                    下一步
-                  </div>
-                  <div
-                    class="btns"
-                    @click="tour.stop"
-                  >
-                    ok
-                  </div>
-                </div>
-              </template>
-            </v-step>
-          </template>
-        </transition>
-      </template>
-    </v-tour>
     
   </div>
 </template>
