@@ -155,6 +155,7 @@ import FormMixin from '@src/component/form/mixin/form';
 /* util */
 import MathUtil from '@src/util/math';
 import * as math from 'mathjs';
+import _ from 'lodash';
 
 export default {
   name: 'form-sparepart',
@@ -371,7 +372,18 @@ export default {
     * @description 修改列表备件数量
     */
     handleSparepartNum(item) {
-      const maxNum = item.repertoryCount;
+      let maxNum = item.repertoryCount || 0;
+      // 如果有自定义字段 maxNum为库存减去列表其它num
+      if (this.partField.length) {
+        this.value.forEach(val => {
+          // id相同时说明是同一个备件 只是自定义选择的不一样
+          if (item.id == val.id && item.isAdd) {
+            if (!(_.isEqual(item.attribute, val.attribute))) {
+              maxNum -= val.number || 0
+            }
+          }
+        })
+      }
       let value = Number(item.number);
       let count = this.decimalNumber(value);
 
@@ -381,7 +393,7 @@ export default {
         return;
       }
       
-      if (maxNum != '' && value > maxNum) {
+      if (value > maxNum) {
         this.$platform.alert(`库存数量为：${ maxNum}`);
         item.number = maxNum;
         return;
@@ -491,14 +503,20 @@ export default {
     * @description 数量校验
     */
     validateNumber(value, field) {
-      const maxNum = this.sparepart.availableNum || '';
+      let maxNum = this.sparepart.repertoryCount || 0;
+      // 如果有自定义字段 maxNum为库存减去列表其它num
+      if (this.partField.length) {
+        this.value.forEach(val => {
+          val.isAdd ? maxNum -= val.number || 0 : ''
+        })
+      }
       const val = Number(value);
       let count = this.decimalNumber(val);
 
       return new Promise((resolve, reject) => {
         if (val <= 0) {
           return resolve('请输入正确的数量');
-        } else if(maxNum && value > maxNum){
+        } else if(value > maxNum){
           return resolve('库存不足，请输入正确的数量');
         } else if (count != -1 && count == 0) {
           return resolve('请输入大于0的正整数');
@@ -534,7 +552,20 @@ export default {
         let newValue = this.value;
 
         // 查找已添加的备件中是否存在该备件
-        let ids = newValue.findIndex(val => val.id == sparepartObj.id);
+        let ids = ''
+        if (this.partField.length) {
+          // 如果有自定义字段 安装产品和安装位置 还需要判断安装产品和安装位置是否相等
+          sparepartObj.attribute = {
+            installPosition: this.sparepart.installPosition,
+            installProductId: this.sparepart.installProductId
+          }
+          // 加入进来的新增isAdd字段 避免编辑回执时计算备件availableNum出错
+          sparepartObj.isAdd = true
+          ids = newValue.findIndex(val => val.id == sparepartObj.id && _.isEqual(val.attribute, sparepartObj.attribute));
+          
+        } else {
+          ids = newValue.findIndex(val => val.id == sparepartObj.id);
+        }
 
         if (ids > -1) {
           const sum = Number(math.add(math.bignumber(newValue[ids].number), math.bignumber(sparepartObj.number)));
