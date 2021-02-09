@@ -5,12 +5,12 @@
     <!-- start 主要内容 -->
     <div class="department-main">
       <div :class="{'department-left': true, 'department-state': tenantType!=2 && tenantType!=3}">
-        <el-button type="primary" @click="synchronousWeChat" :loading="synchronousState" class="base-button" v-if="tenantType==2 || tenantType==3">
+        <el-button type="primary" @click="synchronousWeChat" :loading="synchronousState" class="base-button" :class="{'sync-button': !collapse}" v-if="tenantType==2 || tenantType==3">
           {{ synchronousState ? '同步中': '同步企业微信通讯录' }}
         </el-button>
 
         <!-- start 同步钉钉通讯录 -->
-        <el-button v-if="tenantType==0" class="base-button" type="primary" :loading="synchronousState" @click="syncDingTalkAddressBook">
+        <el-button v-if="tenantType==0" class="base-button" :class="{'sync-button': !collapse}" type="primary" :loading="synchronousState" @click="syncDingTalkAddressBook">
           {{ synchronousState ? '同步中': '同步钉钉通讯录' }}
         </el-button>
         <!-- end 同步钉钉通讯录 -->
@@ -282,7 +282,9 @@
               <i class="iconfont icon-arrowright"></i>
             </div>
           </div>-->
-
+          <el-input v-model="subDeptKeyword" placeholder="请输入下级部门名称搜索" style="width:200px;" @input="subDeptSearch" @keyup.enter.native="subDeptSearch">
+            <i slot="prefix" class="el-input__icon el-icon-search"></i>
+          </el-input>
           <div class="department-user-table" v-if="subDepartments.length > 0">
             <el-table class="team-table" :data="subDepartments" stripe header-row-class-name="team-detail-table-header">
               <el-table-column prop="tagName" label="部门名称" show-overflow-tooltip />
@@ -591,6 +593,7 @@ export default {
   mixins: [tourGuide],
   data() {
     return {
+      subDeptKeyword:'',
       guideDialogVisible: false,
       isAllotByDept: false,
       nowGuideStep: 5,
@@ -684,6 +687,7 @@ export default {
       userPage: new Page(), // 用户列表
       rolePage: new Page(),
       synchronousState: false, // 同步状态
+      subDepartments:[], // 子部门
     }
   },
   computed: {
@@ -702,10 +706,6 @@ export default {
         && this.authorities.AUTH_ROLE == 3
         && this.authorities.AUTH_TAG == 3
       )
-    },
-    /* 子部门 */
-    subDepartments() {
-      return this.deptInfo.children || []
     },
     showRoleDesc() {
       // 0  待分配账号
@@ -794,6 +794,12 @@ export default {
     window.__exports__refresh = this.refreshDept;
   },
   methods: {
+    subDeptSearch: _.debounce(function () {
+      // 下级部门模糊搜索
+      let data = this.deptInfo.children || [];
+      let _subDepartments = _.cloneDeep(data);
+      this.subDepartments = this.subDeptKeyword ? _subDepartments.filter(dept=> dept.tagName.indexOf(this.subDeptKeyword) > -1) : data;
+    }, 500),
     handleGuideClose(){
       this.guideDialogVisible = false;
       storageSet(DEPT_GUIDE_DIALOG, 1)
@@ -919,7 +925,8 @@ export default {
     debounce: _.debounce(async function () {
       // 部门模糊搜索
       try {
-        this.initDeptUser(this.selectedDept)
+        this.depts = await this.fetchDept();
+        this.initDeptUser(this.depts[0]);
       } catch (error) {
         console.log(error)
       }
@@ -1704,6 +1711,7 @@ export default {
             type: 'error',
           })
         this.deptInfo = result.data
+        this.subDepartments = this.deptInfo.children || []
       } catch (error) {
         console.log('error: ', error)
       }
@@ -2278,7 +2286,10 @@ body {
   border-right: 1px solid #f2f2f2;
   .base-button {
     margin: 10px 20px;
-    width: 280px;
+    width: 260px;
+  }
+  .sync-button {
+    width: 360px;
   }
 }
 .department-state {
