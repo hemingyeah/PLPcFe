@@ -503,9 +503,10 @@ export default {
     * @description 数量校验
     */
     validateNumber(value, field) {
-      let maxNum = this.sparepart.repertoryCount || 0;
+      let maxNum = this.sparepart.availableNum || 0;
       // 如果有自定义字段 maxNum为库存减去列表其它num
       if (this.partField.length) {
+        maxNum = this.sparepart.repertoryCount || 0;
         this.value.forEach(val => {
           val.isAdd ? maxNum -= val.number || 0 : ''
         })
@@ -516,7 +517,7 @@ export default {
       return new Promise((resolve, reject) => {
         if (val <= 0) {
           return resolve('请输入正确的数量');
-        } else if(value > maxNum){
+        } else if(val > maxNum){
           return resolve('库存不足，请输入正确的数量');
         } else if (count != -1 && count == 0) {
           return resolve('请输入大于0的正整数');
