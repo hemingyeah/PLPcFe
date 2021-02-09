@@ -98,6 +98,8 @@ export default {
   height: 30px;
   padding: 0;
   
+  border: none;
+  background-color: transparent;
   color: #666;
   
   &:hover{

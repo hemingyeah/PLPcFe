@@ -1,16 +1,14 @@
 /* component */
-import BizVersionLimitDialogComponent from '@src/component/business/BizVersionLimitDialog/BizVersionLimitDialog.tsx'
+import BizVersionLimitDialog from '@src/component/business/BizVersionLimitDialog/BizVersionLimitDialog.tsx'
 /* enum */
 import ComponentNameEnum from '@model/enum/ComponentNameEnum'
-import HtmlTagAttributeNameEnum from '@model/enum/HtmlTagAttributeNameEnum'
-import HtmlTagNameEnum from '@model/enum/HtmlTagNameEnum'
 /* util */
 import fastCall from '@src/component/util/fastCall'
 import { destroyComponent } from '@src/util/dom'
 import { mount } from '@src/util/vue'
 /* vue */
 import VC from '@model/VC'
-import { Component, Emit, Prop, Ref } from 'vue-property-decorator'
+import { Component, Ref } from 'vue-property-decorator'
 import Vue, { VueConstructor } from 'vue'
 
 /**
@@ -21,13 +19,13 @@ export function initVersionLimitDialog(): Vue {
   
   @Component({
     components: {
-      [BizVersionLimitDialogComponent.name]: BizVersionLimitDialogComponent
+      [ComponentNameEnum.BizVersionLimitDialog]: BizVersionLimitDialog
     }
   })
   class BizVersionLimitDialogHOC extends VC {
     
     /* 版本数量限制弹窗组件 */
-    @Ref() BizVersionLimitDialogComponent !: BizVersionLimitDialogComponent
+    @Ref() BizVersionLimitDialogComponent!: BizVersionLimitDialog
     
     /** 销毁 */
     private destroy() {
@@ -53,10 +51,10 @@ export function initVersionLimitDialog(): Vue {
   return mount(BizVersionLimitDialogHOC, ComponentNameEnum.BizVersionLimitDialogHOC) as Vue
 }
 
-const BizVersionLimitDialog = {
+const BizVersionLimitDialogComponent = {
   install(vue: VueConstructor) {
     // 注册到全局组件
-    vue.component(BizVersionLimitDialogComponent.name, BizVersionLimitDialogComponent)
+    vue.component(BizVersionLimitDialog.name, BizVersionLimitDialog)
     // 注册快速调用方法
     fastCall(vue, 'biz', { initVersionLimitDialog })
   },
@@ -64,4 +62,4 @@ const BizVersionLimitDialog = {
   props: { initVersionLimitDialog }
 }
 
-export default BizVersionLimitDialog
+export default BizVersionLimitDialogComponent
