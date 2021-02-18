@@ -359,6 +359,8 @@ export default {
       // 安装产品和安装位置有数据时 增加这两个字段
       if (this.value && this.value.length) {
         this.value.forEach(val => {
+          // 新增originNumber保存原先的备件数量
+          val.originNumber = val.number
           for (let v in val) {
             if (v == 'installProductId') {
               _initData.installProductId = ''
@@ -377,14 +379,21 @@ export default {
       let maxNum = item.repertoryCount || 0;
       // 如果有自定义字段 maxNum为库存减去列表其它num
       if (this.partField.length) {
+        if (!item.isAdd) {
+          // 如果该备件没有做标记则做标记
+          item.isAdd = true
+        }
         this.value.forEach(val => {
           // id相同时说明是同一个备件 只是自定义选择的不一样
-          if (item.id == val.id && item.isAdd) {
-            if (!(_.isEqual(item.attribute, val.attribute))) {
-              maxNum -= val.number || 0
-            }
+          if (item.id == val.id && val.isAdd) {
+            // originNumber存在 说明是备件列表已存在的备件 库存变动为number减去originNumber
+            const num = val.originNumber ? (val.number - val.originNumber) : val.number
+            maxNum -= num
           }
         })
+        maxNum < 0 ? maxNum = 0 : ''
+        // 当前备件最大的库存应为库存减去所有同一个id的备件库存再加上当前备件的数量
+        maxNum += item.number
       }
       let value = Number(item.number);
       let count = this.decimalNumber(value);
@@ -510,8 +519,14 @@ export default {
       if (this.partField.length) {
         maxNum = this.sparepart.repertoryCount || 0;
         this.value.forEach(val => {
-          val.isAdd ? maxNum -= val.number || 0 : ''
+          // id相同时说明是同一个备件 只是自定义选择的不一样
+          if (this.sparepart.id == val.id && val.isAdd) {
+            // originNumber存在 说明是备件列表已存在的备件 库存变动为number减去originNumber
+            const num = val.originNumber ? (val.number - val.originNumber) : val.number
+            maxNum -= num
+          }
         })
+        maxNum < 0 ? maxNum = 0 : ''
       }
       const val = Number(value);
       let count = this.decimalNumber(val);
@@ -574,6 +589,9 @@ export default {
           const sum = Number(math.add(math.bignumber(newValue[ids].number), math.bignumber(sparepartObj.number)));
           newValue[ids].number = sum > sparepartObj.availableNum ? sparepartObj.availableNum : sum;
 
+          if (this.partField.length) {
+            newValue[ids].number = sum
+          }
         } else {
           newValue.push(sparepartObj);
         }
