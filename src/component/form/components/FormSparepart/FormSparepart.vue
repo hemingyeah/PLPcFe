@@ -357,15 +357,17 @@ export default {
         description: ''
       }
       // 安装产品和安装位置有数据时 增加这两个字段
-      this.value.forEach(val => {
-        for (let v in val) {
-          if (v == 'installProductId') {
-            _initData.installProductId = ''
-          } else if (v == 'installPosition') {
-            _initData.installPosition = ''
+      if (this.value && this.value.length) {
+        this.value.forEach(val => {
+          for (let v in val) {
+            if (v == 'installProductId') {
+              _initData.installProductId = ''
+            } else if (v == 'installPosition') {
+              _initData.installPosition = ''
+            }
           }
-        }
-      })
+        })
+      }
       return _initData
     },
     /**
