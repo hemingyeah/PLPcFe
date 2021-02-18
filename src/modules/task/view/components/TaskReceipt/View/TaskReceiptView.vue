@@ -84,6 +84,7 @@
       ref="taskReceiptEdit"
       :init-data="initData"
       :receipt-fields="shareData.receiptFields"
+      :part-field="partField"
     />
     <!-- end 编辑回执弹窗 -->
   </div>

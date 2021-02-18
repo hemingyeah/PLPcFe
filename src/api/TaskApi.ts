@@ -578,6 +578,18 @@ export function reviewTask(params: {} | undefined) {
 }
 
 /**
+ * 回访工单-博立
+ * @param {Object} params - 参数对象
+ * @param {String} params.taskId - 工单id
+ * @param {String} params.suggestion - 回访备注
+ * @param {Object} params.evaluate - 自定义回访信息
+ * @param {Boolean} params.autoClosed - 回访并关闭true，光回访传false
+ */
+export function reviewTaskBoli(params: {} | undefined) {
+  return http.post(`${fixedPrefixTaskPath}/outside/pc/task/boLi/review`, params);
+}
+
+/**
  * @description 保存附加组件
  * @param {Object} params 参数对象
  * @param {String} params.cardId 附加组件id
@@ -1399,6 +1411,13 @@ export function getTaskPoolList(params: TaskPoolSearchModel): Promise<getTaskSea
  */
 export function getTaskTypesMap(): Promise<getTaskTypesResult> {
   return http.get('/api/task/outside/task/list/taskTypeMap')
+}
+
+/**
+ * @description 获取工单安装产品和安装位置字段 目前用于博立定制 后续可能通用
+ */
+export function getExpensePartField(params: {} | undefined) {
+  return http.get(`${fixedPrefixTaskPath}/outside/pc/task/getExpensePartField`, params);
 }
 
 
