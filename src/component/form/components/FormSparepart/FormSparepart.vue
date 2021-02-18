@@ -176,6 +176,7 @@ export default {
       partField: [],
       installProductId: '',
       products: this.initData.task.products,
+      originValue: [],
       visible: false,
       showRepertory: true,
       repertoryId: 0, // 仓库ID
@@ -317,6 +318,7 @@ export default {
   },
   watch: {
     visible(n) {
+      this.originValue = this.value || []
       this.chooseDefaultProduct()
     }
   },
@@ -357,8 +359,8 @@ export default {
         description: ''
       }
       // 安装产品和安装位置有数据时 增加这两个字段
-      if (this.value && this.value.length) {
-        this.value.forEach(val => {
+      if (this.originValue && this.originValue.length) {
+        this.originValue.forEach(val => {
           // 新增originNumber保存原先的备件数量
           val.originNumber = val.number
           for (let v in val) {
@@ -387,7 +389,8 @@ export default {
           // id相同时说明是同一个备件 只是自定义选择的不一样
           if (item.id == val.id && val.isAdd) {
             // originNumber存在 说明是备件列表已存在的备件 库存变动为number减去originNumber
-            const num = val.originNumber ? (val.number - val.originNumber) : val.number
+            let ind = this.originValue.findIndex(_val => val.id == _val.id);
+            const num = this.originValue[ind].originNumber ? (val.number - this.originValue[ind].originNumber) : val.number
             maxNum -= num
           }
         })
@@ -522,7 +525,8 @@ export default {
           // id相同时说明是同一个备件 只是自定义选择的不一样
           if (this.sparepart.id == val.id && val.isAdd) {
             // originNumber存在 说明是备件列表已存在的备件 库存变动为number减去originNumber
-            const num = val.originNumber ? (val.number - val.originNumber) : val.number
+            let ind = this.originValue.findIndex(_val => val.id == _val.id);
+            const num = this.originValue[ind].originNumber ? (val.number - this.originValue[ind].originNumber) : val.number
             maxNum -= num
           }
         })
