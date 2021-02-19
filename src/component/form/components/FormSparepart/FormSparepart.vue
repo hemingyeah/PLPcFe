@@ -318,7 +318,7 @@ export default {
   },
   watch: {
     visible(n) {
-      this.originValue = this.value || []
+      this.value && this.value.length ? this.originValue = [].concat(this.value) : this.originValue = []
       this.chooseDefaultProduct()
     }
   },
