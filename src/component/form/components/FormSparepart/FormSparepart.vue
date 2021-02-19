@@ -358,9 +358,11 @@ export default {
       }
       // 安装产品和安装位置有数据时 增加这两个字段
       if (this.originValue && this.originValue.length) {
-        this.originValue.forEach(val => {
+        this.originValue.forEach((val, ind) => {
           // 新增originNumber保存原先的备件数量
-          val.originNumber = val.number
+          let obj = Object.assign({}, val)
+          obj.originNumber = val.number || 0
+          this.originValue.splice(ind, 1, obj)
           for (let v in val) {
             if (v == 'installProductId') {
               _initData.installProductId = ''
@@ -388,6 +390,7 @@ export default {
           if (item.id == val.id && val.isAdd) {
             // originNumber存在 说明是备件列表已存在的备件 库存变动为number减去originNumber
             let ind = this.originValue.findIndex(_val => val.id == _val.id);
+            console.log(this.originValue[ind], 'originValue')
             const num = this.originValue[ind].originNumber ? (val.number - this.originValue[ind].originNumber) : val.number
             maxNum -= num
           }
