@@ -316,7 +316,6 @@ export default {
   },
   watch: {
     visible(n) {
-      this.value && this.value.length ? this.originValue = [].concat(this.value) : this.originValue = []
       this.chooseDefaultProduct()
     }
   },
@@ -357,12 +356,13 @@ export default {
         description: ''
       }
       // 安装产品和安装位置有数据时 增加这两个字段
-      if (this.originValue && this.originValue.length) {
-        this.originValue.forEach((val, ind) => {
+      if (this.value && this.value.length) {
+        this.originValue = []
+        this.value.forEach((val, ind) => {
           // 新增originNumber保存原先的备件数量
           let obj = Object.assign({}, val)
           obj.originNumber = val.number || 0
-          this.originValue.splice(ind, 1, obj)
+          this.originValue.push(obj)
           for (let v in val) {
             if (v == 'installProductId') {
               _initData.installProductId = ''
@@ -389,9 +389,9 @@ export default {
           // id相同时说明是同一个备件 只是自定义选择的不一样
           if (item.id == val.id && val.isAdd) {
             // originNumber存在 说明是备件列表已存在的备件 库存变动为number减去originNumber
-            let ind = this.originValue.findIndex(_val => val.id == _val.id);
-            console.log(this.originValue[ind], 'originValue')
-            const num = this.originValue[ind].originNumber ? (val.number - this.originValue[ind].originNumber) : val.number
+            let ind = this.originValue.findIndex(_val => _val.id == val.id);
+            console.log(ind, this.originValue, this.value, 'originValue 调试')
+            const num = this.originValue[ind]?.originNumber ? (val.number - this.originValue[ind].originNumber) : val.number
             maxNum -= num
           }
         })
@@ -526,8 +526,8 @@ export default {
           // id相同时说明是同一个备件 只是自定义选择的不一样
           if (this.sparepart.id == val.id && val.isAdd) {
             // originNumber存在 说明是备件列表已存在的备件 库存变动为number减去originNumber
-            let ind = this.originValue.findIndex(_val => val.id == _val.id);
-            const num = this.originValue[ind].originNumber ? (val.number - this.originValue[ind].originNumber) : val.number
+            let ind = this.originValue.findIndex(_val => _val.id == val.id);
+            const num = this.originValue[ind]?.originNumber ? (val.number - this.originValue[ind].originNumber) : val.number
             maxNum -= num
           }
         })
