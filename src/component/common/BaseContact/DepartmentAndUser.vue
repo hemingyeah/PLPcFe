@@ -493,7 +493,7 @@ export default {
 
         let depts = result.data || [];
         // 钉钉端数据处理
-        depts =  JSON.parse(JSON.stringify(depts).replaceAll("name", "tagName").replaceAll("subDepartments","children")); 
+        depts =  JSON.parse(JSON.stringify(depts).replace(/name/g,'tagName').replace(/subDepartments/g,'children'));
         let index = -1;
 
         for(var i = 0; i < depts.length; i++){

@@ -330,7 +330,7 @@
               <span id="v-dept-step-2">成员信息</span>
               <div class="guide-disable-cover" v-if="nowGuideStep == 2"></div>
             </div>
-            <base-button type="primary" @event="openCreateUserPanel" v-if="tenantType==2">新建成员账号</base-button>
+            <base-button type="primary" @event="openCreateUserPanel" v-if="tenantType==1">新建成员账号</base-button>
             <!-- <div class="department-user-block-header-btn">
               <base-button type="primary" @event="openCreateUserPanel" v-if="allowAddUser"> 添加成员 </base-button>
               <base-button type="primary" @event="chooseDepartmentMulti"> 调整部门 </base-button>
