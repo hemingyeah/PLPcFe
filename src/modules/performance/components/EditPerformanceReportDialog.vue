@@ -371,7 +371,7 @@ export default {
       let formRuleId = this.form.ruleId;
       if (formRuleId) return this.openRules.filter(({value}) => value === formRuleId)[0].ruleDesc;
       return '';
-    }
+    },
     columns() {
       const range = this.form.range;
       return [

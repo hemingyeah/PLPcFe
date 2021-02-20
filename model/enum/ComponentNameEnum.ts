@@ -50,6 +50,8 @@ enum ComponentNameEnum {
   VersionMixin = 'version-mixin',
   // 空
   Empty = 'empty',
+  // 应用升级提示弹窗
+  ApplicationUpgradePromptDialog = 'application-upgrade-prompt-dialog',
 }
 
 export default ComponentNameEnum

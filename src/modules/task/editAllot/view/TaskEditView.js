@@ -192,6 +192,7 @@ export default {
     */
     checkNumExceedLimitHandler() {
       if (!this.checkNumExceedLimitBeforeHandler) return
+      
       // 检测新建计划任务
       if (this.isFromPlan) {
         return (
@@ -201,6 +202,7 @@ export default {
           )
         )
       }
+      
       // 检测新建工单
       if (this.isTaskCreate) {
         return (

@@ -1,9 +1,12 @@
 .biz-version-limit-dialog {
-  .base-modal-mask {
+  & > .base-modal-mask {
     align-items: flex-start;
-  }
-  .base-modal-header {
-    display: none;
+    .base-modal {
+      margin: 50px auto;
+    }
+    .base-modal-header {
+      display: none;
+    }
   }
 }
 
@@ -34,5 +37,30 @@
     .service-button {
       color: $color-primary;
     }
+  }
+}
+
+.application-upgrade-prompt-dialog {
+  .base-modal {
+    width: 420px !important;
+    position: absolute;
+    top: 60px;
+    left: 0;
+    right: 0;
+  }
+  .application-upgrade-prompt-dialog {
+    background-color: #fff;
+    text-align: center;
+  }
+  &-qrcode {
+    padding: 30px;
+    img {
+      margin: 0 auto;
+    }
+  }
+  &-message {
+    color: $text-color-regular;
+    line-height: 50px;
+    text-align: center;
   }
 }

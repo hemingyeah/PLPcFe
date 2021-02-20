@@ -1,5 +1,6 @@
 /* component */
-import SaleManager from '@src/modules/system/frame/component/SaleManager.vue';
+import SaleManager from '@src/modules/system/frame/component/SaleManager.vue'
+import ApplicationUpgradePromptDialog from '@src/component/business/BizVersionLimitDialog/components/ApplicationUpgradePromptDialog.tsx'
 /* enum */
 import ComponentNameEnum from '@model/enum/ComponentNameEnum'
 /* image */
@@ -22,7 +23,8 @@ import { getRootWindowInitData } from '@src/util/window'
 @Component({
   name: ComponentNameEnum.BizVersionLimitDialog,
   components: {
-    [SaleManager.name]: SaleManager
+    [SaleManager.name]: SaleManager,
+    ApplicationUpgradePromptDialog
   }
 })
 class BizVersionLimitDialog extends VC {
@@ -33,6 +35,8 @@ class BizVersionLimitDialog extends VC {
   private showBizVersionLimitDialog: boolean = false
   /* 是否显示专属客服 */
   private visibleSaleManager: boolean = false
+  /* 是否显示升级提示 */
+  private visibleUpgradePromptDialog: boolean = false
   
   get rootWindowInitData(): RootWindowInitData {
     return getRootWindowInitData()
@@ -92,7 +96,8 @@ class BizVersionLimitDialog extends VC {
    * @return {void}
   */  
   private upgrade(): void {
-    // do some things ...
+    console.log(1)
+    this.visibleUpgradePromptDialog = true
   }
   
   render(h: CreateElement) {
@@ -122,6 +127,10 @@ class BizVersionLimitDialog extends VC {
           serviceGroupUrl={this.rootWindowInitData.serviceGroupUrl}
           qrcode={this.rootWindowInitData.saleManagerQRCode}
           {...this.getSaleManagerAttributes()}
+        />
+        <application-upgrade-prompt-dialog
+          show={this.visibleUpgradePromptDialog}
+          onInput={(value: boolean) => this.visibleUpgradePromptDialog = value}
         />
       </div>
     )

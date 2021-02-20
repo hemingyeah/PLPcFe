@@ -124,6 +124,7 @@ export default class VersionMixin extends VC {
           // 是否超出上限
           let isExceed = (
             responseData?.code == CommonResultCodeEnum.DATA_COUNT_LIMIT
+            || responseData?.code == ErrorCodeEnum.DataLimitTask
             || responseData?.status == ErrorCodeEnum.DataLimit
           )
           
