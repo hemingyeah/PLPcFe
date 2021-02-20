@@ -383,10 +383,10 @@ export default {
         this.value.forEach(val => {
           // id相同时说明是同一个备件 只是自定义选择的不一样
           if (item.id == val.id && val.isAdd) {
-            // originNumber存在 说明是备件列表已存在的备件 库存变动为number减去originNumber
+            // originValue存在 说明是备件列表已存在的备件 库存变动为number减去originValue.number
             let ind = this.originValue.findIndex(_val => _val.id == val.id);
             console.log(ind, this.originValue, this.value, 'originValue 调试111')
-            const num = this.originValue[ind]?.originNumber ? (val.number - this.originValue[ind].originNumber) : val.number
+            const num = this.originValue[ind]?.number ? (val.number - this.originValue[ind].number) : val.number
             maxNum -= num
           }
         })
@@ -520,9 +520,9 @@ export default {
         this.value.forEach(val => {
           // id相同时说明是同一个备件 只是自定义选择的不一样
           if (this.sparepart.id == val.id && val.isAdd) {
-            // originNumber存在 说明是备件列表已存在的备件 库存变动为number减去originNumber
+            // originValue存在 说明是备件列表已存在的备件 库存变动为number减去originValue.number
             let ind = this.originValue.findIndex(_val => _val.id == val.id);
-            const num = this.originValue[ind]?.originNumber ? (val.number - this.originValue[ind].originNumber) : val.number
+            const num = this.originValue[ind]?.number ? (val.number - this.originValue[ind].number) : val.number
             maxNum -= num
           }
         })
@@ -679,13 +679,7 @@ export default {
         })
         this.partField = result.result || []
         if (this.value && this.value.length) {
-          this.originValue = []
-          this.value.forEach(val => {
-            // 新增originNumber保存原先的备件数量
-            let obj = Object.assign({}, val)
-            obj.originNumber = val.number || 0
-            this.originValue.push(obj)
-          })
+          this.originValue = _.cloneDeep(this.value)
           console.log(this.originValue, 'originValue断点')
         }
       }
