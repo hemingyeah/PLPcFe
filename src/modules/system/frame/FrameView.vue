@@ -1141,7 +1141,8 @@ export default {
         M_CALLCENTER_WORKBENCH_LIST: this.has_call_center_module,
         M_CALLCENTER_STATISTICS: this.has_call_center_module,
         M_CALLCENTER_STAGE: this.has_call_center_module,
-        M_VIP_SPAREPART_APPLY: !isStandardEdition()
+        M_VIP_SPAREPART_APPLY: !isStandardEdition(),
+        M_DASHBOARD_JX: !isStandardEdition()
       };
       let isFilter = false;
       let filterMenuKeys = [];

@@ -219,9 +219,12 @@ import {createPerformanceReport, getApprovePerson, getApprovePersonList, checkTa
 
 import ApproveProcess from './ApproveProcess.vue'
 import ChooseTeamUserOptionsDialog from './ChooseTeamUserOptionsDialog.vue';
+/* mixin */
+import VersionMixin from '@src/mixins/versionMixin/index.ts'
 
 export default {
   name: 'edit-performance-report-dialog',
+  mixins: [VersionMixin],
   props: {
     initData: {
       type: Object,
@@ -329,10 +332,14 @@ export default {
     }
   },
   computed: {
+    isCreate() {
+      return this.stage === 'build'
+    },
     title() {
-      if (this.stage === 'build') return '新增绩效报告';
-      if (this.stage === 'confirm') return '重复统计';
-      return '统计成功';
+      if (this.isCreate) return '新增绩效报告'
+      if (this.stage === 'confirm') return '重复统计'
+      
+      return '统计成功'
     },
     openRules() {
       return (this.initData.AllOpenRules || [])
@@ -364,7 +371,7 @@ export default {
       let formRuleId = this.form.ruleId;
       if (formRuleId) return this.openRules.filter(({value}) => value === formRuleId)[0].ruleDesc;
       return '';
-    },
+    }
     columns() {
       const range = this.form.range;
       return [
@@ -448,14 +455,16 @@ export default {
       if (!res) return;
       this.pending = true;
       const params = this.buildParams();
-
-      checkTaskRepeatCalculation(params)
+      
+      const CheckTaskRepeatCalculationPromise = checkTaskRepeatCalculation(params)
+      
+      this.checkNumExceedLimitAfterHandler(CheckTaskRepeatCalculationPromise)
         .then(res => {
           let data = res.data;
           let isSucc = res.status == 0;
-
+          
           this.pending = false;
-
+          
           if (!isSucc) {
             return this.$platform.notification({
               title: '失败',
@@ -463,7 +472,7 @@ export default {
               type: 'error',
             });
           }
-
+          
           // 结算是否重复
           if (!data) {
             this.visible = false;

@@ -2,8 +2,10 @@
 import * as SettingApi from '@src/api/SettingApi'
 /* components */
 import BizVersionLimitDialog from '@src/component/business/BizVersionLimitDialog/BizVersionLimitDialog'
+import { initVersionLimitDialog } from '@src/component/business/BizVersionLimitDialog/index.tsx'
 /* enum */
 import ComponentNameEnum from '@model/enum/ComponentNameEnum'
+import CommonResultCodeEnum from '@model/enum/CommonResultCodeEnum'
 import TenantDataLimitSourceEnum from '@model/enum/TenantDataLimitSourceEnum'
 import TenantDataLimitTypeEnum from '@model/enum/TenantDataLimitTypeEnum'
 import ErrorCodeEnum from '@model/enum/ErrorCodeEnum'
@@ -11,7 +13,6 @@ import ErrorCodeEnum from '@model/enum/ErrorCodeEnum'
 import MsgModel from '@model/MsgModel'
 /* vue */
 import VC from '@model/VC'
-import { CreateElement } from 'vue'
 import { Component, Emit, Prop, Ref } from 'vue-property-decorator'
 /* util */
 import Log from '@src/util/log.ts'
@@ -92,7 +93,7 @@ export default class VersionMixin extends VC {
       let isExceed = await this.fetchCheckNumExceedLimit(source, type)
       if (isExceed) {
         // 打开版本数量限制弹窗
-        this.$fast?.biz?.initVersionLimitDialog()
+        initVersionLimitDialog()
         // 失败的回调函数
         isFunction(errorCallback) && errorCallback()
       } else {
@@ -122,13 +123,13 @@ export default class VersionMixin extends VC {
         submitEventPromise.then((responseData: any) => {
           // 是否超出上限
           let isExceed = (
-            responseData?.code == ErrorCodeEnum.DataLimit 
+            responseData?.code == CommonResultCodeEnum.DATA_COUNT_LIMIT
             || responseData?.status == ErrorCodeEnum.DataLimit
           )
           
           if (isExceed) {
             // 打开版本数量限制弹窗
-            this.$fast?.biz?.initVersionLimitDialog()
+            initVersionLimitDialog()
             reject(responseData)
           } else {
             resolve(responseData)

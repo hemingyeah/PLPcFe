@@ -16,7 +16,6 @@ import Vue, { VueConstructor } from 'vue'
  * @return {Vue} vue组件实例
 */
 export function initVersionLimitDialog(): Vue {
-  
   @Component({
     components: {
       [ComponentNameEnum.BizVersionLimitDialog]: BizVersionLimitDialog
