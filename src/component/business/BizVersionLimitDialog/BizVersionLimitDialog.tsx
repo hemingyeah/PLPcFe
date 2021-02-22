@@ -96,7 +96,6 @@ class BizVersionLimitDialog extends VC {
    * @return {void}
   */  
   private upgrade(): void {
-    console.log(1)
     this.visibleUpgradePromptDialog = true
   }
   
