@@ -2128,7 +2128,7 @@ export default {
     },
     /* 异常搜索字段 */
     abnormalParams() {
-      if (this.selectColumnState === 'exception' && this.abnormalData.length) {
+      if (this.selectColumnState === 'exception' && this.abnormalData.taskExceptionRange.length) {
         let exceptionStates = []
         this.abnormalData.taskExceptionRange.forEach(item => {
           exceptionStates = [...exceptionStates, ...item.taskExceptionRangeValue]
