@@ -65,12 +65,6 @@
             </div>
             <!-- end 当前工单状态操作按钮 -->
 
-            <el-button @click="openDialog('cancel')" :disabled="pending" size="mini" v-if="allowCancelTask">取消
-            </el-button>
-
-            <el-button @click="redeploy" :disabled="pending" size="mini" v-if="allowRedeployTask">转派</el-button>
-            <el-button :class="{'once-printed': task.oncePrinted == 1}" @click="printTask" :disabled="pending" size="mini" v-if="allowPrintTask">打印</el-button>
-
             <!-- start 服务报告 -->
             <template v-if="allowServiceReport && isShowReport">
               <el-button @click="createReport(true)" :disabled="pending" v-if="srSysTemplate || srSysTemplate == null">服务报告</el-button>
