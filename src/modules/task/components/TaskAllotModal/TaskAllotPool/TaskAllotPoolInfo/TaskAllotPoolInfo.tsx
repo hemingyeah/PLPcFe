@@ -87,6 +87,12 @@ export default class TaskAllotPoolInfo extends Vue {
           <span class={`${this.className}-item-content`}>
             {fmt_number(this.users?.subscription?.length, '')}
           </span>
+          <el-tooltip
+            content="选中后，地图上只显示订阅了工单池的员工的位置"
+            placement="bottom"
+          >
+            <i class="iconfont icon-info"></i>
+          </el-tooltip>
         </div>
         <div class={`${this.className}-item`}>
           <el-checkbox value={this.checked?.auth} onInput={this.handleAuthCheckedChange}></el-checkbox>
@@ -96,6 +102,12 @@ export default class TaskAllotPoolInfo extends Vue {
           <span class={`${this.className}-item-content`}>
             {fmt_number(this.users?.auth?.length, '')}
           </span>
+          <el-tooltip
+            content="选中后，地图上只显示可以在工单池抢单的员工的位置"
+            placement="bottom"
+          >
+            <i class="iconfont icon-info"></i>
+          </el-tooltip>
         </div>
       </div>
     )

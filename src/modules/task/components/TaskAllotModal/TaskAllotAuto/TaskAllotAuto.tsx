@@ -236,6 +236,12 @@ export default class TaskAllotAuto extends Vue {
           提交后，系统会按分配规则重新匹配，可能会出现与预估的负责人不一致的情况。您可以
           <el-checkbox value={this.isUsedResult} onInput={(value: boolean) => { this.emitUsedChange(value); }}>
             勾选可使用预估匹配结果
+            <el-tooltip
+              content="选中后，直接使用页面上计算出来的员工，【提交】后，不再按规则重新匹配"
+              placement="bottom"
+            >
+              <i class="iconfont icon-info"></i>
+            </el-tooltip>
           </el-checkbox>
         </div>
       </div>
