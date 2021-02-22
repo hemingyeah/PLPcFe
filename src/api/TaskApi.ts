@@ -1313,7 +1313,7 @@ export function getTaskPoolList(params: TaskPoolSearchModel): Promise<getTaskSea
  * @description 获取用户开启的配置节点 以及工单搜索范围 和 异常原因字段值
  */
 export function getTurnOnTaskExceptionNodeInfo(params = {}) {
-  return http.get('/outside/pc/setting/getTurnOnTaskExceptionNodeInfo', params)
+  return http.get(`${fixedPrefixTaskPath}/outside/pc/setting/getTurnOnTaskExceptionNodeInfo`, params)
 }
 
 /**
@@ -1321,7 +1321,7 @@ export function getTurnOnTaskExceptionNodeInfo(params = {}) {
  */
 
 export function obtainReasonByTaskStatus(params: number) {
-  return http.get(`/outside/pc/setting/obtainReasonByTaskStatus/${params}`)
+  return http.get(`${fixedPrefixTaskPath}/outside/pc/setting/obtainReasonByTaskStatus/${params}`)
 }
 
 /**
