@@ -91,7 +91,8 @@ export default {
       // 显示详情向导
       showTaskDetailGuide: false,
       // 是否显示指派弹窗
-      showAllotModal: false
+      showAllotModal: false,
+      checkBack: ''
     }
   },
   computed: {
