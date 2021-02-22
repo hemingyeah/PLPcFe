@@ -380,13 +380,19 @@ export default {
           // 如果该备件没有做标记则做标记
           item.isAdd = true
         }
-        this.value.forEach(val => {
+        this.value.forEach((val, ind) => {
           // id相同时说明是同一个备件 只是自定义选择的不一样
           if (item.id == val.id && val.isAdd) {
+            let index = -1
+            const attribute1 = item.attribute || {}
+            const attribute2 = val.attribute || {}
+            if (_.isEqual(attribute1, attribute2)) {
+              index = ind
+            }
+            console.log(index, this.originValue, this.value, 'originValue 调试123')
             // originValue存在 说明是备件列表已存在的备件 库存变动为number减去originValue.number
-            let ind = this.originValue.findIndex(_val => _val.id == val.id);
-            console.log(ind, this.originValue, this.value, 'originValue 调试111')
-            const num = this.originValue[ind]?.number ? (val.number - this.originValue[ind].number) : val.number
+            let num = val.number
+            if (index > -1 && this.originValue[index]) num = this.originValue[index].number
             maxNum -= num
           }
         })
@@ -517,12 +523,19 @@ export default {
       // 如果有自定义字段 maxNum为库存减去列表其它num
       if (this.partField.length) {
         maxNum = this.sparepart.repertoryCount || 0;
-        this.value.forEach(val => {
+        this.value.forEach((val, ind) => {
           // id相同时说明是同一个备件 只是自定义选择的不一样
           if (this.sparepart.id == val.id && val.isAdd) {
+            let index = -1
+            const attribute1 = this.sparepart.attribute || {}
+            const attribute2 = val.attribute || {}
+            if (_.isEqual(attribute1, attribute2)) {
+              index = ind
+            }
+            console.log(index, this.originValue, this.value, 'originValue 调试123')
             // originValue存在 说明是备件列表已存在的备件 库存变动为number减去originValue.number
-            let ind = this.originValue.findIndex(_val => _val.id == val.id);
-            const num = this.originValue[ind]?.number ? (val.number - this.originValue[ind].number) : val.number
+            let num = val.number
+            if (index > -1 && this.originValue[index]) num = val.number - this.originValue[index].number
             maxNum -= num
           }
         })
