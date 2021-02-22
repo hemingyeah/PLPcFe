@@ -55,15 +55,6 @@
         <!-- start 顶部按钮组 -->
         <div class="task-detail-header-top-btn">
           <template v-if="!isDelete">
-            <!-- start 当前工单状态操作按钮 -->
-            <div class="current-state-button" v-show="!collapse">
-              <template v-for="(item, index) in stateButtonData">
-                <el-button :key="index" :type="item.type" @click="item.event" :disabled="pending" v-if="item.show">
-                  {{ item.name }}
-                </el-button>
-              </template>
-            </div>
-            <!-- end 当前工单状态操作按钮 -->
 
             <!-- start 服务报告 -->
             <template v-if="allowServiceReport && isShowReport">
