@@ -54,7 +54,16 @@ export default {
     * @description 备件、服务项目、折扣费用数据集合
     */
     expenseSheet() {
-      return this.initData.receiptExpenseSheetForUpdate || {};
+      let data = this.initData.receiptExpenseSheetForUpdate || {};
+
+      // fix: 修改备件数量可选数量，应当计算当前数量和仓库数量
+      if(data.sparePartsExpense) {
+        data.sparePartsExpense = data.sparePartsExpense.map(item => {
+          item.repertoryCount = item.repertoryCount + item.subtotal;
+          return item;
+        })
+      }
+      return data;
     },
     /** 
     * @description 显示折扣费用
