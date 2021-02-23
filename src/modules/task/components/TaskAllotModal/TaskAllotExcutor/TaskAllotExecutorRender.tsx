@@ -242,6 +242,24 @@ class TaskAllotExecutorRender extends TaskAllotExecutorMethods {
     
     return (
       <div class='task-allot-reason-row task-allot-executor-header'>
+        <div class="task-flex task-ai task-mr12">       
+          转派说明： 
+          <el-select value={this.customReason} placeholder="请选择转派原因" onChange={(v: string) => this.customReasonChangedHandler(v)}>
+            {
+              this.backList.map(item => {
+                return (
+                  <el-option
+                    key={item}
+                    label={item}
+                    value={item}
+                  />
+                )
+              })
+            }
+          </el-select>
+          {
+            this.systemAdmin ? <div class="task-font12 task-c13 task-ml12 task-pointer" onClick={() => {window.location.href = '/setting/task/taskSet'}}>去配置原因</div> : null
+          }</div>
         { this.renderTaskAllotExecutorHeaderRow('转派原因：', this.renderTaskAllotReason()) }
       </div>
     )

@@ -948,7 +948,6 @@ export default {
     },
     // 打开弹窗
     openDialog(action) {
-
       this.checkBack = '' //清除拒绝原因
 
       if (action === 'cancel') {

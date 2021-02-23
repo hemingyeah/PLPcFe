@@ -73,7 +73,8 @@ enum TaskAllotExecutorEmitEventEnum {
   SetSynergys = 'setSynergys',
   SetExecutor = 'setExecutor',
   SetCustomerTags = 'setCustomerTags',
-  SetReason = 'setReason'
+  SetReason = 'setReason',
+  SetCustomReason = 'setCustomReason'
 }
 
 class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
@@ -148,6 +149,14 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
   @Emit(TaskAllotExecutorEmitEventEnum.SetReason)
   public reasonChangedHandler(reason: string): string {
     return reason
+  }
+
+  @Emit(TaskAllotExecutorEmitEventEnum.SetCustomReason)
+  /**
+   * @description  转派说明
+   */
+  public customReasonChangedHandler(customReason: string):string {
+    return customReason
   }
   
   /** 
