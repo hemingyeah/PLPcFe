@@ -1,6 +1,9 @@
 const presets = [
-  ['@babel/env', {useBuiltIns: 'usage'}]
-];
+    ['@babel/env', {
+      corejs: '3',  
+      useBuiltIns: 'usage'
+    }]
+  ];
 
 const plugins = [
     '@babel/plugin-syntax-dynamic-import',
