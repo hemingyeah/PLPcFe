@@ -977,6 +977,7 @@ export default {
             item.taskUsedTime = this.timestamp(item.taskUsedTime);
             item.workUsedTime = this.timestamp(item.workUsedTime);
             item.taskResponseTime = this.timestamp(item.taskResponseTime);
+            item.createToCompleteUsedTime = this.timestamp(item.createToCompleteUsedTime);
             if (item.planTime && this.planTimeType === 'date') {
               item.planTime = formatDate(new Date(item.planTime), 'YYYY-MM-DD');
             }

@@ -844,6 +844,10 @@
                   <template v-else-if="column.field === 'taskResponseTimeStr'">
                     {{ scope.row.taskResponseTime && scope.row.taskResponseTime }}
                   </template>
+                  <!-- 响应用时 -->
+                  <template v-else-if="column.field === 'createToCompleteUsedTimeStr'">
+                    {{ scope.row.createToCompleteUsedTime && scope.row.createToCompleteUsedTime }}
+                  </template>
                   <!-- 支付方式 -->
                   <template
                     v-else-if="
