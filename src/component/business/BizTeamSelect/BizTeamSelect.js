@@ -72,7 +72,12 @@ const BizTeamSelect = {
     popperOptions: {
       type: Object,
       default: () => ({})
+    },
+    isAutoSelectChild: {
+      type: Boolean,
+      default: false
     }
+
   },
   data(){
     return {
@@ -156,10 +161,44 @@ const BizTeamSelect = {
       
       // 多选
       let index = this.value.findIndex(item => item.id === value.id);
-      index >= 0 ? this.value.splice(index, 1) : this.value.push(value);
+      if (this.isAutoSelectChild) {
+        this.chooseValueHandler(index, value)
+      } else {
+        index >= 0 ? this.value.splice(index, 1) : this.value.push(value);
+      }
       
       this.$emit('input', this.value);
       this.updatePopper();
+    },
+    chooseValueHandler(index = -1, value = {}) {
+      let children = value.children || [];
+      // 是否 已选中
+      let isSelected = index >= 0;
+      // 是否为 主团队且有子团队
+      let isParentAndHasValue = Array.isArray(children) && children.length > 0;
+
+      isSelected ? this.value.splice(index, 1) : this.value.push(value);
+
+      // 如果允许 自动选择子团队 且 子团队有数据
+      if (this.isAutoSelectChild && isParentAndHasValue) {
+        this.chooseParentTeamValueHandler(index, value, isSelected);
+      }
+    },
+    // 选中主团队处理
+    chooseParentTeamValueHandler(index = -1, value = {}, isSelected = false) {
+      let children = value.children || [];
+      let currentValue = this.value || [];
+
+      for (let i = 0; i < children.length; i++) {
+        let item = children[i];
+        let itemIndex = currentValue.findIndex(v => v.id === item.id);
+        itemIndex > -1 && currentValue.splice(itemIndex, 1);
+      }
+
+      if (!isSelected) {
+        this.value = [...this.value, ...children];
+      }
+
     },
     /** 删除选中项 */
     remove(event, item){

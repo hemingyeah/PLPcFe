@@ -1,7 +1,7 @@
 <template>
   <div class="header-select task-flex task-ai">
     <div class="team-select">
-      <biz-team-select :value="team" multiple @input="update" />
+      <biz-team-select :value="team" multiple is-auto-select-child collapse @input="update" />
     </div>
     <div class="task-ml15 task-span1">
       <el-select v-model="principal" placeholder="请选择负责人" multiple filterable clearable @change="excutorName">
@@ -63,7 +63,7 @@ export default {
     },
     /* 团队选者 */
     update(event) {
-      this.team = event
+      this.team = event.map(item => {return item})
       let ids = event.map(item => {
         return item.id
       }).join(',')
