@@ -356,7 +356,7 @@ export default {
     previousStep() {},
 
     abnormalLabel(type) {
-      if (!this.abnormalData.length) return
+      if (!this.abnormalData.taskCustomExceptionNodeList.length) return
       const list = this.abnormalData.taskCustomExceptionNodeList.map(item => {return item.exceptionName})
       if (list.indexOf(type) !== -1) return true
       return false
