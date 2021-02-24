@@ -37,12 +37,12 @@ if (user) {
   const config = require(`./config/${user}`);
   ROOT_PATH = config.targetRootPath;
 } else {
-  let userPath = "/Users/mac/Desktop/web"
+  let userPath = path.resolve(__dirname, '../../')
   let searchResult = searchWeb(`${userPath }/`);
   if (searchResult.have == false) {
     return console.log('未找到同级文件中的web文件夹，打包失败')
   }
-  ROOT_PATH = userPath;
+  ROOT_PATH = searchResult.url;
 }
 const monitorScript = '<script>!(function(c,i,e,b){var h=i.createElement("script");var f=i.getElementsByTagName("script")[0];h.type="text/javascript";h.defer=true;h.crossorigin=true;h.onload=function(){c[b]||(c[b]=new c.wpkReporter({bid:window.location.host=="app.shb.ltd"||window.location.href.indexOf("dingtalk")>-1?"dta_2_3144":"dta_2_3397"}));c[b].installAll()};f.parentNode.insertBefore(h,f);h.src=e})(window,document,"https://g.alicdn.com/woodpeckerx/jssdk??wpkReporter.js","__wpk");</script>'
 
