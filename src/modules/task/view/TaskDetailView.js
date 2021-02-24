@@ -949,7 +949,6 @@ export default {
     // 打开弹窗
     openDialog(action) {
       this.checkBack = '' //清除拒绝原因
-      console.log(1)
       if (action === 'cancel') {
         this.$refs.cancelTaskDialog.openDialog();
         this.obtainReasonByTaskStatus(1)
@@ -966,11 +965,8 @@ export default {
         this.refuseDialog.visible = true;
         this.obtainReasonByTaskStatus(2)
       } else if (action === "back") {
-        console.log(2)
         this.backDialog.reason = "";
-        console.log(3)
         this.backDialog.visible = true;
-        console.log(4)
         this.obtainReasonByTaskStatus(4)
       } else if (action === "finish") {
         this.$refs.taskReceiptEdit.openDialog();
@@ -990,7 +986,6 @@ export default {
      * @description 获取工单异常原因
      */
     async obtainReasonByTaskStatus(taskType) {
-      console.log(5)
       const {success, result} = await TaskApi.obtainReasonByTaskStatus(taskType)
       if (success) {
         const {systemAdmin, reason} = result
