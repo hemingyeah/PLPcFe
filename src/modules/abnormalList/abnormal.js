@@ -260,7 +260,14 @@ export default {
     },
     /* 柱状图 */
     Columnar(taskExceptionVOList) {
-      const nams = taskExceptionVOList.map(item => {return item.exceptionName})
+      const nams = !this.checkTab ? taskExceptionVOList.map(item => {
+        this.taskCustomExceptionNodeList.forEach(v => {
+          if(v.englishName === item.action) {
+            item.exceptionName = `${item.exceptionName}-${v.exceptionName}`
+          }
+        })
+        return item.exceptionName
+      }) : taskExceptionVOList.map(item => { return item.exceptionName})
       const data = taskExceptionVOList.map(item => {return {value: item.exceptionNameNum, action: item.action, exceptionName: item.exceptionName}})
       const columnarChart = echarts.init(this.$refs.columnar)
       let option = {
