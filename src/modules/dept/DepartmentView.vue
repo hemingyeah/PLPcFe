@@ -115,7 +115,7 @@
             <base-button v-if="isSystemRole || isCustomeRole" type="primary" @event="chooseUser('role')">添加成员</base-button>
             <base-button v-if="(isSystemRole || isCustomeRole) && rolePage.list.length" type="primary" @event="roleDeleteConfirm()">移除成员</base-button>
             <!-- <base-button v-if="isCustomeRole" type="primary" @event="createRole">新建角色</base-button> -->
-            <base-button v-if="selectedRole.id == 0 && tenantType != 1" type="primary" @event="roleDialogVisible = true">自动分配角色</base-button>
+            <base-button v-if="selectedRole.id == 0 && tenantType == 0" type="primary" @event="roleDialogVisible = true">自动分配角色</base-button>
           </div>
 
           <div class="department-user-table" v-if="rolePage.list.length > 0">
@@ -1072,7 +1072,7 @@ export default {
     async dispatchRole() {
       try {
         this.pending = true
-        const params = { state: false, roleId: this.roleForm.roleId }
+        const params = { state: this.roleForm.roleId != 0, roleId: this.roleForm.roleId }
         const { status, message } = await autoAuth(params)
         if (status !== 0)
           return this.$platform.notification({
