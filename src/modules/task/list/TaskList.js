@@ -2140,7 +2140,7 @@ export default {
       if (this.selectColumnState === 'exception' && this.abnormalData.taskExceptionRange.length) {
         let exceptionStates = []
         this.abnormalData.taskExceptionRange.forEach(item => {
-          exceptionStates = [...exceptionStates, ...item.taskExceptionRangeValue]
+          if (item.switch) exceptionStates = [...exceptionStates, ...item.taskExceptionRangeValue]
         })
         let params = {
           exceptionNodes: this.exceptionNodes ? [this.exceptionNodes] : this.taskCustomExceptionNodeList.filter(item => {return item.englishName}).map(item => {return item.englishName}),
