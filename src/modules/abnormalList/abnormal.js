@@ -316,7 +316,7 @@ export default {
       if (event) {
         const {action, exceptionName} = event.data
         this.columnarParams.action = action
-        this.exceptionName = exceptionName
+        this.exceptionName = exceptionName.split('-')[0]
         this.curPageParams = {page: 1, pageSize: 10}
       }
       const {succ, data} = await TaskApi.histogramList({...this.columnarParams, ...this.curPageParams, ...{exceptionName: this.exceptionName}})
