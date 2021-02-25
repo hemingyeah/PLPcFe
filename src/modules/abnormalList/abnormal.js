@@ -377,17 +377,14 @@ export default {
     },
     // 柱状图导出
     async reasonExport(type) {
-      let exceptionName = this.exceptionName
-      if (type === 'all') {
-        exceptionName = ''
-      }
+      let exceptionName = ''
       const {executorUserIds, createTimeStart, tagIds, createTimeEnd, action} = this.columnarParams
       const params = {
         userIds: executorUserIds,
         tagIds,
         createTimeStart,
         createTimeEnd,
-        action,
+        action: type === 'all' ? '' : action,
         exceptionName
       }
       const {succ, message} = await TaskApi.reasonExport(params)
