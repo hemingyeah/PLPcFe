@@ -19,8 +19,8 @@ const DepartmentAndUserComponent = Vue.extend(DepartmentAndUser);
 function choose(type = 'dept', options = {}) {
   Log.succ(type, 'type', choose.name)
   
-  if(type == 'dept') return deptWithUser(options);
-  if(type == 'team') return teamWithUser(options);
+  if(type == 'dept' || type == 'team') return deptWithUser(options);
+  // if(type == 'team') return teamWithUser(options);
   if(type == 'dept_only') return department(options);
 }
 
