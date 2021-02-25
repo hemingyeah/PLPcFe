@@ -695,8 +695,8 @@
                     
 
                     <el-tooltip
-                      v-if="abnormalHover(scope.row).length > 3"
-                      :content="abnormalHover(scope.row)"
+                      v-if="abnormalHover(scope.row).length > 2"
+                      :content="abnormalHover(scope.row).join(',')"
                       placement="top"
                     >
                       <span class="task-ml4">...</span>

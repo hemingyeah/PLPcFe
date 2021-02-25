@@ -23,12 +23,12 @@ import { fields, selectIds, advancedList, allExport, Inquire, AbnormalList } fro
 import { LINK_REG } from '@src/model/reg';
 
 /** utils */
-import _ from "lodash";
-import Page from "@model/Page";
-import { storageGet, storageSet } from "@src/util/storage";
-import { formatDate } from "@src/util/lang";
-import { getRootWindow } from "@src/util/dom";
-import * as FormUtil from "@src/component/form/util"
+import _ from 'lodash';
+import Page from '@model/Page';
+import { storageGet, storageSet } from '@src/util/storage';
+import { formatDate } from '@src/util/lang';
+import { getRootWindow } from '@src/util/dom';
+import * as FormUtil from '@src/component/form/util'
 import VersionMixin from '@src/mixins/versionMixin'
 import StorageUtil from '@src/util/storage.ts'
 
@@ -77,8 +77,8 @@ const Region = {
 }
 
 export default {
-  name: "task-list",
-  inject: ["initData"],
+  name: 'task-list',
+  inject: ['initData'],
   mixins: [tourGuide, VersionMixin],
   data() {
     return {
@@ -371,23 +371,32 @@ export default {
       // 超时
       if(overTime && this.abnormalLabel('超时') && s > e) {
         value.push('超时')
-      } else if (isPaused && this.abnormalLabel('暂停')) {
+      }
+      if (isPaused && this.abnormalLabel('暂停')) {
         value.push('暂停')
-      } else if (oncePaused && this.abnormalLabel('曾暂停')) {
+      }
+      if (oncePaused && this.abnormalLabel('曾暂停')) {
         value.push('曾暂停')
-      } else if (onceOverTime && this.abnormalLabel('曾超时')) {
+      }
+      if (onceOverTime && this.abnormalLabel('曾超时')) {
         value.push('曾超时')
-      } else if (state === 'refused' && this.abnormalLabel('拒绝')) {
+      }
+      if (state === 'refused' && this.abnormalLabel('拒绝')) {
         value.push('拒绝')
-      } else if (onceRefused && this.abnormalLabel('曾拒绝')) {
+      }
+      if (onceRefused && this.abnormalLabel('曾拒绝')) {
         value.push('曾拒绝')
-      } else if (onceReallot && this.abnormalLabel('转派')) {
+      }
+      if (onceReallot && this.abnormalLabel('转派')) {
         value.push('转派')
-      } else if (onceRollback && this.abnormalLabel('回退')) {
+      }
+      if (onceRollback && this.abnormalLabel('回退')) {
         value.push('回退')
-      } else if (state === 'offed' && this.abnormalLabel('取消')) {
+      }
+      if (state === 'offed' && this.abnormalLabel('取消')) {
         value.push('取消')
-      } else if (positionException && this.abnormalLabel('位置异常')) {
+      }
+      if (positionException && this.abnormalLabel('位置异常')) {
         value.push('位置异常')
       }
 
@@ -1186,7 +1195,7 @@ export default {
             minWidth = 125;
           }
           if (field.fieldName === 'taskNo') {
-            field.width = 280
+            field.width = 290
           }
           return {
             ...field,

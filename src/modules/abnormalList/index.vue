@@ -5,7 +5,8 @@
     <!-- 饼图 -->
     <div class="abnormal-piechart task-mb10">
       <h3>工单异常节点统计</h3>
-      <div id="piechart" ref="piechart"></div>
+      <div id="piechart" ref="piechart" v-show="PieChartList.length"></div>
+      <no-data-view v-show="!PieChartList.length" :notice-msg="'暂无数据'"></no-data-view>
       <div class="abnormal-ant" v-show="pieTabList.length">
         <base-button
           type="primary"
@@ -89,7 +90,8 @@
       <div class="abnormal-tab task-flex task-ai">
         <div v-for="(item, index) in taskCustomExceptionNodeList" :key="index" @click="TabSwitch(item.englishName)" :class="{'active': checkTab === item.englishName}">{{item.exceptionName}}</div>
       </div>
-      <div id="columnar" ref="columnar"></div>
+      <div id="columnar" ref="columnar" v-show="ColumnarList.length"></div>
+      <no-data-view v-show="!ColumnarList.length" :notice-msg="'暂无数据'"></no-data-view>
       <div class="abnormal-ant" v-show="columnarTabList.length">
         <base-button
           type="primary"
@@ -170,6 +172,7 @@ export default Abnormal;
     padding: 20px 30px;
     border-radius: 4px;
     margin-top: 10px;
+    padding-bottom: 30px;
   }
   &-tab {
     justify-content: center;
@@ -200,5 +203,9 @@ export default Abnormal;
 }
 h3 {
   font-weight: normal;
+}
+.app-nodata-view {
+  position: relative;
+  top: -40px;
 }
 </style>

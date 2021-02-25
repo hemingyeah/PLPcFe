@@ -7,6 +7,7 @@ import * as TaskApi from '@src/api/TaskApi.ts';
  * components
  */
 import HeaderSelect from './components/headerSelect.vue'
+import NoDataView from '@src/component/common/NoDataView';
 
 /* echarts */
 import echarts from 'echarts';
@@ -62,6 +63,8 @@ export default {
       PieTime: '', // 图表时间
       pieAction: '', // 饼图节点
       exceptionName: '', // 柱状图原因
+      PieChartList: [],
+      ColumnarList: [],
       Pietotal: 0,
       curtotal: 0,
       curPageParams: {page: 1, pageSize: 10},
@@ -72,7 +75,8 @@ export default {
     }
   },
   components: {
-    [HeaderSelect.name]: HeaderSelect
+    [HeaderSelect.name]: HeaderSelect,
+    [NoDataView.name]: NoDataView
   },
 
   mounted() {
@@ -86,8 +90,12 @@ export default {
     async getTurnOnTaskExceptionNodeInfo() {
       const {success, result} = await TaskApi.getTurnOnTaskExceptionNodeInfo()
       if(success) {
-        result.taskCustomExceptionNodeList.forEach(item => {
-          this.taskCustomExceptionNodeList.push(item)
+        let taskCustomExceptionNodeList = result.taskCustomExceptionNodeList.filter(item => {
+          return item.switch && item
+        }).forEach(item => {
+          if (['拒绝', '暂停', '转派', '回退', '取消'].indexOf(item.exceptionName) !== -1) {
+            this.taskCustomExceptionNodeList.push(item)
+          }
         })
       }
 
@@ -106,7 +114,10 @@ export default {
           })
           return item
         })
-        this.PieChart(taskExceptionVOList)
+        this.PieChartList = taskExceptionVOList
+        this.$nextTick(() => {
+          this.PieChart(taskExceptionVOList)
+        })
       }
 
     },
@@ -116,7 +127,11 @@ export default {
       const {succ, data} = await TaskApi.histogram(columnarParams)
       if (succ) {
         this.columnarTabList = []
-        this.Columnar(data.taskExceptionVOList)
+
+        this.ColumnarList = data.taskExceptionVOList
+        this.$nextTick(() => {
+          this.Columnar(data.taskExceptionVOList)
+        })
       }
     },
     // 负责人
@@ -347,11 +362,10 @@ export default {
         action,
       }
       const {succ, message} = await TaskApi.actionExport(params)
+      this.$platform.alert(message)
       if (succ) {
         window.parent.showExportList();
         window.parent.exportPopoverToggle(true);
-      } else {
-        this.$platform.alert(message)
       }
     },
     // 柱状图导出
@@ -370,11 +384,10 @@ export default {
         exceptionName
       }
       const {succ, message} = await TaskApi.reasonExport(params)
+      this.$platform.alert(message)
       if (succ) {
         window.parent.showExportList();
         window.parent.exportPopoverToggle(true);
-      } else {
-        this.$platform.alert(message)
       }
     },
     /* tab切换 */
