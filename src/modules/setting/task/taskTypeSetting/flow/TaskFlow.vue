@@ -174,7 +174,7 @@ export default {
     /** 格式化工单类型名称 */
     formatTaskTypeName(name) {
       if(name.length > 9) {
-        return name.slice(0, 9) + '...';
+        return `${name.slice(0, 9) }...`;
       }
 
       return name;
@@ -369,8 +369,6 @@ export default {
     async submit() {
       if (!this.$refs.comp.submit) return;
 
-      let message = [];
-
       let name = this.taskTypeConfig.name;
       if (name === '') {
         return this.$platform.notification({
@@ -383,13 +381,13 @@ export default {
           title: '工单类型名称超过20个字',
           type: 'error'
         });
-      };
+      }
       if(!/^[a-zA-Z0-9\u4e00-\u9fa5]+$/.test(name)) {
         return this.$platform.notification({
           title: '工单类型名称只能输入中文、字母、数字',
           type: 'error'
         });
-      };
+      }
 
       let nameAndColor = {
         name: this.taskTypeConfig.name,
@@ -397,7 +395,7 @@ export default {
       };
       this.pending = true;
       try {
-        await this.$refs.comp.submit(nameAndColor);
+        await this.$refs.comp.submit(nameAndColor, true);
         // await this.updateTaskTypeNameAndColor();
         this.fetchTasktype();
       } catch (error) {

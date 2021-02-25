@@ -33,6 +33,7 @@
       </div>
       <div class="setting-flow-main-content" id="setting-flow-main-content-guide">
         <flow-setting
+          ref="flowSettingRef"
           :task-type-id="taskTypeId"
           :type="currFlow"
           :flow-setting="taskFlowData.taskTypeConfig.flowSetting[currFlow]"
@@ -51,6 +52,7 @@ import * as SettingApi from '@src/api/SettingApi';
 /** components */
 import FlowSetting from '../components/FlowSetting.vue';
 
+import { convertDataToParams } from '../util';
 // 新存储工具方法
 import { storageGet, storageSet } from '@src/util/storage.ts';
 /* enum */
@@ -79,104 +81,12 @@ export default {
   methods: {
     clickFlow(type) {
       this.currFlow = type;
-    },
-    /**
-         * 审批设置转化成参数
-         */
-    formatApproveSetting(setting) {
-      if(setting === undefined) return {};
-      let approveSetting = _.cloneDeep(setting);
-      if(approveSetting.level < 2) {
-        delete approveSetting.multiApproverSetting;
-      }
-      if(approveSetting.level === 0) {
-        approveSetting.leader = 'none';
-      }
 
-      // 发起人选择
-      if(approveSetting.leader === 'promoter') {
-        approveSetting.approvers = [];
-        approveSetting.displayName = '';
-        approveSetting.taskTemplateId = '';
-      }
-
-      // leader审批类型为表单人员
-      if(approveSetting.leader && !approveSetting.leader.indexOf('formUser') > -1 && approveSetting.leader !== 'users'){
-        approveSetting.approvers = [];
-      }else{
-        approveSetting.taskTemplateId = '';
-      }
-
-      // 递归:格式化多级审批
-      if(Array.isArray(approveSetting.multiApproverSetting)) {
-        approveSetting.multiApproverSetting = approveSetting.multiApproverSetting.map(item => this.formatApproveSetting(item));
-      }
-
-      if(typeof approveSetting.leader === 'undefined') approveSetting.leader = '';
-
-      return approveSetting;
-    },
-    /** 将数据转化成保存需要的数据结构 */
-    convertDataToParams() {
-      let taskTypeConfig = _.cloneDeep(this.taskFlowData.taskTypeConfig);
-      let {id, flowSetting, delayBack, delayBackMin, allowPause, pauseApproveSetting,
-        planRemindSetting, noticeLeader, noticeUsers, cancelApproveSetting,
-        autoReviewState, taskOverTimeModels } = taskTypeConfig;
-      Object.keys(flowSetting).map(key => {
-        let {state, overTime, approveSetting, reallotAppr} = flowSetting[key];
-        flowSetting[key] = {
-          state,
-          overTime,
-          ...this.formatApproveSetting(approveSetting)
-        }
-
-        if(key === 'allot') {
-          flowSetting[key].reallotAppr = reallotAppr !== 'none';
-        }
-
-        if(key === 'off') {
-          flowSetting[key] = {
-            ...flowSetting[key],
-            ...this.formatApproveSetting(cancelApproveSetting),
-            state: taskTypeConfig.allowCancel
-          }
-        }
-      });
-      flowSetting.pause = {
-        state: allowPause,
-        ...this.formatApproveSetting(pauseApproveSetting)
-      }
-      delete flowSetting.autoReview;
-      let params = {
-        typeId: id,
-        flowSetting,
-        delayBack,
-        delayBackMin,
-        state: planRemindSetting.state,
-        minutes: Number(planRemindSetting.minutes),
-        minutesType: planRemindSetting.minutesType,
-        planningTimeState: 'notice',
-        planningTimeMes: noticeLeader ? ['none', 'leader', 'users'][Number(noticeLeader)] : 'none',
-        usersIds: noticeUsers.map(item => item.userId).join(','),
-        taskOverTimeModels: taskOverTimeModels.map(item => {
-          let {reminders = [], overTimeState, isAhead = '0', minutes = '0', remindType, overTimeStatus} = item;
-          return {
-            overTimeState, 
-            isAhead, 
-            minutes, 
-            remindType,
-            overTimeStatus,
-            ids: reminders.map(item => item.userId).join(','),
-          };
-        }),
-        autoReviewState
-      };
-      return params;
     },
     /** 保存流程设置 (暴露的方法) */
     async submit(otherParams) {
       try {
-        let params = this.convertDataToParams();
+        let params = convertDataToParams(this.taskFlowData.taskTypeConfig);
         params = {
           ...params,
           ...otherParams
@@ -196,7 +106,7 @@ export default {
         });
                 
       } catch (error) {
-        console.error('sumbit saveProcess => error', error);
+        console.error('error', error);
       }
     },
     /** 检查内容是否有修改 (暴露的方法) */
@@ -243,23 +153,25 @@ export default {
           return document.getElementById('setting-flow-main-content-guide').getElementsByClassName('form-design-center')[0]
         },
         lastFinish: true
-      }, {
-        id: 'task-flow-guide',
-        content: '流程中「通用规则」部分的设置，在所有节点均生效',
-        haveStep: true,
-        needCover: true,
-        direction: 'row',
-        outsideParent: true,
-        inside: true,
-        nowStep: 3,
-        domObj: () => {
-          return document.getElementById('setting-flow-main-content-guide').getElementsByClassName('setting-common')[0]
-        },
-        insideDom: () => {
-          return document.getElementById('setting-flow-main-content-guide').getElementsByClassName('setting-common')[0].getElementsByClassName('setting-specific-form')[1]
-        },
-        lastFinish: true
-      }, {
+      },
+      //  {
+      //   id: 'task-flow-guide',
+      //   content: '流程中「通用规则」部分的设置，在所有节点均生效',
+      //   haveStep: true,
+      //   needCover: true,
+      //   direction: 'row',
+      //   outsideParent: true,
+      //   inside: true,
+      //   nowStep: 3,
+      //   domObj: () => {
+      //     return document.getElementById('setting-flow-main-content-guide').getElementsByClassName('setting-common')[0]
+      //   },
+      //   insideDom: () => {
+      //     return document.getElementById('setting-flow-main-content-guide').getElementsByClassName('setting-common')[0].getElementsByClassName('setting-specific-form')[1]
+      //   },
+      //   lastFinish: true
+      // }, 
+      {
         id: 'task-flow-guide',
         content: '在「完成工单」节点设置回执表单',
         haveStep: true,
@@ -267,7 +179,7 @@ export default {
         direction: 'row',
         outsideParent: true,
         inside: true,
-        nowStep: 4,
+        nowStep: 3,
         domObj: () => {
           return document.getElementById('setting-flow-axis-guide')
         },

@@ -56,7 +56,27 @@
         <div v-if="showOvertime" class="setting-specific-overtime">
           <h2>
             超时提醒
+            <!-- ps: 不希望切换流程节点时，switch有动画 -->
             <el-switch
+              v-show="taskOverTimeModel.overTimeStatus && !flag"
+              class="ml-12"
+              :value="true"
+              @change="(val) => {
+                $set(taskOverTimeModel,'overTimeStatus', false);
+                updateOvertimeSetting()
+              }"
+            />
+            <el-switch
+              v-show="!taskOverTimeModel.overTimeStatus && !flag"
+              class="ml-12"
+              :value="false"
+              @change="() => {
+                $set(taskOverTimeModel,'overTimeStatus', true);
+                updateOvertimeSetting()
+              }"
+            />
+            <el-switch
+              v-show="flag"
               class="ml-12"
               v-model="taskOverTimeModel.overTimeStatus"
               @change="updateOvertimeSetting"
@@ -169,75 +189,6 @@
         </div>
         <!--E 关闭工单查看权限 -->
       </div>
-
-      <!-- 公共设置 -->
-      <div class="setting-common">
-        <div class="setting-specific-form">
-          <h2 class="mt-12">
-            计划时间提醒
-            <el-switch
-              class="ml-12"
-              v-model="taskTypeConfig.planRemindSetting.state"
-            />
-          </h2>
-          <div class="mb-8">
-            在计划时间
-            <el-select
-              class="w-87"
-              v-model="taskTypeConfig.planRemindSetting.minutesType"
-              placeholder="请选择"
-            >
-              <el-option label="前" :value="0"> </el-option>
-              <el-option label="后" :value="1"> </el-option>
-            </el-select>
-            <el-input
-              class="w-87"
-              onkeyup="this.value=this.value.replace(/\D/g,'')"
-              v-model="taskTypeConfig.planRemindSetting.minutes"
-            />
-            分钟提醒工单负责人、协同人及
-            <el-select v-model="taskTypeConfig.noticeLeader" placeholder="请选择">
-              <el-option
-                v-for="item in planOptions"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value"
-              >
-              </el-option>
-            </el-select>
-            <el-input
-              v-if="taskTypeConfig.noticeLeader == 2"
-              class="w-187"
-              placeholder="请选择通知人"
-              readonly
-              :value="getApproverNames(taskTypeConfig.noticeUsers)"
-              @click.native="selectApproveUser('planRemind')"
-            />
-          </div>
-        </div>
-        <div class="setting-specific-form">
-          <h2>
-            允许工单负责人将工单状态设为暂停
-            <el-switch class="ml-12" v-model="taskTypeConfig.allowPause" />
-          </h2>
-          <approve-setting
-            :options="options.pause"
-            :approve-setting="taskTypeConfig.pauseApproveSetting"
-            @change="(setting) => changeApproveSetting(setting, 'pause')"
-          />
-        </div>
-        <div class="setting-specific-form">
-          <h2>
-            允许工单在完成前被取消
-            <el-switch class="ml-12" v-model="taskTypeConfig.allowCancel" />
-          </h2>
-          <approve-setting
-            :options="options.cancel"
-            :approve-setting="taskTypeConfig.cancelApproveSetting"
-            @change="(setting) => changeApproveSetting(setting, 'cancel')"
-          />
-        </div>
-      </div>
     </div>
     <!--E 设置项 -->
 
@@ -288,6 +239,7 @@ export default {
   },
   data() {
     return {
+      flag: false,
       compKey: new Date().getTime(),
       taskTypeName: '', // 接口返回的工单类型名称
 
@@ -383,12 +335,14 @@ export default {
   watch: {
     type(val) {
       if (val) {
+        this.flag = false;
         this.getTaskFields(val);
         // 获取当前流程超时提醒设置
         this.taskOverTimeModel = this.taskTypeConfig.taskOverTimeModels.find(
           (item) => item.overTimeState === val
         ) || {};
         this.options.flow = this.approveOptions(this.type);
+        setTimeout(() => {this.flag = true;})
       }
     },
     taskTypeId(id) {
@@ -617,6 +571,7 @@ export default {
     flex: 1;
     overflow: auto;
     .setting-specific {
+      height: 100%;
       font-size: 14px;
       padding: 8px 20px 20px 20px;
       background: #ffffff;
@@ -698,4 +653,5 @@ export default {
 /deep/.el-checkbox{
   margin-bottom: 0;
 }
+
 </style>

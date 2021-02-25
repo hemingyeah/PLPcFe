@@ -119,8 +119,12 @@ export default {
         fromId
       });
     },
-    // 保存数据
-    async submit(otherParams) {
+    /** 
+     * @description 保存数据
+     * @param {object} otherParams 工单类型名称和颜色
+     * @param {boolean} flag 是否返回上一页
+     */
+    async submit(otherParams, flag) {
       try {
         const params = {
           taskTypeId: this.taskTypeId,
@@ -133,9 +137,13 @@ export default {
             title: '保存成功',
             type: 'success'
           });
-          setTimeout(()=>{
-            this.goBack();
-          }, 1000)
+
+          if(!flag) {
+            setTimeout(()=>{
+              this.goBack();
+            }, 1000)
+          }
+          
         }else {
           this.$platform.notification({
             title: res.message,
