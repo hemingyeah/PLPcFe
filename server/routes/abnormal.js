@@ -15,7 +15,7 @@ const modules = require('../../modules');
 //   ctx.body = Template.renderWithHtml('工单异常统计报表', body, script, modConfig.template)
 // });
 
-router.get('/abnormal/v2/list', async ctx => {
+router.get('/stats/abnormalList', async ctx => {
   let modConfig = modules['abnormal.list'];
   let script = ['/abnormal.list.js'];
   
