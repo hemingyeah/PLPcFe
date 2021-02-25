@@ -50,8 +50,10 @@ class TaskAllotExecutorRender extends TaskAllotExecutorMethods {
         )
       },
     }
+    
     return (
       <biz-form-remote-select
+        ref='TeamUserBizFormRemoteSelect'
         cleared
         value={this.selectTeamUsers}
         onInput={(value: any[]) => this.handlerTeamUsersChange(value)}
@@ -59,6 +61,7 @@ class TaskAllotExecutorRender extends TaskAllotExecutorMethods {
         placeholder='请输入查询'
         remoteMethod={(params: any) => this.fetchTeamUsers(params)}
         scopedSlots={scopedSlots}
+        onFocus={(element: Element) => this.handlerExecutorSelectFocus(element)}
       >
       </biz-form-remote-select>
     )

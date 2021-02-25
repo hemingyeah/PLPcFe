@@ -2,8 +2,10 @@
 .task-allot-modal {
   display: flex;
   & > .base-modal {
-    height: calc(100vh - 100px);
-    width: calc(100% - 100px) !important;
+    height: calc(100vh - 24px);
+    max-height: calc(100% - 24px);
+    width: calc(100% - 12px) !important;
+    margin: 12px;
     & > .base-modal-body {
       display: flex;
       flex-wrap: wrap;
@@ -135,10 +137,8 @@
       width: 100%;
       .el-table {
         height: 100%;
+        min-height: 100%;
         overflow: auto;
-        .el-table__body-wrapper {
-          //height: calc(100% - 48px);
-        }
       }
     }
   }

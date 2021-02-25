@@ -50,6 +50,9 @@ const BizFormRemoteSelect = {
     },
     input(value) {
       this.$emit('input', value);
+    },
+    onFocusHandler(selectElement) {
+      this.$emit('focus', selectElement)
     }
   },
   render(h) {
@@ -63,6 +66,7 @@ const BizFormRemoteSelect = {
     return (
       <div class="biz-form-remote-select">
         <base-select
+          ref='BizFormRemoteBaseSelect'
           value-key={ this.valueKey }
           onInput={ this.input }
           placeholder={ this.placeholder }
@@ -73,6 +77,7 @@ const BizFormRemoteSelect = {
           disabled={ this.inputDisabled }
           collapsed={ this.collapsed }
           computedWidthKeys={this.computedWidthKeys}
+          onFocus={ this.onFocusHandler }
         >
         </base-select>
         { this.cleared && this.value.length > 0 && !this.inputDisabled && clearButton }

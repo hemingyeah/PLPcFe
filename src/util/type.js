@@ -62,3 +62,10 @@ export function isNull(value){
 export function isEmpty(value) {
   return _.isEmpty(value)
 }
+
+/** 
+ * @description 是否为 DOM元素
+*/
+export function isElement(element) {
+  return _.isElement(element)
+}

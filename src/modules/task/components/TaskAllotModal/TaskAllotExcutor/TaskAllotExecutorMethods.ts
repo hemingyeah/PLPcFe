@@ -37,8 +37,8 @@ import Column from '@model/types/Column'
 /* util */
 import * as _ from 'lodash'
 import LogUtil from '@src/util/log.ts'
-import { isArray } from '@src/util/type'
-import Platform from '@src/util/Platform'
+import { isArray, isElement } from '@src/util/type'
+import Platform from '@src/util/platform'
 import { objectArrayIntersection } from '@src/util/array'
 import { storageGet, storageSet } from '@src/util/storage.ts'
 /* vue */
@@ -403,8 +403,6 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
    * -- 内部调用的
   */
   public fetchUsers(): Promise<PageInfo<getTaskAllotUserInfoResult> | null | any> {
-    // TODO: 修改
-    // if (this.pending) return Promise.resolve({})
     
     LogUtil.succ(LogUtil.Start, this.fetchUsers.name)
     
@@ -682,6 +680,30 @@ class TaskAllotExecutorMethods extends TaskAllotExecutorComputed {
     
     const columns = this.simplifyTableColumnsProperty(this.columns)
     this.saveDataToStorage(StorageKeyEnum.TaskAllotTableColumns, columns)
+  }
+  
+  public handlerExecutorSelectFocus(selectElement: Element): void {
+    if (!isElement(selectElement)) return
+    
+    const executorSelectMaxHeight = 400
+    const executorSelectClientHeight = selectElement.clientHeight
+    const executorSelectRectData = selectElement.getBoundingClientRect()
+    const taskAllotModalElement = this.$parent.$el
+    const taslAllotModalFoolterElement = taskAllotModalElement.querySelector('.task-allot-modal-dialog-footer')
+    
+    if (!isElement(taslAllotModalFoolterElement)) return
+    
+    const taslAllotModalFoolterElementRectData = taslAllotModalFoolterElement?.getBoundingClientRect()
+    const middleHeight = Number(taslAllotModalFoolterElementRectData?.y) - executorSelectRectData.y - executorSelectClientHeight
+    
+    if (middleHeight >= executorSelectMaxHeight) return
+    
+    // @ts-ignore
+    const executorSelecePanelElement = this.$refs?.TeamUserBizFormRemoteSelect?.$refs?.BizFormRemoteBaseSelect?.$refs.searchDom
+    if (!isElement(executorSelecePanelElement)) return
+    
+    executorSelecePanelElement.style.height = `${middleHeight - 40}px`
+    
   }
   
   public handlerNumberFormat(value: string): number | null {
