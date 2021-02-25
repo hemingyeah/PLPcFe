@@ -28,7 +28,7 @@
               <!-- start 部门列表树 -->
               <div class="department-tree-view">
                 <div class="bc-dept" v-if="depts.length > 0">
-                  <base-tree-dept expand :data="depts" :selected="[selectedDept]" :show-checkbox="allowCheckDept" @node-selected="initDeptUser" @node-check="chooseDept" :node-render="nodeRender" />
+                  <base-tree-dept expand :data="depts" :selected="selectedDept" :show-checkbox="allowCheckDept" @node-selected="initDeptUser" @node-check="chooseDept" :node-render="nodeRender" />
                 </div>
               </div>
               <!-- end 部门列表树 -->
