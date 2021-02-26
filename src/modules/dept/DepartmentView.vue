@@ -10,7 +10,7 @@
         </el-button>
 
         <!-- start 同步钉钉通讯录 -->
-        <el-button v-if="tenantType==0" class="base-button" :class="{'sync-button': !collapse}" type="primary" :loading="synchronousState" @click="syncDingTalkAddressBook">
+        <el-button v-if="tenantType==0 && hasStaffAuth" class="base-button" :class="{'sync-button': !collapse}" type="primary" :loading="synchronousState" @click="syncDingTalkAddressBook">
           {{ synchronousState ? '同步中': '同步钉钉通讯录' }}
         </el-button>
         <!-- end 同步钉钉通讯录 -->
@@ -381,7 +381,7 @@
             <el-table :data="userPage.list" stripe @select="selectionHandle" @select-all="selectionHandle" :highlight-current-row="false" header-row-class-name="team-detail-table-header" ref="multipleTable"
                       class="team-table">
               <el-table-column type="selection" width="48" align="center" class-name="select-column"></el-table-column>
-              <el-table-column prop="displayName" label="姓名">
+              <el-table-column prop="displayName" label="姓名" width="180px">
                 <div style="display: flex" slot-scope="scope">
                   <a :href="`/security/user/view/${scope.row.userId}`" :data-id="scope.row.userId" @click="goUserDetail" class="view-detail-btn">{{scope.row.displayName}}</a>
                   <i v-if="scope.row.superAdmin == 1" class="iconfont icon-people">主管</i>
@@ -421,13 +421,7 @@
             </el-table>
 
             <div class="table-footer">
-              <div class="list-info">
-                共
-                <span class="level-padding">{{userPage.total}}</span>记录，
-                已选中
-                <span class="selectedCount">{{multipleSelection.length}}</span>条
-                <span class="selectedCount select-init-text" @click="selectionToggle()">清空</span>
-              </div>
+              <div class="list-info">共<span class="level-padding">{{userPage.total}}</span>记录</div>
               <el-pagination class="customer-table-pagination" background @current-change="jump" @size-change="handleSizeChange" :page-sizes="[10, 20, 50]" :page-size="params.pageSize" :current-page="params.pageNum"
                              layout="prev, pager, next, sizes, jumper" :total="userPage.total"></el-pagination>
             </div>
