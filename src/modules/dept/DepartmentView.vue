@@ -28,7 +28,7 @@
               <!-- start 部门列表树 -->
               <div class="department-tree-view">
                 <div class="bc-dept" v-if="depts.length > 0">
-                  <base-tree-dept expand :data="depts" :selected="[selectedDept]" :show-checkbox="allowCheckDept" @node-selected="initDeptUser" @node-check="chooseDept" :node-render="nodeRender" />
+                  <base-tree-dept expand :data="depts" :selected="selectedDept" :show-checkbox="allowCheckDept" @node-selected="initDeptUser" @node-check="chooseDept" :node-render="nodeRender" />
                 </div>
               </div>
               <!-- end 部门列表树 -->
@@ -99,7 +99,7 @@
                 角色名称：
                 <a :href="`/security/role/view/${selectedRole.id}`" :data-id="selectedRole.id" @click="goRoleDetail" style="color:#13c2c2;">{{selectedRole.text}}</a>
                 <!-- <base-button style="margin-left:10px;" type="ghost" @event="openCreateUserPanel"> 查看 </base-button> -->
-                <base-button v-if="canEditSystemRole || isCustomeRole" style="margin-left:10px;" type="ghost" @event="editRole(selectedRole.id)">编辑</base-button>
+                <base-button v-if="canEditSystemRole || isCustomeRole" style="margin-left:10px;" type="ghost" @event="editRole(selectedRole.id)">编辑角色权限</base-button>
                 <base-button v-if="selectedRole.custom" style="margin-left:10px;" type="ghost" @event="resetRole(selectedRole.custom)">重置权限</base-button>
                 <base-button v-if="selectedRole.isSys == 0" style="margin-left:10px;" type="danger" @event="delRole(selectedRole.id)">删除角色</base-button>
               </h4>
@@ -115,14 +115,14 @@
             <base-button v-if="isSystemRole || isCustomeRole" type="primary" @event="chooseUser('role')">添加成员</base-button>
             <base-button v-if="(isSystemRole || isCustomeRole) && rolePage.list.length" type="primary" @event="roleDeleteConfirm()">移除成员</base-button>
             <!-- <base-button v-if="isCustomeRole" type="primary" @event="createRole">新建角色</base-button> -->
-            <base-button v-if="selectedRole.id == 0 && tenantType != 1" type="primary" @event="roleDialogVisible = true">自动分配角色</base-button>
+            <base-button v-if="selectedRole.id == 0 && tenantType == 0" type="primary" @event="roleDialogVisible = true">自动分配角色</base-button>
           </div>
 
           <div class="department-user-table" v-if="rolePage.list.length > 0">
             <el-table :data="rolePage.list" stripe @select="roleSelectionHandle" @select-all="roleSelectionHandle" :highlight-current-row="false" show-overflow-tooltip header-row-class-name="team-detail-table-header"
                       ref="roleMultipleTable" class="team-table">
               <el-table-column type="selection" width="48" align="center" class-name="select-column"></el-table-column>
-              <el-table-column prop="displayName" label="姓名">
+              <el-table-column prop="displayName" label="姓名" width="180px">
                 <div style="display: flex" slot-scope="scope">
                   <a :href="`/security/user/view/${scope.row.userId}`" :data-id="scope.row.userId" @click="goUserDetail" class="view-detail-btn">{{scope.row.displayName}}</a>
                   <span v-if="scope.row.superAdmin == 2" class="super-admin-label">主管理员</span>
@@ -779,7 +779,7 @@ export default {
     }
     this.initialize()
     this.dept_role_data = this.initData.rolesJson || []
-    this.roles = [{ id: '0', text: '待分配' }].concat(this.dept_role_data)
+    this.roles = [{ id: '0', text: '待分配人员' }].concat(this.dept_role_data)
     this.selectedRole = this.roles[0]
     // 自动分配角色
     this.autoAuthRoles = [{ id: '0', text: '由管理员每次指定' }].concat(
@@ -1072,7 +1072,7 @@ export default {
     async dispatchRole() {
       try {
         this.pending = true
-        const params = { state: false, roleId: this.roleForm.roleId }
+        const params = { state: this.roleForm.roleId != 0, roleId: this.roleForm.roleId }
         const { status, message } = await autoAuth(params)
         if (status !== 0)
           return this.$platform.notification({
@@ -1668,7 +1668,7 @@ export default {
       this.multipleSelection = []
       this.roleMultipleSelection = []
       if (this.activeName == 'tag' && this.selectedRole.id == -1) {
-        this.selectedRole = { id: '0', text: '待分配' }
+        this.selectedRole = { id: '0', text: '待分配人员' }
       }
       try {
         if (this.selectedDept.id != dept.id) {

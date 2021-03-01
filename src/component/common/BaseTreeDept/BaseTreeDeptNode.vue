@@ -45,8 +45,8 @@ export default {
       default: false
     },
     selected: {
-      type: Array,
-      default: () => []
+      type: Object,
+      default: () => ({})
     },
     deep: {
       type: Number,
@@ -69,17 +69,7 @@ export default {
      * -- 后面考虑下性能
     */
     isSelected(){
-      let isSelected = false
-      
-      try {
-        isSelected = this.selected.some(item => {
-          return JSON.stringify(this.node) == JSON.stringify(item)
-        })
-      } catch (error) {
-        console.warn('base-tree-dept-node -> isSelected -> error', error)
-      }
-      
-      return isSelected
+      return this.node == this.selected
     }
   },
   watch: {

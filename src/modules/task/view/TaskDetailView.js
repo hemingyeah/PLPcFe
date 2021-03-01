@@ -1259,7 +1259,7 @@ export default {
             needCover: true,
             lastFinish:true,
             finishBtn:'知道了'
-          }], 3, '', (e) => {
+          }], 0, '', (e) => {
             return new Promise((resolve, reject) => {
               if(e.type == 'stop' || e.type == 'finish'){
                 if ( this.showTaskDetailGuide && this.showAllotModal) {

@@ -215,7 +215,9 @@ export default {
     focusInput() {
       if (this.disabled) return
       if (this.showList) return this.close()
-
+      
+      this.$emit('focus', this.$el)
+      
       this.isFocus = true
       this.initList()
     },

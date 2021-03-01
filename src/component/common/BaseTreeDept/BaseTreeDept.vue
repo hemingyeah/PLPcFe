@@ -31,8 +31,8 @@ export default {
       default: true,
     },
     selected: {
-      type: Array,
-      default: () => []
+      type: Object,
+      default: () => ({})
     },
     showCheckbox: {
       type: Boolean,
