@@ -149,7 +149,6 @@
           </el-dropdown>
           <!-- 选择列 -->
           <div class="guide-box mar-l-25">
-            <!-- <div class="guide-disable-cover" v-if="nowGuideStep == 2"></div> -->
             <div :class="[
                    'task-ai',
                    'task-flex',
@@ -299,6 +298,10 @@
 
                 <template v-else-if="column.fieldName == 'address'">
                   {{ getAddress(scope.row.address) }}
+                </template>
+
+                <template v-else-if="column.label=='购买日期' || column.label=='过保日期'">
+                  {{ scope.row.attribute[column.field] | formatDate2 }}
                 </template>
 
                 <template v-else-if="!column.isSystem">
@@ -823,6 +826,10 @@ export default {
       if (!val) return '';
       return formatDate(val, 'YYYY-MM-DD HH:mm:ss');
     },
+    formatDate2 (val) {
+      if (!val) return '';
+      return formatDate(val, 'YYYY-MM-DD');
+    },
     displaySelect (value) {
       if (!value) return null;
       if (value && typeof value === 'string') {
@@ -892,7 +899,7 @@ export default {
     async resetPage () {
       // 获取产品动态字段
       try {
-        let res = await getProductFields({ isFromSetting: true });
+        let res = await getProductFields({ isFromSetting: false });
         this.dynamicFields = res.data || [];
         this.buildColumns();
         this.getSelectCount();

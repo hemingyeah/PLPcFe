@@ -3,7 +3,7 @@
     <el-tooltip content="勾选后，将会在移动端工单卡片上显示生效" placement="top">
       <el-checkbox :value="field.isAppShow" @input="update" :true-label="1" :false-label="0" :disabled="isDisabled">
         移动端展示
-        ( {{ mobileShowField.length }}/{{ taskMobileShowMaxLengthMax }})
+        <template v-if="!field.isCommon">( {{ mobileShowField.length }}/{{ taskMobileShowMaxLengthMax }})</template>
         <i class="iconfont icon-question"></i>
       </el-checkbox>
     </el-tooltip>
@@ -24,11 +24,11 @@ export default {
   computed: {
     // 是否禁用
     isDisabled() {
-      return this.mobileShowField.length >= this.taskMobileShowMaxLengthMax && this.field.isAppShow !== 1;
+      return this.mobileShowField.length >= this.taskMobileShowMaxLengthMax && this.field.isAppShow !== 1 && !this.field.isCommon;
     },
     // 工单：移动端显示的 字段列表
     mobileShowField() {
-      return this.fields.filter(field => field.isAppShow === 1);
+      return this.fields.filter(field => field.isAppShow === 1 && !field.isCommon);
     },
     // 工单移动端展示最大数量
     taskMobileShowMaxLengthMax() {

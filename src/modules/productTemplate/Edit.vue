@@ -16,7 +16,6 @@
       
       <!-- start form builder -->
       <form-builder ref="productTemplateEditForm" :fields="fields" mode="productTemplate" :value="form" @update="update">
-        
         <!-- start 产品类型 -->
         <template slot="type" slot-scope="{field}">
           <form-item :label="field.displayName" validation>
@@ -102,8 +101,8 @@ export default {
     },
     fields() {
       let originFields = (this.fieldsInfo.filter(f => {
-        return (
-          f.fieldName !== 'customer' 
+          return (
+            f.fieldName !== 'customer' 
             && f.fieldName !== 'tags'
         )
       })
@@ -123,11 +122,10 @@ export default {
     }
   },
   async mounted() {
-    const { status, data } = await getProductFields({isFromSetting:true});
+    const { status, data, message } = await getProductFields({isFromSetting:true});
     if( status == 0 ){
       this.fieldsInfo = data;
     }
-    
     // 初始化默认值
     let form = {}
     // 编辑
@@ -236,8 +234,9 @@ export default {
       fields.forEach(field => {
         let {fieldName, isSystem} = field;
         let value = form[fieldName];
-        
-        if (field.formType === 'location') {
+        let tv = null;
+
+        if ((field.formType === 'location') && !value.isHaveLocation) {
           value = {};
         }
         if (field.formType === 'address' && !field.isSystem) {

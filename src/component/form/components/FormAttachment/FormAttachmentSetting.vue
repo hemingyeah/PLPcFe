@@ -4,6 +4,7 @@
     <form-title-setting
       :field="field"
       :setting="setting"
+      :disabled="isSystem"
       @input="updateForDom"
     ></form-title-setting>
     <!-- end 标题 -->
@@ -30,11 +31,9 @@
     <!-- end 校验 -->
 
     <!-- start 字段权限 -->
-    <div class="form-setting-group form-setting-item">
+    <div class="form-setting-group form-setting-item" v-if="!isSystem">
       <h4 class="form-item-title">字段权限</h4>
       <div class="form-item-box">
-        <!-- 移动端列表展示 -->
-        <mobile-show-setting v-if="isTaskMode" :field="field" :fields="fields" @input="update"></mobile-show-setting>
         <!-- 可见性 -->
         <form-visible-setting :field="field" @input="update"></form-visible-setting>
       </div>
@@ -62,6 +61,11 @@ export default {
   name: 'form-attachment-setting',
   mixins: [SettingMixin],
   props: settingProps,
+  computed: {
+    isSystem() {
+      return this.field.isSystem === 1
+    }
+  },
   methods: {
     updateForDom(event){
       let el = event.target;

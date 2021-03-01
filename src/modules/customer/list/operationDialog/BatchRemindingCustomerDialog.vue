@@ -25,7 +25,7 @@
           <span style="display: inline-block; margin-top: 10px;">按角色：</span>
           <el-checkbox-group :value="sendRoleSetting" @input="change" style="display:inline">
             <el-checkbox label="sendToCustomerExecutor">客户负责人</el-checkbox>
-            <el-checkbox label="sendToCustomerTag">客户所属服务团队</el-checkbox>
+            <el-checkbox label="sendToCustomerTag">客户所属服务部门</el-checkbox>
           </el-checkbox-group>
         </template>
         <template v-else>

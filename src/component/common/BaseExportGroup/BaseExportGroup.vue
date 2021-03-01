@@ -58,7 +58,7 @@
             <div class="tooltip" v-if="item.value === 'taskChecked' && col.formType === 'select' && col.setting.isMulti">多行数据</div>
             <div class="tooltip" v-if="item.value === 'receiptChecked' && col.formType === 'select' && col.setting.isMulti">多行数据</div>
             <div class="tooltip" v-if="item.value === 'receiptChecked' && (col.label === '备件' || col.label === '服务项目')">多行数据</div>
-            <div class="tooltip" v-if="item.value === 'systemChecked' && (col.label === '负责人所属团队' || col.label === '协同人')">多行数据</div>
+            <div class="tooltip" v-if="item.value === 'systemChecked' && (col.label === '负责人所属团队' || col.label === '负责人所属部门' || col.label === '协同人')">多行数据</div>
             <div class="tooltip" v-if="item.value === `annexChecked${index}` && col.inputType =='multiple'">多行数据</div>
             <div class="tooltip" v-if="item.value === `annexChecked${index}` && col.inputType =='single' && col.formType =='selectMulti'">多行数据</div>
           </el-checkbox>
@@ -224,7 +224,7 @@ export default {
         let checkedArr = [];
 
         if (value.indexOf(key) > -1) {
-          let columns = filterColumnsMap[key];
+          let columns = filterColumnsMap[key] || [];
 
           checkedArr = columns.map((item) =>
             item.exportAlias ? item.exportAlias : item.field

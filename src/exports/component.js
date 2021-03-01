@@ -1,15 +1,16 @@
 /** 此文件作为导出组件的入口，不在项目中引用 */
-import '../assets/scss/reboot.scss'
-import '../assets/scss/transition.scss'
-import '../assets/scss/base.scss'
-import './element.scss'
-import '../common/polyfill'
+import '../assets/scss/reboot.scss';
+import '../assets/scss/transition.scss';
+import '../assets/scss/base.scss';
+import './element.scss';
+import '../common/polyfill';
 /* components */
-import BaseModal from '../component/common/BaseModal'
-import BaseTree from '../component/common/BaseTree'
-import BaseContact from '../component/common/BaseContact'
-import BaseMapPicker from '../component/common/BaseMapPicker'
-import BizTeamSelect from '../component/business/BizTeamSelect'
+import BaseModal from '../component/common/BaseModal';
+import BaseTree from '../component/common/BaseTree';
+import BaseContact from '../component/common/BaseContact';
+import BaseMapPicker from '../component/common/BaseMapPicker';
+import BizTeamSelect from '../component/business/BizTeamSelect';
+import BizProposeApproveDialog from '../component/business/BizProposeApproveDialog';
 import BizVersionLimitDialogHOC from '../component/business/BizVersionLimitDialog/index.tsx'
 import BizVersionLimitDialog from '../component/business/BizVersionLimitDialog/BizVersionLimitDialog.tsx'
 
@@ -21,10 +22,14 @@ import Vue from 'vue'
 import filter from '../filter'
 import directive from '../directive'
 
+Vue.use(BaseModal);
+Vue.use(BaseTree);
+Vue.use(Checkbox);
 Vue.use(BaseModal)
 Vue.use(BaseTree)
 Vue.use(Checkbox)
 Vue.use(Button)
+
 Vue.use(filter)
 Vue.use(directive)
 
@@ -37,12 +42,15 @@ const components = {
     ...BizTeamSelect.props,
     ...BizVersionLimitDialogHOC.props
   },
+  [BizProposeApproveDialog.namespace]: BizProposeApproveDialog.props
 }
 
 function install(Vue){
   Vue.use(directive)
+  
   Vue.component(BizTeamSelect.name, BizTeamSelect)
   Vue.component(ComponentNameEnum.BizVersionLimitDialog, BizVersionLimitDialog)
+  Vue.component(BizProposeApproveDialog.name, BizProposeApproveDialog)
 }
 
 window._pc_componentsV2 = components

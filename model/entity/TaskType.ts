@@ -69,7 +69,7 @@ interface TaskType {
   /**
    * 新的配置信息放在这，就跟configHelper一样，以后别加一个设置就加个字段了
   */
-  config?: string
+  config?: any
   
   // 字段列表 移动端查询所有工单类型会返回
   field?: Field[]

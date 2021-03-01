@@ -13,12 +13,14 @@ const callcenter = require('./callcenter')
 
 const doMyself = require('./doMyself')
 const customerContact = require('./customerContact')
+const department = require('./department')
 
 const sparePart = require('./sparePart')
 const linkc = require('./linkc')
 const productV2 = require('./productV2')
 
 const superQrcode = require('./superQrcode')
+const guideForNewUser = require('./guideForNewUser')
 
 /** 
  * 定义各个模块的配置，路径相对于项目根路径 
@@ -59,9 +61,12 @@ module.exports = {
   ...callcenter,
   ...doMyself,
   ...customerContact,
+  ...department,
+  ...sparePart,
   ...task,
   ...sparePart,
   ...linkc,
   ...productV2,
-  ...superQrcode
+  ...superQrcode,
+  ...guideForNewUser
 }

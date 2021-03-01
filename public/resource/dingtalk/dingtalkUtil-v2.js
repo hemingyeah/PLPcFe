@@ -4,7 +4,18 @@
   window.inDingTalkPC = function () {
     return window.DingTalkPC && window.DingTalkPC.ua.isDesktop;
   }
-
+  
+  //判断是否为钉钉环境
+  window.isDingTalk = function () {
+    try {
+      let location = window.location || {}
+      return window.inDingTalkPC() || location.hostname.endsWith('shb.ltd')
+    } catch (error) {
+      console.warn('dingtalkUtil-v2.js ~ isDingTalk ~ error', error)
+      return false
+    }
+  }
+  
   //============================alert实现=================================
   window.dd_alert = function (message, title, buttonName, id, callback) {
     if (window.DingTalkPC && window.DingTalkPC.ua.isDesktop) {

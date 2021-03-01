@@ -90,7 +90,7 @@
 
           <template slot="tags" slot-scope="{value}">
             <div class="form-view-row" v-if="isDivideByTag">
-              <label>服务团队</label>
+              <label>服务部门</label>
               <div class="form-view-row-content">{{value | fmt_tag}}</div>
             </div>
           </template>
@@ -463,7 +463,7 @@ export default {
           title: this.isAttention ? '取消关注成功' : '关注客户成功',
           message: this.isAttention
             ? '您不会再接收该客户信息动态变更的通知'
-            : '当该客户信息动态变更时，您会收到钉钉通知'
+            : '当该客户信息动态变更时，您会收到通知'
         })
 
         this.fetchAttentionUsers()

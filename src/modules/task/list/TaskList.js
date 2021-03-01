@@ -20,17 +20,15 @@ import { fields, selectIds, advancedList, allExport, Inquire } from './TaskField
 import { LINK_REG } from '@src/model/reg';
 
 /** utils */
-import _ from "lodash";
-import Page from "@model/Page";
-import { storageGet, storageSet } from "@src/util/storage";
-import { formatDate } from "@src/util/lang";
-import { getRootWindow } from "@src/util/dom";
-import * as FormUtil from "@src/component/form/util"
-import VersionMixin from '@src/mixins/versionMixin/index.ts'
+import _ from 'lodash';
+import Page from '@model/Page';
+import { storageGet, storageSet } from '@src/util/storage';
+import { formatDate } from '@src/util/lang';
+import { getRootWindow } from '@src/util/dom';
+import * as FormUtil from '@src/component/form/util'
+import VersionMixin from '@src/mixins/versionMixin'
 import StorageUtil from '@src/util/storage.ts'
 
-/* mixin */
-import tourGuide from '@src/mixins/tourGuide'
 
 /* constants */
 import {
@@ -74,23 +72,17 @@ const Region = {
 }
 
 export default {
-  name: "task-list",
-  inject: ["initData"],
-  mixins: [tourGuide, VersionMixin],
+  name: 'task-list',
+  inject: ['initData'],
+  mixins: [VersionMixin],
   data() {
     return {
       selectIds, // id
       taskView: [], // 顶部筛选列表
       otherList: [], // 其他列表
-      filterId: selectIds.allId, // 顶部筛选选中的状态id
-      otherText: '自定义筛选视图', // 其他文案
-      filterData: {}, // 状态数据
-      region: {}, // 保存视图的数据
-      isViewModel: '默认', // 视图是否保存过
       advanceds: advancedList, // 高级搜索列表
       searchParams: {}, // 筛选列表的参数
       searchParams_spare: {},
-      dropDownInfo: '', // 顶部下拉
       mapShow: true, // 地图预览
       selectColumnState: '', // 视图选择列状态存储
       planTimeType: '', // 判断计划时间展示的样式
@@ -149,7 +141,6 @@ export default {
       showBj: false,
       typeHeight: '',
       stateHeight: '',
-      nowGuideStep:5,
       guideSearchModelSave: false,
       guideDropdownMenu: false,
       isGuide:false,
@@ -197,7 +188,7 @@ export default {
       return this.auth.TASK_EDIT === 3;
     },
     exportPermissionTaskBatchDispatch() {
-      return this.auth.TASK_BATCH_DISPATCH;
+      return this.auth.TASK_BATCH_DISPATCH === 3;
     },
     /** 高级搜索面板宽度 */
     panelWidth() {
@@ -279,7 +270,7 @@ export default {
     /* 是否显示 批量创建/生成服务报告 */
     isShowBatchCreateOrPrintReport() {
       return (
-        this.isSystemAdmin
+        this.isSystemAdmin 
         && (
           this.selectColumnState == TaskStateEnum.FINISHED.value
           || this.region?.viewId == Region.closeViewId
@@ -295,11 +286,7 @@ export default {
       }
       if (Array.isArray(value) && value.length) {
         return value.join('，');
-      }
-      return null;
-    },
     /** 审批状态 */
-    displayApprove(value) {
       return value == 0 ? '无审批' : '审批中'
     }
   },
@@ -332,8 +319,42 @@ export default {
 
     this.$nextTick(() => {
       setTimeout(() => {
-        if (!storageGet(TASK_GUIDE_LIST)) this.$tours['myTour'].start(), this.nowGuideStep = 1, storageSet(TASK_GUIDE_LIST, '4');
-        // if (!storageGet(TASK_GUIDE_DROPDOWN_MENU)) this['guideDropdownMenu'] = true;
+        if (storageGet(TASK_GUIDE_LIST) && storageGet(TASK_GUIDE_LIST) > 0) return this.$Guide().destroy('task-task-list-view')
+        this.$Guide([{
+          content:
+            '可拖拽改变列宽',
+          haveStep: true,
+          nowStep: 1,
+          id: 'task-task-list-view',
+          domObj:()=>{
+            return document.getElementById('v-task-step-0').getElementsByClassName('el-table__header-wrapper')[0]
+          },
+          lastFinish:true,
+          needCover: true,
+        }, {
+          content:
+            '可自定义组合查询条',
+          haveStep: true,
+          nowStep: 2,
+          id: 'task-task-list-view',
+          domId: 'v-task-step-1',
+          lastFinish:true,
+          needCover: true,
+        }, {
+          content:
+            '可自定义列表显示项',
+          haveStep: true,
+          nowStep: 3,
+          id: 'task-task-list-view',
+          domId: 'v-task-step-2',
+          lastFinish:true,
+          needCover: true,
+        }], 0, '', (e) => {
+          return new Promise((resolve, reject) => {
+            resolve()
+          })
+        }).create().then(res_=>{if(res_)storageSet(TASK_GUIDE_LIST, '4')})
+
       }, 1000)
     })
 
@@ -341,16 +362,23 @@ export default {
     window.__exports__refresh = this.searchList;
   },
   methods: {
+    /** 工单列表拨打电话 */
+    async makePhoneCall(phone) {
+      if(!this.customerSetting.linkmanOn) return;
+      try {
+        const { code, message } = await this.$http.post('/api/callcenter/outside/callcenter/api/dialout', {phone, taskType:'customer'}, false)
+        if (code !== 0) return this.$platform.notification({
+          title: '呼出失败',
+          message: message || '',
+          type: 'error',
+        }) 
+      } catch (error) {
+        console.error(error);
+      }
+    },
     guideDropdownMenu_enter(){
       // if (storageGet(TASK_GUIDE_DROPDOWN_MENU) == '1') return this['guideDropdownMenu'] = false;
       // storageSet(TASK_GUIDE_DROPDOWN_MENU, '1')
-    },
-    previousStep() {},
-    nextStep() {
-      this.nowGuideStep ++;
-    },
-    stopStep() {
-      this.nowGuideStep = 5;
     },
     /**
      * 获取附件
@@ -739,7 +767,7 @@ export default {
       
     },
     /**
-     * 请求 getTaskTemplateFields and fetchTaskFields 接口
+     * 请求 getAllFields and fetchTaskFields 接口
      */
     getTaskOpen(fn) {
       Promise.all([this.fetchTaskFields(), this.fetchTaskReceiptFields()])
@@ -1054,6 +1082,7 @@ export default {
       // this.advanceds = [...advancedList, ...this.taskTypeFilterFields];
       // E 高级搜索
       let columns = fields
+        .filter(f => !['attachment', 'separator', 'info', 'autograph'].includes(f.formType))
         .map((field) => {
           let sortable = false;
           let minWidth = 120;
@@ -1380,6 +1409,13 @@ export default {
      * @description 工单类型改变
      */
     changeTaskType(taskType) {
+
+      if (localStorage.getItem('checkedMap')) {
+        localStorage.removeItem('checkedMap')
+        localStorage.removeItem('checkedGroupArr')
+        localStorage.removeItem('isCheckedAll')
+      }
+
       this.searchParams = {...this.searchParams_spare, ...{templateId: taskType.id}}
       this.currentTaskType = taskType;
       // this.selectId = 'all'
@@ -1435,10 +1471,11 @@ export default {
      */
     fetchTaskFields() {
       let params = {
-        templateId: this.currentTaskType.id || '',
+        typeId: this.currentTaskType.id || '',
         tableName: 'task',
+        isFromSetting: false
       };
-      return TaskApi.getTaskTemplateFields(params).then((result) => {
+      return TaskApi.getAllFields(params).then((result) => {
         result.forEach((field) => {
           field.group = 'task';
           field.label = field.displayName;
@@ -1453,10 +1490,11 @@ export default {
      */
     fetchTaskReceiptFields() {
       let params = {
-        templateId: this.currentTaskType.id || '',
+        typeId: this.currentTaskType.id || '',
         tableName: 'task_receipt',
+        isFromSetting: false
       };
-      return TaskApi.getTaskTemplateFields(params).then((result) => {
+      return TaskApi.getAllFields(params).then((result) => {
         result.forEach((field) => {
           field.group = 'task_receipt';
           field.label = field.displayName;
@@ -1562,14 +1600,14 @@ export default {
      */
     async getIndexedDbData() {
       let data = {}
-
+      
       try {
         data = await StorageUtil.storageGet(TASK_LIST_KEY, {}, StorageModuleEnum.Task)
       } catch (error) {
         data = {}
         console.error('Caused ~ TaskList ~ getIndexedDbData ~ error', error)
       }
-
+      
       return data
     },
     /**
@@ -1898,10 +1936,10 @@ export default {
           let form = forms[i];
           form.setAttribute('novalidate', true);
         }
-
+        
         if (!storageGet(TASK_GUIDE_SEARCH_MODEL) || storageGet(TASK_GUIDE_SEARCH_MODEL) * 1 < 2) {
           this.$refs.searchPanel.createGuide([{
-            content: '高级搜索的“空白”，由您来填充。通过“设置”功能，定制您专属的“常用查询条件',
+            content: '高级搜索的“空白”，由您来填充。通过“设置”功能，定制您专属的“常用查询条件”',
             haveStep: true,
             nowStep: 1,
             id: 'v-task-step',
@@ -2467,7 +2505,7 @@ export default {
         address_list = '',
         product_list = ''
       taskSelfFields = taskFields.filter(item => {
-        return item.formType !== 'attachment'
+        return item.formType !== 'attachment' && item.formType !== 'autograph'
       })
       if (taskFields.length) {
         let first = taskFields.filter(item => {
@@ -2608,7 +2646,7 @@ export default {
       taskReceiptSystemFields = [
         ...taskReceiptSystemFields,
         ...taskReceiptFields.filter(item => {
-          return (item.isSystem === 0 && item.formType !== 'attachment')
+          return item.isSystem === 0 && item.formType !== 'attachment' && item.formType !== 'autograph'
         })
       ].map((field) => {
         field.export = true;

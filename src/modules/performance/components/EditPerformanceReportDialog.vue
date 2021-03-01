@@ -52,7 +52,7 @@
             :class="{'input-is-error': !formValidation.target}" 
             @click.native="selectTeam" 
             style="width: 315px; margin-left: 15px;"
-            placeholder="请选择团队/人员"
+            placeholder="请选择部门人员"
           >
           </el-input>
           <!-- end 按团队选择 -->
@@ -277,7 +277,7 @@ export default {
           value: 0,
         },
         {
-          label: '按团队',
+          label: '按部门',
           value: 1,
         },
       ],

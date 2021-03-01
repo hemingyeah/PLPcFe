@@ -8,24 +8,24 @@
       </div>
     </div>
     <form-builder ref="form" :value="form">
-      <form-item label="团队名称" :validation="checkName">
+      <form-item label="部门名称" :validation="checkName">
         <form-text :field="filedMap.tagName" v-model="form.tagName"/>
       </form-item>
-      <form-item label="团队描述" validation>
+      <form-item label="部门描述" validation>
         <form-textarea :field="filedMap.description" v-model="form.description"/>
       </form-item>
-      <form-item label="团队主管" validation>
+      <form-item label="部门主管" validation>
         <form-user v-if="action == 'create'" :field="filedMap.teamLeaders" v-model="form.teamLeaders" max="10" multiple/>
         <team-user-select v-if="action == 'edit'" :field="filedMap.teamLeaders" :fetch="fetchTeamUser" v-model="form.teamLeaders"/>
       </form-item>
       <form-item label="主管权限">
-        <div class="team-form-role-tip"><input type="checkbox" checked disabled> 团队管理员（团队主管将自动获得团队管理员角色权限）</div>
+        <div class="team-form-role-tip"><input type="checkbox" checked disabled> 部门管理员（部门主管将自动获得部门管理员角色权限）</div>
       </form-item>
       <form-item label="联系方式" validation>
         <form-text :field="filedMap.phone" v-model="form.phone"/>
       </form-item>
-      <form-item label="团队位置" validation>
-        <form-address :field="filedMap.tagAddress" v-model="form.tagAddress" :placeholder="'您可以指定一下该团队所在的地理位置'"/>
+      <form-item label="部门位置" validation>
+        <form-address :field="filedMap.tagAddress" v-model="form.tagAddress" :placeholder="'您可以指定一下该部门所在的地理位置'"/>
       </form-item>
       <form-item label="负责区域" :validation="checkPlace">
         <team-places :field="filedMap.tagPlaceList" v-model="form.tagPlaceList"/>
@@ -63,20 +63,20 @@ export default {
       pending: false,
       filedMap: {
         tagName: {
-          displayName: '团队名称', 
+          displayName: '部门名称', 
           fieldName: 'tagName',
           formType: 'text',
           placeHolder: '最多20字',
           isNull: 0
         },
         description: {
-          displayName: '团队描述', 
+          displayName: '部门描述', 
           fieldName: 'description',
           formType: 'textarea', 
           isNull: 1
         },
         teamLeaders: {
-          displayName: '团队主管', 
+          displayName: '部门主管', 
           fieldName: 'teamLeaders',
           formType: 'user', 
           isNull: 0
@@ -88,7 +88,7 @@ export default {
           isNull: 1
         },
         tagAddress: {
-          displayName: '团队位置', 
+          displayName: '部门位置', 
           fieldName: 'tagAddress',
           formType: 'address', 
           isNull: 1
@@ -109,24 +109,24 @@ export default {
       },
       id: '',
       loadingPage: false,
-      parent: {}, // 主团队信息
+      parent: {}, // 主部门信息
       teamData: {},
       users: [], // 用户
     }
   },
   computed: {
-    /* 是否是 新建团队 */
+    /* 是否是 新建部门 */
     isCreate() {
       return this.action != 'edit'
     },
   },
   methods: {
-    /** 自定义验证团队名称 */
+    /** 自定义验证部门名称 */
     checkName(value, field, changeStatus){
       return new Promise((resolve, reject) => {
         if(stringLen(value) > 40) {
           changeStatus(false)
-          return resolve('团队名称不能超过20个文字/40字节');
+          return resolve('部门名称不能超过20个文字/40字节');
         }
         this.remoteCheckName({id: this.id, field: 'name', value}, resolve, changeStatus)
       })
@@ -135,7 +135,7 @@ export default {
       changeStatus(true);
       return TeamApi.checkUnique(params).then(validate => {
         changeStatus(false);
-        return resolve(validate ? null : '团队名称不能重复');
+        return resolve(validate ? null : '部门名称不能重复');
       })
         .catch(err => console.error(err))
     }, 500),
@@ -247,13 +247,13 @@ export default {
           console.error(err);
         })
     },
-    /* 新建 团队 */
+    /* 新建 部门 */
     async teamCreate(params) {
       this.pending = true;
       let child = '';
       
       try {
-        // 判断是否是新建子团队
+        // 判断是否是新建子部门
         if(this.parent.id) {
           params.parent = {
             id: this.parent.id,
@@ -267,7 +267,7 @@ export default {
         
         this.$platform.notification({
           type: result.status == 0 ? 'success' : 'error',
-          title: `${child}团队创建${result.status == 0 ? '成功' : '失败'}`,
+          title: `${child}部门创建${result.status == 0 ? '成功' : '失败'}`,
           message: result.status == 0 ? null : result.message
         })
         
@@ -281,7 +281,7 @@ export default {
       
       this.pending = false;
     },
-    /* 更新 团队 */
+    /* 更新 部门 */
     async teamUpdate(params) {
       this.pending = true;
     
@@ -296,7 +296,7 @@ export default {
         
         this.$platform.notification({
           type: result.status == 0 ? 'success' : 'error',
-          title: `${child}团队编辑${result.status == 0 ? '成功' : '失败'}`,
+          title: `${child}部门编辑${result.status == 0 ? '成功' : '失败'}`,
           message: result.status == 0 ? null : result.message
         })
         if(result.status == 0) {
@@ -369,7 +369,7 @@ export default {
         return (
           <div class="team-form-places">
             <div class="team-form-places-header">
-              <p>设置本团队负责哪些区域的客户，可以用于客户按照区域自动分配</p>
+              <p>设置本部门负责哪些区域的客户，可以用于客户按照区域自动分配</p>
               <button type="button" class="btn-text" onClick={e => this.addPlace()}><i class="iconfont icon-add"></i>添加</button>
             </div>
             {

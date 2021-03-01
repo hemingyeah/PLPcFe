@@ -188,8 +188,8 @@ export default {
           let info = [<h5>发送了消息提醒。</h5>, <p>提醒名称：{content.remindName}</p>, <p>通知范围：通知人：{content.remindTo}</p>]
           if(content.customerManagerName) info.push(<p class="principal-info">客户负责人：{content.customerManagerName}</p>)
           if(content.customerManagerName === null) info.push(<p class="principal-info">客户负责人：发送失败，客户负责人不存在</p>);
-          if(content.tagName) info.push(<p class="principal-info">所属服务团队：{content.tagName}</p>);
-          if(content.tagName === null) info.push(<p class="principal-info"> 所属服务团队：发送失败，客户所属服务团队不存在</p>);
+          if(content.tagName) info.push(<p class="principal-info">所属服务部门：{content.tagName}</p>);
+          if(content.tagName === null) info.push(<p class="principal-info"> 所属服务部门：发送失败，客户所属服务部门不存在</p>);
           return info;
         }
         return [

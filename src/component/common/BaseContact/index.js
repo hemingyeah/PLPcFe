@@ -1,29 +1,38 @@
 import Vue from 'vue';
 
-// 部门组件
-import Department from './Department.vue';
+import {isEnterprise} from '@src/util/Platform';
+// 选部门和人员组件
+import DepartmentAndUser from './DepartmentAndUser.vue';
+// 团队选人组件
 import Team from './Team.vue';
-
+import MulTeam from './MulTeam.vue';
+// 选择部门组件
+import Department from './Department.vue';
+/* util */
+import Log from '@src/util/log.ts'
 import { destroyComponent } from '@src/util/dom';
 import fastCall from '@src/component/util/fastCall.ts'
 
-const DeptComponent = Vue.extend(Department);
-const MAX_NUM = 150; // 单次选人上限
+
+const DepartmentAndUserComponent = Vue.extend(DepartmentAndUser);
 
 function choose(type = 'dept', options = {}) {
-  if (type == 'dept') return dept(options);
-  if (type == 'team') return team(options);
+  Log.succ(type, 'type', choose.name)
+  
+  if(type == 'dept' || type == 'team') return deptWithUser(options);
+  // if(type == 'team') return teamWithUser(options);
+  if(type == 'dept_only') return department(options);
 }
 
-/** 部门 */
-function dept(options) {
+/** 部门和人员 */
+function deptWithUser(options){
   // 处理传入参数
   let selectedUser = [];
   let max = options.max;
-
-  if (
-    (typeof max == 'number' || typeof max == 'string')
-    && !isNaN(max)
+  
+  if(
+    ( typeof max == 'number' || typeof max == 'string' )
+    && !isNaN(max) 
     && isFinite(max)
   ) {
     max = parseInt(max);
@@ -42,11 +51,12 @@ function dept(options) {
   }
 
   let showLocation = !!options.allotMap;
-  let action = '/security/department/user';
-  if (showLocation || options.allot) action = '/task/department/user/dispatch/list';
-  if (options.action) action = options.action;
+  let action = '/security/tag/userList' ;
+  // 多端工单选择负责人接口也改成/security/tag/userList
+  // if(showLocation || options.allot) action = '/task/department/user/dispatch/list';
+  if(options.action) action = options.action;
 
-  let instance = new DeptComponent({
+  let instance = new DepartmentAndUserComponent({
     propsData: {
       title: options.title,
       selectedUser,
@@ -64,70 +74,70 @@ function dept(options) {
       showDeleteUser: options.showDeleteUser || false, // 是否显示离职人员
     }
   });
-
+  
   let ele = document.createElement('div');
   let body = document.body;
   let pending = false;
-
+  
   return new Promise((resolve, reject) => {
     instance.$on('destroy', event => {
       setTimeout(() => destroyComponent(instance), 1500);
     })
-
+    
     instance.$on('input', user => {
-      if (pending) return;
-
+      if(pending) return;
+      
       pending = true;
       resolve({ status: 0, data: user });
     });
 
     instance.$on('cancel', () => {
-      if (pending) return;
-
+      if(pending) return;
+      
       pending = true;
       resolve({ status: 1, message: 'cancel' });
     })
-
+    
     body.appendChild(ele);
     instance.$mount(ele);
   })
 }
 
-/** 团队  */
-function team(options = {}) {
+/** 团队和人员 */
+function teamWithUser( options = {} ){
   // 处理传入参数
   let selectedUser = [];
   let selectedTeam = [];
   let max = options.max;
   let from = options.from;
-  let action = '/security/tag/tagComponet/getUserList';
+  let action = isEnterprise ? '/security/tag/userList' : '/security/tag/tagComponet/getUserList';
   let selectTypes = ['universal', 'performance'];
   let selectType = 'universal';
-
-  if (
-    (typeof max == 'number' || typeof max == 'string')
-    && !isNaN(max)
+  
+  if(
+    ( typeof max == 'number' || typeof max == 'string' )
+    && !isNaN(max) 
     && isFinite(max)
   ) {
     max = parseInt(max);
   } else {
     max = 0;
   }
-
-  if (options.selected && max !== 1 && Object.keys(options.selected).length > 0) {
+  
+  if(options.selected && max !== 1 && Object.keys(options.selected).length > 0) {
     let users = options?.selected?.users;
     let teams = options?.selected?.teams;
     let isUserArray = Array.isArray(users);
     let isTeamArray = Array.isArray(teams);
-
-    if (isUserArray) selectedUser = users;
-    if (isTeamArray) selectedTeam = teams;
+    
+    if(isUserArray) selectedUser = users;
+    if(isTeamArray) selectedTeam = teams;
   }
   if (options.action) action = options.action;
   if (selectTypes.indexOf(options.selectType) > 0) {
     selectType = options.selectType;
   }
-
+  
   let ele = document.createElement('div');
   let body = document.body;
   let pending = false;
@@ -140,17 +150,120 @@ function team(options = {}) {
       methods: {
         /** 取消  */
         cancel() {
-          if (pending) return;
-
+          if(pending) return;
+          
           pending = true;
           resolve({ status: 1, message: 'cancel' });
         },
         /** 销毁  */
         destroy() {
-          let el = this.$el;
-          // this.$destroy(true);
+          setTimeout(() => destroyComponent(this), 1500);
+        },
+        /** 值的改变  */
+        input(user) {
+          if(pending) return;
+          
+          pending = true;
+          resolve({status: 0, data: user});
+        }
+      },
+      render(){
+        return (
+          isEnterprise 
+            ? <base-contact-team-mul
+              action={action}
+              dataFunc={typeof options.dataFunc == 'function' ? options.dataFunc : undefined}
+              lat={options.lat}
+              lng={options.lng}
+              isRepeatUser={options.isRepeatUser === true}
+              isGroup={options.isGroup === true}
+              isHideTeam={options.isHideTeam === true}
+              max={max}
+              selectType={selectType}
+              selectedTeam={selectedTeam}
+              selectedUser={selectedUser}
+              showTeamCheckbox={ options.showTeamCheckbox === true}
+              showTaskCount={options.showTaskCount === true}
+              showUserState={options.showUserState === true}
+              title={options.title}
+              onDestroy={this.destroy.bind(this)}
+              onCancel={this.cancel.bind(this)}
+              onInput={this.input.bind(this)}
+            >
+            </base-contact-team-mul> 
+            : <base-contact-team 
+              action={action}
+              dataFunc={typeof options.dataFunc == 'function' ? options.dataFunc : undefined}
+              lat={options.lat}
+              lng={options.lng}
+              isRepeatUser={options.isRepeatUser === true}
+              isGroup={options.isGroup === true}
+              isHideTeam={options.isHideTeam === true}
+              max={max}
+              selectType={selectType}
+              selectedTeam={selectedTeam}
+              selectedUser={selectedUser}
+              showTeamCheckbox={ options.showTeamCheckbox === true}
+              showTaskCount={options.showTaskCount === true}
+              showUserState={options.showUserState === true}
+              title={options.title}
+              onDestroy={this.destroy.bind(this)}
+              onCancel={this.cancel.bind(this)}
+              onInput={this.input.bind(this)}
+            >
+            </base-contact-team>
+        )
+      },
+      components: {
+        [Team.name]: Team,
+        [MulTeam.name]: MulTeam,
+      }
+    })
+  })
+}
 
-          // el.parentNode && el.parentNode.removeChild(el); 
+/** 选择部门 */
+function department( options = {} ){
+  // 处理传入参数
+  let max = options.max;
+
+  if(
+    ( typeof max == 'number' || typeof max == 'string' )
+    && !isNaN(max) 
+    && isFinite(max)
+  ) {
+    max = parseInt(max);
+  } else {
+    max = 0;
+  }
+  
+  let selectedDepts = [];
+  if(Array.isArray(options.selectedDepts)) {
+    selectedDepts = options.selectedDepts;
+  }
+
+  let body = document.body;
+  let mountEl = options.mountEl instanceof HTMLElement ? options.mountEl : body
+
+
+  let ele = document.createElement('div');
+  let pending = false;
+
+  mountEl.appendChild(ele);
+
+  return new Promise((resolve, reject) => {
+    new Vue({
+      el: ele,
+      methods: {
+        /** 取消  */
+        cancel() {
+          if(pending) return;
+
+          pending = true;
+          resolve({status: 1, message: 'cancel'});
+        },
+        /** 销毁  */
+        destroy() {
           setTimeout(() => destroyComponent(this), 1500);
         },
         /** 值的改变  */
@@ -163,32 +276,42 @@ function team(options = {}) {
       },
       render() {
         return (
-          <base-contact-team 
-            action={action}
-            from={from}
-            dataFunc={typeof options.dataFunc == 'function' ? options.dataFunc : undefined}
-            lat={options.lat}
-            lng={options.lng}
-            isRepeatUser={options.isRepeatUser === true}
-            isGroup={options.isGroup === true}
-            isHideTeam={options.isHideTeam === true}
+          <base-contact-department 
             max={max}
-            selectType={selectType}
-            selectedTeam={selectedTeam}
-            selectedUser={selectedUser}
-            showTeamCheckbox={ options.showTeamCheckbox === true}
-            showTaskCount={options.showTaskCount === true}
-            showUserState={options.showUserState === true}
-            title={options.title}
+            selectedDept={selectedDepts}
+            seeAllOrg={options.seeAllOrg || false}
+            title={options.title || undefined}
             onDestroy={this.destroy.bind(this)}
             onCancel={this.cancel.bind(this)}
             onInput={this.input.bind(this)}
           >
-          </base-contact-team>
+          </base-contact-department>
+        //   <base-contact-team 
+        //   action={action}
+        //   from={from}
+        //   dataFunc={typeof options.dataFunc == 'function' ? options.dataFunc : undefined}
+        //   lat={options.lat}
+        //   lng={options.lng}
+        //   isRepeatUser={options.isRepeatUser === true}
+        //   isGroup={options.isGroup === true}
+        //   isHideTeam={options.isHideTeam === true}
+        //   max={max}
+        //   selectType={selectType}
+        //   selectedTeam={selectedTeam}
+        //   selectedUser={selectedUser}
+        //   showTeamCheckbox={ options.showTeamCheckbox === true}
+        //   showTaskCount={options.showTaskCount === true}
+        //   showUserState={options.showUserState === true}
+        //   title={options.title}
+        //   onDestroy={this.destroy.bind(this)}
+        //   onCancel={this.cancel.bind(this)}
+        //   onInput={this.input.bind(this)}
+        // >
+        // </base-contact-team>
         )
       },
       components: {
-        [Team.name]: Team
+        [Department.name]: Department
       }
     })
   })

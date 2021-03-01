@@ -53,9 +53,9 @@ export default {
     productFields() {
       return [
         {
-          displayName: '从模板中选择',
-          fieldName: 'template',
-          formType: 'select',
+          displayName: "从模板中选择",
+          fieldName: "template",
+          formType: "select",
           isSystem: 1
         },
         ...this.dynamicProductFields
@@ -72,7 +72,7 @@ export default {
       return this.initData.customer || null;
     },
     action() {
-      return this.productId ? 'edit' : 'create';
+      return this.productId ? "edit" : "create";
     }
   },
   async mounted() {
@@ -81,22 +81,27 @@ export default {
       let res = await getProductFields({isFromSetting: true});
       this.dynamicProductFields = res.data.filter(item =>
         // 过滤新的产品类型
-        item.formType != 'related_catalog'
+        item.formType != "related_catalog"
       ) || [];
+      // 产品编号限制字数最大长度为100
+      this.dynamicProductFields.forEach(field => {
+        if (field.fieldName == 'serialNumber') {
+          field.maxlength = 100
+        }
+      })
     } catch (e) {
-      console.error('product Edit mounted error', e);
+      console.error("product-add_edit fetch product fields error", e);
     }
-    
+
     // 初始化默认值
     let form = {};
-    if (this.action === 'edit') {
+    if (this.action === "edit") {
       // 处理编辑时数据
       this.loadingPage = true;
       let res = await getProductDetail({id: this.productId});
-      
+
       this.loadingPage = false;
       if(res.id) form = res;
-      
     } else {
       // 检查版本数量限制
       this.checkNumExceedLimitBeforeHandler 
@@ -106,8 +111,8 @@ export default {
       )
     }
     
-    form = util.packToForm(this.productFields, form)
-    
+    form = util.packToForm(this.productFields, form);
+
     // 客户详情新建产品，会带的客户信息
     if (this.customer) {
       form.customer = [{
@@ -141,7 +146,7 @@ export default {
           const params = util.packToProduct(this.productFields, this.form)
           
           this.productFields.forEach(field =>{
-            if(field.fieldName == 'customer' && field.isSystem == 1) {
+            if(field.fieldName == "customer" && field.isSystem == 1) {
               if (!field.setting.customerOption.address) {
                 params.address = {}
               } else if (!field.setting.customerOption.linkman){
@@ -165,8 +170,8 @@ export default {
               if (res.status) {                
                 return this.$platform.notification({
                   title: `${action}产品失败`,
-                  message: res.message || '',
-                  type: 'error',
+                  message: res.message || "",
+                  type: "error",
                 })
               }
               
@@ -203,7 +208,7 @@ export default {
         })
     },
     goBack() {
-      if(this.action == 'create') {
+      if(this.action == "create") {
         let id = window.frameElement.dataset.id;
         return this.$platform.closeTab(id);
       }

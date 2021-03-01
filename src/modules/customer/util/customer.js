@@ -64,7 +64,7 @@ export function packToCustomer(fields, form, initTags){
       }
     }
     
-    if (field.formType === 'location') {
+    if ((field.formType === 'location') && !value.isHaveLocation) {
       value = {};
     }
     

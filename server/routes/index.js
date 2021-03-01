@@ -29,11 +29,12 @@ const doMyselft = require('./doMyself');
 const customerContact = require('./customerContact');
 const taskRouter = require('./task');
 const sparePartRouter = require('./sparePart');
-
+const departmentRouter = require('./department')
 const linkcRouter = require('./linkc')
 const productV2Router = require('./productV2')
 
 const superQrcodeRouter = require('./superQrcode')
+const guideForNewUser = require('./guideForNewUser')
 
 router.get('/', async (ctx) => {
   let modConfig = modules['system.frame'];
@@ -103,7 +104,7 @@ router.use('/temp', (ctx) =>
     // 主机地址
     host: '127.0.0.1',
     // 端口
-    port: 10006,
+    port: 10012,
     // 头信息
     headers: {
       cookie: 'VIPPUBLINKJSESSIONID=a644d918-3065-4760-b2a4-a47d50230230',
@@ -111,15 +112,6 @@ router.use('/temp', (ctx) =>
   })
 )
 
-router.use('', performanceRouter.routes());
-router.use('', customerRouter.routes(), customerRouter.allowedMethods());
-router.use('', openRouter.routes(), openRouter.allowedMethods());
-router.use('', settingRouter.routes(), settingRouter.allowedMethods());
-router.use('', teamRouter.routes(), teamRouter.allowedMethods());
-router.use('', productRouter.routes(), productRouter.allowedMethods());
-router.use('', approveRouter.routes(), productRouter.allowedMethods());
-router.use('', dataScreenRouter.routes(), dataScreenRouter.allowedMethods());
-router.use('', repositoryRouter.routes(), repositoryRouter.allowedMethods());
 router.use('', BillRouter.routes(), BillRouter.allowedMethods());
 router.use('', jobtransferRouter.routes(), jobtransferRouter.allowedMethods());
 router.use('', callCenterRouter.routes(), callCenterRouter.allowedMethods());
@@ -127,9 +119,11 @@ router.use('', doMyselft.routes(), doMyselft.allowedMethods());
 router.use('', customerContact.routes(), customerContact.allowedMethods());
 router.use('', taskRouter.routes(), taskRouter.allowedMethods());
 router.use('', sparePartRouter.routes(), sparePartRouter.allowedMethods());
+router.use('', departmentRouter.routes(), departmentRouter.allowedMethods());
 router.use('', linkcRouter.routes(), sparePartRouter.allowedMethods());
 router.use('', productV2Router.routes(), sparePartRouter.allowedMethods());
 router.use('', superQrcodeRouter.routes(), sparePartRouter.allowedMethods());
+router.use('', guideForNewUser.routes(), sparePartRouter.allowedMethods());
 
 router.all('/*', (ctx) => {
   return HttpClient.proxy(ctx);

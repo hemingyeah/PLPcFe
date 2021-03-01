@@ -2,10 +2,11 @@
   <div class="form-datetime">
     <el-date-picker
       :id="`form_${field.fieldName}`"
+      :format='format'
       :type="type"
       :prefix-icon="`iconfont icon-fdn-${type}`"
       :picker-options="pickerOptions"
-      :value-format="formate"
+      :value-format="format"
       :placeholder="placeholder"
       :value="value" 
       @focus="dateTimePickerFocusHandler"
@@ -36,7 +37,7 @@ export default {
     }
   },
   computed: {
-    formate() {
+    format() {
       return this.isDateTime ? 'yyyy-MM-dd HH:mm:ss' : 'yyyy-MM-dd';
     },
     isDateTime() {
@@ -53,12 +54,12 @@ export default {
     */
     dateTimePickerFocusHandler() {
       if(!this.isDateTime) return
-
+      
       addClass(document.body, PlanTimeClassName);
     },
     dateTimePickerBlurHandler() {
       if(!this.isDateTime) return
-
+      
       removeClass(document.body, PlanTimeClassName);
     },
     choose(newValue){    
@@ -88,6 +89,14 @@ export default {
     .el-picker-panel__footer {
       button:nth-child(1) {
         display: none;
+      }
+    }
+    .el-time-spinner {
+      .el-time-spinner__wrapper {
+        width: 50%;
+        &:last-child {
+          display: none;
+        }
       }
     }
   }

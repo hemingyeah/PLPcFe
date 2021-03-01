@@ -108,15 +108,6 @@
             <template v-if="column.field === 'name'">
               <a href="" class="view-detail-btn" @click.stop.prevent="goProductTemplateView(scope.row.id)">{{scope.row[column.field]}}</a>
             </template>
-            <template v-else-if="column.formType === 'select'">
-              {{ scope.row[column.field] | displaySelect }}
-            </template>
-            <template v-else-if="column.formType === 'user' && scope.row.attribute[column.field]">
-              {{ getUserName(column, scope.row.attribute[column.field]) }}
-            </template>
-            <template v-else-if="column.formType === 'cascader' && scope.row.attribute[column.field]">
-              {{ scope.row.attribute[column.field] | displayCascader }}
-            </template>
             <template v-else-if="column.formType === 'location'">
               {{ scope.row.attribute[column.field] && scope.row.attribute[column.field].address}}
             </template>
@@ -137,7 +128,7 @@
             </div>
 
             <template v-else>
-              {{scope.row[column.field]}}
+              {{scope.row[column.field] | fmt_form_field(column.formType, column.fieldName, scope.row.attribute)}}
             </template>
           </template>
         </el-table-column>
@@ -370,7 +361,7 @@ export default {
     },
     productFields() {
       return (this.fieldsInfo || [])
-        .filter(f => f.formType !== "separator" && f.formType !== "autograph")
+        .filter(f => f.formType !== 'separator' && f.formType !== 'autograph')
         .map(f => {
 
           // 调整字段顺序
@@ -392,26 +383,6 @@ export default {
     },
   },
   filters: {
-    displaySelect(value) {
-      if (!value) return null;
-      if (value && typeof value === "string") {
-        return value;
-      }
-      if (Array.isArray(value) && value.length) {
-        return value.join("，");
-      }
-      return null;
-    },
-    displayCascader(value) {
-      if (!value) return null;
-      if (value && typeof value === 'string') {
-        return value;
-      }
-      if (Array.isArray(value) && value.length) {
-        return value.join('/');
-      }
-      return null;
-    },
     formatDate(val) {
       if (!val) return "";
       return formatDate(val, "YYYY-MM-DD HH:mm:ss")
@@ -433,7 +404,7 @@ export default {
     this.paramsSearchRevert();
     this.columns = this.buildTableColumn();
     this.search();
-
+  
     // [tab_spec]标准化刷新方式
     window.__exports__refresh = this.search;
   },
@@ -523,7 +494,7 @@ export default {
 
       let baseColumns = this.buildTableFixedColumns();
       let customizedColumns = this.productTemplateConfig.productFields
-        .filter(f => !f.isSystem && f.formType !== "attachment" && f.formType !== "separator" && f.formType !== "info" && f.fieldName !== "customer" && f.formType !== "autograph")
+        .filter(f => !f.isSystem && f.formType !== 'attachment' && f.formType !== 'separator' && f.formType !== 'info' && f.fieldName !== 'customer' && f.formType !== 'autograph')
         .map(field => {
           let sortable = false;
           let minWidth = null;
@@ -979,7 +950,7 @@ export default {
     // 产品新建
     productCreate() {
 
-      window.TDAPP.onEvent("pc：产品模板-新建事件");
+      window.TDAPP.onEvent('pc：产品模板-新建事件');
 
       // window.location = '/product/create';
       let fromId = window.frameElement.getAttribute("id");

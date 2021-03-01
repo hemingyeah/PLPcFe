@@ -19,6 +19,7 @@
 <script>
 import http from '@src/util/http';
 import platform from '@src/platform'
+import Platform from '@src/util/Platform'
 
 const VERSION_NUM_KEY = 'shb_version_num';
 const EditionMap = {
@@ -29,6 +30,7 @@ const EditionMap = {
 
 export default {
   name: 'version',
+  inject: ['initData'],
   props: {
     edition: {
       type: Number
@@ -50,6 +52,9 @@ export default {
     }
   },
   computed: {
+    tenantType() {
+      return this.initData.tenantType;
+    },
     editionText() {
       return EditionMap[this.edition] || EditionMap[1]
     }
@@ -83,7 +88,8 @@ export default {
       return false;
     },
     seeHelp(){
-      platform.openLink(`https://www.yuque.com/shb/updatelog/${this.version.replace(' ', '')}`);
+      let updatelog = !Platform.isDingTalk() ? 'updatelog2' : 'updatelog'
+      platform.openLink(`https://www.yuque.com/shb/${updatelog}/${this.version.replace(' ', '')}`);
       this.show = false;
     }
   },

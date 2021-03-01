@@ -20,10 +20,10 @@
         <el-button @click="submit" :loading="pending">
           仅保存
         </el-button>
-        
+         
       </div>
     </div>
-    
+
     <public-dialog :product-id="productId" :dialog-type="'linkQrcode'" @dialogBind="dialogBind" ref="publicDialog"/>
   </div>
 </template>
@@ -48,6 +48,7 @@ import VersionMixin from '@src/mixins/versionMixin/index.ts'
 import * as util from '@src/modules/product/utils/ProductMapping';
 import * as FormUtil from '@src/component/form/util';
 import { storageGet, storageSet } from '@src/util/storage'
+import initData from '@src/modules/productV2/productEdit/initData.js'
 /* constants */
 const { PRODUCT_PRODUCT_EDIT } = require('@src/component/guide/productV2Store')
 
@@ -55,6 +56,7 @@ export default {
   name: 'product-edit',
   provide(){
     return{
+      // initData,
       cloneProduct:this.cloneProduct
     }
   },
@@ -67,6 +69,7 @@ export default {
       init: false,
       submitting: false,
       form: {},
+      // initData,
       dynamicProductFields: []
     }
   },
@@ -86,6 +89,7 @@ export default {
       return this.initData.auth || {};
     },
     productId() {
+      // const matchRes = window.location.href.match(/customer\/product\/edit\/([\w-]*)(\??.*)/);
       return this.initData.id || '';
     },
     // 客户上创建产品会带一个cId
@@ -101,10 +105,16 @@ export default {
       // 获取产品自定义字段
       let res = await getProductFields({isFromSetting: true});
       this.dynamicProductFields = res.data || [];
+      // 产品编号限制字数最大长度为100
+      this.dynamicProductFields.forEach(field => {
+        if (field.fieldName == 'serialNumber') {
+          field.maxlength = 100
+        }
+      })
     } catch (e) {
       console.error('product-add_edit fetch product fields error', e);
     }
-    
+
     // 初始化默认值
     let form = {};
     if (this.action === 'edit') {
@@ -276,14 +286,12 @@ export default {
           ...this.customer
         }];
       }
-      
       /**
-     * 初始化所有字段的初始值
-     * @param {*} fields 字段
-     * @param {*} origin 原始值
-     * @param {*} target 待合并的值
-     */
-      
+       * 初始化所有字段的初始值
+       * @param {*} fields 字段
+       * @param {*} origin 原始值
+       * @param {*} target 待合并的值
+       */      
       this.form = FormUtil.initialize(this.productFields, form)
     },
     toggleLoading(loading = true) {

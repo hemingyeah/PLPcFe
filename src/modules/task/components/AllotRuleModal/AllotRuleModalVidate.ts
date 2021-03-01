@@ -32,10 +32,10 @@ function validate(form: RuleForm): Promise<boolean> {
       reject('请选择条件')
     }
     
-    // 规则类型 按客户所属团队
+    // 规则类型 按客户所属部门
     let { tags } = typeData[RuleTypeEnum.Tag]
     if (type === RuleTypeEnum.Tag && tags.length <= 0) {
-      reject('请选择客户团队')
+      reject('请选择客户部门')
     }
     
     // 分配给 指定人员
@@ -50,16 +50,16 @@ function validate(form: RuleForm): Promise<boolean> {
       isRolesEmpty ? reject('请选择指定角色') : resolve(true)
     }
     
-    // 分配给 指定服务团队
+    // 分配给 指定服务部门
     if (groupType == AllotGroupEnum.Tag) {
       let isTagsEmpty = groupData[AllotGroupEnum.Tag].length <= 0
-      isTagsEmpty ? reject('请选择指定团队') : resolve(true)
+      isTagsEmpty ? reject('请选择指定部门') : resolve(true)
     }
     
-    // 分配给 指定服务团队主管
+    // 分配给 指定服务部门主管
     if (groupType == AllotGroupEnum.TagLeader) {
       let isTagsEmpty = groupData[AllotGroupEnum.TagLeader].length <= 0
-      isTagsEmpty ? reject('请选择团队主管所属团队') : resolve(true)
+      isTagsEmpty ? reject('请选择部门主管所属部门') : resolve(true)
     }
     
     // 派单顺序

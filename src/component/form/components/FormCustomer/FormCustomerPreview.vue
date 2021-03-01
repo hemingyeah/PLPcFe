@@ -3,7 +3,7 @@
     <div class="form-preview-group">
       <label>{{field.displayName}} <span class="form-preview-notNull" v-if="field.isNull == 0">*</span></label>
       <div class="form-preview-mock">
-        <p class="form-preview-control form-preview-withIcon">
+        <p class="form-preview-control">
           {{ field.placeHolder }}
         </p>
       </div>

@@ -32,8 +32,7 @@ import TaskAllotModal from '@src/modules/task/components/TaskAllotModal/TaskAllo
 
 /* enum */
 import { TaskEventNameMappingEnum } from '@model/enum/EventNameMappingEnum.ts';
-/* mixin */
-import tourGuide from '@src/mixins/tourGuide'
+import TableNameEnum from '@model/enum/TableNameEnum.ts';
 
 const ENCRYPT_FIELD_VALUE = '***';
 
@@ -42,7 +41,6 @@ const { TASK_GUIDE_DETAIL } = require('@src/component/guide/taskV2Store');
 export default {
   name: 'task-detail-view',
   inject: ['initData'],
-  mixins: [tourGuide],
   data() {
     return {
       loading: false,
@@ -81,7 +79,6 @@ export default {
         boundariesElement: 'viewport',
         removeOnDestroy: true
       },
-      nowGuideStep: 5,
       guideSearchModelSave: false,
       guideDropdownMenu: false,
       isGuide: false,
@@ -846,7 +843,9 @@ export default {
     allot() {
       // 新工单新指派
       if (this.isRestructAllot) {
-        this.$refs.TaskAllotModal.outsideShow()
+        this.checkNotNullForCard('allot', () => {
+          this.$refs.TaskAllotModal.outsideShow();
+        })
       } else {
         this.pending = true;
         location.href = `/task/allotTask?id=${this.task.id}`;
@@ -931,10 +930,14 @@ export default {
         this.backDialog.reason = '';
         this.backDialog.visible = true;
       } else if (action === 'finish') {
-        this.$refs.taskReceiptEdit.openDialog();
+        this.checkNotNullForCard('finish', () => {
+          this.$refs.taskReceiptEdit.openDialog()
+        })
       } else if (action === 'balance') {
-        this.rightActiveTab = 'balance-tab';
-        this.$refs.taskAccount.openDialog('create');
+        this.checkNotNullForCard('cost', () => {
+          this.rightActiveTab = 'balance-tab';
+          this.$refs.taskAccount.openDialog('create');
+        })
       } else if (action === 'feedback') {
         this.rightActiveTab = 'feedback-tab';
         this.$refs.taskFeedback.feedback();
@@ -1043,7 +1046,7 @@ export default {
         { name: '指派', type: 'primary', show: this.allowAllotTask, event: this.allot },
         { name: '接单', type: 'primary', show: this.allowPoolTask, event: () => { this.openDialog('acceptFromPool') } },
         { name: '接受', type: 'primary', show: this.allowAcceptTask, event: () => { this.openDialog('accept') } },
-        { name: '开始', type: 'primary', show: this.allowStartTask, event: this.start },
+        { name: '开始', type: 'primary', show: this.allowStartTask, event: () => { this.checkNotNullForCard('start', this.start) } },
         { name: '完成回执', type: 'primary', show: this.allowFinishTask, event: () => { this.openDialog('finish') } },
         { name: '回退', type: 'primary', show: this.allowBackTask, event: this.backTask },
         { name: '结算', type: 'primary', show: this.viewBalanceTab && this.allowBalanceTask, event: () => { this.openDialog('balance') } },
@@ -1086,6 +1089,23 @@ export default {
     },
     outsideUpdateRecords() {
       this.$eventBus.$emit(TaskEventNameMappingEnum.UpdateRecord);
+    },
+    // 检验附加组件是否必填
+    checkNotNullForCard(flow, callback) {
+      this.pending = true;
+      TaskApi.checkNotNullForCard({ id: this.task.id, flow })
+        .then(res => {
+          this.pending = false;
+
+          if (res.status == 0) {
+            callback();
+          } else {
+            this.$platform.alert(res.message);
+          }
+        })
+        .catch(err => {
+          this.pending = false;
+        })
     }
   },
   created() {
@@ -1108,11 +1128,11 @@ export default {
       let { templateId } = this.task;
 
       let subtask = [
-        TaskApi.getTaskTemplateFields({ templateId, tableName: 'task' })
+        TaskApi.getAllFields({ typeId: templateId, tableName: TableNameEnum.Task, isFromSetting: false })
       ];
 
       // 显示回执时获取回执字段信息
-      if (this.allowFinishTask || this.showReceipt) subtask.push(TaskApi.getTaskTemplateFields({ templateId, tableName: 'task_receipt' }));
+      if (this.allowFinishTask || this.showReceipt) subtask.push(TaskApi.getAllFields({ typeId: templateId, tableName: TableNameEnum.TaskReceipt, isFromSetting: false }));
 
       const result = await Promise.all(subtask);
 
@@ -1195,11 +1215,59 @@ export default {
       
       this.$nextTick(() => {
         setTimeout(() => {
-          if (this.showTaskDetailGuide) {
-            this.$tours['myTour'].start();
-            this.nowGuideStep = 1;
-            storageSet(TASK_GUIDE_DETAIL, '4');
-          }
+          if (storageGet(TASK_GUIDE_DETAIL) && storageGet(TASK_GUIDE_DETAIL) > 0) return this.$Guide().destroy('task-task-detail-view')
+          this.$Guide([{
+            content:'清晰展示当前工单进度',
+            title:'工单进度',
+            domId:'v-task-detail-step-0',
+            haveStep: true,
+            nowStep: 1,
+            id: 'task-task-detail-view',
+            needCover: true,
+            lastFinish:true,
+            finishBtn:'知道了'
+          }, {
+            content:
+            '工单重要信息展示',
+            haveStep: true,
+            nowStep: 2,
+            id: 'task-task-detail-view',
+            domId: 'v-task-detail-step-1',
+            needCover: true,
+            lastFinish:true,
+            finishBtn:'知道了'
+          }, {
+            content:
+            '「工单动态」搬到这里了',
+            haveStep: true,
+            nowStep: 3,
+            id: 'task-task-detail-view',
+            domId: 'tab-record',
+            needCover: true,
+            lastFinish:true,
+            copyDom:true,
+            finishBtn:'知道了'
+          }, {
+            content:
+            '编辑、复制及删除',
+            title:'工单操作',
+            haveStep: true,
+            nowStep: 4,
+            id: 'task-task-detail-view',
+            domId: 'v-task-detail-step-3',
+            needCover: true,
+            lastFinish:true,
+            finishBtn:'知道了'
+          }], 0, '', (e) => {
+            return new Promise((resolve, reject) => {
+              if(e.type == 'stop' || e.type == 'finish'){
+                if ( this.showTaskDetailGuide && this.showAllotModal) {
+                  this.allot()
+                }
+              }
+              resolve()
+            })
+          }).create().then(res_=>{if(res_)storageSet(TASK_GUIDE_DETAIL, '4')})
         }, 1000)
       })
 
@@ -1213,11 +1281,6 @@ export default {
     },
     collapseDirection(newValue) {
       sessionStorage.setItem(`task_collapseDirection_${this.task.id}`, newValue);
-    },
-    nowGuideStep(newValue) {
-      if (newValue == 5 && this.showTaskDetailGuide && this.showAllotModal) {
-        this.allot()
-      }
     }
   },
   components: {

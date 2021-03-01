@@ -74,7 +74,7 @@
         <div class="top-btn-group">
           <base-button type="primary" icon="icon-add" @event="openDialog">新建</base-button>
           <base-button type="ghost" icon="icon-qingkongshanchu" @event="deleteReport">删除</base-button>
-          <a href="https://www.yuque.com/shb/help/operating#IbBYe" target="_blank">如何通过绩效报告统计团队或个人数据？</a>
+          <a :href="performanceReportLink" target="_blank">如何通过绩效报告统计部门或个人数据？</a>
         </div>
 
 
@@ -231,6 +231,7 @@ import _ from 'lodash';
 import { formatDate, } from '@src/util/lang';
 import {getPerformanceReports, deletePerformanceReports, getApprovePersonList} from '@src/api/PerformanceApi';
 import EditPerformanceReportDialog from './components/EditPerformanceReportDialog.vue';
+import Platform from '@src/util/Platform'
 
 export default {
   name: 'list-view',
@@ -284,7 +285,7 @@ export default {
           value: 0,
         },
         {
-          label: '按团队',
+          label: '按部门',
           value: 1,
         },
       ],
@@ -336,6 +337,14 @@ export default {
     },
     userId () {
       return this.initData.loginUserId;
+    },
+    // 是否在钉钉环境
+    isDingTalk() {
+      return Platform.isDingTalk()
+    },
+    // 绩效报告介绍链接
+    performanceReportLink() {
+      return this.isDingTalk ? 'https://www.yuque.com/shb/help/operating#IbBYe' : 'https://www.yuque.com/shb/help2/gbrdc7#IbBYe'
     }
   },
   mounted() {
@@ -414,7 +423,7 @@ export default {
               createTime: formatDate(new Date(createTime), 'YYYY-MM-DD'),
               startTime: formatDate(new Date(startTime), 'YYYY-MM-DD'),
               endTime: formatDate(new Date(endTime), 'YYYY-MM-DD'),
-              type: type ? '按团队' : '按个人',
+              type: type ? '按部门' : '按个人',
               id,
               carbonCopy: carbonCopy ? carbonCopy.replace(/\[|\]|"/g, '') : '',
               waitingForApprove: status === 1,
@@ -713,22 +722,6 @@ export default {
         selectType: '',
         selected: this.userList,
         showTeamCheckbox: true,
-        // dataFunc(data) {
-        //   let chosen = data.slice();
-        //   let team = {};
-        //   let group = [];
-
-        //   chosen.forEach(c => {
-        //     let tagId = c.tagId;
-
-        //     if(!team.hasOwnProperty(tagId)) {
-        //       team[tagId] = [];
-        //     }
-        //     team[tagId].push(c)
-        //   });
-
-        //   return team
-        // }
       };
 
       this.$fast.contact.choose('team', options).then(res => {
@@ -738,9 +731,8 @@ export default {
     },
     selectionInit(rows) {
       let isNotOnCurrentPage = false;
-      let report = undefined;
       let row = undefined;
-
+      
       if (rows) {
         for(let i = 0; i < rows.length; i++) {
           row = rows[i];
@@ -749,36 +741,36 @@ export default {
           })
           if(isNotOnCurrentPage) return 
         }
-
+        
         rows.forEach(row => {
           this.$refs.multipleTable.toggleRowSelection(row);
         });
       } else {
         this.$refs.multipleTable.clearSelection();
         this.multipleSelection = [];
-
+        
       }
     },
     selectPerformanceCancel(item) {
       if (!item || !item.id) return;
-
+      
       this.multipleSelection = this.multipleSelection.filter(ms => ms.id !== item.id);
       this.multipleSelection.length < 1 ? this.selectionInit() : this.selectionInit([item]);
     },
     // 批量匹配选中
     matchSelected() {
       if (!this.multipleSelection.length) return;
-
+      
       const selected = this.reports
         .filter(c => {
           if (this.multipleSelection.some(sc => sc.id === c.id)) {
-
+            
             this.multipleSelection = this.multipleSelection.filter(sc => sc.id !== c.id);
             this.multipleSelection.push(c);
             return c;
           }
         }) || [];
-
+      
       this.$nextTick(() => {
         this.selectionInit(selected);
       });

@@ -1,4 +1,4 @@
-import http from "@src/util/http"
+import http from '@src/util/http'
 import {
   TaskCreateAndEditModel,
   PlanTaskCreateAndEditModel,
@@ -18,7 +18,7 @@ import {
   CustomerTahTaskPoolCountGetModel,
   TaskPoolSearchModel,
   TaskReAllotTaskPoolModel
-} from "@model/param/in/Task"
+} from '@model/param/in/Task'
 
 import { 
   getUserViewsResult, 
@@ -45,9 +45,9 @@ import {
 
 import GrayUtil from '@src/util/gray'
 
-const fixedPrefixTaskPath = "/api/task";
-const ElASTICSEARCH = "/api/elasticsearch";
-const fixedPrefixPaymentPath = "/api/payment";
+const fixedPrefixTaskPath = '/api/task';
+const ElASTICSEARCH = '/api/elasticsearch';
+const fixedPrefixPaymentPath = '/api/payment';
 const CUSTOMER = 'api/customer'
 const APPS = 'api/app'
 
@@ -59,7 +59,7 @@ const APPS = 'api/app'
  * @param {Array} params.ids - 计划id
  */
 export function deletePlanTask(params: {} | undefined) {
-  return http.post("/task/deletePlanTask", params, false);
+  return http.post('/task/deletePlanTask', params, false);
 }
 
 /**
@@ -70,7 +70,7 @@ export function deletePlanTask(params: {} | undefined) {
  * @param {*} params = {String module,String id,String fieldName,String formType}
  */
 export function relatedFieldValue(params: {} | undefined) {
-  return http.get("/dd/task/relatedFieldValue", params);
+  return http.get('/dd/task/relatedFieldValue', params);
 }
 
 /**
@@ -80,7 +80,7 @@ export function relatedFieldValue(params: {} | undefined) {
  * @param {String} params.templateId -- 类型模板id
  */
 export function getTaskTemplateFields(params: {} | undefined) {
-  return http.get("/task/getTaskTemplateFields", params);
+  return http.get('/task/getTaskTemplateFields', params);
 }
 
 /**
@@ -90,7 +90,36 @@ export function getTaskTemplateFields(params: {} | undefined) {
  * @param {String} params.typeId -- 类型模板id
  */
 export function getFields(params: {} | undefined) {
-  return http.get("/setting/taskType/getFields", params);
+  return http.get('/setting/taskType/getFields', params);
+}
+
+/**
+ * @description 获取工单表单数据
+ * @param {Object} params-- params
+ * @param {String} params.typeId -- 工单类型id
+ * @param {String} params.tableName -- task:工单表单字段 task_receipt:工单回执表单字段
+ * @param {String} params.isFromSetting -- 用于设置页全部显示，不用于设置页，则通过可见性和隐藏性来过滤字段
+ */
+export function getAllFields(params: {} | undefined) {
+  return http.get('/setting/taskType/getAllFields', params);
+}
+
+/**
+ * @description 获取工单表单公共字段列表
+ * @param {Object} params-- params
+ * @param {String} params.tableName -- task:工单表单字段 task_receipt:工单回执表单字段
+ */
+export function getCommonFieldList(params: {} | undefined) {
+  return http.get(`${fixedPrefixTaskPath}/outside/pc/task/getCommonFieldList`, params);
+}
+
+/**
+ * @description 确认开启工单设置灰度
+ * @param {Object} params-- params
+ * @param {String} params.isConfirm -- true为确认开启
+ */
+export function checkConfirmSettingGrayFunction(params: {} | undefined) {
+  return http.get('/setting/checkConfirmSettingGrayFunction', params);
 }
 
 /**
@@ -102,7 +131,7 @@ export function getFields(params: {} | undefined) {
  * @param {String} params.formType -- 字段类型
  */
 export function getTaskRelatedInfo(params: {} | undefined) {
-  return http.get("/task/getRelatedInfo", params);
+  return http.get('/task/getRelatedInfo', params);
 }
 
 /**
@@ -113,7 +142,7 @@ export function getTaskRelatedInfo(params: {} | undefined) {
  * @param {String} params.keyword -- 关键字
  */
 export function getTaskCustomerList(params: {} | undefined) {
-  return http.get("/task/customer/list", params);
+  return http.get('/task/customer/list', params);
 }
 
 /**
@@ -125,7 +154,7 @@ export function getTaskCustomerList(params: {} | undefined) {
  * @param {String} params.customerId -- 客户id
  */
 export function getTaskCustomerProduct(params: {} | undefined) {
-  return http.get("/task/customer/product", params);
+  return http.get('/task/customer/product', params);
 }
 
 /**
@@ -137,7 +166,7 @@ export function getTaskCustomerProduct(params: {} | undefined) {
  * @param {String} params.customerId -- 客户id
  */
 export function getTaskCustomerLinkman(params: {} | undefined) {
-  return http.get("/api/elasticsearch/outside/es/linkman/list", params);
+  return http.get('/api/elasticsearch/outside/es/linkman/list', params);
 }
 
 /**
@@ -149,7 +178,7 @@ export function getTaskCustomerLinkman(params: {} | undefined) {
  * @param {String} params.customerId -- 客户id
  */
 export function getTaskCustomerAddress(params: {} | undefined) {
-  return http.get("/task/customer/address", params);
+  return http.get('/task/customer/address', params);
 }
 
 /**
@@ -160,7 +189,7 @@ export function getTaskCustomerAddress(params: {} | undefined) {
  * @param {String} params.notNull -- 分页数
  */
 export function getTaskDefaultInfo(params: {} | undefined) {
-  return http.get("/task/defaultInfo", params);
+  return http.get('/task/defaultInfo', params);
 }
 
 /**
@@ -179,119 +208,119 @@ export function getCustomerByProduct(params: {} | undefined) {
  * @param {String} params.lmId -- 产品id
  */
 export function getLmBindAddress(params: {} | undefined) {
-  return http.get("/task/getLmBindAddress", params);
+  return http.get('/task/getLmBindAddress', params);
 }
 
 /**
  * @description 获取新建客户相关数据
  */
 export function getCreateCustomerData(params: {} | undefined) {
-  return http.get("/task/getCustomerEditInitData", params);
+  return http.get('/task/getCustomerEditInitData', params);
 }
 
 /**
  * @description 获取新建产品相关数据
  */
 export function getCreateProductData(params: {} | undefined) {
-  return http.get("/task/getProducEditInitData", params);
+  return http.get('/task/getProducEditInitData', params);
 }
 
 /**
  * @description 获取备件配置信息
  */
 export function getSparepartConfig(params: {} | undefined) {
-  return http.post("/partV2/repertory/sparepartConfig", params);
+  return http.post('/partV2/repertory/sparepartConfig', params);
 }
 
 /**
  * @description 获取备件仓库列表数据
  */
 export function getRepertoryList(params: {} | undefined) {
-  return http.get("/task/repertory", params);
+  return http.get('/task/repertory', params);
 }
 
 /**
  * @description 检查附加组件是否必填
  */
 export function checkNotNullForCard(params: {} | undefined) {
-  return http.post("/task/checkNotNullForCard", params, false);
+  return http.post('/task/checkNotNullForCard', params, false);
 }
 
 /**
  * @description 打印工单
  */
 export function printTask(params: {} | undefined) {
-  return http.get("/task/getPrintToken", params);
+  return http.get('/task/getPrintToken', params);
 }
 
 /**
  * @description 审批详情
  */
 export function getApprove(params: {} | undefined) {
-  return http.get("/approve/get", params);
+  return http.get('/approve/get', params);
 }
 
 /**
  * @description 审批
  */
 export function saveApprove(params: {} | undefined) {
-  return http.post("/approve/saveResult", params, false);
+  return http.post('/approve/saveResult', params, false);
 }
 
 /**
  * @description 撤回审批
  */
 export function offApprove(params: {} | undefined) {
-  return http.get("/approve/offApprove", params);
+  return http.get('/approve/offApprove', params);
 }
 
 /**
  * @description 发起审批
  */
 export function applyApprove(params: {} | undefined) {
-  return http.post("/approve/apply", params);
+  return http.post('/approve/apply', params);
 }
 
 /**
  * @description 开始工单时校验是否需要审批
  */
 export function startApproveCheck(params: {} | undefined) {
-  return http.get("/task/approve/start", params);
+  return http.get('/task/approve/start', params);
 }
 
 /**
  * @description 取消工单时校验是否需要审批
  */
 export function offApproveCheck(params: {} | undefined) {
-  return http.post("/task/approve/off", params, true);
+  return http.post('/task/approve/off', params, true);
 }
 
 /**
  * @description 暂停工单时校验是否需要审批
  */
 export function pauseApproveCheck(params: {} | undefined) {
-  return http.get("/task/approve/pause", params);
+  return http.get('/task/approve/pause', params);
 }
 
 /**
  * @description 审核结算时校验是否需要审批
  */
 export function balanceApproveCheck(params: {} | undefined) {
-  return http.post("/balance/approve/confirm", params, false, { headers: { indices: true } });
+  return http.post('/balance/approve/confirm', params, false, { headers: { indices: true } });
 }
 
 /**
  * @description 回访时校验是否需要审批
  */
 export function reviewApproveCheck(params: {} | undefined) {
-  return http.post("/task/approve/degreeForView", params);
+  return http.post('/task/approve/degreeForView', params);
 }
 
 /**
  * @description 完成时校验是否需要审批
  */
 export function finishApproveCheck(params: {} | undefined) {
-  return http.post("/task/approve/finish", params);
+  return http.post('/task/approve/finish', params);
 }
 
 /**
@@ -301,7 +330,7 @@ export function finishApproveCheck(params: {} | undefined) {
  * @return {MsgModal<String>} 最近更新记录
  */
 export function getTaskUpdateRecord(params: { taskId: string }): Promise<getLatestRecordResult> {
-  return http.get("/task/getLatestRecord", params, false)
+  return http.get('/task/getLatestRecord', params, false)
 }
 
 /**
@@ -309,7 +338,7 @@ export function getTaskUpdateRecord(params: { taskId: string }): Promise<getLate
  * @param {Object} params - 参数
  */
 export function getTaskCustonerProductList(params: {} | undefined) {
-  return http.get("/task/customer/product", params, false);
+  return http.get('/task/customer/product', params, false);
 }
 
 /**
@@ -319,7 +348,7 @@ export function getTaskCustonerProductList(params: {} | undefined) {
  * @param {String} params.id - id
  */
 export function getCountForCreate(params: {} | undefined) {
-  return http.get("/task/getCountForCreate", params, false);
+  return http.get('/task/getCountForCreate', params, false);
 }
 
 /**
@@ -328,14 +357,14 @@ export function getCountForCreate(params: {} | undefined) {
  * @param {String} params.phone - 手机号
  */
 export function getCustomerByPhone(params: {} | undefined) {
-  return http.get("/task/getCustomerByPhone", params, false);
+  return http.get('/task/getCustomerByPhone', params, false);
 }
 
 /**
  * @description 获取工单配置
  */
 export function getTaskConfig(): Promise<getTaskConfigResult> {
-  return http.get("/task/getTaskConfig", {}, false);
+  return http.get('/task/getTaskConfig', {}, false);
 }
 
 /**
@@ -373,7 +402,7 @@ export function getTaskTypes() {
  * @param {String} params.typeId - 工单类型id
  */
 export function taskList(params: {} | undefined) {
-  return http.post("/task/findList", params);
+  return http.post('/task/findList', params);
 }
 
 /**
@@ -708,7 +737,25 @@ export function getPaymentDetail(params: {} | undefined) {
  * @param {String} params.fields - 设置form对象
  */
 export function taskSettingSave(params: {} | undefined) {
-  return http.post("/setting/taskType/field/save", params);
+  return http.post('/setting/taskType/field/save', params);
+}
+
+/**
+ * 将私有字段升级为公共字段/将公共字段降级为私有字段
+ * @param {Object} params - 参数对象
+ * @param {String} params.templateId - 工单类型id
+ * @param {Array} params.commonFieldFormList - 需升降的公共字段数组
+ */
+export function setCommonFields(params: {} | undefined) {
+  return http.post(`${fixedPrefixTaskPath}/outside/pc/task/setCommonFields`, params);
+}
+
+/**
+ * 更新公共字段设置
+ * @param {Object} params - 字段对象
+ */
+export function updateCommonField(params: {} | undefined) {
+  return http.post(`${fixedPrefixTaskPath}/outside/pc/task/updateCommonField`, params);
 }
 
 /**
@@ -717,7 +764,7 @@ export function taskSettingSave(params: {} | undefined) {
  * @param {String} params.id - 人员id
  */
 export function checkUser(params: {} | undefined) {
-  return http.post("/setting/fieldInfo/check", params, false);
+  return http.post('/setting/fieldInfo/check', params, false);
 }
 
 /**
@@ -726,7 +773,7 @@ export function checkUser(params: {} | undefined) {
  * @param {String} params.id - 人员id
  */
 export function cancelUserApproval(params: {} | undefined) {
-  return http.post("/setting/fieldInfo/confirm", params, false);
+  return http.post('/setting/fieldInfo/confirm', params, false);
 }
 
 /**
@@ -735,7 +782,16 @@ export function cancelUserApproval(params: {} | undefined) {
  * @param {String} params.id - 人员id
  */
 export function deleteComponent(params: {} | undefined) {
-  return http.post("/setting/fieldInfo/delete2", params, false);
+  return http.post('/setting/fieldInfo/delete2', params, false);
+}
+
+/**
+ * 工单设置，删除组件
+ * @param {Object} params - 参数对象
+ * @param {String} params.id - 字段id
+ */
+export function deleteField(params: {} | undefined) {
+  return http.post('/setting/fieldInfo/delete3', params, false);
 }
 
 /**
@@ -744,7 +800,7 @@ export function deleteComponent(params: {} | undefined) {
  * @param {String} params.id - 工单id
  */
 export function getTaskType(params: { id: string } | undefined): Promise<getTaskTypeResult> {
-  return http.get("/setting/taskType/getOne", params);
+  return http.get('/setting/taskType/getOne', params);
 }
 
 /**
@@ -755,7 +811,7 @@ export function getTaskType(params: { id: string } | undefined): Promise<getTask
  * @param {String} params.state - 配置状态
  */
 export function modifyOption(params: {} | undefined) {
-  return http.post("/setting/taskType/saveOption", params, false);
+  return http.post('/setting/taskType/saveOption', params, false);
 }
 
 /**
@@ -766,7 +822,7 @@ export function modifyOption(params: {} | undefined) {
  * @param {String} params.state - 配置状态
  */
 export function modifyConfig(params: {} | undefined) {
-  return http.post("/setting/taskType/saveConfig", params, false);
+  return http.post('/setting/taskType/saveConfig', params, false);
 }
 
 /**
@@ -775,7 +831,7 @@ export function modifyConfig(params: {} | undefined) {
  * @param {String} params.typeId - 配置id
  */
 export function getTaskCardDetailList(params: {} | undefined) {
-  return http.get("/setting/getTaskCardDetailList", params);
+  return http.get('/setting/getTaskCardDetailList', params);
 }
 
 /**
@@ -834,7 +890,7 @@ export function deleteView(params: {} | undefined) {
  * @param {String} params.typeId - 配置id
  */
 export function getTaskTemplate(params: {} | undefined) {
-  return http.get("/setting/taskType/getTemplateDic", params);
+  return http.get('/setting/taskType/getTemplateDic', params);
 }
 
 /**
@@ -938,7 +994,7 @@ export function search(params: TaskSearchListModel): Promise<getTaskSearchListRe
  * @param {String} params.typeId - 配置id
  */
 export function savePrintTemplate(params: {} | undefined) {
-  return http.post("/setting/taskType/savePrintTemplates", params, false);
+  return http.post('/setting/taskType/savePrintTemplates', params, false, { headers: { indices: true }});
 }
 
 /**
@@ -947,7 +1003,7 @@ export function savePrintTemplate(params: {} | undefined) {
  * @param {String} params.typeId - 配置id
  */
 export function saveReportTemplate(params: {} | undefined) {
-  return http.post("/setting/taskType/saveReportTemplates", params, false);
+  return http.post('/setting/taskType/saveReportTemplates', params, false, { headers: { indices: true } });
 }
 
 /**
@@ -957,7 +1013,7 @@ export function saveReportTemplate(params: {} | undefined) {
  * @param {String} params.reportSetting - 勾选整个对象包裹
  */
 export function saveSystemReport(params: {} | undefined) {
-  return http.post("/setting/taskType/saveReport", params);
+  return http.post('/setting/taskType/saveReport', params);
 }
 
 /**
@@ -967,7 +1023,17 @@ export function saveSystemReport(params: {} | undefined) {
  * @param {String} params.printSetting - 勾选整个对象包裹
  */
 export function saveSystemPrint(params: {} | undefined) {
-  return http.post("/setting/taskType/savePrint", params);
+  return http.post('/setting/taskType/savePrint', params);
+}
+
+/**
+ * 修改工单类型颜色和名称
+ * 
+ * @param {string} params.name 工单类型名称
+ * @param {string} parmas.color 工单类型颜色
+ */
+export function updateTaskTypeNameAndColor(params: {} | undefined) {
+  return http.post(`${fixedPrefixTaskPath}/outside/pc/task/taskType/updateTaskType`, params);
 }
 
 /**
@@ -998,6 +1064,19 @@ export function getRelatedInfo(params: {} | undefined) {
 }
 
 /**
+ * @description 查询关联显示项数据
+ * @param {Object} params 参数对象
+ * @param {String} params.customerId 客户id
+ * @param {Array} params.productIds 产品id数组
+ */
+export function getRelatedInfos(params: {} | undefined) {
+  return http.post(
+    `${fixedPrefixTaskPath}/outside/pc/task/getRelatedInfos`,
+    params
+  );
+}
+
+/**
  * @description 筛选已经关联过备件的工单
  * @param {String} taskIds 查询的工单ids example: taskIds=1&taskIds=2
  */
@@ -1019,7 +1098,7 @@ export function editBatchTask(params: Object = {}) {
  * @description 工单转派
  */
 export function redeployBatch(params: Object = {}) {
-  return http.post("/task/redeployBatch", params);
+  return http.post('/task/redeployBatch', params);
 }
 
 /**
@@ -1089,7 +1168,7 @@ export function taskRecordDelete(params: any) {
  * @description 拨打电话
  */
 export function dialout(params: object) {
-  return http.post("/api/callcenter/outside/callcenter/api/dialout", params, false);
+  return http.post('/api/callcenter/outside/callcenter/api/dialout', params, false);
 }
 
 /**
@@ -1104,7 +1183,7 @@ export function getUserViews(): Promise<getUserViewsResult> {
  * @description 根据工单类型id获取其附加组件信息
  */
 export function getCardDetailList(params: TaskGetCardDetailListModel): Promise<Map<string, any>[]> {
-  return http.get(`/task/getCardDetailList`, params)
+  return http.get('/task/getCardDetailList', params)
 }
 
 /**
@@ -1125,7 +1204,7 @@ export function getUserListByTag(params: TaskAllotUserListByTagModel): Promise<g
  * @description 旧版切换原因
  */
 export function revertReason(params: object) {
-  return http.post(`/task/revertReason`, params)
+  return http.post('/task/revertReason', params)
 }
 /**
  * 获取负责人 协同人 派单人 创建人
@@ -1229,6 +1308,13 @@ export function getTaskAllotUserInfo(params: TaskAllotUserSearchModel): Promise<
  */
 export function getTaskAllotApprove(params: TaskAllotApproveGetModel): Promise<getTaskAllotApproveResult> {
   return http.post('/task/confirmAllotTo', params)
+}
+
+/**
+ * @description 工单指派-转派前验证是否审批接口
+ */
+export function getTransferTaskAllotApprove(params: TaskAllotApproveGetModel): Promise<getTaskAllotApproveResult> {
+  return http.post('/task/checkTransferTask', params)
 }
 
 /**

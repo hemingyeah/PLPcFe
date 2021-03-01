@@ -21,7 +21,7 @@
       <template v-if="customerOption.product">
         <div class="form-view-row" v-if="!products.length"><label>产品</label></div>
         <div class="product-list" v-else>
-          <div class="product-item" v-for="product in products" :key="product.id">
+          <div class="product-item" v-for="(product, index) in products" :key="product.id">
             <div class="product-item-name">
               <label>产品</label>
               <span
@@ -38,8 +38,11 @@
                 </div>
               </el-tooltip>
             </div>
-            <div class="product-item-relation" v-if="products.length == 1 && relationProductfields.length">
-              <form-view class="form-view-two-column" :fields="relationProductfields" :value="task"></form-view>
+            <div class="form-row-two-columns product-item-relation" v-if="relationProductfields.length">
+              <div class="form-view-row" v-for="field in relationProductfields" :key="field.id">
+                <label>{{ field.displayName }}</label>
+                <div class="form-view-row-content"> {{ prettyRelationProductValue(task.attribute[field.fieldName], index) }} </div>
+              </div>
             </div>
           </div>
         </div>
@@ -254,7 +257,7 @@ export default {
     */
     showProductRelationCount(product) {
       let { id, name } = product;
-      let { all } = this.productRelationCount[id];
+      let { all } = this.productRelationCount[id] || {};
       return Number(all) > 0 && !this.isEncryptField(name);
     },
     /**
@@ -303,6 +306,16 @@ export default {
         }
       })
         .catch(err => console.error(err))
+    },
+    /** 
+    * @description 处理产品关联字段数据
+    */
+    prettyRelationProductValue(value, index) {
+      if (Array.isArray(value)) {
+        return value[index];
+      }
+
+      return value;
     }
   },
   created() {

@@ -31,7 +31,7 @@
         <p>区域：<span v-if="contact.customerAddress">{{contact.customerAddress.adProvince}}</span></p>
         <p>详细地址：<span v-if="contact.customerAddress">{{contact.customerAddress.adAddress}}</span></p>
         <p>负责人：<span>{{contact.customerManagerName}}</span></p>
-        <p>服务团队：<span>{{dealTags(contact.tags)}}</span></p>
+        <p>服务部门：<span>{{dealTags(contact.tags)}}</span></p>
         <p>未完成的工单：<span class="unFinishTask">{{contact.unfinishedTaskCount}}</span></p>
         <p>未完成的事件：<span class="unFinishEvent">{{contact.unfinishedEventCount}}</span></p>
       </template>

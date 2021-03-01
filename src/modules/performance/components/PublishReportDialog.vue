@@ -3,9 +3,9 @@
     <dl>
       <dt>请检查核对绩效报告内容，发送后将无法撤回。</dt>
       <dd><el-checkbox v-model="form.isAdvice">仅通知有绩效结果的对象，绩效报告中计算项为空的用户不发送</el-checkbox></dd>
-      <dd><el-checkbox v-model="form.isRanking">显示排名信息，用户收到的绩效报告中会显示在团队中的排名</el-checkbox></dd>
+      <dd><el-checkbox v-model="form.isRanking">显示排名信息，用户收到的绩效报告中会显示在部门中的排名</el-checkbox></dd>
     </dl>
-    <div class="warning" v-if="tagsName">提示：{{tagsName}}等团队主管为空，请检查后重新发送或忽略该信息继续发送，这可能导致某些人看不到绩效数据。</div>
+    <div class="warning" v-if="tagsName">提示：{{tagsName}}等部门主管为空，请检查后重新发送或忽略该信息继续发送，这可能导致某些人看不到绩效数据。</div>
 
     <div class="dialog-footer">
       <el-button type="primary" @click="send" :disabled="pending">发布</el-button>

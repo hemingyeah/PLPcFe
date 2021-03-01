@@ -113,13 +113,6 @@
             <template v-else-if="column.field === 'tags'">
               {{scope.row | formatTags}}
             </template>
-            <!-- 自定义的选择类型字段显示， 与type 区别-->
-            <template v-else-if="column.formType === 'cascader'">
-              {{ scope.row.attribute[column.field] | displayCascader }}
-            </template>
-            <template v-else-if="column.formType === 'select' && !column.isSystem">
-              {{scope.row.attribute[column.field] | displaySelect}}
-            </template>
             <template v-else-if="column.field === 'updateTime'">
               <template v-if="scope.row.latesetUpdateRecord">
                 <el-tooltip class="item" effect="dark" :content="scope.row.latesetUpdateRecord" placement="top">
@@ -137,19 +130,10 @@
             <template v-else-if="column.formType === 'address'">
               {{formatCustomizeAddress(scope.row.attribute[column.field])}}
             </template>
-            <template v-else-if="column.formType === 'user' && scope.row.attribute[column.field]">
-              {{ getUserName(column, scope.row.attribute[column.field]) }}
-            </template>
             <template v-else-if="column.formType === 'location'">
               {{ scope.row.attribute[column.field] && scope.row.attribute[column.field].address}}
             </template>
             <template v-else-if="column.formType == 'related_task'">
-              {{ getRelatedTask(scope.row.attribute[column.field]) }}
-            </template>
-            <template v-else-if="column.field === 'createUser'">
-              {{ scope.row.createUser && scope.row.createUser.displayName }}
-            </template>
-            <template v-else-if="column.field === 'createTime'">
               {{ scope.row.createTime | formatDate }}
             </template>
             <div v-else-if="column.formType === 'textarea'" v-html="buildTextarea(scope.row.attribute[column.field])" @click="openOutsideLink">
@@ -168,11 +152,11 @@
             </template>
 
             <template v-else-if="!column.isSystem">
-              {{scope.row.attribute[column.field]}}
+              {{scope.row.attribute[column.field] | fmt_form_field(column.formType, column.fieldName, scope.row.attribute)}}
             </template>
 
             <template v-else>
-              {{scope.row[column.field]}}
+              {{scope.row[column.field] | fmt_form_field(column.formType, column.fieldName, scope.row.attribute)}}
             </template>
           </template>
         </el-table-column>
@@ -383,7 +367,7 @@ export default {
           isSystem: 0,
         },
         {
-          displayName: '服务团队',
+          displayName: '服务部门',
           fieldName: 'tags',
           isExport: true,
           isSystem: 0,
@@ -577,28 +561,7 @@ export default {
     formatDate(val) {
       if (!val) return '';
       return formatDate(val, 'YYYY-MM-DD HH:mm:ss')
-    },
-    displaySelect(value) {
-      if (!value) return null;
-      if (value && typeof value === 'string') {
-        return value;
-      }
-      if (Array.isArray(value) && value.length) {
-        return value.join('，');
-      }
-      return null;
-    },
-    displayCascader(value) {
-      if (!value) return null;
-      if (value && typeof value === 'string') {
-        return value;
-      }
-      if (Array.isArray(value) && value.length) {
-        return value.join('/');
-      }
-      return null;
     }
-
   },
   async mounted() {
     this.buildColumns();
@@ -621,7 +584,7 @@ export default {
     // [tab_spec]标准化刷新方式
     window.__exports__refresh = this.search;
 
-    this.$eventBus.$on('product_list.update_product_list_remind_count', this.updateProductRemindCount)
+    this.$eventBus.$on('product_list.update_product_list_remind_count', this.updateProductRemindCount) 
   },
   beforeDestroy() {
     this.$eventBus.$off('product_list.update_product_list_remind_count', this.updateProductRemindCount)

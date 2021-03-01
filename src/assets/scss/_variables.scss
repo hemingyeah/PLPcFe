@@ -46,4 +46,7 @@ $color-nav-hover: rgba(255, 255, 255, .08) !default;
 // 表格hover颜色
 $color-td-hover: #F5FAFA !default;
 
-$color-main:#00D1B2;
+$color-main: #00D1B2;
+
+// 过渡
+$fade-transition: transform 300ms cubic-bezier(0.23, 1, 0.32, 1), opacity 300ms cubic-bezier(0.23, 1, 0.32, 1) !default;

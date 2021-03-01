@@ -105,7 +105,7 @@ export default {
 
           if (failure) return;
           this.visible = false;
-          this.reset();
+          // this.reset();
           this.callback && this.callback();
         })
         .catch(e => console.error('e', e));

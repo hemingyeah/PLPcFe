@@ -1,7 +1,11 @@
+/* enum */
+import AuthEnum from '@model/enum/AuthEnum.ts'
 /* util */
 import qs from '@src/util/querystring'
 /* model */
-import TaskStateEnum from '@model/enum/TaskStateEnum.ts';
+import TaskStateEnum from '@model/enum/TaskStateEnum.ts'
+/* util */
+import { isArray } from '@src/util/type'
 
 export default {
   /* 权限 */
@@ -73,7 +77,20 @@ export default {
    * 3. 有工单派单权限
   */
   isShowSaveAndAllotButton() {
-    return this.isShowOnlySaveButton && this.auth.indexOf('TASK_DISPATCH') > -1;
+    // 是否显示
+    let show = false
+    // 权限数据是否为数组
+    let isAuthArray = isArray(this.auth)
+    try {
+      // 是否有权限
+      let isHaveAuth = isAuthArray ? this.auth.indexOf(AuthEnum.TASK_DISPATCH) > -1 : Boolean(this.auth?.[AuthEnum.TASK_DISPATCH])
+      show = this.isShowOnlySaveButton && isHaveAuth
+    } catch (error) {
+      show = false
+      console.error('isShowSaveAndAllotButton ~ error', error)
+    }
+    
+    return show
   },
   /** 
   * @description 是否显示工单按钮组

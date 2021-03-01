@@ -1,6 +1,5 @@
 <template>
   <div class="task-detail-container" v-loading="loading">
-    <div class="guide-model-box" v-if="nowGuideStep < 5"></div>
     <!-- start 顶部操作区 -->
     <div class="task-detail-header">
       <div class="header-btns">
@@ -42,22 +41,6 @@
           class="task-detail-main-content-left"
           v-show="collapseDirection != 'left'"
         >
-          <div
-            class="task-detail-step-2-box"
-            :style="
-              nowGuideStep == 3
-                ? 'width: 104px;height: 40px;background:#fff'
-                : ''
-            "
-            id="v-task-detail-step-2"
-          >
-            <div class="task-detail-step-2" v-if="nowGuideStep == 3">
-              动态信息
-              <div style="position: relative;">
-                <div class="guide-disable-cover"></div>
-              </div>
-            </div>
-          </div>
 
           <el-tabs v-model="leftActiveTab">
             <el-tab-pane label="详细信息" name="product-view">

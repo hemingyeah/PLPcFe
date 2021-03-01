@@ -138,7 +138,7 @@ html,body{
 }
 
 .setting-product-design{
-  margin: 10px;
+  padding: 12px;
   height: calc(100% - 53px);
 }
 

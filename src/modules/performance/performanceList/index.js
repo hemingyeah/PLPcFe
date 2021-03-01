@@ -8,8 +8,8 @@ import BaseCollapsePanel from 'packages/BaseCollapsePanel';
 import BaseImport from 'packages/BaseImport';
 import BaseExport from 'packages/BaseExport';
 
-import Platform from 'src/util/Platform';
-import Http from 'src/util/HttpUtil';
+import Platform from '@src/util/Platform';
+import Http from '@src/util/HttpUtil';
 
 import PerformanceList from './PerformanceList.vue';
 

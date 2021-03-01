@@ -8,7 +8,7 @@ import http from '@src/util/http';
  * @returns Promise<Team>
  */
 export function tagList(params) {
-  return http.post('/security/tag/list', params);
+  return http.post('/security/tag/tree', params);
 }
 
 /**

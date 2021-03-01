@@ -1,8 +1,8 @@
-import http from "@src/util/http";
-import GrayUtil from "@src/util/gray";
-let de_headUrl = "";
-let headUrl = "/api/customer/outside/pc"
-let headUrl2 = "/api/elasticsearch/outside/es"
+import http from '@src/util/http';
+import GrayUtil from '@src/util/gray';
+let de_headUrl = '';
+let headUrl = '/api/customer/outside/pc'
+let headUrl2 = '/api/elasticsearch/outside/es'
 
 /** ------------ start 产品 ----------------------- */
 /**
@@ -11,7 +11,7 @@ let headUrl2 = "/api/elasticsearch/outside/es"
  * @returns {*}
  */
 function getProduct(params) {
-  return http.post("/customer/product/list/data", params)
+  return http.post('/customer/product/list/data', params)
   
 }
 
@@ -252,7 +252,7 @@ function getProductTemplateList(params) {
  * @returns Promise<>
  */
 function productTemplateDelete(ids) {
-  let params = (ids || "").split(",");
+  let params = (ids || '').split(',');
   let productPreFixedPath = GrayUtil.getProductV2ApiPath();
   return http.post(`${productPreFixedPath ? headUrl : de_headUrl}/product/delete`, params);
 }
