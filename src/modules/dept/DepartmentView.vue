@@ -10,13 +10,13 @@
         </el-button>
 
         <!-- start 同步钉钉通讯录 -->
-        <el-button v-if="tenantType==0" class="base-button" :class="{'sync-button': !collapse}" type="primary" :loading="synchronousState" @click="syncDingTalkAddressBook">
+        <el-button v-if="tenantType==0 && hasStaffAuth" class="base-button" :class="{'sync-button': !collapse}" type="primary" :loading="synchronousState" @click="syncDingTalkAddressBook">
           {{ synchronousState ? '同步中': '同步钉钉通讯录' }}
         </el-button>
         <!-- end 同步钉钉通讯录 -->
 
         <el-tabs type="card" v-model="activeName" @tab-click="handleClick" :class="{'el-tabs-expand': !collapse}">
-          <el-tab-pane label="组织架构" name="tag">
+          <el-tab-pane v-if="hasTagAuth" label="组织架构" name="tag">
             <!-- 部门搜索框 -->
             <div class="dept-search">
               <el-input v-model="deptKeyword" placeholder="请输入部门名称搜索" @input="debounce" @keyup.enter.native="debounce">
@@ -48,9 +48,9 @@
               </el-popover>  
             </div>
           </el-tab-pane>
-          <el-tab-pane label="角色管理" name="role">
-            
-            <div class="create-role">
+          <el-tab-pane v-if="hasStaffAuth || hasRoleAuth" label="角色管理" name="role">
+
+            <div v-if="hasRoleAuth" class="create-role">
               <el-button type="primary" @click="createRole">新建角色</el-button>
             </div>
             <div v-if="roles.length > 0" class="department-child-list">
@@ -77,7 +77,7 @@
           </div>
         </div>
 
-        <div class="department-child-item dept-role-item dept-del-role-item" :class="{'department-role-selected': selectedRole.id == -1, 'dept-del-role-item-expand': !collapse}" @click="chooseDelRole()">
+        <div v-if="hasStaffAuth" class="department-child-item dept-role-item dept-del-role-item" :class="{'department-role-selected': selectedRole.id == -1, 'dept-del-role-item-expand': !collapse}" @click="chooseDelRole()">
           <span>已删除账号 &nbsp;&nbsp;</span>
           <i class="iconfont icon-arrowright"></i>
         </div>
@@ -99,9 +99,9 @@
                 角色名称：
                 <a :href="`/security/role/view/${selectedRole.id}`" :data-id="selectedRole.id" @click="goRoleDetail" style="color:#13c2c2;">{{selectedRole.text}}</a>
                 <!-- <base-button style="margin-left:10px;" type="ghost" @event="openCreateUserPanel"> 查看 </base-button> -->
-                <base-button v-if="canEditSystemRole || isCustomeRole" style="margin-left:10px;" type="ghost" @event="editRole(selectedRole.id)">编辑角色权限</base-button>
-                <base-button v-if="selectedRole.custom" style="margin-left:10px;" type="ghost" @event="resetRole(selectedRole.custom)">重置权限</base-button>
-                <base-button v-if="selectedRole.isSys == 0" style="margin-left:10px;" type="danger" @event="delRole(selectedRole.id)">删除角色</base-button>
+                <base-button v-if="hasRoleAuth && (canEditSystemRole || isCustomeRole) " style="margin-left:10px;" type="ghost" @event="editRole(selectedRole.id)">编辑角色权限</base-button>
+                <base-button v-if="hasRoleAuth && selectedRole.custom" style="margin-left:10px;" type="ghost" @event="resetRole(selectedRole.custom)">重置权限</base-button>
+                <base-button v-if="hasRoleAuth && selectedRole.isSys == 0" style="margin-left:10px;" type="danger" @event="delRole(selectedRole.id)">删除角色</base-button>
               </h4>
               <h4 class="role-desc">角色描述：{{roleDes}}</h4>
             </div>
@@ -112,10 +112,10 @@
               <i slot="prefix" class="el-input__icon el-icon-search"></i>
             </el-input>
             <base-button type="primary" @event="searchRole()">搜索</base-button>
-            <base-button v-if="isSystemRole || isCustomeRole" type="primary" @event="chooseUser('role')">添加成员</base-button>
-            <base-button v-if="(isSystemRole || isCustomeRole) && rolePage.list.length" type="primary" @event="roleDeleteConfirm()">移除成员</base-button>
+            <base-button v-if="hasStaffAuth && (isSystemRole || isCustomeRole)" type="primary" @event="chooseUser('role')">添加成员</base-button>
+            <base-button v-if="hasStaffAuth && (isSystemRole || isCustomeRole) && rolePage.list.length" type="primary" @event="roleDeleteConfirm()">移除成员</base-button>
             <!-- <base-button v-if="isCustomeRole" type="primary" @event="createRole">新建角色</base-button> -->
-            <base-button v-if="selectedRole.id == 0 && tenantType == 0" type="primary" @event="roleDialogVisible = true">自动分配角色</base-button>
+            <base-button v-if="hasStaffAuth && selectedRole.id == 0 && tenantType == 0" type="primary" @event="roleDialogVisible = true">自动分配角色</base-button>
           </div>
 
           <div class="department-user-table" v-if="rolePage.list.length > 0">
@@ -366,6 +366,12 @@
                 <el-dropdown-item>
                   <div @click="exportAccount('all')">导出全部</div>
                 </el-dropdown-item>
+                <el-dropdown-item v-if="productV2Gray">
+                  <div @click="openWxDialog">维护服务微信</div>
+                </el-dropdown-item>
+                <el-dropdown-item>
+                  <div @click="openTelDialog">维护服务电话</div>
+                </el-dropdown-item>
               </el-dropdown-menu>
             </el-dropdown>
             <!-- <base-button type="primary" @event="searchModel.pageNum=1;search();trackEventHandler('search')" native-type="submit">搜索</base-button> -->
@@ -375,7 +381,7 @@
             <el-table :data="userPage.list" stripe @select="selectionHandle" @select-all="selectionHandle" :highlight-current-row="false" header-row-class-name="team-detail-table-header" ref="multipleTable"
                       class="team-table">
               <el-table-column type="selection" width="48" align="center" class-name="select-column"></el-table-column>
-              <el-table-column prop="displayName" label="姓名">
+              <el-table-column prop="displayName" label="姓名" width="180px">
                 <div style="display: flex" slot-scope="scope">
                   <a :href="`/security/user/view/${scope.row.userId}`" :data-id="scope.row.userId" @click="goUserDetail" class="view-detail-btn">{{scope.row.displayName}}</a>
                   <i v-if="scope.row.superAdmin == 1" class="iconfont icon-people">主管</i>
@@ -415,13 +421,7 @@
             </el-table>
 
             <div class="table-footer">
-              <div class="list-info">
-                共
-                <span class="level-padding">{{userPage.total}}</span>记录，
-                已选中
-                <span class="selectedCount">{{multipleSelection.length}}</span>条
-                <span class="selectedCount select-init-text" @click="selectionToggle()">清空</span>
-              </div>
+              <div class="list-info">共<span class="level-padding">{{userPage.total}}</span>记录</div>
               <el-pagination class="customer-table-pagination" background @current-change="jump" @size-change="handleSizeChange" :page-sizes="[10, 20, 50]" :page-size="params.pageSize" :current-page="params.pageNum"
                              layout="prev, pager, next, sizes, jumper" :total="userPage.total"></el-pagination>
             </div>
@@ -545,6 +545,44 @@
         <el-button type="primary" @click="handleGuideClose">确 定</el-button>
       </span>
     </el-dialog> 
+
+    <!-- start 导入服务微信 -->
+    <base-import title="维护服务微信"
+                 ref="serviceWxModal"
+                 :is-import-now="true"
+                 @success="importServiceSuccess"
+                 action="/security/user/import/importWeChat">
+      <div slot="tip">
+        <div class="base-import-warn">
+          请先下载<a :href="`/security/user/import/weChatTemplate?tagId=${selectedDept.id}`">导入模版 </a>，填写完成后再上传导入。<br>
+          微信号仅用于客户联系服务人员；<br>
+          如果微信号未填写，客户将无法获取服务人员微信号；<br>
+          此数据为非必填项。<br>
+        </div>
+      </div>
+    </base-import>
+    <!-- end 导入服务微信 -->
+
+    <!-- start 导入服务电话 -->
+    <base-import title="维护服务电话"
+                 ref="serviceTelModal"
+                 :is-import-now="true"
+                 @success="importServiceSuccess"
+                 action="/security/user/import/cellPhone">
+      <div slot="tip">
+        <div class="base-import-warn">
+          请先下载<a :href="`/security/user/import/template?tagId=${selectedDept.id}`">导入模版 </a>，填写完成后再上传导入。<br>
+          这里维护服务电话仅用于给客户发送预约短信时显示服务人员电话；<br>
+          如果没有维护服务人员电话将会发送短信设置中统一服务电话；<br>
+          此数据为非必填项。 <br>
+          <br>
+          短信示例<br>
+          <br>
+          【售后宝】尊敬的客户您好，{公司名称}{计划时间}安排{服务人员姓名}{服务电话}为您提供服务，请安排好您的时间，{客服电话}，谢谢
+        </div>
+      </div>
+    </base-import>
+    <!-- end 导入服务电话 -->
 
   </div>
   <!-- end 选择组织架构页面 -->
@@ -707,6 +745,18 @@ export default {
         && this.authorities.AUTH_TAG == 3
       )
     },
+    // 查看组织架构权限对应之前的团队权限
+    hasTagAuth(){
+      return 'AUTH_TAG' in this.authorities
+    },
+    // 账号权限
+    hasStaffAuth(){
+      return 'AUTH_STAFF' in this.authorities
+    },
+    // 角色权限
+    hasRoleAuth(){
+      return 'AUTH_ROLE' in this.authorities
+    },
     showRoleDesc() {
       // 0  待分配账号
       // -1  已删除账号
@@ -761,30 +811,42 @@ export default {
     isDingTalk() {
       return Platform.isDingTalk()
     },
+    productV2Gray(){
+      return this.initData.openSuperCode;
+    }
   },
   mounted() {
     // isAllotByDept对应钉钉端是否按照钉钉通讯录选人 如果钉钉端之前勾选了按服务团队派单isAllotByDept为false, 
-    if(this.tenantType == 0) {
-      // 钉钉端
-      this.isAllotByDept = !this.initData.allotByTag;
-      setTimeout(()=>{
-        if (storageGet(DEPT_GUIDE_DIALOG) != 1) {
-          this.guideDialogVisible = true;
-        }
-        if (storageGet(DEPT_GUIDE_DIALOG) == 1 && storageGet(DEPT_GUIDE) < this.deptSteps.length) {
-          this.$tours['myTour'].start()
-          this.nowGuideStep = 0
-        } 
-      }, 100)
+    // 去掉引导页面
+    // if(this.tenantType == 0) {
+    //   // 钉钉端
+    //   this.isAllotByDept = !this.initData.allotByTag;
+    //   setTimeout(()=>{
+    //     if (storageGet(DEPT_GUIDE_DIALOG) != 1) {
+    //       this.guideDialogVisible = true;
+    //     }
+    //     if (storageGet(DEPT_GUIDE_DIALOG) == 1 && storageGet(DEPT_GUIDE) < this.deptSteps.length) {
+    //       this.$tours['myTour'].start()
+    //       this.nowGuideStep = 0
+    //     } 
+    //   }, 100)
+    // }
+    if(this.hasTagAuth) {
+      this.initialize()
     }
-    this.initialize()
-    this.dept_role_data = this.initData.rolesJson || []
-    this.roles = [{ id: '0', text: '待分配人员' }].concat(this.dept_role_data)
-    this.selectedRole = this.roles[0]
-    // 自动分配角色
-    this.autoAuthRoles = [{ id: '0', text: '由管理员每次指定' }].concat(
-      this.dept_role_data
-    )
+    if(this.hasStaffAuth || this.hasRoleAuth) {
+      this.dept_role_data = this.initData.rolesJson || []
+      this.roles = [{ id: '0', text: '待分配人员' }].concat(this.dept_role_data)
+      this.selectedRole = this.roles[0]
+      if(!this.hasTagAuth) {
+        this.activeName = 'role';
+        this.chooseRole(this.selectedRole);
+      }
+      // 自动分配角色
+      this.autoAuthRoles = [{ id: '0', text: '由管理员每次指定' }].concat(
+        this.dept_role_data
+      )
+    }
     let href = url.parse(window.location.href, true) || {}
     if (href.query && href.query.from == 'role') {
       // jsp新建角色后跳转过来的
@@ -794,6 +856,17 @@ export default {
     window.__exports__refresh = this.refreshDept;
   },
   methods: {
+    /* 打开服务电话弹出框 */
+    openTelDialog () {
+      this.$refs.serviceTelModal.open();
+    },
+    openWxDialog () {
+      this.$refs.serviceWxModal.open();
+    },
+    /* 导入维护服务电话成功 */
+    importServiceSuccess () {
+      // 
+    },
     subDeptSearch: _.debounce(function () {
       // 下级部门模糊搜索
       let data = this.deptInfo.children || [];

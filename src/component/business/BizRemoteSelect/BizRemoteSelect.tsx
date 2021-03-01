@@ -84,7 +84,7 @@ class BizRemoteSelect extends VC<{}> {
       })
       if(Array.isArray(value)){
         const notInListValues=value.filter(v=>!this.optionList.find((option:any)=>option.value===v))
-        const notInList=this.value?.filter(item=>notInListValues.find(v=>item.value===v))
+        const notInList=this.value?.filter(item=>notInListValues.find(v=>item.value===v)) || []
         data = data.concat(notInList)
       }
     } else {
