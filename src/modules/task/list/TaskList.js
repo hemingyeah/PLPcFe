@@ -80,9 +80,15 @@ export default {
       selectIds, // id
       taskView: [], // 顶部筛选列表
       otherList: [], // 其他列表
+      filterId: selectIds.allId, // 顶部筛选选中的状态id
+      otherText: '自定义筛选视图', // 其他文案
+      filterData: {}, // 状态数据
+      region: {}, // 保存视图的数据
+      isViewModel: '默认', // 视图是否保存过
       advanceds: advancedList, // 高级搜索列表
       searchParams: {}, // 筛选列表的参数
       searchParams_spare: {},
+      dropDownInfo: '', // 顶部下拉
       mapShow: true, // 地图预览
       selectColumnState: '', // 视图选择列状态存储
       planTimeType: '', // 判断计划时间展示的样式
@@ -286,7 +292,11 @@ export default {
       }
       if (Array.isArray(value) && value.length) {
         return value.join('，');
+      }
+      return null;
+    },
     /** 审批状态 */
+    displayApprove(value) {
       return value == 0 ? '无审批' : '审批中'
     }
   },
