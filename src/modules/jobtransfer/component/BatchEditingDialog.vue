@@ -115,7 +115,10 @@ export default {
           break;
         case '负责客户':
           url = '/customer/editBatch';
-          params = this.buildParams();
+          params = {
+            ...this.buildParams(),
+            isQuitTurn: true
+          };
           emulateJSON = false;
           break;
         default:
