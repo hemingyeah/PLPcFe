@@ -123,7 +123,16 @@ router.use('', departmentRouter.routes(), departmentRouter.allowedMethods());
 router.use('', linkcRouter.routes(), sparePartRouter.allowedMethods());
 router.use('', productV2Router.routes(), sparePartRouter.allowedMethods());
 router.use('', superQrcodeRouter.routes(), sparePartRouter.allowedMethods());
-router.use('', guideForNewUser.routes(), sparePartRouter.allowedMethods());
+router.use('', guideForNewUser.routes(), guideForNewUser.allowedMethods());
+router.use('', customerRouter.routes(), customerRouter.allowedMethods());
+router.use('', openRouter.routes(), openRouter.allowedMethods());
+router.use('', settingRouter.routes(), settingRouter.allowedMethods());
+router.use('', teamRouter.routes(), teamRouter.allowedMethods());
+router.use('', performanceRouter.routes(), performanceRouter.allowedMethods());
+router.use('', productRouter.routes(), productRouter.allowedMethods());
+router.use('', approveRouter.routes(), approveRouter.allowedMethods());
+router.use('', dataScreenRouter.routes(), dataScreenRouter.allowedMethods());
+router.use('', repositoryRouter.routes(), repositoryRouter.allowedMethods());
 
 router.all('/*', (ctx) => {
   return HttpClient.proxy(ctx);

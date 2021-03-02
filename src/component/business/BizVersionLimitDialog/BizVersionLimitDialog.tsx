@@ -12,7 +12,7 @@ import '@src/component/business/BizVersionLimitDialog/BizVersionLimitDialog.scss
 import RootWindowInitData from '@model/types/RootWindowInitData'
 /* vue */
 import VC from '@model/VC'
-import { Component, Emit, Prop, Ref } from 'vue-property-decorator'
+import { Component, Emit, Prop, Provide, Ref } from 'vue-property-decorator'
 import { CreateElement } from 'vue'
 /* util */
 import Log from '@src/util/log.ts'
@@ -28,6 +28,8 @@ import { getRootWindowInitData } from '@src/util/window'
   }
 })
 class BizVersionLimitDialog extends VC {
+  /* 初始化数据 */
+  @Provide() initData: RootWindowInitData = getRootWindowInitData()
   
   /* 等待状态 */
   private pending: boolean = false

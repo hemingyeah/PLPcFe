@@ -133,7 +133,7 @@
               <i class="iconfont icon-triangle-down task-icon"></i>
             </div>
             <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item>
+              <el-dropdown-item v-if="!isExperienceEdition">
                 <div @click="openDialog('importProduct')">导入产品</div>
               </el-dropdown-item>
               <el-dropdown-item>
@@ -142,7 +142,7 @@
               <el-dropdown-item>
                 <div @click="exportProduct(true)">导出全部</div>
               </el-dropdown-item>
-              <el-dropdown-item>
+              <el-dropdown-item v-if="!isExperienceEdition">
                 <div @click="openDialog('update')">批量更新</div>
               </el-dropdown-item>
             </el-dropdown-menu>
@@ -533,7 +533,7 @@ import { catalogFieldFixForProduct, productFieldFix } from '@src/modules/product
 import { getListProductFields, getProductLinkCatalogCount } from '@src/api/ProductV2Api'
 import TeamMixin from '@src/mixins/teamMixin';
 import { isShowCustomerRemind } from '@src/util/version.ts';
-
+import VersionMixin from '@src/mixins/versionMixin/index.ts'
 
 
 const {
@@ -544,7 +544,7 @@ const link_reg = /((((https?|ftp?):(?:\/\/)?)(?:[-;:&=\+\$]+@)?[A-Za-z0-9.-]+|(?
 
 export default {
   name: 'product-list',
-  mixins: [TeamMixin],
+  mixins: [TeamMixin, VersionMixin],
   inject: ['initData'],
   // props: {
   //   initData: {
