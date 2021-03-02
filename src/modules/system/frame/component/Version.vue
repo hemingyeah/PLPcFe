@@ -24,7 +24,8 @@ const VERSION_NUM_KEY = 'shb_version_num';
 const EditionMap = {
   '1': 'VIP版',
   '2': '标准版',
-  '3': '企业版'
+  '3': '企业版',
+  '4': '体验版'
 }
 
 export default {
