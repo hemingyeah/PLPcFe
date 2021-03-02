@@ -206,7 +206,7 @@ export default {
       }
       
       // 检测新建工单
-      if (this.isTaskCreate) {
+      if (this.isTaskCreate || this.isFromProduct || this.isFromEvent || this.isFromCustomer) {
         return (
           this.checkNumExceedLimitBeforeHandler(
             TenantDataLimitSourceEnum.Task,
