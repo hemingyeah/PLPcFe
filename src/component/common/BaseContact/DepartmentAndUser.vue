@@ -8,7 +8,8 @@
   >
     <div class="bc-dept-wrap">
       <div class="bc-dept" v-if="depts.length > 0 && departShow">
-        <base-tree
+        <base-tree-dept
+          expand
           :data="depts" 
           :node-render="nodeRender"
           :selected="selectedDept" 
@@ -204,6 +205,10 @@ export default {
     return data
   },
   computed: {
+    mainTagId(){
+      // 组织架构主tag
+      return this.depts[0].id 
+    },
     isDingtalk(){
       // 判断是否钉钉端选择通讯录
       let tenantType = localStorage.getItem('tenantType');
@@ -363,7 +368,7 @@ export default {
         
         // 查询用户
         this.params.keyword = '';
-        this.params.tagId = this.selectedDept.id;
+        this.params.tagId = this.selectedDept.id == this.mainTagId ? '' : this.selectedDept.id;
         // start 兼容钉钉端 
         this.params.deptId = this.selectedDept.id;
         this.params.departmentId = this.selectedDept.id;
@@ -527,11 +532,12 @@ export default {
       this.isSeeAllOrg = false;
       try {
         /* 如果开启 查询按组织架构选项 */
-        if(this.seeAllOrg) {
-          let result = await this.getSeeAllOrg();
-          this.isSeeAllOrg = result.data;
-        }
-        
+        // if(this.seeAllOrg) {
+        //   let result = await this.getSeeAllOrg();
+        //   this.isSeeAllOrg = result.data;
+        // }
+        let result = await this.getSeeAllOrg();
+        this.isSeeAllOrg = result.data;
       } catch (error) {
         console.log('error: ', error);
         this.isSeeAllOrg = false;

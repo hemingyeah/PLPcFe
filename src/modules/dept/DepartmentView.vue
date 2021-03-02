@@ -128,7 +128,7 @@
                   <span v-if="scope.row.superAdmin == 2" class="super-admin-label">主管理员</span>
                 </div>
               </el-table-column>
-              <el-table-column prop="loginName" label="账号" />
+              <el-table-column prop="loginName" label="账号" v-if="tenantType == 1"/>
               <template v-if="selectedRole.id == -1">
                 <el-table-column label="删除时间" width="180px">
                   <template slot-scope="scope">{{scope.row.deleteTime | fmt_datetime}}</template>
@@ -263,10 +263,12 @@
             <div class="department-child-block-header-text">
               <i class="iconfont icon-bumen"></i>
               <span>下级部门</span>
+              <!-- <el-button type="text" class="department-child-expand-tip" @click="subDeptExpand=!subDeptExpand">{{subDeptExpand ? '收起' : '展开'}}</el-button> -->
             </div>
 
             <div class="department-child-block-header-btn dept-edit-del">
               <base-button type="ghost" @event="addDepartment" id="v-dept-step-3">添加子部门</base-button>
+              <base-button type="ghost" @event="subDeptExpand=!subDeptExpand">{{subDeptExpand ? '收起' : '展开'}}</base-button>
               <div class="guide-disable-cover" v-if="nowGuideStep == 3"></div>
               <!-- <base-button type="danger" @event="delDepartment" v-if="subDepartments.length > 0"> 删除 </base-button> -->
             </div>
@@ -282,38 +284,40 @@
               <i class="iconfont icon-arrowright"></i>
             </div>
           </div>-->
-          <el-input v-model="subDeptKeyword" placeholder="请输入下级部门名称搜索" style="width:200px;" @input="subDeptSearch" @keyup.enter.native="subDeptSearch">
-            <i slot="prefix" class="el-input__icon el-icon-search"></i>
-          </el-input>
-          <div class="department-user-table" v-if="subDepartments.length > 0">
-            <el-table class="team-table" :data="subDepartments" stripe header-row-class-name="team-detail-table-header">
-              <el-table-column prop="tagName" label="部门名称" show-overflow-tooltip />
-              <el-table-column label="部门主管" show-overflow-tooltip>
-                <template slot-scope="scope" v-if="scope.row.teamLeaders">{{scope.row.teamLeaders.map(i => (i && i.displayName) || '').join('，')}}</template>
-              </el-table-column>
-              <el-table-column prop="phone" label="联系电话" />
-              <el-table-column label="部门位置" show-overflow-tooltip>
-                <template slot-scope="scope" v-if="scope.row.tagAddress">{{scope.row.tagAddress | fmt_address}}</template>
-              </el-table-column>
-              <el-table-column label="负责区域" show-overflow-tooltip>
-                <template slot-scope="scope" v-if="scope.row.tagPlaceList">{{scope.row.tagPlaceList.map(p => p && `${p.province}${p.city ? `-${p.city}` : ''}${p.dist ? `-${p.dist}` : ''}`).join('，\n')}}</template>
-              </el-table-column>
+          <template v-if="subDeptExpand">
+            <el-input v-model="subDeptKeyword" placeholder="请输入下级部门名称搜索" style="width:200px;" @input="subDeptSearch" @keyup.enter.native="subDeptSearch">
+              <i slot="prefix" class="el-input__icon el-icon-search"></i>
+            </el-input>
+            <div class="department-user-table" v-if="subDepartments.length > 0">
+              <el-table border class="team-table" :data="subDepartments" stripe header-row-class-name="team-detail-table-header">
+                <el-table-column prop="tagName" label="部门名称" show-overflow-tooltip />
+                <el-table-column label="部门主管" show-overflow-tooltip>
+                  <template slot-scope="scope" v-if="scope.row.teamLeaders">{{scope.row.teamLeaders.map(i => (i && i.displayName) || '').join('，')}}</template>
+                </el-table-column>
+                <el-table-column prop="phone" label="联系电话" />
+                <el-table-column label="部门位置" show-overflow-tooltip>
+                  <template slot-scope="scope" v-if="scope.row.tagAddress">{{scope.row.tagAddress | fmt_address}}</template>
+                </el-table-column>
+                <el-table-column label="负责区域" show-overflow-tooltip>
+                  <template slot-scope="scope" v-if="scope.row.tagPlaceList">{{scope.row.tagPlaceList.map(p => p && `${p.province}${p.city ? `-${p.city}` : ''}${p.dist ? `-${p.dist}` : ''}`).join('，\n')}}</template>
+                </el-table-column>
 
-              <el-table-column label="操作">
-                <template slot-scope="scope">
-                  <el-button type="text" @click="openDepartmentEditPanel(scope.row.id)">编辑</el-button>
-                  <el-button type="text" style="color:#FB602C" @click="delDepartment(scope.row.id)">删除</el-button>
-                </template>
-              </el-table-column>
-            </el-table>
+                <el-table-column label="操作">
+                  <template slot-scope="scope">
+                    <el-button type="text" @click="openDepartmentEditPanel(scope.row.id)">编辑</el-button>
+                    <el-button type="text" style="color:#FB602C" @click="delDepartment(scope.row.id)">删除</el-button>
+                  </template>
+                </el-table-column>
+              </el-table>
 
-            <div class="table-footer">
-              <div class="list-info">
-                共
-                <span class="level-padding">{{subDepartments.length}}</span>记录
+              <div class="table-footer">
+                <div class="list-info">
+                  共
+                  <span class="level-padding">{{subDepartments.length}}</span>记录
+                </div>
               </div>
             </div>
-          </div>
+          </template>
           <!-- end 下级部门列表 -->
 
           <!-- <div class="no-data-block" v-else>
@@ -378,7 +382,7 @@
           </div>
 
           <div class="department-user-table" v-if="userPage.list.length > 0">
-            <el-table :data="userPage.list" stripe @select="selectionHandle" @select-all="selectionHandle" :highlight-current-row="false" header-row-class-name="team-detail-table-header" ref="multipleTable"
+            <el-table border :data="userPage.list" stripe @select="selectionHandle" @select-all="selectionHandle" :highlight-current-row="false" header-row-class-name="team-detail-table-header" ref="multipleTable"
                       class="team-table">
               <el-table-column type="selection" width="48" align="center" class-name="select-column"></el-table-column>
               <el-table-column prop="displayName" label="姓名" width="180px">
@@ -631,6 +635,7 @@ export default {
   mixins: [tourGuide],
   data() {
     return {
+      subDeptExpand: true,
       subDeptKeyword:'',
       guideDialogVisible: false,
       isAllotByDept: false,
