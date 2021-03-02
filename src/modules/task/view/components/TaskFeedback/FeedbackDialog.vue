@@ -135,7 +135,7 @@ export default {
 
         // 服务标签
         if(this.evaluateConfig.useTagEvaluate && this.form.evaluate.tagEvaluates) {
-          this.form.tagValue = this.tagEvaluates.filter(tags => {
+          this.tagValue = this.tagEvaluates.filter(tags => {
             return this.form.evaluate.tagEvaluates.some(tag => tags == tag);
           })
         }
@@ -151,7 +151,6 @@ export default {
 
       // 若已回访过并且满意度设置禁用评价内容可修改时，不可修改
       this.allowModify = !(this.hasFeedback && !this.evaluateConfig.modifyEvaluate);
-
       this.visible = true;
     },
     async submit(autoClosed) {
