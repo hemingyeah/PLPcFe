@@ -86,19 +86,6 @@ export default {
     */
     closeAndOpenTab(url, newTabId) {
       location.href = url;
-      // let id = window.frameElement.dataset.id;
-      // this.$platform.closeTab(id)
-      
-      // let fromId = window.frameElement.getAttribute('id')
-      
-      // this.$platform.openTab({
-      //   id: newTabId,
-      //   title: '',
-      //   url,
-      //   reload: true,
-      //   close: true,
-      //   fromId
-      // });
     },
     /** 
      * @description 呼叫中心与工单数据的处理 linkman/address/customer
@@ -466,16 +453,16 @@ export default {
     */
     submit: _.debounce(function (isAllot = false) {
       if(this.submitting) return
-
+      
       this.submitting = true;
-
+      
       this.$refs.form
         .validate()
         .then(valid => {
           this.submitting = false;
-
+          
           if (!valid) return Promise.reject('validate fail.');
-        
+          
           const task = util.packToTask(this.fields, this.form);
           task.templateId = taskTemplate.value;
           task.templateName = taskTemplate.text;
@@ -490,16 +477,16 @@ export default {
             task,
             tick,
           };
-        
+          
           this.togglePending(true);
-
+          
           if (this.isTaskEdit) {
             return this.updateTaskMethod(params, isAllot);
           }
           if (this.isTaskCreate) {
             return this.createTaskMethod(params, isAllot);
           }
-
+          
         })
         .catch(err => {
           this.togglePending();

@@ -160,6 +160,7 @@ export default {
           })
           
           if (!isSucc) {
+            --this.submitCount
             return this.togglePending();
           }
           
@@ -538,9 +539,9 @@ export default {
             let isFirstCreate = this.submitCount <= 1 && this.isTaskCreate
             let taskMethodFunc = isFirstCreate ? this.createTaskMethod : this.updateTaskMethod
             return taskMethodFunc(params, isAllot)
-          } else {
-            return this.openAllotModel(this.allotTask)
           }
+          
+          return this.openAllotModel(this.allotTask)
           
         })
         .catch(err => {
