@@ -747,14 +747,20 @@ export default {
     },
     // 查看组织架构权限对应之前的团队权限
     hasTagAuth(){
+      // 多端默认true
+      if(this.tenantType == 1) return true
       return 'AUTH_TAG' in this.authorities
     },
     // 账号权限
     hasStaffAuth(){
+      // 多端默认true
+      if(this.tenantType == 1) return true
       return 'AUTH_STAFF' in this.authorities
     },
     // 角色权限
     hasRoleAuth(){
+      // 多端默认true
+      if(this.tenantType == 1) return true
       return 'AUTH_ROLE' in this.authorities
     },
     showRoleDesc() {

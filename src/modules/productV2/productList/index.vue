@@ -238,7 +238,13 @@
                 </template>
                 <!-- 自定义的选择类型字段显示， 与type 区别-->
                 <template v-else-if="column.formType === 'cascader'">
-                  {{ scope.row[column.field] | displaySelect }}
+                  <!-- 这里区分下自定义字段 -->
+                  <template v-if="!column.isSystem">
+                    {{scope.row.attribute[column.field] | fmt_form_field(column.formType, column.fieldName, scope.row.attribute)}}
+                  </template>
+                  <template v-else>
+                    {{ scope.row[column.field] | displaySelect }}
+                  </template>
                 </template>
                 <template v-else-if="column.formType === 'select' && !column.isSystem">
                   {{ scope.row.attribute[column.field] | displaySelect }}
@@ -305,7 +311,7 @@
                 </template>
 
                 <template v-else-if="!column.isSystem">
-                  {{ scope.row.attribute[column.field] }}
+                  {{scope.row.attribute[column.field] | fmt_form_field(column.formType, column.fieldName, scope.row.attribute)}}
                 </template>
 
                 <!-- 移植自产品类型列表并同步更新 s -->
@@ -373,7 +379,7 @@
                 <!-- 移植自产品类型列表并同步更新 e -->
 
                 <template v-else>
-                  {{ scope.row[column.field] }}
+                  {{scope.row[column.field] | fmt_form_field(column.formType, column.fieldName, scope.row.attribute)}}
                 </template>
 
               </template>
