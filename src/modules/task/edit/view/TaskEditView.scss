@@ -66,3 +66,12 @@ body {
 }
 
 // 工单类型
+.biz-form-remote-select {
+  width: 100%;
+}
+
+.application-upgrade-prompt-dialog {
+  .base-modal {
+    top: 120px;
+  }
+}

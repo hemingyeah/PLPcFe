@@ -2,6 +2,7 @@
   & > .base-modal-mask {
     align-items: flex-start;
     .base-modal {
+      width: 500px;
       margin: 50px auto;
     }
     .base-modal-header {
@@ -45,8 +46,7 @@
     width: 420px !important;
     position: absolute;
     top: 60px;
-    left: 0;
-    right: 0;
+    left: calc(50% - 210px);
   }
   .application-upgrade-prompt-dialog {
     background-color: #fff;
