@@ -58,7 +58,7 @@ export default {
       })
       // 关联项查询处理
       this.relationFieldHandler();
-
+      
       // 是否打开派单设置弹窗
       this.$nextTick(async () => {
         let query = parse(window.location.search) || {}
@@ -77,19 +77,6 @@ export default {
     */
     closeAndOpenTab(url, newTabId) {
       location.href = url;
-      // let id = window.frameElement.dataset.id;
-      // this.$platform.closeTab(id)
-      
-      // let fromId = window.frameElement.getAttribute('id')
-      
-      // this.$platform.openTab({
-      //   id: newTabId,
-      //   title: '',
-      //   url,
-      //   reload: true,
-      //   close: true,
-      //   fromId
-      // });
     },
     /** 
      * @description 呼叫中心与工单数据的处理 linkman/address/customer
@@ -121,13 +108,13 @@ export default {
       TaskApi.createTask(params)
         .then(res => {
           let isSucc = res.success;
-
+          
           platform.notification({
             type: isSucc ? 'success' : 'error',
             title: `创建工单${isSucc ? '成功' : '失败'}`,
             message: !isSucc && res.message
           })
-
+          
           if (!isSucc) {
             return this.togglePending();
           }
@@ -138,10 +125,10 @@ export default {
           let taskAllotPath = `/task/allotTask?id=${taskId}`;
           let url = isAllot ? taskAllotPath : taskDetailPath;
           let id = isAllot ? `task_allot_${taskId}` : `task_view${taskId}`
-
+          
           this.closeAndOpenTab(url, id)
           this.togglePending()
-
+          
         })
         .catch(err => {
           this.togglePending();
@@ -427,16 +414,16 @@ export default {
     */
     submit: _.debounce(function (isAllot = false) {
       if(this.submitting) return
-
+      
       this.submitting = true;
-
+      
       this.$refs.form
         .validate()
         .then(valid => {
           this.submitting = false;
-
+          
           if (!valid) return Promise.reject('validate fail.');
-        
+          
           const task = util.packToTask(this.fields, this.form);
           task.templateId = taskTemplate.value;
           task.templateName = taskTemplate.text;
@@ -451,16 +438,16 @@ export default {
             task,
             tick,
           };
-        
+          
           this.togglePending(true);
-
+          
           if (this.isTaskEdit) {
             return this.updateTaskMethod(params, isAllot);
           }
           if (this.isTaskCreate) {
             return this.createTaskMethod(params, isAllot);
           }
-
+          
         })
         .catch(err => {
           this.togglePending();
