@@ -13,7 +13,7 @@ enum TenantDataLimitTypeEnum {
   // 产品二维码
   ProductCode = 'productCode',
   // 备件
-  SparePart = 'sparePart',
+  SparePart = 'sparepart',
   // 文档库
   Wiki = 'wiki',
   // 通知公告
