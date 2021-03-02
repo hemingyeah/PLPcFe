@@ -754,7 +754,7 @@ export default {
         <h5><strong>{ userName }</strong> { action } 了工单 #{ taskNo }。</h5>,
         synergy && <div>{`协同人：${ synergy }`}</div>,
         updateType == 'tRecord' && <div>{ updateContent }</div>,
-        isGoBack !== undefined && <div> 工单被取消{isGoBack !== null ? `，备件及服务项目${ isGoBack == '1' ? '已' : '未' }退回` : ''} </div>,
+        isGoBack !== undefined && <div> {isGoBack !== null ? `工单被取消，备件及服务项目${ isGoBack == '1' ? '已' : '未' }退回` : ''} </div>,
         createAttachmentDom(h, attachments)
       ];
     },
