@@ -481,6 +481,8 @@ export default {
           this.togglePending(true);
           
           if (this.isTaskEdit) {
+            // fix: 后端会查询回执附件拼接上去，所以前端需要过滤下回执附件
+            params.task.attachment = task.attachment.filter(item => !item.receipt);
             return this.updateTaskMethod(params, isAllot);
           }
           if (this.isTaskCreate) {
