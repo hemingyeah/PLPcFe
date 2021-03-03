@@ -26,7 +26,7 @@ function commonJudgeShow(): boolean {
   if(isOldVipEdition()) return true
   
   // 体验版
-  if (isExperienceEdition()) return false
+  if (isExperienceEdition()) return true
   
   return false
 }
@@ -65,7 +65,7 @@ export function isShowCreateChildrenTeam(initData: any): boolean {
   if (isEnterpriseEdition()) return true
   
   // 体验版
-  if (isExperienceEdition()) return false
+  if (isExperienceEdition()) return initData?.showNewTeam === true
   
   // 老版本vip版
   return Boolean(isOldVipEdition() && initData?.showNewTeam === true)

@@ -400,6 +400,9 @@ export default {
   destroyed() {
     this.clearGuide();
   },
+  destroyed () {
+    this.clearGuide()
+  }
 };
 </script>
 <style lang="scss" scoped>
@@ -434,6 +437,10 @@ export default {
   }
   .tour-arrow-down {
     position: absolute;
+  }
+  .tour-arrow-down {
+    position: absolute;
+    bottom: -5px;
   }
 }
 .tour-content-box {

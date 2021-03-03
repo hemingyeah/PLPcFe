@@ -197,9 +197,6 @@
             <template v-else-if="column.isSystem === 0">
               <pre class="pre-text">{{scope.row.attribute[column.field] | fmt_form_field(column.formType, column.fieldName, scope.row.attribute)}}</pre>
             </template>
-            <template v-else>
-              <pre class="pre-text">{{scope.row[column.field] | fmt_form_field(column.formType, column.fieldName, scope.row.attribute)}}</pre>
-            </template>
           </template>
         </el-table-column>
       </el-table>
@@ -362,7 +359,7 @@ import * as CustomerApi from '@src/api/CustomerApi.ts';
 // import {searchLinkman} from '@src/api/EcSearchApi.js';
 import TeamMixin from '@src/mixins/teamMixin';
 import { isShowCustomerRemind } from '@src/util/version.ts'
-import VersionMixin from '@src/mixins/versionMixin'
+import VersionMixin from '@src/mixins/versionMixin/index.ts'
 
 const link_reg = /((((https?|ftp?):(?:\/\/)?)(?:[-;:&=\+\$]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\?\+=&;:%!\/@.\w_]*)#?(?:[-\+=&;%!\?\/@.\w_]*))?)/g;
 
@@ -521,6 +518,19 @@ export default {
     window.__exports__refresh = this.search;
   },
   methods: {
+    getRelatedTask(field) {
+      return Array.isArray(field) ? field.map(item => item.taskNo).join(',') : '';
+    },
+    // 处理人员显示
+    getUserName(field, value) {
+      // 多选
+      if(Array.isArray(value)) {
+        return value.map(i => i.displayName || i.name).join(',');
+      }
+
+      let user = value || {};
+      return user.displayName || user.name;
+    },
     async makePhoneCall(phone){
       if(!this.hasCallCenterModule) return
       try {

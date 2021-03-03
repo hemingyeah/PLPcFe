@@ -3,6 +3,7 @@ import http from '@src/util/http';
 import TaskHoursRecordView from './TaskHoursRecordView.vue';
 Vue.prototype.$http = http;
 
+Vue.prototype.$http = http;
 // 处理注入的参数
 let initData = {};
 try {

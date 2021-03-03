@@ -344,5 +344,6 @@ export function isCreator(task: any = {}): boolean {
 
 export default {
   checkApprove,
-  getFieldValue2string
+  getFieldValue2string,
+  isCreator
 }

@@ -35,17 +35,22 @@
 </template>
 
 <script>
+/* api */
 import * as TeamApi from '@src/api/TeamApi'
-
-import _ from 'lodash'
-import qs from 'qs';
-
+/* enum */
+import TenantDataLimitSourceEnum from '@model/enum/TenantDataLimitSourceEnum'
+import TenantDataLimitTypeEnum from '@model/enum/TenantDataLimitTypeEnum'
+/* mixin */
+import VersionMixin from '@src/mixins/versionMixin/index.ts'
 import FormMixin from '@src/component/form/mixin/form'
-
-import { stringLen } from './../../../util/lang/index.js'
+/* utils */
+import _ from 'lodash'
+import qs from 'qs'
+import { stringLen } from '@src/util/lang/index.js'
 
 export default {
   name: 'team-edit-view',
+  mixins: [VersionMixin],
   props: {
     initData: {
       type: Object,
@@ -56,7 +61,6 @@ export default {
     return {
       action: '',
       pending: false,
-
       filedMap: {
         tagName: {
           displayName: '部门名称', 
@@ -135,14 +139,12 @@ export default {
       })
         .catch(err => console.error(err))
     }, 500),
-
     checkPlace(){
       return new Promise((resolve, reject) => {
         let tagPlaceList = this.form.tagPlaceList || [];
         let message = null;
-
         let isRepeat = this.checkPlaceRepeat();
-
+        
         if(isRepeat) {
           message = '负责区域有重复';
         } else {
@@ -154,7 +156,7 @@ export default {
             }
           }
         }
-
+        
         resolve(message)
       })
     },
@@ -162,16 +164,16 @@ export default {
     checkPlaceRepeat() {
       let tagPlaceList = this.form.tagPlaceList || [];
       let isRepeat = false;
-
+      
       for(let i = 0; i < tagPlaceList.length; i++) {
         let item = tagPlaceList[i];
         let place = `${item.province}${item.city}${item.dist}`;
-
+        
         if(place) {
-
+          
           for(let j = 0; j < tagPlaceList.length; j++) {
             if(j == i) continue
-
+            
             let tItem = tagPlaceList[j];
             let tPlace = `${tItem.province}${tItem.city}${tItem.dist}`;
             
@@ -180,7 +182,7 @@ export default {
               break
             }
           }
-
+          
         }
       }
       return isRepeat
@@ -199,25 +201,25 @@ export default {
     /* 打包给服务端的数据 */
     packData(data) {
       let params = {};
-
+      
       params.tagName = data.tagName;
       params.description = data.description;
       params.teamLeaders = data.teamLeaders;
       params.phone = data.phone;
       params.tagAddress = data.tagAddress;
-
+      
       if(!params.tagAddress.hasOwnProperty('addressType')) {
         params.tagAddress.addressType = 1;
       }
-
+      
       params.tagPlaceList = data.tagPlaceList || [];
       params.teamLeaders = data.teamLeaders;
-
+      
       return params
     },
     unPackData(data) {
       let form = {};
-
+      
       form.tagName = data.tagName;
       form.description = data.description;
       form.teamLeaders = data.teamLeaders || [];
@@ -225,19 +227,19 @@ export default {
       form.phone = data.phone;
       form.tagAddress = data.tagAddress || {};
       form.tagPlaceList = data.tagPlaceList || [];
-
+      
       return form
     },
     reloadTab() {
       let fromId = window.frameElement.getAttribute('fromid');
-
+      
       this.$platform.refreshTab(fromId);
     },
     submit() {
       return this.$refs.form.validate()
         .then(valid => {
           if(!valid) return Promise.reject('validate fail.');
-
+          
           const params = this.packData(this.form);
           return this.action === 'edit' ? this.teamUpdate(params) : this.teamCreate(params);
         })
@@ -249,7 +251,7 @@ export default {
     async teamCreate(params) {
       this.pending = true;
       let child = '';
-
+      
       try {
         // 判断是否是新建子部门
         if(this.parent.id) {
@@ -259,15 +261,16 @@ export default {
           };
           child = '子';
         }
-
-        let result = await TeamApi.createTag(params);
-
+        
+        const CreateTeamPromise = TeamApi.createTag(params)
+        let result = await this.checkNumExceedLimitAfterHandler(CreateTeamPromise)
+        
         this.$platform.notification({
           type: result.status == 0 ? 'success' : 'error',
           title: `${child}部门创建${result.status == 0 ? '成功' : '失败'}`,
           message: result.status == 0 ? null : result.message
         })
-
+        
         if(result.status == 0) {
           this.reloadTab();
           window.location.href = `/security/tag/view/${result.data}?noHistory=1`;
@@ -275,7 +278,7 @@ export default {
       } catch (error) {
         console.error('error: ', error);
       }
-
+      
       this.pending = false;
     },
     /* 更新 部门 */
@@ -286,11 +289,11 @@ export default {
         params.id = this.id;
         let result = await TeamApi.updateTag(params);
         let child = '';
-
+        
         if(this.initData.tag.parent) {
           child = '子';
         }
-
+        
         this.$platform.notification({
           type: result.status == 0 ? 'success' : 'error',
           title: `${child}部门编辑${result.status == 0 ? '成功' : '失败'}`,
@@ -298,26 +301,35 @@ export default {
         })
         if(result.status == 0) {
           let fromId = window.frameElement.getAttribute('fromid');
-
+          
           this.$platform.refreshTab(fromId);
           this.goBack();
         }
       } catch (error) {
         console.error('error: ', error);
       }
-
+      
       this.pending = false;
     }
   },
   created () {
     let query = qs.parse(window.location.search.substr(1));
     let tag = this.initData.tag || {};
-
+    
     this.action = tag.id ? 'edit' : 'create';
     this.id = tag.id || '';
     this.form = this.unPackData(tag)
     this.parent.id = query.pid;
     this.parent.tagName = query.pname;
+    
+    if (this.isCreate) {
+      // 检查版本数量限制
+      this.checkNumExceedLimitBeforeHandler 
+      && this.checkNumExceedLimitBeforeHandler(
+        TenantDataLimitSourceEnum.Tag,
+        TenantDataLimitTypeEnum.Tag
+      )
+    }
   },
   components: {
     'team-places': {
@@ -336,7 +348,7 @@ export default {
         removePlace(item){
           let index = this.value.indexOf(item);
           if(index >= 0) this.value.splice(index, 1);
-
+          
           this.$emit('input', this.value);
         },
         convertToArray(item){
@@ -345,11 +357,11 @@ export default {
         },
         update(item, value = []){
           let [province, city, dist] = value;
-
+          
           this.$set(item, 'province', province)
           this.$set(item, 'city', city)
           this.$set(item, 'dist', dist)
-
+          
           this.$emit('input', this.value);
         }
       },

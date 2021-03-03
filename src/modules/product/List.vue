@@ -133,10 +133,7 @@
             <template v-else-if="column.formType === 'location'">
               {{ scope.row.attribute[column.field] && scope.row.attribute[column.field].address}}
             </template>
-            <template v-else-if="column.field === 'createUser'">
-              {{ scope.row.createUser && scope.row.createUser.displayName }}
-            </template>
-            <template v-else-if="column.field === 'createTime'">
+            <template v-else-if="column.formType == 'related_task'">
               {{ scope.row.createTime | formatDate }}
             </template>
             <div v-else-if="column.formType === 'textarea'" v-html="buildTextarea(scope.row.attribute[column.field])" @click="openOutsideLink">
@@ -295,7 +292,7 @@ import {
 } from '@src/api/ProductApi';
 import TeamMixin from '@src/mixins/teamMixin';
 import { isShowCustomerRemind, isShowPlanTask } from '@src/util/version.ts'
-import VersionMixin from '@src/mixins/versionMixin'
+import VersionMixin from '@src/mixins/versionMixin/index.ts'
 
 const link_reg = /((((https?|ftp?):(?:\/\/)?)(?:[-;:&=\+\$]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\?\+=&;:%!\/@.\w_]*)#?(?:[-\+=&;%!\?\/@.\w_]*))?)/g
 
@@ -595,6 +592,19 @@ export default {
   methods: {
     getAddress(field) {
       return field.province + field.city + field.dist + field.address || ''
+    },
+    getRelatedTask(field) {
+      return Array.isArray(field) ? field.map(item => item.taskNo).join(',') : '';
+    },
+    // 处理人员显示
+    getUserName(field, value) {
+      // 多选
+      if(Array.isArray(value)) {
+        return value.map(i => i.displayName || i.name).join(',');
+      }
+
+      let user = value || {};
+      return user.displayName || user.name;
     },
     openOutsideLink(e) {
       let url = e.target.getAttribute('url');

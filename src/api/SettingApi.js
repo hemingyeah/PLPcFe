@@ -26,14 +26,14 @@ export const updateIsShowOrIsShopWindows = (params = {}) => {
 /**
  * 商品服务列表
  */
-export const serviceList= (params = {}) => {
+export const serviceList = (params = {}) => {
   return http.get('/setting/market/service/list', params)
 }
 
 /**
  * 是否发布
  */
-export const marketItem= (params = {}) => {
+export const marketItem = (params = {}) => {
   return http.post('/setting/marketItem/save', params, false)
 } 
 
@@ -93,6 +93,13 @@ export function getSettingTaskTypeEnabledFields(params) {
 */
 export function saveSettingDispatchRule(params) {
   return http.post('/setting/dispatchRule/task/save', params)
+}
+
+/** 
+ * @description 检测版本某些功能数量是否超过限制
+*/
+export function checkNumExceedLimit(params) {
+  return http.post('/setting/checkDataCount', params)
 }
 
 /******************** S 工单类型设置 ***************/

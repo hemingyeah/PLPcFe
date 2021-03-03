@@ -44,6 +44,16 @@ enum ComponentNameEnum {
   UiInput = 'ui-input',
   // 工单状态
   UiTaskState = 'ui-task-state',
+  // 版本限制数量弹窗
+  BizVersionLimitDialog = 'biz-version-limit-dialog',
+  // 版本限制数量弹窗 (HOC)
+  BizVersionLimitDialogHOC = 'biz-version-limit-dialog-hoc',
+  // 版本混入组件
+  VersionMixin = 'version-mixin',
+  // 空
+  Empty = 'empty',
+  // 应用升级提示弹窗
+  ApplicationUpgradePromptDialog = 'application-upgrade-prompt-dialog',
   // 业务远程搜索
   BizRemoteSelect = 'biz-remote-select',
 }

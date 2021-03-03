@@ -20,6 +20,10 @@ import computed from './computed'
 import methods from './methods'
 /* enum */
 import { TaskFieldNameMappingEnum } from '@model/enum/FieldMappingEnum.ts'
+import TenantDataLimitSourceEnum from '@model/enum/TenantDataLimitSourceEnum'
+import TenantDataLimitTypeEnum from '@model/enum/TenantDataLimitTypeEnum'
+/* mixin */
+import VersionMixin from '@src/mixins/versionMixin/index.ts'
 /* constant */
 import { PLATN_TASK_PLAN_TIME_REQUIRES_MESSAGE } from '@src/model/const/Alert.ts'
 
@@ -27,6 +31,7 @@ let taskTemplate = {};
 
 export default {
   name: 'task-edit-view',
+  mixins: [VersionMixin],
   inject: ['initData'],
   data() {
     return data
@@ -35,7 +40,7 @@ export default {
   async mounted() {
     try {
       this.initialize();
-
+      
       // 初始化默认值
       let form = this.workTask;
 
@@ -47,7 +52,7 @@ export default {
 
       // 呼叫中心需求处理
       this.callCenterWithTaskDataHandler();
-
+      
       this.init = true;
       
       this.$nextTick(() => {
@@ -58,14 +63,18 @@ export default {
       })
       // 关联项查询处理
       this.relationFieldHandler();
-
+      
       // 是否打开派单设置弹窗
       this.$nextTick(async () => {
         let query = parse(window.location.search) || {}
         if(query.openAllotSetting) {
           await this.planTaskEditDialogOpen();
         }
-      });
+      })
+      
+      // 版本数量限制
+      this.checkNumExceedLimitHandler()
+      
     } catch (error) {
       console.warn('error ', error)
     }
@@ -77,19 +86,6 @@ export default {
     */
     closeAndOpenTab(url, newTabId) {
       location.href = url;
-      // let id = window.frameElement.dataset.id;
-      // this.$platform.closeTab(id)
-      
-      // let fromId = window.frameElement.getAttribute('id')
-      
-      // this.$platform.openTab({
-      //   id: newTabId,
-      //   title: '',
-      //   url,
-      //   reload: true,
-      //   close: true,
-      //   fromId
-      // });
     },
     /** 
      * @description 呼叫中心与工单数据的处理 linkman/address/customer
@@ -100,7 +96,7 @@ export default {
       if(!callRecordId) {
         return console.warn(`Caused: current is not have callRecordId, The value is ${callRecordId}`);
       }
-
+      
       // 联系人 地址
       let { linkman, address } = callCenterMap;
       // 更新联系人/客户数据
@@ -118,16 +114,18 @@ export default {
      * @description 创建工单方法
     */
     createTaskMethod(params, isAllot) {
-      TaskApi.createTask(params)
+      const CreateTaskPromise = TaskApi.createTask(params)
+      
+      this.checkNumExceedLimitAfterHandler(CreateTaskPromise)
         .then(res => {
           let isSucc = res.success;
-
+          
           platform.notification({
             type: isSucc ? 'success' : 'error',
             title: `创建工单${isSucc ? '成功' : '失败'}`,
             message: !isSucc && res.message
           })
-
+          
           if (!isSucc) {
             return this.togglePending();
           }
@@ -138,15 +136,41 @@ export default {
           let taskAllotPath = `/task/allotTask?id=${taskId}`;
           let url = isAllot ? taskAllotPath : taskDetailPath;
           let id = isAllot ? `task_allot_${taskId}` : `task_view${taskId}`
-
+          
           this.closeAndOpenTab(url, id)
           this.togglePending()
-
+          
         })
         .catch(err => {
           this.togglePending();
           console.error('err', err)
         })
+    },
+    /** 
+     * @description 检查版本数量限制
+    */
+    checkNumExceedLimitHandler() {
+      if (!this.checkNumExceedLimitBeforeHandler) return
+      
+      // 检测新建计划任务
+      if (this.isFromPlan) {
+        return (
+          this.checkNumExceedLimitBeforeHandler(
+            TenantDataLimitSourceEnum.PlanTask,
+            TenantDataLimitTypeEnum.PlanTask
+          )
+        )
+      }
+      
+      // 检测新建工单
+      if (this.isTaskCreate || this.isFromProduct || this.isFromEvent || this.isFromCustomer) {
+        return (
+          this.checkNumExceedLimitBeforeHandler(
+            TenantDataLimitSourceEnum.Task,
+            TenantDataLimitTypeEnum.Task
+          )
+        )
+      }
     },
     /** 
      * @description 从客户新建工单处理
@@ -326,7 +350,9 @@ export default {
      * @description 新建计划任务提交
     */
     planTaskCreateSubmit(params = {}) {
-      TaskApi.createPlanTask(params)
+      const PlanTaskCreatePromise = TaskApi.createPlanTask(params)
+      
+      this.checkNumExceedLimitAfterHandler(PlanTaskCreatePromise)
         .then(res => {
           let isSucc = res.success;
 
@@ -427,16 +453,16 @@ export default {
     */
     submit: _.debounce(function (isAllot = false) {
       if(this.submitting) return
-
+      
       this.submitting = true;
-
+      
       this.$refs.form
         .validate()
         .then(valid => {
           this.submitting = false;
-
+          
           if (!valid) return Promise.reject('validate fail.');
-        
+          
           const task = util.packToTask(this.fields, this.form);
           task.templateId = taskTemplate.value;
           task.templateName = taskTemplate.text;
@@ -451,16 +477,16 @@ export default {
             task,
             tick,
           };
-        
+          
           this.togglePending(true);
-
+          
           if (this.isTaskEdit) {
             return this.updateTaskMethod(params, isAllot);
           }
           if (this.isTaskCreate) {
             return this.createTaskMethod(params, isAllot);
           }
-
+          
         })
         .catch(err => {
           this.togglePending();

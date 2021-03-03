@@ -11,7 +11,7 @@ import Department from './Department.vue';
 /* util */
 import Log from '@src/util/log.ts'
 import { destroyComponent } from '@src/util/dom';
-import fastCall from '@src/component/util/fastCall'
+import fastCall from '@src/component/util/fastCall.ts'
 
 
 const DepartmentAndUserComponent = Vue.extend(DepartmentAndUser);
@@ -39,14 +39,14 @@ function deptWithUser(options){
   } else {
     max = 0;
   }
-  
+
   // 后端已经限制了人数，前端不应限制选人
-  if(Array.isArray(options.selected)) {
+  if (Array.isArray(options.selected)) {
     selectedUser = max === 1 ? [] : options.selected;
   }
-  
+
   let selectedDepts = [];
-  if(options.showDeptCheckbox && Array.isArray(options.selectedDepts)) {
+  if (options.showDeptCheckbox && Array.isArray(options.selectedDepts)) {
     selectedDepts = options.selectedDepts;
   }
 
@@ -88,14 +88,14 @@ function deptWithUser(options){
       if(pending) return;
       
       pending = true;
-      resolve({status: 0, data: user});
+      resolve({ status: 0, data: user });
     });
-    
+
     instance.$on('cancel', () => {
       if(pending) return;
       
       pending = true;
-      resolve({status: 1, message: 'cancel'});
+      resolve({ status: 1, message: 'cancel' });
     })
     
     body.appendChild(ele);
@@ -133,8 +133,8 @@ function teamWithUser( options = {} ){
     if(isUserArray) selectedUser = users;
     if(isTeamArray) selectedTeam = teams;
   }
-  if(options.action) action = options.action;
-  if(selectTypes.indexOf(options.selectType) > 0) {
+  if (options.action) action = options.action;
+  if (selectTypes.indexOf(options.selectType) > 0) {
     selectType = options.selectType;
   }
   
@@ -153,7 +153,7 @@ function teamWithUser( options = {} ){
           if(pending) return;
           
           pending = true;
-          resolve({status: 1, message: 'cancel'});
+          resolve({ status: 1, message: 'cancel' });
         },
         /** 销毁  */
         destroy() {
@@ -268,13 +268,13 @@ function department( options = {} ){
         },
         /** 值的改变  */
         input(user) {
-          if(pending) return;
+          if (pending) return;
 
           pending = true;
-          resolve({status: 0, data: user});
+          resolve({ status: 0, data: user });
         }
       },
-      render(){
+      render() {
         return (
           <base-contact-department 
             max={max}
@@ -318,7 +318,7 @@ function department( options = {} ){
 }
 
 const BaseContact = {
-  install(Vue){
+  install(Vue) {
     fastCall(Vue, 'contact', { choose })
   },
   namespace: 'contact',

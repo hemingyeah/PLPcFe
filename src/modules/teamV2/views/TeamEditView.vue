@@ -37,13 +37,18 @@ import * as TeamApi from '@src/api/TeamApi'
 
 import _ from 'lodash'
 import qs from 'qs';
-
+/* enum */
+import TenantDataLimitSourceEnum from '@model/enum/TenantDataLimitSourceEnum'
+import TenantDataLimitTypeEnum from '@model/enum/TenantDataLimitTypeEnum'
+/* mixins */
+import VersionMixin from '@src/mixins/versionMixin/index.ts'
 import FormMixin from '@src/component/form/mixin/form'
 
 import { stringLen } from './../../../util/lang/index.js'
 let tag = {}, isRoot = false;
 export default {
   name: 'team-edit-view',
+  mixins: [VersionMixin],
   props: {
     initData: {
       type: Object,
@@ -273,22 +278,17 @@ export default {
           };
           child = '子';
         }
-
-        let result = await TeamApi.createTag(params);
-
-        this.$platform.notification({
-          type: result.status == 0 ? 'success' : 'error',
-          title: `${child}部门创建${result.status == 0 ? '成功' : '失败'}`,
-          message: result.status == 0 ? null : result.message
-        })
-
+        
+        const CreateTeamPromise = TeamApi.createTag(params)
+        let result = await this.checkNumExceedLimitAfterHandler(CreateTeamPromise)
+        
         if(result.status == 0) {
           this.goBack(); 
         }
       } catch (error) {
         console.error('error: ', error);
       }
-
+      
       this.pending = false;
     },
     /* 更新 部门 */
@@ -332,6 +332,16 @@ export default {
     isRoot = query.isRoot;
     // 根部门名称不能编辑
     if(isRoot === 'true' && tag.id) this.filedMap.tagName.disabled = true
+    
+    if (this.isCreate) {
+      // 检查版本数量限制
+      this.checkNumExceedLimitBeforeHandler 
+      && this.checkNumExceedLimitBeforeHandler(
+        TenantDataLimitSourceEnum.Tag,
+        TenantDataLimitTypeEnum.Tag
+      )
+    }
+    
   },
   components: {
     'team-places': {

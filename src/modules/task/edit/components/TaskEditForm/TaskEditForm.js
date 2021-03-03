@@ -90,14 +90,14 @@ export default {
           value: data.id,
           id: data.id
         }])
-
+        
         // 绑定联系人
         this.bindLinkman({
           id: data.lmId,
           name: data.lmName,
           phone: data.lmPhone
         })
-
+        
         // 绑定地址
         data.addressId && this.bindAddress({
           id: data.addressId,
@@ -109,12 +109,12 @@ export default {
           latitude: data.latitude,
           longitude: data.longitude,
         })
-
+        
         // 查询客户关联字段
         this.relationFieldSelectHandler();
         // 关闭弹窗
         this.addCustomerDialog = false;
-
+        
       });
     },
     /** 
@@ -128,7 +128,7 @@ export default {
       }
       // 提交
       this.productFormDom.submit(customer, data => {
-
+        
         let productArr = this.value.product?.length ? _.cloneDeep(this.value.product) : [];
         productArr.push({
           value: data.productId,
@@ -147,7 +147,7 @@ export default {
         });
         // 关闭弹窗
         this.addProductDialog = false;
-
+        
       });
     },
     buildValidation(){
@@ -157,7 +157,7 @@ export default {
           changeStatus(true);
           let isProductRequired = that.customerOption?.productNotNull === true;
           let isSelectedProduct = Array.isArray(value) && value.length > 0;
-
+          
           return new Promise((resolve, reject) => {
             changeStatus(false);
             let errorMessage = isSelectedProduct ? '' : REQUIRES_PRODUCT_MESSAGE;
@@ -169,13 +169,13 @@ export default {
           
           let isDateTimeType = field?.setting?.dateType == 'dateTime';
           let errorMessage = '';
-
+          
           if(isDateTimeType) {
             let planTime = DateUtil.parseDateTime(value).getTime();
             let nowTime = new Date().getTime();
             errorMessage = planTime < nowTime && that.isVilidatePlantime ? PLAN_TIME_NOT_LESS_THEN_NOW_MEESSAGE : '';
           }
-
+          
           return new Promise((resolve, reject) => {
             changeStatus(false);
             resolve(errorMessage)
@@ -245,17 +245,17 @@ export default {
       if(this.state.isFromEvent) {
         return this.convertTaskHandler(templateId);
       }
-
+      
       let loading = this.$loading();
       try {
         if(this.justGuide) this.taskFields = taskFields;
         else this.taskFields = await this.fetchTaskTemplateFields({ typeId: templateId, tableName: 'task', isFromSetting: true });
         this.taskValue = FormUtil.initialize(this.taskFields, { templateId });
-
+        
         // 表单初始化
         this.$emit('update:value', this.taskValue);
         this.$emit('update:fields', this.taskFields);
-
+        
         // 清空校验结果
         setTimeout(() => {
           this.$refs.form.$children.map(child => {
@@ -268,11 +268,11 @@ export default {
         // 更新工单类型数据
         this.selectedType = this.taskTypesMap[templateId];
         this.$emit('updatetemplateId', this.selectedType);
-
+        
       } catch (error) {
         console.error(error)
       }
-
+      
       loading.close();
     },
     /** 
@@ -281,9 +281,9 @@ export default {
     */
     copyTaskHandler(templateId = '') {
       if(!this.state.isCopyTask) return
-
+      
       this.$emit('loading', true);
-
+      
       let { taskId = '' } = this.urlParams;
       window.location.href = `/task/copyTask?taskId=${taskId}&newTaskTemplateId=${templateId}`
     },

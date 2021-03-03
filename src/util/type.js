@@ -4,7 +4,7 @@ import { typeOf } from './assist'
 /** 
  * @description 是否为 字符串类型
 */
-export function isString(string){
+export function isString(string) {
   return typeOf(string) === 'string'
 }
 
@@ -52,7 +52,7 @@ export function isUndefined(value) {
 /**
  * @description 是否为 null
  */
-export function isNull(value){
+export function isNull(value) {
   return typeOf(value) === 'null'
 }
 

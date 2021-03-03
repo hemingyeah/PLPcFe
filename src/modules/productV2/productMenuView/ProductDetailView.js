@@ -1,35 +1,24 @@
 /* api */
 import * as TaskApi from '@src/api/TaskApi.ts';
-
-
-
 import {
   getProductMenuField,
   getPageInfo,
   delTreeList,
   productMenuStatistics
 } from '@src/api/ProductV2Api.js';
-
 /* util */
 import AuthUtil from '@src/util/auth';
 import Filter from '@src/filter/filter.js';
-import {
-  parse
-} from '@src/util/querystring';
+import { parse } from '@src/util/querystring';
 import {
   isShowReport,
   isShowCustomerRemind,
   isShowPlanTask
 } from '@src/util/version.ts'
-
-
 /* component */
 import ProductMenuView from '@src/modules/productV2/productMenuView/components/ProductMenuView.vue';
 import ProductMenuInfoRecord from '@src/modules/productV2/productMenuView/components/ProductMenuInfoRecord.vue';
 import MiniTable from '@src/modules/productV2/productMenu/WorkTree/compoment/MiniTable';
-
-
-
 /* mixin */
 import tourGuide from '@src/mixins/tourGuide'
 

@@ -450,7 +450,8 @@ import {
   isShowPlanTask,
   isShowLinkC,
   isShowMoreSperaParts,
-  isStandardEdition
+  isStandardEdition,
+  isExperienceEdition
 } from '@src/util/version.ts';
 
 /* util */
@@ -1005,7 +1006,7 @@ export default {
         reload: true,
       });
     },
-    goCreateTask() {
+    goCreateTask () {
       platform.openTab({
         id: 'task_create',
         title: '新建工单',
@@ -1054,7 +1055,7 @@ export default {
         reload: true,
       });
     },
-    goCallCenterSetting() {
+    goCallCenter () {
       platform.openTab({
         id: 'callcenter_setting',
         title: '呼叫中心设置',
@@ -1287,7 +1288,8 @@ export default {
         M_CALLCENTER_WORKBENCH_LIST: this.has_call_center_module,
         M_CALLCENTER_STATISTICS: this.has_call_center_module,
         M_CALLCENTER_STAGE: this.has_call_center_module,
-        M_VIP_SPAREPART_APPLY: !isStandardEdition()
+        M_VIP_SPAREPART_APPLY: !isStandardEdition(),
+        M_DASHBOARD_JX: !isExperienceEdition()
       };
       let isFilter = false;
       let filterMenuKeys = [];

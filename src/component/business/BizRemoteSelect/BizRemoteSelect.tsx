@@ -27,7 +27,6 @@ interface LoadmoreOptions {
   distance: number,
 }
 
-/* @deprecated 已弃用 */
 @Component({
   name: ComponentNameEnum.BizRemoteSelect,
   mixins: [FormMixin]

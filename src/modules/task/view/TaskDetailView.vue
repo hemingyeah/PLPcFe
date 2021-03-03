@@ -251,6 +251,15 @@
         <div class="collapse-right" v-show="collapseDirection == 'right'">
           {{ viewBalanceTab ? '审核结算' : viewFeedbackTab ? '客户评价' : '附加组件' }}
         </div>
+        <div class="task-detail-step-2-box" :style="nowGuideStep == 3 ? 'width: 104px;height: 40px;background:#fff' : ''" id="v-task-detail-step-2">
+
+          <div class="task-detail-step-2" v-if="nowGuideStep == 3">
+            动态信息
+            <div style="position: relative;">
+              <div class="guide-disable-cover"></div>
+            </div>
+          </div>
+        </div>
       </template>
       <!-- end 附加组件 -->
     </base-collapse>

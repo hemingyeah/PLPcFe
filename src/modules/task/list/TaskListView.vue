@@ -479,7 +479,7 @@
                 <i class="iconfont icon-triangle-down task-icon"></i>
               </div>
               <el-dropdown-menu slot="dropdown">
-                <el-dropdown-item v-if="exportPermission">
+                <el-dropdown-item v-if="exportPermission && !isExperienceEdition">
                   <div class="import-task">
                     导入工单
                     <div class="import-task-item">

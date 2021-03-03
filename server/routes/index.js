@@ -112,26 +112,6 @@ router.use('/temp', (ctx) =>
   })
 )
 
-router.use('/webregister/outside/register', (ctx) =>
-  HttpClient.proxy(ctx, {
-    // 是否强制使用当前配置
-    force: true,
-    // http协议，非 http 则为 https
-    httpProtocol: 'http',
-    host: '30.40.62.5',
-    port: 8080,
-  })
-);
-
-router.use('', performanceRouter.routes());
-router.use('', customerRouter.routes(), customerRouter.allowedMethods());
-router.use('', openRouter.routes(), openRouter.allowedMethods());
-router.use('', settingRouter.routes(), settingRouter.allowedMethods());
-router.use('', teamRouter.routes(), teamRouter.allowedMethods());
-router.use('', productRouter.routes(), productRouter.allowedMethods());
-router.use('', approveRouter.routes(), productRouter.allowedMethods());
-router.use('', dataScreenRouter.routes(), dataScreenRouter.allowedMethods());
-router.use('', repositoryRouter.routes(), repositoryRouter.allowedMethods());
 router.use('', BillRouter.routes(), BillRouter.allowedMethods());
 router.use('', jobtransferRouter.routes(), jobtransferRouter.allowedMethods());
 router.use('', callCenterRouter.routes(), callCenterRouter.allowedMethods());
@@ -143,8 +123,16 @@ router.use('', departmentRouter.routes(), departmentRouter.allowedMethods());
 router.use('', linkcRouter.routes(), sparePartRouter.allowedMethods());
 router.use('', productV2Router.routes(), sparePartRouter.allowedMethods());
 router.use('', superQrcodeRouter.routes(), sparePartRouter.allowedMethods());
-router.use('', guideForNewUser.routes(), sparePartRouter.allowedMethods());
-
+router.use('', guideForNewUser.routes(), guideForNewUser.allowedMethods());
+router.use('', customerRouter.routes(), customerRouter.allowedMethods());
+router.use('', openRouter.routes(), openRouter.allowedMethods());
+router.use('', settingRouter.routes(), settingRouter.allowedMethods());
+router.use('', teamRouter.routes(), teamRouter.allowedMethods());
+router.use('', performanceRouter.routes(), performanceRouter.allowedMethods());
+router.use('', productRouter.routes(), productRouter.allowedMethods());
+router.use('', approveRouter.routes(), approveRouter.allowedMethods());
+router.use('', dataScreenRouter.routes(), dataScreenRouter.allowedMethods());
+router.use('', repositoryRouter.routes(), repositoryRouter.allowedMethods());
 
 router.all('/*', (ctx) => {
   return HttpClient.proxy(ctx);

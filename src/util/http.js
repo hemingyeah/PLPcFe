@@ -59,10 +59,10 @@ axiosIns.interceptors.request.use(config => {
   if (config.cancelable) { // 如果请求可取消
     let key = `${config.method}_${config.url}`;
     removeFromPool(key); // 取消重复请求
-
+    
     // 生成取消token
-    config.cancelToken = new CancelToken(function (c) {
-      requestPool[key] = c;
+    config.cancelToken = new CancelToken(function (cancelFunction) {
+      requestPool[key] = cancelFunction
     })
   }
 

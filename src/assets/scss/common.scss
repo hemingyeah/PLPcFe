@@ -528,14 +528,14 @@
 .form-row-two-columns {
   display: flex;
   flex-wrap: wrap;
-
+  
   .form-view-row {
     width: 50%;
-
+    
     &:nth-child(odd) {
       padding-right: 12px;
     }
-
+    
     &:nth-child(even) {
       padding-left: 12px;
     }
