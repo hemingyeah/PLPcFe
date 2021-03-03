@@ -31,8 +31,8 @@ export default {
       default: true,
     },
     selected: {
-      type: Object,
-      default: () => ({})
+      type: Array,
+      default: () => []
     },
     showCheckbox: {
       type: Boolean,
@@ -43,17 +43,6 @@ export default {
       type: Boolean,
       default: false
     },
-  },
-  computed: {
-    /* 选中的节点对象 key: node.id, value: node */
-    // selectedNodeMap() {
-    //   return (
-    //     this.selected.reduce((accumulator = {}, currentNode = {}) => {
-    //       accumulator[currentNode.id] = currentNode
-    //       return accumulator
-    //     }, {})
-    //   )
-    // }
   },
   methods: {
     selectedChange() {
