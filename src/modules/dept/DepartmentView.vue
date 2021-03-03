@@ -103,7 +103,7 @@
                 <base-button v-if="hasRoleAuth && selectedRole.custom" style="margin-left:10px;" type="ghost" @event="resetRole(selectedRole.custom)">重置权限</base-button>
                 <base-button v-if="hasRoleAuth && selectedRole.isSys == 0" style="margin-left:10px;" type="danger" @event="delRole(selectedRole.id)">删除角色</base-button>
               </h4>
-              <h4 class="role-desc">角色描述：{{roleDes}}</h4>
+              <h4 class="role-desc">角色描述：{{selectedRole.desc || ''}}</h4>
             </div>
           </div>
 
@@ -121,7 +121,7 @@
           <div class="department-user-table" v-if="rolePage.list.length > 0">
             <el-table :data="rolePage.list" stripe @select="roleSelectionHandle" @select-all="roleSelectionHandle" :highlight-current-row="false" show-overflow-tooltip header-row-class-name="team-detail-table-header"
                       ref="roleMultipleTable" class="team-table">
-              <el-table-column type="selection" width="48" align="center" class-name="select-column"></el-table-column>
+              <el-table-column v-if="selectedRole.id != -1" type="selection" width="48" align="center" class-name="select-column"></el-table-column>
               <el-table-column prop="displayName" label="姓名" width="180px">
                 <div style="display: flex" slot-scope="scope">
                   <a :href="`/security/user/view/${scope.row.userId}`" :data-id="scope.row.userId" @click="goUserDetail" class="view-detail-btn">{{scope.row.displayName}}</a>
@@ -1030,7 +1030,7 @@ export default {
         })
     },
     async deleteDeptUser(row) {
-      if (await this.$platform.confirm('确定要把选中成员从该部门中删除吗？')) {
+      if (await this.$platform.confirm('确定要把选中成员删除吗？')) {
         row.pending = true
         this.$http
           .post('/security/user/delete', { userId: row.userId }, false)
