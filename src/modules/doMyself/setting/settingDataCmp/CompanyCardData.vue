@@ -98,7 +98,7 @@
 import _, { reject } from 'lodash';
 import Uploader from 'packages/BaseUpload/uploader';
 import userImg from '@src/assets/img/myShop/logo.png';
-let reg_phone = /^(((0\d{2,3}-){0,1}\d{7,8})|(1[345678]\d{9}))$/;
+let reg_phone = /^(((\d{2,4}-){0,1}\d{6,8})|(1[345678]\d{9}))$/;
 
 export default {
   name: 'company-card-data',
