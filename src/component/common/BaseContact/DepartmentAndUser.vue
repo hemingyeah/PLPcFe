@@ -8,7 +8,7 @@
   >
     <div class="bc-dept-wrap">
       <div class="bc-dept" v-if="depts.length > 0 && departShow">
-        <base-tree-dept
+        <base-tree
           expand
           :data="depts" 
           :node-render="nodeRender"

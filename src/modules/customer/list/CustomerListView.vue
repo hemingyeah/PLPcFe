@@ -197,6 +197,9 @@
             <template v-else-if="column.isSystem === 0">
               <pre class="pre-text">{{scope.row.attribute[column.field] | fmt_form_field(column.formType, column.fieldName, scope.row.attribute)}}</pre>
             </template>
+            <template v-else>
+              <pre class="pre-text">{{scope.row[column.field] | fmt_form_field(column.formType, column.fieldName, scope.row.attribute)}}</pre>
+            </template>
           </template>
         </el-table-column>
       </el-table>
