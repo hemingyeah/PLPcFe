@@ -5,7 +5,9 @@
   >
     <div 
       class="base-tree-node-content" 
-      :class="{'base-tree-selected': isSelected}" :style="{paddingLeft: `${16 * deep}px`}">
+      :class="{'base-tree-selected': isSelected}" 
+      :style="{paddingLeft: `${16 * deep}px`}"
+    >
       <span class="base-tree-node-arrow" :class="{'base-tree-node-arrow-down': isExpand}" @click="toggle">
         <i class="iconfont icon-arrow-right" v-if="node.children.length > 0"></i>
       </span>
@@ -45,8 +47,8 @@ export default {
       default: false
     },
     selected: {
-      type: Object,
-      default: () => ({})
+      type: Array,
+      default: () => []
     },
     deep: {
       type: Number,
@@ -66,10 +68,19 @@ export default {
   computed: {
     /** 
      * @description 是否选中
-     * -- 后面考虑下性能
     */
-    isSelected(){
-      return this.node == this.selected
+    isSelected(){      
+      let isSelected = false
+      
+      try {
+        isSelected = this.selected.some(item => {
+          return this.node.id == item.id
+        })
+      } catch (error) {
+        console.warn('base-tree-dept-node -> isSelected -> error', error)
+      }
+      
+      return isSelected
     }
   },
   watch: {
