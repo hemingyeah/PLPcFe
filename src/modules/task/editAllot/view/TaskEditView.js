@@ -533,7 +533,7 @@ export default {
             isSameForm = true
           }
           
-          if (this.isTaskEdit) {
+          if (this.isTaskEdit && params.task && Array.isArray(params.task.attachment)) {
             // fix: 后端会查询回执附件拼接上去，所以前端需要过滤下回执附件
             params.task.attachment = params.task.attachment.filter(item => !item.receipt);
           }
