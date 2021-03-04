@@ -1,10 +1,25 @@
-import _ from 'lodash';
-import { TaskFieldNameMappingEnum } from '@model/enum/FieldMappingEnum.ts';
-import { taskTypeSelectConversion } from '@src/util/conversionFunctionUtil.ts';
-/* model */
+/* enum */
+import AuthEnum from '@model/enum/AuthEnum.ts'
 import TaskStateEnum from '@model/enum/TaskStateEnum.ts'
+import { TaskFieldNameMappingEnum } from '@model/enum/FieldMappingEnum.ts';
+/* utils */
+import { taskTypeSelectConversion } from '@src/util/conversionFunctionUtil.ts';
+import _ from 'lodash';
+import AuthUtil from '@src/util/auth'
 
 export default {
+  /** 
+   * @description 是否允许新建客户
+  */
+  allowCreateCustomer() {
+    return AuthUtil.hasAuth(this.auth, AuthEnum.CUSTOMER_CREATE)
+  },
+  /** 
+   * @description 是否允许新建产品
+  */
+  allowCreateProduct() {
+    return AuthUtil.hasAuth(this.auth, AuthEnum.PRODUCT_CREATE)
+  },
   /* 客户字段 */
   customerField() {
     return this.fields.filter(f => f.fieldName === 'customer')[0];

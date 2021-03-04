@@ -52,7 +52,7 @@
       <task-process-steps :template-id="currentTaskTemplateId" :state="currentTaskState"></task-process-steps>
       <!-- end 工单流程步骤 -->
       
-      <task-edit-form :task="task" :fields.sync="fields" :state="state" :types="types" :url-params="urlParams" :value.sync="form" ref="form" @updatetemplateId="updateTaskTemplateId"></task-edit-form>
+      <task-edit-form :auth="auth" :task="task" :fields.sync="fields" :state="state" :types="types" :url-params="urlParams" :value.sync="form" ref="form" @updatetemplateId="updateTaskTemplateId"></task-edit-form>
     </form>
       
     <!-- start 新建/编辑 计划任务弹窗 -->

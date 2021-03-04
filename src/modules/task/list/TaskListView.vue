@@ -414,7 +414,7 @@
             <!-- 删除 -->
             <div
               class="task-list-del task-font14 task-c06"
-              v-if="exportPermissionTaskEdit"
+              v-if="allowDelete"
               @click="delTask"
             >
               <i class="iconfont icon-shanchu1 task-icon"></i>

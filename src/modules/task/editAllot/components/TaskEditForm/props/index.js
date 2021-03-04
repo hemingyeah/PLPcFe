@@ -1,4 +1,9 @@
 export default {
+  /* 权限数据 */
+  auth: {
+    type: Object,
+    default: () => ({})
+  },
   /* 字段列表 */
   fields: {
     type: Array,
