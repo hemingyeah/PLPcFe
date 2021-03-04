@@ -133,7 +133,10 @@
             <template v-else-if="column.formType === 'location'">
               {{ scope.row.attribute[column.field] && scope.row.attribute[column.field].address}}
             </template>
-            <template v-else-if="column.formType == 'related_task'">
+            <template v-else-if="column.field === 'createUser'">
+              {{ scope.row.createUser && scope.row.createUser.displayName }}
+            </template>
+            <template v-else-if="column.field === 'createTime'">
               {{ scope.row.createTime | formatDate }}
             </template>
             <div v-else-if="column.formType === 'textarea'" v-html="buildTextarea(scope.row.attribute[column.field])" @click="openOutsideLink">
