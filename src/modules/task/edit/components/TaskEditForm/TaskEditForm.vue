@@ -66,7 +66,7 @@
                 </p>
               </div>
             </biz-remote-select>
-            <el-button @click="dialogOpen('customer')" v-if="!isCreateCustomer && !justGuide">新建</el-button>
+            <el-button @click="dialogOpen('customer')" v-if="!isCreateCustomer && !justGuide && allowCreateCustomer">新建</el-button>
           </div>
           
           <el-tooltip v-if="isShowCustomerRelevanceTaskCountButton" placement="top">
@@ -93,7 +93,7 @@
               :computed-width-keys="['name']"
             >
             </biz-remote-select>
-            <el-button @click="dialogOpen('contact')" v-if="!isCreateCustomer && !justGuide">新建</el-button>
+            <el-button @click="dialogOpen('contact')" v-if="!isCreateCustomer && !justGuide && allowCreateCustomer">新建</el-button>
           </div>
         </form-item>
         <!-- end 联系人 -->
@@ -109,7 +109,7 @@
               :computed-width-keys="['address']"
             >
             </biz-remote-select>
-            <el-button @click="dialogOpen('address')" v-if="!isCreateCustomer && !justGuide">新建</el-button>
+            <el-button @click="dialogOpen('address')" v-if="!isCreateCustomer && !justGuide && allowCreateCustomer">新建</el-button>
           </div>
         </form-item>
         <!-- end 地址 -->
@@ -142,7 +142,7 @@
                 </p>
               </div>
             </biz-remote-select>
-            <el-button v-if="!justGuide" @click="dialogOpen('product')">新建</el-button>
+            <el-button v-if="!justGuide && allowCreateProduct" @click="dialogOpen('product')">新建</el-button>
           </div>
           
           <el-tooltip v-if="isShowProductRelevanceTaskCountButton" placement="top">
