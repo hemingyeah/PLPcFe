@@ -532,7 +532,12 @@ export default {
           } catch (error) {
             isSameForm = true
           }
-
+          
+          if (this.isTaskEdit) {
+            // fix: 后端会查询回执附件拼接上去，所以前端需要过滤下回执附件
+            params.task.attachment = params.task.attachment.filter(item => !item.receipt);
+          }
+          
           // 表单数据不相同 或非指派
           if (!isSameForm || !isAllot) {
             this.backParams = params
