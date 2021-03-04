@@ -850,10 +850,12 @@
           class="dialog-footer flex-x"
           v-if="partDealData.data.state === 'suspending' || partDealData.data.state === 'dealing'"
         >
-          <div class="ding-btn" v-if="partDealData.data.cancel" @click="dingMessage">
+          <!-- tenantType=0 钉钉端  -->
+          <div class="ding-btn" v-if="isDingDingDesktop && partDealData.data.cancel" @click="dingMessage">
             <i class="iconfont icon-Ding"></i>
             DING
           </div>
+
           <!-- <base-button
             v-if="partDealData.data.state === 'suspending' && partDealData.data.cancel"
             type="primary"
@@ -1121,6 +1123,7 @@ import {
   approveBatchByApproveNos
 } from '@src/api/SparePart';
 import StorageUtil from '@src/util/storageUtil';
+import Platform from '@src/util/Platform'
 
 let allPerson = [];
 
@@ -1267,6 +1270,9 @@ export default {
     };
   },
   computed: {
+    tenantType() {
+      return this.initData.tenantType;
+    },
     allowInout() {
       return AuthUtil.hasAuth(this.auths, 'VIP_SPAREPART_INOUT');
     },
@@ -1289,6 +1295,9 @@ export default {
           { value: '入库', label: '入库', key: '1' },
           { value: '调拨', label: '调拨', key: '2' }
         ];
+    },
+    isDingDingDesktop() {
+      return Platform.isDingDingDesktop()
     }
   },
   watch: {

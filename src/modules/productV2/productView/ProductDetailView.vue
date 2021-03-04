@@ -84,13 +84,13 @@
                 </el-dropdown>
               </div>
               <div class="mar-l-8 flex-x"
-                   v-if="!product.qrcodeId">
+                   v-if="!dataInfo.qrcodeId">
                 <el-button type="primary"
                            @click="openPublicDialog('linkQrcode')"><i class="iconfont icon-add2"></i>关联二维码</el-button>
               </div>
             </div>
             <div class="fle-x mar-l-20">
-              <el-tooltip v-if="product.qrcodeId"
+              <el-tooltip v-if="dataInfo.qrcodeId"
                           :popper-options="popperOptions"
                           content="查看二维码"
                           placement="top">

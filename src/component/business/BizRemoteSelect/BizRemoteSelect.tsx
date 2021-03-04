@@ -27,7 +27,6 @@ interface LoadmoreOptions {
   distance: number,
 }
 
-/* @deprecated 已弃用 */
 @Component({
   name: ComponentNameEnum.BizRemoteSelect,
   mixins: [FormMixin]
@@ -83,6 +82,11 @@ class BizRemoteSelect extends VC<{}> {
         optionValue = option[this.valueKey || '']
         return value.indexOf(optionValue) >= 0
       })
+      if(Array.isArray(value)){
+        const notInListValues=value.filter(v=>!this.optionList.find((option:any)=>option.value===v))
+        const notInList=this.value?.filter(item=>notInListValues.find(v=>item.value===v)) || []
+        data = data.concat(notInList)
+      }
     } else {
       data = this.optionList.filter((item: any) => item?.id === value || item?.value === value)
     }

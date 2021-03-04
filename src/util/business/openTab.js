@@ -144,7 +144,7 @@ export function openTabForTeamChildCreate(parentData) {
   
   platform.openTab({
     id: 'team_create',
-    title: '新建子团队',
+    title: '新建子部门',
     url: `/security/tag/createTag?${qs.stringify(parentData)}`,
     reload: true,
     close: true,

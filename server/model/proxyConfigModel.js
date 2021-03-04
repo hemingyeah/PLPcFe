@@ -23,6 +23,12 @@ const ENV_MAP = {
     host: 'pre2app.shb.ltd',
     port: 443
   },
+  'pre_mul': {
+    user: LOGIN_USER.pre_mul || {},
+    location: 'https://pctest.linker.ltd',
+    host: 'pctest.linker.ltd',
+    port: 443
+  },
   'prod': {
     user: LOGIN_USER.production || {},
     location: 'https://app.shb.ltd',

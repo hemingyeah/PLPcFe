@@ -127,8 +127,8 @@ export default {
           formType: "date",
           returnData: (result) => {
             let obj = {
-              createTimeStart: formatDate(result[0], "YYYY-MM-DD HH:mm:ss"),
-              createTimeEnd: formatDate(result[1], "YYYY-MM-DD HH:mm:ss"),
+              createTimeStart: `${formatDate(result[0], 'YYYY-MM-DD')} 00:00:00`,
+              createTimeEnd: `${formatDate(result[1], 'YYYY-MM-DD')} 23:59:59`,
             };
             return obj;
           },

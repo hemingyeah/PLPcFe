@@ -194,7 +194,7 @@ export default {
       return this.auth.TASK_EDIT === 3;
     },
     exportPermissionTaskBatchDispatch() {
-      return this.auth.TASK_BATCH_DISPATCH;
+      return this.auth.TASK_BATCH_DISPATCH === 3;
     },
     /** 高级搜索面板宽度 */
     panelWidth() {
@@ -1949,7 +1949,7 @@ export default {
         
         if (!storageGet(TASK_GUIDE_SEARCH_MODEL) || storageGet(TASK_GUIDE_SEARCH_MODEL) * 1 < 2) {
           this.$refs.searchPanel.createGuide([{
-            content: '高级搜索的“空白”，由您来填充。通过“设置”功能，定制您专属的“常用查询条件',
+            content: '高级搜索的“空白”，由您来填充。通过“设置”功能，定制您专属的“常用查询条件”',
             haveStep: true,
             nowStep: 1,
             id: 'v-task-step',

@@ -43,6 +43,7 @@ export default {
   inject: ['initData'],
   data() {
     return {
+      partField: [], // 安装产品和安装位置字段 博立定制
       loading: false,
       pending: false,
       collapse: true,
@@ -634,6 +635,12 @@ export default {
     }
   },
   methods: {
+    nextStep() {
+      this.nowGuideStep++;
+    },
+    stopStep() {
+      this.nowGuideStep = this.detailSteps.length + 1;
+    },
     /**
      * 折叠
      */
@@ -837,7 +844,9 @@ export default {
     allot() {
       // 新工单新指派
       if (this.isRestructAllot) {
-        this.$refs.TaskAllotModal.outsideShow()
+        this.checkNotNullForCard('allot', () => {
+          this.$refs.TaskAllotModal.outsideShow();
+        })
       } else {
         this.pending = true;
         location.href = `/task/allotTask?id=${this.task.id}`;
@@ -922,10 +931,14 @@ export default {
         this.backDialog.reason = '';
         this.backDialog.visible = true;
       } else if (action === 'finish') {
-        this.$refs.taskReceiptEdit.openDialog();
+        this.checkNotNullForCard('finish', () => {
+          this.$refs.taskReceiptEdit.openDialog()
+        })
       } else if (action === 'balance') {
-        this.rightActiveTab = 'balance-tab';
-        this.$refs.taskAccount.openDialog('create');
+        this.checkNotNullForCard('cost', () => {
+          this.rightActiveTab = 'balance-tab';
+          this.$refs.taskAccount.openDialog('create');
+        })
       } else if (action === 'feedback') {
         this.rightActiveTab = 'feedback-tab';
         this.$refs.taskFeedback.feedback();
@@ -1034,7 +1047,7 @@ export default {
         { name: '指派', type: 'primary', show: this.allowAllotTask, event: this.allot },
         { name: '接单', type: 'primary', show: this.allowPoolTask, event: () => { this.openDialog('acceptFromPool') } },
         { name: '接受', type: 'primary', show: this.allowAcceptTask, event: () => { this.openDialog('accept') } },
-        { name: '开始', type: 'primary', show: this.allowStartTask, event: this.start },
+        { name: '开始', type: 'primary', show: this.allowStartTask, event: () => { this.checkNotNullForCard('start', this.start) } },
         { name: '完成回执', type: 'primary', show: this.allowFinishTask, event: () => { this.openDialog('finish') } },
         { name: '回退', type: 'primary', show: this.allowBackTask, event: this.backTask },
         { name: '结算', type: 'primary', show: this.viewBalanceTab && this.allowBalanceTask, event: () => { this.openDialog('balance') } },
@@ -1077,6 +1090,23 @@ export default {
     },
     outsideUpdateRecords() {
       this.$eventBus.$emit(TaskEventNameMappingEnum.UpdateRecord);
+    },
+    // 检验附加组件是否必填
+    checkNotNullForCard(flow, callback) {
+      this.pending = true;
+      TaskApi.checkNotNullForCard({ id: this.task.id, flow })
+        .then(res => {
+          this.pending = false;
+
+          if (res.status == 0) {
+            callback();
+          } else {
+            this.$platform.alert(res.message);
+          }
+        })
+        .catch(err => {
+          this.pending = false;
+        })
     }
   },
   created() {
@@ -1089,6 +1119,7 @@ export default {
 
   },
   async mounted() {
+    console.log(this.initData, 'initData')
     try {
       this.loading = true;
 
@@ -1228,7 +1259,7 @@ export default {
             needCover: true,
             lastFinish:true,
             finishBtn:'知道了'
-          }], 3, '', (e) => {
+          }], 0, '', (e) => {
             return new Promise((resolve, reject) => {
               if(e.type == 'stop' || e.type == 'finish'){
                 if ( this.showTaskDetailGuide && this.showAllotModal) {
@@ -1241,6 +1272,11 @@ export default {
         }, 1000)
       })
 
+      // 获取是否有安装产品和安装位置 目前只有博立有数据 其它的数据为空
+      const _res = await TaskApi.getExpensePartField()
+      if (_res.code == 0) {
+        this.partField = _res.result || []
+      }
     } catch (e) {
       console.error('error ', e)
     }

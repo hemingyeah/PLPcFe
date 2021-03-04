@@ -5,8 +5,8 @@
       :value="displayName"
       :placeholder="placeholder"
       readonly 
-      @click="choose">
-    <!-- @keydown.enter.prevent="choose" -->
+      @click="choose"
+    >
     <button type="button" class="btn-text form-user-clear" @click="clear" v-if="!isEmpty">
       <i class="iconfont icon-fe-close"></i>
     </button>
@@ -127,9 +127,8 @@ export default {
     padding-right: 32px;
     width: 100%;
     cursor: pointer;
-    //background-color: #f6f9f7;
   }
-
+  
   &:hover .form-user-clear{
     display: block;
   }

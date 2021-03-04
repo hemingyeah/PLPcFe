@@ -546,7 +546,7 @@ import AuthUtil from '@src/util/auth';
 import StorageUtil from '@src/util/storageUtil';
 
 import BaseGallery from 'packages/BaseGallery/index'
-import VersionMixin from '@src/mixins/versionMixin'
+import VersionMixin from '@src/mixins/versionMixin/index.ts'
 
 import { isShowPartTransfer, isShowPartApply, isShowMoreSperaParts, isStandardEdition } from '@src/util/version.ts'
 

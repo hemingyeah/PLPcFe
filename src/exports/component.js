@@ -4,49 +4,62 @@ import '../assets/scss/transition.scss';
 import '../assets/scss/base.scss';
 import './element.scss';
 import '../common/polyfill';
-
-import Vue from 'vue';
-import filter from '../filter';
-import directive from '../directive';
-
+/* components */
 import BaseModal from '../component/common/BaseModal';
 import BaseTree from '../component/common/BaseTree';
 import BaseContact from '../component/common/BaseContact';
 import BaseMapPicker from '../component/common/BaseMapPicker';
 import BizTeamSelect from '../component/business/BizTeamSelect';
 import BizProposeApproveDialog from '../component/business/BizProposeApproveDialog';
+import BizVersionLimitDialogHOC from '../component/business/BizVersionLimitDialog/index.tsx'
+import BizVersionLimitDialog from '../component/business/BizVersionLimitDialog/BizVersionLimitDialog.tsx'
 
-import {
-  Checkbox
-} from 'shb-element-ui';
-
+import { Checkbox, Button } from 'shb-element-ui'
+/* enum */
+import ComponentNameEnum from '@model/enum/ComponentNameEnum'
+/* vue */
+import Vue from 'vue'
+import filter from '../filter'
+import directive from '../directive'
 
 Vue.use(BaseModal);
 Vue.use(BaseTree);
 Vue.use(Checkbox);
-Vue.use(filter)
-Vue.use(directive);
+Vue.use(BaseModal)
+Vue.use(BaseTree)
+Vue.use(Checkbox)
+Vue.use(Button)
 
-Vue.prototype.$ELEMENT = { size: 'small'};
+Vue.use(filter)
+Vue.use(directive)
+
+Vue.prototype.$ELEMENT = { size: 'small'}
 
 const components = {
   [BaseContact.namespace]: BaseContact.props,
   [BaseMapPicker.namespace]: BaseMapPicker.props,
-  [BizTeamSelect.namespace]: BizTeamSelect.props,
+  [BizTeamSelect.namespace]: {
+    ...BizTeamSelect.props,
+    ...BizVersionLimitDialogHOC.props
+  },
   [BizProposeApproveDialog.namespace]: BizProposeApproveDialog.props
 }
 
-window._pc_componentsV2 = components;
-
 function install(Vue){
   Vue.use(directive)
+  
   Vue.component(BizTeamSelect.name, BizTeamSelect)
+  Vue.component(ComponentNameEnum.BizVersionLimitDialog, BizVersionLimitDialog)
   Vue.component(BizProposeApproveDialog.name, BizProposeApproveDialog)
 }
 
-window._pc_components_exports = install;
-if(null != window.Vue) install(window.Vue)
+window._pc_componentsV2 = components
+window._pc_components_exports = install
 
-console.warn('该组件只用于兼容旧有页面，整体迁移后删除');
+if(typeof window.Vue != undefined) {
+  install(window.Vue)
+}
 
-export default components;
+console.warn('该组件只用于兼容旧有页面，整体迁移后删除')
+
+export default components

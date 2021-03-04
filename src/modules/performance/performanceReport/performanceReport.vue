@@ -49,7 +49,7 @@
       <div class="report-panel">
         <el-table stripe :data="list">
           <el-table-column
-            :prop="type=='团队' ? 'oName': 'uName'"
+            :prop="type=='部门' ? 'oName': 'uName'"
             label="对象">
           </el-table-column>
           <el-table-column
@@ -139,7 +139,7 @@ export default {
   },
   methods: {
     showDetil(row){
-      let name = this.type == '团队' ? 'oName' : 'uName';
+      let name = this.type == '部门' ? 'oName' : 'uName';
       let data = {
         type: this.rewardType,
         mes: this.mes[row.userId],
@@ -201,7 +201,7 @@ export default {
         element.hitsize = hit;
       }
      this.list = res.data.list;
-      this.type = this.report.settleType == 'tuandui' ? '团队' : '个人';
+      this.type = this.report.settleType == 'tuandui' ? '部门' : '个人';
       this.rewardType = res.data.list[0].type === 'jifen' ? '计分' : '奖金';
     },
     doExport(row) {

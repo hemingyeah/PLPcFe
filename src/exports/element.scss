@@ -1,4 +1,5 @@
-/* 改变主题色变量 */
-$--color-primary: #00ac97;
+@import './../component/element-ui/index.scss';
 
-@import "~shb-element-ui/packages/theme-chalk/src/checkbox.scss";
+body {
+  font-size: 12px;
+}

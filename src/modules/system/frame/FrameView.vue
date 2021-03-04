@@ -6,7 +6,7 @@
                  :callcenter="has_call_center_module"
                  @open="openForNav"
                  @collapse-changed="adjustOpenTab"
-                 v-if="showNavBar" />
+                 v-if="(showNavBar && !initData.from) || (showNavBar && initData && initData.from != 'ddcrm')" />
 
       <div class="frame-content">
         <header class="frame-header">
@@ -54,6 +54,18 @@
 
             <!-- profile -->
             <div class="frame-quick-right">
+
+              <button v-if="initData.from && initData.from == 'ddcrm'"
+                      type="button"
+                      class="btn-text frame-header-btn frame-header-btn-bg"
+                      @click="goback"
+                      title="返回"
+                      v-tooltip>
+                <i class="iconfont icon-left"></i>
+                返回
+              </button>
+
+
               <button v-if="has_call_center_module"
                       type="button"
                       class="btn-text frame-header-btn"
@@ -136,6 +148,8 @@
                      @click="clearStorage">清空缓存</a>
                   <a href="javascript:;"
                      @click="openDemo">demo</a>
+                  <a href="javascript:;" @click="goDepartment">组织架构管理</a>
+                  <a href="javascript:;" @click="goDepartment2">组织架构管理2</a>   
                   <!-- <a href="javascript:;" @click="goRoleTeam">团队管理</a> -->
                   <!-- <a href="javascript:;" @click="goProductTemplate">产品模板旧版</a>
                   <a href="javascript:;" @click="goProductOld">产品管理旧版</a>
@@ -212,13 +226,16 @@
               </button>
 
               <!-- 个人信息 -->
-              <el-popover popper-class="user-profile-menu"
-                          v-model="profilePopperVisible">
-                <div class="frame-user-profile"
-                     slot="reference">
-                  <a class="user-avatar"
-                     :href="`/mine/` + loginUser.userId"
-                     @click.stop.prevent="openUserView">
+              <el-popover
+                popper-class="user-profile-menu"
+                v-model="profilePopperVisible"
+              >
+                <div class="frame-user-profile" slot="reference" id="v-step-0">
+                  <a
+                    class="user-avatar"
+                    :href="`/mine/` + loginUser.userId"
+                    @click.stop.prevent="openUserView"
+                  >
                     <img :src="userAvatar" />
                     <span class="user-color-icon user-color-icon-mini"
                           :style="{ backgroundColor: userStateColor }"></span>
@@ -257,11 +274,16 @@
                     <i class="iconfont icon-people"></i>个人中心
                   </a>
                 </div>
+                <div class="user-profile-item" v-if="tenantInform.multi">
+                  <a @click.prevent.self="openUserEnterprise">
+                    <i class="iconfont icon-qiehuan1"></i>切换企业
+                  </a>
+                </div>
 
                 <div class="user-profile-item logout">
                   <a href="javascript:;"
                      @click.prevent="logout">
-                    <i class="iconfont icon-logout"></i>注销
+                    <i class="iconfont icon-logout"></i>{{isInDingTalk ? '注销' : '退出'}}
                   </a>
                 </div>
               </el-popover>
@@ -343,10 +365,56 @@
     <!-- start 用户向导 -->
     <user-guide ref="userGuideView"></user-guide>
     <!-- end 用户向导 -->
+
+    <!--start 切换企业 -->
+    <switchcompanies-dialog
+      ref="switchcompaniesToast"
+      @handleClose="handleClose"
+      v-if="switchcompaniesState"
+      @refresh="refresh"
+      :tenantInform="tenantInform"
+    ></switchcompanies-dialog>
+    <!--end 切换企业 -->
+
+    <!--start 提醒存在多个企业-->
+    <v-tour v-if="showTour" name="myTour" class='multiple-tour' :steps="steps" :options="options">
+      <template slot-scope="tour">
+        <transition name="fade">
+          <v-step
+            v-if="tour.currentStep === index"
+            v-for="(step, index) of tour.steps"
+            :key="index"
+            :step="step"
+            :previous-step="tour.previousStep"
+            :next-step="tour.nextStep"
+            :stop="tour.stop"
+            :is-first="tour.isFirst"
+            :is-last="tour.isLast"
+            :labels="tour.labels"
+          >
+            <template>
+              <div slot="actions" class="option-btns">
+                <button class="btn btn-transfer btn-disabled" disabled>
+                  « 上一步
+                </button>
+                <button class="btn btn-transfer btn-disabled" disabled>
+                  下一步 »
+                </button>
+                <button @click="stopStep" class="btn btn-transfer">
+                  好,知道了
+                </button>
+              </div>
+            </template>
+          </v-step>
+        </transition>
+      </template>
+    </v-tour>
+    <!--end 提醒存在多个企业-->
+
     <!-- S 返回旧版原因弹框 -->
     <reason-panel ref="reasonPanel"
                   @oldVersion="changeTaskVersion(false)" />
-                  <!-- E 返回旧版原因弹框 -->
+    <!-- E 返回旧版原因弹框 -->
 
     <!-- start 工单设置新版引导弹框 -->
     <task-setting-guide ref="taskSettingGuide" />
@@ -365,12 +433,13 @@ import Version from './component/Version.vue';
 import SystemPopup from './component/SystemPopup.vue';
 import SaleManager from './component/SaleManager.vue';
 import UserGuide from './component/UserGuide.vue';
+import switchCompaniesDialog from './component/switchCompaniesDialog.vue';
 import ReasonPanel from './component/ReasonPanel';
 import TaskSettingGuide from './component/TaskSettingGuide';
 
 import ImportAndExport from './component/ImportAndExport.vue';
 
-import DefaultHead from '@src/assets/img/user-avatar.png';
+import DefaultHead from '@src/assets/img/avatar.png';
 import NotificationCenter from './component/NotificationCenter.vue';
 import * as NotificationApi from '@src/api/NotificationApi';
 import * as CallCenterApi from '@src/api/CallCenterApi';
@@ -381,21 +450,19 @@ import {
   isShowPlanTask,
   isShowLinkC,
   isShowMoreSperaParts,
-  isStandardEdition
+  isStandardEdition,
+  isExperienceEdition
 } from '@src/util/version.ts';
 
 /* util */
 import _ from 'lodash';
-import Axios from 'axios';
 
 const newTaskGuideStore = require('@src/component/guide/taskV2Store');
 const GuideStoreObj = {
   newTaskGuideStore,
 };
-
 const NOTIFICATION_TIME = 1000 * 60 * 10;
 
-// const wsUrl = 'ws://30.40.56.211:8080/websocket/asset/7416b42a-25cc-11e7-a500-00163e12f748_dd4531bf-7598-11ea-bfc9-00163e304a25'
 let webSocketClient = null,
   lockReconnect = false,
   reconnectTimmer = null;
@@ -406,6 +473,26 @@ export default {
   inject: ['initData'],
   data () {
     return {
+      isInDingTalk: platform.inDingTalk,
+      tenantInform:{},
+      showTour: false,
+      options: {
+        labels: {
+          buttonPrevious: "« 上一步",
+          buttonNext: "下一步 »",
+          buttonStop: "好,知道了",
+        },
+      },
+      steps: [
+        {
+          target: "#v-step-0",
+          content:"当前账号存在多个企业，点击此处【切换企业】按钮可进行切换！",
+          header: {
+            title: "温馨提示",
+          },
+        },
+      ],
+      switchcompaniesState: false,
       notificationInfo: {},
       notification: {
         count: 0,
@@ -466,7 +553,10 @@ export default {
     };
   },
   computed: {
-    loadedSystemModal () {
+    tenantType() {
+      return this.initData.tenantType;
+    },
+    loadedSystemModal() {
       return this.loadedSystemPopup && this.showSystemPopup;
     },
     wsUrl () {
@@ -482,8 +572,8 @@ export default {
       }`;
     },
     /** 是否显示devtool */
-    showDevTool () {
-      return this.$appConfig.env != 'production';
+    showDevTool() {
+      return this.$appConfig.env != "production" || this.initData.env != "prod" || this.initData.env != "production";
     },
     /** 用户工作状态颜色配置 */
     userStateMap () {
@@ -517,7 +607,7 @@ export default {
     /** 允许切换工单新旧版本 */
     allowChangeTaskVersion () {
       // 企业是否开启工单灰度功能
-      let isTaskGray = this.initData.isTaskGrayFunction;
+      let isTaskGray = this.initData.isTaskGrayFunction
       return isTaskGray && this.currentTaskListTab.id;
     },
     /* 是否是系统管理员 */
@@ -534,8 +624,36 @@ export default {
       }
       this.$refs.reasonPanel.open();
     },
-    updateSystemPopup () {
-      this.showSystemPopup = true;
+    //获取多租户信息
+    getTenantInform() {
+      http.post("/ismulti").then((res)=>{
+        this.tenantInform = res.data;
+        const detailTour = localStorage.getItem('user-switch-companies-tour');
+        //打开提示框
+        if(!detailTour && res.data.multi) {
+          this.$tours['myTour'].start();
+        }
+        }).catch();
+    },
+    //关闭提示框
+    stopStep(){
+      localStorage.setItem('user-switch-companies-tour', true);
+      this.showTour = false;
+    },
+    //切换企业
+    openUserEnterprise() {
+      this.switchcompaniesState = true;
+      this.$nextTick(() => {
+        this.$refs.switchcompaniesToast.openDialog();
+        this.$refs.tenantInform = this.tenantInform;
+      });
+    },
+    handleClose() {
+      this.switchcompaniesState = false;
+    },
+    refresh() {},
+    updateSystemPopup(){
+      this.showSystemPopup = true
     },
     async hangUpCall () {
       try {
@@ -661,9 +779,12 @@ export default {
           : '/logout';
       }
     },
-    openHelpDoc (event) {
-      platform.openLink('https://www.yuque.com/shb/help');
+    openHelpDoc(event) {
+      platform.openLink(!platform.inDingTalk ? 'https://www.yuque.com/shb/help2' : 'https://www.yuque.com/shb/help');
       this.profilePopperVisible = false;
+    },
+    goback (){
+      history.go(-2);return false;
     },
     openUserView (event) {
       this.openForFrame({
@@ -765,7 +886,7 @@ export default {
     async getSystemPopup () {
       try {
         let info = await http.get('/api/app/outside/message/v1/getSysMsgAlert');
-        if (info.status == 0 && info.data.length > 0) {
+        if (info.status == 0 && info.data?.length > 0) {
           this.loadedSystemPopup = true;
           this.systemData = info.data;
         }
@@ -829,19 +950,35 @@ export default {
     getNum () {
       this.getSystemMsg();
     },
+    goDepartment() {
+      platform.openTab({
+        id: "department_view",
+        title: "组织架构管理",
+        url: "/security/department/view",
+        reload: true,
+      });
+    },
+    goDepartment2() {
+      platform.openTab({
+        id: "dept_view",
+        title: "组织架构管理",
+        url: "/security/dept/view",
+        reload: true,
+      });
+    },
     goProductTemplate () {
       platform.openTab({
-        id: 'product_template',
-        title: '产品模板列表',
-        url: '/product/old',
+        id: "department_view",
+        title: "组织架构管理",
+        url: "/security/department/view",
         reload: true,
       });
     },
     goProductOld () {
       platform.openTab({
-        id: 'product',
-        title: '产品管理',
-        url: '/customer/product/old',
+        id: "dept_view",
+        title: "组织架构管理",
+        url: "/security/dept/view",
         reload: true,
       });
     },
@@ -869,7 +1006,7 @@ export default {
         reload: true,
       });
     },
-    goCreateTask() {
+    goCreateTask () {
       platform.openTab({
         id: 'task_create',
         title: '新建工单',
@@ -918,7 +1055,7 @@ export default {
         reload: true,
       });
     },
-    goCallCenterSetting() {
+    goCallCenter () {
       platform.openTab({
         id: 'callcenter_setting',
         title: '呼叫中心设置',
@@ -1151,7 +1288,8 @@ export default {
         M_CALLCENTER_WORKBENCH_LIST: this.has_call_center_module,
         M_CALLCENTER_STATISTICS: this.has_call_center_module,
         M_CALLCENTER_STAGE: this.has_call_center_module,
-        M_VIP_SPAREPART_APPLY: !isStandardEdition()
+        M_VIP_SPAREPART_APPLY: !isStandardEdition(),
+        M_DASHBOARD_JX: !isExperienceEdition()
       };
       let isFilter = false;
       let filterMenuKeys = [];
@@ -1173,6 +1311,7 @@ export default {
       }
 
       this.navBarMenus = menus;
+
       this.showNavBar = true;
     },
     pushTaskListIds (id) {
@@ -1199,7 +1338,8 @@ export default {
       this.confirmSetting = true;
     }
   },
-  created () {
+  created() {
+    this.showTour = true;
     // TODO: 迁移完成后删除
     window.updateUserState = this.updateUserState;
     window.showExportList = this.checkExports;
@@ -1223,6 +1363,11 @@ export default {
     }, NOTIFICATION_TIME);
   },
   async mounted () {
+    localStorage.setItem('tenantType', this.initData.tenantType || 0);
+    if(this.initData.tenantType == 0) {
+      localStorage.setItem('allotByTag', this.initData.allotByTag ? 1 : 0);
+      localStorage.setItem('useStateBlackList', this.initData.stateBlackList?.length ? 1 : 0); 
+    } 
     await this.judgeCallCenterGray();
     let userGuide = this?.initData?.userGuide === true || false;
 
@@ -1268,7 +1413,11 @@ export default {
     }
     /** * 部分页面引导 数据处理  e*/
     this.checkExports();
-    this.getShbEdition();
+    if(this.tenantType == 1) {
+      // 多端自建的
+      this.getTenantInform();
+    }
+    this.getShbEdition()
     this.getSystemPopup();
 
   },
@@ -1281,6 +1430,7 @@ export default {
     [NotificationCenter.name]: NotificationCenter,
     [ImportAndExport.name]: ImportAndExport,
     [UserGuide.name]: UserGuide,
+    [switchCompaniesDialog.name]: switchCompaniesDialog,
     [ReasonPanel.name]: ReasonPanel,
     [TaskSettingGuide.name]: TaskSettingGuide
   },

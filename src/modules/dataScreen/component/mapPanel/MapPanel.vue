@@ -142,7 +142,7 @@
         <!-- 客户信息，服务团队，备件库 -->
         <div class="markpoint-wrap">
           <div v-if="showCustomerInfo" class="markpoint-item-wrap"><span class="mw-customer"></span>客户信息</div>
-          <div v-if="showServerTagInfo" class="markpoint-item-wrap"><span class="mw-server"></span>服务团队</div>
+          <div v-if="showServerTagInfo" class="markpoint-item-wrap"><span class="mw-server"></span>服务部门</div>
           <div v-if="showSparePartsInfo" class="markpoint-item-wrap"><span class="mw-spare"></span>备件数</div>
         </div>
       </div>
@@ -194,7 +194,7 @@ const taskPersonFilter = [
 // 客户信息，服务团队，备件库
 const taskInfoFilter = [
   { label: '客户信息', key: 'customerInformation', selected: false },
-  { label: '服务团队', key: 'serverTag', selected: false },
+  { label: '服务部门', key: 'serverTag', selected: false },
   { label: '备件库', key: 'sparePartsLibrary', selected: false },
 ]
 

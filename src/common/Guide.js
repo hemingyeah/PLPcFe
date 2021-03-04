@@ -8,33 +8,6 @@ import GrayUtil from '@src/util/gray';
 
 import Vue from 'vue';
 
-// <div id="guide-test"></div>
-// this.$nextTick(()=>{
-//   this.$Guide([{
-//     content:
-// '步骤1',
-//     haveStep: true,
-//     nowStep: 1,
-//     gStyle: 'top:35px',
-//     id: 'guide-test',
-//     finishBtn: 'OK',
-//     needCover:true,
-//     diyContent:true,
-//     diyContentDom:组件名称
-//   }, {
-//     content:
-// '步骤2',
-//     haveStep: true,
-//     nowStep: 2,
-//     gStyle: 'top:35px',
-//     id: 'guide-test',
-//     finishBtn: 'OK',
-//   }], 0, '', (e)=>{
-//     return new Promise((resolve, reject)=>{
-//       resolve()
-//     })
-//   }).create()
-// })
 class Guide {
   constructor(arr = [], nowStep, storageKe, watchStepFn) {
     this.arr = arr;

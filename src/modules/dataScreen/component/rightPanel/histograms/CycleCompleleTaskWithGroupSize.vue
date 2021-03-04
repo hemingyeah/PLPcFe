@@ -58,7 +58,7 @@ export default {
     },
     extendTitleSuffix: {
       type: String,
-      default: '当前团队人数'
+      default: '当前部门人数'
     },
     engineerIcon: {
       type: [Object, String],

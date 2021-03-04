@@ -5,6 +5,7 @@ import BaseModal from './common/BaseModal';
 import BasePanel from './common/BasePanel';
 import BaseUpload from './common/BaseUpload';
 import BaseTree from './common/BaseTree';
+import BaseTreeDept from './common/BaseTreeDept';
 import BaseImport from './common/BaseImport';
 import BaseExport from './common/BaseExport';
 import BaseExportGroup from './common/BaseExportGroup';
@@ -45,6 +46,7 @@ import BizSearchProductSelect from './business/BizSearchProductSelect';
 import BizProcess from './business/BizProcess';
 import BizProcessTime from './business/BizProcessTime';
 import BizSelectColumn from './business/BizSelectColumn';
+import BizVersionLimitDialog from '@src/component/business/BizVersionLimitDialog/index.tsx';
 import BizRemoteSelect from '@src/component/business/BizRemoteSelect'
 
 import SampleTooltip from './common/SampleTooltip';
@@ -64,6 +66,7 @@ const components = [
   BasePanel,
   BaseUpload,
   BaseTree,
+  BaseTreeDept,
   BaseContact,
   BaseMapPicker,
   BaseDistPicker,
@@ -95,6 +98,7 @@ const components = [
   BizProcess,
   BizProcessTime,
   BizSelectColumn,
+  BizVersionLimitDialog,
   BizRemoteSelect,
   
   BaseWindow,

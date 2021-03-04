@@ -8,13 +8,10 @@
             <i class="iconfont icon-fe-close"></i>
           </button>
         </div>
-        <div class="saleManager-qrcode">
+        <div v-if="!tenantType" class="saleManager-qrcode">
           <img :src="saleManagerQRCode" alt="专属客服"/>
-          <p>钉钉扫码联系专属客服</p>
+          <p>扫码联系专属客服</p>
         </div>
-        <!-- <div class="saleManager-qrcode">
-          <div class="saleManager-qrcode-block" ref="qrcode"></div>
-        </div> -->
         <div class="saleManager-line"></div>
         <div class="saleManager-contact">
           <p>统一客服电话： 010-86461890</p>
@@ -26,12 +23,15 @@
 </template>
 
 <script>
-import QRCode from 'qrcodejs2';
+/* util */
+import QRCode from 'qrcodejs2'
 
 export default {
   name: 'sale-manager',
+  inject: ['initData'],
   props: {
-    show: { // 是否显示组件
+    // 是否显示组件
+    show: {
       type: Boolean,
       default: false
     },
@@ -45,28 +45,24 @@ export default {
     }
   },
   computed: {
+    tenantType() {
+      return this.initData.tenantType;
+    },
     saleManagerQRCode(){
       return `/files/getQrcode?fileName=${this.qrcode}`;
     }
   },
-  // watch: {
-  //   show(newValue) {
-  //     if(newValue) {
-  //       this.createCode();
-  //     }
-  //   }
-  // },
   methods: {
     close(){
       this.$emit('update:show', false)
     },
     createCode() {
-      let url = this.serviceGroupUrl || '';
-
-      if(!url) return;
-
+      let url = this.serviceGroupUrl || ''
+      
+      if(!url) return
+      
       this.$nextTick(() => {
-        this.$refs.qrcode.innerHTML = '';
+        this.$refs.qrcode.innerHTML = ''
         new QRCode(this.$refs.qrcode, {
           text: url,
           width: 268,
@@ -74,7 +70,7 @@ export default {
           colorDark: '#000000',
           colorLight: '#ffffff',
           correctLevel: QRCode.CorrectLevel.H
-        });
+        })
       })
     }
   }
@@ -105,9 +101,11 @@ export default {
   width: 30px;
   height: 30px;
   padding: 0;
-
+  
+  border: none;
+  background-color: transparent;
   color: #666;
-
+  
   &:hover{
     color: #e84040;
   }
@@ -116,7 +114,7 @@ export default {
 .saleManager-header{
   position: relative;
   padding: 12px 0;
-
+  
   h3{
     text-align: center;
     margin: 0;
@@ -133,7 +131,7 @@ export default {
     width: 268px;
     height: 268px;
   }
-
+  
   p{
     color: #797e89;
     text-align: center;

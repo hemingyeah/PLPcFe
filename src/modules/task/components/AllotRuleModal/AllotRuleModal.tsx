@@ -39,7 +39,7 @@ export default class AllotRuleModal extends AllotRuleModalRender {
             <el-radio-group disabled={this.isDisabled} value={this.form.type} onInput={(value: RuleTypeEnum) => this.handlerTypeChange(value)}>
               <el-radio label={RuleTypeEnum.Type}>按照工单类型</el-radio>
               <el-radio label={RuleTypeEnum.Select}>按照特定条件</el-radio>
-              <el-radio label={RuleTypeEnum.Tag}>按照客户所属团队</el-radio>
+              <el-radio label={RuleTypeEnum.Tag}>按照客户所属部门</el-radio>
             </el-radio-group>
             {this.renderAllotType()}
           </el-form-item>

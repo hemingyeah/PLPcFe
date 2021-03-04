@@ -86,3 +86,9 @@ body {
     }
   }
 }
+
+.application-upgrade-prompt-dialog {
+  .base-modal {
+    top: 120px;
+  }
+}

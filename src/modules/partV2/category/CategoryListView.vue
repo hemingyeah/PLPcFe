@@ -19,19 +19,9 @@
         </span>
       </form>
     </div>
-
+    
     <form @submit.prevent="search();trackEventHandler('search')">
-      <!--<div class="page-panel">-->
-      <!--<div class="page-panel-body search-form-nano">-->
-      <!--<el-input v-model="model.keyWord" placeholder="根据备件信息搜索"></el-input>-->
-      <!--<el-button-group>-->
-      <!--<el-button type="primary" native-type="submit">搜索</el-button>-->
-      <!--<el-button @click="reset();trackEventHandler('reset')">重置</el-button>-->
-      <!--</el-button-group>-->
-      <!--<el-button type="text" @click="isExpand = !isExpand;trackEventHandler('advSearch')" :icon="isExpand ? 'el-icon-minus' : 'el-icon-plus'">高级搜索</el-button>-->
-      <!--</div>-->
-      <!--</div>-->
-
+      
       <base-collapse-panel :value="isExpand" class="page-panel">
         <div class="page-panel-head">
           <h5>高级搜索</h5>
@@ -93,32 +83,30 @@
         </div>
       </base-collapse-panel>
     </form>
-
-
-
+    
     <div class="base-operation-bar-container" style="border: none">
       <div class="top-btn-group">
         <base-button type="primary" icon="el-icon-plus" @event="create" v-if="allowCreate">新建</base-button>
         <base-button type="ghost" icon="el-icon-delete" v-if="allowEdit" @event="remove">删除</base-button>
       </div>
       <div class="action-button-group">
-
+        
         <base-button type="plain" v-if="allowEdit" @event="openEditSparepartDialog">批量编辑</base-button>
         <el-dropdown :hide-on-click="false" trigger="click" :show-timeout="150">
           <span class="el-dropdown-link el-dropdown-btn" >选择列<i class="iconfont icon-nav-down"></i></span>
-
+          
           <el-dropdown-menu slot="dropdown" class="dropdown-more">
             <el-dropdown-item v-for="column in columns" :key="column.field">
               <el-checkbox :value="column.show" @input="chooseColnum(column)" class="dropdown-item">{{column.label}}</el-checkbox>
             </el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
-
+        
         <el-dropdown trigger="click" :show-timeout="150" v-if="allowImportAndExport && allowEdit && allowInout" @command="trackEventHandler('moreAction')">
           <span class="el-dropdown-link el-dropdown-btn">
             更多操作<i class="iconfont icon-nav-down"></i>
           </span>
-
+          
           <el-dropdown-menu slot="dropdown" class="dropdown-more">
             <el-dropdown-item v-if="!isExperienceEdition">
               <span class="dropdown-item" @click="importPart">导入</span>
@@ -134,14 +122,14 @@
             </el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
-
+        
       </div>
     </div>
-
+    
     <div style="background: #fff;padding: 0 10px">
       <base-selection-bar ref="baseSelectionBar" v-model="selected" @toggle-selection="toggleSelection" @show-panel="() => multipleSelectionPanelShow = true" />
     </div>
-
+    
     <div class="table-container">
       <el-table stripe ref="table"
                 :data="page.list"
@@ -290,9 +278,7 @@
         </template>
       </div>
     </base-panel>
-
-
-
+    
   </div>
 </template>
 
@@ -306,8 +292,9 @@ import PartEditBatchForm from "./form/PartEditBatchForm.vue";
 import PartImport from "./components/PartImport.vue";
 
 import SampleTooltip from 'packages/SampleTooltip/SampleTooltip'
-import VersionMixin from '@src/mixins/versionMixin'
-
+/* mixin */
+import VersionMixin from '@src/mixins/versionMixin/index.ts'
+/* constants */
 const STORAGE_COLNUM_KEY = "category_list_column";
 const STORAGE_PAGESIZE_KEY = "category_list_pagesize";
 
@@ -327,7 +314,7 @@ export default {
       pageSize,
       sortBy: {}
     };
-
+    
     return {
       selectedLimit: 500,
       auths: {},

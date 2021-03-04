@@ -17,22 +17,28 @@
 </template>
 
 <script>
-
+/* api */
 import {
   getProductFields,
   getProductDetail,
   createProduct,
   updateProduct
-} from "@src/api/ProductApi";
-import * as FormUtil from "@src/component/form/util";
-import ProductEditForm from "./components/ProductEditForm.vue";
-
-import * as util from "./utils/ProductMapping";
-
+} from '@src/api/ProductApi'
+/* component */
+import ProductEditForm from '@src/modules/product/components/ProductEditForm.vue'
+/* enum */
+import TenantDataLimitSourceEnum from '@model/enum/TenantDataLimitSourceEnum'
+import TenantDataLimitTypeEnum from '@model/enum/TenantDataLimitTypeEnum'
+/* mixin */
+import VersionMixin from '@src/mixins/versionMixin/index.ts'
+/* util */
+import * as FormUtil from '@src/component/form/util'
+import * as util from './utils/ProductMapping'
 
 export default {
-  name: "product-edit",
-  inject: ["initData"],
+  name: 'product-edit',
+  inject: ['initData'],
+  mixins: [VersionMixin],
   data() {
     return {
       loadingPage: false,
@@ -40,7 +46,6 @@ export default {
       init: false,
       submitting: false,
       form: {},
-
       dynamicProductFields: []
     }
   },
@@ -60,7 +65,6 @@ export default {
       return this.initData.auth || {};
     },
     productId() {
-      // const matchRes = window.location.href.match(/customer\/product\/edit\/([\w-]*)(\??.*)/);
       return this.initData.id;
     },
     // 客户上创建产品会带一个cId
@@ -98,7 +102,15 @@ export default {
 
       this.loadingPage = false;
       if(res.id) form = res;
+    } else {
+      // 检查版本数量限制
+      this.checkNumExceedLimitBeforeHandler 
+      && this.checkNumExceedLimitBeforeHandler(
+        TenantDataLimitSourceEnum.Product,
+        TenantDataLimitTypeEnum.Product
+      )
     }
+    
     form = util.packToForm(this.productFields, form);
 
     // 客户详情新建产品，会带的客户信息
@@ -107,9 +119,9 @@ export default {
         label: this.customer.name,
         value: this.customer.id,
         ...this.customer
-      }];
+      }]
     }
-
+    
     /**
      * 初始化所有字段的初始值
      * @param {*} fields 字段
@@ -118,8 +130,8 @@ export default {
      */
     
     this.form = FormUtil.initialize(this.productFields, form)
-
-    this.init = true;
+    
+    this.init = true
   },
 
   methods: {
@@ -127,9 +139,12 @@ export default {
       this.submitting = true;
       this.$refs.productEditForm.validate()
         .then(valid => {
-          this.submitting = false;
-          if (!valid) return Promise.reject("validate fail.");
-          const params = util.packToProduct(this.productFields, this.form);
+          this.submitting = false
+          
+          if (!valid) return Promise.reject('validate fail.')
+          
+          const params = util.packToProduct(this.productFields, this.form)
+          
           this.productFields.forEach(field =>{
             if(field.fieldName == "customer" && field.isSystem == 1) {
               if (!field.setting.customerOption.address) {
@@ -138,55 +153,58 @@ export default {
                 params.linkman = {}
               }  
             }
-          });
-          if(this.action!=='create'){
-            params.attribute.remindCount=localStorage.getItem('product_remind_count') || 0;
+          })
+          
+          if(this.action !== 'create'){
+            params.attribute.remindCount = localStorage.getItem('product_remind_count') || 0
           }
-          this.pending = true;
-          this.loadingPage = true;
-          let fn = this.action === "create" ? createProduct : updateProduct;
-          fn(params)
+          
+          this.toggleLoading()
+          
+          let fn = this.action === 'create' ? createProduct : updateProduct
+          
+          this.checkNumExceedLimitAfterHandler(fn(params))
             .then(res => {
-              let action = this.action === "create" ? "新建" : "更新";
-
-              if (res.status) {
-                this.pending = false;
-                this.loadingPage = false;
-
+              let action = this.action === 'create' ? '新建' : '更新';
+              
+              if (res.status) {                
                 return this.$platform.notification({
                   title: `${action}产品失败`,
                   message: res.message || "",
                   type: "error",
                 })
               }
-
+              
               this.$platform.notification({
                 title: `${action}产品成功`,
-                type: "success",
-              });
-
-              if(this.action == "create") {
-                this.reloadTab();
+                type: 'success',
+              })
+              
+              if(this.action == 'create') {
+                this.reloadTab()
               } else {
-                let fromId = window.frameElement.getAttribute("fromid");
-                this.$platform.refreshTab(fromId);
+                let fromId = window.frameElement.getAttribute('fromid')
+                this.$platform.refreshTab(fromId)
               }
+              
               if (this.customer) {
-                window.location.href = `/customer/view/${this.customer.id}`;
+                window.location.href = `/customer/view/${this.customer.id}`
               } else {
-                window.location.href = `/customer/product/view/${res.data}`;
+                window.location.href = `/customer/product/view/${res.data}`
               }
+              
             })
             .catch(err => {
-              console.error(err);
-              this.pending = false;
-              this.loadingPage = false;
-            });
+              console.error(err)
+            })
+            .finally(() => {
+              this.toggleLoading(false)
+            })
+            
         })
         .catch(err => {
           console.error(err);
-          this.pending = false;
-          this.loadingPage = false;
+          this.toggleLoading(false)
         })
     },
     goBack() {
@@ -197,10 +215,13 @@ export default {
       parent.frameHistoryBack(window);
     },
     reloadTab() {
-      let fromId = window.frameElement.getAttribute("fromid");
-
+      let fromId = window.frameElement.getAttribute('fromid');
       this.$platform.refreshTab(fromId);
     },
+    toggleLoading(loading = true) {
+      this.pending = loading
+      this.loadingPage = loading
+    }
   },
   components: {
     [ProductEditForm.name]: ProductEditForm,

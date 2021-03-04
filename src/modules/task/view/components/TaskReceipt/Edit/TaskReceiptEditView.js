@@ -17,6 +17,10 @@ export default {
   name: 'task-receipt-edit-view',
   mixins: [ReceiptMixin],
   props: {
+    partField: {
+      type: Array,
+      default: () => ([])
+    },
     receiptFields: {
       type: Array,
       default: () => ([])
@@ -54,7 +58,16 @@ export default {
     * @description 备件、服务项目、折扣费用数据集合
     */
     expenseSheet() {
-      return this.initData.receiptExpenseSheetForUpdate || {};
+      let data = this.initData.receiptExpenseSheetForUpdate || {};
+
+      // fix: 修改备件数量可选数量，应当计算当前数量和仓库数量
+      if(data.sparePartsExpense) {
+        data.sparePartsExpense = data.sparePartsExpense.map(item => {
+          item.repertoryCount = item.repertoryCount + item.subtotal;
+          return item;
+        })
+      }
+      return data;
     },
     /** 
     * @description 显示折扣费用
@@ -125,7 +138,18 @@ export default {
 
       form = util.packToForm(this.fields, form);
       this.form = FormUtil.initialize(this.fields, form);
-
+      // 编辑回执时配件增加安装产品和安装位置 博立定制 后期可能通用
+      if (this.partField.length) {
+        this.partField.forEach((part, ind) => {
+          this.form.sparepart.forEach(_sparepart => {
+            if (part.fieldName == 'installProductId') {
+              _sparepart.installProductId = _sparepart.attribute ? _sparepart.attribute.installProductId : ''
+            } else if (part.fieldName == 'installPosition') {
+              _sparepart.installPosition = _sparepart.attribute ? _sparepart.attribute.installPosition : ''
+            }
+          })
+        })
+      }
       // 自定义回执表单自定义字段length等于0时直接完成
       if (this.fields.length == 0) {
         let params = util.packToReceipt(this.fields, this.form);

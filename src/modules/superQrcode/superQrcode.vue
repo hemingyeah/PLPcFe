@@ -75,11 +75,11 @@
             </div>
 
             <ul class="two-panel">
-              <li @click="changeType('contact')">
+              <li @click="changeType('contact')" :class="doorOpenState?'':'no-service'">
                 <img src="../../assets/img/customer_ser.png" />
-                <span>马上联系</span>
+                <span v-show="doorOpenState">马上联系</span>
               </li>
-              <li @click="changeType('service')">
+              <li @click="changeType('service')" v-if="doorOpenState">
                 <img src="../../assets/img/selfService.png" />
                 <span>自助服务</span>
               </li>
@@ -370,6 +370,7 @@ export default {
         productVideo: [],
         knowledge: []
       },
+      doorOpenState:false,
       quickInfos: [],
       rules: [],
 
@@ -580,6 +581,8 @@ export default {
           this.eventTypeList = res.data;
           if (res.data) {
             this.eventTypeIdList = res.data.map(item => item.id);
+          }else{
+            this.eventTypeIdList=[];
           }
         }
       } else {
@@ -616,6 +619,8 @@ export default {
         this.settingInfo.knowledgeOpenState = val ? 1 : 0;
       } else if (option === 'part') {
         this.settingInfo.partOpenState = val ? 1 : 0;
+      }else if(option === 'service'){
+        this.doorOpenState=val;
       }
     },
     // 保存成功
@@ -786,6 +791,10 @@ export default {
       let res = await queryProductSetting(params);
       if (res.code === '200') {
         this.settingInfo = res.data;
+        this.settingInfo.companyImages=null;
+        if(this.settingInfo.doorOpenState===1 && this.settingInfo.doorEventType && this.settingInfo.doorEventType.length>0){
+          this.doorOpenState=true;
+        }
 
         this.queryEventType();
       } else {
@@ -1477,6 +1486,17 @@ p {
                 center;
               background-size: 100% 100%;
             }
+            li:last-child.no-service{
+              width: 100%;
+              background: url("../../assets/img/contact2.png") no-repeat center
+                center;
+              background-size: 100% 100%;
+
+              img{
+                margin:15px;
+                width: 70px;
+              }
+            }
           }
 
           .box-card {
@@ -1532,10 +1552,9 @@ p {
             height: 140px;
           }
           .setting-swipe-noimg {
-            background: url("../../assets/img/myShop/default.png") no-repeat
+            background: url("../../assets/img/myShop/defaultBanner.png") no-repeat
               center center;
-            background-size: 80px 80px;
-            background-color: $bg-color-l3;
+            background-size: 100% 100%;
           }
           .swipe-img {
             width: 100%;

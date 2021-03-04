@@ -10,7 +10,7 @@
           <el-row class="task-type-others">
             <el-row type="flex" class="task-type-team-setting">
               <p @click="chooseTeam" class="pointer"> 
-                <span style="color: #666666;">可用团队: </span>
+                <span style="color: #666666;">可用部门: </span>
                 <el-tooltip v-if="formatTeamName.length>28" trigger="hover">
                   <div slot="content" style="width: 300px">{{formatTeamName}}</div>
                   <span>{{formatTeamName.substring(0, 28)}}...等{{tagIds.length}}个</span>
@@ -92,7 +92,7 @@ export default {
     // 可用团队名称显示
     formatTeamName() {
       let tagIds = this.tagIds;
-      return tagIds.length === 0 ? '全部团队' : tagIds.map(tagId => {
+      return tagIds.length === 0 ? '全部部门' : tagIds.map(tagId => {
         return this.teamList.find(team => team.id === tagId).tagName;
       }).join('，');
     },

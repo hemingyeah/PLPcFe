@@ -54,7 +54,7 @@
     <div class="flex-x box-12 bg-w"
          v-if="qrcodeEnabled">
       <div class="flex-1">
-        <div class="font-w-600">分配规则</div>
+        <div class="font-w-600">服务人员分配规则</div>
       </div>
       <el-button id="product-set-guide-1"
                  type="primary"
@@ -440,25 +440,25 @@ export default {
         return [
           { label: '指定人员', value: 'user' },
           { label: '指定角色', value: 'role' },
-          { label: '指定服务团队', value: 'tag' },
-          { label: '指定服务团队主管', value: 'tagLeader' },
+          { label: '指定服务部门', value: 'tag' },
+          { label: '指定服务部门主管', value: 'tagLeader' },
         ];
       } else if (this.form.ruleType === 2) {
         return [
-          { label: '指定服务团队', value: 'tag' },
-          { label: '指定服务团队主管', value: 'tagLeader' },
-          { label: '指定客户所属服务团队', value: 'cusTag' },
-          { label: '指定客户所属服务团队主管', value: 'cusTagLeader' },
+          { label: '指定服务部门', value: 'tag' },
+          { label: '指定服务部门主管', value: 'tagLeader' },
+          { label: '指定客户所属服务部门', value: 'cusTag' },
+          { label: '指定客户所属服务部门主管', value: 'cusTagLeader' },
           { label: '指定客户负责人', value: 'customerManager' },
         ];
       }
       return [
         { label: '指定人员', value: 'user' },
         { label: '指定角色', value: 'role' },
-        { label: '指定服务团队', value: 'tag' },
-        { label: '指定服务团队主管', value: 'tagLeader' },
-        { label: '指定客户所属服务团队', value: 'cusTag' },
-        { label: '指定客户所属服务团队主管', value: 'cusTagLeader' },
+        { label: '指定服务部门', value: 'tag' },
+        { label: '指定服务部门主管', value: 'tagLeader' },
+        { label: '指定客户所属服务部门', value: 'cusTag' },
+        { label: '指定客户所属服务部门主管', value: 'cusTagLeader' },
         { label: '指定客户负责人', value: 'customerManager' },
       ];
 

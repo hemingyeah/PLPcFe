@@ -4,7 +4,7 @@ import { typeOf } from './assist'
 /** 
  * @description 是否为 字符串类型
 */
-export function isString(string){
+export function isString(string) {
   return typeOf(string) === 'string'
 }
 
@@ -43,18 +43,17 @@ export function isFunction(func) {
   return func && typeOf(func) === 'function'
 }
 
-/**
- * @description 是否为 null
- */
-export function isNull(value){
-  return typeOf(value) === 'null'
-}
-
 /** 
  * @description 是否为 undefined
 */
 export function isUndefined(value) {
   return typeOf(value) === 'undefined'
+}
+/**
+ * @description 是否为 null
+ */
+export function isNull(value) {
+  return typeOf(value) === 'null'
 }
 
 /** 
@@ -62,4 +61,11 @@ export function isUndefined(value) {
 */
 export function isEmpty(value) {
   return _.isEmpty(value)
+}
+
+/** 
+ * @description 是否为 DOM元素
+*/
+export function isElement(element) {
+  return _.isElement(element)
 }

@@ -1,0 +1,68 @@
+.histogram-container {
+  overflow: hidden;
+}
+
+.histogram-page {
+  position: relative;
+  height: 100%;
+}
+
+.hisgotram-page-animation-p1 {
+  animation: hisgotram-page-kf-p1 linear 12s infinite;
+  animation-delay: 5s;
+}
+
+.hisgotram-page-animation-p2 {
+  animation: hisgotram-page-kf-p2 linear 12s infinite;
+  animation-delay: 5s;
+}
+
+@keyframes hisgotram-page-kf-p1 {
+  0% {
+    visibility: visible;
+    transform: translateY(0);
+  }
+  8% {
+    transform: translateY(-100%);
+    visibility: hidden;
+  }
+  9% {
+    transform: translateY(100%);
+    visibility: hidden;
+  }
+  50% {
+    transform: translateY(100%);
+    visibility: hidden;
+  }
+  58% {
+    transform: translateY(0%);
+  }
+  100% {
+    transform: translateY(0%);
+  }
+}
+
+@keyframes hisgotram-page-kf-p2 {
+  0% {
+    visibility: visible;
+    transform: translateY(0);
+  }
+  8% {
+    transform: translateY(-100%);
+  }
+  50% {
+    transform: translateY(-100%);
+  }
+  58% {
+    transform: translateY(-200%);
+    visibility: hidden;
+  }
+  59% {
+    transform: translateY(-200%);
+    visibility: hidden;
+  }
+  100% {
+    transform: translateY(0);
+    visibility: hidden;
+  }
+}

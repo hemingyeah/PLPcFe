@@ -16,24 +16,31 @@
           </button>
         </div>
       </div>
-
+      
       <customer-edit-form :fields="fields" v-model="form" ref="form" />
     </form>
   </div>
 </template>
 
 <script>
-import CustomerEditForm from '../components/CustomerEditForm.vue'
-
+/* api */
 import * as CustomerApi from '@src/api/CustomerApi.ts'
-import * as FormUtil from '@src/component/form/util'
-import * as util from '../util/customer'
-
+/* component */
+import CustomerEditForm from '@src/modules/customer/components/CustomerEditForm.vue'
+/* enum */
+import TenantDataLimitSourceEnum from '@model/enum/TenantDataLimitSourceEnum'
+import TenantDataLimitTypeEnum from '@model/enum/TenantDataLimitTypeEnum'
+/* util */
 import platform from '@src/platform'
+import * as FormUtil from '@src/component/form/util'
+import * as util from '@src/modules/customer/util/customer'
+/* mixin */
+import VersionMixin from '@src/mixins/versionMixin/index.ts'
 
 export default {
   name: 'customer-edit-view',
   inject: ['initData'],
+  mixins: [VersionMixin],
   data() {
     return {
       submitting: false,
@@ -62,6 +69,10 @@ export default {
         .map(f => {
           if (f.formType === 'address' && f.isSystem) {
             f.isNull = this.initData.isAddressAllowNull ? 1 : 0
+          }
+          // 客户名称长度单独处理
+          if (f.fieldName === 'name') {
+            f.maxlength = 50
           }
           return f
         })
@@ -94,48 +105,44 @@ export default {
             this.form,
             this.initData.tags
           )
-
-          this.pending = true
-          this.loadingPage = true
+          
+          this.toggleLoading()
+          
           if (this.action === 'edit') {
             return this.updateMethod(params)
           }
           if (this.action === 'createFromEvent') {
             return this.createCustomerForEvent(params)
           }
-
+          
           this.createMethod(params)
         })
         .catch(err => {
           console.error(err)
-          this.pending = false
-          this.loadingPage = false
+          this.toggleLoading(false)
         })
     },
     createCustomerForEvent(params) {
-      this.$http
-        .post('/event/customer/create', params)
+      this.$http.post('/event/customer/create', params)
         .then(res => {
-          let isSucc = !res.status
+          let isSucc = res.succ
+          
           platform.notification({
             type: isSucc ? 'success' : 'error',
             title: `创建客户${isSucc ? '成功' : '失败'}`,
             message: !isSucc && res.message
           })
-
-          this.pending = false
-          this.loadingPage = false
-
+          
           if (!isSucc) return
-
+          
           const params = {
             ...res.data,
             eventId: this.eventId
           }
-
+          
           delete params.latitude
           delete params.longitude
-
+          
           this.$http.post('/event/update4CusInfo', params, false).then(res => {
             if (this.initData.goto === 'eventView') {
               return (window.location.href = `/event/view/${this.initData.eventId}`)
@@ -144,62 +151,76 @@ export default {
               return (window.location.href = `/event/convent2Task/jump?eventId=${this.initData.eventId}&flow=${this.initData.flow}`)
             }
           })
+          
         })
-        .catch(err =>
-          console.error('createCustomerForEvent catch an error', err)
+        .catch(error =>
+          console.error('edit CustomerEditView createCustomerForEvent error', error)
         )
+        .finally(() => {
+          this.toggleLoading(false)
+        })
     },
     createMethod(params) {
-      this.$http
-        .post('/customer/create', params)
-        .then(res => {
-          let isSucc = !res.status
+      const CreateCustomerPromise = this.$http.post('/customer/create', params)
+      
+      this.checkNumExceedLimitAfterHandler(CreateCustomerPromise)
+        .then(res =>{
+          let isSuccess = Boolean(res.succ)
+          
           platform.notification({
-            type: isSucc ? 'success' : 'error',
-            title: `创建客户${isSucc ? '成功' : '失败'}`,
-            message: !isSucc && res.message
+            type: isSuccess ? 'success' : 'error',
+            title: `创建客户${isSuccess ? '成功' : '失败'}`,
+            message: !isSuccess && res.message
           })
-          this.pending = false
-          this.loadingPage = false
-
-          if (!isSucc) return
-
+          
+          if (!isSuccess) return
+          
           this.reloadTab()
           window.location.href = `/customer/view/${res.data.customerId}`
+          
         })
-        .catch(err => console.error('err', err))
+        .catch(err => {
+          console.error('err', err)
+        })
+        .finally(() => {
+          this.toggleLoading(false)
+        })
     },
     updateMethod(params) {
       const remindCount=localStorage.getItem('customer_remind_count');
       params.attribute.remindCount=remindCount || 0;
-      this.$http
-        .post(`/customer/update?id=${this.editId}`, params)
+      
+      const UpdateCustomerPromise = this.$http.post(`/customer/update?id=${this.editId}`, params)
+      
+      this.checkNumExceedLimitAfterHandler(UpdateCustomerPromise)
         .then(res => {
-          if (res.status == 1) {
-            this.loadingPage = false
-            this.pending = false
+          if (!res.succ) {
             return platform.notification({
               type: 'error',
               title: '更新客户失败',
               message: res.message
             })
           }
-
+          
           let fromId = window.frameElement.getAttribute('fromid')
           this.$platform.refreshTab(fromId)
-
+          
           window.location.href = `/customer/view/${res.data || this.editId}`
         })
         .catch(err => {
-          this.pending = false
-          console.error('err', err)
-          this.loadingPage = false
+          console.error('CustomerEditView ~ updateMethod ~ error', err)
+        })
+        .finally(() => {
+          this.toggleLoading(false)
         })
     },
     reloadTab() {
       let fromId = window.frameElement.getAttribute('fromid')
-
       this.$platform.refreshTab(fromId)
+    },
+    toggleLoading(loading = true) {
+      this.pending = loading
+      this.loadingPage = loading
     }
   },
   async mounted() {
@@ -209,8 +230,9 @@ export default {
       if (result.succ) {
         this.fieldInfo = result.data;
       }
-      
+      // 权限数据
       this.auth = this.initData.auth || {}
+      
       // 初始化默认值
       let form = {}
       if (this.initData.action === 'edit' && this.initData.id) {
@@ -219,18 +241,27 @@ export default {
         let cusRes = await CustomerApi.getForEdit(this.initData.id)
         this.loadingPage = false
         if (cusRes.status === 0) form = cusRes.data
+      } else {
+        // 检查版本数量限制
+        this.checkNumExceedLimitBeforeHandler 
+        && this.checkNumExceedLimitBeforeHandler(
+          TenantDataLimitSourceEnum.Customer,
+          TenantDataLimitTypeEnum.Customer
+        )
       }
-
+      // 从事件新建客户
       if (this.initData.action === 'createFromEvent') {
         form = this.initData.eventCustomer
       }
-
+      // 初始化解析表单数据
       form = util.packToForm(this.fields, form, this.initData.customerAddress)
       this.form = FormUtil.initialize(this.fields, form)
-
+      
       this.init = true
-    } catch (e) {
-      console.error('CustomerEditView caught an error ', e)
+      
+    } catch (error) {
+      this.toggleLoading(false)
+      console.error('CustomerEditView mounted error ', error)
     }
   },
   components: {

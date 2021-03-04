@@ -17,7 +17,6 @@
             native-type="submit"
           >搜索</base-button>
           <base-button type="ghost" @event="resetParams">重置</base-button>
-          <!-- <a href="/customer/oldList">返回旧版</a> -->
         </div>
         <span class="advanced-search-visible-btn" @click.self="panelSearchAdvancedToggle">
           <i class="iconfont icon-add"></i>
@@ -363,7 +362,7 @@ import * as CustomerApi from '@src/api/CustomerApi.ts';
 // import {searchLinkman} from '@src/api/EcSearchApi.js';
 import TeamMixin from '@src/mixins/teamMixin';
 import { isShowCustomerRemind } from '@src/util/version.ts'
-import VersionMixin from '@src/mixins/versionMixin'
+import VersionMixin from '@src/mixins/versionMixin/index.ts'
 
 const link_reg = /((((https?|ftp?):(?:\/\/)?)(?:[-;:&=\+\$]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\?\+=&;:%!\/@.\w_]*)#?(?:[-\+=&;%!\?\/@.\w_]*))?)/g;
 
@@ -522,6 +521,19 @@ export default {
     window.__exports__refresh = this.search;
   },
   methods: {
+    getRelatedTask(field) {
+      return Array.isArray(field) ? field.map(item => item.taskNo).join(',') : '';
+    },
+    // 处理人员显示
+    getUserName(field, value) {
+      // 多选
+      if(Array.isArray(value)) {
+        return value.map(i => i.displayName || i.name).join(',');
+      }
+
+      let user = value || {};
+      return user.displayName || user.name;
+    },
     async makePhoneCall(phone){
       if(!this.hasCallCenterModule) return
       try {
@@ -1098,7 +1110,7 @@ export default {
           show: true
         },
         {
-          label: '服务团队',
+          label: '服务部门',
           field: 'tags',
           // width: '110px',
           show: true

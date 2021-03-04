@@ -33,11 +33,11 @@ function logInfo (data: any, message?: string, functionName?: string) {
   if (Array.isArray(data)) return logTable(data, message, functionName)
   
   try {
-    console.info(`${functionName || ''} -> ${message || 'logInfo'} ->`, data)
+    console.info(`${functionName || ''} -> ${message || 'logInfo'} -> `, data)
   } catch (error) {
     console.warn('logInfo -> error', error)
   }
-
+  
 }
 
 function logTable(data: any[], message?: string, functionName?: string) {
@@ -56,7 +56,7 @@ function isShowLog(): boolean {
   try {
     const RootWindow = getRootWindow(window)
     // @ts-ignore
-    return window.shb.showLog === true  || RootWindow.shb.showLog === true
+    return RootWindow?.shb?.showLog === true || window?.shb?.showLog === true
   } catch (error) {
     return false
   }

@@ -16,16 +16,24 @@
 </template>
 
 <script>
-import TextTitle from './component/TextTitle.vue'
-
-import { Message } from 'shb-element-ui';
-
+/* api */
+import * as TeamApi from '@src/api/TeamApi'
 import * as RepositoryApi from '@src/api/Repository'
+/* component */
+import TextTitle from './component/TextTitle.vue'
+import { Message } from 'shb-element-ui'
+/* enum */
+import TenantDataLimitSourceEnum from '@model/enum/TenantDataLimitSourceEnum'
+import TenantDataLimitTypeEnum from '@model/enum/TenantDataLimitTypeEnum'
+/* mixin */
+import VersionMixin from '@src/mixins/versionMixin/index.ts'
+/* util */
 import http from '@src/util/http';
 import _ from 'lodash';
 
 export default {
   name: 'document-create-view',
+  mixins: [VersionMixin],
   components: {
     [TextTitle.name]: TextTitle,
   },
@@ -80,6 +88,13 @@ export default {
     }
     this.saveArticle();
     this.getTypes();
+    
+    // 检查版本数量限制
+    this.checkNumExceedLimitBeforeHandler 
+    && this.checkNumExceedLimitBeforeHandler(
+      TenantDataLimitSourceEnum.Notice,
+      TenantDataLimitTypeEnum.Notice
+    )
   },
 
   beforeDestroy() {
@@ -141,10 +156,11 @@ export default {
         this.sumbtting = true;
 
         let params = this.buildParams();
-        this.pending = true; 
-        let res = await RepositoryApi.createBulletin(params);
+        this.pending = true;
+        const CreateBulletionPromise = RepositoryApi.createBulletin(params)
+        let res = await this.checkNumExceedLimitAfterHandler(CreateBulletionPromise)
         this.pending = false; 
-
+        
         if(res.success) {
           localStorage.removeItem(`bulletin_article_${ this.initData.userInfo.userId }`);
           this.$platform.notification({
@@ -164,7 +180,6 @@ export default {
         console.error(err)
       }
     },
-
     // 删除文章
     async deleteFile () {
       try {
@@ -190,11 +205,9 @@ export default {
         console.error(e);
       }
     },
-
     openFrame () {
       let id = window.frameElement.dataset.id;
       this.$platform.closeTab(id);
-
       let fromId = window.frameElement.getAttribute('id');
       
       this.$platform.openTab({
@@ -206,7 +219,6 @@ export default {
         fromId
       });
     },
-
     // 获取带格式的文章内容
     getInput (html) {
       this.articleHtml = html;
@@ -221,21 +233,19 @@ export default {
       }
       return true;
     },
-
     imgCount (html) {
       if(!html) return null;
       let imgReg = /<img.*?(?:>|\/>)/gi // 匹配图片中的img标签
       let arr = html.match(imgReg)  //筛选出所有的img
       return (arr && arr.length) || null;
     },
-
+    
     // 获取缓存的文章信息
     getArticle () {
       let detail = localStorage.getItem(`bulletin_article_${ this.initData.userInfo.userId }`);
       this.params = Object.assign(this.params, JSON.parse(detail));
       if(!this.params.article) this.params.article = ' ';
     },
-
     // 本地缓存文章内容，2分钟一次
     saveArticle () {
       this.interval && clearInterval(this.interval);
@@ -286,13 +296,13 @@ export default {
           let num = 0;
           this.params.selectedDepts.forEach(async item => {
             let params = {
-              deptId: item.id,
+              tagId: item.id,
               pageNum: 1,
               pageSize: 50,
               sellAllOrg: false,
               keyword: '',
             }
-            let res = await http.get('/security/department/user', params);
+            let res = await TeamApi.userList(params)
             num = res.list.length + num;
           })
         }

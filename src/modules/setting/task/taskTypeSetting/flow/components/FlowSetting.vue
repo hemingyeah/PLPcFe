@@ -88,7 +88,7 @@
             <el-input
               v-if="taskOverTimeModel.remindType === null"
               class="w-187"
-              placeholder="请选择审批人"
+              placeholder="请选择通知人"
               readonly
               :value="getApproverNames(taskOverTimeModel.reminders)"
               @click.native="selectApproveUser('overTime')"
@@ -208,7 +208,7 @@
             <el-input
               v-if="taskTypeConfig.noticeLeader == 2"
               class="w-187"
-              placeholder="请选择审批人"
+              placeholder="请选择通知人"
               readonly
               :value="getApproverNames(taskTypeConfig.noticeUsers)"
               @click.native="selectApproveUser('planRemind')"
@@ -307,7 +307,7 @@ export default {
         },
         {
           value: 1,
-          label: '通知负责人团队主管',
+          label: '通知负责人部门主管',
         },
         {
           value: null,
@@ -322,7 +322,7 @@ export default {
         },
         {
           value: '1',
-          label: '通知负责人团队主管',
+          label: '通知负责人部门主管',
         },
         {
           value: '2',
@@ -370,7 +370,7 @@ export default {
         return '接受工单';
       }
       for (const key in this.flowMap) {
-        if(!!this.taskTypeConfig.flowSetting[key].state) {
+        if(this.taskTypeConfig.flowSetting[key].state) {
           if(this.type !== 'create' && this.type === key) {
             return name;
           }
@@ -535,7 +535,7 @@ export default {
       if (type === 'planRemind') selected = this.taskTypeConfig.noticeUsers;
 
       let options = {
-        title: '选择审批人', // [选填] 默认值为 '请选择人员'
+        title: ['overTime', 'planRemind'].includes(type) ? '选择通知人' : '选择审批人', // [选填] 默认值为 '请选择人员'
         max: 14, // [选填]最大人数：当值小于等于0或者不填时，不对选择人数做限制，max值为1时单选，大于1时多选
         selected, // [选填] 已选人员 每个人员必须包括userId,displayName,staffId,head这四个属性，只有带max大于1时生效
       };

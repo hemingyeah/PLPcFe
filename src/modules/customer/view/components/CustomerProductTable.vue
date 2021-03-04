@@ -188,6 +188,19 @@ export default {
     this.fetchData();
   },
   methods: {
+    getRelatedTask(field) {
+      return Array.isArray(field) ? field.map(item => item.taskNo).join(',') : '';
+    },
+    // 处理人员显示
+    getUserName(field, value) {
+      // 多选
+      if(Array.isArray(value)) {
+        return value.map(i => i.displayName || i.name).join(',');
+      }
+      
+      let user = value || {};
+      return user.displayName || user.name;
+    },
     getAddress(field) {
       return field.province + field.city + field.dist + field.address || ''
     },

@@ -132,7 +132,7 @@ const productFieldFix = [
     tableName:'product',
   },
   {
-    displayName: '服务团队',
+    displayName: '服务部门',
     fieldName: 'tags',
     export: true,
     isSystem: 0,

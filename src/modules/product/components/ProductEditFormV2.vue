@@ -158,16 +158,15 @@ import {
   getProductTemplateList,
   searchCustomerAddressForProduct,
 } from '@src/api/ProductApi';
-import _ from 'lodash';
+import _ from "lodash";
 
 import EditContactDialog from './EditContactDialog.vue';
 import EditAddressDialog from './EditAddressDialog.vue';
 import CloneProductDialog from '@src/modules/product/components/CloneProductDialog.vue';
-
 import {productSerachCustomer, productSearchTemplate} from '@src/modules/guideForNewUser/initData.js'
 
 export default {
-  name: 'product-edit-form',
+  name: "product-edit-form",
   props: {
     fields: {
       type: Array,

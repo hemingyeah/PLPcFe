@@ -32,6 +32,8 @@ enum ComponentNameEnum {
   UserButton = 'user-button',
   // 工单流程步骤
   TaskProcessSteps = 'task-process-steps',
+  // 基础面板侧边栏
+  BasePanelAside = 'base-panel-aside',
   // 呼叫中心打电话
   BizCallCenterPhone = 'biz-call-center-phone',
   // 工单地图信息弹窗
@@ -42,6 +44,16 @@ enum ComponentNameEnum {
   UiInput = 'ui-input',
   // 工单状态
   UiTaskState = 'ui-task-state',
+  // 版本限制数量弹窗
+  BizVersionLimitDialog = 'biz-version-limit-dialog',
+  // 版本限制数量弹窗 (HOC)
+  BizVersionLimitDialogHOC = 'biz-version-limit-dialog-hoc',
+  // 版本混入组件
+  VersionMixin = 'version-mixin',
+  // 空
+  Empty = 'empty',
+  // 应用升级提示弹窗
+  ApplicationUpgradePromptDialog = 'application-upgrade-prompt-dialog',
   // 业务远程搜索
   BizRemoteSelect = 'biz-remote-select',
 }

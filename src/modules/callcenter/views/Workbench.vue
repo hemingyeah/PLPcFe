@@ -172,7 +172,6 @@ export default {
     },
   },
   mounted() {
-    console.log('22222222222');
     this.query = parse(window.location.search) || {};
     if(this.query.id && this.query.callPhone) {
       if(this.query.callState === 'Link'){
@@ -188,7 +187,6 @@ export default {
       // 说明是websocket过来的 获取联系人信息 
       this.item = {id:this.query.id, dialPhone:this.query.callPhone || '', dialCount:this.query.dialCount || 0} 
     }
-    // console.info('query::', this.query);
     this.$eventBus.$on('callcenter-workbench.select_tab', this.selectTab)
     this.getHistoryList()
     this.getRemarkList()
@@ -205,7 +203,6 @@ export default {
         try {
           let {code, message} = await CallCenterApi.hangUpCall();
           if(code != 0) this.$message.error(message || '内部错误')
-          console.log('res:', code, message);
         } catch(error) {
           console.error(error);
         }
@@ -234,7 +231,7 @@ export default {
       hour = hour > 0 && hour < 10 ? `0${ hour }` : hour;
       min = min < 10 ? `0${ min }` : min;       
       sec = sec < 10 ? `0${ sec }` : sec;
-      console.info('temp:', hour == 0 ? `${ min }:${ sec }` : `${ hour }:${ min }:${ sec }`);
+      // console.info('temp:', hour == 0 ? `${ min }:${ sec }` : `${ hour }:${ min }:${ sec }`);
       this.ringTime = hour == 0 ? `${ min }:${ sec }` : `${ hour }:${ min }:${ sec }`;
     },
     // 获取服务备注列表
@@ -255,14 +252,12 @@ export default {
       CallCenterApi.getZxSortList().then(({code, message, result}) => {
         if (code !== 0) return this.$message.error(message || '内部错误')
         this.categoryList = result || []
-        // console.info('this.categoryList:', this.categoryList);
       }).catch((err) => {
         console.error(err)
       })
     },
     // 选择项发生变化触发这个函数
     parentCateChanged() {
-      // console.info('this.selectedKeys:', this.selectedKeys)
       // 如果 selectedKeys 数组中的 length 大于0，证明选中父级分类
       if (this.selectedKeys.length > 0) {
         this.ruleForm.sortId = this.selectedKeys[this.selectedKeys.length - 1]
@@ -272,7 +267,6 @@ export default {
     },
     // 今日通话记录
     async getHistoryList(){
-      // this.loadingListData = true
       try {
         this.recordListPage.list = [];
         this.params.pageNum = 1;
@@ -285,7 +279,6 @@ export default {
               this.item = this.recordListPage.list[0]
               this.getRemarkList()
               this.activeLinkId = this.item.id
-              // console.info('item:', this.item)
             }
           }
         }
@@ -293,23 +286,6 @@ export default {
       } catch(error) {
         console.error(error);
       }
-
-      // CallCenterApi.getTodayCallRecordList().then(({code, message, result}) => {
-      //   this.loadingListData = false
-      //   if (code !== 0) return this.$message.error(message || '内部错误')
-      //   this.historyList = result || []
-      //   if(!this.query.linkmanName && this.query.callState !== 'Link') {
-      //     if(this.historyList.length) {
-      //       this.item = this.historyList[0]
-      //       this.getRemarkList()
-      //       this.activeLinkId = this.item.id
-      //     // console.info('item:', this.item)
-      //     }
-      //   }
-      // }).catch((err) => {
-      //   this.loadingListData = false
-      //   console.error(err)
-      // })
     },
     handleHistoryItem(item, index) {
       this.activeLinkId = item.id
@@ -348,7 +324,6 @@ export default {
         })
         const params = this.ruleForm
         params.recordId = this.item.id
-        // console.info('params', params)
         try {
           const {code, message} = await CallCenterApi.saveFwRemark(params)
           if (code !== 0) return this.$platform.notification({
