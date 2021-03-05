@@ -311,6 +311,7 @@ export default {
         taskList.forEach((value, index) => {
           if (
             item.property === value.fieldName
+            || item.property === value.englishName
             || (item.property === 'customerId'
               && value.fieldName === 'customer')
             || (item.property === 'tlmId' && value.fieldName === 'tlmName')
@@ -558,6 +559,7 @@ export default {
 
         const isSystemFields = taskInquireList.filter((f) => f.isSystem);
         const notSystemFields = taskInquireList.filter((f) => !f.isSystem);
+        const abnormals = ['refusedReason', 'pausedReason', 'rollbackReason', 'reallotReason', 'offedReason']
 
         let tv = null;
         let fn = '';
@@ -671,6 +673,16 @@ export default {
               inValue: form[fn],
             });
             continue;
+          }
+
+          if (abnormals.indexOf(tv.fieldName) !== -1) {
+            let condition = {
+              property: tv.englishName,
+              operator: 'eq',
+              value: form[fn],
+            };
+            params.systemConditions.push(condition);
+            continue;    
           }
 
           if (tv.fieldName == 'allotTypeStr') {

@@ -491,6 +491,7 @@ export default {
 
       const isSystemFields = taskInquireList.filter((f) => f.isSystem);
       const notSystemFields = taskInquireList.filter((f) => !f.isSystem);
+      const abnormals = ['refusedReason', 'pausedReason', 'rollbackReason', 'reallotReason', 'offedReason']
 
       params.systemConditions = [];
 
@@ -567,6 +568,16 @@ export default {
           };
           params.systemConditions.push(condition);
           continue;
+        }
+
+        if (abnormals.indexOf(tv.fieldName) !== -1) {
+          let condition = {
+            property: tv.englishName,
+            operator: 'eq',
+            value: form[fn],
+          };
+          params.systemConditions.push(condition);
+          continue;    
         }
 
         if (tv.fieldName === 'exceptionType') {

@@ -232,6 +232,14 @@ function checkTagUserRepeat(params) {
   return http.post('/security/tag/tagComponet/checkTagUserRepeat', params, false);
 }
 
+/**
+ * 根据团队获取负责人
+ */
+
+ const TeamUser = (params) => {
+   return http.post('/api/report/outside/stats/staff/teamUser', params)
+ }
+
 export {
   createPerformanceRule,
   getFieldsForPerformance,
@@ -252,5 +260,6 @@ export {
   getPerformanceRecord,
   publishPerformance,
   checkTagUserRepeat,
-  checkTaskRepeatCalculation
+  checkTaskRepeatCalculation,
+  TeamUser
 }

@@ -122,7 +122,6 @@ export default {
       // 重置
       this.approver = {};
       this.apprForm = { source: 'task' };
-      this.apprForm.params = data;
       this.apprForm.applyRemark = '';
       this.chooseApprover = false;
 

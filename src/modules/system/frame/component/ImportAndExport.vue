@@ -120,7 +120,7 @@ import http from '@src/util/http';
 /** constants */
 
 // 支持下载的actions  导出/批量生成服务报告/批量打印服务报告
-const SupportDownloadActions = ['export', 'taskServiceReportBatch', 'taskServicePrintBatch']
+const SupportDownloadActions = ['export', 'taskServiceReportBatch', 'taskServicePrintBatch', 'taskExceptionChartExport']
 
 export default {
   name: 'import-and-export-view',

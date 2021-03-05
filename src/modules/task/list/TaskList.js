@@ -12,12 +12,15 @@ import BatchEditingCustomerDialog from './components/BatchEditingCustomerDialog.
 import TaskTransfer from './components/TaskTransfer.vue';
 import TaskMap from './components/TaskMap.vue';
 import TaskView from './components/TaskView.vue'
+// import guideCompoment from "@src/component/guide/guide";
 import TaskViewPane from '@src/modules/task/components/list/TaskViewPanel.vue';
+
 /* enum */
 import StorageModuleEnum from '@model/enum/StorageModuleEnum'
+
 /** model */
 import TaskStateEnum from '@model/enum/TaskStateEnum.ts';
-import { fields, selectIds, advancedList, allExport, Inquire } from './TaskFieldModel';
+import { fields, selectIds, advancedList, allExport, Inquire, AbnormalList } from './TaskFieldModel';
 import { LINK_REG } from '@src/model/reg';
 
 /** utils */
@@ -151,6 +154,10 @@ export default {
       guideSearchModelSave: false,
       guideDropdownMenu: false,
       isGuide:false,
+      abnormalData: {},
+      abnormals: AbnormalList,
+      taskCustomExceptionNodeList: [{englishName: '', exceptionName: '全部异常'}],
+      exceptionNodes: '', // 选择异常
     };
   },
   computed: {
@@ -335,6 +342,7 @@ export default {
     this.getUserViews();
     this.getTaskCountByState();
     this.revertStorage();
+    this.getTurnOnTaskExceptionNodeInfo()
 
     this.$nextTick(() => {
       setTimeout(() => {
@@ -398,6 +406,88 @@ export default {
     guideDropdownMenu_enter(){
       // if (storageGet(TASK_GUIDE_DROPDOWN_MENU) == '1') return this['guideDropdownMenu'] = false;
       // storageSet(TASK_GUIDE_DROPDOWN_MENU, '1')
+    },
+    previousStep() {},
+
+    abnormalLabel(type) {
+      if (!this.abnormalData.taskCustomExceptionNodeList.length) return
+      const list = this.abnormalData.taskCustomExceptionNodeList.map(item => {return item.exceptionName})
+      if (list.indexOf(type) !== -1) return true
+      return false
+    },
+    abnormalHover(item) {
+      if (!item) return
+      const {overTime, isPaused, oncePaused, onceOverTime, state, onceRefused, onceReallot, onceRollback, positionException} = item
+      const s = new Date().getTime()
+      const e = new Date(overTime).getTime()
+      
+      let value = []
+      // 超时
+      if(overTime && this.abnormalLabel('超时') && s > e) {
+        value.push('超时')
+      }
+      if (isPaused && this.abnormalLabel('暂停')) {
+        value.push('暂停')
+      }
+      if (oncePaused && this.abnormalLabel('曾暂停')) {
+        value.push('曾暂停')
+      }
+      if (onceOverTime && this.abnormalLabel('曾超时')) {
+        value.push('曾超时')
+      }
+      if (state === 'refused' && this.abnormalLabel('拒绝')) {
+        value.push('拒绝')
+      }
+      if (onceRefused && this.abnormalLabel('曾拒绝')) {
+        value.push('曾拒绝')
+      }
+      if (onceReallot && this.abnormalLabel('转派')) {
+        value.push('转派')
+      }
+      if (onceRollback && this.abnormalLabel('回退')) {
+        value.push('回退')
+      }
+      if (state === 'offed' && this.abnormalLabel('取消')) {
+        value.push('取消')
+      }
+      if (positionException && this.abnormalLabel('位置异常')) {
+        value.push('位置异常')
+      }
+
+      return value
+
+    },
+    /** 异常选择 */
+    checkAbnormal({englishName}){
+      this.exceptionNodes = englishName
+      this.search()
+    },
+    /** 获取用户开启的配置节点 以及工单搜索范围 和 异常原因字段值 */
+    async getTurnOnTaskExceptionNodeInfo() {
+      const {success, result} = await TaskApi.getTurnOnTaskExceptionNodeInfo()
+      if(success) {
+        this.abnormalData = result
+        this.abnormalData['hoverText'] = result.taskCustomExceptionNodeList.map(item => {return item.exceptionName}).join(',')
+        this.taskCustomExceptionNodeList = [...this.taskCustomExceptionNodeList, ...result.taskCustomExceptionNodeList]
+
+        const {taskExceptionReasonList} = result
+        this.abnormals = this.abnormals.map((item, index) => {
+          item.setting['isMulti'] = false
+          taskExceptionReasonList.forEach(v => {
+            if (item.englishName === v.englishName) {
+              item.setting['dataSource'] = v.exceptionReason
+            }
+          })
+          return item
+        })
+      }
+
+    },
+    nextStep() {
+      this.nowGuideStep ++;
+    },
+    stopStep() {
+      this.nowGuideStep = 5;
     },
     /**
      * 获取附件
@@ -840,7 +930,13 @@ export default {
       this.searchParams = searchModel
       this.searchParams_spare = searchModel
       this.params = this.initParams(this.params.pageSize);
+      this.exceptionNodes = ''
+      this.seoSet()
+
+
+
       this.buildColumns();
+      this._exportColumns()
       this.createPerspective({id: this.selectId})
       // 埋点
       window.TDAPP.onEvent(`pc：工单列表-${name}`);
@@ -1094,6 +1190,10 @@ export default {
       let taskListFields = this.filterTaskListFields();
       let fields = taskListFields.concat(this.taskTypeFilterFields);
 
+      // if (this.selectColumnState === 'exception') {
+      fields = fields.concat(AbnormalList)
+      // }
+
       if (Array.isArray(columnStatus) && columnStatus.length > 0) {
         fields = this.buildSortFields(fields, localColumns)
       }
@@ -1151,7 +1251,7 @@ export default {
             minWidth = 125;
           }
           if (field.fieldName === 'taskNo') {
-            field.width = 216
+            field.width = 290
           }
           return {
             ...field,
@@ -1796,7 +1896,10 @@ export default {
           }]
         }
       }
-      this.seoSetList = [...taskFields.filter(item => { return item.isSystem === 1 && item.displayName !== '工单编号' && item.formType !== 'attachment'}).map(item => {if (item.fieldName === 'planTime'){item.isNull = 1} return item}), ...linkman_list, ...address_list, ...product_list, ...Inquire]
+      this.seoSetList = [...taskFields.filter(item => { return item.isSystem === 1 && item.displayName !== '工单编号' && item.formType !== 'attachment'}).map(item => {if (item.fieldName === 'planTime'){item.formType = 'date'; item.isNull = 1} return item}), ...linkman_list, ...address_list, ...product_list, ...Inquire]
+      // if (this.selectColumnState === 'exception') {
+      this.seoSetList = [...this.seoSetList, ...this.abnormals]
+      // }
     },
     /**
      * @description 初始化page
@@ -2097,13 +2200,28 @@ export default {
       }
       this.search(this.searchParams, bool);
     },
+    /* 异常搜索字段 */
+    abnormalParams() {
+      if (this.selectColumnState === 'exception' && this.abnormalData.taskExceptionRange.length) {
+        let exceptionStates = []
+        this.abnormalData.taskExceptionRange.forEach(item => {
+          if (item.switch) exceptionStates = [...exceptionStates, ...item.taskExceptionRangeValue]
+        })
+        let params = {
+          exceptionNodes: this.exceptionNodes ? [this.exceptionNodes] : this.taskCustomExceptionNodeList.filter(item => {return item.englishName}).map(item => {return item.englishName}),
+          isException: 1,
+          exceptionStates
+        }
+        return params
+      }
+      return {}
+    },
     /**
      * @description 搜索
      * @return {Promise}
      */
     search(searchModel = '', bool = true, searchBool) {
       const params = this.buildSearchParams();
-      console.log('搜索条件', params)
       let resetParamBool = bool
       if (!searchBool) {
         this.loading = true;
@@ -2159,6 +2277,17 @@ export default {
         } else {
           conditions = params.conditions || []
         }
+
+        // 异常字段
+        const seoAbnormal = this.abnormals
+        let esTaskExceptionEntities = []
+        seoAbnormal.forEach(item => {
+          for(let key in params) {
+            if (item.fieldName === key && params[key]) {
+              esTaskExceptionEntities.push({action: item.englishName, exceptionName:params[key]})
+            }
+          }
+        })
 
         // 创建时间
         const createTimeStart = this._time(params.createTime, 0);
@@ -2374,6 +2503,8 @@ export default {
           payTypes: params.paymentMethods,
           searchTagIds: params.tags && params.tags.map(({ id }) => id),
           systemConditions: customizeSys,
+          esTaskExceptionEntities,
+          ...this.abnormalParams(),
           // eventNo: params.eventNo,
         };
         // 工单搜索分类型
@@ -2439,7 +2570,7 @@ export default {
 
         searchModel.templateId = this.currentTaskType.id;
 
-        this.searchParams = { ...searchModel };
+        this.searchParams = { ...searchModel, ...this.abnormalParams() };
       }
 
       if (!searchBool) {
@@ -2660,7 +2791,7 @@ export default {
         item.export = true
         return item
       })
-
+      
 
       // 回执信息逻辑
       taskReceiptSystemFields = [
@@ -2672,6 +2803,10 @@ export default {
         field.export = true;
         return field;
       });
+
+      // 系统信息
+      let sysList = [...allExport, ...AbnormalList]
+
       this.exportColumns = [
         {
           label: '工单信息',
@@ -2686,7 +2821,7 @@ export default {
         {
           label: '系统信息',
           value: 'systemChecked',
-          columns: allExport.map(item => {
+          columns: sysList.map(item => {
             item.export = true
             item.label = item.displayName
             return item
@@ -2885,7 +3020,7 @@ export default {
         columnsStatus = columnsList;
       }
 
-      this.saveDataToIndexedDb('columnStatus', columnsStatus);
+      this.saveDataToStorage('columnStatus', columnsStatus);
     },
     /** 
      * @description 批量创建服务报告

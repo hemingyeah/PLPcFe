@@ -66,6 +66,7 @@ export interface AutoDispatchParams {
 
 /* 派单到负责人参数 */
 export interface AllotExcutorParams {
+  customReason?: string;
   // 工单id
   taskId: string,
   // 负责人用户id

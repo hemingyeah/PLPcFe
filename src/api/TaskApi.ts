@@ -50,6 +50,7 @@ const ElASTICSEARCH = '/api/elasticsearch';
 const fixedPrefixPaymentPath = '/api/payment';
 const CUSTOMER = 'api/customer'
 const APPS = 'api/app'
+const REPORT = '/api/report'
 
 /* ------------- start 旧工单api ---------------- */
 
@@ -1406,6 +1407,76 @@ export function getTaskPoolList(params: TaskPoolSearchModel): Promise<getTaskSea
   return http.post(`${ElASTICSEARCH}/outside/es/task/taskPool`, params)
 }
 
+/**
+ * @description 获取用户开启的配置节点 以及工单搜索范围 和 异常原因字段值
+ */
+export function getTurnOnTaskExceptionNodeInfo(params = {}) {
+  return http.get(`${fixedPrefixTaskPath}/outside/pc/setting/getTurnOnTaskExceptionNodeInfo`, params)
+}
+
+/**
+ * @description 获取工单异常原因
+ */
+
+export function obtainReasonByTaskStatus(params: number) {
+  return http.get(`${fixedPrefixTaskPath}/outside/pc/setting/obtainReasonByTaskStatus/${params}`)
+}
+
+/**
+ * 工单异常饼图
+ */
+export function chart(params = {}) {
+  return http.post(`${REPORT}/outside/task/exception/chart`, params)
+}
+
+/**
+ * 工单异常饼图列表
+ */
+export function chartList(params = {}) {
+  return http.post(`${REPORT}/outside/task/exception/chart/list`, params)
+}
+
+/**
+ * 工单异常柱状图
+ */
+export function histogram(params = {}) {
+  return http.post(`${REPORT}/outside/task/exception/histogram`, params)
+}
+
+/**
+ * 工单异常柱状图列表
+ */
+export function histogramList(params = {}) {
+  return http.post(`${REPORT}/outside/task/exception/histogram/list`, params)
+}
+
+/**
+ * 工单异常节点导出
+ */
+export function actionExport(params = {}) {
+  return http.post('/excels/task/exception/action/export', params)
+}
+
+/**
+ * 工单异常原因导出
+ */
+export function reasonExport(params = {}) {
+  return http.post('/excels/task/exception/reason/export', params)
+}
+
+/**
+ * 异常节点获取全部数量
+ */
+export function chartTotal(params = {}) {
+  return http.post(`${REPORT}/outside/task/exception/chart/all/total`, params)
+}
+
+/**
+ * 异常原因获取全部数量
+ */
+export function histogramTotal(params = {}) {
+  return http.post(`${REPORT}/outside/task/exception/histogram/all/total`, params)
+}
 /**
  * @description 查询所有工单类型
  */

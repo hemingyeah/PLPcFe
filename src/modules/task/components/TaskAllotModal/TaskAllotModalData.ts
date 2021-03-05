@@ -40,6 +40,10 @@ class TaskAllotModalData extends TaskAllotModalProps {
   public pending: boolean = false
   /* 转派说明 */
   public reason: string = ''
+  /* 转派选择 */
+  public transferList: Array<string> = ['1','2','3']
+  /* 转派选择的原因 */
+  public customReason: string = ''
   /* 是否显示清空派单结果 */
   public showClearTaskAllotResultButton: boolean = false
   /* 是否显示派单弹窗 */

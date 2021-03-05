@@ -21,7 +21,27 @@
         <p>获取工单的结算单失败，无法判断工单是否添加了备件，确定取消工单？</p>
       </template>
 
-      <textarea v-model="cancelModal.reason" placeholder="请输入取消说明[最多500字][必填]" rows="3" maxlength="500" />
+      <div class="task-detail-view-panel">
+        <div class="task-flex task-ai">
+          <span class="task-cef task-font16 task-detail-view-panel-icon">*</span><span>取消原因：</span>
+          <el-select v-model="checkBack" placeholder="请选择取消原因" class="task-w70">
+            <el-option
+              v-for="item in backList"
+              :key="item"
+              :label="item"
+              :value="item"
+            >
+            </el-option>
+          </el-select>
+          <span class="task-font12 task-c13 task-ml12 task-pointer" v-if="systemAdmin" @click="jump()">去配置原因</span>
+        </div>
+        <!--  -->
+        <div class="task-flex task-mt12">
+          <div class="task-font14">详细原因：</div>
+          <textarea v-model="cancelModal.reason" placeholder="请输入取消说明[最多500字][必填]" rows="3" maxlength="500" />
+        </div>
+      </div>
+
     </div>
     <div slot="footer" class="dialog-footer">
       <el-button @click="visible = false">取 消</el-button>
@@ -32,28 +52,40 @@
 
 <script>
 /* api */
-import * as TaskApi from "@src/api/TaskApi.ts";
+import * as TaskApi from '@src/api/TaskApi.ts';
 
 export default {
-  name: "cancel-task-dialog",
+  name: 'cancel-task-dialog',
   props: {
     taskId: {
       type: String,
-      default: "",
+      default: '',
+    },
+    backList: {
+      type: Array,
+      default: () => {[]}
+    },
+    systemAdmin: {
+      type: Boolean | String,
+      default: ''
     }
   },
   data() {
     return {
       visible: false,
       pending: false,
-      cancelModal: this.buildModalParams()
+      cancelModal: this.buildModalParams(),
+      checkBack: ''
     }
   },
   methods: {
+    jump() {
+      window.location.href = '/setting/task/taskSet'
+    },
     buildParams() {
       let { showWithPart, isGoBack, reason } = this.cancelModal;
 
-      let content = {updateType: "tRecord", updateContent: reason};
+      let content = {updateType: 'tRecord', updateContent: reason};
       let task = {id: this.taskId};
 
       if (showWithPart) content.isGoBack = isGoBack;
@@ -68,8 +100,8 @@ export default {
         showWithPart: false,
         errorWithPart: false,
         isRequired: false,
-        reason: "",
-        isGoback: ""
+        reason: '',
+        isGoback: ''
       }
     },
     async openDialog() {
@@ -92,34 +124,40 @@ export default {
         this.visible = true;
 
       } catch (e) {
-        console.error("cancelTask error", e);
+        console.error('cancelTask error', e);
       }
     },
     async submit() {
       let { showWithPart, isGoBack, reason } = this.cancelModal;
+
+      const {checkBack} = this
+      if (!checkBack) {
+        this.$platform.alert('请选择取消工单原因');
+        return
+      }
       
       // 工单如果使用了备件，则"是否做退回处理"必选
       if (showWithPart && !isGoBack) return this.cancelModal.isRequired = true;
 
-      if (!reason.trim()) return this.$platform.alert("请填写取消说明");
+      if (!reason.trim()) return this.$platform.alert('请填写取消说明');
 
       this.pending = true;
 
       // 取消是否需要审批
       const result = await TaskApi.offApproveCheck(this.buildParams());
-      if (!result.succ && result.message == "需要审批") {
-        this.$emit("proposeApprove", result.data);
+      if (!result.succ && result.message == '需要审批') {
+        this.$emit('proposeApprove', {data: result.data, customReason: checkBack});
         this.visible = false;
         this.pending = false;
         return;
       }
 
-      const params = { taskId: this.taskId, reason };
+      const params = { taskId: this.taskId, reason, customReason: checkBack };
       if (showWithPart) params.isGoBack = isGoBack;
 
       TaskApi.cancelTask(params).then(res => {
         if (res.success) {
-          let fromId = window.frameElement.getAttribute("fromid");
+          let fromId = window.frameElement.getAttribute('fromid');
           // this.$platform.refreshTab(fromId);
 
           window.location.reload();

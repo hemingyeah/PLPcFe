@@ -60,7 +60,8 @@ window.openCustomerViewFunc = function openCustomerViewFunc(customerId: string) 
 
 
 enum TaskAllotPoolEmitEventEnum {
-  SetReason = 'setReason'
+  SetReason = 'setReason',
+  SetCustomReason = 'setCustomReason'
 }
 
 @Component({ 
@@ -99,6 +100,14 @@ export default class TaskAllotPool extends Vue {
   @Prop() readonly taskConfig: TaskConfig | undefined
   /* 工单类型列表 */
   @Prop() readonly taskTypesMap: { [x: string]: TaskType} | undefined
+
+  /* 转派选择的原因 */
+  @Prop() public customReason: string = ''
+  /*异常列表 */
+  @Prop()
+  readonly backList: Array<string>  = []
+  /*判断是否配置 */ 
+  @Prop() readonly systemAdmin: any | undefined
   
   /* 工单信息弹窗 */
   private AMapTaskInfoWindow: any = null
@@ -183,6 +192,13 @@ export default class TaskAllotPool extends Vue {
     return reason
   }
   
+  @Emit(TaskAllotPoolEmitEventEnum.SetCustomReason)
+  /**
+   * @description  转派说明
+   */
+  public customReasonChangedHandler(customReason: string):string {
+    return customReason
+  }
   /** 
    * @description 构建标记
   */
@@ -556,6 +572,24 @@ export default class TaskAllotPool extends Vue {
     
     return (
       <div class='task-allot-reason-row task-allot-executor-header'>
+        <div class="task-flex task-ai task-mr12">       
+          转派说明： 
+          <el-select value={this.customReason} placeholder="请选择转派原因" onChange={(v: string) => this.customReasonChangedHandler(v)}>
+            {
+              this.backList.map(item => {
+                return (
+                  <el-option
+                    key={item}
+                    label={item}
+                    value={item}
+                  />
+                )
+              })
+            }
+          </el-select>
+          {
+            this.systemAdmin ? <div class="task-font12 task-c13 task-ml12 task-pointer" onClick={() => {window.location.href = '/setting/task/taskSet'}}>去配置原因</div> : null
+          }</div>
         { taskAllotExcutor.renderTaskAllotExecutorHeaderRow('转派原因：', this.renderTaskAllotReason()) }
       </div>
     )

@@ -213,6 +213,7 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
   public buildReAllotParams(): AllotExcutorParams {
     let reAllotParams = this.buildAllotExcutorParams()
     reAllotParams.reason = this.reason
+    reAllotParams.customReason = this.customReason
     
     return reAllotParams
   }
@@ -825,6 +826,13 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
     LogUtil.succ(LogUtil.Start, this.outsideSetReason.name)
     this.reason = value
   }
+
+  /**
+   * @description 工单转派
+   */
+  public outsideSetCustomReason(value: string) {
+    this.customReason = value
+  }
   
   /** 
    * @description 显示弹窗
@@ -975,6 +983,7 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
   */
   public async submitReAllotWithExecutor() {
     // 验证负责人是否存在
+    console.log(this.buildReAllotParams())
     let executor = this.executorUser?.userId
     if (!executor) {
       this.pending = false

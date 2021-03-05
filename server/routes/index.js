@@ -29,6 +29,8 @@ const doMyselft = require('./doMyself');
 const customerContact = require('./customerContact');
 const taskRouter = require('./task');
 const sparePartRouter = require('./sparePart');
+const abnormalRouter = require('./abnormal');
+
 const departmentRouter = require('./department')
 const linkcRouter = require('./linkc')
 const productV2Router = require('./productV2')
@@ -121,6 +123,7 @@ router.use('', taskRouter.routes(), taskRouter.allowedMethods());
 router.use('', sparePartRouter.routes(), sparePartRouter.allowedMethods());
 router.use('', departmentRouter.routes(), departmentRouter.allowedMethods());
 router.use('', linkcRouter.routes(), sparePartRouter.allowedMethods());
+router.use('', abnormalRouter.routes(), abnormalRouter.allowedMethods());
 router.use('', productV2Router.routes(), sparePartRouter.allowedMethods());
 router.use('', superQrcodeRouter.routes(), sparePartRouter.allowedMethods());
 router.use('', guideForNewUser.routes(), guideForNewUser.allowedMethods());

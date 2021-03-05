@@ -54,6 +54,7 @@
         <!-- start 顶部按钮组 -->
         <div class="task-detail-header-top-btn">
           <template v-if="!isDelete">
+
             <!-- start 服务报告 -->
             <template v-if="allowServiceReport && isShowReport">
               <el-button @click="createReport(true)" :disabled="pending" v-if="srSysTemplate || srSysTemplate == null">服务报告</el-button>
@@ -246,6 +247,16 @@
               <task-detail-card :share-data="propsForSubComponents" />
             </el-tab-pane>
           </el-tabs>
+
+          <div class="task-detail-step-2-box" :style="nowGuideStep == 3 ? 'width: 104px;height: 40px;background:#fff' : ''" id="v-task-detail-step-2">
+
+            <div class="task-detail-step-2" v-if="nowGuideStep == 3">
+              动态信息
+              <div style="position: relative;">
+                <div class="guide-disable-cover"></div>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div class="collapse-right" v-show="collapseDirection == 'right'">
@@ -270,7 +281,26 @@
       <div class="base-modal-content">
         <p v-if="task.state == 'finished'">回退工单将工单退回工单负责人，可以重新提交回执信息，原有回执信息将不再保存</p>
         <p v-else-if="task.state == 'costed'">回退工单将工单退回已完成状态，可以重新提交审核结算信息，原有审核结算信息将不再保存</p>
-        <textarea v-model="backDialog.reason" placeholder="请输入回退说明[最多500字][必填]" rows="3" maxlength="500" />
+        <div class="task-detail-view-panel">
+          <div class="task-flex task-ai">
+            <span class="task-cef task-font16 task-detail-view-panel-icon">*</span><span>回退原因：</span>
+            <el-select v-model="checkBack" placeholder="请选择回退原因" class="task-w70">
+              <el-option
+                v-for="item in backList"
+                :key="item"
+                :label="item"
+                :value="item"
+              >
+              </el-option>
+            </el-select>
+            <span class="task-font12 task-c13 task-ml12 task-pointer" v-if="systemAdmin" @click="jump()">去配置原因</span>
+          </div>
+          <!--  -->
+          <div class="task-flex task-mt12">
+            <div class="task-font14">详细原因：</div>
+            <textarea v-model="backDialog.reason" placeholder="请输入回退说明[最多500字][必填]" rows="3" maxlength="500" />
+          </div>
+        </div>
       </div>
       <div slot="footer" class="dialog-footer">
         <el-button @click="backDialog.visible = false">取 消</el-button>
@@ -282,7 +312,26 @@
     <!-- start 暂停工单弹窗 -->
     <base-modal title="暂停工单" :show.sync="pauseDialog.visible" width="700px">
       <div class="base-modal-content">
-        <textarea v-model="pauseDialog.reason" placeholder="请输入暂停原因[最多500字]" rows="3" maxlength="500" />
+        <div class="task-detail-view-panel">
+          <div class="task-flex task-ai">
+            <span class="task-cef task-font16 task-detail-view-panel-icon">*</span><span>暂停原因：</span>
+            <el-select v-model="checkBack" placeholder="请选择暂停原因" class="task-w70">
+              <el-option
+                v-for="item in backList"
+                :key="item"
+                :label="item"
+                :value="item"
+              >
+              </el-option>
+            </el-select>
+            <span class="task-font12 task-c13 task-ml12 task-pointer" v-if="systemAdmin" @click="jump()">去配置原因</span>
+          </div>
+          <!--  -->
+          <div class="task-flex task-mt12">
+            <div class="task-font14">详细原因：</div>
+            <textarea v-model="pauseDialog.reason" placeholder="请输入暂停原因[最多500字]" rows="3" maxlength="500" />
+          </div>
+        </div>
       </div>
       <div slot="footer" class="dialog-footer">
         <el-button @click="pauseDialog.visible = false">取 消</el-button>
@@ -294,7 +343,26 @@
     <!-- start 拒绝工单弹窗 -->
     <base-modal title="拒绝工单" :show.sync="refuseDialog.visible" width="700px">
       <div class="base-modal-content">
-        <textarea v-model="refuseDialog.reason" placeholder="请输入拒绝说明[最多500字][必填]" rows="3" maxlength="500" />
+        <div class="task-detail-view-panel">
+          <div class="task-flex task-ai">
+            <span class="task-cef task-font16 task-detail-view-panel-icon">*</span><span>拒绝原因：</span>
+            <el-select v-model="checkBack" placeholder="请选择拒绝原因" class="task-w70">
+              <el-option
+                v-for="item in backList"
+                :key="item"
+                :label="item"
+                :value="item"
+              >
+              </el-option>
+            </el-select>
+            <span class="task-font12 task-c13 task-ml12 task-pointer" v-if="systemAdmin" @click="jump()">去配置原因</span>
+          </div>
+          <!--  -->
+          <div class="task-flex task-mt12">
+            <div class="task-font14">详细原因：</div>
+            <textarea v-model="refuseDialog.reason" placeholder="请输入拒绝说明[最多500字][必填]" rows="3" maxlength="500" />
+          </div>
+        </div>
       </div>
       <div slot="footer" class="dialog-footer">
         <el-button @click="refuseDialog.visible = false">取 消</el-button>
@@ -304,7 +372,7 @@
     <!-- end 拒绝工单弹窗 -->
 
     <!-- start 取消工单弹窗 -->
-    <cancel-task-dialog ref="cancelTaskDialog" :task-id="task.id" @proposeApprove="proposeApprove" />
+    <cancel-task-dialog ref="cancelTaskDialog" :task-id="task.id" @proposeApprove="cancelModel" :back-list="backList" :system-admin="systemAdmin" />
     <!-- end 取消工单弹窗 -->
 
     <!-- start 计划时间弹窗 -->
@@ -335,6 +403,8 @@
       :task="task" 
       :login-user="initData.loginUser"
       :is-re-allot="allowRedeployTask"
+      :back-list="backList" 
+      :system-admin="systemAdmin"
       @updateTask="outsideUpdateTask"
       @updateRecords="outsideUpdateRecords"
     />

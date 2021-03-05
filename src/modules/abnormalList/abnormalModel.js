@@ -1,0 +1,37 @@
+export const Model = [{
+  action: 'onceOverTime',
+  actionNmae: '曾超时',
+}, {
+  action: 'onceRefused',
+  actionNmae: '曾拒绝',
+}, {
+  action: 'oncePaused',
+  actionNmae: '曾暂停',
+}, {
+  action: 'reallot',
+  actionNmae: '转派',
+}, {
+  action: 'overTime',
+  actionNmae: '超时',
+}, {
+  action: 'refused',
+  actionNmae: '拒绝',
+}, {
+  action: 'paused',
+  actionNmae: '暂停',
+}, {
+  action: 'rollback',
+  actionNmae: '回退',
+}, {
+  action: 'offed',
+  actionNmae: '取消',
+}, {
+  action: 'abnormalLocation',
+  actionNmae: '位置异常',
+}, {
+  action: 'taskExceptionRange',
+  actionNmae: '异常工单范围设置',
+}, {
+  action: 'customException',
+  actionNmae: '自定义异常',
+}]

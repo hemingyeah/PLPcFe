@@ -78,6 +78,7 @@ const BizTeamSelect = {
       type: Boolean,
       default: false
     }
+
   },
   data(){
     return {
@@ -159,7 +160,11 @@ const BizTeamSelect = {
       
       // 多选
       let index = this.value.findIndex(item => item.id === value.id);
-      index >= 0 ? this.value.splice(index, 1) : this.value.push(value);
+      if (this.isAutoSelectChild) {
+        this.chooseValueHandler(index, value)
+      } else {
+        index >= 0 ? this.value.splice(index, 1) : this.value.push(value);
+      }
       
       this.$emit('input', this.value);
       this.updatePopper();

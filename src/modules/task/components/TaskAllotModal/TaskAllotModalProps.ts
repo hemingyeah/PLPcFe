@@ -13,6 +13,14 @@ class TaskAllotModalProps extends TaskAllotModalComponents {
   @Prop() readonly loginUser: InitDataLoginUser | undefined
   /* 工单信息 */
   @Prop() readonly task: any | undefined
+  /*异常列表 */ 
+  /*异常列表 */
+  @Prop()
+  readonly backList: Array<string>
+    /*异常列表 */
+    = []
+  /*异常列表 */ 
+  @Prop() readonly systemAdmin: any | undefined
   /* 工单字段列表 */
   @Prop() readonly fields: Field[] | undefined
 }

@@ -33,12 +33,17 @@
                           :key="index"
                           class="task-flex task-ai task-pointer"
                         >
-                          <span class="task-list-dropdown-item" @click="checkOther(item)">{{
-                            item.name
-                          }}</span>
+                          <span
+                            class="task-list-dropdown-item"
+                            @click="checkOther(item)"
+                          >{{ item.name }}</span
+                          >
                           <div class="task-list-dropdown-icon">
                             <el-tooltip content="查看筛选条件" placement="top">
-                              <i class="iconfont icon-yanjing task-font12" @click="creatViewPanel(item, 'view')"></i>
+                              <i
+                                class="iconfont icon-yanjing task-font12"
+                                @click="creatViewPanel(item, 'view')"
+                              ></i>
                             </el-tooltip>
                             <el-tooltip content="编辑视图" placement="top">
                               <i
@@ -52,7 +57,8 @@
                                 class="iconfont icon-shanchu-copy task-ml12 task-font12"
                                 @click.stop="delView(item)"
                                 v-if="item.authEdit"
-                              ></i>{{item.authEdit}}
+                              ></i
+                              >{{ item.authEdit }}
                             </el-tooltip>
                           </div>
                         </div>
@@ -98,7 +104,11 @@
                   >
                     搜索
                   </base-button>
-                  <base-button type="ghost" @event="resetParams" class="task-ml12">
+                  <base-button
+                    type="ghost"
+                    @event="resetParams"
+                    class="task-ml12"
+                  >
                     重置
                   </base-button>
                   <div class="guide-box">
@@ -107,12 +117,16 @@
                       :class="['advanced-search-visible-btn', 'task-ml12']"
                       @click.self="panelSearchAdvancedToggle"
                     >
-                      <i class="iconfont icon-gaojisousuo task-font12 task-mr4"></i>
+                      <i
+                        class="iconfont icon-gaojisousuo task-font12 task-mr4"
+                      ></i>
                       高级搜索
                     </div>
                   </div>
                 </div>
-          </div></div></form>
+              </div>
+            </div>
+          </form>
         </div>
         <!-- 筛选 -->
         <div class="task-list-header-nav">
@@ -252,7 +266,12 @@
                     'task-c2': item.id === filterId,
                   }"
                 >
-                  {{ `异常工单(${filterData.exception || 0})` }}
+                  <el-tooltip
+                    :content="`当前已选择 ${abnormalData.hoverText}`"
+                    placement="top"
+                  >
+                    <span> {{ `异常工单(${filterData.exception || 0})` }}</span>
+                  </el-tooltip>
                 </div>
                 <!-- 未完成工单 -->
                 <div
@@ -301,15 +320,14 @@
                   :key="index"
                   class="task-nav-create"
                   :class="{ 'task-c2': selectId === item.id }"
-                  @click.stop="
-                    createPerspective(item)
-                  "
+                  @click.stop="createPerspective(item)"
                 >
                   {{ item.name }}
                 </div>
               </div>
             </div>
           </div>
+          <!-- 工单类型 -->
           <div class="task-flex">
             <div class="task-font14 task-c6 state">工单类型：</div>
             <div class="list" :style="typeHeight">
@@ -338,6 +356,23 @@
                 v-if="typeHeight === 'height:30px'"
               ></i>
               <i class="el-icon-arrow-up task-icon" v-else></i>
+            </div>
+          </div>
+          <!-- 异常节点 -->
+          <div class="task-flex" v-show="selectColumnState === 'exception'">
+            <div class="task-font14 task-c6 state">异常节点：</div>
+            <div class="list" :style="typeHeight">
+              <div class="list-item task-flex task-ai">
+                <div
+                  v-for="item in taskCustomExceptionNodeList"
+                  :key="item.englishName"
+                  @click="checkAbnormal(item)"
+                  :class="{ 'task-c2': exceptionNodes === item.englishName }"
+                  class="task-nav-create"
+                >
+                  {{ item.exceptionName }}
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -370,7 +405,7 @@
         </div>
       </task-search-panel>
       <!-- end 高级搜索 -->
-      
+
       <!-- S 新建视图 -->
       <task-view-panel
         :init-data="initData"
@@ -382,9 +417,14 @@
         :customize-list="[...taskFields, ...taskReceiptFields]"
         ref="viewPanel"
       >
-        <div class="advanced-search-btn-group task-flex task-buttom" slot="footer">
+        <div
+          class="advanced-search-btn-group task-flex task-buttom"
+          slot="footer"
+        >
           <div class="task-span1"></div>
-          <base-button type="ghost" @event="$refs.viewPanel.hide()">{{viewType === 'view' ? '关闭' : '取消'}}</base-button>
+          <base-button type="ghost" @event="$refs.viewPanel.hide()">{{
+            viewType === "view" ? "关闭" : "取消"
+          }}</base-button>
           <base-button
             v-if="viewType !== 'view'"
             type="primary"
@@ -531,7 +571,9 @@
             {{ multipleSelection.length }}
           </span>
           条
-          <span class="task-c2 task-pointer" @click="toggleSelection">清空</span>
+          <span class="task-c2 task-pointer" @click="toggleSelection"
+          >清空</span
+          >
         </div>
         <!-- start content 列表表格 -->
         <div class="guide-box" id="v-task-step-0">
@@ -600,18 +642,26 @@
                     >
                       审批中
                     </span>
-                    <!-- 暂停中 -->
+                    <!-- 异常标签 -->
                     <span
                       class="task-state-block task-state-block-overtime task-font12"
-                      v-if="
-                        scope.row.overTime &&
-                          new Date().getTime() >
-                          new Date(scope.row.overTime).getTime()
-                      "
+                      :class="{'task-state-block-approve': v === '转派' || v === '回退', 'task-state-block-ff': v === '曾暂停' || v === '曾超时' || v === '曾拒绝'}"
+                      v-for="(v, i) in abnormalHover(scope.row)"
+                      :key="i"
+                      v-show="i < 2"
                     >
-                      超时
+                      {{v}}
                     </span>
-                  </div>
+
+                    
+
+                    <el-tooltip
+                      v-if="abnormalHover(scope.row).length > 2"
+                      :content="abnormalHover(scope.row).join(',')"
+                      placement="top"
+                    >
+                      <span class="task-ml4">...</span>
+                  </el-tooltip></div>
 
                   <!-- 客户  TODO: 客户查看权限 -->
                   <template v-else-if="column.field === 'customer'">
@@ -685,7 +735,9 @@
                   <template v-else-if="column.field === 'product'">
                     {{
                       scope.row.products &&
-                        scope.row.products.map((product) => product.name).join(", ")
+                        scope.row.products
+                          .map((product) => product.name)
+                          .join(", ")
                     }}
                   </template>
 
@@ -708,7 +760,11 @@
                         "
                       >
                         {{
-                          presonDisplayObj("displayName", column.field, scope.row)
+                          presonDisplayObj(
+                            "displayName",
+                            column.field,
+                            scope.row
+                          )
                         }}
                       </a>
                     </template>
@@ -741,7 +797,7 @@
 
                   <!-- 审批状态 -->
                   <template v-else-if="column.field === 'inApprove'">
-                    {{ scope.row.inApprove | displayApprove}}
+                    {{ scope.row.inApprove | displayApprove }}
                   </template>
                   <!-- 工单状态 -->
                   <template v-else-if="column.field === 'state'">
@@ -750,9 +806,9 @@
                       class="task-state-block task-font12"
                       v-if="scope.row.isPaused == 1"
                       style="
-                      color: rgba(153, 153, 153);
-                      background-color: rgba(153, 153, 153, 0.2);
-                    "
+                        color: rgba(153, 153, 153);
+                        background-color: rgba(153, 153, 153, 0.2);
+                      "
                     >
                       已暂停
                     </div>
@@ -807,7 +863,9 @@
 
                   <!-- 时间 -->
                   <template v-else-if="!column.isSystem">
-                    {{ scope.row.attribute && scope.row.attribute[column.field] }}
+                    {{
+                      scope.row.attribute && scope.row.attribute[column.field]
+                    }}
                   </template>
 
                   <!-- 时间 -->
@@ -842,7 +900,9 @@
                   </template>
                   <!-- 响应用时 -->
                   <template v-else-if="column.field === 'taskResponseTimeStr'">
-                    {{ scope.row.taskResponseTime && scope.row.taskResponseTime }}
+                    {{
+                      scope.row.taskResponseTime && scope.row.taskResponseTime
+                    }}
                   </template>
                   <!-- 响应用时 -->
                   <template v-else-if="column.field === 'createToCompleteUsedTimeStr'">
@@ -856,7 +916,9 @@
                         initData.paymentConfig.version === 1
                     "
                   >
-                    {{ scope.row.attribute && scope.row.attribute.paymentMethod }}
+                    {{
+                      scope.row.attribute && scope.row.attribute.paymentMethod
+                    }}
                   </template>
                   <template v-else-if="!column.isSystem">
                     <template
@@ -875,7 +937,7 @@
                   </template>
 
                   <template v-else>
-                    {{ scope.row[column.field] }}
+                    {{ Array.isArray(scope.row[column.field]) ? scope.row[column.field].join(',') : scope.row[column.field] }}
                   </template>
                 </template>
               </el-table-column>
@@ -1031,7 +1093,9 @@ export default TaskList;
   .v-step[data-v-7c9c03f0] {
     background: #fff !important;
     color: #333 !important;
-    -webkit-filter: drop-shadow(0px 9px 28px 8px rgba(0, 0, 0, 0.05)) !important;
+    -webkit-filter: drop-shadow(
+      0px 9px 28px 8px rgba(0, 0, 0, 0.05)
+    ) !important;
     filter: drop-shadow(0px 9px 28px 8px rgba(0, 0, 0, 0.05)) !important;
     padding: 0 !important;
     min-width: 240px !important;
@@ -1123,20 +1187,20 @@ export default TaskList;
     top: -0.5rem;
   }
 
-  .guide-model-box{
+  .guide-model-box {
     position: fixed;
     width: 100%;
     height: 100vh;
     top: 0;
-    left:0 ;
+    left: 0;
     background: rgba(0, 0, 0, 0.5);
     z-index: 996;
   }
-  .guide-point{
+  .guide-point {
     z-index: 997;
     position: sticky;
   }
-  .bg-w{
+  .bg-w {
     background: #fff;
   }
 }

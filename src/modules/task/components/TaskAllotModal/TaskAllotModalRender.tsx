@@ -10,6 +10,7 @@ import TaskAllotModalMethods from '@src/modules/task/components/TaskAllotModal/T
 import { TaskAllotTypeModeEnum } from '@src/modules/task/components/TaskAllotModal/TaskAllotModalModel'
 /* vue */
 import { VNode } from 'vue'
+import { divide } from 'lodash'
 
 class TaskAllotModalRender extends TaskAllotModalMethods {
   
@@ -47,6 +48,22 @@ class TaskAllotModalRender extends TaskAllotModalMethods {
     return (
       <div class='task-allot-reason'>
         <span class='task-allot-nav-title'>转派说明</span>
+        <el-select value={this.customReason} placeholder="请选择转派原因" onChange={(v: string) => {this.customReason = v}}>
+          {
+            this.backList.map(item => {
+              return (
+                <el-option
+                  key={item}
+                  label={item}
+                  value={item}
+                />
+              )
+            })
+          }
+        </el-select>
+        {
+          this.systemAdmin ? <div class="task-font12 task-c13 task-mt12 task-pointer" onClick={() => {window.location.href = '/setting/task/taskSet'}}>去配置原因</div> : null
+        }
         <el-input
           type='textarea'
           rows={5}

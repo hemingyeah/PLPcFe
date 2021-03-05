@@ -40,7 +40,7 @@ body {
   
       .base-modal-content {
         textarea {
-          width: 100%;
+          width: 70%;
         }
         
         p {
@@ -435,6 +435,9 @@ body {
     // height: 100%;
     // overflow: hidden;
   }
+  &-right {
+    position: relative;
+  }
 
   .collapse-left,
   .collapse-right {
@@ -578,5 +581,12 @@ body {
     
     position: relative;
     left: 10px;
+  }
+}
+
+.task-detail-view-panel {
+  &-icon {
+    position: absolute;
+    margin-left: -6px;
   }
 }
