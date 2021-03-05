@@ -31,7 +31,13 @@ export default class TaskAllotPoolNotification extends Vue {
       <div class={ComponentNameEnum.TaskAllotPoolNotification}>
         <el-checkbox-group value={this.checked} onInput={this.onNotificationChanged}>
           <el-checkbox label={TaskPoolNotificationTypeEnum.SendToTeamUser}>
-            通知服务部门人员
+            通知服务团队人员
+            <el-tooltip
+              content="选中后，可以给对应的员工账号发送【有新的工单】的站内消息，提醒员工及时关注"
+              placement="right"
+            >
+              <i class="iconfont icon-info"></i>
+            </el-tooltip>
           </el-checkbox>
           <el-checkbox label={TaskPoolNotificationTypeEnum.SendToAuthUser}>
             通知有权限接单用户
