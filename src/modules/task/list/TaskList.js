@@ -2,7 +2,8 @@
 import * as TaskApi from '@src/api/TaskApi.ts';
 import { createServiceReportBatch } from '@src/api/ExcelsApi'
 import { createServicePrintBatch } from '@src/api/PrintApi'
-
+/* enum */
+import AuthEnum from '@model/enum/AuthEnum.ts'
 /* components */
 import TaskSearchPanel from '@src/modules/task/components/list/TaskSearchPanel.vue';
 import TaskSelect from './components/TaskSelect.vue';
@@ -31,7 +32,7 @@ import { getRootWindow } from '@src/util/dom';
 import * as FormUtil from '@src/component/form/util'
 import VersionMixin from '@src/mixins/versionMixin'
 import StorageUtil from '@src/util/storage.ts'
-
+import AuthUtil from '@src/util/auth';
 
 /* constants */
 import {
@@ -289,6 +290,14 @@ export default {
           || this.region?.viewId == Region.closeViewId
         )
       )
+    },
+    /** 
+     * @desscription 是否允许删除工单
+     * 1. 有编辑工单全部权限
+     * 2. 且有删除工单权限
+    */
+    allowDelete() {
+      return this.permissionTaskView && AuthUtil.hasAuth(this.auth, AuthEnum.TASK_DELETE)
     }
   },
   filters: {
