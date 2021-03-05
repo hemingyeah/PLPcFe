@@ -56,6 +56,7 @@
   height: auto;
   word-break: break-all;
   &.logical-field-selected{
+    color: $color-primary;
     background-color: #f5f7fa;
   }
 
