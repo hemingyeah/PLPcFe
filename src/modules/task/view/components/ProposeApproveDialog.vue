@@ -69,7 +69,7 @@
 /* api */
 import * as TaskApi from '@src/api/TaskApi.ts';
 
-import FormUser from "@src/component/form/components/FormUser/FormUser.vue";
+import FormUser from '@src/component/form/components/FormUser/FormUser.vue';
 
 export default {
   name: 'propose-approve-dialog',
@@ -97,6 +97,8 @@ export default {
       approversName: '',
       approveLevel: 1, // 审批等级
       multiApproverSetting: [], // 多级审批（2级以上审批）
+
+      successBc: null
     }
   },
   computed: {
@@ -118,7 +120,10 @@ export default {
         approver: data
       })
     },
-    openDialog(data) {
+    openDialog(data, successBc) {
+      if(Object.prototype.toString.call(successBc) === '[object Function]'){
+        this.successBc = successBc();
+      }
       // 重置
       this.approver = {};
       this.apprForm = { source: 'task' };
@@ -166,6 +171,8 @@ export default {
       TaskApi.applyApprove(this.apprForm).then(res => {
         if (res.status == 0) {
           this.$platform.alert(this.$platform.inDingTalk ? '已发起审批，请等待审批结果，结果会以钉钉消息的方式通知' : '已发起审批，请等待审批结果');
+          // 为提供jsp成功回调
+          if(this.succseeBc) return this.succseeBc();
           this.$emit('success')
           window.location.href = `/task/view/${this.taskId}`;
         } else {
