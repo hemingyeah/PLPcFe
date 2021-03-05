@@ -122,7 +122,7 @@ export default {
     },
     openDialog(data, successBc) {
       if(Object.prototype.toString.call(successBc) === '[object Function]'){
-        this.successBc = successBc();
+        this.successBc = successBc;
       }
       // 重置
       this.approver = {};
