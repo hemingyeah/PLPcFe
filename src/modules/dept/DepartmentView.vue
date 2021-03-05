@@ -829,19 +829,19 @@ export default {
   mounted() {
     // isAllotByDept对应钉钉端是否按照钉钉通讯录选人 如果钉钉端之前勾选了按服务团队派单isAllotByDept为false, 
     // 去掉引导页面
-    // if(this.tenantType == 0) {
-    //   // 钉钉端
-    //   this.isAllotByDept = !this.initData.allotByTag;
-    //   setTimeout(()=>{
-    //     if (storageGet(DEPT_GUIDE_DIALOG) != 1) {
-    //       this.guideDialogVisible = true;
-    //     }
-    //     if (storageGet(DEPT_GUIDE_DIALOG) == 1 && storageGet(DEPT_GUIDE) < this.deptSteps.length) {
-    //       this.$tours['myTour'].start()
-    //       this.nowGuideStep = 0
-    //     } 
-    //   }, 100)
-    // }
+    if(this.tenantType == 0) {
+      // 钉钉端
+      this.isAllotByDept = !this.initData.allotByTag;
+      // setTimeout(()=>{
+      //   if (storageGet(DEPT_GUIDE_DIALOG) != 1) {
+      //     this.guideDialogVisible = true;
+      //   }
+      //   if (storageGet(DEPT_GUIDE_DIALOG) == 1 && storageGet(DEPT_GUIDE) < this.deptSteps.length) {
+      //     this.$tours['myTour'].start()
+      //     this.nowGuideStep = 0
+      //   } 
+      // }, 100)
+    }
     if(this.hasTagAuth) {
       this.initialize()
     }
