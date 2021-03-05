@@ -50,6 +50,7 @@
 </template>
 
 <script>
+import * as TeamApi from '@src/api/TeamApi'
 import platform from '@src/platform';
 import Uploader from '@src/util/uploader';
 import http from '@src/util/http';
@@ -97,7 +98,6 @@ export default {
   methods: {
     // 点击加号显示标签输入框
     chooseTeam () {
-      // this.$refs.notificationRange.$el.click();
       let max = -1;
       
       let options = {
@@ -133,13 +133,13 @@ export default {
           let num = 0;
           this.params.selectedDepts.forEach(async item => {
             let params = {
-              deptId: item.id,
+              tagId: item.id,
               pageNum: 1,
               pageSize: 50,
               sellAllOrg: false,
               keyword: '',
             }
-            let res = await http.get('/security/department/user', params);
+            let res = await TeamApi.userList(params)
             num = res.list.length + num;
             this.params.deptPerson = num;
           })

@@ -31,10 +31,12 @@ const taskRouter = require('./task');
 const sparePartRouter = require('./sparePart');
 const abnormalRouter = require('./abnormal');
 
+const departmentRouter = require('./department')
 const linkcRouter = require('./linkc')
 const productV2Router = require('./productV2')
 
 const superQrcodeRouter = require('./superQrcode')
+const guideForNewUser = require('./guideForNewUser')
 
 router.get('/', async (ctx) => {
   let modConfig = modules['system.frame'];
@@ -104,56 +106,14 @@ router.use('/temp', (ctx) =>
     // 主机地址
     host: '127.0.0.1',
     // 端口
-    port: 10006,
+    port: 10012,
     // 头信息
     headers: {
       cookie: 'VIPPUBLINKJSESSIONID=a644d918-3065-4760-b2a4-a47d50230230',
     },
   })
 )
-router.use('/api/customer/outside/pc', (ctx) =>
-  HttpClient.proxy(ctx, {
-    host: '30.40.58.216',
-    port: 10013,
-  })
-);
 
-router.use('/api/linkc', (ctx) =>
-  HttpClient.proxy(ctx, {
-    host: '30.40.63.238',
-    port: 10016,
-  })
-);
-
-router.use('/setting/product/productConfig', (ctx) =>
-  HttpClient.proxy(ctx, {
-    host: '30.40.63.238',
-    port: 8080,
-  })
-);
-
-router.use('/api/elasticsearch/outside/es', (ctx) =>
-  HttpClient.proxy(ctx, {
-    host: '30.40.58.216',
-    port: 10006,
-  })
-);
-router.use('/files', (ctx) =>
-  HttpClient.proxy(ctx, {
-    host: '30.40.58.216',
-    port: 8083,
-  })
-);
-
-router.use('', performanceRouter.routes());
-router.use('', customerRouter.routes(), customerRouter.allowedMethods());
-router.use('', openRouter.routes(), openRouter.allowedMethods());
-router.use('', settingRouter.routes(), settingRouter.allowedMethods());
-router.use('', teamRouter.routes(), teamRouter.allowedMethods());
-router.use('', productRouter.routes(), productRouter.allowedMethods());
-router.use('', approveRouter.routes(), productRouter.allowedMethods());
-router.use('', dataScreenRouter.routes(), dataScreenRouter.allowedMethods());
-router.use('', repositoryRouter.routes(), repositoryRouter.allowedMethods());
 router.use('', BillRouter.routes(), BillRouter.allowedMethods());
 router.use('', jobtransferRouter.routes(), jobtransferRouter.allowedMethods());
 router.use('', callCenterRouter.routes(), callCenterRouter.allowedMethods());
@@ -161,11 +121,21 @@ router.use('', doMyselft.routes(), doMyselft.allowedMethods());
 router.use('', customerContact.routes(), customerContact.allowedMethods());
 router.use('', taskRouter.routes(), taskRouter.allowedMethods());
 router.use('', sparePartRouter.routes(), sparePartRouter.allowedMethods());
+router.use('', departmentRouter.routes(), departmentRouter.allowedMethods());
 router.use('', linkcRouter.routes(), sparePartRouter.allowedMethods());
 router.use('', abnormalRouter.routes(), abnormalRouter.allowedMethods());
 router.use('', productV2Router.routes(), sparePartRouter.allowedMethods());
 router.use('', superQrcodeRouter.routes(), sparePartRouter.allowedMethods());
-
+router.use('', guideForNewUser.routes(), guideForNewUser.allowedMethods());
+router.use('', customerRouter.routes(), customerRouter.allowedMethods());
+router.use('', openRouter.routes(), openRouter.allowedMethods());
+router.use('', settingRouter.routes(), settingRouter.allowedMethods());
+router.use('', teamRouter.routes(), teamRouter.allowedMethods());
+router.use('', performanceRouter.routes(), performanceRouter.allowedMethods());
+router.use('', productRouter.routes(), productRouter.allowedMethods());
+router.use('', approveRouter.routes(), approveRouter.allowedMethods());
+router.use('', dataScreenRouter.routes(), dataScreenRouter.allowedMethods());
+router.use('', repositoryRouter.routes(), repositoryRouter.allowedMethods());
 
 router.all('/*', (ctx) => {
   return HttpClient.proxy(ctx);

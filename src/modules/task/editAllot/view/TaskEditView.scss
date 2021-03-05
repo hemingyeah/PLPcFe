@@ -1,3 +1,7 @@
+html, body {
+  width: 100%;
+}
+
 body {
   padding: 10px;
 }
@@ -80,5 +84,11 @@ body {
     .product-container {
       overflow: visible;
     }
+  }
+}
+
+.application-upgrade-prompt-dialog {
+  .base-modal {
+    top: 120px;
   }
 }

@@ -17,6 +17,7 @@ import { CreateElement } from 'vue'
 import { checkApprove } from '@service/TaskService'
 /* scss */
 import '@src/modules/task/components/TaskProcessSteps/TaskProcessSteps.scss'
+import { taskSteps } from '@src/modules/guideForNewUser/initData.js'
 
 interface TaskProcessStep {
   // 节点名称
@@ -45,43 +46,46 @@ const StepMap: { [x: string]: TaskProcessStep } = {
   [TaskActionEnum.FINISH.value]: { name: TaskActionEnum.FINISH.name, value: TaskActionEnum.FINISH.value, icon: 'wancheng', state: TaskStateProcessEnum.FINISHED.value }
 }
 
-@Component({ 
-  name: ComponentNameEnum.TaskProcessSteps 
+@Component({
+  name: ComponentNameEnum.TaskProcessSteps
 })
 export default class TaskProcessSteps extends Vue {
   /* 工单节点状态 */
   @Prop() state: string | undefined
   /* 工单类型id */
   @Prop() templateId: string | undefined
-  
+
+  /* 是否是引导展示 */
+  @Prop() readonly justGuide: any | undefined
+
   /* 步骤条列表 */
   private steps: TaskProcessStep[] = []
   /* 工单类型数据 */
   private taskType: TaskType | null = null
-  
+
   @Watch('templateId')
   onTemplateIdChanged() {
     this.fetchTaskType()
   }
-  
+
   /** 
    * @description 获取当前状态的索引 当前的步骤流程
   */
   private get active(): number {
     let index = 0
     let step: TaskProcessStep | null = null
-    
-    for(let i = 0; i < this.steps.length; i++) {
+
+    for (let i = 0; i < this.steps.length; i++) {
       step = this.steps[i]
       if (this.isCurrentState(step.state)) {
         index = i + 1
         break
       }
     }
-    
+
     return index
   }
-  
+
   /** 
    * @description 查询工单类型配置
   */
@@ -89,37 +93,49 @@ export default class TaskProcessSteps extends Vue {
     if (!this.templateId) {
       return console.warn('Caused: [TaskProcessSteps] templateId is empty')
     }
-    
+
     let params = { id: this.templateId || '' }
-    
+
     return (
       getTaskType(params)
         .then((result: getTaskTypeResult) => {
           let isSuccess = result.succ
           if (!isSuccess) return
-          
+
           this.taskType = result.data || null
           this.setSteps()
-          
+
         })
         .catch(err => {
           console.error(err)
         })
     )
   }
-  
+
   private getScopedSlots(step: TaskProcessStep) {
     let { flow, value, icon } = step
     // 判空
     if (!flow) {
       return console.warn('Caused: [TaskProcessSteps] getScopedSlots flow is empty')
     }
-    
+
     // 审批信息
     let taskApprove: TaskApprove | null = this.taskType ? checkApprove(this.taskType, value, { id: '' }, {}) : null
     // 超时时间
     let overTime: string | null = flow?.overTime ? flow.overTime : null
-    
+    let newOverTimeSetting: any;
+    let currOverTimeSetting: any;
+    let overTimeStatus: any;
+    try {
+      newOverTimeSetting = this.taskType?.config?.newOverTimeSetting;
+      currOverTimeSetting = newOverTimeSetting.find((item: any) => item.overTimeState === value) || {};
+      overTimeStatus = currOverTimeSetting.overTimeStatus && overTime;
+    } catch (error) {
+      console.warn(error, 'error try catch');
+    }
+
+
+
     const scopedSlots = {
       icon: (props: any) => {
         return <i class={['iconfont', `icon-${icon}`]}></i>
@@ -133,22 +149,22 @@ export default class TaskProcessSteps extends Vue {
               && <div class='task-step-flow-approve'>需审批</div>
             }
             {
-              overTime
+              overTimeStatus
               && <div class='task-step-flow-overtime'>{overTime}小时超时</div>
             }
           </div>
         )
       }
     }
-    
+
     return scopedSlots
   }
-  
+
   /* 判断是否是当前状态 */
   private isCurrentState(state: string | string[]): boolean {
     return state == this.state || (Array.isArray(state) && state.indexOf(this.state || '') > -1)
   }
-  
+
   /** 
    * @description 设置步骤条数据
   */
@@ -156,7 +172,7 @@ export default class TaskProcessSteps extends Vue {
     if (!this.taskType) {
       return console.warn('Caused: [TaskProcessSteps] taskType is empty')
     }
-    
+
     this.steps = []
 
     // 工单流程设置
@@ -169,17 +185,18 @@ export default class TaskProcessSteps extends Vue {
       let isEnabled = currentFlow?.state === true
       // 开启则 添加该流程
       isEnabled
-      && StepMap[flow]
-      && this.steps.push({ ...StepMap[flow],  flow: currentFlow})
+        && StepMap[flow]
+        && this.steps.push({ ...StepMap[flow], flow: currentFlow })
     }
-    
+
   }
-  
+
   mounted() {
+    if (this.justGuide) this.steps = taskSteps;
     this.fetchTaskType()
   }
-  
-  render(h: CreateElement) {    
+
+  render(h: CreateElement) {
     return (
       <div class={ComponentNameEnum.TaskProcessSteps}>
         <el-steps active={this.active} finish-status='success'>
@@ -194,6 +211,6 @@ export default class TaskProcessSteps extends Vue {
       </div>
     )
   }
-  
+
 }
 

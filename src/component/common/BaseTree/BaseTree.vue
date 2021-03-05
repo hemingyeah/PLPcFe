@@ -5,6 +5,7 @@
       :node="node" :selected="selected" :show-checkbox="showCheckbox"
       @node-click="$emit('node-selected', $event)" 
       @node-check="$emit('node-check', $event)"
+      @selected-change="selectedChange"
       :node-render="nodeRender">
     </base-tree-node>
   </div>  
@@ -20,6 +21,10 @@ export default {
       type: Array,
       default: () => []
     },
+    isAutoOpenTree: {
+      type: Boolean,
+      default: true,
+    },
     selected: {
       type: Object,
       default: () => ({})
@@ -29,6 +34,11 @@ export default {
       default: false
     },
     nodeRender: Function
+  },
+  methods: {
+    selectedChange() {
+      if(!this.isAutoOpenTree) return;
+    },
   },
   components: {
     [BaseTreeNode.name]: BaseTreeNode

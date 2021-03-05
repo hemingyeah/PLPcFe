@@ -1,9 +1,6 @@
 <template>
   <div class="task-box">
-    <div
-      class="guide-model-box"
-      v-if="nowGuideStep < listSteps.length + 1"
-    ></div>
+    <div id="task-task-list-view"></div>
     <!-- s 列表展示 -->
     <div
       class="task-list-view common-list-container"
@@ -16,24 +13,11 @@
         <div class="task-list-header-seach">
           <form onsubmit="return false;">
             <div class="seach task-span1 guide-box">
-              <div style="position: relative">
-                <div class="guide-disable-cover" v-if="nowGuideStep == 4"></div>
-                <div
-                  itemid=""
-                  @mouseenter="guideDropdownMenu_enter"
-                  class="task-flex task-ai task-jend"
-                >
-                  <el-dropdown id="v-task-step-3">
+              <div style="position: relative;" >
+                <div itemid="" @mouseenter="guideDropdownMenu_enter" class="task-flex task-ai task-jend">  
+                  <el-dropdown id="v-task-step-3" >
                     <div
-                      :class="[
-                        'task-list-customize',
-                        'task-font14',
-                        'task-c3',
-                        'task-flex',
-                        'task-ai',
-                        'task-pointer',
-                        nowGuideStep == 4 ? 'guide-point bg-w' : '',
-                      ]"
+                      :class="['task-list-customize', 'task-font14', 'task-c3', 'task-flex', 'task-ai', 'task-pointer','bg-w']"
                     >
                       <img
                         src="../../../assets/img/customize.png"
@@ -129,16 +113,8 @@
                   </base-button>
                   <div class="guide-box">
                     <div
-                      class="guide-disable-cover"
-                      v-if="nowGuideStep == 3"
-                    ></div>
-                    <div
                       id="v-task-step-2"
-                      :class="[
-                        'advanced-search-visible-btn',
-                        'task-ml12',
-                        nowGuideStep == 3 ? 'guide-point' : '',
-                      ]"
+                      :class="['advanced-search-visible-btn', 'task-ml12']"
                       @click.self="panelSearchAdvancedToggle"
                     >
                       <i
@@ -522,17 +498,8 @@
             </el-dropdown>
             <!-- 选择列 -->
             <div class="guide-box">
-              <div class="guide-disable-cover" v-if="nowGuideStep == 2"></div>
               <div
-                :class="[
-                  'task-ai',
-                  'task-flex',
-                  'task-font14',
-                  'task-c6',
-                  'task-pointer',
-                  'task-width103',
-                  nowGuideStep == 2 ? 'guide-point bg-w' : '',
-                ]"
+                :class="['task-ai', 'task-flex', 'task-font14', 'task-c6', 'task-pointer', 'task-width103', 'bg-w' ]"
                 id="v-task-step-1"
                 @click="showAdvancedSetting"
               >
@@ -574,7 +541,7 @@
                 </el-dropdown-item>
                 <el-dropdown-item
                   v-if="
-                    exportPermissionTaskEdit ||
+                    exportPermissionTaskEdit &&
                       exportPermissionTaskBatchDispatch
                   "
                 >
@@ -609,10 +576,8 @@
           >
         </div>
         <!-- start content 列表表格 -->
-        <div class="guide-box">
-          <div class="guide-disable-cover" v-if="nowGuideStep == 1"></div>
+        <div class="guide-box" id="v-task-step-0">
           <div
-            id="v-task-step-0"
             class="task-list-section common-list-table-view"
             v-if="columns.length"
           >
@@ -626,12 +591,8 @@
               @select-all="handleSelection"
               @sort-change="sortChange"
               @header-dragend="headerDragend"
-              :class="[
-                'task-list-table',
-                'common-list-table',
-                nowGuideStep == 1 ? 'guide-point' : '',
-              ]"
-              header-row-class-name="common-list-table-header taks-list-table-header"
+              :class="['task-list-table', 'common-list-table']"
+              header-row-class-name="common-list-table-header taks-list-table-header bg-w"
               ref="multipleTable"
             >
               <el-table-column
@@ -739,6 +700,7 @@
                   <template v-else-if="column.field === 'tlmPhone'">
                     <div>
                       {{ scope.row["linkMan"] && scope.row["linkMan"].phone }}
+                      <i v-if="customerSetting.linkmanOn" class="iconfont icon-fdn-phone" title="拨打电话" @click="makePhoneCall(scope.row['linkMan'].phone)"></i>
                     </div>
                   </template>
                   <!-- 自定义的选择类型字段显示， 与type 区别-->
@@ -828,7 +790,7 @@
                     {{ allotTypeText(scope.row.allotType) }}
                   </template>
 
-                  <!-- 服务团队(负责人所在的团队) -->
+                  <!-- 服务部门(负责人所在的部门) -->
                   <template v-else-if="column.field === 'executorTags'">
                     {{ formatExecutorTags(scope.row[column.field]) }}
                   </template>
@@ -879,6 +841,11 @@
                   <!-- 地址 -->
                   <template v-else-if="column.formType === 'address'">
                     {{ formatCustomizeAddress(scope.row[column.formType]) }}
+                  </template>
+
+                  <!-- 表单设计器特殊控件 -->
+                  <template v-else-if="['cascader', 'select', 'user', 'related_task','relationProduct','location'].includes(column.formType)">
+                    {{ scope.row[column.field] | fmt_form_field(column.formType, column.fieldName, scope.row.attribute)}}
                   </template>
 
                   <!-- 用户 -->
@@ -1092,60 +1059,7 @@
 
     <div class="task-bj" v-show="showBj"></div>
 
-    <v-tour
-      v-if="showTour"
-      name="myTour"
-      :steps="listSteps"
-      :options="listOptions"
-      :callbacks="myCallbacks"
-    >
-      <template slot-scope="tour">
-        <transition name="fade">
-          <template v-for="(step, index) of tour.steps">
-            <v-step
-              v-if="tour.currentStep === index"
-              :key="index"
-              :step="step"
-              :previous-step="tour.previousStep"
-              :next-step="tour.nextStep"
-              :stop="tour.stop"
-              :is-first="tour.isFirst"
-              :is-last="tour.isLast"
-              :labels="tour.labels"
-            >
-              <template>
-                <div slot="content" class="v-tour-content-box">
-                  <div class="v-tour-left-tips">
-                    {{ `${index + 1}/${listSteps.length}` }}
-                  </div>
-                  <div class="v-tour-content">
-                    <div class="flex-x v-tour-content-head">
-                      <i @click="tour.stop" class="iconfont icon-fe-close"></i>
-                    </div>
-                    <div class="v-tour-content-con">
-                      {{ listSteps[index].content }}
-                    </div>
-                  </div>
-                </div>
-                <div slot="actions" class="v-tour-bottom">
-                  <!-- <div class="text" v-if="index > 0" @click="tour.previousStep">
-                    上一步
-                  </div> -->
-                  <div
-                    class="btns"
-                    v-if="index < listSteps.length - 1"
-                    @click="tour.nextStep"
-                  >
-                    下一步
-                  </div>
-                  <div class="btns" @click="tour.stop">ok</div>
-                </div>
-              </template>
-            </v-step>
-          </template>
-        </transition>
-      </template>
-    </v-tour>
+    
   </div>
 </template>
 

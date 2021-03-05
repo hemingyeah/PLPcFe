@@ -52,12 +52,19 @@
         <!-- 可见性 -->
         <form-visible-setting :field="field" @input="update"></form-visible-setting>
         <!-- 支持高级搜索 -->
-        <form-search-setting :field="field" @input="update"></form-search-setting>
+        <form-search-setting :field="field" @input="update" v-if="!isTaskCardForm"></form-search-setting>
       </div>
     </div>
     <!-- end 字段权限 -->
 
     <!-- start 其他设置 -->
+    <div class="form-setting-group form-setting-item" v-if="allowPublicSet">
+      <h4 class="form-item-title">其他设置</h4>
+      <div class="form-item-box">
+        <!-- 设为公用字段 -->
+        <form-public-setting :field="field" @input="update"></form-public-setting>
+      </div>
+    </div>
     <!-- end 其他设置 -->
   </div>
 </template>
@@ -67,7 +74,8 @@
 import SettingMixin from '@src/component/form/mixin/setting';
 /* props */
 import { settingProps } from '@src/component/form/components/props';
-
+/* enum */
+import TableNameEnum from '@model/enum/TableNameEnum.ts';
 export default {
   name: 'form-phone-setting',
   mixins: [SettingMixin],
@@ -76,6 +84,10 @@ export default {
     defaultValueConfig() {
       return this.field.setting && this.field.setting.defaultValueConfig || {}
     },
+    // 是否是附加组件表单
+    isTaskCardForm() {
+      return [ TableNameEnum.TaskCard ].indexOf(this.mode) > -1;
+    }
   },
   methods: {
     updateForDom(event){

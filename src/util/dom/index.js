@@ -188,15 +188,15 @@ export function getStyle(el, styleProp) {
 }
 
 export function getTextWidth() {
-
+  // do some things...
 }
 
 export function createElement(tag, attrs){
   let element = document.createElement(tag);
-
+  
   if(null != attrs){
     for(let prop in attrs) element[prop] = attrs[prop]
   }
-
+  
   return element;
 }

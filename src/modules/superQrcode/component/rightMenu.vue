@@ -70,7 +70,7 @@
     <div v-if="nowOption === 'service'" class="common-wrapper">
       <span>是否启用自助服务模块</span>
       <div class="fright">
-        <el-switch v-model="doorOpenState"></el-switch>
+        <el-switch v-model="doorOpenState" @change="changeState"></el-switch>
         <span>{{doorOpenState?'启用':'禁用'}}</span>
       </div>
       <h4 style="margin-top:20px;">关联事件模板</h4>
@@ -253,10 +253,10 @@ export default {
       groupList:[
         {label:'指定人员',value:'user'},
         {label:'指定角色',value:'role'},
-        {label:'指定服务团队',value:'tag'},
-        {label:'指定服务团队主管',value:'tagLeader'},
-        {label:'指定客户所属服务团队',value:'cusTag'},
-        {label:'指定客户所属服务团队主管',value:'cusTagLeader'},
+        {label:'指定服务部门',value:'tag'},
+        {label:'指定服务部门主管',value:'tagLeader'},
+        {label:'指定客户所属服务部门',value:'cusTag'},
+        {label:'指定客户所属服务部门主管',value:'cusTagLeader'},
         {label:'指定客户负责人',value:'customerManager'}
       ],
       provinceList:['北京','天津','上海','重庆','内蒙古','广西','西藏','宁夏','新疆','河北','山西','辽宁','吉林','黑龙江','江苏','浙江','安徽','福建','江西','山东','河南','湖北','湖南','广东','海南','四川','贵州','云南','陕西','甘肃','青海','香港','澳门','台湾'],
@@ -384,6 +384,9 @@ export default {
       }else if(option==='intro'){
         params.productIntroduction=this.copyForm.productIntroduction;
       }else if(option==='service'){
+        if(this.doorOpenState && this.copyEventTypeIdList.length===0){
+          return this.$platform.alert('请选择关联事件模板');
+        }
         params.doorOpenState=this.doorOpenState?1:0;
         params.doorEventType=this.copyEventTypeIdList;
       }else if(option==='proInfo'){
@@ -626,7 +629,6 @@ ul {
     span{
       font-weight: bold;
       display: inline-block;
-      height: 25px;
     }
     .fright{
       float: right;

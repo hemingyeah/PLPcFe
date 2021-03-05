@@ -9,7 +9,7 @@
     <!-- end 重复人员列表 -->
 
     <div class="choose-team-user-options-modal-btns">
-      <base-button type="primary" @event="choose('onlyParent')">只计算主团队</base-button>
+      <base-button type="primary" @event="choose('onlyParent')">只计算主部门</base-button>
       <base-button type="primary" @event="choose('repeat')">包含所有成员</base-button>
       <base-button type="danger" @event="choose('cancel')">取消</base-button>
 

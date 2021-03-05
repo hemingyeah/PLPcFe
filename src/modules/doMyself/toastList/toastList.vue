@@ -5,7 +5,7 @@
       <nav :class="nowPage==='visitor'?'nav-checked':''" @click="nowPage='visitor'">公众号消息记录</nav>
     </div>
     <customer-conctact-message v-if="nowPage==='customer'" @pageLoading="pageLoading"></customer-conctact-message>
-    <customer-conctact-wxMessage v-if="nowPage==='visitor'" @pageLoading="pageLoading"></customer-conctact-wxMessage>
+    <customer-conctact-wx-message v-if="nowPage==='visitor'" @pageLoading="pageLoading"></customer-conctact-wx-message>
   </div>
 </template>
 <script>

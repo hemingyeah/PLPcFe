@@ -70,7 +70,7 @@ export function packToTask(fields, form){
       }
     }
     
-    if (field.formType === TaskFieldNameMappingEnum.Location) {
+    if ((field.formType === TaskFieldNameMappingEnum.Location) && !value.isHaveLocation) {
       value = {};
     }
 
@@ -102,6 +102,7 @@ export function packToForm(fields, data){
     id: data.id,
     taskNo: data.taskNo,
     templateName: data.templateName,
+    templateId: data.templateId,
     ...data.attribute
   };
 
@@ -163,6 +164,12 @@ export function packToForm(fields, data){
         task.receiptAttachment = value.filter(img => img.receipt);
         value = value.filter(img => !img.receipt);
       }
+    }
+    
+    // 产品关联查询
+    if (field.formType === TaskFieldNameMappingEnum.RelationProduct) {
+      let fieldValue = task[fieldName];
+      if (!Array.isArray(fieldValue) && fieldValue) task[fieldName] = [fieldValue];
     }
 
     isSystem == 1 && (task[fieldName] = value);

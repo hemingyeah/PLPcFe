@@ -21,16 +21,24 @@
 </template>
 
 <script>
+/* component */
+import { Message } from 'shb-element-ui'
 import TextTitle from './component/TextTitle.vue'
 import UpdateLog from './component/UpdateLog.vue'
 import RequestApprove from './component/RequestApprove.vue'
+/* api */
 import * as RepositoryApi from '@src/api/Repository'
+/* util */
 import _ from 'lodash';
-
-import { Message } from 'shb-element-ui';
+/* enum */
+import TenantDataLimitSourceEnum from '@model/enum/TenantDataLimitSourceEnum'
+import TenantDataLimitTypeEnum from '@model/enum/TenantDataLimitTypeEnum'
+/* mixin */
+import VersionMixin from '@src/mixins/versionMixin/index.ts'
 
 export default {
   name: 'document-create-view',
+  mixins: [VersionMixin],
   components: {
     [TextTitle.name]: TextTitle,
     [UpdateLog.name]: UpdateLog,
@@ -88,9 +96,19 @@ export default {
           localStorage.removeItem(`document_article_${ this.initData.userInfo.userId }`);
         }
       }
-      if(!this.isEdit) this.saveArticle();
+      if(!this.isEdit) {
+        this.saveArticle()
+        // 检查版本数量限制
+        this.checkNumExceedLimitBeforeHandler 
+        && this.checkNumExceedLimitBeforeHandler(
+          TenantDataLimitSourceEnum.Wiki,
+          TenantDataLimitTypeEnum.Wiki
+        )
+      }
+      
       await this.getTypes();
       if(this.isEdit) this.getArticle();
+      
     } catch (error) {
       console.error('error', error)
     }
@@ -212,7 +230,8 @@ export default {
       try {
         let params = this.buildParams();
         this.pending = true;        
-        let res = await RepositoryApi.saveAndSumbit(params);
+        const SubmitPromise = RepositoryApi.saveAndSumbit(params)
+        let res = await this.checkNumExceedLimitAfterHandler(SubmitPromise)
         this.pending = false;
 
         if(res.success) {
@@ -251,7 +270,8 @@ export default {
           otherInfo
         }
         this.pending = true;          
-        let res = await RepositoryApi.createApprove(params);
+        const ApprovePromise = RepositoryApi.createApprove(params)
+        let res = await this.checkNumExceedLimitAfterHandler(ApprovePromise)
         this.pending = false;  
 
         if(res.success) {

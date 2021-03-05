@@ -3,8 +3,6 @@
        v-loading="loading">
 
     <div id="product-product-detail"></div>
-    <div class="guide-model-box"
-         v-if="nowGuideStep < 5"></div>
     <div class="task-detail-header">
       <div class="header-btns">
         <div class="flex-x box-12-t-b">
@@ -86,13 +84,13 @@
                 </el-dropdown>
               </div>
               <div class="mar-l-8 flex-x"
-                   v-if="!product.qrcodeId">
+                   v-if="!dataInfo.qrcodeId">
                 <el-button type="primary"
                            @click="openPublicDialog('linkQrcode')"><i class="iconfont icon-add2"></i>关联二维码</el-button>
               </div>
             </div>
             <div class="fle-x mar-l-20">
-              <el-tooltip v-if="product.qrcodeId"
+              <el-tooltip v-if="dataInfo.qrcodeId"
                           :popper-options="popperOptions"
                           content="查看二维码"
                           placement="top">
@@ -173,21 +171,6 @@
       <template slot="left">
         <div class="task-detail-main-content-left"
              v-show="collapseDirection != 'left'">
-          <div class="task-detail-step-2-box"
-               :style="
-                 nowGuideStep == 3
-                   ? 'width: 104px;height: 40px;background:#fff'
-                   : ''
-               "
-               id="v-task-detail-step-2">
-            <div class="task-detail-step-2"
-                 v-if="nowGuideStep == 3">
-              动态信息
-              <div style="position: relative;">
-                <div class="guide-disable-cover"></div>
-              </div>
-            </div>
-          </div>
 
           <el-tabs v-model="leftActiveTab"
                    id="product-product-detail-1">

@@ -115,7 +115,7 @@ export default {
 
             if (failure) return;
             this.visible = false;
-            this.reset();
+            // this.reset();
             this.callback && this.callback();
           }, idNumber > 20 ? 3000 : 1500);
         })

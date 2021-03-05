@@ -49,6 +49,7 @@ import {
   Upload,
   Collapse,
   CollapseItem,
+  Tree,
   Carousel,
   CarouselItem
 } from 'shb-element-ui';
@@ -99,6 +100,7 @@ const ElementUI = {
     Vue.use(Row);
     Vue.use(OptionGroup);
     Vue.use(Message.name, Message);
+    Vue.use(Tree);
     Vue.use(Col);
     
     Vue.component(Autocomplete.name, Autocomplete);

@@ -15,7 +15,7 @@
       <div slot="content">
         计算公式={{this.formulaText}}；
         <br />
-        如因公式缺少计算对象或输入无效值，请重新确认；或联系管理员确认是否登录账号是否无计算对象的查看权限
+        如因公式缺少计算对象或输入无效值，请重新确认；或联系管理员确认登录账号是否无计算对象的查看权限
       </div>
       <i class="iconfont icon-question" v-if="formula.length"></i>
     </el-tooltip>

@@ -29,4 +29,9 @@ export default {
     required: true,
     default: () => ({})
   },
+  /* 值数据 */
+  justGuide: {
+    type: Boolean,
+    default: () => false
+  },
 }

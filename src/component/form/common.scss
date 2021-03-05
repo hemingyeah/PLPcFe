@@ -17,8 +17,8 @@
   .form-design-left{
     padding: 0 12px;
     overflow: auto;
-    height: 98%;
-    margin-bottom: 20px;
+    height: 100%;
+    // margin-bottom: 20px;
     .form-design-widget{
       margin-bottom: 24px;
    
@@ -58,23 +58,38 @@
 .form-design-field-wrap {
   margin: 10px 0 0 0;
   cursor: move;
+
+  &.disabled {
+    opacity: .4;
+    cursor: not-allowed;
+
+    .form-design-field:hover {
+      background: none !important;
+    }
+  }
 }
 
 .form-design-field {
   width: 148px;
   height: 32px;
   line-height: 24px;
-  padding: 3px 24px 3px 12px;
+  padding: 3px 12px;
   text-align: left;
   border: 1px solid #D8D8D8;
   font-size: 12px;
   transition: background-color ease .15s;
   border-radius: 3px;
+  display: flex;
+
   .anticon{
     margin-right: 10px;
-
   }
 
+  .field-name {
+    flex: 1;
+    @include text-ellipsis();
+    word-break: break-all;
+  }
 
   &:hover {
     background-color:#F5F7FA;
@@ -95,8 +110,8 @@
   display: flex;
   flex-direction: column;
   flex: 1;
-  height: calc(100% - 20px);
-  margin: 0px 10px;
+  height: 100%;
+  margin: 0px 12px;
   border-top: none;
   border-bottom: none;
   user-select: none;
@@ -166,12 +181,76 @@
 // }
 
 .form-design-setting {
-  min-width: 200px;
+  min-width: 250px;
   width: 345px;
   height: 100%;
   background-color: #fff;
-  // overflow: auto;
+  overflow: auto;
   border-radius: 4px;
+
+  .ql-snow .ql-tooltip {
+    left: 0 !important;
+  }
+}
+
+// 公用字段设置组件
+.form-design-setting-disabled {
+  cursor: not-allowed;
+
+  .common-field-setting {
+    padding: 23px 12px 0;
+    cursor: auto;
+
+    &-btn {
+      button {
+        width: 128px;
+        padding: 9px;
+        margin: 0;
+
+        &:first-child {
+          margin-right: 8px;
+        }
+      }
+    }
+  }
+
+  .form-setting-panel {
+    opacity: .4;
+    pointer-events: none;
+  }
+}
+
+// 修改控件配置弹窗
+.field-setting-modal {
+  @include mask();
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 99;
+
+  .base-panel {
+    display: flex;
+    flex-direction: column;
+
+    &-title {
+      min-height: 44px;
+      padding: 6px 12px;
+    }
+
+    &-content {
+      flex: 1;
+      overflow: auto;
+  
+      .form-design-warning {
+        margin: 12px 12px 0;
+      }
+    }
+  
+    &-footer {
+      min-height: 52px;
+      padding: 10px 20px;
+      text-align: right;
+      border-top: 1px solid #f2f8f7;
+    }
+  }
 }
 
 .form-setting-panel-title{
@@ -198,9 +277,9 @@
 
 // ------------ setting ------------
 .form-setting-panel {
-  height: 100vh;
-  overflow: auto;
-  padding: 23px 12px 100px 12px;
+  // height: 100vh;
+  // overflow: auto;
+  padding: 23px 12px;
 
   & > h3 {
     line-height: 24px;
@@ -215,6 +294,11 @@
     font-weight: normal;
   }
   .form-date-type{
+    margin-top: 8px;
+  }
+
+  .form-setting-select {
+    width: 100%;
     margin-top: 8px;
   }
 }
@@ -310,7 +394,7 @@
 .form-preview-control {
   width: 100%;
   border-radius: 4px;
-  padding: 0 5px;
+  // padding: 0 5px;
   line-height: 20px;
   height: 20px;
   color: #9a9a9a;
@@ -607,10 +691,20 @@
 }
 
 .form-design-warning{
-  border-radius: 2px;
-  background-color: #fdf6ec;
-  color: #e6a23c;
-  padding: 10px;
+  padding: 12px;
+  color: $text-color-regular;
+  font-size: $font-size-small;
+
+  background: #FFFBE6;
+  border: 1px solid #FFE58F;
+  border-radius: $border-radius-base;
+  display: flex;
+
+  .iconfont {
+    color: #FAAD14;
+    margin-right: 8px;
+    font-size: $font-size-base;
+  }
 }
 
 .form-item__text{

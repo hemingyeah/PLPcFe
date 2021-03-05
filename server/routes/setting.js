@@ -33,23 +33,55 @@ router.get('/setting/performance/v2/rule', async ctx => {
   ctx.body = Template.renderWithHtml('绩效规则', body, script, modConfig.template)
 });
 
-router.get('/setting/task/field/task', async ctx => {
-  let modConfig = modules['setting.task.fields'];
-  let script = ['/setting.task.fields.js'];
+router.get('/setting/taskType/manage', async ctx => {
+  let modConfig = modules['setting.task.manage'];
+  let script = ['/setting.task.manage.js'];
   let { url, headers } = ctx.request;
   let result = await HttpClient.request(url, 'get', null, { headers });
   let body = result.body;
   
-  ctx.body = Template.renderWithHtml('工单表单设置', body, script, modConfig.template)
+  ctx.body = Template.renderWithHtml('工单类型设置', body, script, modConfig.template)
 });
 
-router.get('/setting/task/field/taskReceipt', async ctx => {
-  let modConfig = modules['setting.task.receipt_fields'];
-  let script = ['/setting.task.receipt_fields.js'];
+router.get('/setting/task/taskFormSet', async ctx => {
+  let modConfig = modules['setting.task.flow'];
+  let script = ['/setting.task.flow.js'];
+  let { url, headers } = ctx.request;
+  let result = await HttpClient.request(url, 'get', null, { headers });
+  let body = result.body;
   
-  ctx.body = Template.renderWithData('工单回执表单设置', {}, script, modConfig.template)
+  ctx.body = Template.renderWithHtml('工单流程设置', body, script, modConfig.template)
 });
 
+router.get('/setting/task/cardManage', async ctx => {
+  let modConfig = modules['setting.task.additional'];
+  let script = ['/setting.task.additional.js'];
+  let { url, headers } = ctx.request;
+  let result = await HttpClient.request(url, 'get', null, { headers });
+  let body = result.body;
+  
+  ctx.body = Template.renderWithHtml('附加组件设置', body, script, modConfig.template)
+});
+
+router.get('/setting/task/cardFormfields', async ctx => {
+  let modConfig = modules['setting.task.addcard_fields'];
+  let script = ['/setting.task.addcard_fields.js'];
+  let { url, headers } = ctx.request;
+  let result = await HttpClient.request(url, 'get', null, { headers });
+  let body = result.body;
+  
+  ctx.body = Template.renderWithHtml('附加组件表单设置', body, script, modConfig.template)
+});
+
+router.get('/setting/task/cardHoursRecord', async ctx => {
+  let modConfig = modules['setting.task.hoursrecord'];
+  let script = ['/setting.task.hoursrecord.js'];
+  let { url, headers } = ctx.request;
+  let result = await HttpClient.request(url, 'get', null, { headers });
+  let body = result.body;
+  
+  ctx.body = Template.renderWithHtml('工单设置', body, script, modConfig.template)
+});
 
 router.get('/setting/serviceStation/partShop', async ctx => {
   let script = ['/system.mall.index.js'];

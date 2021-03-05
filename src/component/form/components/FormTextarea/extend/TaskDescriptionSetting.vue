@@ -1,6 +1,45 @@
 <template>
   <div class="form-setting-panel">
-    <h3>{{ isSystem ? '系统' : '基础' }}字段 -- {{setting.name}}</h3>
+    <!-- start 标题 -->
+    <form-title-setting
+      :field="field"
+      :setting="setting"
+      :disabled="isSystem"
+      @input="updateForDom"
+    ></form-title-setting>
+    <!-- end 标题 -->
+
+    <!-- start 描述信息 -->
+    <form-describe-setting
+      :field="field"
+      @input="updateForDom"
+    ></form-describe-setting>
+    <!-- end 描述信息 -->
+
+    <!-- start 校验 -->
+    <div class="form-setting-group form-setting-item">
+      <h4 class="form-item-title">校验</h4>
+      <div class="form-item-box">
+        <!-- 必填 -->
+        <form-required-setting :field="field" @input="update"></form-required-setting>
+      </div>
+    </div>
+    <!-- end 校验 -->
+
+    <!-- start 字段权限 -->
+    <div class="form-setting-group form-setting-item">
+      <h4 class="form-item-title">字段权限</h4>
+      <div class="form-item-box">
+        <!-- 可见性 -->
+        <!-- <form-visible-setting :field="field" @input="update"></form-visible-setting> -->
+
+        <!-- 支持高级搜索 -->
+        <div class="form-search-setting">
+          <el-checkbox :value="true" disabled>支持高级搜索</el-checkbox>
+        </div>
+      </div>
+    </div>
+    <!-- end 字段权限 -->
   </div>
 </template>
 

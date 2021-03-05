@@ -390,7 +390,7 @@ export default class UserCard extends Vue {
         {
           this.isUserInCustomerTag && (
             <div>
-              <el-tooltip content='客户的服务团队' placement='top'>
+              <el-tooltip content='客户的服务部门' placement='top'>
                 <i class='iconfont icon-favorfill'></i>
               </el-tooltip>
             </div>

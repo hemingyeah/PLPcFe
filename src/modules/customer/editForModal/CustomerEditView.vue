@@ -7,18 +7,25 @@
 </template>
 
 <script>
-import CustomerEditForm from '../components/CustomerEditForm.vue'
-
-import * as FormUtil from '@src/component/form/util';
-import * as util from '../util/customer'
-
-import platform from '@src/platform';
-
-import * as CustomerApi from '@src/api/CustomerApi';
+/* api */
+import * as CustomerApi from '@src/api/CustomerApi.ts'
+/* component */
+import CustomerEditForm from '@src/modules/customer/components/CustomerEditForm.vue'
+/* enum */
+import TenantDataLimitSourceEnum from '@model/enum/TenantDataLimitSourceEnum'
+import TenantDataLimitTypeEnum from '@model/enum/TenantDataLimitTypeEnum'
+/* util */
+import platform from '@src/platform'
+import * as FormUtil from '@src/component/form/util'
+import * as util from '@src/modules/customer/util/customer'
+import { isFunction } from '@src/util/type'
+/* mixin */
+import VersionMixin from '@src/mixins/versionMixin/index.ts'
 
 export default {
   name: 'customer-edit-view',
   inject: ['initData'],
+  mixins: [VersionMixin],
   data() {
     return {
       submitting: false,
@@ -39,6 +46,10 @@ export default {
         .map(f => {
           if (f.formType === 'address' && f.isSystem) {
             f.isNull = this.initData.isAddressAllowNull ? 1 : 0;
+          }
+          // 客户名称加长度限制
+          if (f.fieldName == 'name') {
+            f.maxlength = 50
           }
           return f;
         })
@@ -66,27 +77,22 @@ export default {
         .then(valid => {
           this.submitting = false;
           if (!valid) return Promise.reject('validate fail.');
-
+          
           const params = util.packToCustomer(this.fields, this.form, this.initData.tags);
-          this.pending = true;
-          this.loadingPage = true;
+          
+          this.toggleLoading()
           this.createMethod(params, callBack);
         })
         .catch(err => {
-          console.error(err);
-          this.pending = false;
-          this.loadingPage = false;
+          console.error(err)
+          this.toggleLoading(false)
         });
     },
     createMethod(params, callBack) {
-      this.$http.post(this.postUrl, params)
+      this.checkNumExceedLimitAfterHandler(this.$http.post(this.postUrl, params))
         .then(result => {
-
-          this.pending = false;
-          this.loadingPage = false;
-
-          let isSucc = result.succ;
-
+          let isSucc = result.succ
+          
           platform.notification({
             type: isSucc ? 'success' : 'error',
             title: `创建客户${isSucc ? '成功' : '失败'}`,
@@ -94,11 +100,11 @@ export default {
           });
           
           if (!isSucc) return;
-
+          
           const addressId = result.data.addressId;
           const customerId = result.data.customerId;
           const linkmanId = result.data.linkmanId;
-
+          
           const customer = {
             id:customerId,
             name: params.name,
@@ -116,34 +122,53 @@ export default {
             customerManager: params.customerManager,
             customerManagerName: params.customerManagerName || ''
           }
-
-          callBack && typeof callBack == 'function' && callBack(customer);
+          
+          isFunction(callBack) && callBack(customer)
+          
         })
-        .catch(err => console.error('err', err));
+        .catch(err => {
+          console.error('editForModal CustomerEditView createMethod error', err)
+        })
+        .finally(() => {
+          this.toggleLoading(false)
+        })
     },
     initFormData() {
       let form = util.packToForm(this.fields, {}, this.initData.customerAddress);
       this.form = FormUtil.initialize(this.fields, form);
       this.addressBackup = this.form.customerAddress;
+    },
+    toggleLoading(loading = true) {
+      this.pending = loading
+      this.loadingPage = loading
     }
   },
   async mounted() {
     // 暴露提交方法
     window.submit = this.submit;
-
+    
     try {
       // 获取客户表单字段列表
       let result = await CustomerApi.getCustomerFields({isFromSetting: true});
       if (result.succ) {
         this.fieldInfo = result.data;
       }
-
+      
+      // 检查版本数量限制
+      this.checkNumExceedLimitBeforeHandler 
+      && this.checkNumExceedLimitBeforeHandler(
+        TenantDataLimitSourceEnum.Customer,
+        TenantDataLimitTypeEnum.Customer
+      )
+      
       // 初始化默认值
-      this.initFormData();
-      this.init = true;
-    } catch (e) {
-      console.error('CustomerEditView caught an error ', e);
+      this.initFormData()
+      this.init = true
+      
+    } catch (error) {
+      console.error('editForModal CustomerEditView mounted an error ', error)
     }
+    
   },
   components: {
     [CustomerEditForm.name]: CustomerEditForm

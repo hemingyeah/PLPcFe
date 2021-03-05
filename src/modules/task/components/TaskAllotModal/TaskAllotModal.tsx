@@ -120,9 +120,14 @@ export default class TaskAllotModal extends TaskAllotModalRender {
           </keep-alive>
         </div>
         
-        <propose-approve-dialog ref='ApproveDialog' taskId={this?.task?.id} onSuccess={() => this.allotSuccess()} />
+        <propose-approve-dialog 
+          ref='ApproveDialog' 
+          remarkRequired={Boolean(this.taskConfig.approveRemark)}
+          taskId={this?.task?.id} 
+          onSuccess={() => this.allotSuccess()}  
+        />
         
-        <div slot='footer' class='dialog-footer'>
+        <div slot='footer' class='dialog-footer task-allot-modal-dialog-footer'>
             <el-button onClick={() => this.close()}>取 消</el-button>
             <el-button type='primary' disabled={this.pending} onClick={() => this.submit()}>提 交</el-button>
         </div>

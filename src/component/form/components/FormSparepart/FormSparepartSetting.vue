@@ -1,25 +1,28 @@
 <template>
   <div class="form-setting-panel">
     <!-- start 标题 -->
-    <form-title-setting
-      :field="field"
-      :setting="setting"
-      @input="updateForDom"
-    ></form-title-setting>
+    <div class="form-setting-group form-common-setting">
+      <h3 class="form-setting-panel-title">{{ field.displayName }}</h3>
+      <div class="form-design-warning">备件组件可以在工单完成时选择备件库中的备件直接管理核销出库，并生成价格。</div>
+    </div>
     <!-- end 标题 -->
-    <div class="form-setting-group">
-      <p class="form-separator-setting-tips">备件组件可以在工单完成时选择备件库中的备件直接管理核销出库，并生成价格。</p>
-      <!-- start 描述信息 -->
-      <form-describe-setting
-        :field="field"
-        @input="updateForDom"
-      ></form-describe-setting>
-      <!-- end 描述信息 -->
-      <div class="form-setting-group">
-        <el-checkbox :value="field.isNull" @input="update($event, 'isNull')" :true-label="0" :false-label="1">必填</el-checkbox>
+
+    <!-- start 描述信息 -->
+    <form-describe-setting
+      :field="field"
+      @input="updateForDom"
+    ></form-describe-setting>
+    <!-- end 描述信息 -->
+
+    <!-- start 校验 -->
+    <div class="form-setting-group form-setting-item">
+      <h4 class="form-item-title">校验</h4>
+      <div class="form-item-box">
+        <!-- 必填 -->
+        <form-required-setting :field="field" @input="update"></form-required-setting>
       </div>
     </div>
-    
+    <!-- end 校验 -->
   </div>
 </template>
 
@@ -39,19 +42,9 @@ export default {
       
       this.update(value, prop)
     },
-    update(value, prop){
-      this.$emit('input', {value, prop});
+    update(value, prop, isSetting = false) {
+      this.$emit('input', {value, prop, isSetting});
     }
   }
 }
 </script>
-
-<style lang="scss">
-.form-separator-setting-tips{
-  margin-top: 10px;
-  padding: 10px;
-  border-radius: 2px;
-  background-color: #fdf6ec;
-  color: #e6a23c;
-}
-</style>

@@ -45,6 +45,19 @@ function createAttachmentDom(h, attachments){
     : ''
 }
 
+function createLinkDom(h,s){
+  const reg = /((((https?|ftp?):(?:\/\/)?)(?:[-;:&=\+\$]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\?\+=&;:%!\/@.\w_]*)#?(?:[-\+=&;%!\?\/@.\w_]*))?)/g;
+  const str=s.replace(reg,str=>`@@${str}@@`);
+  const arr=str.split('@@');
+  return <p class="pre-line secondary-info">{arr.map(item=>{
+    if(item.indexOf('http')===0){
+      return <a href={item} target='_blank'>{item}</a>
+    }else{
+      return <span>{item}</span>
+    }
+  })}</p>
+}
+
 export default {
   name: 'task-info-record',
   inject: ['initData'],
@@ -403,7 +416,7 @@ export default {
         </h5>,
         content.isDelete == 'true'
           ? <p class="text-danger">{content.deleteUserName}于{content.deleteTime}删除了该备注。</p> 
-          : [<p class="pre-line secondary-info">{content.updateContent}</p>, createAttachmentDom(h, attachments)]
+          : [createLinkDom(h,content.updateContent), createAttachmentDom(h, attachments)]
       ]
     },
     /* 渲染api新建 */
@@ -515,7 +528,7 @@ export default {
     /* 渲染工单审批dom */
     renderTaskApproveDom(record = {}) {
       let { content, taskNo, address, userName, longitude, latitude } = record;
-      let { state } = content;
+      let { state, level } = content;
       // 工单审批状态
       let taskState = {
         unApproved: state == 'unapproved',
@@ -523,6 +536,8 @@ export default {
         fail: state == 'fail',
         offed: state == 'offed',
       }
+      // 工单审批等级
+      let levelName =  level >= 1 ? ['零', '一', '二', '三', '四', '五', '六', '七', '八', '九'][level] + '级': '';
       // 是否显示地址
       let isShowAddress = address && address != 'PC端';
       // 地址数据
@@ -544,15 +559,15 @@ export default {
       
       // 审批成功dom
       let isAutoApprove = userName == '自动审批';
-      let autoApproveDom = <h5>工单 #{ taskNo } { content.action }节点未设置审批人，流程自动审批通过</h5>;
+      let autoApproveDom = <h5>工单 #{ taskNo } { content.action }节点未设置{ levelName }审批人，流程自动审批通过</h5>;
       let notAutoApproveDom = [
-        <div><strong>{ userName }</strong> 通过了对工单 #{taskNo} { content.action } 操作的审批</div>,
+        <div><strong>{ userName }</strong> 通过了对工单 #{taskNo} { content.action } 操作的{ levelName }审批</div>,
         content.remark && <div>备注：{ content.remark }</div>
       ]
       let successDom = isAutoApprove ? autoApproveDom : notAutoApproveDom;
       // 审批失败dom
       let failDom = [
-        <div><strong>{ userName }</strong> 拒绝了对工单 #{taskNo} { content.action } 操作的审批</div>,
+        <div><strong>{ userName }</strong> 拒绝了对工单 #{taskNo} { content.action } 操作的{ levelName }审批</div>,
         content.remark && <div>备注：{ content.remark }</div>
       ];
       // 审批撤回dom
@@ -745,7 +760,7 @@ export default {
         <h5><strong>{ userName }</strong> { action } 了工单 #{ taskNo }。</h5>,
         synergy && <div>{`协同人：${ synergy }`}</div>,
         updateType == 'tRecord' && <div>{ updateContent }</div>,
-        isGoBack !== undefined && <div> 工单被取消，备件及服务项目{ isGoBack == '1' ? '已' : '未' }退回 </div>,
+        isGoBack !== undefined && <div> {isGoBack !== null ? `工单被取消，备件及服务项目${ isGoBack == '1' ? '已' : '未' }退回` : ''} </div>,
         createAttachmentDom(h, attachments)
       ];
     },

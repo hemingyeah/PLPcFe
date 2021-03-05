@@ -5,6 +5,7 @@ import {
   getTaskAutoDispatchApprove, 
   taskAutoDispatch, 
   getTaskAllotApprove, 
+  getTransferTaskAllotApprove,
   taskAllotExcutor, 
   taskAllotTaskPoll, 
   getTaskAllotTaskPoolApprove, 
@@ -488,9 +489,10 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
   }
   
   /* 派单审批 */
-  public fetchApproveWithTaskAllot(params: AllotExcutorParams): Promise<any | null> {
+  public fetchApproveWithTaskAllot(params: AllotExcutorParams, isReAllot: Boolean = false): Promise<any | null> {
+    let fetchAllotApproveAction = isReAllot ? getTransferTaskAllotApprove : getTaskAllotApprove;
     return (
-      getTaskAllotApprove(params)
+      fetchAllotApproveAction(params)
       .then((result: getTaskAllotApproveResult) => {
         let isSuccess = result.succ
         let isNeedApprove = !isSuccess && result.message === Approve.message
@@ -995,7 +997,7 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
     
     // 验证审批
     const allotExecutorParams = this.buildAllotExcutorParams()
-    let approve: any | null = await this.fetchApproveWithTaskAllot(allotExecutorParams)
+    let approve: any | null = await this.fetchApproveWithTaskAllot(allotExecutorParams, true)
     if (!approve) return
     
     let isNeedApprove = approve.isNeedApprove === true

@@ -392,7 +392,7 @@ export default {
         seeAllOrg: true,
         // selected: this.shareInfo.selectedUsers,
         max,
-        action: "/wiki/approver/list",
+        action: '/security/tag/userList',
       };
       return this.$fast.contact
         .choose("dept", options)

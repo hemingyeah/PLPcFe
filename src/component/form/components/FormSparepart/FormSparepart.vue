@@ -50,6 +50,12 @@
           </template>
           <!-- end 操作 -->
 
+          <!-- start 安装产品id获取安装产品名称 -->
+          <template v-else-if="column.field === 'installProductId'">
+            {{ getProductName(scope.row[column.field]) }}
+          </template>
+          <!-- end  安装产品id获取安装产品名称 -->
+
           <template v-else>{{ scope.row[column.field] }}</template>
         </template>
       </el-table-column>
@@ -67,6 +73,17 @@
             </form-item>
           </template>
           <!-- end 仓库 -->
+
+          <!-- start 安装产品 只有一个产品默认选中-->
+          <template v-if="partField.length && products.length == 1">
+            <template slot="installProductId" slot-scope="{ field }" >
+              <form-item :label="field.displayName">
+                <form-select :field="field" v-model="installProductId" />
+              </form-item>
+            </template>
+          </template>
+          
+          <!-- end 安装产品 -->
 
           <!-- start 备件 -->
           <template slot="part" slot-scope="{ field }">
@@ -139,10 +156,12 @@ import FormMixin from '@src/component/form/mixin/form';
 /* util */
 import MathUtil from '@src/util/math';
 import * as math from 'mathjs';
+import _ from 'lodash';
 
 export default {
   name: 'form-sparepart',
   mixins: [FormMixin],
+  inject: ['initData'],
   props: {
     field: {
       type: Object,
@@ -155,12 +174,16 @@ export default {
   },
   data() {
     return {
+      partField: [],
+      installProductId: '',
+      products: this.initData.task.products,
+      originValue: [],
       visible: false,
       showRepertory: true,
       repertoryId: 0, // 仓库ID
       repertoryList: [], // 仓库列表数据
       selectedSparepart: [], // 当前选中的备件
-      sparepart: this.initData(), // 备件信息
+      sparepart: this._initData(), // 备件信息
       config: {}, // 备件配置
       editUnitPrice: false, // 是否可以修改单品价格
       isPaySuccess: false // 是否支付成功
@@ -202,14 +225,21 @@ export default {
           minWidth: '70px'
         })
       }
-
+      
+      // 增加安装产品和安装位置
+      this.partField.forEach((_part, _ind) => {
+        colums.splice(_ind + 1, 0, {
+          label: _part.displayName,
+          field: _part.fieldName
+        })
+      })
       return colums;
     },
     /**
     * @description 备件字段
     */
     fields() {
-      return [{
+      let fields = [{
         formType: 'select',
         fieldName: 'repertory',
         displayName: '仓库',
@@ -263,6 +293,12 @@ export default {
         isNull: 1,
         disabled: true
       }]
+
+      // 增加安装产品和安装位置
+      this.partField.forEach((_part, _ind) => {
+        fields.splice(_ind + 2, 0, _part)
+      })
+      return fields
     },
     /**
     * @description 小计
@@ -278,12 +314,34 @@ export default {
       return this.editUnitPrice && !this.isPaySuccess;
     }
   },
+  watch: {
+    visible(n) {
+      this.chooseDefaultProduct()
+    }
+  },
   methods: {
+    // 根据产品id获取产品名称
+    getProductName(id) {
+      let name = ''
+      this.products.forEach(product => {
+        if (id == product.id) {
+          name = product.name
+        }
+      })
+      return name
+    },
+    // 只有一个产品时默认选中
+    chooseDefaultProduct() {
+      if (this.partField.length && this.products.length && this.products.length == 1) {
+        this.installProductId = this.products[0].id
+        this.$set(this.sparepart, 'installProductId', this.installProductId)
+      }
+    },
     /**
     * @description 初始化备件默认值
     */
-    initData() {
-      return {
+    _initData() {
+      let _initData = {
         id: '',
         name: '',
         serialNumber: '',
@@ -297,12 +355,51 @@ export default {
         repertoryCount: '',
         description: ''
       }
+      // 安装产品和安装位置有数据时 增加这两个字段
+      if (this.value && this.value.length) {
+        this.value.forEach(val => {
+          for (let v in val) {
+            if (v == 'installProductId') {
+              _initData.installProductId = ''
+            } else if (v == 'installPosition') {
+              _initData.installPosition = ''
+            }
+          }
+        })
+      }
+      return _initData
     },
     /**
     * @description 修改列表备件数量
     */
     handleSparepartNum(item) {
-      const maxNum = item.repertoryCount;
+      let maxNum = item.repertoryCount || 0;
+      // 如果有自定义字段 maxNum为库存减去列表其它num
+      if (this.partField.length) {
+        if (!item.isAdd) {
+          // 如果该备件没有做标记则做标记
+          item.isAdd = true
+        }
+        this.value.forEach((val, ind) => {
+          // id相同时说明是同一个备件 只是自定义选择的不一样
+          if (item.id == val.id && val.isAdd) {
+            let index = -1
+            const attribute1 = item.attribute || {}
+            const attribute2 = val.attribute || {}
+            if (_.isEqual(attribute1, attribute2)) {
+              index = ind
+            }
+            console.log(index, this.originValue, this.value, 'originValue 调试123')
+            // originValue存在 说明是备件列表已存在的备件 库存变动为number减去originValue.number
+            let num = val.number
+            if (index > -1 && this.originValue[index]) num = this.originValue[index].number
+            maxNum -= num
+          }
+        })
+        maxNum < 0 ? maxNum = 0 : ''
+        // 当前备件最大的库存应为库存减去所有同一个id的备件库存再加上当前备件的数量
+        maxNum += item.number
+      }
       let value = Number(item.number);
       let count = this.decimalNumber(value);
 
@@ -312,7 +409,7 @@ export default {
         return;
       }
       
-      if (maxNum != '' && value > maxNum) {
+      if (value > maxNum) {
         this.$platform.alert(`库存数量为：${ maxNum}`);
         item.number = maxNum;
         return;
@@ -345,8 +442,9 @@ export default {
     */
     reset() {
       this.repertoryId = this.repertoryList[0]?.value || 0;
-      this.sparepart = this.initData();
+      this.sparepart = this._initData();
       this.selectedSparepart = [];
+      this.installProductId = ''
 
       // 清空校验结果
       setTimeout(() => {
@@ -373,7 +471,8 @@ export default {
     updateRepertory() {
       // 重置备件信息
       this.selectedSparepart = [];
-      this.sparepart = this.initData();
+      this.sparepart = this._initData();
+      this.chooseDefaultProduct()
     },
     /**
     * @description 搜索备件
@@ -414,19 +513,41 @@ export default {
           this.sparepart[key] = newValue[key];
         }
       }
+      this.chooseDefaultProduct()
     },
     /**
     * @description 数量校验
     */
     validateNumber(value, field) {
-      const maxNum = this.sparepart.availableNum || '';
+      let maxNum = this.sparepart.availableNum || 0;
+      // 如果有自定义字段 maxNum为库存减去列表其它num
+      if (this.partField.length) {
+        maxNum = this.sparepart.repertoryCount || 0;
+        this.value.forEach((val, ind) => {
+          // id相同时说明是同一个备件 只是自定义选择的不一样
+          if (this.sparepart.id == val.id && val.isAdd) {
+            let index = -1
+            const attribute1 = this.sparepart.attribute || {}
+            const attribute2 = val.attribute || {}
+            if (_.isEqual(attribute1, attribute2)) {
+              index = ind
+            }
+            console.log(index, this.originValue, this.value, 'originValue 调试123')
+            // originValue存在 说明是备件列表已存在的备件 库存变动为number减去originValue.number
+            let num = val.number
+            if (index > -1 && this.originValue[index]) num = val.number - this.originValue[index].number
+            maxNum -= num
+          }
+        })
+        maxNum < 0 ? maxNum = 0 : ''
+      }
       const val = Number(value);
       let count = this.decimalNumber(val);
 
       return new Promise((resolve, reject) => {
         if (val <= 0) {
           return resolve('请输入正确的数量');
-        } else if(maxNum && value > maxNum){
+        } else if(val > maxNum){
           return resolve('库存不足，请输入正确的数量');
         } else if (count != -1 && count == 0) {
           return resolve('请输入大于0的正整数');
@@ -462,12 +583,28 @@ export default {
         let newValue = this.value;
 
         // 查找已添加的备件中是否存在该备件
-        let ids = newValue.findIndex(val => val.id == sparepartObj.id);
+        let ids = ''
+        if (this.partField.length) {
+          // 如果有自定义字段 安装产品和安装位置 还需要判断安装产品和安装位置是否相等
+          sparepartObj.attribute = {
+            installPosition: this.sparepart.installPosition,
+            installProductId: this.sparepart.installProductId
+          }
+          // 加入进来的新增isAdd字段 避免编辑回执时计算备件availableNum出错
+          sparepartObj.isAdd = true
+          ids = newValue.findIndex(val => val.id == sparepartObj.id && _.isEqual(val.attribute, sparepartObj.attribute));
+          
+        } else {
+          ids = newValue.findIndex(val => val.id == sparepartObj.id);
+        }
 
         if (ids > -1) {
           const sum = Number(math.add(math.bignumber(newValue[ids].number), math.bignumber(sparepartObj.number)));
           newValue[ids].number = sum > sparepartObj.availableNum ? sparepartObj.availableNum : sum;
 
+          if (this.partField.length) {
+            newValue[ids].number = sum
+          }
         } else {
           newValue.push(sparepartObj);
         }
@@ -519,6 +656,46 @@ export default {
       // 设置仓库默认值
       this.repertoryId = this.repertoryList[0]?.value || 0;
       
+      // 获取是否有安装产品和安装位置 目前只有博立有数据 其它的数据为空
+      const result = await TaskApi.getExpensePartField()
+      if (result.code == 0) {
+        result.result.forEach((res, ind) => {
+          if (res.fieldName == 'installProductId') {
+            // 设置安装产品的下拉数据
+            let _res = Object.assign({}, res)
+            let products = this.products
+            products.forEach(product => {
+              product.text = product.name
+              product.value = product.id
+            })
+            _res.setting = {
+              isMulti: false,
+              dataSource: products
+            }
+            result.result.splice(ind, 1, _res)
+          } else if (res.fieldName == 'installPosition') {
+            // 设置安装位置的下拉数据
+            let dataSource = res.setting.dataSource
+            let _res = Object.assign({}, res)
+            _res.setting = {
+              isMulti: res.setting.isMulti,
+              dataSource: []
+            }
+            dataSource.forEach(s => {
+              _res.setting.dataSource.push({
+                text: s,
+                value: s
+              })
+            })
+            result.result.splice(ind, 1, _res)
+          }
+        })
+        this.partField = result.result || []
+        if (this.value && this.value.length) {
+          this.originValue = _.cloneDeep(this.value)
+          console.log(this.originValue, 'originValue断点')
+        }
+      }
     } catch (err) {
       console.error('err', err);
     }

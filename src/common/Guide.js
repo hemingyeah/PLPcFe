@@ -8,33 +8,6 @@ import GrayUtil from '@src/util/gray';
 
 import Vue from 'vue';
 
-// <div id="guide-test"></div>
-// this.$nextTick(()=>{
-//   this.$Guide([{
-//     content:
-// '步骤1',
-//     haveStep: true,
-//     nowStep: 1,
-//     gStyle: 'top:35px',
-//     id: 'guide-test',
-//     finishBtn: 'OK',
-//     needCover:true,
-//     diyContent:true,
-//     diyContentDom:组件名称
-//   }, {
-//     content:
-// '步骤2',
-//     haveStep: true,
-//     nowStep: 2,
-//     gStyle: 'top:35px',
-//     id: 'guide-test',
-//     finishBtn: 'OK',
-//   }], 0, '', (e)=>{
-//     return new Promise((resolve, reject)=>{
-//       resolve()
-//     })
-//   }).create()
-// })
 class Guide {
   constructor(arr = [], nowStep, storageKe, watchStepFn) {
     this.arr = arr;
@@ -55,7 +28,18 @@ class Guide {
       });
     };
     this.finishBtnFn = () => {
-      return this.stopStep();
+      return new Promise((resolve, reject) => {
+        if (watchStepFn)
+          return watchStepFn({ type: 'finish', nowStep: this.nowStep }).then(
+            (res) => {
+              if (storageKe) storageSet(storageKe, arr.length);
+              resolve();
+            }
+          );
+
+        if (storageKe) storageSet(storageKe, arr.length);
+        resolve();
+      });
     };
     this.previousStep = () => {
       return new Promise((resolve, reject) => {
@@ -117,6 +101,7 @@ class Guide {
               canUse={obj.canUse}
               inside={obj.inside}
               nowStep={obj.nowStep}
+              title={obj.title}
               content={obj.content}
               needCover={obj.needCover}
               finishBtn={obj.finishBtn}
@@ -130,6 +115,11 @@ class Guide {
               finishBtnFn={_this.finishBtnFn}
               watchContentClick={_this.watchContentClick}
               nextStep={_this.nextStep}
+              copyDom={obj.copyDom}
+              direction={obj.direction}
+              lastFinish={obj.lastFinish}
+              insideDom={obj.insideDom}
+              outsideParent={obj.outsideParent}
             >
               <template slot="diyContent">
                 <Test />
@@ -158,6 +148,16 @@ class Guide {
 }
 
 function domGuide(arr = [], nowStep, storageKe, watchStepFn) {
+  if(!arr || arr.length <= 0){
+    return {
+      create: () => {
+        return Promise.resolve(false)
+      },
+      destroy: () => {
+        return Promise.resolve(false)
+      },
+    };
+  }
   let productPreFixedPath = GrayUtil.getProductV2ApiPath();
   let guideType;
   try {
@@ -172,8 +172,12 @@ function domGuide(arr = [], nowStep, storageKe, watchStepFn) {
     create: () => {
       return Promise.resolve(false)
     },
-    destroy: () => {},
+    destroy: () => {
+      return Promise.resolve(false)
+    },
   };
+  
+  
 }
 
 export default domGuide;

@@ -1,5 +1,5 @@
 export default class Field{
-  constructor(options = {}){
+  constructor(options = {}) {
     // 以下字段需要在提交时补全
     this.tenantId = options.tenantId;
     this.tableName = options.tableName;
@@ -22,15 +22,19 @@ export default class Field{
     this.defaultValue = options.defaultValue;
     this.enabled = options.enabled || 1;
     this.isDelete = options.isDelete || 0;
-
+    
     this.isHidden = options.isHidden || 0;
+    this.isCommon = options.isCommon || 0;
+    this.isPublic = options.isPublic || 0;
+    this.isDragCommon = options.isDragCommon || 0;
+    this.isOnceCommon = options.isOnceCommon || 0;
+    
     // 客户、产品的字段id
     this.fieldId = options.id;
     this.tableChsName = options.tableChsName;
     // 工单、事件的字段id
     this.id = options.id;
-
-
+    
     // linkman组件自定义接口参数
     this.searchUrl = options.searchUrl || '';
   }

@@ -95,6 +95,35 @@ export function getFields(params: {} | undefined) {
 }
 
 /**
+ * @description 获取工单表单数据
+ * @param {Object} params-- params
+ * @param {String} params.typeId -- 工单类型id
+ * @param {String} params.tableName -- task:工单表单字段 task_receipt:工单回执表单字段
+ * @param {String} params.isFromSetting -- 用于设置页全部显示，不用于设置页，则通过可见性和隐藏性来过滤字段
+ */
+export function getAllFields(params: {} | undefined) {
+  return http.get('/setting/taskType/getAllFields', params);
+}
+
+/**
+ * @description 获取工单表单公共字段列表
+ * @param {Object} params-- params
+ * @param {String} params.tableName -- task:工单表单字段 task_receipt:工单回执表单字段
+ */
+export function getCommonFieldList(params: {} | undefined) {
+  return http.get(`${fixedPrefixTaskPath}/outside/pc/task/getCommonFieldList`, params);
+}
+
+/**
+ * @description 确认开启工单设置灰度
+ * @param {Object} params-- params
+ * @param {String} params.isConfirm -- true为确认开启
+ */
+export function checkConfirmSettingGrayFunction(params: {} | undefined) {
+  return http.get('/setting/checkConfirmSettingGrayFunction', params);
+}
+
+/**
  * @description 查询客户产品关联字段
  * @param {Object} params -- 参数对象
  * @param {String} params.module -- 模块 customer/product
@@ -329,7 +358,7 @@ export function getCountForCreate(params: {} | undefined) {
  * @param {String} params.phone - 手机号
  */
 export function getCustomerByPhone(params: {} | undefined) {
-  return http.get('task/getCustomerByPhone', params, false);
+  return http.get('/task/getCustomerByPhone', params, false);
 }
 
 /**
@@ -550,6 +579,18 @@ export function reviewTask(params: {} | undefined) {
 }
 
 /**
+ * 回访工单-博立
+ * @param {Object} params - 参数对象
+ * @param {String} params.taskId - 工单id
+ * @param {String} params.suggestion - 回访备注
+ * @param {Object} params.evaluate - 自定义回访信息
+ * @param {Boolean} params.autoClosed - 回访并关闭true，光回访传false
+ */
+export function reviewTaskBoli(params: {} | undefined) {
+  return http.post(`${fixedPrefixTaskPath}/outside/pc/task/boLi/review`, params);
+}
+
+/**
  * @description 保存附加组件
  * @param {Object} params 参数对象
  * @param {String} params.cardId 附加组件id
@@ -713,6 +754,24 @@ export function taskSettingSave(params: {} | undefined) {
 }
 
 /**
+ * 将私有字段升级为公共字段/将公共字段降级为私有字段
+ * @param {Object} params - 参数对象
+ * @param {String} params.templateId - 工单类型id
+ * @param {Array} params.commonFieldFormList - 需升降的公共字段数组
+ */
+export function setCommonFields(params: {} | undefined) {
+  return http.post(`${fixedPrefixTaskPath}/outside/pc/task/setCommonFields`, params);
+}
+
+/**
+ * 更新公共字段设置
+ * @param {Object} params - 字段对象
+ */
+export function updateCommonField(params: {} | undefined) {
+  return http.post(`${fixedPrefixTaskPath}/outside/pc/task/updateCommonField`, params);
+}
+
+/**
  * 校验人员是否是审批人
  * @param {Object} params - 参数对象
  * @param {String} params.id - 人员id
@@ -737,6 +796,15 @@ export function cancelUserApproval(params: {} | undefined) {
  */
 export function deleteComponent(params: {} | undefined) {
   return http.post('/setting/fieldInfo/delete2', params, false);
+}
+
+/**
+ * 工单设置，删除组件
+ * @param {Object} params - 参数对象
+ * @param {String} params.id - 字段id
+ */
+export function deleteField(params: {} | undefined) {
+  return http.post('/setting/fieldInfo/delete3', params, false);
 }
 
 /**
@@ -939,7 +1007,7 @@ export function search(params: TaskSearchListModel): Promise<getTaskSearchListRe
  * @param {String} params.typeId - 配置id
  */
 export function savePrintTemplate(params: {} | undefined) {
-  return http.post('/setting/taskType/savePrintTemplates', params, false);
+  return http.post('/setting/taskType/savePrintTemplates', params, false, { headers: { indices: true }});
 }
 
 /**
@@ -948,7 +1016,7 @@ export function savePrintTemplate(params: {} | undefined) {
  * @param {String} params.typeId - 配置id
  */
 export function saveReportTemplate(params: {} | undefined) {
-  return http.post('/setting/taskType/saveReportTemplates', params, false);
+  return http.post('/setting/taskType/saveReportTemplates', params, false, { headers: { indices: true } });
 }
 
 /**
@@ -969,6 +1037,16 @@ export function saveSystemReport(params: {} | undefined) {
  */
 export function saveSystemPrint(params: {} | undefined) {
   return http.post('/setting/taskType/savePrint', params);
+}
+
+/**
+ * 修改工单类型颜色和名称
+ * 
+ * @param {string} params.name 工单类型名称
+ * @param {string} parmas.color 工单类型颜色
+ */
+export function updateTaskTypeNameAndColor(params: {} | undefined) {
+  return http.post(`${fixedPrefixTaskPath}/outside/pc/task/taskType/updateTaskType`, params);
 }
 
 /**
@@ -994,6 +1072,19 @@ export function editTask(params: TaskCreateAndEditModel) {
 export function getRelatedInfo(params: {} | undefined) {
   return http.get(
     `${fixedPrefixTaskPath}/outside/pc/task/getRelatedInfo`,
+    params
+  );
+}
+
+/**
+ * @description 查询关联显示项数据
+ * @param {Object} params 参数对象
+ * @param {String} params.customerId 客户id
+ * @param {Array} params.productIds 产品id数组
+ */
+export function getRelatedInfos(params: {} | undefined) {
+  return http.post(
+    `${fixedPrefixTaskPath}/outside/pc/task/getRelatedInfos`,
     params
   );
 }
@@ -1233,6 +1324,13 @@ export function getTaskAllotApprove(params: TaskAllotApproveGetModel): Promise<g
 }
 
 /**
+ * @description 工单指派-转派前验证是否审批接口
+ */
+export function getTransferTaskAllotApprove(params: TaskAllotApproveGetModel): Promise<getTaskAllotApproveResult> {
+  return http.post('/task/checkTransferTask', params)
+}
+
+/**
  * @description 工单指派-验证指派到工单池是否需要审批
  */
 export function getTaskAllotTaskPoolApprove(params: TaskAllotTaskPoolModel): Promise<getTaskAllotTaskPollApproveResult> {
@@ -1384,6 +1482,13 @@ export function histogramTotal(params = {}) {
  */
 export function getTaskTypesMap(): Promise<getTaskTypesResult> {
   return http.get('/api/task/outside/task/list/taskTypeMap')
+}
+
+/**
+ * @description 获取工单安装产品和安装位置字段 目前用于博立定制 后续可能通用
+ */
+export function getExpensePartField(params: {} | undefined) {
+  return http.get(`${fixedPrefixTaskPath}/outside/pc/task/getExpensePartField`, params);
 }
 
 

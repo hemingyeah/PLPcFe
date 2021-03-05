@@ -145,8 +145,6 @@ const BizTeamSelect = {
     },
    
     choose(value){
-      console.log('val::', value);
-
       // 单选
       if(!this.multiple){
         // let data = this.value.every(s => s.id !== value.id) ? [value] : [];

@@ -7,7 +7,7 @@
       <div class="setting-panel" ref="loadingWrapper">
         <div class="setting-panel-header">
           <!-- 说明信息 -->
-          <el-tooltip placement="bottom-start" effect="light" popper-class="tip-popper" :visible-arrow="false" content="绩效管理模块可以帮助企业管理针对服务团队和服务人员的定期绩效数据统一，根据您在这里配置的规则到绩效管理创建绩效统计报告。">
+          <el-tooltip placement="bottom-start" effect="light" popper-class="tip-popper" :visible-arrow="false" content="绩效管理模块可以帮助企业管理针对服务部门和服务人员的定期绩效数据统一，根据您在这里配置的规则到绩效管理创建绩效统计报告。">
             <h3 class="title"><span>绩效规则</span> <i class="iconfont icon-tip"></i></h3>
           </el-tooltip>
           <!-- 添加按钮 -->

@@ -17,7 +17,6 @@
             native-type="submit"
           >搜索</base-button>
           <base-button type="ghost" @event="resetParams">重置</base-button>
-          <!-- <a href="/customer/oldList">返回旧版</a> -->
         </div>
         <span class="advanced-search-visible-btn" @click.self="panelSearchAdvancedToggle">
           <i class="iconfont icon-add"></i>
@@ -187,33 +186,19 @@
             <template v-else-if="column.field === 'remindCount'">
               {{scope.row.attribute.remindCount || 0}}
             </template>
-            <template v-else-if="column.formType === 'select' && scope.row.attribute[column.field]">
-              {{scope.row.attribute[column.field] | displaySelect}}
-            </template>
-            <template v-else-if="column.formType === 'cascader' && scope.row.attribute[column.field]">
-              {{scope.row.attribute[column.field] | displayCascader}}
-            </template>
-            <template v-else-if="column.formType === 'user' && scope.row.attribute[column.field]">
-              {{ getUserName(column, scope.row.attribute[column.field]) }}
-            </template>
             <template v-else-if="column.formType === 'location'">
               {{ scope.row.attribute[column.field] && scope.row.attribute[column.field].address}}
             </template>
-
             <template v-else-if="column.formType === 'address'">
               {{formatCustomizeAddress(scope.row.attribute[column.field])}}
             </template>
-            <template v-else-if="column.formType == 'related_task'">
-              {{ getRelatedTask(scope.row.attribute[column.field]) }}
-            </template>
-
             <div class="pre-text" v-else-if="column.formType === 'textarea'" v-html="buildTextarea(scope.row.attribute[column.field])" @click="openOutsideLink"></div>
 
             <template v-else-if="column.isSystem === 0">
-              <pre class="pre-text">{{scope.row.attribute[column.field]}}</pre>
+              <pre class="pre-text">{{scope.row.attribute[column.field] | fmt_form_field(column.formType, column.fieldName, scope.row.attribute)}}</pre>
             </template>
             <template v-else>
-              <pre class="pre-text">{{scope.row[column.field]}}</pre>
+              <pre class="pre-text">{{scope.row[column.field] | fmt_form_field(column.formType, column.fieldName, scope.row.attribute)}}</pre>
             </template>
           </template>
         </el-table-column>
@@ -377,7 +362,7 @@ import * as CustomerApi from '@src/api/CustomerApi.ts';
 // import {searchLinkman} from '@src/api/EcSearchApi.js';
 import TeamMixin from '@src/mixins/teamMixin';
 import { isShowCustomerRemind } from '@src/util/version.ts'
-import VersionMixin from '@src/mixins/versionMixin'
+import VersionMixin from '@src/mixins/versionMixin/index.ts'
 
 const link_reg = /((((https?|ftp?):(?:\/\/)?)(?:[-;:&=\+\$]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\?\+=&;:%!\/@.\w_]*)#?(?:[-\+=&;%!\?\/@.\w_]*))?)/g;
 
@@ -507,26 +492,6 @@ export default {
         .filter(tag => tag && tag.tagName)
         .map(tag => tag.tagName)
         .join('，');
-    },
-    displaySelect(value) {
-      if (!value) return null;
-      if (value && typeof value === 'string') {
-        return value;
-      }
-      if (Array.isArray(value) && value.length) {
-        return value.join('，');
-      }
-      return null;
-    },
-    displayCascader(value) {
-      if (!value) return null;
-      if (value && typeof value === 'string') {
-        return value;
-      }
-      if (Array.isArray(value) && value.length) {
-        return value.join('/');
-      }
-      return null;
     }
   },
   async mounted() {
@@ -565,7 +530,7 @@ export default {
       if(Array.isArray(value)) {
         return value.map(i => i.displayName || i.name).join(',');
       }
-      
+
       let user = value || {};
       return user.displayName || user.name;
     },
@@ -1145,7 +1110,7 @@ export default {
           show: true
         },
         {
-          label: '服务团队',
+          label: '服务部门',
           field: 'tags',
           // width: '110px',
           show: true

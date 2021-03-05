@@ -279,6 +279,14 @@ export default {
         operator = 'location';
         break;
       }
+      case 'related_task': {
+        operator = 'array_eq';
+        break;
+      }
+      case 'formula': {
+        operator = 'eq';
+        break;
+      }
       default: {
         operator = 'like';
         break;
@@ -613,7 +621,11 @@ export default {
             item: this.selectedField,
             index: this.index,
           });
-          this.form[val] = val == 'tags' ? [] : '';
+          if(this.selectedField.formType === 'date') {
+            this.form[val] = []
+          }else {
+            this.form[val] = val == 'tags' ? [] : '';
+          }
           if (MultiFieldNames.indexOf(this.selectedField.fieldName) > -1) {
             this.form[val] = [];
           }

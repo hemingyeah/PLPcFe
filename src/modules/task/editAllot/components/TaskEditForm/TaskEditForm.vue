@@ -1,6 +1,6 @@
 <template>
   <div v-loading.fullscreen.lock="loading">
-    <form-builder ref="form" :fields="taskFields" :value="taskValue" @update="update">
+    <form-builder ref="form" :fields="taskFormFields" :value="taskValue" mode="task" @update="update">
 
       <template slot="taskNo" slot-scope="{ field, value }">
 
@@ -43,13 +43,14 @@
         <!-- start 客户 -->
         <form-item :label="field.displayName">
           <div class="input-and-btn">
-            <biz-form-remote-select
+            <biz-remote-select
               :value="value.customer"
               :field="customerField"
               :remote-method="searchCustomer"
               @input="updateCustomer"
               placeholder="请输入关键字搜索客户"
               :input-disabled="isCreateCustomer"
+              :computed-width-keys="['name']"
             >
               <div class="customer-template-option" slot="option" slot-scope="{ option }">
                 <h3>{{ option.name }}</h3>
@@ -64,7 +65,7 @@
                   </span>
                 </p>
               </div>
-            </biz-form-remote-select>
+            </biz-remote-select>
             <el-button @click="dialogOpen('customer')" v-if="!isCreateCustomer">新建</el-button>
           </div>
 
@@ -81,16 +82,17 @@
         <!-- start 联系人 -->
         <form-item v-if="customerOption.linkman" label="联系人">
           <div class="input-and-btn">
-            <biz-form-remote-select
+            <biz-remote-select
               ref="linkman"
-              v-model="value.linkman"
-              :remote-method="searchLinkmanOuterHandler"
-              @input="updateLinkman(value.linkman[0])"
               placeholder="请输入关键字搜索联系人"
-              :input-disabled="isCreateCustomer"
+              v-model="value.linkman"
               :cleared="true"
+              :remote-method="searchLinkmanOuterHandler"
+              :input-disabled="isCreateCustomer"
+              @input="updateLinkman(value.linkman[0])"
+              :computed-width-keys="['name']"
             >
-            </biz-form-remote-select>
+            </biz-remote-select>
             <el-button @click="dialogOpen('contact')" v-if="!isCreateCustomer">新建</el-button>
           </div>
         </form-item>
@@ -99,12 +101,14 @@
         <!-- start 地址 -->
         <form-item v-if="customerOption.address" label="地址">
           <div class="input-and-btn">
-            <biz-form-remote-select
+            <biz-remote-select
+              placeholder="请输入关键字搜索地址"
               v-model="value.address"
               :cleared="true"
               :remote-method="searchAddressOuterHandler"
-              placeholder="请输入关键字搜索地址">
-            </biz-form-remote-select>
+              :computed-width-keys="['address']"
+            >
+            </biz-remote-select>
             <el-button @click="dialogOpen('address')" v-if="!isCreateCustomer">新建</el-button>
           </div>
         </form-item>
@@ -114,14 +118,16 @@
         <form-item v-if="customerOption.product" label="产品" :validation="validation.product">
 
           <div class="input-and-btn">
-            <biz-form-remote-select
+            <biz-remote-select
               ref="product"
               :field="productField"
               v-model="value.product"
               :remote-method="searchProductOuterHandler"
               @input="updateProductForProductSelect"
               placeholder="请输入关键字搜索产品"
-              multiple>
+              multiple
+              :computed-width-keys="['name', 'serialNumber']"
+            >
               <div class="product-template-option" slot="option" slot-scope="{ option }">
                 <h3>{{ option.name }}</h3>
                 <p>
@@ -145,7 +151,7 @@
                   </span>
                 </p>
               </div>
-            </biz-form-remote-select>
+            </biz-remote-select>
             <el-button @click="dialogOpen('product')">新建</el-button>
           </div>
 
@@ -155,6 +161,20 @@
               {{ `${productRelevanceTaskCountData.unfinished}/${productRelevanceTaskCountData.all}` }}
             </el-button>
           </el-tooltip>
+
+          <!-- start 产品关联查询字段 -->
+          <div class="relation-product-list" v-if="value.product && value.product.length && relationProductfields.length">
+            <div class="relation-product-list-item" v-for="(product, index) in value.product" :key="product.id">
+              <div class="product-name">{{ product.label }}</div>
+              <div class="form-row-two-columns product-relation-field-list">
+                <div class="form-view-row" v-for="field in relationProductfields" :key="field.id">
+                  <label>{{ field.displayName }}</label>
+                  <div class="form-view-row-content"> {{ (value[field.fieldName] || [])[index] }} </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- end 产品关联查询字段 -->
 
         </form-item>
         <!-- end 产品 -->

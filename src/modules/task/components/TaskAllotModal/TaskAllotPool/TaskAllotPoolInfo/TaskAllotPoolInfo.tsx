@@ -71,7 +71,7 @@ export default class TaskAllotPoolInfo extends Vue {
           !this.hideCustomerTagInfo && (
             <div class={`${this.className}-item`}>
               <span class={`${this.className}-item-label`}>
-                客户服务团队待接单量: 
+                客户服务部门待接单量: 
               </span>
               <span class={`${this.className}-item-content`}>
                 {fmt_number(this.info?.customerTeamUnAcceptCount, '')}

@@ -248,10 +248,11 @@ const BizUserSelect = {
           onClick={ e => e.stopPropagation() }>
           <input
             type="text" ref="search"
-            class="search-user-keyword"
-            placeholder="请选择成员"
-            onInput={ this.handleInput } />
-          <div class="biz-user-select-panel" { ...panelAttrs }>
+            class="search-user-keyword" 
+            placeholder="请选择部门内的成员" 
+            onInput={this.handleInput}
+          />
+          <div class="biz-user-select-panel" {...panelAttrs}>
             { content }
             { this.renderUserList(h, this.page.list) }
           </div>

@@ -37,6 +37,11 @@ const BizFormRemoteSelect = {
     collapsed: {
       type: Boolean,
       default: false
+    },
+    /* 计算宽度的属性 */
+    computedWidthKeys: {
+      type: Array,
+      default: () => []
     }
   },
   methods: {
@@ -45,6 +50,9 @@ const BizFormRemoteSelect = {
     },
     input(value) {
       this.$emit('input', value);
+    },
+    onFocusHandler(selectElement) {
+      this.$emit('focus', selectElement)
     }
   },
   render(h) {
@@ -54,10 +62,11 @@ const BizFormRemoteSelect = {
         <i class="el-icon-error" style="color:rgba(211, 214, 217, 0.69);"></i>
       </div>
     )
-
+    
     return (
       <div class="biz-form-remote-select">
         <base-select
+          ref='BizFormRemoteBaseSelect'
           value-key={ this.valueKey }
           onInput={ this.input }
           placeholder={ this.placeholder }
@@ -67,6 +76,8 @@ const BizFormRemoteSelect = {
           multiple={ this.multiple }
           disabled={ this.inputDisabled }
           collapsed={ this.collapsed }
+          computedWidthKeys={this.computedWidthKeys}
+          onFocus={ this.onFocusHandler }
         >
         </base-select>
         { this.cleared && this.value.length > 0 && !this.inputDisabled && clearButton }

@@ -25,7 +25,7 @@ export function packToProduct(fields, form){
       all ? attribute[f.fieldName]['all'] = all : '';
     }
   
-    if (f.formType === 'location') {
+    if ((f.formType === 'location') && !attribute[f.fieldName].isHaveLocation) {
       attribute[f.fieldName] = {};
     }
   

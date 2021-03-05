@@ -29,27 +29,28 @@
 </template>
 
 <script>
-
+/* api */
 import {
   getProductFields,
   getProductDetail,
   createProduct,
   updateProduct
-} from '@src/api/ProductApi';
-import * as FormUtil from '@src/component/form/util';
+} from '@src/api/ProductApi'
+/* component */
 import ProductEditForm from '@src/modules/product/components/ProductEditFormV2.vue';
 import PublicDialog from '@src/modules/productV2/productView/components/PublicDialog.vue';
-
+/* enum */
+import TenantDataLimitSourceEnum from '@model/enum/TenantDataLimitSourceEnum'
+import TenantDataLimitTypeEnum from '@model/enum/TenantDataLimitTypeEnum'
+/* mixin */
+import VersionMixin from '@src/mixins/versionMixin/index.ts'
+/* util */
 import * as util from '@src/modules/product/utils/ProductMapping';
-
-
+import * as FormUtil from '@src/component/form/util';
+import { storageGet, storageSet } from '@src/util/storage'
 import initData from '@src/modules/productV2/productEdit/initData.js'
-import { storageGet, storageSet } from '@src/util/storage';
-const {
-  PRODUCT_PRODUCT_EDIT
-} = require('@src/component/guide/productV2Store');
-
-
+/* constants */
+const { PRODUCT_PRODUCT_EDIT } = require('@src/component/guide/productV2Store')
 
 export default {
   name: 'product-edit',
@@ -60,6 +61,7 @@ export default {
     }
   },
   inject: ['initData'],
+  mixins: [VersionMixin],
   data() {
     return {
       loadingPage: false,
@@ -103,6 +105,12 @@ export default {
       // 获取产品自定义字段
       let res = await getProductFields({isFromSetting: true});
       this.dynamicProductFields = res.data || [];
+      // 产品编号限制字数最大长度为100
+      this.dynamicProductFields.forEach(field => {
+        if (field.fieldName == 'serialNumber') {
+          field.maxlength = 100
+        }
+      })
     } catch (e) {
       console.error('product-add_edit fetch product fields error', e);
     }
@@ -113,12 +121,20 @@ export default {
       // 处理编辑时数据
       this.loadingPage = true;
       let res = await getProductDetail({id: this.productId});
-
+      
       this.loadingPage = false;
       if(res.id) form = res;
+    } else {
+      // 检查版本数量限制
+      this.checkNumExceedLimitBeforeHandler 
+      && this.checkNumExceedLimitBeforeHandler(
+        TenantDataLimitSourceEnum.Product,
+        TenantDataLimitTypeEnum.Product
+      )
     }
+    
     form = util.packToForm(this.productFields, form);
-
+    
     // 客户详情新建产品，会带的客户信息
     if (this.customer) {
       form.customer = [{
@@ -128,18 +144,14 @@ export default {
       }];
     }
     
-
     /**
      * 初始化所有字段的初始值
      * @param {*} fields 字段
      * @param {*} origin 原始值
      * @param {*} target 待合并的值
      */
-
     this.form = FormUtil.initialize(this.productFields, form);
-
-
-
+    
     if (storageGet(PRODUCT_PRODUCT_EDIT) && storageGet(PRODUCT_PRODUCT_EDIT) > 0) this.$Guide().destroy('product-product-edit')
     else this.$Guide([{
       content:
@@ -163,9 +175,12 @@ export default {
       this.submitting = true;
       this.$refs.productEditForm.validate()
         .then(valid => {
-          this.submitting = false;
-          if (!valid) return Promise.reject('validate fail.');
-          const params = util.packToProduct(this.productFields, this.form);
+          this.submitting = false
+          
+          if (!valid) return Promise.reject('validate fail.')
+          
+          const params = util.packToProduct(this.productFields, this.form)
+          
           this.productFields.forEach(field =>{
             if(field.fieldName == 'customer' && field.isSystem == 1) {
               if (!field.setting.customerOption.address) {
@@ -174,56 +189,57 @@ export default {
                 params.linkman = {}
               }
             }
-          });
-          this.pending = true;
-          this.loadingPage = true;
-          let fn = this.action === 'create' ? createProduct : updateProduct;
-          fn(params)
+          })
+          
+          this.toggleLoading()
+          
+          let fn = this.action === 'create' ? createProduct : updateProduct
+          
+          this.checkNumExceedLimitAfterHandler(fn(params))
             .then(res => {
-              let action = this.action === 'create' ? '新建' : '更新';
-
-              if (res.status) {
-                this.pending = false;
-                this.loadingPage = false;
-
+              let action = this.action === 'create' ? '新建' : '更新'
+              
+              if (!res.succ) {
+                this.toggleLoading(false)
                 return this.$platform.notification({
                   title: `${action}产品失败`,
                   message: res.message || '',
                   type: 'error',
                 })
               }
-              this.$refs.publicDialog.close();
-
+              
+              this.$refs.publicDialog.close()
+              
               this.$platform.notification({
                 title: `${action}产品成功`,
                 type: 'success',
-              });
-
+              })
+              
               if(this.action == 'create') {
-                this.reloadTab();
+                this.reloadTab()
               } else {
-                let fromId = window.frameElement.getAttribute('fromid');
-                this.$platform.refreshTab(fromId);
+                let fromId = window.frameElement.getAttribute('fromid')
+                this.$platform.refreshTab(fromId)
               }
+              
               if (this.customer) {
-                window.location.href = `/customer/view/${this.customer.id}`;
+                window.location.href = `/customer/view/${this.customer.id}`
               } else {
-                window.location.href = `/customer/product/view/${res.data}`;
+                window.location.href = `/customer/product/view/${res.data}`
               }
+              
             })
             .catch(err => {
               console.error(err);
-              this.pending = false;
-              this.loadingPage = false;
+              this.toggleLoading(false)
             })
             .finally(()=>{
               this.$refs.publicDialog.changeLoading(false);
-            });
+            })
         })
         .catch(err => {
           console.error(err);
-          this.pending = false;
-          this.loadingPage = false;
+          this.toggleLoading(false)
         })
     },
     submitChooseQrcode(){
@@ -234,12 +250,10 @@ export default {
         })
         .catch(err => {
           console.error(err);
-          this.pending = false;
-          this.loadingPage = false;
+          this.toggleLoading(false)
         })
     },
     dialogBind(e){
-      console.log('dialogBind', e)
       this.form['qrcodeId'] = e.qrcodeId;
       this.submit();
     },
@@ -252,7 +266,6 @@ export default {
     },
     reloadTab() {
       let fromId = window.frameElement.getAttribute('fromid');
-
       this.$platform.refreshTab(fromId);
     },
     async cloneProduct(id){
@@ -260,11 +273,11 @@ export default {
       // 处理编辑时数据
       this.loadingPage = true;
       let res = await getProductDetail({id});
-
+      
       this.loadingPage = false;
       if(res.id) form = res;
       form = util.packToForm(this.productFields, form);
-
+      
       // 客户详情新建产品，会带的客户信息
       if (this.customer) {
         form.customer = [{
@@ -273,16 +286,18 @@ export default {
           ...this.customer
         }];
       }
-
       /**
-     * 初始化所有字段的初始值
-     * @param {*} fields 字段
-     * @param {*} origin 原始值
-     * @param {*} target 待合并的值
-     */
-
+       * 初始化所有字段的初始值
+       * @param {*} fields 字段
+       * @param {*} origin 原始值
+       * @param {*} target 待合并的值
+       */      
       this.form = FormUtil.initialize(this.productFields, form)
     },
+    toggleLoading(loading = true) {
+      this.pending = loading
+      this.loadingPage = loading
+    }
   },
   components: {
     [ProductEditForm.name]: ProductEditForm,

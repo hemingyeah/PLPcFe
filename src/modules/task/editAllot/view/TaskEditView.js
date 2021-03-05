@@ -24,6 +24,10 @@ import computed from './computed'
 import methods from './methods'
 /* enum */
 import { TaskFieldNameMappingEnum } from '@model/enum/FieldMappingEnum.ts'
+import TenantDataLimitSourceEnum from '@model/enum/TenantDataLimitSourceEnum'
+import TenantDataLimitTypeEnum from '@model/enum/TenantDataLimitTypeEnum'
+/* mixin */
+import VersionMixin from '@src/mixins/versionMixin/index.ts'
 /* constant */
 import { PLATN_TASK_PLAN_TIME_REQUIRES_MESSAGE } from '@src/model/const/Alert.ts'
 
@@ -32,6 +36,7 @@ let taskTemplate = {};
 export default {
   name: 'task-edit-view',
   inject: ['initData'],
+  mixins: [VersionMixin],
   data() {
     data.template = taskTemplate
     return data
@@ -44,10 +49,11 @@ export default {
       // 初始化默认值
       let form = this.workTask;
       
-      this.fields = await TaskApi.getTaskTemplateFields({ templateId: this.genTemplateId(), tableName: 'task' });
+      this.fields = await TaskApi.getAllFields({ typeId: this.genTemplateId(), tableName: 'task', isFromSetting: true });
       
       form = util.packToForm(this.fields, form);
       this.form = FormUtil.initialize(this.fields, form);
+      this.form.templateId = this.genTemplateId();
       
       // 呼叫中心需求处理
       this.callCenterWithTaskDataHandler();
@@ -69,7 +75,11 @@ export default {
         if(query.openAllotSetting) {
           await this.planTaskEditDialogOpen();
         }
-      });
+      })
+      
+      // 版本数量限制
+      this.checkNumExceedLimitHandler()
+      
     } catch (error) {
       console.warn('error ', error)
     }
@@ -137,7 +147,9 @@ export default {
      * @description 创建工单方法
     */
     createTaskMethod(params, isAllot) {
-      TaskApi.createTask(params)
+      const CreateTaskPromise = TaskApi.createTask(params)
+      
+      this.checkNumExceedLimitAfterHandler(CreateTaskPromise)
         .then(res => {
           let isSucc = res.success;
           
@@ -148,6 +160,7 @@ export default {
           })
           
           if (!isSucc) {
+            --this.submitCount
             return this.togglePending();
           }
           
@@ -175,6 +188,32 @@ export default {
           this.togglePending();
           console.error('err', err)
         })
+    },
+    /** 
+     * @description 检查版本数量限制
+    */
+    checkNumExceedLimitHandler() {
+      if (!this.checkNumExceedLimitBeforeHandler) return
+      
+      // 检测新建计划任务
+      if (this.isFromPlan) {
+        return (
+          this.checkNumExceedLimitBeforeHandler(
+            TenantDataLimitSourceEnum.PlanTask,
+            TenantDataLimitTypeEnum.PlanTask
+          )
+        )
+      }
+      
+      // 检测新建工单
+      if (this.isTaskCreate || this.isFromProduct || this.isFromEvent || this.isFromCustomer) {
+        return (
+          this.checkNumExceedLimitBeforeHandler(
+            TenantDataLimitSourceEnum.Task,
+            TenantDataLimitTypeEnum.Task
+          )
+        )
+      }
     },
     /** 
      * @description 从客户新建工单处理
@@ -364,9 +403,11 @@ export default {
      * @description 新建计划任务提交
     */
     planTaskCreateSubmit(params = {}) {
-      TaskApi.createPlanTask(params)
+      const PlanTaskCreatePromise = TaskApi.createPlanTask(params)
+      
+      this.checkNumExceedLimitAfterHandler(PlanTaskCreatePromise)
         .then(res => {
-          let isSucc = res.success;
+          let isSucc = res.success
           
           platform.notification({
             type: isSucc ? 'success' : 'error',
@@ -448,11 +489,6 @@ export default {
      * @description 关联显示项
     */
     relationFieldHandler() {
-      // 事件转工单/拷贝工单
-      if(!this.isFromEvent && !this.isCopyTask) return
-      // 从客户新建工单
-      if(this.isFromCustomer) return;
-      
       // 子组件form
       this.$nextTick(() => {
         let form = this.$refs.form;
@@ -503,9 +539,9 @@ export default {
             let isFirstCreate = this.submitCount <= 1 && this.isTaskCreate
             let taskMethodFunc = isFirstCreate ? this.createTaskMethod : this.updateTaskMethod
             return taskMethodFunc(params, isAllot)
-          } else {
-            return this.openAllotModel(this.allotTask)
           }
+          
+          return this.openAllotModel(this.allotTask)
           
         })
         .catch(err => {

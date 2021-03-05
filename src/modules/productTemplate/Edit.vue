@@ -1,9 +1,9 @@
 <template>
   <div class="product-template-edit-container" v-loading.fullscreen.lock="loadingPage">
-
+    
     <!-- start 新建编辑表单 -->
     <form @submit.prevent="submit" class="base-form" v-if="init" novalidate>
-
+      
       <!-- start 页面顶部按钮 -->
       <div class="page-title">
         <div class="title">
@@ -13,10 +13,9 @@
         </div>
       </div>
       <!-- end 页面顶部按钮 -->
-
+      
       <!-- start form builder -->
       <form-builder ref="productTemplateEditForm" :fields="fields" mode="productTemplate" :value="form" @update="update">
-
         <!-- start 产品类型 -->
         <template slot="type" slot-scope="{field}">
           <form-item :label="field.displayName" validation>
@@ -36,24 +35,36 @@
           </form-item>
         </template>
       <!-- end 产品类型 -->
-
+      
       </form-builder>
       <!-- end form builder -->
-
+      
     </form>
     <!-- end 新建编辑表单 -->
-
+    
   </div>
 </template>
 
 <script>
-import * as FormUtil from '@src/component/form/util';
-import platform from '@src/platform';
-
-import { productTemplateCreate, productTemplateUpdate, getProductTemplate , getProductFields } from '@src/api/ProductApi.js'
+/* api */
+import { 
+  productTemplateCreate, 
+  productTemplateUpdate, 
+  getProductTemplate, 
+  getProductFields 
+} from '@src/api/ProductApi'
+/* enum */
+import TenantDataLimitSourceEnum from '@model/enum/TenantDataLimitSourceEnum'
+import TenantDataLimitTypeEnum from '@model/enum/TenantDataLimitTypeEnum'
+/* mixin */
+import VersionMixin from '@src/mixins/versionMixin/index.ts'
+/* util */
+import * as FormUtil from '@src/component/form/util'
+import platform from '@src/platform'
 
 export default {
   name: 'product-template-edit',
+  mixins: [VersionMixin],
   props: {
     initData: {
       type: Object,
@@ -62,16 +73,22 @@ export default {
   },
   data() {
     return {
-      auth: {}, // 权限
-      fieldsLocal: [], // 字段列表
+      // 权限
+      auth: {},
+      // 字段列表
+      fieldsLocal: [],
+      // 表单数据
       form: {
         name: '',
         serialNumber: '',
         type: ''
-      }, // 表单数据
-      init: false, // 初始化
-      loadingPage: false, // 加载页面
-      pending: false, // 等待状态
+      },
+      // 初始化
+      init: false, 
+      // 加载页面
+      loadingPage: false,
+      // 等待状态
+      pending: false,
       fieldsInfo: []
     }
   },
@@ -87,12 +104,12 @@ export default {
           return (
             f.fieldName !== 'customer' 
             && f.fieldName !== 'tags'
-          )
-        })
+        )
+      })
       );
       let localFields = this.fieldsLocal;
       let fields = [...localFields, ...originFields];
-
+      
       let sortedFields = fields.sort((a, b) => a.orderId - b.orderId)
         .map(f => {
           if (f.formType === 'address' && f.isSystem) {
@@ -110,38 +127,48 @@ export default {
       this.fieldsInfo = data;
     }
     // 初始化默认值
-    let form = {};
+    let form = {}
     // 编辑
     if(this.action == 'edit' && this.initData.id) {
       try {
-        this.loadingPage = true;
-  
+        this.toggleLoading(false)
+        
         let result = await getProductTemplate(this.initData.id);
-  
+        
         form = result;
-
+        
         if(form.attribute) {
           form = {
             ...form,
             ...form.attribute
           }
         }
-        this.loadingPage = false;
-
       } catch(err) {
-        console.log(`edit mounted err ${err}`)
+        console.error(`productTemplate edit mounted err ${err}`)
+      } finally {
+        this.toggleLoading(false)
       }
       
+    } else {
+      // 检查版本数量限制
+      this.checkNumExceedLimitBeforeHandler 
+      && this.checkNumExceedLimitBeforeHandler(
+        TenantDataLimitSourceEnum.Product,
+        TenantDataLimitTypeEnum.ProductTemplate
+      )
     }
-    this.form = FormUtil.initialize(this.fields, form);
-    this.init = true;
+    
+    this.form = FormUtil.initialize(this.fields, form)
+    this.init = true
   },
   methods: {
     createProductTemplate(params) {
-      productTemplateCreate(params)
+      const CreateProductPromise = productTemplateCreate(params)
+      
+      this.checkNumExceedLimitAfterHandler(CreateProductPromise)
         .then(res => {
-          const isSucc = (res.status == 0);
-
+          const isSucc = (res.succ === true)
+          
           platform.notification({
             type: isSucc ? 'success' : 'error',
             title: `创建产品模板${isSucc ? '成功' : '失败'}`,
@@ -151,33 +178,39 @@ export default {
           if(isSucc) {
             this.reloadTab();
             window.location.href = `/product/detail/${res.data}`;
-          } else {
-            this.pending = false;
-            this.loadingPage = false;
           }
+          
         })
-        .catch(err => console.error('err', err));
+        .catch(err => {
+          console.error('err', err)
+        })
+        .finally(() => {
+          this.toggleLoading(false)
+        })
     },
     editProductTemplate(params) {
       productTemplateUpdate(params)
         .then(res => {
-          const isSucc = (res.status == 0);
-
+          const isSucc = res.status === true
+          
           platform.notification({
             type: isSucc ? 'success' : 'error',
             title: `更新产品模板${isSucc ? '成功' : '失败'}`,
             message: !isSucc && res.message
           })
-
+          
           if(isSucc) {
-            this.reloadTab();
-            this.goBack();
-          } else {
-            this.pending = false;
-            this.loadingPage = false;
+            this.reloadTab()
+            this.goBack()
           }
+          
         })
-        .catch(err => console.error('err', err));
+        .catch(err => {
+          console.error('err', err)
+        })
+        .finally(() => {
+          this.toggleLoading(false)
+        })
     },
     // 返回
     goBack() {
@@ -197,37 +230,37 @@ export default {
         id: form.id,
         attribute: {}
       }
-
+      
       fields.forEach(field => {
         let {fieldName, isSystem} = field;
         let value = form[fieldName];
         let tv = null;
 
-        if (field.formType === 'location') {
+        if ((field.formType === 'location') && !value.isHaveLocation) {
           value = {};
         }
         if (field.formType === 'address' && !field.isSystem) {
-          let all =  [value.province, value.city, value.dist, value.address].filter(str => !!str).join('');
-
+          let all = [value.province, value.city, value.dist, value.address].filter(str => !!str).join('');
+          
           value = {
             ...value,
           };
-
+          
           all ? value.all = all : '';
-
+        
         }
-
+        
         // 不为系统字段,放在attribute里面
         isSystem == 0
           ? product.attribute[fieldName] = value
           : product[fieldName] = value;
       })
-
+      
       return product
     },
     reloadTab() {
       let fromId = window.frameElement.getAttribute('fromid');
-
+      
       this.$platform.refreshTab(fromId);
     },
     // 提交
@@ -235,34 +268,36 @@ export default {
       this.$refs.productTemplateEditForm.validate(false)
         .then(valid => {
           if (!valid) return Promise.reject('productTemplateEditForm validate fail.');
-
+          
+          this.toggleLoading()
+          
           const params = this.packForm(this.fields, this.form);
-        
-          this.pending = true;
-          this.loadingPage = true;
-
+          
           if (this.action === 'edit') {
             return this.editProductTemplate(params);
           }
-
+          
           this.createProductTemplate(params);
         })
         .catch(err => {
           console.error(err);
-          this.pending = false;
-          this.loadingPage = false;
-        });
+          this.toggleLoading(false)
+        })
     },
     // 更新数据
-    update({field, newValue, oldValue}){
+    update({ field, newValue }){
       let {fieldName, displayName} = field;
-
+      
       if (this.$appConfig.debug) {
         console.info(`[FormBuilder] ${displayName}(${fieldName}) : ${JSON.stringify(newValue)}`);
       }
-
+      
       this.$set(this.form, fieldName, newValue);
     },
+    toggleLoading(loading = true) {
+      this.pending = loading
+      this.loadingPage = loading
+    }
   }
 }
 </script>

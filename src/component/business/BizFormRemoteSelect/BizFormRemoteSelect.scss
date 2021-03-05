@@ -1,17 +1,33 @@
 .biz-form-remote-select {
   flex: 1;
   position: relative;
-
+  
   &-clear {
     position: absolute;
     right: 10px;
     top: 6px;
-
+    
     &:hover {
       cursor: pointer;
       color: #ed3f14;
     }
-
+  
   }
+  
+  .base-select-main-content {
+    .el-tag {
+      max-width: calc(100% - 30px);
+      padding-right: 10px;
+      @include text-ellipsis();
+    }
+  }
+}
 
+.task-allot-executor-header-row {
+  .base-select-container {
+    .list-wrapper {
+      height: 400px;
+      overflow: hidden;
+    }
+  }
 }

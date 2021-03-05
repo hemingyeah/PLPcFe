@@ -496,7 +496,35 @@ export default {
         });
       }
       // 返回接口数据
+      // 创建时间
+      const createTimeStart = this._time(params.createTime, 0);
+      const createTimeEnd = this._time(params.createTime, 1);
+      // 更新时间
+      const updateTimeStart = this._time(params.updateTime, 0);
+      const updateTimeEnd = this._time(params.updateTime, 1);
+      params.createTimeStart = createTimeStart;
+      params.createTimeEnd = createTimeEnd;
+      params.updateTimeStart = updateTimeStart;
+      params.updateTimeEnd = updateTimeEnd;
+      delete params.createTime;
+      delete params.updateTime;
       return params;
+    },
+    /**
+     * @description 时间字符串切割
+     */
+    _time(params, num) {
+      if (!params) return;
+      if (params && !isNaN(num)) {
+        let S, E;
+        if (num === 1) {
+          E = `${params.split('-')[1]} 23:59:59`
+        } else {
+          S = `${params.split('-')[0]} 00:00:00`
+        }
+        return new Date([S, E][num]);
+      } 
+      return new Date(params);
     },
     setAdvanceSearchColumn(command) {
       this.columnNum = Number(command);
