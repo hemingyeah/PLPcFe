@@ -41,15 +41,6 @@
         </div>
         <div class="page-panel-body">
           <div class="form-row">
-            <!-- <div class="form-item">
-              <label>备件类别</label>
-              <div class="form-item-content">
-                <el-select placeholder="请选择备件类别" v-model="model.type">
-                  <el-option label="全部" value=""></el-option>
-                  <el-option :label="item" :value="item" v-for="item in types" :key="item"></el-option>
-                </el-select>
-              </div>
-            </div>-->
             <div class="form-item">
               <label>备件名称</label>
               <div class="form-item-content">
@@ -86,6 +77,80 @@
                   <el-option label="全部" value></el-option>
                   <el-option label="出库" value="出库"></el-option>
                   <el-option label="入库" value="入库"></el-option>
+                </el-select>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-item">
+              <label>备件类别</label>
+              <div class="form-item-content">
+                <el-select placeholder="请选择备件类别" v-model="model.sparepartType">
+                  <el-option label="全部" value=""></el-option>
+                  <el-option :label="item" :value="item" v-for="item in types" :key="item"></el-option>
+                </el-select>
+              </div>
+            </div>
+            <div class="form-item">
+              <label>仓库</label>
+              <el-input v-model="model.name" placeholder="请输入仓库名称"></el-input>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-item">
+              <label>原仓库</label>
+              <el-input v-model="model.sourceName" placeholder="请输入原仓库名称"></el-input>
+            </div>
+            <div class="form-item">
+              <label>目标库</label>
+              <el-input v-model="model.targetName" placeholder="请输入目标库名称"></el-input>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-item">
+              <label>变化</label>
+              <el-input type="number" v-model="model.variation" placeholder="请输入变化值"></el-input>
+            </div>
+            <div class="form-item">
+              <label>结余</label>
+              <el-input type="number" v-model="model.number" placeholder="请输入结余值"></el-input>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-item">
+              <label>备注</label>
+              <el-input v-model="model.remark" placeholder="请输入备注"></el-input>
+            </div>
+            <div class="form-item">
+              <label>发起人</label>
+              <div class="form-item-content">
+                <el-select
+                  class="srp-list-form-item"
+                  style="width: 100%;"
+                  :value="model.propser"
+                  @input="choosePropser"
+                  filterable
+                  clearable
+                  remote
+                  placeholder="选择人员"
+                  :remote-method="fetchUser"
+                  :loading="user.loading"
+                >
+                  <el-option
+                    v-for="item in user.options"
+                    :key="item.userId"
+                    :label="item.displayName"
+                    :value="item.userId"
+                  >
+                    <div class="srp-user-item">
+                      <img :src="item.head || '/resource/images/account_userhead.png'" />
+                      <p>{{item.displayName}}</p>
+                    </div>
+                  </el-option>
                 </el-select>
               </div>
             </div>
@@ -409,6 +474,16 @@ const STORAGE_PAGESIZE_KEY = 'repe_record_list_pagesize';
 
 import { isStandardEdition } from '@src/util/version.ts'
 
+let validateText=val=>{
+  if(val.length>20) return val.slice(0,20);
+  return val
+}
+let validateNum=val=>{
+  if(val<0) return 0;
+  else if(val>99999) return 99999
+  else return val
+}
+
 export default {
   name: 'repertory-record-view',
   inject: ['initData'],
@@ -422,6 +497,13 @@ export default {
       item: '',
       enable: '',
       pageNum: 1,
+      propser:'', // 发起人
+      remark:'',      // 备注
+      name:'',        // 仓库
+      sourceName:'',  // 原仓库
+      targetName:'',  // 目标库
+      variation:'',   // 变化
+      number:'',      // 结余
       pageSize,
       approveNo: '' //  申请编号
     };
@@ -498,6 +580,38 @@ export default {
     },
     isStandardEdition() {
       return isStandardEdition()
+    }
+  },
+  watch:{
+    'model.sourceName':{
+      handler(val){
+        this.model.sourceName=validateText(val);
+      }
+    },
+    'model.name':{
+      handler(val){
+        this.model.name=validateText(val);
+      }
+    },
+    'model.remark':{
+      handler(val){
+        this.model.remark=validateText(val);
+      }
+    },
+    'model.targetName':{
+      handler(val){
+        this.model.targetName=validateText(val);
+      }
+    },
+    'model.variation':{
+      handler(val){
+        this.model.variation=validateNum(val);
+      }
+    },
+    'model.number':{
+      handler(val){
+        this.model.number=validateNum(val);
+      }
     }
   },
   methods: {
@@ -620,6 +734,11 @@ export default {
       this.user.userId = value;
       this.model.executor = value;
 
+    },
+    // 选择发起人
+    choosePropser(value){
+      if(this.model.propser == value) return
+      this.model.propser = value;
     },
 
     openDetail(row){
