@@ -9,6 +9,7 @@ import BaseTreeDept from './common/BaseTreeDept';
 import BaseImport from './common/BaseImport';
 import BaseExport from './common/BaseExport';
 import BaseExportGroup from './common/BaseExportGroup';
+import BaseExportGroupProduct from './common/BaseExportGroupProduct';
 import BaseFileItem from './common/BaseFileItem';
 import BaseTabBar from './common/BaseTabBar';
 import BaseTimeline from './common/BaseTimeline';
@@ -75,6 +76,7 @@ const components = [
   BaseImport,
   BaseExport,
   BaseExportGroup,
+  BaseExportGroupProduct,
   BaseFileItem,
   BaseTabBar,
   BaseTimeline,
