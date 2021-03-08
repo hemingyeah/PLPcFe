@@ -473,15 +473,15 @@
       </div>
     </base-import>
     <!-- start 导出工单 -->
-    <base-export-group ref="exportPanel"
-                       :alert="exportAlert"
-                       :columns="exportColumns"
-                       :build-params="buildExportParams"
-                       :group="true"
-                       :validate="checkExportCount"
-                       :needchoose-break="false"
-                       method="post"
-                       action="/excels/customer/customerProductNew" />
+    <base-export-group-product ref="exportPanel"
+                               :alert="exportAlert"
+                               :columns="exportColumns"
+                               :build-params="buildExportParams"
+                               :group="true"
+                               :validate="checkExportCount"
+                               :needchoose-break="false"
+                               method="post"
+                               action="/excels/customer/customerProductNew" />
     <!-- end 导出工单 -->
 
     <batch-update-dialog ref="batchUpdateDialog"
