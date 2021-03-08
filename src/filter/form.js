@@ -35,7 +35,7 @@ export const fmt_form_field = function(value, formType, fieldName, attribute) {
     }
   }
 
-  return formatVal;
+  return fmt_form_default(formatVal);
 }
 
 

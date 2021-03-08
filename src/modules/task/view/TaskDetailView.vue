@@ -384,7 +384,7 @@
     <!-- end 审批弹窗 -->
 
     <!-- start 工单发起审批弹窗 -->
-    <propose-approve-dialog ref="proposeApprove" :remark-required="taskConfig.approveRemark" :task-id="task.id" />
+    <propose-approve-dialog ref="proposeApprove" :remark-required="taskConfig.approveRemark" :task-id="task.id"/>
     <!-- end 工单发起审批弹窗 -->
 
     <!-- start 完成回执弹窗 -->

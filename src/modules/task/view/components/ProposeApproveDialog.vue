@@ -131,6 +131,8 @@ export default {
       this.apprForm.params = data;
       this.chooseApprover = false;
 
+      if (Object.keys(successBc).length) this.apprForm.params = {...this.apprForm.params, ...successBc}
+
       if (data.isOpt == 1) {
         this.chooseApprover = true;
       } else {
