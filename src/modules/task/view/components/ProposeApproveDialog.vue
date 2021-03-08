@@ -70,6 +70,7 @@
 import * as TaskApi from '@src/api/TaskApi.ts';
 
 import FormUser from "@src/component/form/components/FormUser/FormUser.vue";
+import string from '@src/util/string';
 
 export default {
   name: 'propose-approve-dialog',
@@ -85,6 +86,10 @@ export default {
     taskId: {
       type: String,
       default: '',
+    },
+    checkBack: {
+      type: String,
+      default: ''
     }
   },
   data() {
@@ -152,6 +157,7 @@ export default {
       if (!this.apprForm.applyRemark && this.remarkRequired) return this.$platform.alert('请填写审批说明');
 
       if (this.chooseApprover) this.apprForm.params.approveId = this.approver.userId;
+      if (this.apprForm.param) this.apprForm.params.customReason = this.checkBack
 
       // 多级审批参数
       for (let i = 0; i < this.multiApproverSetting.length; i++) {
