@@ -122,12 +122,13 @@ export default {
     },
     openDialog(data, successBc) {
       if(Object.prototype.toString.call(successBc) === '[object Function]'){
-        this.successBc = successBc();
+        this.successBc = successBc;
       }
       // 重置
       this.approver = {};
       this.apprForm = { source: 'task' };
       this.apprForm.applyRemark = '';
+      this.apprForm.params = data;
       this.chooseApprover = false;
 
       if (data.isOpt == 1) {
