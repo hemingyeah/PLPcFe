@@ -131,8 +131,7 @@ export default {
       this.apprForm.params = data;
       this.chooseApprover = false;
 
-      if (Object.keys(successBc).length) this.apprForm.params = {...this.apprForm.params, ...successBc}
-
+      if (successBc && Object.keys(successBc).length) this.apprForm.params = {...this.apprForm.params, ...successBc}
       if (data.isOpt == 1) {
         this.chooseApprover = true;
       } else {
@@ -141,7 +140,6 @@ export default {
 
       this.approveLevel = data.level || 1;
       this.multiApproverSetting = data.multiApproverSetting ? [...data.multiApproverSetting] : [];
-
       this.visible = true;
     },
     submit() {

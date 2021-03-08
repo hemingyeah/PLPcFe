@@ -193,6 +193,10 @@ export default Abnormal;
     display: flex;
     justify-content: flex-end;
   }
+  .abnormal-tab {
+    position: relative;
+    z-index: 100;
+  }
 }
 
 
