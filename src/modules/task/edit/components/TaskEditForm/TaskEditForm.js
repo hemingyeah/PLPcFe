@@ -56,10 +56,11 @@ export default {
   computed,
   created () {
     this.init();
+    this.taskValue = this.value;
   },
   mounted () {
     this.taskFields = this.fields;
-    this.taskValue = this.value;
+    // this.taskValue = this.value;
     this.selectedType = taskTypeSelectConversion(this?.initData?.defaultType) || this.taskTypes[0] || {};
     this.$emit('updatetemplateId', this.selectedType);
     
