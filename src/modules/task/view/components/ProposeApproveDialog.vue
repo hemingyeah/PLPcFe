@@ -69,8 +69,7 @@
 /* api */
 import * as TaskApi from '@src/api/TaskApi.ts';
 
-import FormUser from "@src/component/form/components/FormUser/FormUser.vue";
-import string from '@src/util/string';
+import FormUser from '@src/component/form/components/FormUser/FormUser.vue';
 
 export default {
   name: 'propose-approve-dialog',
@@ -86,10 +85,6 @@ export default {
     taskId: {
       type: String,
       default: '',
-    },
-    checkBack: {
-      type: String,
-      default: ''
     }
   },
   data() {
@@ -102,6 +97,8 @@ export default {
       approversName: '',
       approveLevel: 1, // 审批等级
       multiApproverSetting: [], // 多级审批（2级以上审批）
+
+      successBc: null
     }
   },
   computed: {
@@ -123,12 +120,18 @@ export default {
         approver: data
       })
     },
-    openDialog(data) {
+    openDialog(data, successBc) {
+      if(Object.prototype.toString.call(successBc) === '[object Function]'){
+        this.successBc = successBc;
+      }
       // 重置
       this.approver = {};
       this.apprForm = { source: 'task' };
       this.apprForm.applyRemark = '';
+      this.apprForm.params = data;
       this.chooseApprover = false;
+
+      if (Object.keys(successBc).length) this.apprForm.params = {...this.apprForm.params, ...successBc}
 
       if (data.isOpt == 1) {
         this.chooseApprover = true;
@@ -157,7 +160,6 @@ export default {
       if (!this.apprForm.applyRemark && this.remarkRequired) return this.$platform.alert('请填写审批说明');
 
       if (this.chooseApprover) this.apprForm.params.approveId = this.approver.userId;
-      if (this.apprForm.param) this.apprForm.params.customReason = this.checkBack
 
       // 多级审批参数
       for (let i = 0; i < this.multiApproverSetting.length; i++) {
@@ -171,6 +173,8 @@ export default {
       TaskApi.applyApprove(this.apprForm).then(res => {
         if (res.status == 0) {
           this.$platform.alert(this.$platform.inDingTalk ? '已发起审批，请等待审批结果，结果会以钉钉消息的方式通知' : '已发起审批，请等待审批结果');
+          // 为提供jsp成功回调
+          if(this.succseeBc) return this.succseeBc();
           this.$emit('success')
           window.location.href = `/task/view/${this.taskId}`;
         } else {
