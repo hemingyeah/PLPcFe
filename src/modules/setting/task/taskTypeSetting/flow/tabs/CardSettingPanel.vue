@@ -138,7 +138,7 @@ export default {
             type: 'success'
           });
 
-          if(!flag) {
+          if(flag) {
             setTimeout(()=>{
               this.goBack();
             }, 1000)

@@ -60,7 +60,7 @@
         <el-button
           class="header-save-btn"
           plain
-          @click="submit"
+          @click="submit(true)"
           :loading="pending"
         >保 存</el-button
         >
@@ -366,7 +366,7 @@ export default {
     //   }
     // },
     /** 右上角保存按钮 */
-    async submit() {
+    async submit(flag = false) {
       if (!this.$refs.comp.submit) return;
 
       let name = this.taskTypeConfig.name;
@@ -395,7 +395,7 @@ export default {
       };
       this.pending = true;
       try {
-        await this.$refs.comp.submit(nameAndColor, true);
+        await this.$refs.comp.submit(nameAndColor, flag);
         // await this.updateTaskTypeNameAndColor();
         this.fetchTasktype();
       } catch (error) {
