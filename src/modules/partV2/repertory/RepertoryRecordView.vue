@@ -478,6 +478,11 @@ let validateText=val=>{
   if(val.length>20) return val.slice(0,20);
   return val
 }
+let validateNumNeg=val=>{
+  if(val<-99999) return -99999;
+  else if(val>99999) return 99999
+  else return val
+}
 let validateNum=val=>{
   if(val<0) return 0;
   else if(val>99999) return 99999
@@ -605,7 +610,7 @@ export default {
     },
     'model.variation':{
       handler(val){
-        this.model.variation=validateNum(val);
+        this.model.variation=validateNumNeg(val);
       }
     },
     'model.number':{
