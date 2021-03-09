@@ -164,6 +164,8 @@ export default {
             return this.togglePending();
           }
           
+          ++this.submitCount
+          
           // 根据是否派单决定跳转地址
           let taskId = res.result;
           
@@ -518,7 +520,6 @@ export default {
           
           const params = this.buildParams()
           
-          ++this.submitCount
           this.togglePending(true)
           
           // 指派需要对比 现在的表单于上一次表单数据是否相同，不相同则更新工单数据
@@ -541,12 +542,12 @@ export default {
           // 表单数据不相同 或非指派
           if (!isSameForm || !isAllot) {
             this.backParams = params
-            let isFirstCreate = this.submitCount <= 1 && this.isTaskCreate
+            let isFirstCreate = this.submitCount <= 0 && this.isTaskCreate
             let taskMethodFunc = isFirstCreate ? this.createTaskMethod : this.updateTaskMethod
             return taskMethodFunc(params, isAllot)
           }
           
-          return this.openAllotModel(this.allotTask)
+          this.submitCount > 0 ? this.openAllotModel(this.allotTask) : this.createTaskMethod(params, isAllot)
           
         })
         .catch(err => {
