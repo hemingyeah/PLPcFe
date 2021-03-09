@@ -615,7 +615,7 @@
                 :min-width="column.minWidth"
                 :prop="column.field"
                 :sortable="column.sortable"
-                :show-overflow-tooltip="column.field !== 'name'"
+                :show-overflow-tooltip="column.field !== 'name' && column.field !== 'taskNo'"
                 :width="column.width"
                 :resizable="true"
               >
