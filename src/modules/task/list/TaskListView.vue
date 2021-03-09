@@ -752,6 +752,7 @@
                       style="
                       color: rgba(153, 153, 153);
                       background-color: rgba(153, 153, 153, 0.2);
+                      border:1px solid rgba(153, 153, 153, 0.3)
                     "
                     >
                       已暂停
@@ -766,6 +767,10 @@
                           0.2
                         ),
                         color: taskStateEnum.getColor(scope.row[column.field]),
+                        border: `1px solid ${taskStateEnum.getBgColor(
+                          scope.row[column.field],
+                          0.3
+                        )}`
                       }"
                     >
                       {{
