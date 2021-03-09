@@ -895,9 +895,9 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
   /** 
    * @description 显示审批弹窗
   */
-  public showApproveDialog(data: TaskApprove) {
+  public showApproveDialog(data: TaskApprove, customReason:String = '') {
     // @ts-ignore
-    this.$refs?.ApproveDialog?.openDialog(data)
+    this.$refs?.ApproveDialog?.openDialog(data, customReason ? {customReason} : '')
   }
   
   /**
@@ -997,6 +997,7 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
     
     // 验证审批
     const allotExecutorParams = this.buildAllotExcutorParams()
+    const reAllotParams = this.buildReAllotParams()
     let approve: any | null = await this.fetchApproveWithTaskAllot(allotExecutorParams, true)
     if (!approve) return
     
@@ -1004,10 +1005,9 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
     // 有审批
     if (isNeedApprove) {
       this.pending = false
-      return this.showApproveDialog(approve.data)
+      return this.showApproveDialog(approve.data, reAllotParams.customReason || '')
     }
     // 提交
-    const reAllotParams = this.buildReAllotParams()
     this.fetchReAllotSubmit(reAllotParams)
   }
   
