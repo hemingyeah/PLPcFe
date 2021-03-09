@@ -8,11 +8,11 @@
   >
     <div class="bc-dept-wrap">
       <div class="bc-dept" v-if="depts.length > 0 && departShow">
-        <base-tree
+        <base-tree-dept
           expand
           :data="depts" 
           :node-render="nodeRender"
-          :selected="selectedDept" 
+          :selected="[selectedDept]" 
           :show-checkbox="allowCheckDept"
           @node-selected="initDeptUser" 
           @node-check="chooseDept" 

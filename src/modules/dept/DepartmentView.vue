@@ -388,7 +388,7 @@
               <el-table-column prop="displayName" label="姓名" width="180px">
                 <div style="display: flex" slot-scope="scope">
                   <a :href="`/security/user/view/${scope.row.userId}`" :data-id="scope.row.userId" @click="goUserDetail" class="view-detail-btn">{{scope.row.displayName}}</a>
-                  <i v-if="scope.row.superAdmin == 1" class="iconfont icon-people">主管</i>
+                  <i v-if="scope.row.isTeamLeader" class="iconfont icon-people">主管</i>
                 </div>
               </el-table-column>
               <el-table-column prop="loginName" label="账号" />
