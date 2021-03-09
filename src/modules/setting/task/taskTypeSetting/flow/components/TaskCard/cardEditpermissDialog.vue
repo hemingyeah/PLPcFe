@@ -92,7 +92,6 @@ export default {
 
       if (newValue) {
         this.getRoleListReq();
-        this.tableData = this.rolesList()
       }
     },
   },
@@ -120,7 +119,7 @@ export default {
 
     // 初始化角色数据
     rolesList() {
-      let rolesList = cloneDeep(this.taskCard.authInfo)
+      let rolesList = this.mergeRoles()
 
       rolesList.forEach((item, index)=>{
         item.canCreate = item.canCreate == undefined ? item.canWrite : item.canCreate;
@@ -162,7 +161,7 @@ export default {
         .then((res) => {
           const { status, message, list } = res;
           this.roleList = list;
-          this.mergeRoles();
+          this.tableData = this.rolesList()
 
         })
         .catch((error) => {
