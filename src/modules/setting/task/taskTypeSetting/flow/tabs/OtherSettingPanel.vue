@@ -522,7 +522,12 @@ export default {
       this.taskFlowData.taskTypeConfig = _.cloneDeep(this.taskFlowData.initTaskTypeConfig);
     },
   },
-  mounted() {
+  // mounted() {
+  //   if(this.taskTypeId) {
+  //     this.fetchFromUser(this.taskTypeId);
+  //   }
+  // },
+  activated() {
     if(this.taskTypeId) {
       this.fetchFromUser(this.taskTypeId);
     }
