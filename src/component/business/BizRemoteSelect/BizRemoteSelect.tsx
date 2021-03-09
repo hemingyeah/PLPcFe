@@ -226,6 +226,7 @@ class BizRemoteSelect extends VC<{}> {
     if (visible) return this.search()
     
     this.page.list = []
+    this.keyword = ''
   }
   
   /**
