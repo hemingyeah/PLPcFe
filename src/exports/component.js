@@ -7,6 +7,7 @@ import '../common/polyfill';
 /* components */
 import BaseModal from '../component/common/BaseModal';
 import BaseTree from '../component/common/BaseTree';
+import BaseTreeDept from '../component/common/BaseTreeDept';
 import BaseContact from '../component/common/BaseContact';
 import BaseMapPicker from '../component/common/BaseMapPicker';
 import BizTeamSelect from '../component/business/BizTeamSelect';
@@ -24,10 +25,9 @@ import directive from '../directive'
 
 Vue.use(BaseModal);
 Vue.use(BaseTree);
+Vue.use(BaseTreeDept);
 Vue.use(Checkbox);
 Vue.use(BaseModal)
-Vue.use(BaseTree)
-Vue.use(Checkbox)
 Vue.use(Button)
 
 Vue.use(filter)
