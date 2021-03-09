@@ -19,15 +19,15 @@ type TaskState = {
 class TaskStateEnum extends BaseEnum {
   
   static CREATED: TaskState = {
-    bgColor: '250, 140, 22',
-    color: '#FA8C16',
+    bgColor: '255, 145, 0',
+    color: '#FF9100',
     name: '待指派',
     value: 'created'
   }
   
   static ALLOCATED: TaskState = {
-    bgColor: '250, 174, 20',
-    color: '#FAAE14',
+    bgColor: '68, 138, 255',
+    color: '#448AFF',
     name: '已指派',
     value: 'allocated',
   };
@@ -40,64 +40,64 @@ class TaskStateEnum extends BaseEnum {
   };
   
   static ACCEPTED: TaskState = {
-    bgColor: '250, 174, 20',
-    color: '#FAAE14',
+    bgColor: '83, 109, 254',
+    color: '#536DFE',
     name: '已接受',
     value: 'accepted',
   };
   
   static PROCESSING: TaskState = {
-    bgColor: '250, 174, 20',
-    color: '#FAAE14',
+    bgColor: '0, 145, 234',
+    color: '#0091EA',
     name: '进行中',
     value: 'processing',
   };
   
   static FINISHED: TaskState = {
-    bgColor: '103, 194, 58',
-    color: '#67C23A',
+    bgColor: '82, 196, 26',
+    color: '#52C41A',
     name: '已完成',
     value: 'finished',
   };
   
   static REFUSED: TaskState = {
-    bgColor: '245, 108, 108',
-    color: '#F56C6C',
+    bgColor: '255, 77, 79',
+    color: '#FF4D4F',
     name: '已拒绝',
     value: 'refused',
   };
   
   static COSTED: TaskState = {
-    bgColor: '25, 206, 111',
-    color: '#19CE6F',
+    bgColor: '76, 175, 80',
+    color: '#4CAF50',
     name: '已结算',
     value: 'costed',
   };
   
   static CLOSED: TaskState = {
-    bgColor: '153, 153, 153',
-    color: '#999',
+    bgColor: '96, 125, 139',
+    color: '#607D8B',
     name: '已关闭',
     value: 'closed',
   };
   
   static OFFED: TaskState = {
-    bgColor: '153, 153, 153',
-    color: '#999',
+    bgColor: '140, 140, 140',
+    color: '#8C8C8C',
     name: '已取消',
     value: 'offed',
   };
   
   static PSUSED: TaskState = {
-    bgColor: '245, 108, 108',
-    color: '#F56C6C',
+    bgColor: '255, 77, 79',
+    color: '#FF4D4F',
     name: '暂停中',
     value: 'paused',
   };
   
   static UNFINISHED: TaskState = {
-    bgColor: '245, 108, 108',
-    color: '#F56C6C',
+    bgColor: '255, 64, 129',
+    color: '#FF4081',
     name: '未完成',
     value: 'unfinished',
   };
