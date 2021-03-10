@@ -1126,12 +1126,17 @@ export default {
      * @description 时间戳转换
      */
     timestamp(value) {
-      if (value) {
+      if (typeof value === 'number') {
         let h = value / 3600 < 0 ? 0 : parseInt(value / 3600), m;
         if (h > 0) {
-          m = (value % 3600) ? parseInt((value % 3600) / 60) : value % 3600
+          m = (value % 3600) ? Math.ceil((value % 3600) / 60) : value % 3600
         } else {
-          m = parseInt(value / 60)
+          m = Math.ceil(value / 60)
+        }
+
+        if(m > 59) {
+          m = 0;
+          h ++;
         }
         return `${h}小时${m}分钟`;
       } 
@@ -1896,7 +1901,7 @@ export default {
           }]
         }
       }
-      this.seoSetList = [...taskFields.filter(item => { return item.isSystem === 1 && item.displayName !== '工单编号' && item.formType !== 'attachment'}).map(item => {if (item.fieldName === 'planTime'){item.formType = 'date'; item.isNull = 1} return item}), ...linkman_list, ...address_list, ...product_list, ...Inquire]
+      this.seoSetList = [...taskFields.filter(item => { return item.isSystem === 1 && item.displayName !== '工单编号' && item.formType !== 'attachment'}).map(item => {if (item.fieldName === 'planTime'){ item.isNull = 1} return item}), ...linkman_list, ...address_list, ...product_list, ...Inquire]
       // if (this.selectColumnState === 'exception') {
       this.seoSetList = [...this.seoSetList, ...this.abnormals]
       // }

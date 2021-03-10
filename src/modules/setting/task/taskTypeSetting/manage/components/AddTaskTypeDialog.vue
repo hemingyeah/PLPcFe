@@ -207,9 +207,14 @@ export default {
         if(valid) {
           let fromId = window.frameElement.getAttribute('id');
           // 从行业模板创建
-          if(this.taskType === 'template') {
+          if(this.clickTaskType === 'template') {
             this.pedding = true;
-            SettingApi.importTaskType(this.form).then(res => {
+            let params = {
+              taskTypeName: this.form.typeName,
+              color: this.form.color,
+              taskTypeId: this.form.taskTypeId
+            }
+            SettingApi.importTaskType(params).then(res => {
               if(res.status == 0){
                 this.$platform.openTab({
                   id: 'task_form_setting',
