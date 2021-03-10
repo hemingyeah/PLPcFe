@@ -50,6 +50,7 @@ import {
   TASK_NO_EXECUTOR_MESSAGE, 
   TASK_ALLOT_NOT_STORAGE_RESULT, 
   TASK_NO_REALLOT_REASON_MESSAGE, 
+  TASK_NO_REALLOR_CUSTOMREASON,
   TASK_REALLOT_NOT_SAME_USER_MESSAGE 
 } from '@src/model/const/Alert'
 import { getCustomerDetailResult } from '@model/param/out/Customer'
@@ -957,6 +958,11 @@ class TaskAllotModalMethods extends TaskAllotModalComputed {
   public async submitWithReAllot() {
     try {      
       // 效验
+      if (this.reallotRemarkNotNull && !this.customReason) {
+        this.pending = false
+        return Platform.alert(TASK_NO_REALLOR_CUSTOMREASON)
+      }
+
       if (this.reallotRemarkNotNull && !this.reason) {
         this.pending = false
         return Platform.alert(TASK_NO_REALLOT_REASON_MESSAGE)

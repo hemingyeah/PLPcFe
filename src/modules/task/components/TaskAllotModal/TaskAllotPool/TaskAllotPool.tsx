@@ -574,7 +574,7 @@ export default class TaskAllotPool extends Vue {
       <div class='task-allot-reason-row task-allot-executor-header'>
         <div class="task-flex task-ai task-mr12">       
           转派说明： 
-          <el-select value={this.customReason} placeholder="请选择转派原因" onChange={(v: string) => this.customReasonChangedHandler(v)}>
+          <el-select value={this.customReason} placeholder={`${this.reallotRemarkNotNull ? '[必填]' : '[选填]'}请选择转派原因`}  onChange={(v: string) => this.customReasonChangedHandler(v)}>
             {
               this.backList.map(item => {
                 return (

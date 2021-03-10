@@ -48,7 +48,7 @@ class TaskAllotModalRender extends TaskAllotModalMethods {
     return (
       <div class='task-allot-reason'>
         <span class='task-allot-nav-title'>转派说明</span>
-        <el-select value={this.customReason} placeholder="请选择转派原因" onChange={(v: string) => {this.customReason = v}}>
+        <el-select value={this.customReason} placeholder={`${this.reallotRemarkNotNull ? '[必填]' : '[选填]'}请选择转派原因`} onChange={(v: string) => {this.customReason = v}}>
           {
             this.backList.map(item => {
               return (
