@@ -32,6 +32,8 @@ export const REQUIRED_MIN_MESSAGE: string = '请输入正确的范围';
 export const REQUIRED_MAX_MESSAGE: string = '请输入正确的范围';
 // 转派说明必填提示
 export const TASK_NO_REALLOT_REASON_MESSAGE: string = '请填写转派说明';
+// 转派选择原因提示
+export const TASK_NO_REALLOR_CUSTOMREASON: string = '请选择转派原因'
 // 不能将工单转派给原负责人
 export const TASK_REALLOT_NOT_SAME_USER_MESSAGE: string = '不能将工单转派给原负责人，请检查';
 // 为匹配到分配规则
