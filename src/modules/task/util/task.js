@@ -1,4 +1,5 @@
-import { TaskFieldNameMappingEnum } from '@model/enum/FieldMappingEnum.ts';
+import { TaskFieldNameMappingEnum } from '@model/enum/FieldMappingEnum.ts'
+import { isSelect, isMultiSelect } from '@src/component/form/util'
 
 /** 将form对象转成客户对象，用于提交表单 */
 export function packToTask(fields, form){
@@ -105,11 +106,13 @@ export function packToForm(fields, data){
     templateId: data.templateId,
     ...data.attribute
   };
-
+  
+  let fieldValue = null
+  
   fields.forEach(field => {
     let { fieldName, isSystem } = field;
     let value = data[fieldName];
-
+    
     if(fieldName === TaskFieldNameMappingEnum.Customer){
       // 初始化客户
       task.customer = [];
@@ -152,12 +155,12 @@ export function packToForm(fields, data){
 
       return;
     }
-
+    
     if (field.formType === TaskFieldNameMappingEnum.PlanTime && value) {
       let { dateType = 'date' } = field.setting;
       value = dateType == 'date' ? value.substr(0, 10) : value;
     }
-
+    
     if (fieldName === TaskFieldNameMappingEnum.Attachment && value) {
       // 分离附件和回执附件
       if (value.length) {
@@ -171,11 +174,27 @@ export function packToForm(fields, data){
       let fieldValue = task[fieldName];
       if (!Array.isArray(fieldValue) && fieldValue) task[fieldName] = [fieldValue];
     }
-
-    isSystem == 1 && (task[fieldName] = value);
-
-  });
-
+    
+    // 字段值
+    fieldValue = field.isSystem === 1 ? data[fieldName] : data?.attribute?.[fieldName]
+    
+    // 多选改单选,若原来有值则保留第一个
+    if(isSelect(field) && Array.isArray(fieldValue)) {
+      fieldValue = (fieldValue && fieldValue.length >= 1) ? fieldValue[0] : ''
+    }
+    // 单选改多选，将原值加入数组
+    if(isMultiSelect(field) && !Array.isArray(fieldValue)) {
+      fieldValue = fieldValue ? [fieldValue] : []
+    }
+    
+    if (isSystem == 1) {
+      task[fieldName] = value
+    } else {
+      task[fieldName] = fieldValue
+    }
+    
+  })
+  
   return task;
 }
 
