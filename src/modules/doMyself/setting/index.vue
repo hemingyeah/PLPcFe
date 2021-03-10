@@ -752,8 +752,9 @@ export default {
       this.$refs['wxRulerForm'].validate((valid) => {
         if (valid) {
           this.fullscreenLoading = true;
-          let params_ = _.cloneDeep(this.wxRulerFormData);
-          let params = this.$safeParams(params_);
+          let params = _.cloneDeep(this.wxRulerFormData);
+          //去除参数加密
+          // let params = this.$safeParams(params_);
 
           weChat(params)
             .then((res) => {
