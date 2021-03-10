@@ -40,6 +40,7 @@ export default {
     return {
       visible: false,
       pending: false,
+      renderKey: ''
     };
   },
   computed: {
@@ -217,7 +218,7 @@ export default {
       },
       mounted() {
         this.reset();
-        this.buildForm();
+        // this.buildForm();
       },
       methods: {
         returnData() {
@@ -262,6 +263,9 @@ export default {
           this.form = { [f.fieldName]: event.newValue };
         },
         selectField(val) {
+          this.buildForm()
+          this.renderKey = val // form-item组件重新渲染
+
           this.selectedField = this.fields.filter(
             (f) => f.fieldName === val
           )[0];
@@ -356,7 +360,7 @@ export default {
               <label class="form-name">修改字段</label>
               <div>{this.renderSelector()}</div>
             </div>
-            <form-item label={'修改为'}>{this.renderInput(h)}</form-item>
+            <form-item label={'修改为'} key={this.renderKey}>{this.renderInput(h)}</form-item>
           </div>
         );
       },
